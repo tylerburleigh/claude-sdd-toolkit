@@ -1,0 +1,343 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/code-documentation.schema.json",
+  "title": "Codebase Documentation Schema",
+  "description": "Schema for machine-readable codebase documentation",
+  "type": "object",
+  "required": ["metadata", "statistics", "modules"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Project metadata and generation information",
+      "required": ["project_name", "version", "generated_at", "language"],
+      "properties": {
+        "project_name": {
+          "type": "string",
+          "description": "Name of the project"
+        },
+        "version": {
+          "type": "string",
+          "description": "Project version",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "generated_at": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when documentation was generated",
+          "format": "date-time"
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary programming language",
+          "enum": ["python", "javascript", "typescript", "java", "go", "rust"]
+        }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "description": "Project-wide statistics and metrics",
+      "properties": {
+        "total_files": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of source files analyzed"
+        },
+        "total_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total lines of code across all files"
+        },
+        "total_classes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of classes defined"
+        },
+        "total_functions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of functions defined"
+        },
+        "avg_complexity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average cyclomatic complexity across all functions"
+        },
+        "max_complexity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum cyclomatic complexity found"
+        },
+        "high_complexity_functions": {
+          "type": "array",
+          "description": "Functions with complexity above threshold",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "description": "List of analyzed modules/files",
+      "items": {
+        "$ref": "#/definitions/module"
+      }
+    },
+    "classes": {
+      "type": "array",
+      "description": "All classes found in the codebase",
+      "items": {
+        "$ref": "#/definitions/class"
+      }
+    },
+    "functions": {
+      "type": "array",
+      "description": "All functions found in the codebase",
+      "items": {
+        "$ref": "#/definitions/function"
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "Module dependency graph",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "module": {
+      "type": "object",
+      "description": "A single module or source file",
+      "required": ["name", "file"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Module name (usually filename without extension)"
+        },
+        "file": {
+          "type": "string",
+          "description": "Relative file path from project root"
+        },
+        "docstring": {
+          "type": ["string", "null"],
+          "description": "Module-level docstring"
+        },
+        "classes": {
+          "type": "array",
+          "description": "Names of classes defined in this module",
+          "items": {
+            "type": "string"
+          }
+        },
+        "functions": {
+          "type": "array",
+          "description": "Names of functions defined in this module",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imports": {
+          "type": "array",
+          "description": "External modules imported",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total lines in the file"
+        }
+      }
+    },
+    "class": {
+      "type": "object",
+      "description": "A class definition",
+      "required": ["name", "file", "line"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Class name"
+        },
+        "file": {
+          "type": "string",
+          "description": "File where class is defined"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Line number where class is defined"
+        },
+        "docstring": {
+          "type": ["string", "null"],
+          "description": "Class docstring"
+        },
+        "bases": {
+          "type": "array",
+          "description": "Base classes (inheritance)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "methods": {
+          "type": "array",
+          "description": "Method names",
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "description": "Property names (decorated with @property)",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "function": {
+      "type": "object",
+      "description": "A function definition",
+      "required": ["name", "file", "line"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Function name"
+        },
+        "file": {
+          "type": "string",
+          "description": "File where function is defined"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Line number where function is defined"
+        },
+        "docstring": {
+          "type": ["string", "null"],
+          "description": "Function docstring"
+        },
+        "parameters": {
+          "type": "array",
+          "description": "Function parameters",
+          "items": {
+            "$ref": "#/definitions/parameter"
+          }
+        },
+        "return_type": {
+          "type": ["string", "null"],
+          "description": "Return type annotation"
+        },
+        "decorators": {
+          "type": "array",
+          "description": "Decorator names",
+          "items": {
+            "type": "string"
+          }
+        },
+        "complexity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Cyclomatic complexity score"
+        },
+        "is_async": {
+          "type": "boolean",
+          "description": "Whether function is async"
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "description": "Function parameter",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parameter name"
+        },
+        "type": {
+          "type": ["string", "null"],
+          "description": "Type annotation"
+        },
+        "default": {
+          "type": ["string", "null"],
+          "description": "Default value"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "metadata": {
+        "project_name": "ExampleProject",
+        "version": "1.0.0",
+        "generated_at": "2025-01-20T10:30:00Z",
+        "language": "python"
+      },
+      "statistics": {
+        "total_files": 5,
+        "total_lines": 1200,
+        "total_classes": 8,
+        "total_functions": 25,
+        "avg_complexity": 3.4,
+        "max_complexity": 12,
+        "high_complexity_functions": [
+          "process_data (12)",
+          "validate_input (11)"
+        ]
+      },
+      "modules": [
+        {
+          "name": "processor",
+          "file": "src/processor.py",
+          "docstring": "Data processing module",
+          "classes": ["DataProcessor"],
+          "functions": ["process", "validate"],
+          "imports": ["typing", "json"],
+          "lines": 250
+        }
+      ],
+      "classes": [
+        {
+          "name": "DataProcessor",
+          "file": "src/processor.py",
+          "line": 15,
+          "docstring": "Processes data",
+          "bases": ["BaseProcessor"],
+          "methods": ["process", "validate"],
+          "properties": ["status"]
+        }
+      ],
+      "functions": [
+        {
+          "name": "process",
+          "file": "src/processor.py",
+          "line": 42,
+          "docstring": "Process the data",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "Dict[str, Any]"
+            },
+            {
+              "name": "options",
+              "type": "Optional[ProcessOptions]",
+              "default": "None"
+            }
+          ],
+          "return_type": "ProcessedData",
+          "decorators": [],
+          "complexity": 5,
+          "is_async": false
+        }
+      ],
+      "dependencies": {
+        "src/processor.py": ["typing", "json", "dataclasses"],
+        "src/utils.py": ["os", "pathlib"]
+      }
+    }
+  ]
+}

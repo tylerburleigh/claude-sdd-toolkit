@@ -169,9 +169,10 @@ def cmd_run(args: argparse.Namespace, printer: PrettyPrinter) -> int:
 # ---------------------------------------------------------------------------
 
 
-def register_run_tests(subparsers: argparse._SubParsersAction) -> None:  # type: ignore[attr-defined]
+def register_run_tests(subparsers: argparse._SubParsersAction, parent_parser: argparse.ArgumentParser) -> None:  # type: ignore[attr-defined]
     check_parser = subparsers.add_parser(
         "check-tools",
+        parents=[parent_parser],
         help="Check availability of external CLI tools",
         description="Check which external AI CLI tools are available",
     )
@@ -180,6 +181,7 @@ def register_run_tests(subparsers: argparse._SubParsersAction) -> None:  # type:
 
     consult_parser = subparsers.add_parser(
         "consult",
+        parents=[parent_parser],
         help="Consult external AI tools for test debugging",
         description="Consult external AI tools with auto-routing and prompt formatting",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -213,6 +215,7 @@ Failure types:
 
     discover_parser = subparsers.add_parser(
         "discover",
+        parents=[parent_parser],
         help="Discover and analyze test structure",
         description="Discover test files, fixtures, markers, and project structure",
     )

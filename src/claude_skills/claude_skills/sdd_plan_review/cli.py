@@ -213,12 +213,13 @@ def cmd_list_tools(args, printer):
         return 0
 
 
-def register_plan_review(subparsers):
+def register_plan_review(subparsers, parent_parser):
     """Register plan-review subcommands for unified CLI."""
 
     # review command
     parser_review = subparsers.add_parser(
         'review',
+        parents=[parent_parser],
         help='Review specification with multiple AI models'
     )
     parser_review.add_argument('spec_file', help='Path to specification file')
@@ -251,6 +252,7 @@ def register_plan_review(subparsers):
     # list-tools command
     parser_list = subparsers.add_parser(
         'list-review-tools',
+        parents=[parent_parser],
         help='List available AI CLI tools for reviews'
     )
     parser_list.set_defaults(func=cmd_list_tools)

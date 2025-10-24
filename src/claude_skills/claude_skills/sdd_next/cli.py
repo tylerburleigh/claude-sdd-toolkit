@@ -27,7 +27,6 @@ from claude_skills.common import (
     check_complete,
     list_blockers as list_blocked_tasks
 )
-from claude_skills.common.metrics import track_metrics
 
 # Import from sdd_next module
 from claude_skills.sdd_next.discovery import (
@@ -869,174 +868,107 @@ def cmd_spec_stats(args, printer):
 
 
 
-def register_next(subparsers):
+def register_next(subparsers, parent_parser):
     """
     Register 'next' subcommands for unified CLI.
     """
     # verify-tools
-    parser_verify = subparsers.add_parser('verify-tools', help='Verify required tools')
+    parser_verify = subparsers.add_parser('verify-tools', parents=[parent_parser], help='Verify required tools')
     parser_verify.set_defaults(func=cmd_verify_tools)
 
     # find-specs
-    parser_find = subparsers.add_parser('find-specs', help='Find specs directory')
+    parser_find = subparsers.add_parser('find-specs', parents=[parent_parser], help='Find specs directory')
     parser_find.set_defaults(func=cmd_find_specs)
 
     # next-task
-    parser_next = subparsers.add_parser('next-task', help='Find next actionable task')
+    parser_next = subparsers.add_parser('next-task', parents=[parent_parser], help='Find next actionable task')
     parser_next.add_argument('spec_id', help='Specification ID')
     parser_next.set_defaults(func=cmd_next_task)
 
     # task-info
-    parser_info = subparsers.add_parser('task-info', help='Get task information')
+    parser_info = subparsers.add_parser('task-info', parents=[parent_parser], help='Get task information')
     parser_info.add_argument('spec_id', help='Specification ID')
     parser_info.add_argument('task_id', help='Task ID')
     parser_info.set_defaults(func=cmd_task_info)
 
     # check-deps
-    parser_deps = subparsers.add_parser('check-deps', help='Check task dependencies')
+    parser_deps = subparsers.add_parser('check-deps', parents=[parent_parser], help='Check task dependencies')
     parser_deps.add_argument('spec_id', help='Specification ID')
     parser_deps.add_argument('task_id', help='Task ID')
     parser_deps.set_defaults(func=cmd_check_deps)
 
     # progress
-    parser_progress = subparsers.add_parser('progress', help='Show overall progress')
+    parser_progress = subparsers.add_parser('progress', parents=[parent_parser], help='Show overall progress')
     parser_progress.add_argument('spec_id', help='Specification ID')
     parser_progress.set_defaults(func=cmd_progress)
 
 
     # init-env
-    parser_init_env = subparsers.add_parser('init-env', help='Initialize development environment')
+    parser_init_env = subparsers.add_parser('init-env', parents=[parent_parser], help='Initialize development environment')
     parser_init_env.add_argument('--spec-path', dest='spec_path', help='Optional path to spec file or directory')
     parser_init_env.add_argument('--export', action='store_true', help='Output as shell export statements')
     parser_init_env.set_defaults(func=cmd_init_env)
 
     # prepare-task
-    parser_prepare = subparsers.add_parser('prepare-task', help='Prepare task for implementation')
+    parser_prepare = subparsers.add_parser('prepare-task', parents=[parent_parser], help='Prepare task for implementation')
     parser_prepare.add_argument('spec_id', help='Specification ID')
     parser_prepare.add_argument('task_id', nargs='?', help='Task ID (optional, finds next task if not provided)')
     parser_prepare.set_defaults(func=cmd_prepare_task)
 
     # format-plan
-    parser_format_plan = subparsers.add_parser('format-plan', help='Format execution plan for display')
+    parser_format_plan = subparsers.add_parser('format-plan', parents=[parent_parser], help='Format execution plan for display')
     parser_format_plan.add_argument('spec_id', help='Specification ID')
     parser_format_plan.add_argument('task_id', help='Task ID')
     parser_format_plan.set_defaults(func=cmd_format_plan)
 
     # validate-spec
-    parser_validate = subparsers.add_parser('validate-spec', help='Validate spec file')
+    parser_validate = subparsers.add_parser('validate-spec', parents=[parent_parser], help='Validate spec file')
     parser_validate.add_argument('spec_file', help='Path to spec markdown file')
     parser_validate.set_defaults(func=cmd_validate_spec)
 
     # find-pattern
-    parser_find_pattern = subparsers.add_parser('find-pattern', help='Find files matching a pattern')
+    parser_find_pattern = subparsers.add_parser('find-pattern', parents=[parent_parser], help='Find files matching a pattern')
     parser_find_pattern.add_argument('pattern', help='Glob pattern (e.g., "*.ts", "src/**/*.spec.ts")')
     parser_find_pattern.add_argument('--directory', help='Directory to search (defaults to current directory)')
     parser_find_pattern.set_defaults(func=cmd_find_pattern)
 
     # detect-project
-    parser_detect_project = subparsers.add_parser('detect-project', help='Detect project type and dependencies')
+    parser_detect_project = subparsers.add_parser('detect-project', parents=[parent_parser], help='Detect project type and dependencies')
     parser_detect_project.add_argument('--directory', help='Directory to analyze (defaults to current directory)')
     parser_detect_project.set_defaults(func=cmd_detect_project)
 
     # find-tests
-    parser_find_tests = subparsers.add_parser('find-tests', help='Find test files and patterns')
+    parser_find_tests = subparsers.add_parser('find-tests', parents=[parent_parser], help='Find test files and patterns')
     parser_find_tests.add_argument('--directory', help='Directory to search (defaults to current directory)')
     parser_find_tests.add_argument('--source-file', dest='source_file', help='Source file to find corresponding test')
     parser_find_tests.set_defaults(func=cmd_find_tests)
 
     # check-environment
-    parser_check_env = subparsers.add_parser('check-environment', help='Check environmental requirements')
+    parser_check_env = subparsers.add_parser('check-environment', parents=[parent_parser], help='Check environmental requirements')
     parser_check_env.add_argument('--directory', help='Directory to check (defaults to current directory)')
     parser_check_env.add_argument('--required', help='Comma-separated list of required dependencies')
     parser_check_env.set_defaults(func=cmd_check_environment)
 
     # find-circular-deps
-    parser_circular = subparsers.add_parser('find-circular-deps', help='Find circular dependencies in JSON spec')
+    parser_circular = subparsers.add_parser('find-circular-deps', parents=[parent_parser], help='Find circular dependencies in JSON spec')
     parser_circular.add_argument('spec_id', help='Specification ID')
     parser_circular.set_defaults(func=cmd_find_circular_deps)
 
     # find-related-files
-    parser_related = subparsers.add_parser('find-related-files', help='Find files related to a source file')
+    parser_related = subparsers.add_parser('find-related-files', parents=[parent_parser], help='Find files related to a source file')
     parser_related.add_argument('file', help='Source file path')
     parser_related.add_argument('--directory', help='Project directory (defaults to current directory)')
     parser_related.set_defaults(func=cmd_find_related_files)
 
     # validate-paths
-    parser_validate_paths = subparsers.add_parser('validate-paths', help='Validate and normalize paths')
+    parser_validate_paths = subparsers.add_parser('validate-paths', parents=[parent_parser], help='Validate and normalize paths')
     parser_validate_paths.add_argument('paths', nargs='+', help='Paths to validate')
     parser_validate_paths.add_argument('--base-directory', dest='base_directory', help='Base directory for relative paths')
     parser_validate_paths.set_defaults(func=cmd_validate_paths)
 
     # spec-stats
-    parser_spec_stats = subparsers.add_parser('spec-stats', help='Show spec file statistics')
+    parser_spec_stats = subparsers.add_parser('spec-stats', parents=[parent_parser], help='Show spec file statistics')
     parser_spec_stats.add_argument('spec_file', help='Path to spec markdown file')
     parser_spec_stats.add_argument('--spec-file', dest='spec_file_json', help='Optional path to JSON spec')
     parser_spec_stats.set_defaults(func=cmd_spec_stats)
 
-
-
-
-
-@track_metrics('sdd-next')
-def main():
-    parser = argparse.ArgumentParser(
-        description="Spec-Driven Development Tools",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  %(prog)s verify-tools
-  %(prog)s find-specs
-
-  # Spec operations
-  %(prog)s next-task my-spec-id
-  %(prog)s task-info my-spec-id task-2-1
-  %(prog)s check-deps my-spec-id task-2-1
-  %(prog)s progress my-spec-id
-  %(prog)s list-phases my-spec-id
-
-  # Workflow commands
-  %(prog)s init-env --export
-  %(prog)s prepare-task my-spec-id
-  %(prog)s prepare-task my-spec-id task-2-1
-  %(prog)s validate-spec spec.json
-  %(prog)s find-pattern "*.ts" --directory src
-
-  # Project analysis commands
-  %(prog)s detect-project --directory .
-  %(prog)s find-tests --source-file src/services/auth.ts
-  %(prog)s check-environment --required bcrypt,jsonwebtoken
-  %(prog)s find-circular-deps my-spec-id
-  %(prog)s find-related-files src/services/auth.ts
-  %(prog)s validate-paths spec.json --base-directory /home/user
-  %(prog)s spec-stats spec.json
-        """
-    )
-
-    # Global flags (available to all commands)
-    parser.add_argument('--no-color', action='store_true',
-                       help='Disable colored output')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Show detailed output (info messages)')
-    parser.add_argument('--quiet', '-q', action='store_true',
-                       help='Minimal output (errors only)')
-
-    subparsers = parser.add_subparsers(dest='command', help='Command to execute', required=True)
-    register_next(subparsers)
-
-    args = parser.parse_args()
-
-    # Configure the printer instance locally
-    use_color = not args.no_color if hasattr(args, 'no_color') else True
-    verbose = args.verbose if hasattr(args, 'verbose') else False
-    quiet = args.quiet if hasattr(args, 'quiet') else False
-    printer = PrettyPrinter(use_color=use_color, verbose=verbose, quiet=quiet)
-
-    if not hasattr(args, 'func'):
-        parser.print_help()
-        return 1
-
-    return args.func(args, printer)
-
-
-if __name__ == "__main__":
-    sys.exit(main())

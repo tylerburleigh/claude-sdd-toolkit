@@ -151,12 +151,13 @@ def cmd_template(args, printer):
     return 0
 
 
-def register_plan(subparsers):
+def register_plan(subparsers, parent_parser):
     """Register plan subcommands for unified CLI."""
 
     # create command
     parser_create = subparsers.add_parser(
         'create',
+        parents=[parent_parser],
         help='Create new specification'
     )
     parser_create.add_argument('name', help='Specification name')
@@ -171,6 +172,7 @@ def register_plan(subparsers):
     # analyze command
     parser_analyze = subparsers.add_parser(
         'analyze',
+        parents=[parent_parser],
         help='Analyze codebase for planning'
     )
     parser_analyze.add_argument(
@@ -184,6 +186,7 @@ def register_plan(subparsers):
     # template command
     parser_template = subparsers.add_parser(
         'template',
+        parents=[parent_parser],
         help='Manage spec templates'
     )
     parser_template.add_argument(

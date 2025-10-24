@@ -98,7 +98,7 @@ def _make_wrapper(cmd: LegacyCommand):
     return _handler
 
 
-def register_all_subcommands(subparsers: Any) -> None:
+def register_all_subcommands(subparsers: Any, parent_parser: argparse.ArgumentParser) -> None:
     """Register all skills-dev subcommands."""
     if not isinstance(
         subparsers, argparse._SubParsersAction
@@ -106,7 +106,7 @@ def register_all_subcommands(subparsers: Any) -> None:
         raise TypeError("subparsers must be an argparse._SubParsersAction")
 
     for cmd in LEGACY_COMMANDS:
-        parser = subparsers.add_parser(cmd.name, help=cmd.help)
+        parser = subparsers.add_parser(cmd.name, parents=[parent_parser], help=cmd.help)
         if cmd.passthrough:
             _configure_passthrough(parser)
         parser.set_defaults(func=_make_wrapper(cmd))
@@ -114,6 +114,7 @@ def register_all_subcommands(subparsers: Any) -> None:
     # Placeholder for future native commands
     placeholder = subparsers.add_parser(
         "migrate",
+        parents=[parent_parser],
         help="Show migration guidance for legacy skills development commands",
     )
     placeholder.set_defaults(func=_show_migration_info)

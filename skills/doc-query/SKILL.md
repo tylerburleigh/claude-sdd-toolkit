@@ -65,6 +65,8 @@ If the verification command fails, ensure the SDD toolkit is properly installed 
   - `ARCHITECTURE.md` (optional, for system design)
   - `DOCUMENTATION.md` (optional, for human-readable reference)
 
+**Note**: You should NOT read the `documentation.json` or `DOCUMENTATION.md` documents manually.
+
 ## Auto-Detection
 
 `sdd doc` CLI automatically searches for documentation in multiple locations (in order of priority):

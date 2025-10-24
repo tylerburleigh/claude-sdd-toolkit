@@ -180,13 +180,19 @@ def track_metrics(skill_name: str):
             command = 'main'
 
             try:
-                # Try to extract subcommand from sys.argv
+                # Try to extract subcommand(s) from sys.argv
                 if len(sys.argv) > 1:
-                    # Get first non-flag argument as command
+                    # Collect all non-flag arguments as subcommands
+                    # For "sdd doc generate" -> ["doc", "generate"] -> "doc-generate"
+                    # For "sdd next-task" -> ["next-task"]
+                    subcommands = []
                     for arg in sys.argv[1:]:
                         if not arg.startswith('-'):
-                            command = arg
-                            break
+                            subcommands.append(arg)
+
+                    # Join with hyphens for consistency with existing format
+                    if subcommands:
+                        command = '-'.join(subcommands)
 
                 exit_code = func(*args, **kwargs) or 0
                 return exit_code

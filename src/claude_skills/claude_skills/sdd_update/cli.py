@@ -15,7 +15,6 @@ from pathlib import Path
 
 # Import shared utilities
 from claude_skills.common import find_specs_directory, PrettyPrinter
-from claude_skills.common.metrics import track_metrics
 from claude_skills.common import execute_verify_task, load_json_spec
 
 # Import operations from scripts directory
@@ -760,16 +759,14 @@ def cmd_sync_metadata(args, printer):
     return 0 if success else 1
 
 
-def register_update(subparsers):
+def register_update(subparsers, parent_parser):
     """
     Register 'update' subcommands for unified CLI.
-    """
-    # Create parent parser for subcommand-specific shared arguments
-    # Note: Global options (--json, --quiet, --verbose, --path, --specs-dir)
-    # are now provided by the unified CLI, so don't add them here
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    # No arguments needed - global options are handled by unified CLI
 
+    Args:
+        subparsers: The subparsers object to add commands to
+        parent_parser: Parent parser with global options (--json, --quiet, --verbose, etc.)
+    """
     # update-status command
     p_update = subparsers.add_parser("update-status", help="Update task status", parents=[parent_parser])
     p_update.add_argument("spec_id", help="Specification ID")
@@ -982,39 +979,3 @@ def register_update(subparsers):
     p_sync_meta.add_argument("spec_id", help="Specification ID")
     p_sync_meta.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
     p_sync_meta.set_defaults(func=cmd_sync_metadata)
-
-
-@track_metrics('sdd-update')
-def main():
-    """Main CLI entry point."""
-    # Create main parser
-    parser = argparse.ArgumentParser(
-        description="SDD Update Tools - Progress tracking for spec-driven development",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-
-    # Add arguments that are not shared by subparsers, if any.
-    # For sdd-update, all top-level args are in the parent_parser.
-
-    subparsers = parser.add_subparsers(dest="subcommand", help="Command to execute", required=True)
-    register_update(subparsers)
-
-    args = parser.parse_args()
-
-    # Configure printer
-    printer = PrettyPrinter(
-        use_color=not getattr(args, 'json', False),
-        verbose=getattr(args, 'verbose', False),
-        quiet=getattr(args, 'quiet', False)
-    )
-
-    # Execute command
-    if hasattr(args, 'func'):
-        return args.func(args, printer)
-    else:
-        parser.print_help()
-        return 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

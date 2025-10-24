@@ -22,7 +22,6 @@ try:
         DEFAULT_BOTTLENECK_THRESHOLD,
         PrettyPrinter,
     )
-    from claude_skills.common.metrics import track_metrics
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -501,18 +500,20 @@ def cmd_check_deps(args, printer):
     return 0
 
 
-def register_validate(subparsers):
+def register_validate(subparsers, parent_parser):
     """
     Register 'validate' subcommand for unified CLI.
 
     Args:
         subparsers: ArgumentParser subparsers object
+        parent_parser: Parent parser with global options
 
     Note:
         Handlers receive (args, printer) when invoked from main().
     """
     # Validate command
     parser_validate = subparsers.add_parser('validate',
+                                            parents=[parent_parser],
                                             help='Validate JSON spec file')
     parser_validate.add_argument('spec_file', help='Path to JSON spec file')
     parser_validate.add_argument('--report', action='store_true',
@@ -524,6 +525,7 @@ def register_validate(subparsers):
 
     # Fix command
     parser_fix = subparsers.add_parser('fix',
+                                       parents=[parent_parser],
                                        help='Auto-fix validation issues')
     parser_fix.add_argument('spec_file', help='Path to JSON spec file')
     parser_fix.add_argument('--preview', action='store_true',
@@ -544,6 +546,7 @@ def register_validate(subparsers):
 
     # Report command
     parser_report = subparsers.add_parser('report',
+                                          parents=[parent_parser],
                                           help='Generate detailed validation report')
     parser_report.add_argument('spec_file', help='Path to JSON spec file')
     parser_report.add_argument('--output', '-o', help='Output file path (use "-" for stdout)')
@@ -555,83 +558,16 @@ def register_validate(subparsers):
 
     # Stats command
     parser_stats = subparsers.add_parser('stats',
+                                         parents=[parent_parser],
                                          help='Show spec statistics')
     parser_stats.add_argument('spec_file', help='Path to JSON spec file')
     parser_stats.set_defaults(func=cmd_stats)
 
     # Analyze dependencies command (renamed from check-deps to avoid conflict with sdd-next)
     parser_deps = subparsers.add_parser('analyze-deps',
+                                        parents=[parent_parser],
                                         help='Analyze dependencies for circular dependencies and bottlenecks')
     parser_deps.add_argument('spec_file', help='Path to JSON spec file')
     parser_deps.add_argument('--bottleneck-threshold', type=int, default=DEFAULT_BOTTLENECK_THRESHOLD,
                             help=f'Minimum tasks blocked to flag bottleneck (default: {DEFAULT_BOTTLENECK_THRESHOLD})')
     parser_deps.set_defaults(func=cmd_check_deps)
-
-
-@track_metrics('sdd-validate')
-def main():
-    parser = argparse.ArgumentParser(
-        prog='sdd-validate',
-        description="""
-Standalone validation for Spec-Driven Development JSON specification files.
-
-This tool validates JSON spec files for structure, hierarchy integrity,
-metadata completeness, and dependency relationships.
-        """,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Basic validation (recommended)
-  %(prog)s validate specs/active/my-spec.json
-
-  # With verbose output
-  %(prog)s --verbose validate specs/active/my-spec.json
-
-  # Generate detailed report
-  %(prog)s validate specs/active/my-spec.json --report
-
-  # Preview auto-fixable issues
-  %(prog)s fix specs/active/my-spec.json --preview
-
-  # Apply auto-fixes with backup
-  %(prog)s fix specs/active/my-spec.json
-
-  # Show statistics
-  %(prog)s stats specs/active/my-spec.json
-
-  # Check for circular dependencies
-  %(prog)s check-deps specs/active/my-spec.json
-        """
-    )
-
-    # Global options
-    parser.add_argument('--no-color', action='store_true',
-                        help='Disable colored output')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                        help='Show detailed validation output')
-    parser.add_argument('--quiet', '-q', action='store_true',
-                        help='Suppress progress messages (errors only)')
-    parser.add_argument('--json', action='store_true',
-                        help='Output results as JSON')
-
-    subparsers = parser.add_subparsers(dest='command', help='Commands', required=True)
-    register_validate(subparsers)
-
-    args = parser.parse_args()
-
-    # Configure printer
-    printer = PrettyPrinter(
-        use_color=not args.no_color,
-        verbose=getattr(args, 'verbose', False)
-    )
-
-    # Execute command
-    if hasattr(args, 'func'):
-        return args.func(args, printer)
-    else:
-        parser.print_help()
-        return 1
-
-
-if __name__ == '__main__':
-    sys.exit(main())

@@ -33,22 +33,15 @@ test = [
 #   sdd skills-dev <cmd> - Development utilities (gendocs, etc.)
 sdd = "claude_skills.cli.sdd:main"
 
-# Legacy SDD commands (⚠️ DEPRECATED - Will be removed in v3.0.0)
-# Please migrate to the unified sdd CLI:
-#   sdd-next → sdd next-task, sdd verify-tools, sdd find-specs, etc.
-#   sdd-update → sdd update-status, sdd add-journal, sdd mark-blocked, etc.
-#   sdd-validate → sdd validate, sdd fix, sdd report, etc.
-# See MIGRATION_GUIDE.md for details
-sdd-next = "claude_skills.sdd_next.cli:main"
-sdd-update = "claude_skills.sdd_update.cli:main"
-sdd-validate = "claude_skills.sdd_validate.cli:main"
-
 # Other tools
 sdd-integration = "claude_skills.doc_query.sdd_integration:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["claude_skills*"]
+
+[tool.setuptools.package-data]
+claude_skills = ["*.json", "**/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["claude_skills/tests"]

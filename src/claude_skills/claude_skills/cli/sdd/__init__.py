@@ -7,10 +7,12 @@ import argparse
 from pathlib import Path
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.cli.sdd.options import add_global_options
+from claude_skills.common.metrics import track_metrics
+from claude_skills.cli.sdd.options import add_global_options, create_global_parent_parser
 from claude_skills.cli.sdd.registry import register_all_subcommands
 
 
+@track_metrics('sdd')
 def main():
     """Main entry point for unified SDD CLI."""
     parser = argparse.ArgumentParser(
@@ -19,8 +21,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    # Add global options
+    # Add global options to main parser
     add_global_options(parser)
+
+    # Create parent parser with global options for inheritance by subcommands
+    global_parent = create_global_parent_parser()
 
     # Create subparsers
     subparsers = parser.add_subparsers(
@@ -30,8 +35,8 @@ def main():
     )
 
     # CRITICAL: Register subcommands BEFORE parsing
-    # Pass None for printer initially - it will be created after parsing
-    register_all_subcommands(subparsers)
+    # Pass parent parser so nested subcommands can inherit global options
+    register_all_subcommands(subparsers, global_parent)
 
     # Parse args (single pass, after subcommands are registered)
     args = parser.parse_args()

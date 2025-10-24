@@ -398,8 +398,21 @@ def run_consultation(
         print(f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>")
         return True, "Dry run - no output"
 
+    # Always show what we're asking the AI (even in non-verbose mode)
+    # Determine what type of research from prompt
+    if "Architecture" in prompt:
+        task_type = "architecture analysis"
+        task_areas = "System Overview, Components, Data Flow, Design Patterns, Technology Stack, Decisions"
+    elif "AI Context" in prompt:
+        task_type = "AI context generation"
+        task_areas = "Project Overview, Domain Concepts, Critical Files, Workflows, Gotchas, Extensions"
+    else:
+        task_type = "analysis"
+        task_areas = "code structure and patterns"
+
+    print(f"   Asking external AI ({tool}) to analyze: {task_areas}")
+
     if verbose:
-        print(f"Consulting {tool}...")
         print("=" * 60)
 
     try:
@@ -480,9 +493,19 @@ def consult_multi_agent(
             print(f"  - {tool}")
         return {"success": True, "responses": []}
 
+    # Determine task description and areas (always show, regardless of verbose)
+    task_desc = "architecture analysis" if "Architecture" in prompt else "AI context generation"
+    if "Architecture" in prompt:
+        task_areas = "System Overview, Component Identification, Data Flow, Design Patterns, Technology Stack, Architectural Decisions"
+    else:
+        task_areas = "Project Overview, Domain Concepts, Critical Files, Common Workflows, Potential Gotchas, Extension Patterns"
+
+    # Always show what we're asking the AI to do
+    print(f"   Asking {len(available_from_pair)} external AI model(s) to analyze:")
+    print(f"   - {task_areas}")
+    print(f"   Using: {', '.join(available_from_pair)}")
+
     if verbose:
-        print(f"Consulting {len(available_from_pair)} agents in parallel...")
-        print(f"Tools: {', '.join(available_from_pair)}")
         print("=" * 60)
 
     # Run consultations in parallel

@@ -290,17 +290,6 @@ class TestCommandDelegation:
 class TestBackwardsCompatibility:
     """Tests for backwards compatibility with old command style."""
 
-    @pytest.mark.skipif(not shutil.which("sdd-next"), reason="Legacy sdd-next not installed")
-    def test_legacy_sdd_next_still_works(self):
-        """Test that legacy sdd-next command still works if installed."""
-        result = subprocess.run(
-            ["sdd-next", "--help"],
-            capture_output=True,
-            text=True
-        )
-
-        assert result.returncode == 0
-
     def test_new_sdd_command_works(self):
         """Test that new sdd command works."""
         result = run_sdd_command(

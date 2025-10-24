@@ -1,4 +1,20 @@
 """Shared argument groups for unified CLI."""
+import argparse
+
+
+def create_global_parent_parser():
+    """
+    Create a parent parser with global options that can be inherited by subparsers.
+
+    This allows global options like --verbose, --debug, etc. to work universally
+    across all command levels, including nested subcommands.
+
+    Returns:
+        ArgumentParser configured with global options and add_help=False
+    """
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    add_global_options(parent_parser)
+    return parent_parser
 
 
 def add_global_options(parser):

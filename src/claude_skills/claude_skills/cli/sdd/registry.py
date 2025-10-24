@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def register_all_subcommands(subparsers):
+def register_all_subcommands(subparsers, parent_parser):
     """
     Register all subcommands from skill modules.
 
@@ -13,6 +13,7 @@ def register_all_subcommands(subparsers):
 
     Args:
         subparsers: ArgumentParser subparsers object
+        parent_parser: Parent parser with global options to inherit
 
     Note:
         Handlers will receive printer when invoked, not during registration.
@@ -26,16 +27,16 @@ def register_all_subcommands(subparsers):
     from claude_skills.sdd_plan_review.cli import register_plan_review
 
     # Register core SDD subcommands
-    register_next(subparsers)
-    register_update(subparsers)
-    register_validate(subparsers)
-    register_plan(subparsers)
-    register_plan_review(subparsers)
+    register_next(subparsers, parent_parser)
+    register_update(subparsers, parent_parser)
+    register_validate(subparsers, parent_parser)
+    register_plan(subparsers, parent_parser)
+    register_plan_review(subparsers, parent_parser)
 
     # Register unified CLIs as SDD subcommands
-    _register_doc_cli(subparsers)
-    _register_test_cli(subparsers)
-    _register_skills_dev_cli(subparsers)
+    _register_doc_cli(subparsers, parent_parser)
+    _register_test_cli(subparsers, parent_parser)
+    _register_skills_dev_cli(subparsers, parent_parser)
 
     # Optional: register workflow orchestration (may not exist in Phase 1)
     try:
@@ -48,13 +49,14 @@ def register_all_subcommands(subparsers):
         pass
 
 
-def _register_doc_cli(subparsers):
+def _register_doc_cli(subparsers, parent_parser):
     """Register the doc CLI as an SDD subcommand."""
     from claude_skills.code_doc.cli import register_code_doc
     from claude_skills.doc_query.cli import register_doc_query
 
     doc_parser = subparsers.add_parser(
         'doc',
+        parents=[parent_parser],
         help='Documentation generation and querying',
         description='Unified documentation generation and querying CLI'
     )
@@ -63,16 +65,17 @@ def _register_doc_cli(subparsers):
         dest='doc_command',
         required=True
     )
-    register_code_doc(doc_subparsers)
-    register_doc_query(doc_subparsers)
+    register_code_doc(doc_subparsers, parent_parser)
+    register_doc_query(doc_subparsers, parent_parser)
 
 
-def _register_test_cli(subparsers):
+def _register_test_cli(subparsers, parent_parser):
     """Register the test CLI as an SDD subcommand."""
     from claude_skills.run_tests.cli import register_run_tests
 
     test_parser = subparsers.add_parser(
         'test',
+        parents=[parent_parser],
         help='Testing and debugging utilities',
         description='Unified testing and debugging CLI'
     )
@@ -81,15 +84,16 @@ def _register_test_cli(subparsers):
         dest='test_command',
         required=True
     )
-    register_run_tests(test_subparsers)
+    register_run_tests(test_subparsers, parent_parser)
 
 
-def _register_skills_dev_cli(subparsers):
+def _register_skills_dev_cli(subparsers, parent_parser):
     """Register the skills-dev CLI as an SDD subcommand."""
     from claude_skills.cli.skills_dev.registry import register_all_subcommands as register_skills_dev_subcommands
 
     skills_dev_parser = subparsers.add_parser(
         'skills-dev',
+        parents=[parent_parser],
         help='Skills development utilities',
         description='Internal development utilities for claude_skills'
     )
@@ -98,4 +102,4 @@ def _register_skills_dev_cli(subparsers):
         dest='skills_dev_command',
         required=True
     )
-    register_skills_dev_subcommands(skills_dev_subparsers)
+    register_skills_dev_subcommands(skills_dev_subparsers, parent_parser)

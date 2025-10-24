@@ -430,10 +430,11 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         return _handle_error(args, printer, exc)
 
 
-def register_code_doc(subparsers: argparse._SubParsersAction) -> None:  # type: ignore[attr-defined]
+def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: argparse.ArgumentParser) -> None:  # type: ignore[attr-defined]
     """Register documentation commands for the unified CLI."""
     generate_parser = subparsers.add_parser(
         'generate',
+        parents=[parent_parser],
         help='Generate codebase documentation',
         description='Generate documentation (Markdown/JSON)',
     )
@@ -453,6 +454,7 @@ def register_code_doc(subparsers: argparse._SubParsersAction) -> None:  # type: 
 
     validate_parser = subparsers.add_parser(
         'validate-json',
+        parents=[parent_parser],
         aliases=['validate'],
         help='Validate generated JSON documentation against schema',
     )
@@ -461,6 +463,7 @@ def register_code_doc(subparsers: argparse._SubParsersAction) -> None:  # type: 
 
     analyze_parser = subparsers.add_parser(
         'analyze',
+        parents=[parent_parser],
         help='Analyze codebase and print statistics only',
     )
     analyze_parser.add_argument('directory', help='Project directory to analyze')
@@ -471,6 +474,7 @@ def register_code_doc(subparsers: argparse._SubParsersAction) -> None:  # type: 
 
     analyze_ai_parser = subparsers.add_parser(
         'analyze-with-ai',
+        parents=[parent_parser],
         help='Generate comprehensive documentation with AI assistance',
     )
     analyze_ai_parser.add_argument('directory', help='Project directory to analyze')

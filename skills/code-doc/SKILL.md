@@ -57,11 +57,18 @@ sdd doc analyze-with-ai <directory> --name ProjectName --version X.Y.Z --verbose
 - `DOCUMENTATION.md` - Structural reference (classes, functions, dependencies)
 - `ARCHITECTURE.md` - Architecture and design docs (composed from AI research)
 - `AI_CONTEXT.md` - Quick reference for AI assistants (composed from AI research)
-- `documentation.json` - Machine-readable structural data
+- `documentation.json` - Machine-readable structural data (queryable with `sdd doc` commands)
 
 **Requirements:**
 - At least one AI CLI tool installed: cursor-agent (with gpt-4.1), gemini, or codex
 - Uses multi-agent consultation by default for comprehensive analysis
+
+**After generation, you can query the documentation:**
+```bash
+sdd doc stats --docs-path ./docs/documentation.json
+sdd doc find-class MyClass --docs-path ./docs/documentation.json
+```
+See "Documentation Query Commands" section for all 12 query commands.
 
 ### Option 2: Structural Documentation Only
 
@@ -86,6 +93,20 @@ sdd doc generate <directory> --name ProjectName --version X.Y.Z --format both --
 ```bash
 sdd doc validate-json ./docs/documentation.json
 ```
+
+5. **Query (Optional)** → Explore the generated documentation
+```bash
+# Get statistics
+sdd doc stats --docs-path ./docs/documentation.json
+
+# Find high-complexity functions
+sdd doc complexity --threshold 10 --docs-path ./docs/documentation.json
+
+# Search for specific entities
+sdd doc search "MyClass" --docs-path ./docs/documentation.json
+```
+
+**Note:** All query commands support flexible argument order - put `--docs-path` before or after the subcommand.
 
 ---
 
@@ -425,6 +446,296 @@ sdd doc validate-json <json_file>
 
 ---
 
+### Documentation Query Commands
+
+After generating documentation with `generate` or `analyze-with-ai`, you can query the generated `documentation.json` file using these commands.
+
+```bash
+sdd doc <command> --docs-path ./docs/documentation.json
+```
+
+If `--docs-path` is omitted, it auto-detects `./docs/documentation.json`.
+
+---
+
+#### 1. `stats` - Show Documentation Statistics
+
+```bash
+sdd doc stats --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Quick overview of documented codebase
+- Get total counts (files, classes, functions, lines)
+- Check complexity metrics
+
+**Output:**
+```
+Documentation Statistics:
+  Project: MyProject (version 1.0.0)
+  Total Files: 85
+  Total Classes: 38
+  Total Functions: 424
+  Total Lines: 25214
+  Average Complexity: 6.82
+  Max Complexity: 40
+```
+
+---
+
+#### 2. `complexity` - Show High-Complexity Functions
+
+```bash
+sdd doc complexity --docs-path ./docs/documentation.json --threshold 10
+```
+
+**When to use:**
+- Identify functions needing refactoring
+- Code quality assessment
+- Technical debt analysis
+
+**Options:**
+- `--threshold N`: Minimum complexity (default: 5)
+- `--module PATH`: Filter by module
+
+**Output:**
+```
+Found 42 result(s):
+
+1. Function: generate_report
+   File: src/validator.py
+   Complexity: 40
+   Parameters: result, options
+```
+
+---
+
+#### 3. `find-class` - Find Class by Name or Pattern
+
+```bash
+sdd doc find-class PrettyPrinter --docs-path ./docs/documentation.json
+sdd doc find-class ".*Printer" --pattern --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Locate a specific class
+- Find classes matching a pattern
+- Get class details (file, line, methods)
+
+**Options:**
+- `--pattern`: Treat name as regex pattern
+
+**Output:**
+```
+Found 1 result(s):
+
+1. Class: PrettyPrinter
+   File: src/common/printer.py
+   Line: 8
+```
+
+---
+
+#### 4. `find-function` - Find Function by Name or Pattern
+
+```bash
+sdd doc find-function register_validate --docs-path ./docs/documentation.json
+sdd doc find-function "register_.*" --pattern --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Locate a specific function
+- Find functions matching a pattern
+- Get function details (file, line, complexity, parameters)
+
+**Options:**
+- `--pattern`: Treat name as regex pattern
+
+---
+
+#### 5. `find-module` - Find Module by Name or Pattern
+
+```bash
+sdd doc find-module cli.py --docs-path ./docs/documentation.json
+sdd doc find-module ".*validator.*" --pattern --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Locate a specific module
+- Find modules matching a pattern
+
+**Options:**
+- `--pattern`: Treat name as regex pattern
+
+---
+
+#### 6. `search` - Search All Documented Entities
+
+```bash
+sdd doc search "validation" --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Search across classes, functions, and modules
+- Find entities by keyword
+- Broad exploration of codebase
+
+**Output:**
+```
+Found 48 result(s):
+
+1. Class: SpecValidationResult
+   File: src/common/validation.py
+
+2. Function: validate_hierarchy
+   File: src/common/hierarchy_validation.py
+   Complexity: 22
+```
+
+---
+
+#### 7. `context` - Gather Context for Feature Area
+
+```bash
+sdd doc context "printer" --docs-path ./docs/documentation.json --limit 5
+```
+
+**When to use:**
+- Understand a feature area
+- Get related classes, modules, and dependencies
+- Prepare for feature work
+
+**Options:**
+- `--limit N`: Limit results per entity type
+- `--include-docstrings`: Include docstring excerpts
+- `--include-stats`: Include module statistics
+
+**Output:**
+```
+Found 3 total entities:
+
+Classes (1):
+  - PrettyPrinter (src/common/printer.py)
+
+Modules (1):
+  - src/common/printer.py
+
+Dependencies (1):
+  - sys
+```
+
+---
+
+#### 8. `describe-module` - Describe a Module
+
+```bash
+sdd doc describe-module src/common/printer.py --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Get detailed module information
+- See module's classes, functions, dependencies
+- Understand module complexity
+
+**Options:**
+- `--top-functions N`: Limit to top N complex functions
+- `--include-docstrings`: Include docstring excerpts
+- `--skip-dependencies`: Skip dependency details
+
+**Output:**
+```
+Module: src/common/printer.py
+  Classes: 1 | Functions: 0 | Avg Complexity: 0
+  Imports: sys
+  Outgoing Dependencies: sys
+
+  Classes (1):
+    - PrettyPrinter
+```
+
+---
+
+#### 9. `dependencies` - Show Module Dependencies
+
+```bash
+sdd doc dependencies src/cli/registry.py --docs-path ./docs/documentation.json
+sdd doc dependencies src/common/printer.py --reverse --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Understand module dependencies
+- Find reverse dependencies (who depends on this)
+- Impact analysis before changes
+
+**Options:**
+- `--reverse`: Show reverse dependencies
+
+**Output:**
+```
+Found 1 result(s):
+
+1. Dependency: logging
+   Depended by: src/cli/registry.py
+```
+
+---
+
+#### 10. `list-classes` - List All Classes
+
+```bash
+sdd doc list-classes --docs-path ./docs/documentation.json
+sdd doc list-classes --module src/common --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Browse all classes in codebase
+- Filter classes by module
+- Get class inventory
+
+**Options:**
+- `--module PATH`: Filter by module path
+
+---
+
+#### 11. `list-functions` - List All Functions
+
+```bash
+sdd doc list-functions --docs-path ./docs/documentation.json
+sdd doc list-functions --module src/validator --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- Browse all functions in codebase
+- Filter functions by module
+- Get function inventory
+
+**Options:**
+- `--module PATH`: Filter by module path
+
+---
+
+#### 12. `list-modules` - List All Modules
+
+```bash
+sdd doc list-modules --docs-path ./docs/documentation.json
+```
+
+**When to use:**
+- See all documented modules
+- Get module overview
+- Navigate codebase structure
+
+**Output:**
+```
+Found 85 result(s):
+
+1. Module: scripts/extract_commands.py
+   Classes: 1 | Functions: 8 | Avg Complexity: 3.75
+   Imports: argparse, json, re, ...
+```
+
+---
+
 ## AI Tool Setup (for analyze-with-ai)
 
 ### Checking Tool Availability
@@ -701,6 +1012,46 @@ sdd doc validate-json ./ci_artifacts/documentation.json
 ```bash
 sdd doc generate ./django_project --name "DjangoApp" --version "3.2.0" --exclude tests --exclude migrations --exclude static --exclude media --exclude venv --format both --verbose
 ```
+
+---
+
+### Scenario 6: Querying Generated Documentation
+
+**User Request:** "Find all classes related to validation" or "Show me high-complexity functions" or "What modules handle printing?"
+
+**Your Response:**
+1. Verify documentation exists
+2. Use appropriate query command
+3. Present results clearly
+4. Offer to dive deeper if needed
+
+**Example:**
+```bash
+# Find validation-related entities
+sdd doc search "validation" --docs-path ./docs/documentation.json
+
+# Show high-complexity functions needing refactoring
+sdd doc complexity --threshold 15 --docs-path ./docs/documentation.json
+
+# Get context for printer-related code
+sdd doc context "printer" --docs-path ./docs/documentation.json --limit 5
+
+# Find a specific class
+sdd doc find-class PrettyPrinter --docs-path ./docs/documentation.json
+
+# List all classes in a module
+sdd doc list-classes --module src/common --docs-path ./docs/documentation.json
+
+# See module details
+sdd doc describe-module src/common/printer.py --docs-path ./docs/documentation.json
+```
+
+**When to use query commands:**
+- User wants to explore generated documentation
+- Looking for specific classes, functions, or modules
+- Analyzing code complexity or dependencies
+- Understanding feature areas before making changes
+- Quick lookups without reading full documentation
 
 ---
 

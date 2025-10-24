@@ -227,6 +227,19 @@ def review_with_tools(
     # Generate review prompt using new prompts module
     prompt = generate_review_prompt(spec_content, review_type, spec_id, spec_title)
 
+    # Show what we're asking the external AI models to evaluate
+    review_dimensions = {
+        "quick": "Completeness, Clarity",
+        "full": "Completeness, Clarity, Feasibility, Architecture, Risk Management, Verification",
+        "security": "Security vulnerabilities, Authentication, Authorization, Data handling, Risk Management",
+        "feasibility": "Time estimates, Dependencies, Complexity, Resource requirements, Feasibility"
+    }
+
+    dimensions = review_dimensions.get(review_type, "All standard dimensions")
+
+    print(f"\n   Sending {review_type} review to {len(tools)} external AI model(s): {', '.join(tools)}")
+    print(f"   Evaluating: {dimensions}")
+
     # Execute tools
     if parallel and len(tools) > 1:
         # Parallel execution
@@ -242,8 +255,14 @@ def review_with_tools(
                     result = future.result(timeout=150)
                     if result["success"]:
                         results["raw_responses"].append(result)
+                        # Show progress as each tool completes
+                        duration = result.get("duration", 0)
+                        print(f"   ✓ {tool} completed ({duration:.1f}s)")
                     else:
                         results["failures"].append(result)
+                        # Show failure
+                        error = result.get("error", "unknown error")
+                        print(f"   ✗ {tool} failed: {error}")
                 except Exception as e:
                     results["failures"].append({
                         "success": False,
@@ -252,14 +271,21 @@ def review_with_tools(
                         "output": None,
                         "duration": 0,
                     })
+                    print(f"   ✗ {tool} exception: {str(e)}")
     else:
         # Sequential execution
         for tool in tools:
             result = call_tool(tool, prompt)
             if result["success"]:
                 results["raw_responses"].append(result)
+                # Show progress as each tool completes
+                duration = result.get("duration", 0)
+                print(f"   ✓ {tool} completed ({duration:.1f}s)")
             else:
                 results["failures"].append(result)
+                # Show failure
+                error = result.get("error", "unknown error")
+                print(f"   ✗ {tool} failed: {error}")
 
     # Parse responses using synthesis module
     for raw_response in results["raw_responses"]:

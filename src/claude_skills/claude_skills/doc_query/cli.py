@@ -440,61 +440,61 @@ def cmd_list_modules(args: argparse.Namespace, printer: PrettyPrinter) -> int:
 # ---------------------------------------------------------------------------
 
 
-def register_doc_query(subparsers: argparse._SubParsersAction) -> None:  # type: ignore[attr-defined]
+def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: argparse.ArgumentParser) -> None:  # type: ignore[attr-defined]
     """Register documentation query commands for the unified doc CLI."""
-    find_class = subparsers.add_parser('find-class', help='Find class by name or pattern')
+    find_class = subparsers.add_parser('find-class', parents=[parent_parser], help='Find class by name or pattern')
     find_class.add_argument('name', help='Class name or regex pattern')
     find_class.add_argument('--pattern', action='store_true', help='Treat name as regex pattern')
     find_class.set_defaults(func=cmd_find_class)
 
-    find_function = subparsers.add_parser('find-function', help='Find function by name or pattern')
+    find_function = subparsers.add_parser('find-function', parents=[parent_parser], help='Find function by name or pattern')
     find_function.add_argument('name', help='Function name or regex pattern')
     find_function.add_argument('--pattern', action='store_true', help='Treat name as regex pattern')
     find_function.set_defaults(func=cmd_find_function)
 
-    find_module = subparsers.add_parser('find-module', help='Find module by name or pattern')
+    find_module = subparsers.add_parser('find-module', parents=[parent_parser], help='Find module by name or pattern')
     find_module.add_argument('name', help='Module name or regex pattern')
     find_module.add_argument('--pattern', action='store_true', help='Treat name as regex pattern')
     find_module.set_defaults(func=cmd_find_module)
 
-    complexity = subparsers.add_parser('complexity', help='Show high-complexity functions')
+    complexity = subparsers.add_parser('complexity', parents=[parent_parser], help='Show high-complexity functions')
     complexity.add_argument('--threshold', type=int, default=5, help='Minimum complexity (default: 5)')
     complexity.add_argument('--module', help='Filter by module')
     complexity.set_defaults(func=cmd_complexity)
 
-    deps = subparsers.add_parser('dependencies', help='Show module dependencies')
+    deps = subparsers.add_parser('dependencies', parents=[parent_parser], help='Show module dependencies')
     deps.add_argument('module', help='Module path')
     deps.add_argument('--reverse', action='store_true', help='Show reverse dependencies (who depends on this)')
     deps.set_defaults(func=cmd_dependencies)
 
-    search = subparsers.add_parser('search', help='Search all documented entities')
+    search = subparsers.add_parser('search', parents=[parent_parser], help='Search all documented entities')
     search.add_argument('query', help='Search query (regex)')
     search.set_defaults(func=cmd_search)
 
-    context = subparsers.add_parser('context', help='Gather context for feature area')
+    context = subparsers.add_parser('context', parents=[parent_parser], help='Gather context for feature area')
     context.add_argument('area', help='Feature area pattern')
     context.add_argument('--limit', type=int, default=None, help='Limit number of results per entity type')
     context.add_argument('--include-docstrings', action='store_true', help='Include docstring excerpts in results')
     context.add_argument('--include-stats', action='store_true', help='Include statistics in module summaries')
     context.set_defaults(func=cmd_context)
 
-    describe = subparsers.add_parser('describe-module', help='Describe a module with summaries and stats')
+    describe = subparsers.add_parser('describe-module', parents=[parent_parser], help='Describe a module with summaries and stats')
     describe.add_argument('module', help='Module path or name')
     describe.add_argument('--top-functions', type=int, default=None, help='Limit functions shown to top N by complexity')
     describe.add_argument('--include-docstrings', action='store_true', help='Include docstring excerpts in summaries')
     describe.add_argument('--skip-dependencies', action='store_true', help='Skip dependency details in summary')
     describe.set_defaults(func=cmd_describe_module)
 
-    stats_cmd = subparsers.add_parser('stats', help='Show documentation statistics')
+    stats_cmd = subparsers.add_parser('stats', parents=[parent_parser], help='Show documentation statistics')
     stats_cmd.set_defaults(func=cmd_stats)
 
-    list_classes = subparsers.add_parser('list-classes', help='List all classes')
+    list_classes = subparsers.add_parser('list-classes', parents=[parent_parser], help='List all classes')
     list_classes.add_argument('--module', help='Filter by module')
     list_classes.set_defaults(func=cmd_list_classes)
 
-    list_functions = subparsers.add_parser('list-functions', help='List all functions')
+    list_functions = subparsers.add_parser('list-functions', parents=[parent_parser], help='List all functions')
     list_functions.add_argument('--module', help='Filter by module')
     list_functions.set_defaults(func=cmd_list_functions)
 
-    list_modules = subparsers.add_parser('list-modules', help='List all modules')
+    list_modules = subparsers.add_parser('list-modules', parents=[parent_parser], help='List all modules')
     list_modules.set_defaults(func=cmd_list_modules)
