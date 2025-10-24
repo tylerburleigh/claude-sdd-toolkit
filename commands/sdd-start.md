@@ -151,7 +151,7 @@ I'll help you resume work on task [task-id] from [spec-name]...
 
 Use the Skill tool to invoke sdd-next:
 ```
-Skill(sdd-next)
+Skill(sdd-toolkit:sdd-next)
 ```
 
 **IMPORTANT**: When invoking sdd-next for resume, provide context about the specific task:
@@ -169,7 +169,7 @@ I'll use the sdd-next skill to find and prepare the next task from [spec-name]..
 
 Use the Skill tool to invoke sdd-next:
 ```
-Skill(sdd-next)
+Skill(sdd-toolkit:sdd-next)
 ```
 
 **Option 3: "Write new spec"**
@@ -181,7 +181,7 @@ What feature or change would you like to plan?
 
 Use the Skill tool to invoke sdd-plan:
 ```
-Skill(sdd-plan)
+Skill(sdd-toolkit:sdd-plan)
 ```
 
 **Option 4: "Something else"**

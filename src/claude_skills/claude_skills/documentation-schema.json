@@ -9,7 +9,7 @@
     "metadata": {
       "type": "object",
       "description": "Project metadata and generation information",
-      "required": ["project_name", "version", "generated_at", "language"],
+      "required": ["project_name", "version", "generated_at", "languages"],
       "properties": {
         "project_name": {
           "type": "string",
@@ -25,10 +25,14 @@
           "description": "ISO 8601 timestamp of when documentation was generated",
           "format": "date-time"
         },
-        "language": {
-          "type": "string",
-          "description": "Primary programming language",
-          "enum": ["python", "javascript", "typescript", "java", "go", "rust"]
+        "languages": {
+          "type": "array",
+          "description": "Programming languages detected in the codebase",
+          "items": {
+            "type": "string",
+            "enum": ["python", "javascript", "typescript", "java", "go", "rust", "html", "css", "unknown"]
+          },
+          "minItems": 1
         }
       }
     },
@@ -275,7 +279,7 @@
         "project_name": "ExampleProject",
         "version": "1.0.0",
         "generated_at": "2025-01-20T10:30:00Z",
-        "language": "python"
+        "languages": ["python"]
       },
       "statistics": {
         "total_files": 5,

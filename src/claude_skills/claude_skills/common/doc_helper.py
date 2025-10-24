@@ -218,7 +218,7 @@ def ensure_documentation_exists(
     This is a high-level convenience function that combines:
     - check_doc_query_available() - Check if docs exist
     - should_generate_docs() - Determine if generation is needed
-    - Skill(code-doc) invocation - Actually generate docs
+    - Skill(sdd-toolkit:code-doc) invocation - Actually generate docs
 
     Args:
         project_root: Root directory (default: auto-detect)

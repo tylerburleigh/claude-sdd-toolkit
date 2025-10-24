@@ -8,10 +8,10 @@ description: Multi-model specification review using direct AI CLI tools. Calls g
 ## Skill Family
 
 This skill is part of the **Spec-Driven Development** family:
-- **Skill(sdd-plan)** - Creates specifications and task hierarchies
-- **Skill(sdd-plan-review)** (this skill) - Reviews specs with multi-model collaboration
-- **Skill(sdd-next)** - Identifies next tasks and creates execution plans
-- **Skill(sdd-update)** - Tracks progress and maintains documentation
+- **Skill(sdd-toolkit:sdd-plan)** - Creates specifications and task hierarchies
+- **Skill(sdd-toolkit:sdd-plan-review)** (this skill) - Reviews specs with multi-model collaboration
+- **Skill(sdd-toolkit:sdd-next)** - Identifies next tasks and creates execution plans
+- **Skill(sdd-toolkit:sdd-update)** - Tracks progress and maintains documentation
 
 ## Complete Workflow
 
@@ -54,7 +54,7 @@ This skill is part of the **Spec-Driven Development** family:
 
 ## When to Use This Skill
 
-Use `Skill(sdd-plan-review)` to:
+Use `Skill(sdd-toolkit:sdd-plan-review)` to:
 - Review new specifications before approval
 - Validate complex or high-risk specifications
 - Evaluate specs with novel architecture decisions
@@ -74,22 +74,22 @@ Use `Skill(sdd-plan-review)` to:
 
 **When to transition to other skills:**
 
-← **From Skill(sdd-plan)**:
+← **From Skill(sdd-toolkit:sdd-plan)**:
   - After spec creation, validate before approval
   - Before committing to complex implementation
   - When uncertainty exists about approach
 
-→ **To Skill(sdd-update)**:
+→ **To Skill(sdd-toolkit:sdd-update)**:
   - After review, document review status in spec metadata
   - Journal critical issues found and addressed
   - Update spec frontmatter with review scores
 
-→ **To Skill(sdd-next)**:
+→ **To Skill(sdd-toolkit:sdd-next)**:
   - After APPROVE recommendation, begin implementation
   - Once critical issues are fixed and re-review passes
   - When confidence is high and risks are mitigated
 
-← **Back to Skill(sdd-plan)**:
+← **Back to Skill(sdd-toolkit:sdd-plan)**:
   - If REJECT recommendation, redesign spec
   - When fundamental architectural changes needed
   - To split overly complex specs
@@ -98,13 +98,13 @@ Use `Skill(sdd-plan-review)` to:
 
 ```
 What's the situation?
-├─ Just created new spec → Use `Skill(sdd-plan-review)` (validate before approval)
-├─ Security-sensitive (auth/data) → Use `Skill(sdd-plan-review)` --type security
-├─ Tight deadline/aggressive estimates → Use `Skill(sdd-plan-review)` --type feasibility
-├─ Novel architecture/technology → Use `Skill(sdd-plan-review)` --type full
-├─ Simple spec (< 5 tasks) → Skip review, proceed with Skill(sdd-next)
+├─ Just created new spec → Use `Skill(sdd-toolkit:sdd-plan-review)` (validate before approval)
+├─ Security-sensitive (auth/data) → Use `Skill(sdd-toolkit:sdd-plan-review)` --type security
+├─ Tight deadline/aggressive estimates → Use `Skill(sdd-toolkit:sdd-plan-review)` --type feasibility
+├─ Novel architecture/technology → Use `Skill(sdd-toolkit:sdd-plan-review)` --type full
+├─ Simple spec (< 5 tasks) → Skip review, proceed with Skill(sdd-toolkit:sdd-next)
 ├─ Already implementing → Skip review (too late)
-└─ Uncertain? → Use `Skill(sdd-plan-review)` --type quick (10 min)
+└─ Uncertain? → Use `Skill(sdd-toolkit:sdd-plan-review)` --type quick (10 min)
 
 Review Type Selection:
 ├─ High risk + complex → full (20-30 min, comprehensive)
@@ -212,7 +212,7 @@ sdd review specs/active/user-auth-001.json --dry-run
 **Standard review flow:**
 
 ```bash
-# 1. Create spec (via `Skill(sdd-plan)`)
+# 1. Create spec (via `Skill(sdd-toolkit:sdd-plan)`)
 
 # 2. Review it
 sdd review specs/active/myspec.json --type full
@@ -223,10 +223,10 @@ sdd review specs/active/myspec.json --type full
 # 4. Quick re-review (optional)
 sdd review specs/active/myspec.json --type quick
 
-# 5. Document review in spec (via `Skill(sdd-update)`)
+# 5. Document review in spec (via `Skill(sdd-toolkit:sdd-update)`)
 sdd add-journal myspec --title "Review completed" --content "7.5/10 score, 2 critical issues addressed"
 
-# 6. Approve and proceed (via `Skill(sdd-next)`)
+# 6. Approve and proceed (via `Skill(sdd-toolkit:sdd-next)`)
 sdd update-frontmatter myspec status "approved"
 ```
 
@@ -507,7 +507,7 @@ MEDIUM (consider fixing):
 
 Edit the spec file to address issues found.
 
-**3. Document review (via Skill(sdd-update)):**
+**3. Document review (via Skill(sdd-toolkit:sdd-update)):**
 
 ```bash
 # Journal the review results
@@ -538,8 +538,8 @@ sdd review specs/active/user-auth-001.json --type quick
 sdd update-frontmatter user-auth-001 status "approved"
 sdd update-frontmatter user-auth-001 review_status "approved"
 
-# Begin implementation (via Skill(sdd-next))
-# (Use Skill(sdd-next) to find first task)
+# Begin implementation (via Skill(sdd-toolkit:sdd-next))
+# (Use Skill(sdd-toolkit:sdd-next) to find first task)
 ```
 
 ## CLI Command Reference
@@ -650,12 +650,12 @@ sdd review critical-spec.json --type full --tools gemini,codex,cursor-agent
 
 ## Integration with SDD Workflow
 
-### With `Skill(sdd-plan)`
+### With `Skill(sdd-toolkit:sdd-plan)`
 
 **After spec creation:**
 
 ```bash
-# 1. Create spec (via Skill(sdd-plan))
+# 1. Create spec (via Skill(sdd-toolkit:sdd-plan))
 #    → Generates specs/active/myspec.json
 
 # 2. Review it
@@ -678,10 +678,10 @@ sdd review specs/active/myspec.json --type full
 # → Overall: 2.5/10 (REJECT)
 
 # Back to sdd-plan to redesign
-# (Use `Skill(sdd-plan)` to create new version)
+# (Use `Skill(sdd-toolkit:sdd-plan)` to create new version)
 ```
 
-### With `Skill(sdd-update)`
+### With `Skill(sdd-toolkit:sdd-update)`
 
 **Document review results:**
 
@@ -726,7 +726,7 @@ sdd update-frontmatter user-auth-001 status "approved"
 }
 ```
 
-### With `Skill(sdd-next)`
+### With `Skill(sdd-toolkit:sdd-next)`
 
 **Review → Approve → Implement:**
 
@@ -735,11 +735,11 @@ sdd update-frontmatter user-auth-001 status "approved"
 sdd review specs/active/user-auth-001.json --type full
 # → 8.2/10 (APPROVE)
 
-# Document approval (via Skill(sdd-update))
+# Document approval (via Skill(sdd-toolkit:sdd-update))
 sdd update-frontmatter user-auth-001 status "approved"
 
-# Begin implementation (via Skill(sdd-next))
-# (Use Skill(sdd-next) to find first task)
+# Begin implementation (via Skill(sdd-toolkit:sdd-next))
+# (Use Skill(sdd-toolkit:sdd-next) to find first task)
 ```
 
 **Review gates implementation:**
@@ -755,7 +755,7 @@ Review Score → Decision
 
 ```bash
 # 1. Create spec
-# (Use Skill(sdd-plan))
+# (Use Skill(sdd-toolkit:sdd-plan))
 # → specs/active/myspec.json created
 
 # 2. Review spec
@@ -769,15 +769,15 @@ sdd review specs/active/myspec.json --type full
 sdd review specs/active/myspec.json --type quick
 # → 8.0/10 (APPROVE)
 
-# 5. Document review (via Skill(sdd-update))
+# 5. Document review (via Skill(sdd-toolkit:sdd-update))
 sdd add-journal myspec --title "Review approved" \
   --content "8.0/10, all critical issues resolved"
 sdd update-frontmatter myspec status "approved"
 
-# 6. Begin implementation (via Skill(sdd-next))
-# (Use Skill(sdd-next) to find first task)
+# 6. Begin implementation (via Skill(sdd-toolkit:sdd-next))
+# (Use Skill(sdd-toolkit:sdd-next) to find first task)
 
-# 7. Track progress (via Skill(sdd-update))
+# 7. Track progress (via Skill(sdd-toolkit:sdd-update))
 # ... as implementation proceeds ...
 ```
 
@@ -973,26 +973,26 @@ sdd add-journal myspec --title "Deferred optimization concern" \
 
 ## See Also
 
-**Skill(sdd-plan)** - Use before this skill:
+**Skill(sdd-toolkit:sdd-plan)** - Use before this skill:
 - Create specifications from requirements
 - Generate task hierarchies and phases
 - Define dependencies and verification steps
 - Set up project structure
 
-**Skill(sdd-next)** - Use after review:
+**Skill(sdd-toolkit:sdd-next)** - Use after review:
 - Find next actionable task from approved spec
 - Create execution plans for implementation
 - Begin implementation after APPROVE
 - Handle blockers and resume work
 
-**Skill(sdd-update)** - Use to document review:
+**Skill(sdd-toolkit:sdd-update)** - Use to document review:
 - Update spec metadata (status, review_score, review_date)
 - Add journal entries documenting review results
 - Track review history and decisions
 - Mark spec as approved after successful review
 - Document deferred issues
 
-**Skill(sdd-validate)** - Complementary validation:
+**Skill(sdd-toolkit:sdd-validate)** - Complementary validation:
 - Validate JSON spec file structure
 - Check for schema compliance
 - Find structural errors

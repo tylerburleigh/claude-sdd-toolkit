@@ -348,10 +348,12 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         else:
             printer.detail(f"   Mode: Single-agent ({tool_arg})")
 
-        arch_content = None
+        # Gather AI research (returns dict with responses_by_tool)
+        arch_result = None
+        arch_success = False
         if not args.skip_architecture:
             printer.detail("\n📐 Gathering architecture research...")
-            arch_success, arch_research = generate_architecture_docs(
+            arch_success, arch_result = generate_architecture_docs(
                 context_summary,
                 reading_order,
                 project_dir,
@@ -361,20 +363,14 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 verbose=getattr(args, 'verbose', False),
                 printer=printer,
             )
-            if arch_success and arch_research:
-                printer.detail("   📝 Composing ARCHITECTURE.md from research findings...")
-                arch_content = compose_architecture_doc(
-                    arch_research,
-                    project_name,
-                    args.version,
-                )
-            else:
-                printer.warning(f"Failed to get architecture research: {arch_research}")
+            if not arch_success:
+                printer.warning(f"Failed to get architecture research")
 
-        context_content = None
+        context_result = None
+        context_success = False
         if not args.skip_ai_context:
             printer.detail("\n📝 Gathering AI context research...")
-            context_success, context_research = generate_ai_context_docs(
+            context_success, context_result = generate_ai_context_docs(
                 context_summary,
                 reading_order,
                 project_dir,
@@ -384,21 +380,15 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 verbose=getattr(args, 'verbose', False),
                 printer=printer,
             )
-            if context_success and context_research:
-                printer.detail("   📝 Composing AI_CONTEXT.md from research findings...")
-                context_content = compose_ai_context_doc(
-                    context_research,
-                    project_name,
-                    args.version,
-                )
-            else:
-                printer.warning(f"Failed to get AI context research: {context_research}")
+            if not context_success:
+                printer.warning(f"Failed to get AI context research")
 
         if args.dry_run:
             printer.detail("\n🔍 Dry run complete. No files saved.")
             return 0
 
-        printer.detail(f"\n💾 Saving documentation to {output_dir}...")
+        # Always write structural documentation
+        printer.detail(f"\n💾 Saving structural documentation to {output_dir}...")
         output_dir.mkdir(parents=True, exist_ok=True)
 
         md_path = output_dir / 'DOCUMENTATION.md'
@@ -408,24 +398,36 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         printer.success(f"   ✅ {md_path}")
         printer.success(f"   ✅ {json_path}")
 
-        if arch_content:
-            arch_path = output_dir / 'ARCHITECTURE.md'
-            arch_path.write_text(arch_content, encoding='utf-8')
-            printer.success(f"   ✅ {arch_path}")
+        # Return JSON with separate AI responses for main agent synthesis
+        import json as json_module
 
-        if context_content:
-            context_path = output_dir / 'AI_CONTEXT.md'
-            context_path.write_text(context_content, encoding='utf-8')
-            printer.success(f"   ✅ {context_path}")
+        printer.detail("\n📤 Returning AI research for main agent synthesis...")
 
-        printer.success("\n🎉 Documentation generation complete!")
-        printer.detail("\n📚 Generated files:")
-        printer.detail("   - DOCUMENTATION.md (structural reference)")
-        if arch_content:
-            printer.detail("   - ARCHITECTURE.md (AI-generated design docs)")
-        if context_content:
-            printer.detail("   - AI_CONTEXT.md (AI assistant quick reference)")
-        printer.detail("   - documentation.json (machine-readable)")
+        research_output = {
+            "status": "success",
+            "project_name": project_name,
+            "version": args.version,
+            "output_dir": str(output_dir),
+            "architecture_research": arch_result.get("responses_by_tool", {}) if arch_success and arch_result else None,
+            "ai_context_research": context_result.get("responses_by_tool", {}) if context_success and context_result else None,
+            "statistics": statistics,
+        }
+
+        # Print JSON to stdout for main agent to parse
+        print("\n" + "=" * 80)
+        print("RESEARCH_JSON_START")
+        print(json_module.dumps(research_output, indent=2))
+        print("RESEARCH_JSON_END")
+        print("=" * 80)
+
+        printer.success("\n✅ Research gathering complete!")
+        printer.detail("\n📋 Next steps for main agent:")
+        printer.detail("   1. Parse JSON output from stdout")
+        printer.detail("   2. Synthesize architecture_research from all AI tools")
+        printer.detail("   3. Synthesize ai_context_research from all AI tools")
+        printer.detail("   4. Write ARCHITECTURE.md to output_dir")
+        printer.detail("   5. Write AI_CONTEXT.md to output_dir")
+
         return 0
 
     except Exception as exc:  # pylint: disable=broad-except

@@ -191,8 +191,8 @@ Hooks in `~/.claude/hooks/` run automatically on events.
 {
   "permissions": {
     "allow": [
-      "Skill(sdd-plan)",
-      "Skill(sdd-next)",
+      "Skill(sdd-toolkit:sdd-plan)",
+      "Skill(sdd-toolkit:sdd-next)",
       "Bash(sdd:*)",
       "Read(//**/specs/**)",
       "Write(//**/specs/active/**)"

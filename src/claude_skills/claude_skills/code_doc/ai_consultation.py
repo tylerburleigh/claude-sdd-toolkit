@@ -581,18 +581,17 @@ def consult_multi_agent(
 
     total_duration = time.time() - start_time
 
-    # Pick best response (prefer cursor-agent for architecture, gemini for ai_context)
+    # Return all successful responses keyed by tool name for main agent synthesis
     successful = [r for r in responses if r["success"]]
 
     if successful:
-        # Prefer primary tool from routing
-        primary_tool, _ = DOC_TYPE_ROUTING.get(doc_type, (None, None))
-        best_response = next((r for r in successful if r["tool"] == primary_tool), successful[0])
+        # Create dict of responses keyed by tool name
+        responses_by_tool = {r["tool"]: r["output"] for r in successful}
 
         return {
             "success": True,
-            "primary_tool": best_response["tool"],
-            "output": best_response["output"],
+            "tools_consulted": list(responses_by_tool.keys()),
+            "responses_by_tool": responses_by_tool,
             "responses": responses,
             "total_duration": total_duration
         }
@@ -627,7 +626,7 @@ def generate_architecture_docs(
     dry_run: bool = False,
     verbose: bool = False,
     printer: Optional['PrettyPrinter'] = None
-) -> Tuple[bool, str]:
+) -> Tuple[bool, Dict]:
     """
     Get architecture research findings from AI consultation.
 
@@ -642,20 +641,21 @@ def generate_architecture_docs(
         printer: Optional PrettyPrinter for consistent output
 
     Returns:
-        Tuple of (success: bool, research_findings: str)
+        Tuple of (success: bool, result: Dict with responses_by_tool)
     """
     prompt = format_architecture_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
         result = consult_multi_agent("architecture", prompt, "default", dry_run, verbose, printer)
-        return result["success"], result.get("output", "")
+        return result["success"], result
     else:
         if tool == "auto":
             tool = get_best_tool("architecture")
             if not tool:
-                return False, "No AI tools available"
+                return False, {"error": "No AI tools available"}
 
-        return run_consultation(tool, prompt, dry_run, verbose, printer)
+        success, output = run_consultation(tool, prompt, dry_run, verbose, printer)
+        return success, {"responses_by_tool": {tool: output} if success else {}}
 
 
 def generate_ai_context_docs(
@@ -667,7 +667,7 @@ def generate_ai_context_docs(
     dry_run: bool = False,
     verbose: bool = False,
     printer: Optional['PrettyPrinter'] = None
-) -> Tuple[bool, str]:
+) -> Tuple[bool, Dict]:
     """
     Get AI context research findings from AI consultation.
 
@@ -682,17 +682,18 @@ def generate_ai_context_docs(
         printer: Optional PrettyPrinter for consistent output
 
     Returns:
-        Tuple of (success: bool, research_findings: str)
+        Tuple of (success: bool, result: Dict with responses_by_tool)
     """
     prompt = format_ai_context_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
         result = consult_multi_agent("ai_context", prompt, "default", dry_run, verbose, printer)
-        return result["success"], result.get("output", "")
+        return result["success"], result
     else:
         if tool == "auto":
             tool = get_best_tool("ai_context")
             if not tool:
-                return False, "No AI tools available"
+                return False, {"error": "No AI tools available"}
 
-        return run_consultation(tool, prompt, dry_run, verbose, printer)
+        success, output = run_consultation(tool, prompt, dry_run, verbose, printer)
+        return success, {"responses_by_tool": {tool: output} if success else {}}

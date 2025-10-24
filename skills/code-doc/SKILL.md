@@ -45,23 +45,30 @@ If the verification command fails, ensure the SDD toolkit is properly installed 
 
 ## Quick Start
 
-### Option 1: AI-Enhanced Documentation (Recommended)
+### Option 1: AI-Enhanced Documentation with Main Agent Synthesis (Recommended)
 
-**Single-Step Workflow with AI Assistance:**
+**Two-Phase Workflow with AI Research + Main Agent Synthesis:**
 
 ```bash
 sdd doc analyze-with-ai <directory> --name ProjectName --version X.Y.Z --verbose
 ```
 
-**This generates:**
-- `DOCUMENTATION.md` - Structural reference (classes, functions, dependencies)
-- `ARCHITECTURE.md` - Architecture and design docs (composed from AI research)
-- `AI_CONTEXT.md` - Quick reference for AI assistants (composed from AI research)
-- `documentation.json` - Machine-readable structural data (queryable with `sdd doc` commands)
+**Phase 1: Skill gathers research**
+- Writes `DOCUMENTATION.md` - Structural reference (classes, functions, dependencies)
+- Writes `documentation.json` - Machine-readable structural data
+- Runs multi-agent AI consultation (cursor-agent + gemini in parallel)
+- Returns JSON with separate responses from each AI tool to stdout
+
+**Phase 2: Main agent synthesizes**
+- Parses JSON output containing research from all AI tools
+- Intelligently synthesizes findings from multiple perspectives
+- Writes `ARCHITECTURE.md` - Unified architecture documentation
+- Writes `AI_CONTEXT.md` - Unified AI assistant quick reference
 
 **Requirements:**
-- At least one AI CLI tool installed: cursor-agent (with gpt-4.1), gemini, or codex
+- At least one AI CLI tool installed: cursor-agent (with cheetah), gemini, or codex
 - Uses 2-model consultation by default for comprehensive analysis (falls back to single-model if only 1 tool available)
+- Main agent (Claude Code) performs final synthesis
 
 **After generation, you can query the documentation:**
 ```bash
@@ -141,56 +148,88 @@ sdd doc search "MyClass" --docs-path ./docs/documentation.json
 - Writing conceptual documentation (tutorials, guides, explanations)
 - Generating docstrings (this extracts existing docstrings)
 - Code generation or modification
-- Testing or debugging (use `Skill(run-tests)` instead)
+- Testing or debugging (use `Skill(sdd-toolkit:run-tests)` instead)
 
 ---
 
-## Research-then-Compose Architecture
+## Research-then-Synthesis Architecture
 
-**IMPORTANT: Understanding What Gets Generated Automatically vs Manually**
+**IMPORTANT: Understanding What Gets Generated Automatically vs By Main Agent**
 
-This skill uses a **research-then-compose pattern** for AI-enhanced documentation:
+This skill uses a **research gathering + main agent synthesis pattern** for AI-enhanced documentation:
 
 ### What `analyze-with-ai` Command Does Automatically
 
 When you run the `analyze-with-ai` command, it:
 1. ✅ **Generates structural docs automatically** (DOCUMENTATION.md, documentation.json)
-2. ✅ **Calls external AI CLIs** (cursor-agent, gemini, codex) for research
-3. ✅ **Receives research findings** as text responses from AI CLIs
-4. ⚠️ **Returns research to calling script** (does NOT write ARCHITECTURE.md/AI_CONTEXT.md itself)
+2. ✅ **Calls external AI CLIs in parallel** (cursor-agent + gemini by default)
+3. ✅ **Collects separate research responses** from each AI tool
+4. ✅ **Returns JSON to stdout** with research keyed by tool name
+5. ⚠️ **Does NOT write ARCHITECTURE.md/AI_CONTEXT.md** (main agent does this)
+
+**JSON Output Format:**
+```json
+{
+  "status": "success",
+  "project_name": "MyProject",
+  "version": "1.0.0",
+  "output_dir": "docs",
+  "architecture_research": {
+    "cursor-agent": "raw architecture research from cursor-agent",
+    "gemini": "raw architecture research from gemini"
+  },
+  "ai_context_research": {
+    "cursor-agent": "raw AI context research from cursor-agent",
+    "gemini": "raw AI context research from gemini"
+  },
+  "statistics": {...}
+}
+```
 
 ### What the Main Agent Must Do After Research
 
 **CRITICAL:** The main Claude Code agent must:
-1. **Compose ARCHITECTURE.md** from AI research findings
-   - Research is returned as plain text
-   - Agent adds proper markdown headers
-   - Agent adds project metadata (name, version, date)
-   - Agent writes the final file to disk
+1. **Parse JSON output** from skill's stdout
+   - Extract between `RESEARCH_JSON_START` and `RESEARCH_JSON_END` markers
+   - Parse as JSON object
 
-2. **Compose AI_CONTEXT.md** from AI research findings
-   - Same composition process
-   - Format for AI assistant consumption
-   - Write final file
+2. **Synthesize ARCHITECTURE.md** from multiple AI perspectives
+   - Read responses from cursor-agent and gemini separately
+   - Intelligently merge insights and remove redundancy
+   - Create unified, coherent architecture documentation
+   - Add proper headers, project metadata, and formatting
+   - Write final file to output_dir
+
+3. **Synthesize AI_CONTEXT.md** from multiple AI perspectives
+   - Same synthesis process
+   - Format optimized for AI assistant consumption
+   - Write final file to output_dir
 
 ### The Two-Phase Workflow
 
-**Phase 1: Research (AI CLIs - Read-Only)**
-- External AI CLIs analyze code files
-- They identify patterns and architectural decisions
-- They return research findings as text
-- **They DO NOT write files** (read-only access only)
+**Phase 1: Research Gathering (Skill)**
+- Skill runs multi-agent consultation in parallel
+- Each AI CLI analyzes code files independently
+- Each provides their unique perspective
+- Skill collects all responses without filtering or merging
+- Returns raw responses as JSON to stdout
+- **Does NOT synthesize or write AI docs**
 
-**Phase 2: Composition (Main Agent - Write Access)**
-- Main agent receives research text
-- Agent formats into documentation structure
-- Agent writes ARCHITECTURE.md and AI_CONTEXT.md
-- All file I/O happens in the main agent
+**Phase 2: Synthesis (Main Agent)**
+- Main agent receives separate responses from all AI tools
+- Agent makes intelligent synthesis decisions:
+  - Merges complementary insights
+  - Resolves contradictions
+  - Removes redundancy
+  - Highlights unique perspectives where valuable
+- Agent writes final ARCHITECTURE.md and AI_CONTEXT.md
+- All synthesis and file writing happens in main agent
 
 **Why this separation?**
-- External AI CLIs called via subprocess have read-only tools
-- Main agent has full write access
-- Ensures reliable operation across different AI CLI tools
+- AI CLIs provide diverse perspectives without bias
+- Main agent (Claude Code) has context about the user's needs
+- Main agent can make intelligent synthesis decisions
+- Cleaner separation of concerns: research vs. synthesis
 
 ---
 
@@ -371,13 +410,16 @@ sdd doc analyze-with-ai <directory> [options]
 - `--verbose, -v`: Show progress (ALWAYS use)
 
 **Output:**
-- `DOCUMENTATION.md` - Structural reference
-- `ARCHITECTURE.md` - Architecture docs (composed from AI research)
-- `AI_CONTEXT.md` - AI assistant quick reference (composed from AI research)
-- `documentation.json` - Machine-readable data
+- `DOCUMENTATION.md` - Structural reference (auto-written by skill)
+- `documentation.json` - Machine-readable data (auto-written by skill)
+- JSON to stdout - Research from all AI tools (for main agent synthesis)
+
+**Main agent then writes:**
+- `ARCHITECTURE.md` - Synthesized architecture docs
+- `AI_CONTEXT.md` - Synthesized AI assistant quick reference
 
 **AI Tools:**
-- **cursor-agent with gpt-4.1** (preferred) - 1M context, excellent for large codebases
+- **cursor-agent with cheetah** (preferred) - 1M context, excellent for large codebases
 - **gemini** - Fast, good for structured analysis
 - **codex** - Good for code understanding
 
@@ -385,7 +427,8 @@ sdd doc analyze-with-ai <directory> [options]
 - Consults 2 AI models in parallel for comprehensive analysis
 - Uses priority order: cursor-agent → gemini → codex
 - Automatically selects best 2 available models (or falls back to 1 if only 1 tool installed)
-- Synthesizes responses for comprehensive coverage
+- Returns separate responses keyed by tool name (no merging/synthesis in skill)
+- Main agent performs intelligent synthesis
 - Recommended for production documentation
 
 #### 2. `analyze` - Preview Statistics Only
@@ -892,7 +935,7 @@ Documentation generated for the remaining 43 valid files."
 **Report AI model errors transparently:**
 ```
 "⚠️ AI model consultation encountered an error:
-- cursor-agent failed (model 'gpt-4.1' not available)
+- cursor-agent failed (model 'cheetah' not available)
 - gemini succeeded
 
 Documentation was generated successfully using gemini's analysis.
@@ -923,23 +966,30 @@ You can retry later with: sdd doc analyze-with-ai ..."
 
 **Your Response:**
 1. Ask: "Should I exclude tests and migrations?"
-2. Use `analyze-with-ai` command
-3. Report what was generated
-4. Highlight AI-generated architecture and AI context docs
+2. Run `analyze-with-ai` command (gathers research)
+3. Parse JSON output from skill
+4. Synthesize findings from multiple AI perspectives
+5. Write ARCHITECTURE.md and AI_CONTEXT.md
+6. Report what was generated
 
 **Example:**
 ```bash
-# Single command generates everything
+# Step 1: Run skill to gather research
 sdd doc analyze-with-ai ./my_project --name "MyProject" --version "1.0.0" --exclude tests --exclude migrations --verbose
+
+# Step 2: Skill writes structural docs and returns JSON
+# Step 3: You (main agent) parse JSON with research from cursor-agent and gemini
+# Step 4: You synthesize both perspectives into unified docs
+# Step 5: You write final ARCHITECTURE.md and AI_CONTEXT.md
 ```
 
-**Output:**
+**Final Output:**
 ```
 docs/
-├── DOCUMENTATION.md       # Structural (classes, functions, deps)
-├── ARCHITECTURE.md        # Architecture docs (from AI research)
-├── AI_CONTEXT.md         # AI quick reference (from AI research)
-└── documentation.json    # Machine-readable structural
+├── DOCUMENTATION.md       # Structural (auto-written by skill)
+├── documentation.json     # Machine-readable (auto-written by skill)
+├── ARCHITECTURE.md        # Synthesized by main agent from multi-AI research
+└── AI_CONTEXT.md          # Synthesized by main agent from multi-AI research
 ```
 
 ### Scenario 1b: Full Project Documentation (Structural Only)
@@ -1290,5 +1340,3 @@ sdd doc generate ./src --name MyProject
 - Creating custom formatters
 
 **The tools are already built - use them effectively!**
-
-For detailed command examples, workflow patterns, and integration scenarios, refer to the `references/` directory.

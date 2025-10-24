@@ -15,14 +15,14 @@ from pathlib import Path
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
     # Skills
-    "Skill(run-tests)",
-    "Skill(sdd-plan)",
-    "Skill(sdd-next)",
-    "Skill(sdd-update)",
-    "Skill(sdd-plan-review)",
-    "Skill(sdd-validate)",
-    "Skill(code-doc)",
-    "Skill(doc-query)",
+    "Skill(sdd-toolkit:run-tests)",
+    "Skill(sdd-toolkit:sdd-plan)",
+    "Skill(sdd-toolkit:sdd-next)",
+    "Skill(sdd-toolkit:sdd-update)",
+    "Skill(sdd-toolkit:sdd-plan-review)",
+    "Skill(sdd-toolkit:sdd-validate)",
+    "Skill(sdd-toolkit:code-doc)",
+    "Skill(sdd-toolkit:doc-query)",
 
     # Slash commands
     "SlashCommand(/sdd-start)",
@@ -138,9 +138,9 @@ def check_permissions(project_root):
 
     # Check if key SDD permissions are present
     required_permissions = [
-        "Skill(sdd-plan)",
-        "Skill(sdd-next)",
-        "Skill(sdd-update)",
+        "Skill(sdd-toolkit:sdd-plan)",
+        "Skill(sdd-toolkit:sdd-next)",
+        "Skill(sdd-toolkit:sdd-update)",
     ]
 
     configured = all(perm in existing_permissions for perm in required_permissions)

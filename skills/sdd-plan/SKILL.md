@@ -8,9 +8,9 @@ description: Plan-first development methodology that creates detailed specificat
 ## Skill Family
 
 This skill is part of the **Spec-Driven Development** family:
-- **Skill(sdd-plan)** (this skill) - Creates specifications and task hierarchies
-- **Skill(sdd-next)** - Identifies next tasks and creates execution plans
-- **Skill(sdd-update)** - Tracks progress and maintains documentation
+- **Skill(sdd-toolkit:sdd-plan)** (this skill) - Creates specifications and task hierarchies
+- **Skill(sdd-toolkit:sdd-next)** - Identifies next tasks and creates execution plans
+- **Skill(sdd-toolkit:sdd-update)** - Tracks progress and maintains documentation
 
 ## Complete Workflow
 
@@ -78,7 +78,7 @@ If the verification command fails, ensure the SDD toolkit is properly installed 
 
 ## When to Use This Skill
 
-Use Skill(sdd-plan) for:
+Use Skill(sdd-toolkit:sdd-plan) for:
 - New features or significant functionality additions
 - Complex refactoring across multiple files
 - API integrations or external service connections
@@ -91,29 +91,29 @@ Use Skill(sdd-plan) for:
 - Trivial modifications or formatting changes
 - Exploratory prototyping or spikes
 - Quick experiments or proof-of-concepts
-- Updating existing specs (use Skill(sdd-update))
-- Finding what to work on next (use Skill(sdd-next))
-- Tracking task progress (use Skill(sdd-update))
+- Updating existing specs (use Skill(sdd-toolkit:sdd-update))
+- Finding what to work on next (use Skill(sdd-toolkit:sdd-next))
+- Tracking task progress (use Skill(sdd-toolkit:sdd-update))
 
 ## Skill Handoff Points
 
 **When to transition to other skills:**
 
-→ **To Skill(sdd-next)**:
+→ **To Skill(sdd-toolkit:sdd-next)**:
   - After JSON spec file is created
   - When ready to begin implementation
   - User asks "what should I work on next?"
   - Need to identify the first/next actionable task
 
-→ **To Skill(sdd-update)**:
+→ **To Skill(sdd-toolkit:sdd-update)**:
   - Need to update task status during planning
   - Must document a planning decision
   - Spec needs to be moved between folders
   - Progress metrics need updating
 
 → **To Implementation**:
-  - Never directly - always go through Skill(sdd-next) first
-  - Skill(sdd-next) creates the execution plan
+  - Never directly - always go through Skill(sdd-toolkit:sdd-next) first
+  - Skill(sdd-toolkit:sdd-next) creates the execution plan
   - Then implementation tools (coding assistants) execute it
 
 ## The Spec-Driven Development Process
@@ -295,7 +295,7 @@ Before creating the plan, explore the relevant parts of the codebase:
 - Review similar implementations for consistency
 - Note potential conflicts or breaking changes
 
-#### 1.2.1 Using `Skill(doc-query)` for Efficient Codebase Analysis (Recommended)
+#### 1.2.1 Using `Skill(sdd-toolkit:doc-query)` for Efficient Codebase Analysis (Recommended)
 
 **Proactive Documentation Generation**
 
@@ -319,9 +319,9 @@ planning tasks.
 Generate documentation now? [Y/n]
 ```
 
-3. **If user agrees**, run the `Skill(code-doc)` skill to generate documentation
+3. **If user agrees**, run the `Skill(sdd-toolkit:code-doc)` skill to generate documentation
 
-Then invoke `Skill(doc-query)` for codebase analysis.
+Then invoke `Skill(sdd-toolkit:doc-query)` for codebase analysis.
 
 4. **If user declines** or generation fails, fall back to manual exploration using `Explore`, or alternatively Glob/Read.
 
@@ -335,11 +335,11 @@ Then invoke `Skill(doc-query)` for codebase analysis.
 
 **Using Existing Documentation:**
 
-If codebase documentation has been generated, use `Skill(doc-query)` to efficiently gather context before planning. This provides structured, comprehensive codebase understanding without manual exploration.
+If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` to efficiently gather context before planning. This provides structured, comprehensive codebase understanding without manual exploration.
 
 **Recommended Analysis Workflow:**
 
-The `Skill(doc-query)` provides the following capabilities (command examples shown for reference):
+The `Skill(sdd-toolkit:doc-query)` provides the following capabilities (command examples shown for reference):
 
 **Step 1: Get Codebase Overview**
 ```bash
@@ -434,7 +434,7 @@ sdd doc complexity --module auth.py
 # Understand existing auth complexity
 ```
 
-**Benefits of Using `Skill(doc-query)`:**
+**Benefits of Using `Skill(sdd-toolkit:doc-query)`:**
 - ✅ **10x faster analysis** - Structured queries vs manual exploration
 - ✅ **More accurate specs** - Based on actual structure, not assumptions
 - ✅ **Better dependency awareness** - Understand impact upfront
@@ -1179,7 +1179,7 @@ sdd validate specs/active/your-spec.json
 - **Think ahead**: Consider maintenance, testing, and documentation needs
 - **Stay grounded**: Base plans on actual codebase exploration, not assumptions
 
-### Review Workflow (Integration with `Skill(sdd-plan-review)`)
+### Review Workflow (Integration with `Skill(sdd-toolkit:sdd-plan-review)`)
 
 After creating and validating a spec, consider having it reviewed before implementation:
 
@@ -1197,8 +1197,8 @@ not_reviewed (default) → in_review → reviewed → approved → implementatio
 - `approved`: Review issues addressed, ready for implementation
 
 **Review Integration:**
-1. **Create & Validate**: Use `Skill(sdd-plan)` to create spec, validate with `validate-all`
-2. **Review**: Use `Skill(sdd-plan-review)` to get multi-perspective feedback
+1. **Create & Validate**: Use `Skill(sdd-toolkit:sdd-plan)` to create spec, validate with `validate-all`
+2. **Review**: Use `Skill(sdd-toolkit:sdd-plan-review)` to get multi-perspective feedback
 3. **Revise**: Address critical/high issues found in review
 4. **Track**: Review metadata automatically added to spec frontmatter
 5. **Link**: Revisions can reference the review that triggered them
@@ -1206,7 +1206,7 @@ not_reviewed (default) → in_review → reviewed → approved → implementatio
 **Example Workflow:**
 ```bash
 # 1. Create spec
-# (Use Skill(sdd-plan) skill)
+# (Use Skill(sdd-toolkit:sdd-plan) skill)
 
 # 2. Validate JSON spec file
 sdd validate specs/active/myspec.json
@@ -1221,7 +1221,7 @@ sdd-review review-spec specs/active/myspec.json --type full --auto-fix
 # 5. Re-run validation before handoff
 sdd validate specs/active/myspec.json --json
 
-# 6. Begin implementation with Skill(sdd-next)
+# 6. Begin implementation with Skill(sdd-toolkit:sdd-next)
 ```
 
 **Review Metadata Structure:**
@@ -1270,15 +1270,15 @@ The `review` section tracks all reviews:
 
 1. **Review with user** - Ensure spec meets expectations
 2. **Approve spec** - Update frontmatter status from "draft" to "approved"
-3. **Hand off to Skill(sdd-next)** - Now ready for task identification
-4. **Skill(sdd-next)** identifies first actionable task
-5. **Skill(sdd-next)** creates execution plan for that task
+3. **Hand off to Skill(sdd-toolkit:sdd-next)** - Now ready for task identification
+4. **Skill(sdd-toolkit:sdd-next)** identifies first actionable task
+5. **Skill(sdd-toolkit:sdd-next)** creates execution plan for that task
 6. **Implementation happens** (human/AI executes the plan)
-7. **Skill(sdd-update)** updates progress and status
+7. **Skill(sdd-toolkit:sdd-update)** updates progress and status
 8. **Repeat** steps 4-7 until spec complete
 
 **If Spec Needs Changes:**
-- Use Skill(sdd-update) to document the change decision
+- Use Skill(sdd-toolkit:sdd-update) to document the change decision
 - Use this skill to regenerate portions if major restructuring needed
 - Update spec version in frontmatter if significant
 
@@ -1295,20 +1295,20 @@ The `review` section tracks all reviews:
 
 ```
 Need to plan a new feature or change?
-├─ Yes → Use `Skill(sdd-plan)` (this skill)
+├─ Yes → Use `Skill(sdd-toolkit:sdd-plan)` (this skill)
 └─ No → Continue below
 
 Have an existing spec and ready to implement?
 ├─ Yes, but don't know what to work on next
-│   └─ Use `Skill(sdd-next)`
+│   └─ Use `Skill(sdd-toolkit:sdd-next)`
 └─ Yes, and need to update status/progress
-    └─ Use `Skill(sdd-update)`
+    └─ Use `Skill(sdd-toolkit:sdd-update)`
 
 Spec already exists and needs modification?
 ├─ Minor updates (status, metadata, journal)
-│   └─ Use `Skill(sdd-update)`
+│   └─ Use `Skill(sdd-toolkit:sdd-update)`
 └─ Major restructuring (new phases, tasks)
-    └─ Use `Skill(sdd-plan)` to generate new plan
+    └─ Use `Skill(sdd-toolkit:sdd-plan)` to generate new plan
 ```
 
 ## Quick Reference
@@ -1356,4 +1356,4 @@ Spec already exists and needs modification?
 
 ---
 
-**Remember**: The time spent on specification pays exponential dividends in implementation quality and developer confidence. Never skip the planning phase. Once the spec is created, transition to the `Skill(sdd-next)` to begin identifying and planning specific tasks for implementation.
+**Remember**: The time spent on specification pays exponential dividends in implementation quality and developer confidence. Never skip the planning phase. Once the spec is created, transition to the `Skill(sdd-toolkit:sdd-next)` to begin identifying and planning specific tasks for implementation.

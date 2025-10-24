@@ -1,315 +1,591 @@
-# claude-sdd-toolkit - Architecture Documentation
+# Architecture Documentation
 
-**Version:** 1.0.0
-**Generated:** 2025-10-24 10:59:17
-
----
-
-## Introduction
-
-This document describes the architecture of the codebase, including system design,
-component structure, data flow, and key design decisions.
+**Project:** claude-sdd-toolkit
+**Version:** 0.1.0
+**Generated:** 2025-10-24
 
 ---
-
-## Architecture Analysis
-
-
-# Architecture Research Findings
 
 ## 1. System Overview
 
-The SDD Toolkit is a Python library for Spec-Driven Development (SDD) in Claude Code. It provides a plan-first workflow: create structured specs, identify next tasks, track progress, and validate specs. It also includes documentation generation/querying and test execution/debugging.
+The SDD Toolkit is a Claude Code plugin designed to enforce a structured, spec-driven development workflow. It uses machine-readable JSON specifications to define tasks, dependencies, and track progress throughout the development lifecycle. By formalizing the development process, the toolkit addresses common challenges in AI-assisted development: scope drift, forgotten requirements, and lost context.
 
-Intended users: developers using Claude Code for AI-assisted development.
+**Intended Users:** Software developers working with Claude Code on complex projects who need systematic planning, execution tracking, and comprehensive audit trails.
 
-Problem solved: reduces AI coding errors, prevents context drift, and keeps implementations aligned with intent.
+**Core Problem:** During complex, AI-assisted development sessions, maintaining focus and continuity is challenging. The toolkit solves this by requiring all work to be defined in a specification before implementation begins, providing "guardrails" for both developers and AI assistants.
 
-## 2. Component Identification
+---
 
-### Core Components
+## 2. Component Architecture
 
-**1. Unified CLI System** (`src/claude_skills/cli/sdd/`)
-- Single entry point (`sdd`) with subcommands
-- Registry pattern for plugin registration
-- Global options (`--json`, `--verbose`, `--quiet`, `--debug`)
-- Parent parser for shared options
+The system follows a layered architecture where each layer has distinct responsibilities and clear boundaries.
 
-**2. Common Utilities** (`src/claude_skills/common/`)
-- Spec operations: load/save JSON specs, backup, node operations
-- Progress: recalculation, parent status updates, summaries
-- Path utilities: discovery, validation, normalization
-- Validation: hierarchy, structure, dependencies, metadata
-- Dependency analysis: cycles, deadlocks, bottlenecks
-- Query operations: task queries, phase listing, blockers
-- Metrics: collection and tracking
-- Documentation helpers: doc-query integration
-- Cross-skill integrations: spec validation, verify task execution
+### A. Skills Layer (`~/.claude/skills/`)
 
-**3. SDD Core Skills**
+**Purpose:** Extend Claude with specialized workflows that are automatically invoked based on user intent.
 
-**sdd-plan** (`src/claude_skills/sdd_plan/`)
-- Creates JSON specs with phases, tasks, dependencies
-- Templates (simple, medium, complex, security)
-- Codebase analysis for planning
+**Location:** `skills/*/SKILL.md`
 
-**sdd-next** (`src/claude_skills/sdd_next/`)
-- Finds next actionable tasks
-- Prepares execution plans
-- Checks dependencies and readiness
-- Integrates with doc-query for context
+**Key Skills:**
+- **`sdd-plan`**: Creates JSON specifications from predefined templates (simple, medium, complex)
+- **`sdd-next`**: Core progression engine that identifies the next actionable task based on status and dependencies
+- **`sdd-update`**: State management for updating task statuses, journaling decisions, and time tracking
+- **`sdd-validate`**: Quality assurance tool for validating spec structure, checking for circular dependencies, and auto-fixing common errors
+- **`sdd-render`**: Presentation utility that converts JSON specs to human-readable Markdown
+- **`sdd-plan-review`**: Multi-model AI review system that consults multiple AI tools for comprehensive feedback
+- **`code-doc`**: Generates comprehensive codebase documentation with optional AI-enhanced architecture analysis
+- **`doc-query`**: Provides CLI interface to search and query generated documentation
+- **`run-tests`**: Test runner with AI-powered debugging assistance
 
-**sdd-update** (`src/claude_skills/sdd_update/`)
-- Updates task status
-- Journals decisions
-- Tracks time
-- Manages spec lifecycle
-- Records verification results
+### B. Commands Layer (`~/.claude/commands/`)
 
-**sdd-validate** (`src/claude_skills/sdd_validate/`)
-- Validates JSON spec structure
-- Auto-fixes common issues
-- Generates reports
-- Analyzes dependencies
+**Purpose:** User-invoked interactive workflows triggered with `/` prefix.
 
-**sdd-plan-review** (`src/claude_skills/sdd_plan_review/`)
-- Multi-model spec review
-- Consensus synthesis
-- Markdown/JSON reports
+**Location:** `commands/*.md`
 
-**4. Documentation Tools**
+**Key Commands:**
+- **`/sdd-setup`**: First-time configuration and project permissions setup
+- **`/sdd-start`**: Interactive workflow to resume work on active specs
 
-**code-doc** (`src/claude_skills/code_doc/`)
-- Generates codebase docs (Markdown/JSON)
-- Multi-language parsing (Python, JavaScript, TypeScript, Go, HTML, CSS)
-- AI-assisted docs (optional)
-- Complexity analysis
+### C. Hooks Layer (`~/.claude/hooks/`)
 
-**doc-query** (`src/claude_skills/doc_query/`)
-- Queries generated docs
-- Finds classes, functions, modules
-- Complexity analysis
-- Dependency mapping
+**Purpose:** Event-triggered automation for proactive assistance.
 
-**5. Testing Tools**
+**Location:** `hooks/*`
 
-**run-tests** (`src/claude_skills/run_tests/`)
-- Pytest runner with presets
-- Test discovery
-- AI consultation for debugging
-- Multi-agent consensus
-- Tool availability checking
+**Key Hooks:**
+- **`session-start`**: Detects active specs when a new Claude session begins
+- **`pre-tool-use`**: Pre-tool validation and safety checks
+- **`post-tool-use`**: Post-execution validation and cleanup
 
-**6. Development Tools** (`src/claude_skills/dev_tools/`)
-- Session management
-- Permission setup
-- Documentation generation
+### D. CLI Tools Layer (`src/claude_skills/claude_skills/`)
 
-### Key Relationships
+**Purpose:** Reusable Python tools that provide the core functionality.
+
+**Location:** Python package installed via pip
+
+**Unified CLI Structure:**
+- **`sdd`**: Core SDD workflows (next-task, update-status, validate, plan, review)
+- **`sdd doc`**: Documentation operations (generate, query, search, analyze-with-ai)
+- **`sdd test`**: Testing workflows (run, consult, discover, check-tools)
+- **`sdd skills-dev`**: Development utilities for skill/command/hook creation
+
+### Component Relationships
 
 ```
-Unified CLI (sdd)
-    ├── SDD Core Skills (plan, next, update, validate, review)
-    ├── Documentation (doc generate, doc query)
-    ├── Testing (test run, test consult)
-    └── Dev Tools (skills-dev)
-    
-Common Utilities
-    ├── Used by all SDD skills
-    ├── Provides shared operations
-    └── Enables cross-skill integration
+Claude Code (User Interface)
+    ↓
+Skills/Commands/Hooks (Orchestration Layer)
+    ↓
+CLI Tools (Business Logic)
+    ↓
+File System (State Management)
+    ↓
+Project Files (specs/, code, docs)
 ```
 
-## 3. Data Flow Observations
+**Interaction Pattern:** Skills and commands invoke CLI tools; CLI tools execute operations on files; hooks trigger automatically based on events. All components share a common utilities library for consistent behavior.
+
+---
+
+## 3. Data Flow & State Management
+
+### Specification Structure
+
+JSON specs use a hierarchical tree model:
+
+```
+spec-root (type: "spec")
+    ├── phase-1 (type: "phase")
+    │   ├── group-1 (type: "group")
+    │   │   ├── task-1-1 (type: "task")
+    │   │   │   ├── task-1-1-1 (type: "subtask")
+    │   │   │   └── task-1-1-2 (type: "subtask")
+    │   │   └── verify-1-1 (type: "verify")
+    │   └── group-2 (type: "group")
+    └── phase-2 (type: "phase")
+```
+
+**Node Properties:**
+- **Identification:** `type`, `title`, `id`, `parent`, `children`
+- **Dependencies:** `blocks`, `blocked_by`, `depends`
+- **Status:** `status` (pending, in_progress, completed, blocked)
+- **Progress:** `total_tasks`, `completed_tasks`
+- **Metadata:** Task-specific data, journal entries, time tracking
 
 ### Request/Response Lifecycle
 
-1. User invokes a skill or command
-2. CLI parses arguments and routes to a handler
-3. Handler uses common utilities to load specs/docs
-4. Business logic runs
-5. Results formatted (JSON or human-readable)
-6. Exit code returned
+**Creating a Specification:**
+1. User: "Create spec for feature X"
+2. Claude detects intent → invokes `Skill(sdd-toolkit:sdd-plan)`
+3. Skill loads instructions from `SKILL.md`
+4. Skill executes CLI: `sdd plan create`
+5. CLI generates JSON spec from template
+6. Spec saved to `specs/active/`
+7. Claude reports success to user
 
-### State Management
+**Resuming Work:**
+1. User: `/sdd-start`
+2. Command loads workflow from `commands/sdd-start.md`
+3. CLI: `sdd skills-dev start-helper -- detect-active`
+4. CLI scans `specs/active/` directory
+5. Returns JSON with active spec list
+6. Claude presents interactive menu
+7. User selects spec → `Skill(sdd-toolkit:sdd-next)`
+8. CLI: `sdd next-task <spec-id>`
+9. Returns next task details with full context
+10. Claude assists with implementation
 
-- JSON specs in `specs/active/`, `specs/completed/`, `specs/archived/`
-- Docs in `docs/documentation.json`
-- Metrics in `.claude/metrics/`
-- No database; file-based
+**Updating Progress:**
+1. Task implementation completed
+2. Claude invokes `Skill(sdd-toolkit:sdd-update)`
+3. CLI: `sdd update-status <spec-id> <task-id> completed`
+4. Spec file updated with new status
+5. Progress counters recalculated
+6. Journal entry added for audit trail
+7. State synchronized
 
-### Data Flow Example: Creating and Executing a Spec
+### State Management Strategy
 
+**Primary Storage:**
+- **Active specs:** `specs/active/` - work in progress
+- **Completed specs:** `specs/completed/` - finished work
+- **Archived specs:** `specs/archived/` - historical reference
+- **State files:** `specs/.state/` - optional progress tracking
+
+**State Properties:**
+- **Progress tracking:** `completed_tasks`/`total_tasks` per node
+- **Status tracking:** Four states (pending, in_progress, completed, blocked)
+- **Journal entries:** Decision and change log in `metadata.journal`
+- **Time tracking:** Start/end timestamps for tasks
+
+**Consistency Model:**
+- Single source of truth: JSON spec file
+- Filesystem-based: No database required
+- Version-controllable: Works with Git
+- Stateless tools: Any command can run at any time
+
+---
+
+## 4. Design Patterns
+
+### Command Pattern
+Each CLI subcommand encapsulates a specific operation:
+```python
+def cmd_next_task(args, printer):
+    # Load spec, analyze dependencies, find next task
+    return 0  # Success
 ```
-1. User: "Create spec for user authentication"
-   ↓
-2. Skill(sdd-plan) invoked
-   ↓
-3. sdd-plan analyzes codebase (uses doc-query if available)
-   ↓
-4. Creates JSON spec file: specs/active/user-auth-001.json
-   ↓
-5. Validates spec: sdd validate
-   ↓
-6. User: "What should I work on next?"
-   ↓
-7. Skill(sdd-next) invoked
-   ↓
-8. Loads JSON spec, finds next task
-   ↓
-9. Creates execution plan with context
-   ↓
-10. User implements task
-    ↓
-11. Skill(sdd-update) marks task complete
-    ↓
-12. Updates progress in JSON spec
-    ↓
-13. Cycle repeats until spec complete
+
+**Benefits:** Clear separation of concerns, easy to test, simple to extend.
+
+### Strategy Pattern
+AI tool selection with automatic fallback:
+```python
+# Auto-routing based on failure type or task requirements
+consult_with_auto_routing(failure_type, tool="auto")
 ```
 
-## 4. Design Patterns Detected
+**Benefits:** Flexible integration with multiple AI providers, graceful degradation.
 
-### 1. Registry Pattern
-- Location: `src/claude_skills/cli/sdd/registry.py`
-- Purpose: Register subcommands
-- Why: Extensible without modifying core CLI
+### Template Method Pattern
+Specification generation from templates:
+```python
+templates = {
+    "simple": {...},    # Small features, single file
+    "medium": {...},    # Multiple files, moderate complexity
+    "complex": {...}    # Large features, multiple phases
+}
+```
 
-### 2. Command Pattern
-- Location: CLI handlers
-- Purpose: Encapsulate operations
-- Why: Consistent interface and composability
+**Benefits:** Consistent structure, customizable content, reusable patterns.
 
-### 3. Strategy Pattern
-- Location: AI consultation routing (`run_tests/consultation.py`)
-- Purpose: Select AI tool by failure type
-- Why: Flexible tool selection
+### Factory Pattern
+Parser creation for multi-language support:
+```python
+factory = create_parser_factory(project_dir, exclude_patterns)
+parse_result = factory.parse_all()  # Returns appropriate parser per language
+```
 
-### 4. Template Method Pattern
-- Location: Spec generation templates (`sdd_plan/templates.py`)
-- Purpose: Reusable spec structures
-- Why: Consistent outputs
+**Benefits:** Extensible to new languages, clean abstraction, testable.
 
-### 5. Visitor Pattern
-- Location: Hierarchy validation (`common/hierarchy_validation.py`)
-- Purpose: Traverse and validate spec hierarchy
-- Why: Separation of traversal and validation
+### Observer Pattern
+Event-driven hooks for automation:
+- **`session-start`**: React to new sessions
+- **`pre-tool-use`**: Validate before execution
+- **`post-tool-use`**: Cleanup after execution
 
-### 6. Factory Pattern
-- Location: Parser factory (`code_doc/parsers/`)
-- Purpose: Create language-specific parsers
-- Why: Extensible language support
+**Benefits:** Proactive assistance, separation of concerns, extensible.
 
-### 7. Facade Pattern
-- Location: Unified CLI (`cli/sdd/__init__.py`)
-- Purpose: Single interface to subsystems
-- Why: Simpler API
+### Repository Pattern
+Centralized spec operations:
+```python
+load_json_spec(spec_id, specs_dir)
+save_json_spec(spec_id, specs_dir, spec_data)
+find_specs_directory(project_root)
+```
 
-## 5. Technology Stack Analysis
+**Benefits:** Consistent file access, error handling, path normalization.
+
+### Facade Pattern
+Unified CLI interface (`sdd`) provides simplified access to complex subsystems:
+```bash
+sdd plan create          # Access planning subsystem
+sdd update-status        # Access state management
+sdd doc generate         # Access documentation subsystem
+sdd test run             # Access testing subsystem
+```
+
+**Benefits:** Consistent user experience, hidden complexity, single entry point.
+
+---
+
+## 5. Technology Stack
 
 ### Core Technologies
 
 **Python 3.9+**
-- Language
-- Why: CLI tools, parsing, JSON handling
+- **Rationale:** Robust standard library, excellent for CLI tools and file I/O
+- **Usage:** All CLI tools, utilities, and skill logic
 
-**tree-sitter** (>=0.20.0)
-- Multi-language parsing
-- Why: Fast, accurate parsing
+**JSON**
+- **Rationale:** Machine-readable, validatable, widely supported
+- **Usage:** Specification format, documentation output, configuration
 
-**Language Parsers**
-- tree-sitter-python, tree-sitter-javascript, tree-sitter-typescript, tree-sitter-go, tree-sitter-html, tree-sitter-css
-- Why: Language-specific AST parsing
+**Markdown**
+- **Rationale:** Human-readable, version-controllable, widely supported
+- **Usage:** Skill instructions, command definitions, rendered documentation
+
+**Tree-sitter**
+- **Rationale:** Fast, incremental parsing for multiple languages
+- **Usage:** Code analysis for documentation generation
 
 ### Key Dependencies
 
-**argparse**
-- CLI argument parsing
-- Why: Standard library, flexible
+**`argparse`** (Standard Library)
+- Purpose: CLI argument parsing and command structure
+- Alternative considered: Click (chose standard library for zero dependencies)
 
-**json**
-- Spec and doc serialization
-- Why: Standard library, portable
+**`pytest`**
+- Purpose: Test framework integration
+- Usage: `run-tests` skill wraps pytest for AI-assisted debugging
 
-**pathlib**
-- Path operations
-- Why: Cross-platform, modern API
+**External AI CLIs**
+- **cursor-agent** (with cheetah): Fast analysis
+- **gemini**: Fast structured analysis
+- **codex**: Code understanding and debugging
+- Integration: Subprocess execution for flexibility and decoupling
 
-**pytest** (optional)
-- Testing
-- Why: Common Python testing framework
+**Tree-sitter language parsers**
+- `tree-sitter-python`: Python AST parsing
+- `tree-sitter-javascript`: JS/TS parsing
+- `tree-sitter-go`: Go parsing
+- `tree-sitter-html`: HTML parsing
+- `tree-sitter-css`: CSS parsing
 
-### External Tool Integration
+### Architectural Technology Choices
 
-**AI CLI Tools** (optional)
-- gemini, codex, cursor-agent
-- Why: Multi-model reviews and debugging
+**Filesystem as State Store**
+- **Choice:** Store all state in version-controlled JSON files
+- **Rationale:** Simple, transparent, portable, works with Git
+- **Trade-offs:** No concurrent access, manual sync, limited query capabilities
 
-## 6. Architectural Decisions
+**Subprocess Integration**
+- **Choice:** Execute external tools (pytest, AI CLIs) via subprocess
+- **Rationale:** Decoupling from implementation details, resilient to API changes
+- **Trade-offs:** Requires tools installed locally, environment-dependent
 
-### 1. Unified CLI Architecture
-- Decision: Single `sdd` entry point with subcommands
-- Trade-off: Simpler UX vs. more complex routing
-- Rationale: Consistent interface, easier discovery
+**Unified CLI Architecture**
+- **Choice:** Single `sdd` entry point with subcommands
+- **Rationale:** Consistent interface, discoverability, extensibility
+- **Trade-offs:** Longer command strings, all tools must be installed together
 
-### 2. JSON as Single Source of Truth
-- Decision: JSON specs, not Markdown
-- Trade-off: Less readable vs. machine-processable
-- Rationale: Enables automation and validation
+**Modular Skill System**
+- **Choice:** Independent skill modules with standard structure
+- **Rationale:** Extensibility, maintainability, clear boundaries
+- **Trade-offs:** More boilerplate, coordination overhead
 
-### 3. File-Based State Management
-- Decision: No database
-- Trade-off: Simpler vs. limited concurrency
-- Rationale: Version control friendly, portable
+---
 
-### 4. Plugin Architecture
-- Decision: Registry-based subcommand registration
-- Trade-off: More setup vs. extensibility
-- Rationale: Easy to add skills without core changes
+## 6. Architectural Decisions & Rationale
 
-### 5. Common Utilities Module
-- Decision: Shared utilities across skills
-- Trade-off: Coupling vs. DRY
-- Rationale: Consistency and maintainability
+### A. Skills vs Commands Separation
 
-### 6. Multi-Agent AI Consultation
-- Decision: Optional multi-model reviews
-- Trade-off: Higher cost vs. better quality
-- Rationale: Higher confidence for critical specs
+**Decision:** Skills are automatically invoked by Claude based on intent; commands require explicit user invocation with `/` prefix.
 
-### 7. Staged Planning Approach
-- Decision: Optional phase-only planning before detailed tasks
-- Trade-off: Extra step vs. early feedback
-- Rationale: Reduces rework
+**Rationale:**
+- Clear separation between AI-driven and user-driven workflows
+- Skills enable proactive assistance
+- Commands provide explicit control when needed
 
-### 8. Documentation-First Analysis
-- Decision: Generate docs before planning
-- Trade-off: Initial cost vs. faster analysis
-- Rationale: 10x faster codebase analysis
+**Trade-offs:**
+- Additional abstraction layer
+- More files to maintain
+- Learning curve for users
 
-### Notable Constraints
+### B. JSON-Only Specification Format
 
-1. Python 3.9+ required
-2. tree-sitter parsers needed for code analysis
-3. File-based state limits concurrent access
-4. JSON specs must be valid
-5. External AI tools optional but recommended
+**Decision:** Use JSON exclusively for specifications (deprecated Markdown specs).
 
-### Limitations
+**Rationale:**
+- Single source of truth
+- Schema validation
+- Programmatically queryable
+- Machine-readable for tools and AI
 
-1. No real-time collaboration
-2. No built-in version control integration
-3. Limited to supported languages
-4. No GUI
-5. No cloud sync
+**Trade-offs:**
+- Less human-readable than Markdown
+- More verbose
+- Requires tools to view/edit effectively
+
+**Constraints:** Must maintain backward compatibility during migration from Markdown to JSON.
+
+### C. Hierarchical Task Structure
+
+**Decision:** Organize tasks as a tree: spec → phases → groups → tasks → subtasks.
+
+**Rationale:**
+- Supports complex dependency graphs
+- Enables progress rollup
+- Provides clear organization
+- Allows granular status tracking
+
+**Trade-offs:**
+- Increased complexity
+- Potential for deep nesting
+- More validation rules
+
+**Limitations:** Maximum nesting depth not enforced; large specs can become unwieldy.
+
+### D. Unified CLI Architecture
+
+**Decision:** Single `sdd` entry point with domain-specific subcommands.
+
+**Rationale:**
+- Consistent user experience
+- Simplified installation
+- Easier documentation
+- Clear command structure
+
+**Trade-offs:**
+- Longer command invocations
+- All modules must be installed together
+- Heavier initial installation
+
+**Alternatives Considered:** Separate executables per module (rejected due to installation complexity).
+
+### E. Multi-Agent AI Consultation
+
+**Decision:** Consult 2 AI models in parallel for comprehensive analysis.
+
+**Rationale:**
+- Higher confidence through consensus
+- Diverse perspectives
+- Better coverage
+- Reduced single-model bias
+
+**Trade-offs:**
+- Increased API costs
+- Higher latency
+- Requires multiple tools installed
+
+**Optimization:** Automatic fallback to single-agent mode if only one tool available.
+
+### F. Filesystem-Based State Management
+
+**Decision:** Store all state in JSON files on the filesystem within `specs/` directory.
+
+**Rationale:**
+- Version-controllable with Git
+- Transparent and inspectable
+- No database setup required
+- Portable across environments
+- Simple backup and restore
+
+**Trade-offs:**
+- No concurrent access support
+- Limited query capabilities
+- Manual synchronization required
+- Performance limitations for large specs
+
+**Future Consideration:** Optional database backend for large teams.
+
+### G. Separation of Concerns
+
+**Decision:** Clear boundaries between skills (instructions), CLI (operations), and hooks (automation).
+
+**Rationale:**
+- Maintainability
+- Testability
+- Reusability
+- Independent evolution
+
+**Trade-offs:**
+- More files and directories
+- Coordination overhead
+- Learning curve
+
+---
+
+## 7. System Constraints & Limitations
+
+### Environmental Constraints
+
+**Claude Code Plugin Ecosystem**
+- Must work within Claude Code's skill/command/hook framework
+- Limited to file-based interactions
+- No direct UI beyond chat interface
+
+**Local Environment Dependencies**
+- Requires Python 3.9+
+- External AI CLIs must be installed separately
+- Pytest required for test functionality
+
+### Design Limitations
+
+**Single-User Focus**
+- No multi-user collaboration features
+- No real-time synchronization
+- No conflict resolution for concurrent edits
+
+**Manual Spec Creation**
+- Specs must be explicitly created
+- No automatic spec generation from code
+- Planning overhead required upfront
+
+**No CI/CD Integration**
+- No built-in pipeline integration
+- No automatic deployment workflows
+- Manual integration required
+
+**No Web UI**
+- CLI and chat interface only
+- Limited visualization capabilities
+- No graphical dependency views
+
+### Performance Considerations
+
+**Large Codebase Analysis**
+- Tree-sitter parsing can be slow for very large projects
+- Multi-agent consultation increases latency
+- Documentation generation can take several minutes
+
+**Spec Complexity**
+- Deep nesting can impact performance
+- Large dependency graphs are computationally expensive to validate
+- No pagination for very large specs
+
+---
+
+## 8. Extension Points & Modularity
+
+### Code Organization
+
+**Modular Structure:**
+```
+src/claude_skills/claude_skills/
+├── common/           # Shared utilities (validation, paths, progress, spec loading)
+├── sdd_plan/         # Spec creation and templating
+├── sdd_next/         # Next-task discovery
+├── sdd_update/       # State management and journaling
+├── sdd_validate/     # Validation and auto-fix
+├── sdd_render/       # Markdown rendering
+├── sdd_plan_review/  # Multi-model review
+├── code_doc/         # Documentation generation
+├── doc_query/        # Documentation querying
+└── run_tests/        # Test execution and debugging
+```
+
+**Extension Patterns:**
+
+1. **Custom Skills:** Create `~/.claude/skills/my-skill/SKILL.md` with frontmatter and instructions
+2. **Custom Commands:** Create `~/.claude/commands/my-command.md` with workflow definition
+3. **Custom Hooks:** Create executable script in `~/.claude/hooks/` that reads JSON from stdin
+4. **CLI Extensions:** Add module to `src/claude_skills/`, create `cli.py`, register in unified CLI
+
+**Conventions:**
+- Use `PrettyPrinter` from common utilities for consistent output
+- Use `find_specs_directory()` for path resolution
+- Use `load_json_spec()` for spec loading
+- Follow argparse patterns for CLI tools
+- Write tests in `tests/` directory
+
+---
+
+## 9. Error Handling & Resilience
+
+### Validation Layers
+
+**Multiple Validation Points:**
+1. **Schema validation:** JSON structure conforms to expected format
+2. **Dependency validation:** No circular dependencies, valid references
+3. **State validation:** Status transitions are valid
+4. **Path validation:** File paths are normalized and valid
+
+### Error Handling Strategy
+
+**Graceful Degradation:**
+- AI tool failures fall back to alternative tools
+- Syntax errors skip files and continue processing
+- Missing dependencies logged but don't abort
+
+**Clear Error Messages:**
+- User-friendly error descriptions
+- Actionable remediation steps
+- Detailed logging for debugging
+
+**Dry-Run Support:**
+- Preview changes before applying
+- Validate specs without executing
+- Test workflows without side effects
+
+### Resilience Features
+
+**Auto-Fix Capabilities:**
+- Common spec errors automatically corrected
+- Orphaned tasks reattached
+- Missing metadata populated
+
+**State Recovery:**
+- Reconcile state files with spec JSON
+- Detect and repair inconsistencies
+- Backup before destructive operations
+
+---
+
+## 10. Performance Optimizations
+
+### Lazy Loading
+- Parse only required files
+- Load spec sections on demand
+- Cache parsed results
+
+### Parallel Execution
+- Multi-agent AI consultations run in parallel
+- File parsing can be parallelized
+- Independent validations run concurrently
+
+### Incremental Processing
+- Only analyze changed files for docs
+- Update only affected spec sections
+- Recalculate only modified dependencies
+
+### Caching Strategy
+- Parsed AST results cached
+- Spec metadata cached
+- Dependency graphs memoized
 
 ---
 
 ## Summary
 
-The SDD Toolkit uses a unified CLI with a plugin registry, shared utilities, and JSON-based state. It supports plan-first workflows, documentation generation, and test execution. The design favors extensibility, consistency, and automation over complexity.
+The SDD Toolkit is a comprehensive, layered plugin for Claude Code that enforces spec-driven development through a combination of skills, commands, hooks, and CLI tools. Its architecture emphasizes:
 
+- **Modularity:** Clear separation of concerns with well-defined boundaries
+- **Extensibility:** Plugin architecture supports custom skills, commands, and hooks
+- **Validation:** Multiple layers ensure data integrity and prevent errors
+- **Transparency:** Filesystem-based state is inspectable and version-controlled
+- **AI Integration:** Multi-model consultation for comprehensive analysis
+- **Developer Experience:** Unified CLI interface with consistent conventions
 
----
-
-*This documentation was generated with assistance from AI analysis.*
+The system makes deliberate trade-offs, prioritizing simplicity and transparency over features like real-time collaboration and web UI. This design is well-suited for individual developers and small teams working with AI assistants on complex projects where systematic planning and progress tracking are essential.

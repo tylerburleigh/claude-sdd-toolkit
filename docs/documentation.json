@@ -2,17 +2,15 @@
   "metadata": {
     "project_name": "claude-sdd-toolkit",
     "version": "1.0.0",
-    "generated_at": "2025-10-24T10:59:57.334910",
-    "languages": [
-      "python"
-    ]
+    "generated_at": "2025-10-24T16:18:59.850985",
+    "languages": ["python"]
   },
   "statistics": {
-    "total_files": 85,
-    "total_lines": 25187,
+    "total_files": 92,
+    "total_lines": 26428,
     "total_classes": 38,
-    "total_functions": 422,
-    "avg_complexity": 6.87,
+    "total_functions": 436,
+    "avg_complexity": 6.92,
     "max_complexity": 40,
     "high_complexity_functions": [
       "generate_report (40)",
@@ -23,11 +21,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 85,
-        "lines": 25187,
+        "files": 92,
+        "lines": 26428,
         "classes": 38,
-        "functions": 422,
-        "avg_complexity": 6.87
+        "functions": 436,
+        "avg_complexity": 6.92
       }
     }
   },
@@ -131,6 +129,7 @@
       "docstring": "Unified SDD CLI - Single entry point for all SDD commands.",
       "classes": [],
       "functions": [
+        "reorder_args_for_subcommand",
         "main"
       ],
       "imports": [
@@ -144,7 +143,7 @@
         "claude_skills.cli.sdd.registry.register_all_subcommands"
       ],
       "exports": [],
-      "lines": 64
+      "lines": 133
     },
     {
       "name": "options",
@@ -180,39 +179,104 @@
         "logging"
       ],
       "exports": [],
-      "lines": 105
+      "lines": 107
+    },
+    {
+      "name": "gendocs",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/gendocs.py",
+      "language": "python",
+      "docstring": "Generate Documentation Commands\n\nGenerate SKILL.md documentation from CLI argparse definitions.\nWraps the existing generate_docs.py functionality.",
+      "classes": [],
+      "functions": [
+        "cmd_gendocs",
+        "register_gendocs"
+      ],
+      "imports": [
+        "sys",
+        "pathlib.Path",
+        "claude_skills.common.PrettyPrinter"
+      ],
+      "exports": [],
+      "lines": 61
+    },
+    {
+      "name": "migrate",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/migrate.py",
+      "language": "python",
+      "docstring": "Migration Guidance Commands\n\nProvides guidance for migrating from legacy commands to new unified CLI.",
+      "classes": [],
+      "functions": [
+        "cmd_migrate",
+        "register_migrate"
+      ],
+      "imports": [
+        "claude_skills.common.PrettyPrinter"
+      ],
+      "exports": [],
+      "lines": 79
     },
     {
       "name": "registry",
       "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
       "language": "python",
       "docstring": "Plugin registration for skills development utilities.",
-      "classes": [
-        "LegacyCommand"
-      ],
+      "classes": [],
       "functions": [
-        "_run_legacy_main",
-        "_configure_passthrough",
-        "_make_wrapper",
-        "register_all_subcommands",
-        "_show_migration_info"
+        "register_all_subcommands"
       ],
       "imports": [
         "__future__.annotations",
         "argparse",
-        "contextlib",
-        "importlib",
-        "io",
-        "runpy",
-        "sys",
-        "dataclasses.dataclass",
         "typing.Any",
-        "typing.Iterable",
-        "typing.Sequence",
         "claude_skills.common.PrettyPrinter"
       ],
       "exports": [],
-      "lines": 135
+      "lines": 31
+    },
+    {
+      "name": "setup_permissions",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+      "language": "python",
+      "docstring": "Setup Project Permissions Commands\n\nConfigures .claude/settings.json with required SDD tool permissions.\nUsed by /sdd-start command and sdd-plan skill to ensure proper permissions.",
+      "classes": [],
+      "functions": [
+        "cmd_update",
+        "cmd_check",
+        "register_setup_permissions"
+      ],
+      "imports": [
+        "json",
+        "sys",
+        "pathlib.Path",
+        "claude_skills.common.PrettyPrinter"
+      ],
+      "exports": [],
+      "lines": 203
+    },
+    {
+      "name": "start_helper",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "language": "python",
+      "docstring": "SDD Start Helper Commands\n\nProvides commands for /sdd-start slash command and session management.",
+      "classes": [],
+      "functions": [
+        "cmd_check_permissions",
+        "cmd_find_active_work",
+        "cmd_format_output",
+        "cmd_get_session_info",
+        "register_start_helper"
+      ],
+      "imports": [
+        "json",
+        "sys",
+        "pathlib.Path",
+        "datetime.datetime",
+        "typing.Optional",
+        "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.integrations.get_session_state"
+      ],
+      "exports": [],
+      "lines": 301
     },
     {
       "name": "__init__",
@@ -264,7 +328,7 @@
         "time"
       ],
       "exports": [],
-      "lines": 698
+      "lines": 699
     },
     {
       "name": "calculator",
@@ -292,7 +356,7 @@
       "name": "cli",
       "file": "src/claude_skills/claude_skills/code_doc/cli.py",
       "language": "python",
-      "docstring": "Codebase Documentation Generator CLI\nMain command-line interface for generating comprehensive codebase documentation.\n\nUsage:\n    sdd doc generate <project_directory> [options]\n    sdd doc validate <json_file>\n    sdd doc analyze <project_directory> [options]\n\nSubcommands:\n    generate    Generate documentation (Markdown/JSON)\n    validate    Validate generated JSON against schema\n    analyze     Analyze codebase and print statistics only\n\nOptions for generate:\n    --output-dir DIR     Output directory for documentation (default: ./docs)\n    --format FORMAT      Output format: markdown, json, or both (default: both)\n    --name NAME          Project name (default: directory name)\n    --version VERSION    Project version (default: 1.0.0)\n    --language LANG      Filter by language (python, javascript, go, etc.)\n    --exclude PATTERN    Exclude files matching pattern\n    --verbose, -v        Verbose output\n\nExamples:\n    sdd doc generate ./src\n    sdd doc generate ./src --name MyProject --version 2.0.0\n    sdd doc generate ./src --format json --output-dir ./docs\n    sdd doc analyze ./src --verbose\n    sdd doc validate ./docs/documentation.json",
+      "docstring": "Codebase Documentation Generator CLI\nMain command-line interface for generating comprehensive codebase documentation.\n\nUsage:\n    sdd doc generate <project_directory> [options]\n    sdd doc validate <json_file>\n    sdd doc analyze <project_directory> [options]\n\nSubcommands:\n    generate    Generate documentation (Markdown/JSON)\n    validate    Validate generated JSON against schema\n    analyze     Analyze codebase and print statistics only\n\nOptions for generate:\n    --output-dir DIR     Output directory for documentation (default: ./docs)\n    --format FORMAT      Output format: markdown, json, or both (default: both)\n    --name NAME          Project name (default: directory name)\n    --version VERSION    Project version (default: 1.0.0)\n    --language LANG      Filter by language (python, javascript, go, etc.)\n    --exclude PATTERN    Exclude files matching pattern\n    --verbose, -v        Verbose output\n\nExamples:\n    sdd doc generate ./src\n    sdd doc generate ./src --name MyProject --version 0.1.0\n    sdd doc generate ./src --format json --output-dir ./docs\n    sdd doc analyze ./src --verbose\n    sdd doc validate ./docs/documentation.json",
       "classes": [],
       "functions": [
         "_dump_json",
@@ -333,7 +397,7 @@
         "claude_skills.code_doc.ai_consultation.compose_ai_context_doc"
       ],
       "exports": [],
-      "lines": 492
+      "lines": 494
     },
     {
       "name": "detectors",
@@ -846,7 +910,7 @@
         "contextlib.contextmanager"
       ],
       "exports": [],
-      "lines": 221
+      "lines": 228
     },
     {
       "name": "paths",
@@ -872,7 +936,7 @@
         "typing.Dict"
       ],
       "exports": [],
-      "lines": 303
+      "lines": 313
     },
     {
       "name": "printer",
@@ -921,7 +985,9 @@
         "get_task",
         "list_phases",
         "check_complete",
-        "list_blockers"
+        "list_blockers",
+        "get_journal_entries",
+        "get_task_journal"
       ],
       "imports": [
         "pathlib.Path",
@@ -934,7 +1000,7 @@
         "printer.PrettyPrinter"
       ],
       "exports": [],
-      "lines": 370
+      "lines": 507
     },
     {
       "name": "reporting",
@@ -1131,7 +1197,7 @@
         "pathlib.Path"
       ],
       "exports": [],
-      "lines": 185
+      "lines": 184
     },
     {
       "name": "__init__",
@@ -1535,7 +1601,7 @@
         "claude_skills.sdd_next.workflow.find_pattern"
       ],
       "exports": [],
-      "lines": 974
+      "lines": 984
     },
     {
       "name": "discovery",
@@ -1670,15 +1736,15 @@
         "json",
         "pathlib.Path",
         "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.find_specs_directory",
         "claude_skills.sdd_plan.list_templates",
         "claude_skills.sdd_plan.get_template_description",
         "claude_skills.sdd_plan.create_spec_interactive",
         "claude_skills.sdd_plan.analyze_codebase",
-        "claude_skills.sdd_plan.get_project_context",
-        "claude_skills.sdd_plan.find_specs_directory"
+        "claude_skills.sdd_plan.get_project_context"
       ],
       "exports": [],
-      "lines": 202
+      "lines": 201
     },
     {
       "name": "planner",
@@ -1882,6 +1948,60 @@
     },
     {
       "name": "__init__",
+      "file": "src/claude_skills/claude_skills/sdd_render/__init__.py",
+      "language": "python",
+      "docstring": "sdd_render - Render JSON specs to human-readable markdown.\n\nThis module provides functionality to convert JSON specification files\ninto comprehensive, human-readable markdown documentation.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "renderer.SpecRenderer"
+      ],
+      "exports": [],
+      "lines": 9
+    },
+    {
+      "name": "cli",
+      "file": "src/claude_skills/claude_skills/sdd_render/cli.py",
+      "language": "python",
+      "docstring": "CLI command handlers for sdd render.",
+      "classes": [],
+      "functions": [
+        "cmd_render",
+        "register_render"
+      ],
+      "imports": [
+        "json",
+        "pathlib.Path",
+        "typing.Optional",
+        "claude_skills.common.find_specs_directory",
+        "claude_skills.common.load_json_spec",
+        "claude_skills.common.PrettyPrinter",
+        "renderer.SpecRenderer"
+      ],
+      "exports": [],
+      "lines": 120
+    },
+    {
+      "name": "renderer",
+      "file": "src/claude_skills/claude_skills/sdd_render/renderer.py",
+      "language": "python",
+      "docstring": "Core rendering logic for converting JSON specs to markdown.",
+      "classes": [
+        "SpecRenderer"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "typing.Optional",
+        "pathlib.Path"
+      ],
+      "exports": [],
+      "lines": 299
+    },
+    {
+      "name": "__init__",
       "file": "src/claude_skills/claude_skills/sdd_update/__init__.py",
       "language": "python",
       "docstring": "SDD Update Operations\n\nModular operations for spec-driven development progress tracking.",
@@ -1935,6 +2055,7 @@
         "cmd_audit_spec",
         "cmd_query_tasks",
         "cmd_get_task",
+        "cmd_get_journal",
         "cmd_list_phases",
         "cmd_check_complete",
         "cmd_phase_time",
@@ -1983,7 +2104,7 @@
         "claude_skills.sdd_update.query.list_blockers"
       ],
       "exports": [],
-      "lines": 981
+      "lines": 1018
     },
     {
       "name": "journal",
@@ -2515,18 +2636,6 @@
       "is_public": true
     },
     {
-      "name": "LegacyCommand",
-      "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
-      "line": 18,
-      "language": "python",
-      "docstring": null,
-      "bases": [],
-      "methods": [],
-      "properties": [],
-      "is_exported": false,
-      "is_public": true
-    },
-    {
       "name": "MarkdownGenerator",
       "file": "src/claude_skills/claude_skills/code_doc/formatter.py",
       "line": 12,
@@ -3031,6 +3140,28 @@
       "is_public": true
     },
     {
+      "name": "SpecRenderer",
+      "file": "src/claude_skills/claude_skills/sdd_render/renderer.py",
+      "line": 7,
+      "language": "python",
+      "docstring": "Renders JSON spec data to human-readable markdown.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "to_markdown",
+        "_render_header",
+        "_render_objectives",
+        "_render_phase",
+        "_render_group",
+        "_render_task",
+        "_render_verification",
+        "_get_status_icon"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true
+    },
+    {
       "name": "FieldChange",
       "file": "src/claude_skills/claude_skills/sdd_validate/diff.py",
       "line": 12,
@@ -3346,14 +3477,34 @@
       "is_public": true
     },
     {
+      "name": "reorder_args_for_subcommand",
+      "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+      "line": 15,
+      "language": "python",
+      "docstring": "Reorder command line arguments to support global options before subcommand.\n\nArgparse doesn't natively support global options before subcommand names.\nThis function reorders arguments to put global options after the subcommand.\n\nArgs:\n    cmd_line: List of command line arguments\n    \nReturns:\n    Reordered list of arguments",
+      "parameters": [
+        {
+          "name": "cmd_line",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 12,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
       "name": "main",
       "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-      "line": 16,
+      "line": 84,
       "language": "python",
       "docstring": "Main entry point for unified SDD CLI.",
       "parameters": [],
       "return_type": null,
-      "complexity": 4,
+      "complexity": 5,
       "decorators": [
         "track_metrics('sdd')"
       ],
@@ -3463,7 +3614,7 @@
     {
       "name": "_register_doc_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 52,
+      "line": 54,
       "language": "python",
       "docstring": "Register the doc CLI as an SDD subcommand.",
       "parameters": [
@@ -3488,7 +3639,7 @@
     {
       "name": "_register_test_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 72,
+      "line": 74,
       "language": "python",
       "docstring": "Register the test CLI as an SDD subcommand.",
       "parameters": [
@@ -3513,7 +3664,7 @@
     {
       "name": "_register_skills_dev_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 90,
+      "line": 92,
       "language": "python",
       "docstring": "Register the skills-dev CLI as an SDD subcommand.",
       "parameters": [
@@ -3536,20 +3687,15 @@
       "is_public": false
     },
     {
-      "name": "_run_legacy_main",
-      "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
-      "line": 45,
+      "name": "cmd_gendocs",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/gendocs.py",
+      "line": 14,
       "language": "python",
-      "docstring": "Execute a legacy CLI module's main() while preserving sys.argv.",
+      "docstring": "Generate documentation for a skill.",
       "parameters": [
         {
-          "name": "module_name",
-          "type": "str",
-          "default": null
-        },
-        {
-          "name": "argv",
-          "type": "Sequence[str]",
+          "name": "args",
+          "type": null,
           "default": null
         },
         {
@@ -3559,58 +3705,93 @@
         }
       ],
       "return_type": "int",
-      "complexity": 6,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": false
-    },
-    {
-      "name": "_configure_passthrough",
-      "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
-      "line": 73,
-      "language": "python",
-      "docstring": null,
-      "parameters": [
-        {
-          "name": "parser",
-          "type": "argparse.ArgumentParser",
-          "default": null
-        }
-      ],
-      "return_type": "None",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": false
-    },
-    {
-      "name": "_make_wrapper",
-      "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
-      "line": 81,
-      "language": "python",
-      "docstring": null,
-      "parameters": [
-        {
-          "name": "cmd",
-          "type": "LegacyCommand",
-          "default": null
-        }
-      ],
-      "return_type": null,
       "complexity": 4,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
-      "is_public": false
+      "is_public": true
+    },
+    {
+      "name": "register_gendocs",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/gendocs.py",
+      "line": 39,
+      "language": "python",
+      "docstring": "Register gendocs command.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_migrate",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/migrate.py",
+      "line": 65,
+      "language": "python",
+      "docstring": "Show migration guidance.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "register_migrate",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/migrate.py",
+      "line": 71,
+      "language": "python",
+      "docstring": "Register migrate command.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
     },
     {
       "name": "register_all_subcommands",
       "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
-      "line": 101,
+      "line": 11,
       "language": "python",
-      "docstring": "Register all skills-dev subcommands.",
+      "docstring": "Register all skills-dev subcommands.\n\nProvides development utilities for maintaining the claude_skills package.",
       "parameters": [
         {
           "name": "subparsers",
@@ -3624,6 +3805,131 @@
         }
       ],
       "return_type": "None",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_update",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+      "line": 58,
+      "language": "python",
+      "docstring": "Update .claude/settings.json with SDD permissions.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_check",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+      "line": 119,
+      "language": "python",
+      "docstring": "Check if SDD permissions are configured.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "register_setup_permissions",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+      "line": 170,
+      "language": "python",
+      "docstring": "Register setup-permissions subcommands.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_check_permissions",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Check if SDD permissions are configured for the project.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 7,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_find_active_work",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "line": 69,
+      "language": "python",
+      "docstring": "Find all active SDD specifications with resumable work.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
       "complexity": 4,
       "decorators": [],
       "is_async": false,
@@ -3631,15 +3937,40 @@
       "is_public": true
     },
     {
-      "name": "_show_migration_info",
-      "file": "src/claude_skills/claude_skills/cli/skills_dev/registry.py",
+      "name": "cmd_format_output",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
       "line": 123,
       "language": "python",
-      "docstring": null,
+      "docstring": "Format active work as human-readable text with last-accessed task info.",
       "parameters": [
         {
           "name": "args",
-          "type": "argparse.Namespace",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 12,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_get_session_info",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "line": 219,
+      "language": "python",
+      "docstring": "Get session state information as JSON.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
           "default": null
         },
         {
@@ -3653,7 +3984,32 @@
       "decorators": [],
       "is_async": false,
       "is_exported": false,
-      "is_public": false
+      "is_public": true
+    },
+    {
+      "name": "register_start_helper",
+      "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "line": 250,
+      "language": "python",
+      "docstring": "Register start-helper subcommands.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
     },
     {
       "name": "get_available_tools",
@@ -3902,7 +4258,7 @@
     {
       "name": "_run_tool_capture",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 608,
+      "line": 607,
       "language": "python",
       "docstring": "Run tool and capture output (internal helper for parallel execution).\n\nReturns:\n    Tuple of (success, output, duration)",
       "parameters": [
@@ -3927,9 +4283,9 @@
     {
       "name": "generate_architecture_docs",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 621,
+      "line": 620,
       "language": "python",
-      "docstring": "Get architecture research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, research_findings: str)",
+      "docstring": "Get architecture research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, result: Dict with responses_by_tool)",
       "parameters": [
         {
           "name": "context_summary",
@@ -3972,7 +4328,7 @@
           "default": null
         }
       ],
-      "return_type": "Tuple[bool, str]",
+      "return_type": "Tuple[bool, Dict]",
       "complexity": 4,
       "decorators": [],
       "is_async": false,
@@ -3984,7 +4340,7 @@
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
       "line": 661,
       "language": "python",
-      "docstring": "Get AI context research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, research_findings: str)",
+      "docstring": "Get AI context research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, result: Dict with responses_by_tool)",
       "parameters": [
         {
           "name": "context_summary",
@@ -4027,7 +4383,7 @@
           "default": null
         }
       ],
-      "return_type": "Tuple[bool, str]",
+      "return_type": "Tuple[bool, Dict]",
       "complexity": 4,
       "decorators": [],
       "is_async": false,
@@ -4318,7 +4674,7 @@
         }
       ],
       "return_type": "int",
-      "complexity": 21,
+      "complexity": 17,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -4327,7 +4683,7 @@
     {
       "name": "register_code_doc",
       "file": "src/claude_skills/claude_skills/code_doc/cli.py",
-      "line": 435,
+      "line": 437,
       "language": "python",
       "docstring": "Register documentation commands for the unified CLI.",
       "parameters": [
@@ -5345,7 +5701,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 9,
+      "complexity": 11,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -5354,7 +5710,7 @@
     {
       "name": "get_metrics_file_path",
       "file": "src/claude_skills/claude_skills/common/metrics.py",
-      "line": 214,
+      "line": 221,
       "language": "python",
       "docstring": "Return the path to the metrics JSONL file.",
       "parameters": [],
@@ -5368,7 +5724,7 @@
     {
       "name": "is_metrics_enabled",
       "file": "src/claude_skills/claude_skills/common/metrics.py",
-      "line": 219,
+      "line": 226,
       "language": "python",
       "docstring": "Check if metrics collection is enabled (not in test environment).",
       "parameters": [],
@@ -5393,7 +5749,7 @@
         }
       ],
       "return_type": "Optional[Path]",
-      "complexity": 13,
+      "complexity": 17,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -5402,7 +5758,7 @@
     {
       "name": "find_spec_file",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 73,
+      "line": 83,
       "language": "python",
       "docstring": "Find the spec file for a given spec ID.\n\nSearches in active/, completed/, and archived/ subdirectories.\n\nArgs:\n    spec_id: Specification ID\n    specs_dir: Path to specs directory (containing active/completed/archived)\n\nReturns:\n    Absolute path to the spec file, or None if not found",
       "parameters": [
@@ -5427,7 +5783,7 @@
     {
       "name": "validate_path",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 99,
+      "line": 109,
       "language": "python",
       "docstring": "Validate and normalize a file or directory path.\n\nArgs:\n    path: Path string to validate\n\nReturns:\n    Absolute Path object if valid, None otherwise",
       "parameters": [
@@ -5447,7 +5803,7 @@
     {
       "name": "ensure_directory",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 118,
+      "line": 128,
       "language": "python",
       "docstring": "Ensure a directory exists, creating it if necessary.\n\nArgs:\n    path: Path to directory\n\nReturns:\n    True if directory exists or was created, False on error",
       "parameters": [
@@ -5467,7 +5823,7 @@
     {
       "name": "validate_and_normalize_paths",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 135,
+      "line": 145,
       "language": "python",
       "docstring": "Validate and normalize file paths.\n\nChecks each path for existence, normalizes relative paths, and\ncategorizes them as valid or invalid.\n\nArgs:\n    paths: List of paths to validate (can be relative or absolute)\n    base_directory: Base directory for relative path resolution (defaults to cwd)\n\nReturns:\n    Dictionary with validation results:\n    - valid_paths: list of valid path info dicts\n    - invalid_paths: list of invalid path info dicts\n    - normalized_paths: dict mapping original to normalized paths\n\nExample:\n    >>> result = validate_and_normalize_paths([\"src/main.py\", \"/tmp/test.txt\"])\n    >>> print(f\"Valid: {len(result['valid_paths'])}\")\n    >>> print(result['normalized_paths'])",
       "parameters": [
@@ -5492,7 +5848,7 @@
     {
       "name": "normalize_path",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 206,
+      "line": 216,
       "language": "python",
       "docstring": "Normalize a single path (absolute or relative).\n\nArgs:\n    path: Path string to normalize\n    base_directory: Base directory for relative paths (defaults to cwd)\n\nReturns:\n    Normalized absolute Path object\n\nExample:\n    >>> normalized = normalize_path(\"../specs/active/my-spec.md\")\n    >>> print(normalized)  # /Users/user/project/specs/active/my-spec.md",
       "parameters": [
@@ -5517,7 +5873,7 @@
     {
       "name": "batch_check_paths_exist",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 234,
+      "line": 244,
       "language": "python",
       "docstring": "Check multiple paths for existence.\n\nArgs:\n    paths: List of path strings to check\n    base_directory: Base directory for relative paths (defaults to cwd)\n\nReturns:\n    Dictionary mapping each path to its existence status (True/False)\n\nExample:\n    >>> existence = batch_check_paths_exist([\"src/main.py\", \"tests/test.py\"])\n    >>> for path, exists in existence.items():\n    ...     print(f\"{path}: {'exists' if exists else 'missing'}\")",
       "parameters": [
@@ -5542,7 +5898,7 @@
     {
       "name": "find_files_by_pattern",
       "file": "src/claude_skills/claude_skills/common/paths.py",
-      "line": 264,
+      "line": 274,
       "language": "python",
       "docstring": "Find files matching a pattern in a directory.\n\nArgs:\n    directory: Directory to search\n    pattern: Glob pattern (e.g., \"*.py\", \"test_*.py\")\n    recursive: Whether to search recursively\n    max_depth: Maximum depth for recursive search (None = unlimited)\n\nReturns:\n    List of matching file paths\n\nExample:\n    >>> py_files = find_files_by_pattern(Path(\"src\"), \"*.py\")\n    >>> print(f\"Found {len(py_files)} Python files\")",
       "parameters": [
@@ -5769,7 +6125,7 @@
       "file": "src/claude_skills/claude_skills/common/query_operations.py",
       "line": 103,
       "language": "python",
-      "docstring": "Get detailed information about a specific task.\n\nArgs:\n    spec_id: Specification ID\n    task_id: Task ID to retrieve\n    specs_dir: Path to specs directory\n    printer: Optional printer for output\n\nReturns:\n    Task data dictionary, or None if not found",
+      "docstring": "Get detailed information about a specific task.\n\nArgs:\n    spec_id: Specification ID\n    task_id: Task ID to retrieve\n    specs_dir: Path to specs directory\n    printer: Optional printer for output\n    include_journal: If True, include journal entries for this task\n\nReturns:\n    Task data dictionary, or None if not found",
       "parameters": [
         {
           "name": "spec_id",
@@ -5790,10 +6146,15 @@
           "name": "printer",
           "type": "Optional[PrettyPrinter]",
           "default": null
+        },
+        {
+          "name": "include_journal",
+          "type": "bool",
+          "default": null
         }
       ],
       "return_type": "Optional[Dict]",
-      "complexity": 13,
+      "complexity": 19,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -5802,7 +6163,7 @@
     {
       "name": "list_phases",
       "file": "src/claude_skills/claude_skills/common/query_operations.py",
-      "line": 168,
+      "line": 198,
       "language": "python",
       "docstring": "List all phases with their progress.\n\nArgs:\n    spec_id: Specification ID\n    specs_dir: Path to specs directory\n    printer: Optional printer for output\n\nReturns:\n    List of phase dictionaries, or None on error",
       "parameters": [
@@ -5832,7 +6193,7 @@
     {
       "name": "check_complete",
       "file": "src/claude_skills/claude_skills/common/query_operations.py",
-      "line": 218,
+      "line": 248,
       "language": "python",
       "docstring": "Check if spec or phase is ready to be marked complete.\n\nArgs:\n    spec_id: Specification ID\n    specs_dir: Path to specs directory\n    phase_id: Optional phase ID to check (if None, checks entire spec)\n    printer: Optional printer for output\n\nReturns:\n    Dictionary with completion status and incomplete tasks",
       "parameters": [
@@ -5867,7 +6228,7 @@
     {
       "name": "list_blockers",
       "file": "src/claude_skills/claude_skills/common/query_operations.py",
-      "line": 310,
+      "line": 340,
       "language": "python",
       "docstring": "List all currently blocked tasks with their blocker details.\n\nArgs:\n    spec_id: Specification ID\n    specs_dir: Path to specs directory\n    printer: Optional printer for output\n\nReturns:\n    List of blocked task dictionaries, or None on error",
       "parameters": [
@@ -5889,6 +6250,76 @@
       ],
       "return_type": "Optional[List[Dict]]",
       "complexity": 11,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "get_journal_entries",
+      "file": "src/claude_skills/claude_skills/common/query_operations.py",
+      "line": 403,
+      "language": "python",
+      "docstring": "Get journal entries for a spec, optionally filtered by task_id.\n\nArgs:\n    spec_id: Specification ID\n    specs_dir: Path to specs directory\n    task_id: Optional task ID to filter entries\n    printer: Optional printer for output\n\nReturns:\n    List of journal entry dictionaries, or None on error",
+      "parameters": [
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "specs_dir",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "task_id",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "Optional[PrettyPrinter]",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[List[Dict]]",
+      "complexity": 12,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "get_task_journal",
+      "file": "src/claude_skills/claude_skills/common/query_operations.py",
+      "line": 487,
+      "language": "python",
+      "docstring": "Get journal entries specifically for a task.\n\nThis is a convenience wrapper around get_journal_entries.\n\nArgs:\n    spec_id: Specification ID\n    task_id: Task ID\n    specs_dir: Path to specs directory\n    printer: Optional printer for output\n\nReturns:\n    List of journal entry dictionaries for the task, or None on error",
+      "parameters": [
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "task_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "specs_dir",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "Optional[PrettyPrinter]",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[List[Dict]]",
+      "complexity": 1,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -6690,7 +7121,7 @@
     {
       "name": "update_permissions",
       "file": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
-      "line": 59,
+      "line": 58,
       "language": "python",
       "docstring": "Update .claude/settings.json with SDD permissions.",
       "parameters": [
@@ -6710,7 +7141,7 @@
     {
       "name": "check_permissions",
       "file": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
-      "line": 120,
+      "line": 119,
       "language": "python",
       "docstring": "Check if SDD permissions are configured.",
       "parameters": [
@@ -6730,7 +7161,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
-      "line": 161,
+      "line": 160,
       "language": "python",
       "docstring": null,
       "parameters": [],
@@ -8912,7 +9343,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 5,
+      "complexity": 8,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -8921,34 +9352,9 @@
     {
       "name": "cmd_next_task",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 296,
+      "line": 301,
       "language": "python",
       "docstring": "Find next actionable task.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 7,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_task_info",
-      "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 337,
-      "language": "python",
-      "docstring": "Get detailed task information.",
       "parameters": [
         {
           "name": "args",
@@ -8969,9 +9375,34 @@
       "is_public": true
     },
     {
+      "name": "cmd_task_info",
+      "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "line": 347,
+      "language": "python",
+      "docstring": "Get detailed task information.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
       "name": "cmd_check_deps",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 378,
+      "line": 388,
       "language": "python",
       "docstring": "Check task dependencies.",
       "parameters": [
@@ -8987,7 +9418,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 12,
+      "complexity": 13,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -8996,7 +9427,7 @@
     {
       "name": "cmd_progress",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 425,
+      "line": 435,
       "language": "python",
       "docstring": "Show overall progress.",
       "parameters": [
@@ -9012,7 +9443,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 6,
+      "complexity": 7,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -9021,7 +9452,7 @@
     {
       "name": "cmd_init_env",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 458,
+      "line": 468,
       "language": "python",
       "docstring": "Initialize development environment.",
       "parameters": [
@@ -9046,7 +9477,7 @@
     {
       "name": "cmd_prepare_task",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 483,
+      "line": 493,
       "language": "python",
       "docstring": "Prepare task for implementation.",
       "parameters": [
@@ -9062,7 +9493,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 12,
+      "complexity": 13,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -9071,7 +9502,7 @@
     {
       "name": "cmd_format_plan",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 530,
+      "line": 540,
       "language": "python",
       "docstring": "Format execution plan for display.",
       "parameters": [
@@ -9087,7 +9518,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 3,
+      "complexity": 4,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -9096,7 +9527,7 @@
     {
       "name": "cmd_validate_spec",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 549,
+      "line": 559,
       "language": "python",
       "docstring": "Validate spec file.",
       "parameters": [
@@ -9121,7 +9552,7 @@
     {
       "name": "cmd_find_pattern",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 586,
+      "line": 596,
       "language": "python",
       "docstring": "Find files matching a pattern.",
       "parameters": [
@@ -9146,7 +9577,7 @@
     {
       "name": "cmd_detect_project",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 607,
+      "line": 617,
       "language": "python",
       "docstring": "Detect project type and dependencies.",
       "parameters": [
@@ -9171,7 +9602,7 @@
     {
       "name": "cmd_find_tests",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 646,
+      "line": 656,
       "language": "python",
       "docstring": "Find test files and patterns.",
       "parameters": [
@@ -9196,7 +9627,7 @@
     {
       "name": "cmd_check_environment",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 678,
+      "line": 688,
       "language": "python",
       "docstring": "Check environmental requirements.",
       "parameters": [
@@ -9221,7 +9652,7 @@
     {
       "name": "cmd_find_circular_deps",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 721,
+      "line": 731,
       "language": "python",
       "docstring": "Find circular dependencies in JSON spec.",
       "parameters": [
@@ -9237,7 +9668,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 11,
+      "complexity": 12,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -9246,7 +9677,7 @@
     {
       "name": "cmd_find_related_files",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 761,
+      "line": 771,
       "language": "python",
       "docstring": "Find files related to a source file.",
       "parameters": [
@@ -9271,7 +9702,7 @@
     {
       "name": "cmd_validate_paths",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 797,
+      "line": 807,
       "language": "python",
       "docstring": "Validate and normalize paths.",
       "parameters": [
@@ -9296,7 +9727,7 @@
     {
       "name": "cmd_spec_stats",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 824,
+      "line": 834,
       "language": "python",
       "docstring": "Show spec file statistics.",
       "parameters": [
@@ -9321,7 +9752,7 @@
     {
       "name": "register_next",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 871,
+      "line": 881,
       "language": "python",
       "docstring": "Register 'next' subcommands for unified CLI.",
       "parameters": [
@@ -9681,7 +10112,7 @@
     {
       "name": "cmd_create",
       "file": "src/claude_skills/claude_skills/sdd_plan/cli.py",
-      "line": 21,
+      "line": 20,
       "language": "python",
       "docstring": "Create a new specification.",
       "parameters": [
@@ -9706,7 +10137,7 @@
     {
       "name": "cmd_analyze",
       "file": "src/claude_skills/claude_skills/sdd_plan/cli.py",
-      "line": 62,
+      "line": 61,
       "language": "python",
       "docstring": "Analyze codebase for planning.",
       "parameters": [
@@ -9731,7 +10162,7 @@
     {
       "name": "cmd_template",
       "file": "src/claude_skills/claude_skills/sdd_plan/cli.py",
-      "line": 119,
+      "line": 118,
       "language": "python",
       "docstring": "Work with spec templates.",
       "parameters": [
@@ -9756,7 +10187,7 @@
     {
       "name": "register_plan",
       "file": "src/claude_skills/claude_skills/sdd_plan/cli.py",
-      "line": 154,
+      "line": 153,
       "language": "python",
       "docstring": "Register plan subcommands for unified CLI.",
       "parameters": [
@@ -10661,6 +11092,56 @@
       "is_public": true
     },
     {
+      "name": "cmd_render",
+      "file": "src/claude_skills/claude_skills/sdd_render/cli.py",
+      "line": 15,
+      "language": "python",
+      "docstring": "Render JSON spec to human-readable markdown.\n\nArgs:\n    args: Command line arguments\n    printer: Output printer\n\nReturns:\n    Exit code (0 for success, 1 for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 11,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "register_render",
+      "file": "src/claude_skills/claude_skills/sdd_render/cli.py",
+      "line": 90,
+      "language": "python",
+      "docstring": "Register 'render' command for unified CLI.\n\nArgs:\n    subparsers: Subparser object from argparse\n    parent_parser: Parent parser with global options",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
       "name": "cmd_execute_verify",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
       "line": 48,
@@ -10679,7 +11160,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 28,
+      "complexity": 29,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10704,7 +11185,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10729,7 +11210,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10754,7 +11235,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10779,7 +11260,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10804,7 +11285,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10854,7 +11335,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10929,7 +11410,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10954,7 +11435,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -10979,7 +11460,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 5,
+      "complexity": 6,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -11004,7 +11485,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 5,
+      "complexity": 6,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -11029,7 +11510,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 4,
+      "complexity": 5,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -11054,7 +11535,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 10,
+      "complexity": 11,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -11079,143 +11560,18 @@
         }
       ],
       "return_type": null,
-      "complexity": 5,
+      "complexity": 6,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
       "is_public": true
     },
     {
-      "name": "cmd_list_phases",
+      "name": "cmd_get_journal",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 534,
+      "line": 535,
       "language": "python",
-      "docstring": "List all phases.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 5,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_check_complete",
-      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 556,
-      "language": "python",
-      "docstring": "Check if spec or phase is ready to complete.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 4,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_phase_time",
-      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 579,
-      "language": "python",
-      "docstring": "Calculate time for a phase.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 5,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_list_blockers",
-      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 602,
-      "language": "python",
-      "docstring": "List all blocked tasks.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 5,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_reconcile_state",
-      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 624,
-      "language": "python",
-      "docstring": "Reconcile JSON spec to fix inconsistent task statuses.",
-      "parameters": [
-        {
-          "name": "args",
-          "type": null,
-          "default": null
-        },
-        {
-          "name": "printer",
-          "type": null,
-          "default": null
-        }
-      ],
-      "return_type": null,
-      "complexity": 2,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true
-    },
-    {
-      "name": "cmd_check_journaling",
-      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 643,
-      "language": "python",
-      "docstring": "Check for unjournaled completed tasks.",
+      "docstring": "Get journal entries for a spec or task.",
       "parameters": [
         {
           "name": "args",
@@ -11236,11 +11592,11 @@
       "is_public": true
     },
     {
-      "name": "cmd_bulk_journal",
+      "name": "cmd_list_phases",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 682,
+      "line": 564,
       "language": "python",
-      "docstring": "Bulk journal completed tasks.",
+      "docstring": "List all phases.",
       "parameters": [
         {
           "name": "args",
@@ -11254,18 +11610,18 @@
         }
       ],
       "return_type": null,
-      "complexity": 3,
+      "complexity": 6,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
       "is_public": true
     },
     {
-      "name": "cmd_complete_task",
+      "name": "cmd_check_complete",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 709,
+      "line": 586,
       "language": "python",
-      "docstring": "Complete task workflow (status, journaling, metadata sync).",
+      "docstring": "Check if spec or phase is ready to complete.",
       "parameters": [
         {
           "name": "args",
@@ -11286,9 +11642,159 @@
       "is_public": true
     },
     {
+      "name": "cmd_phase_time",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 609,
+      "language": "python",
+      "docstring": "Calculate time for a phase.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_list_blockers",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 632,
+      "language": "python",
+      "docstring": "List all blocked tasks.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_reconcile_state",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 654,
+      "language": "python",
+      "docstring": "Reconcile JSON spec to fix inconsistent task statuses.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_check_journaling",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 673,
+      "language": "python",
+      "docstring": "Check for unjournaled completed tasks.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_bulk_journal",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 712,
+      "language": "python",
+      "docstring": "Bulk journal completed tasks.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
+      "name": "cmd_complete_task",
+      "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "line": 739,
+      "language": "python",
+      "docstring": "Complete task workflow (status, journaling, metadata sync).",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true
+    },
+    {
       "name": "cmd_sync_metadata",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 743,
+      "line": 773,
       "language": "python",
       "docstring": "Synchronize spec metadata with hierarchy data.",
       "parameters": [
@@ -11304,7 +11810,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 2,
+      "complexity": 3,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -11313,7 +11819,7 @@
     {
       "name": "register_update",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 762,
+      "line": 792,
       "language": "python",
       "docstring": "Register 'update' subcommands for unified CLI.\n\nArgs:\n    subparsers: The subparsers object to add commands to\n    parent_parser: Parent parser with global options (--json, --quiet, --verbose, etc.)",
       "parameters": [
@@ -13636,19 +14142,34 @@
     "src/claude_skills/claude_skills/cli/sdd/registry.py": [
       "logging"
     ],
+    "src/claude_skills/claude_skills/cli/skills_dev/gendocs.py": [
+      "sys",
+      "pathlib.Path",
+      "claude_skills.common.PrettyPrinter"
+    ],
+    "src/claude_skills/claude_skills/cli/skills_dev/migrate.py": [
+      "claude_skills.common.PrettyPrinter"
+    ],
     "src/claude_skills/claude_skills/cli/skills_dev/registry.py": [
       "__future__.annotations",
       "argparse",
-      "contextlib",
-      "importlib",
-      "io",
-      "runpy",
-      "sys",
-      "dataclasses.dataclass",
       "typing.Any",
-      "typing.Iterable",
-      "typing.Sequence",
       "claude_skills.common.PrettyPrinter"
+    ],
+    "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py": [
+      "json",
+      "sys",
+      "pathlib.Path",
+      "claude_skills.common.PrettyPrinter"
+    ],
+    "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py": [
+      "json",
+      "sys",
+      "pathlib.Path",
+      "datetime.datetime",
+      "typing.Optional",
+      "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.integrations.get_session_state"
     ],
     "src/claude_skills/claude_skills/code_doc/__init__.py": [
       "parser.CodebaseAnalyzer",
@@ -14255,12 +14776,12 @@
       "json",
       "pathlib.Path",
       "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.find_specs_directory",
       "claude_skills.sdd_plan.list_templates",
       "claude_skills.sdd_plan.get_template_description",
       "claude_skills.sdd_plan.create_spec_interactive",
       "claude_skills.sdd_plan.analyze_codebase",
-      "claude_skills.sdd_plan.get_project_context",
-      "claude_skills.sdd_plan.find_specs_directory"
+      "claude_skills.sdd_plan.get_project_context"
     ],
     "src/claude_skills/claude_skills/sdd_plan/planner.py": [
       "json",
@@ -14338,6 +14859,25 @@
       "typing.Tuple",
       "statistics.mean",
       "statistics.median"
+    ],
+    "src/claude_skills/claude_skills/sdd_render/__init__.py": [
+      "renderer.SpecRenderer"
+    ],
+    "src/claude_skills/claude_skills/sdd_render/cli.py": [
+      "json",
+      "pathlib.Path",
+      "typing.Optional",
+      "claude_skills.common.find_specs_directory",
+      "claude_skills.common.load_json_spec",
+      "claude_skills.common.PrettyPrinter",
+      "renderer.SpecRenderer"
+    ],
+    "src/claude_skills/claude_skills/sdd_render/renderer.py": [
+      "typing.Dict",
+      "typing.Any",
+      "typing.List",
+      "typing.Optional",
+      "pathlib.Path"
     ],
     "src/claude_skills/claude_skills/sdd_update/__init__.py": [
       "status.update_task_status",

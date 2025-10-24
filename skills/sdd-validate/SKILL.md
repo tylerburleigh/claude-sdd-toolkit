@@ -7,7 +7,7 @@ description: Validate SDD JSON specs, auto-fix common issues, generate detailed 
 
 ## Overview
 
-The **Skill(sdd-validate)** skill provides comprehensive validation for Spec-Driven Development (SDD) JSON specification files. It checks for structural consistency, auto-fixes common issues, generates detailed reports, and analyzes dependencies. Use it to ensure a spec is structurally sound before running other SDD skills.
+The **Skill(sdd-toolkit:sdd-validate)** skill provides comprehensive validation for Spec-Driven Development (SDD) JSON specification files. It checks for structural consistency, auto-fixes common issues, generates detailed reports, and analyzes dependencies. Use it to ensure a spec is structurally sound before running other SDD skills.
 
 **Current capabilities:**
 - Validate JSON spec structure, hierarchy integrity, and metadata presence
@@ -21,10 +21,10 @@ The **Skill(sdd-validate)** skill provides comprehensive validation for Spec-Dri
 
 ## When to Use This Skill
 
-Reach for `Skill(sdd-validate)` when you need to:
+Reach for `Skill(sdd-toolkit:sdd-validate)` when you need to:
 - Confirm a freshly created spec parses correctly
 - Auto-fix common validation issues like missing metadata or incorrect counts
-- Check for structural errors before running `Skill(sdd-next)` or `Skill(sdd-update)`
+- Check for structural errors before running `Skill(sdd-toolkit:sdd-next)` or `Skill(sdd-toolkit:sdd-update)`
 - Generate detailed validation reports for review or CI/CD
 - Analyze spec statistics and complexity metrics
 - Detect dependency issues including cycles, orphans, and bottlenecks

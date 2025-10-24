@@ -8,9 +8,9 @@ description: Progress tracking for spec-driven development. Use to update task s
 ## Skill Family
 
 This skill is part of the **Spec-Driven Development** family:
-- **Skill(sdd-plan)** - Creates specifications and task hierarchies
-- **Skill(sdd-next)** - Identifies next tasks and creates execution plans
-- **Skill(sdd-update)** (this skill) - Tracks progress and maintains documentation
+- **Skill(sdd-toolkit:sdd-plan)** - Creates specifications and task hierarchies
+- **Skill(sdd-toolkit:sdd-next)** - Identifies next tasks and creates execution plans
+- **Skill(sdd-toolkit:sdd-update)** (this skill) - Tracks progress and maintains documentation
 
 ## Complete Workflow
 
@@ -188,7 +188,7 @@ For comprehensive command list, see Command Reference below.
 
 ## When to Use This Skill
 
-Use `Skill(sdd-update)` to:
+Use `Skill(sdd-toolkit:sdd-update)` to:
 - Mark tasks as in_progress, completed, or blocked
 - Update progress percentages across the hierarchy
 - Document why a task is blocked or delayed
@@ -201,19 +201,19 @@ Use `Skill(sdd-update)` to:
 - Update spec metadata fields (status, owner, etc.)
 
 **Do NOT use for:**
-- Creating new specifications (use Skill(sdd-plan))
+- Creating new specifications (use Skill(sdd-toolkit:sdd-plan))
 - Writing code or implementing features
 - Running tests or verification commands
 - Making technical decisions about architecture
-- Planning new phases or tasks (use Skill(sdd-plan))
-- Finding what to work on next (use Skill(sdd-next))
-- Creating execution plans (use Skill(sdd-next))
+- Planning new phases or tasks (use Skill(sdd-toolkit:sdd-plan))
+- Finding what to work on next (use Skill(sdd-toolkit:sdd-next))
+- Creating execution plans (use Skill(sdd-toolkit:sdd-next))
 
 ## Skill Handoff Points
 
 **When to transition to other skills:**
 
-← **From Skill(sdd-next)**:
+← **From Skill(sdd-toolkit:sdd-next)**:
   - After execution plan is approved, mark task as in_progress
   - Before beginning implementation
   - To update status during implementation
@@ -223,12 +223,12 @@ Use `Skill(sdd-update)` to:
   - When encountering blockers, document the issue
   - When making deviations, journal the decision
 
-→ **To Skill(sdd-next)**:
+→ **To Skill(sdd-toolkit:sdd-next)**:
   - After marking task complete, find next task
   - After resolving blocker, resume implementation
   - After updating progress, continue development
 
-→ **To Skill(sdd-plan)**:
+→ **To Skill(sdd-toolkit:sdd-plan)**:
   - When major spec restructuring is needed
   - When adding entirely new phases
   - When spec needs complete regeneration
@@ -237,14 +237,14 @@ Use `Skill(sdd-update)` to:
 
 ```
 What do you need to do?
-├─ Create a new spec → Use `Skill(sdd-plan)`
-├─ Find next task → Use `Skill(sdd-next)`
-├─ Create execution plan → Use `Skill(sdd-next)`
-├─ Update task status → Use `Skill(sdd-update)` (this skill)
-├─ Journal a decision → Use `Skill(sdd-update)` (this skill)
-├─ Move spec to completed → Use `Skill(sdd-update)` (this skill)
-├─ Document blocker → Use `Skill(sdd-update)` (this skill)
-└─ Track progress → Use `Skill(sdd-update)` (this skill)
+├─ Create a new spec → Use `Skill(sdd-toolkit:sdd-plan)`
+├─ Find next task → Use `Skill(sdd-toolkit:sdd-next)`
+├─ Create execution plan → Use `Skill(sdd-toolkit:sdd-next)`
+├─ Update task status → Use `Skill(sdd-toolkit:sdd-update)` (this skill)
+├─ Journal a decision → Use `Skill(sdd-toolkit:sdd-update)` (this skill)
+├─ Move spec to completed → Use `Skill(sdd-toolkit:sdd-update)` (this skill)
+├─ Document blocker → Use `Skill(sdd-toolkit:sdd-update)` (this skill)
+└─ Track progress → Use `Skill(sdd-toolkit:sdd-update)` (this skill)
 
 Task Status Changes:
 ├─ Starting work on task → Mark as in_progress (this skill)
@@ -719,7 +719,7 @@ The verification task must have metadata in the JSON spec specifying how to exec
 
 **Supported execution methods:**
 
-1. **Skill-based** (recommended): Set `"skill": "run-tests"` to use the Skill(run-tests) skill
+1. **Skill-based** (recommended): Set `"skill": "run-tests"` to use the Skill(sdd-toolkit:run-tests) skill
 2. **Command-based**: Set `"command": "pytest tests/"` to run any shell command
 
 **Output:**
@@ -1126,7 +1126,7 @@ sdd update-frontmatter user-auth-001 actual_hours "18.5" --dry-run
 
 #### 5.4 Automatic Metadata Synchronization
 
-`Skill(sdd-update)` can automatically sync JSON metadata with the current state in the hierarchy.
+`Skill(sdd-toolkit:sdd-update)` can automatically sync JSON metadata with the current state in the hierarchy.
 
 **What Gets Synchronized:**
 - `updated` - Current timestamp
@@ -1507,7 +1507,7 @@ Tasks over estimate:
 ### Workflow 1: Starting a Task
 
 1. Load spec and spec files
-2. Find next available task (or use Skill(sdd-next))
+2. Find next available task (or use Skill(sdd-toolkit:sdd-next))
 3. Mark task as `in_progress` in state
 4. Update `started_at` timestamp in metadata
 5. Recalculate parent progress
@@ -1636,7 +1636,7 @@ sdd audit-spec {spec-id} --json
 
 **Resolution:**
 1. If task in state but not spec: Check if spec was updated; remove orphan if confirmed deleted
-2. If task in spec but not state: Regenerate spec file from current spec (use Skill(sdd-plan))
+2. If task in spec but not state: Regenerate spec file from current spec (use Skill(sdd-toolkit:sdd-plan))
 3. Always preserve completed task history even if spec changed
 
 ## Summary
@@ -1668,13 +1668,13 @@ This skill provides document management operations for spec-driven development:
 
 ## See Also
 
-**Skill(sdd-plan)** - Use before this skill to:
+**Skill(sdd-toolkit:sdd-plan)** - Use before this skill to:
 - Create new specifications
 - Generate initial task hierarchies
 - Define phases and dependencies
 - Set up the project structure
 
-**Skill(sdd-next)** - Use alongside this skill:
+**Skill(sdd-toolkit:sdd-next)** - Use alongside this skill:
 - Find next task to work on (read state maintained by Manager)
 - Create execution plans (Developer reads, Manager updates)
 - Resume after completing tasks (Manager marks complete, Developer finds next)
@@ -1682,4 +1682,4 @@ This skill provides document management operations for spec-driven development:
 
 ---
 
-*For creating new specifications, use Skill(sdd-plan). For finding tasks and creating execution plans, use Skill(sdd-next).*
+*For creating new specifications, use Skill(sdd-toolkit:sdd-plan). For finding tasks and creating execution plans, use Skill(sdd-toolkit:sdd-next).*
