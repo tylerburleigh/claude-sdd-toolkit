@@ -188,7 +188,7 @@ You can still use `--multi-agent` flag to manually trigger consensus for any fai
 
 ```bash
 # This will auto-trigger consensus if 'fixture' is in auto_trigger
-~/.claude/skills/run-tests/scripts/tools_cli.py consult fixture  --error "fixture 'db_session' not found"  --hypothesis "Fixture location issue"
+sdd test consult fixture  --error "fixture 'db_session' not found"  --hypothesis "Fixture location issue"
 
 # Output shows:
 # Auto-triggering multi-agent consensus for 'fixture' failure
