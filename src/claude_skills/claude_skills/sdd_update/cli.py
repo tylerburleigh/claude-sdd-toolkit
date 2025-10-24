@@ -522,13 +522,43 @@ def cmd_get_task(args, printer):
         spec_id=args.spec_id,
         task_id=args.task_id,
         specs_dir=specs_dir,
-        printer=printer if not args.json else None
+        printer=printer if not args.json else None,
+        include_journal=getattr(args, 'include_journal', False)
     )
 
     if args.json and task:
         print(json.dumps(task, indent=2))
 
     return 0 if task else 1
+
+
+def cmd_get_journal(args, printer):
+    """Get journal entries for a spec or task."""
+    if not args.json:
+        if args.task_id:
+            printer.action(f"Retrieving journal entries for task {args.task_id}...")
+        else:
+            printer.action(f"Retrieving journal entries for {args.spec_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Import the function here to avoid circular imports
+    from claude_skills.common.query_operations import get_journal_entries
+
+    entries = get_journal_entries(
+        spec_id=args.spec_id,
+        specs_dir=specs_dir,
+        task_id=getattr(args, 'task_id', None),
+        printer=printer if not args.json else None
+    )
+
+    if args.json and entries is not None:
+        print(json.dumps(entries, indent=2))
+
+    return 0 if entries is not None else 1
 
 
 def cmd_list_phases(args, printer):
@@ -892,7 +922,14 @@ def register_update(subparsers, parent_parser):
     p_get_task = subparsers.add_parser("get-task", help="Get detailed task information", parents=[parent_parser])
     p_get_task.add_argument("spec_id", help="Specification ID")
     p_get_task.add_argument("task_id", help="Task ID to retrieve")
+    p_get_task.add_argument("--include-journal", action="store_true", help="Include journal entries for this task")
     p_get_task.set_defaults(func=cmd_get_task)
+
+    # get-journal command
+    p_get_journal = subparsers.add_parser("get-journal", help="Get journal entries", parents=[parent_parser])
+    p_get_journal.add_argument("spec_id", help="Specification ID")
+    p_get_journal.add_argument("--task-id", help="Filter by task ID")
+    p_get_journal.set_defaults(func=cmd_get_journal)
 
     # list-phases command
     p_phases = subparsers.add_parser("list-phases", help="List all phases with progress", parents=[parent_parser])

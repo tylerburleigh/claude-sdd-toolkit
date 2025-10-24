@@ -3,7 +3,7 @@
 A professional Python package for SDD workflows.
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 __author__ = "Claude Code Team"
 
 # Export commonly used functions for convenience

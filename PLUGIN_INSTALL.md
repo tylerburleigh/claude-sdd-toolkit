@@ -322,4 +322,4 @@ Once installed:
 
 ---
 
-**Version**: 2.0.0 | **Installation Guide** | Last updated: 2025-10-24
+**Version**: 0.1.0 | **Installation Guide** | Last updated: 2025-10-24

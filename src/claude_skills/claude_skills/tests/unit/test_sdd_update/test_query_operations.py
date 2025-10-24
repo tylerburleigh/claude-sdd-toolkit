@@ -16,6 +16,10 @@ from claude_skills.sdd_update.query import (
     phase_time,
     list_blockers
 )
+from claude_skills.common.query_operations import (
+    get_journal_entries,
+    get_task_journal
+)
 
 
 @pytest.mark.unit
@@ -541,3 +545,362 @@ class TestListBlockers:
         )
 
         assert blockers is None
+
+
+@pytest.mark.unit
+class TestGetJournalEntries:
+    """Tests for get_journal_entries function."""
+
+    def test_get_all_journal_entries(self, specs_structure, tmp_path):
+        """Test getting all journal entries from a spec."""
+        import json
+        # Create spec with journal entries
+        spec_data = {
+            "spec_id": "journal-spec",
+            "title": "Journal Test Spec",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": []},
+                "task-1-1": {"type": "task", "title": "Task 1", "status": "completed", "parent": "spec-root", "children": []}
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "decision",
+                    "title": "Entry 1",
+                    "author": "claude-code",
+                    "content": "First entry content",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                },
+                {
+                    "timestamp": "2025-01-01T11:00:00+00:00",
+                    "entry_type": "note",
+                    "title": "Entry 2",
+                    "author": "claude-code",
+                    "content": "Second entry content",
+                    "metadata": {}
+                },
+                {
+                    "timestamp": "2025-01-01T12:00:00+00:00",
+                    "entry_type": "status_change",
+                    "title": "Entry 3",
+                    "author": "claude-code",
+                    "content": "Third entry content",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        entries = get_journal_entries(
+            spec_id="journal-spec",
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        assert entries is not None
+        assert len(entries) == 3
+        assert entries[0]["title"] == "Entry 1"
+        assert entries[1]["title"] == "Entry 2"
+        assert entries[2]["title"] == "Entry 3"
+
+    def test_get_journal_entries_filtered_by_task(self, specs_structure, tmp_path):
+        """Test getting journal entries filtered by task_id."""
+        import json
+        spec_data = {
+            "spec_id": "journal-spec",
+            "title": "Journal Test Spec",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": []},
+                "task-1-1": {"type": "task", "title": "Task 1", "status": "completed", "parent": "spec-root", "children": []}
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "decision",
+                    "title": "Task 1 Entry",
+                    "author": "claude-code",
+                    "content": "Entry for task 1",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                },
+                {
+                    "timestamp": "2025-01-01T11:00:00+00:00",
+                    "entry_type": "note",
+                    "title": "General Entry",
+                    "author": "claude-code",
+                    "content": "General entry",
+                    "metadata": {}
+                },
+                {
+                    "timestamp": "2025-01-01T12:00:00+00:00",
+                    "entry_type": "status_change",
+                    "title": "Task 1 Status",
+                    "author": "claude-code",
+                    "content": "Another entry for task 1",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        entries = get_journal_entries(
+            spec_id="journal-spec",
+            specs_dir=specs_structure,
+            task_id="task-1-1",
+            printer=None
+        )
+
+        assert entries is not None
+        assert len(entries) == 2  # Only entries with task_id="task-1-1"
+        assert all(e.get("task_id") == "task-1-1" for e in entries)
+        assert entries[0]["title"] == "Task 1 Entry"
+        assert entries[1]["title"] == "Task 1 Status"
+
+    def test_get_journal_entries_empty(self, specs_structure, tmp_path):
+        """Test getting journal entries when there are none."""
+        import json
+        spec_data = {
+            "spec_id": "no-journal-spec",
+            "title": "No Journal Spec",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": []}
+            },
+            "journal": []
+        }
+        spec_file = specs_structure / "active" / "no-journal-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        entries = get_journal_entries(
+            spec_id="no-journal-spec",
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        assert entries is not None
+        assert len(entries) == 0
+
+    def test_get_journal_entries_no_matching_task(self, specs_structure, tmp_path):
+        """Test filtering by task_id that doesn't exist in journal."""
+        import json
+        spec_data = {
+            "spec_id": "journal-spec",
+            "title": "Journal Test Spec",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": []}
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "note",
+                    "title": "General Entry",
+                    "author": "claude-code",
+                    "content": "General entry",
+                    "metadata": {}
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        entries = get_journal_entries(
+            spec_id="journal-spec",
+            specs_dir=specs_structure,
+            task_id="nonexistent-task",
+            printer=None
+        )
+
+        assert entries is not None
+        assert len(entries) == 0
+
+    def test_get_journal_entries_invalid_spec(self, specs_structure):
+        """Test getting journal entries from invalid spec."""
+        entries = get_journal_entries(
+            spec_id="nonexistent-spec",
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        assert entries is None
+
+
+@pytest.mark.unit
+class TestGetTaskJournal:
+    """Tests for get_task_journal function."""
+
+    def test_get_task_journal(self, specs_structure, tmp_path):
+        """Test getting journal entries for a specific task."""
+        import json
+        spec_data = {
+            "spec_id": "journal-spec",
+            "title": "Journal Test Spec",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": []},
+                "task-1-1": {"type": "task", "title": "Task 1", "status": "completed", "parent": "spec-root", "children": []}
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "decision",
+                    "title": "Task Entry",
+                    "author": "claude-code",
+                    "content": "Task-specific entry",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        entries = get_task_journal(
+            spec_id="journal-spec",
+            task_id="task-1-1",
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        assert entries is not None
+        assert len(entries) == 1
+        assert entries[0]["task_id"] == "task-1-1"
+
+
+@pytest.mark.unit
+class TestGetTaskWithJournal:
+    """Tests for get_task with include_journal parameter."""
+
+    def test_get_task_with_journal(self, specs_structure, tmp_path):
+        """Test getting task with journal entries included."""
+        import json
+        spec_data = {
+            "spec_id": "journal-task-spec",
+            "title": "Journal Task Test",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": ["task-1-1"]},
+                "task-1-1": {
+                    "type": "task",
+                    "title": "Task 1",
+                    "status": "completed",
+                    "parent": "spec-root",
+                    "children": [],
+                    "metadata": {}
+                }
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "decision",
+                    "title": "Task Decision",
+                    "author": "claude-code",
+                    "content": "Decision content",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                },
+                {
+                    "timestamp": "2025-01-01T11:00:00+00:00",
+                    "entry_type": "status_change",
+                    "title": "Task Completed",
+                    "author": "claude-code",
+                    "content": "Status change",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-task-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        task = get_task(
+            spec_id="journal-task-spec",
+            task_id="task-1-1",
+            specs_dir=specs_structure,
+            printer=None,
+            include_journal=True
+        )
+
+        assert task is not None
+        assert "journal_entries" in task
+        assert len(task["journal_entries"]) == 2
+        assert task["journal_entries"][0]["title"] == "Task Decision"
+        assert task["journal_entries"][1]["title"] == "Task Completed"
+
+    def test_get_task_without_journal(self, specs_structure, tmp_path):
+        """Test getting task without journal entries (default behavior)."""
+        import json
+        spec_data = {
+            "spec_id": "journal-task-spec",
+            "title": "Journal Task Test",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": ["task-1-1"]},
+                "task-1-1": {
+                    "type": "task",
+                    "title": "Task 1",
+                    "status": "completed",
+                    "parent": "spec-root",
+                    "children": [],
+                    "metadata": {}
+                }
+            },
+            "journal": [
+                {
+                    "timestamp": "2025-01-01T10:00:00+00:00",
+                    "entry_type": "decision",
+                    "title": "Task Decision",
+                    "author": "claude-code",
+                    "content": "Decision content",
+                    "metadata": {},
+                    "task_id": "task-1-1"
+                }
+            ]
+        }
+        spec_file = specs_structure / "active" / "journal-task-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        task = get_task(
+            spec_id="journal-task-spec",
+            task_id="task-1-1",
+            specs_dir=specs_structure,
+            printer=None,
+            include_journal=False
+        )
+
+        assert task is not None
+        assert "journal_entries" not in task
+
+    def test_get_task_with_journal_no_entries(self, specs_structure, tmp_path):
+        """Test getting task with journal when there are no entries for that task."""
+        import json
+        spec_data = {
+            "spec_id": "journal-task-spec",
+            "title": "Journal Task Test",
+            "hierarchy": {
+                "spec-root": {"type": "spec", "status": "pending", "children": ["task-1-1"]},
+                "task-1-1": {
+                    "type": "task",
+                    "title": "Task 1",
+                    "status": "completed",
+                    "parent": "spec-root",
+                    "children": [],
+                    "metadata": {}
+                }
+            },
+            "journal": []
+        }
+        spec_file = specs_structure / "active" / "journal-task-spec.json"
+        spec_file.write_text(json.dumps(spec_data))
+
+        task = get_task(
+            spec_id="journal-task-spec",
+            task_id="task-1-1",
+            specs_dir=specs_structure,
+            printer=None,
+            include_journal=True
+        )
+
+        assert task is not None
+        assert "journal_entries" in task
+        assert len(task["journal_entries"]) == 0

@@ -1,8 +1,7 @@
 {
   "spec_id": "semantic-search-2025-10-24-001",
   "generated": "2025-10-24T00:00:00Z",
-  "last_updated": "2025-10-24T00:00:00Z",
-
+  "last_updated": "2025-10-24T16:48:23.513434+00:00",
   "metadata": {
     "title": "Semantic Search for Documentation Query",
     "description": "Three-tier hybrid semantic search system combining keyword (regex), BM25 (fast keyword ranking), and semantic embeddings (conceptual understanding)",
@@ -17,66 +16,96 @@
       "Zero breaking changes for existing users"
     ]
   },
-
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Semantic Search for Documentation Query",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
-      "children": ["phase-1", "phase-2", "phase-3", "phase-4", "phase-5"],
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
       "total_tasks": 62,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 2,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "phase-1": {
       "type": "phase",
       "title": "Foundation & Configuration",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
-      "children": ["phase-1-files", "phase-1-verify"],
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Set up dependencies, configuration modules, and code-aware tokenization",
         "risk_level": "low",
         "estimated_hours": 6
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-5"
+        ],
+        "blocked_by": [],
+        "depends": []
       }
     },
-
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
-      "children": ["task-1-1", "task-1-2"],
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
       "total_tasks": 6,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 2,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "task-1-1": {
       "type": "task",
       "title": "src/claude_skills/pyproject.toml",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
-      "children": ["task-1-1-1", "task-1-1-2"],
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {
-        "file_path": "src/claude_skills/pyproject.toml",
-        "estimated_hours": 0.5,
-        "changes": "Add optional dependency groups for semantic search",
-        "reasoning": "Enable progressive enhancement - users can opt-in to BM25 and/or semantic features"
+        "completed_at": "2025-10-24T16:48:23.512925+00:00",
+        "needs_journaling": true,
+        "status_note": "Successfully added semantic and semantic-cpu optional dependency groups to pyproject.toml. TOML syntax validated."
       }
     },
-
     "task-1-1-1": {
       "type": "subtask",
       "title": "Add [semantic] optional dependency group",
@@ -94,7 +123,6 @@
         "details": "Add rank-bm25>=0.2.2, sentence-transformers>=2.2.0, numpy>=1.21.0 to [project.optional-dependencies]"
       }
     },
-
     "task-1-1-2": {
       "type": "subtask",
       "title": "Add [semantic-cpu] optional dependency group",
@@ -112,13 +140,17 @@
         "details": "Same as semantic but with CPU-only torch for non-Mac platforms"
       }
     },
-
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/semantic_config.py",
       "status": "pending",
       "parent": "phase-1-files",
-      "children": ["task-1-2-1", "task-1-2-2", "task-1-2-3", "task-1-2-4"],
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3",
+        "task-1-2-4"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
@@ -133,7 +165,6 @@
         "reasoning": "Centralize configuration for BM25, embeddings, and search behavior"
       }
     },
-
     "task-1-2-1": {
       "type": "subtask",
       "title": "Create BM25Config dataclass",
@@ -151,7 +182,6 @@
         "details": "k1=1.5, b=0.75, epsilon=0.25 (BM25 algorithm parameters)"
       }
     },
-
     "task-1-2-2": {
       "type": "subtask",
       "title": "Create EmbeddingConfig dataclass",
@@ -169,7 +199,6 @@
         "details": "model_name='all-MiniLM-L6-v2', batch_size=32, max_seq_length=384"
       }
     },
-
     "task-1-2-3": {
       "type": "subtask",
       "title": "Create SearchConfig dataclass",
@@ -187,7 +216,6 @@
         "details": "bm25_top_k=50, semantic_top_k=10, similarity_threshold=0.3"
       }
     },
-
     "task-1-2-4": {
       "type": "subtask",
       "title": "Implement tokenize_code_aware() function",
@@ -205,23 +233,26 @@
         "details": "Handle snake_case, camelCase, PascalCase splitting. Use minimal stopwords (only 'the', 'a', 'an', 'and', 'or', 'but') - keep 'in', 'on', 'at' for code context"
       }
     },
-
     "phase-1-verify": {
       "type": "group",
       "title": "Verification",
       "status": "pending",
       "parent": "phase-1",
-      "children": ["verify-1-1", "verify-1-2"],
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-1-files"],
+        "blocked_by": [
+          "phase-1-files"
+        ],
         "depends": []
       },
       "total_tasks": 2,
       "completed_tasks": 0,
       "metadata": {}
     },
-
     "verify-1-1": {
       "type": "verify",
       "title": "Tokenization handles code patterns correctly",
@@ -238,10 +269,9 @@
       "metadata": {
         "verification_type": "auto",
         "command": "python -m pytest tests/test_semantic_config.py::test_tokenize_code_aware",
-        "expected": "getUserName → ['get', 'user', 'name'], HTTPServer → ['http', 'server'], parse_json_file → ['parse', 'json', 'file']"
+        "expected": "getUserName \u2192 ['get', 'user', 'name'], HTTPServer \u2192 ['http', 'server'], parse_json_file \u2192 ['parse', 'json', 'file']"
       }
     },
-
     "verify-1-2": {
       "type": "verify",
       "title": "Configuration dataclasses have correct defaults",
@@ -257,19 +287,27 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "BM25Config, EmbeddingConfig, SearchConfig instantiate with documented defaults"
+        "expected": "BM25Config, EmbeddingConfig, SearchConfig instantiate with documented defaults",
+        "command": ""
       }
     },
-
     "phase-2": {
       "type": "phase",
       "title": "BM25 Search Implementation",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-2-files", "phase-2-verify"],
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-1"],
+        "blocks": [
+          "phase-4",
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
         "depends": []
       },
       "total_tasks": 11,
@@ -280,28 +318,43 @@
         "estimated_hours": 8
       }
     },
-
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-2",
-      "children": ["task-2-1", "task-2-2"],
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
       "total_tasks": 8,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/bm25_search.py",
       "status": "pending",
       "parent": "phase-2-files",
-      "children": ["task-2-1-1", "task-2-1-2", "task-2-1-3", "task-2-1-4"],
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-1-2"]
+        "depends": [
+          "task-1-2"
+        ]
       },
       "total_tasks": 4,
       "completed_tasks": 0,
@@ -312,7 +365,6 @@
         "reasoning": "Provides improved keyword search with better relevance ranking"
       }
     },
-
     "task-2-1-1": {
       "type": "subtask",
       "title": "Create BM25Result dataclass",
@@ -330,7 +382,6 @@
         "details": "entity_id, score, entity_data fields"
       }
     },
-
     "task-2-1-2": {
       "type": "subtask",
       "title": "Create BM25Index class with build() method",
@@ -348,7 +399,6 @@
         "details": "Use rank-bm25 library, tokenize with tokenize_code_aware(), weight name higher (2x repetition)"
       }
     },
-
     "task-2-1-3": {
       "type": "subtask",
       "title": "Implement BM25Index.search() method",
@@ -366,7 +416,6 @@
         "details": "Return top-k results sorted by BM25 score"
       }
     },
-
     "task-2-1-4": {
       "type": "subtask",
       "title": "Add check_bm25_available() helper",
@@ -384,17 +433,23 @@
         "details": "Gracefully handle ImportError if rank-bm25 not installed"
       }
     },
-
     "task-2-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/doc_query_lib.py",
       "status": "pending",
       "parent": "phase-2-files",
-      "children": ["task-2-2-1", "task-2-2-2", "task-2-2-3", "task-2-2-4"],
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2",
+        "task-2-2-3",
+        "task-2-2-4"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-2-1"]
+        "depends": [
+          "task-2-1"
+        ]
       },
       "total_tasks": 4,
       "completed_tasks": 0,
@@ -405,7 +460,6 @@
         "reasoning": "Enable BM25 search within existing query interface"
       }
     },
-
     "task-2-2-1": {
       "type": "subtask",
       "title": "Add BM25 state to __init__()",
@@ -423,7 +477,6 @@
         "details": "self._bm25_available, self._bm25_indices = {classes, functions, modules}"
       }
     },
-
     "task-2-2-2": {
       "type": "subtask",
       "title": "Create _build_bm25_indices() method",
@@ -441,7 +494,6 @@
         "details": "Build BM25Index for classes, functions, modules with error handling"
       }
     },
-
     "task-2-2-3": {
       "type": "subtask",
       "title": "Call _build_bm25_indices() in _reindex()",
@@ -459,7 +511,6 @@
         "details": "Build BM25 indices after standard reindexing if available"
       }
     },
-
     "task-2-2-4": {
       "type": "subtask",
       "title": "Add error handling for BM25 build failures",
@@ -477,23 +528,27 @@
         "details": "Disable BM25 and log warning if build fails, don't crash"
       }
     },
-
     "phase-2-verify": {
       "type": "group",
       "title": "Verification",
       "status": "pending",
       "parent": "phase-2",
-      "children": ["verify-2-1", "verify-2-2", "verify-2-3"],
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-2-files"],
+        "blocked_by": [
+          "phase-2-files"
+        ],
         "depends": []
       },
       "total_tasks": 3,
       "completed_tasks": 0,
       "metadata": {}
     },
-
     "verify-2-1": {
       "type": "verify",
       "title": "BM25 search returns relevant results",
@@ -513,7 +568,6 @@
         "expected": "Query 'user login' returns authenticate_user and login_handler in top results"
       }
     },
-
     "verify-2-2": {
       "type": "verify",
       "title": "BM25 gracefully degrades when not installed",
@@ -529,10 +583,10 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "DocumentationQuery works without rank-bm25, _bm25_available=False"
+        "expected": "DocumentationQuery works without rank-bm25, _bm25_available=False",
+        "command": ""
       }
     },
-
     "verify-2-3": {
       "type": "verify",
       "title": "BM25 search performance meets target",
@@ -552,16 +606,23 @@
         "expected": "BM25 search completes in <50ms for 1000 entities"
       }
     },
-
     "phase-3": {
       "type": "phase",
       "title": "Semantic Embeddings Infrastructure",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-3-files", "phase-3-verify"],
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-1"],
+        "blocks": [
+          "phase-4",
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
         "depends": []
       },
       "total_tasks": 19,
@@ -572,28 +633,47 @@
         "estimated_hours": 14
       }
     },
-
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-3",
-      "children": ["task-3-1", "task-3-2", "task-3-3"],
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
       "total_tasks": 15,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/embeddings.py",
       "status": "pending",
       "parent": "phase-3-files",
-      "children": ["task-3-1-1", "task-3-1-2", "task-3-1-3", "task-3-1-4", "task-3-1-5", "task-3-1-6", "task-3-1-7"],
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4",
+        "task-3-1-5",
+        "task-3-1-6",
+        "task-3-1-7"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-1-2"]
+        "depends": [
+          "task-1-2"
+        ]
       },
       "total_tasks": 7,
       "completed_tasks": 0,
@@ -604,7 +684,6 @@
         "reasoning": "Embeddings used by doc_query, not code_doc. Includes all critical fixes from review."
       }
     },
-
     "task-3-1-1": {
       "type": "subtask",
       "title": "Add imports including 'from datetime import datetime'",
@@ -622,7 +701,6 @@
         "details": "CRITICAL FIX: Missing import caused failure. Import json, numpy, datetime, pathlib, typing, sentence_transformers, semantic_config"
       }
     },
-
     "task-3-1-2": {
       "type": "subtask",
       "title": "Create EmbeddingResult dataclass",
@@ -640,7 +718,6 @@
         "details": "embeddings, metadata, model_name, embedding_dim fields"
       }
     },
-
     "task-3-1-3": {
       "type": "subtask",
       "title": "Create EmbeddingGenerator class with lazy model loading",
@@ -658,7 +735,6 @@
         "details": "Lazy @property for model loading. Add try/except with helpful error messages for network issues, corrupted cache, disk space"
       }
     },
-
     "task-3-1-4": {
       "type": "subtask",
       "title": "Implement generate_for_entities() method",
@@ -676,7 +752,6 @@
         "details": "Generate embeddings for list of entities with progress bar support (tqdm)"
       }
     },
-
     "task-3-1-5": {
       "type": "subtask",
       "title": "Implement _create_embedding_text() static method",
@@ -694,7 +769,6 @@
         "details": "Create searchable text from entity: type, name, docstring, file context, parameters, inheritance"
       }
     },
-
     "task-3-1-6": {
       "type": "subtask",
       "title": "Implement save_embeddings() method with staleness tracking",
@@ -712,7 +786,6 @@
         "details": "Save as NPZ (compressed numpy) + metadata JSON. Include model_version, embedding_version, codebase_hash for staleness detection"
       }
     },
-
     "task-3-1-7": {
       "type": "subtask",
       "title": "Add check_embeddings_available() and compute_codebase_hash() helpers",
@@ -730,17 +803,22 @@
         "details": "Check if sentence-transformers available. Compute SHA-256 hash of documentation.json for staleness detection"
       }
     },
-
     "task-3-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/code_doc/cli.py",
       "status": "pending",
       "parent": "phase-3-files",
-      "children": ["task-3-2-1", "task-3-2-2", "task-3-2-3"],
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2",
+        "task-3-2-3"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-3-1"]
+        "depends": [
+          "task-3-1"
+        ]
       },
       "total_tasks": 3,
       "completed_tasks": 0,
@@ -751,7 +829,6 @@
         "reasoning": "Allow users to generate embeddings during initial doc generation"
       }
     },
-
     "task-3-2-1": {
       "type": "subtask",
       "title": "Add --generate-embeddings flag to generate command",
@@ -769,7 +846,6 @@
         "details": "Boolean flag to enable embedding generation during doc generation"
       }
     },
-
     "task-3-2-2": {
       "type": "subtask",
       "title": "Update cmd_generate() to call EmbeddingGenerator",
@@ -787,7 +863,6 @@
         "details": "After doc generation, generate embeddings for classes, functions, modules if flag set. Show progress bars. Handle ImportError gracefully."
       }
     },
-
     "task-3-2-3": {
       "type": "subtask",
       "title": "Update documentation.json metadata with embeddings info",
@@ -805,17 +880,24 @@
         "details": "Add metadata.embeddings = {available: true, model: ..., path: 'embeddings.npz', dimension: 384}"
       }
     },
-
     "task-3-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/code_doc/cli.py (generate-embeddings command)",
       "status": "pending",
       "parent": "phase-3-files",
-      "children": ["task-3-3-1", "task-3-3-2", "task-3-3-3", "task-3-3-4", "task-3-3-5"],
+      "children": [
+        "task-3-3-1",
+        "task-3-3-2",
+        "task-3-3-3",
+        "task-3-3-4",
+        "task-3-3-5"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-3-1"]
+        "depends": [
+          "task-3-1"
+        ]
       },
       "total_tasks": 5,
       "completed_tasks": 0,
@@ -826,7 +908,6 @@
         "reasoning": "Allow users to generate embeddings for existing documentation"
       }
     },
-
     "task-3-3-1": {
       "type": "subtask",
       "title": "Create generate-embeddings subparser",
@@ -844,7 +925,6 @@
         "details": "Add parser with docs_path (optional), --model (default: all-MiniLM-L6-v2), --force flags"
       }
     },
-
     "task-3-3-2": {
       "type": "subtask",
       "title": "Implement cmd_generate_embeddings() function",
@@ -862,7 +942,6 @@
         "details": "Load existing documentation.json, create EmbeddingGenerator, generate embeddings"
       }
     },
-
     "task-3-3-3": {
       "type": "subtask",
       "title": "Add staleness check",
@@ -880,7 +959,6 @@
         "details": "Check if embeddings exist and are up-to-date using codebase_hash. Skip if current unless --force"
       }
     },
-
     "task-3-3-4": {
       "type": "subtask",
       "title": "Show progress bars during generation",
@@ -898,7 +976,6 @@
         "details": "Use tqdm to show progress for embedding generation (can take 5-10s for 500 entities)"
       }
     },
-
     "task-3-3-5": {
       "type": "subtask",
       "title": "Handle errors gracefully",
@@ -916,23 +993,28 @@
         "details": "ImportError if sentence-transformers missing, file I/O errors, model loading failures. Show helpful install instructions."
       }
     },
-
     "phase-3-verify": {
       "type": "group",
       "title": "Verification",
       "status": "pending",
       "parent": "phase-3",
-      "children": ["verify-3-1", "verify-3-2", "verify-3-3", "verify-3-4"],
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-3-files"],
+        "blocked_by": [
+          "phase-3-files"
+        ],
         "depends": []
       },
       "total_tasks": 4,
       "completed_tasks": 0,
       "metadata": {}
     },
-
     "verify-3-1": {
       "type": "verify",
       "title": "Embeddings generate successfully",
@@ -952,7 +1034,6 @@
         "expected": "Embeddings array shape (N, 384) for all-MiniLM-L6-v2 model"
       }
     },
-
     "verify-3-2": {
       "type": "verify",
       "title": "Embedding files saved correctly",
@@ -968,10 +1049,10 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "embeddings.npz and embeddings_meta.json exist, metadata includes model, dimension, codebase_hash, entity counts"
+        "expected": "embeddings.npz and embeddings_meta.json exist, metadata includes model, dimension, codebase_hash, entity counts",
+        "command": ""
       }
     },
-
     "verify-3-3": {
       "type": "verify",
       "title": "Staleness detection works",
@@ -987,10 +1068,10 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Modify documentation.json, check that codebase_hash changes and embeddings marked stale"
+        "expected": "Modify documentation.json, check that codebase_hash changes and embeddings marked stale",
+        "command": ""
       }
     },
-
     "verify-3-4": {
       "type": "verify",
       "title": "Error handling works for model loading",
@@ -1006,19 +1087,27 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Simulate network failure, verify helpful error message about connectivity, corrupted cache, disk space"
+        "expected": "Simulate network failure, verify helpful error message about connectivity, corrupted cache, disk space",
+        "command": ""
       }
     },
-
     "phase-4": {
       "type": "phase",
       "title": "Hybrid Search Orchestration",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-4-files", "phase-4-verify"],
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-2", "phase-3"],
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-2",
+          "phase-3"
+        ],
         "depends": []
       },
       "total_tasks": 18,
@@ -1029,28 +1118,45 @@
         "estimated_hours": 12
       }
     },
-
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-4",
-      "children": ["task-4-1", "task-4-2", "task-4-3", "task-4-4"],
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4"
+      ],
       "total_tasks": 14,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "task-4-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/semantic_search.py",
       "status": "pending",
       "parent": "phase-4-files",
-      "children": ["task-4-1-1", "task-4-1-2", "task-4-1-3", "task-4-1-4"],
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3",
+        "task-4-1-4"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-3-1"]
+        "depends": [
+          "task-3-1"
+        ]
       },
       "total_tasks": 4,
       "completed_tasks": 0,
@@ -1061,7 +1167,6 @@
         "reasoning": "Enable pure semantic search based on cosine similarity"
       }
     },
-
     "task-4-1-1": {
       "type": "subtask",
       "title": "Create SemanticResult dataclass",
@@ -1079,7 +1184,6 @@
         "details": "entity_id, entity_type, score, entity_data fields"
       }
     },
-
     "task-4-1-2": {
       "type": "subtask",
       "title": "Create SemanticIndex class with load() method",
@@ -1097,7 +1201,6 @@
         "details": "Load embeddings.npz and metadata, load SentenceTransformer model"
       }
     },
-
     "task-4-1-3": {
       "type": "subtask",
       "title": "Implement SemanticIndex.search() method",
@@ -1115,7 +1218,6 @@
         "details": "Generate query embedding, compute cosine similarity, filter by threshold, return top-k"
       }
     },
-
     "task-4-1-4": {
       "type": "subtask",
       "title": "Add _cosine_similarity() static method",
@@ -1133,17 +1235,25 @@
         "details": "Efficient numpy-based cosine similarity computation"
       }
     },
-
     "task-4-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/hybrid_search.py",
       "status": "pending",
       "parent": "phase-4-files",
-      "children": ["task-4-2-1", "task-4-2-2", "task-4-2-3", "task-4-2-4", "task-4-2-5"],
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2",
+        "task-4-2-3",
+        "task-4-2-4",
+        "task-4-2-5"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-2-1", "task-4-1"]
+        "depends": [
+          "task-2-1",
+          "task-4-1"
+        ]
       },
       "total_tasks": 5,
       "completed_tasks": 0,
@@ -1154,7 +1264,6 @@
         "reasoning": "Provides best search quality by combining fast BM25 filtering with accurate semantic ranking"
       }
     },
-
     "task-4-2-1": {
       "type": "subtask",
       "title": "Create SearchStrategy enum",
@@ -1172,7 +1281,6 @@
         "details": "KEYWORD, BM25, SEMANTIC, HYBRID, AUTO values"
       }
     },
-
     "task-4-2-2": {
       "type": "subtask",
       "title": "Create HybridSearchEngine class with capability detection",
@@ -1190,7 +1298,6 @@
         "details": "_detect_capabilities() returns {keyword, bm25, semantic} availability"
       }
     },
-
     "task-4-2-3": {
       "type": "subtask",
       "title": "Implement strategy selection and search routing",
@@ -1208,7 +1315,6 @@
         "details": "search() method routes to _keyword_search(), _bm25_search(), _semantic_search(), or _hybrid_search() based on strategy"
       }
     },
-
     "task-4-2-4": {
       "type": "subtask",
       "title": "Implement _hybrid_search() with min-max normalization",
@@ -1223,10 +1329,9 @@
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
-        "details": "CRITICAL FIX: BM25 filter (top 50) → semantic re-rank. Use min-max normalization for BM25 scores, not division by 10. Combine: 0.4*bm25_norm + 0.6*semantic"
+        "details": "CRITICAL FIX: BM25 filter (top 50) \u2192 semantic re-rank. Use min-max normalization for BM25 scores, not division by 10. Combine: 0.4*bm25_norm + 0.6*semantic"
       }
     },
-
     "task-4-2-5": {
       "type": "subtask",
       "title": "Add get_status() method for capability reporting",
@@ -1244,17 +1349,21 @@
         "details": "Return capabilities, recommended_strategy, available_strategies for CLI display"
       }
     },
-
     "task-4-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/doc_query_lib.py (semantic integration)",
       "status": "pending",
       "parent": "phase-4-files",
-      "children": ["task-4-3-1", "task-4-3-2"],
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-4-1"]
+        "depends": [
+          "task-4-1"
+        ]
       },
       "total_tasks": 2,
       "completed_tasks": 0,
@@ -1265,7 +1374,6 @@
         "reasoning": "Enable semantic search alongside BM25"
       }
     },
-
     "task-4-3-1": {
       "type": "subtask",
       "title": "Add semantic index loading to __init__()",
@@ -1283,7 +1391,6 @@
         "details": "Check for embeddings, create SemanticIndex, call load(). Set self._semantic_index"
       }
     },
-
     "task-4-3-2": {
       "type": "subtask",
       "title": "Update search_entities() to use HybridSearchEngine",
@@ -1301,17 +1408,22 @@
         "details": "Add strategy parameter (default 'auto'), create HybridSearchEngine, delegate to engine.search()"
       }
     },
-
     "task-4-4": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/cli.py",
       "status": "pending",
       "parent": "phase-4-files",
-      "children": ["task-4-4-1", "task-4-4-2", "task-4-4-3"],
+      "children": [
+        "task-4-4-1",
+        "task-4-4-2",
+        "task-4-4-3"
+      ],
       "dependencies": {
         "blocks": [],
         "blocked_by": [],
-        "depends": ["task-4-2"]
+        "depends": [
+          "task-4-2"
+        ]
       },
       "total_tasks": 3,
       "completed_tasks": 0,
@@ -1322,7 +1434,6 @@
         "reasoning": "Allow users to select search strategy explicitly"
       }
     },
-
     "task-4-4-1": {
       "type": "subtask",
       "title": "Add --strategy argument to parser",
@@ -1340,7 +1451,6 @@
         "details": "choices=['keyword', 'bm25', 'semantic', 'hybrid', 'auto'], default='auto'"
       }
     },
-
     "task-4-4-2": {
       "type": "subtask",
       "title": "Update cmd_search() to pass strategy",
@@ -1358,7 +1468,6 @@
         "details": "Call query.search_entities(args.query, strategy=args.strategy). Show which strategy was used."
       }
     },
-
     "task-4-4-3": {
       "type": "subtask",
       "title": "Update cmd_stats() to show search capabilities",
@@ -1376,23 +1485,28 @@
         "details": "Use HybridSearchEngine.get_status() to show available strategies, recommended strategy, installation instructions"
       }
     },
-
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
       "status": "pending",
       "parent": "phase-4",
-      "children": ["verify-4-1", "verify-4-2", "verify-4-3", "verify-4-4"],
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3",
+        "verify-4-4"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-4-files"],
+        "blocked_by": [
+          "phase-4-files"
+        ],
         "depends": []
       },
       "total_tasks": 4,
       "completed_tasks": 0,
       "metadata": {}
     },
-
     "verify-4-1": {
       "type": "verify",
       "title": "Semantic search finds conceptually similar results",
@@ -1412,7 +1526,6 @@
         "expected": "Query 'user authentication logic' finds authenticate_user(), LoginHandler even without exact text match"
       }
     },
-
     "verify-4-2": {
       "type": "verify",
       "title": "Hybrid search combines BM25 and semantic correctly",
@@ -1432,7 +1545,6 @@
         "expected": "Hybrid achieves better ranking than BM25 or semantic alone. Min-max normalization works correctly."
       }
     },
-
     "verify-4-3": {
       "type": "verify",
       "title": "Strategy auto-selection works",
@@ -1452,7 +1564,6 @@
         "expected": "AUTO selects HYBRID when semantic available, BM25 when only BM25 available, KEYWORD as fallback"
       }
     },
-
     "verify-4-4": {
       "type": "verify",
       "title": "Graceful degradation works",
@@ -1468,19 +1579,27 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Request semantic search without embeddings → falls back to BM25 with warning. Request BM25 without rank-bm25 → falls back to keyword with warning."
+        "expected": "Request semantic search without embeddings \u2192 falls back to BM25 with warning. Request BM25 without rank-bm25 \u2192 falls back to keyword with warning.",
+        "command": ""
       }
     },
-
     "phase-5": {
       "type": "phase",
       "title": "Testing, Documentation & Polish",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-5-files", "phase-5-verify"],
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-1", "phase-2", "phase-3", "phase-4"],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
         "depends": []
       },
       "total_tasks": 6,
@@ -1491,18 +1610,27 @@
         "estimated_hours": 16
       }
     },
-
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-5",
-      "children": ["task-5-1", "task-5-2", "task-5-3"],
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
       "total_tasks": 3,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
     },
-
     "task-5-1": {
       "type": "task",
       "title": "src/claude_skills/tests/test_*.py (comprehensive test suite)",
@@ -1524,7 +1652,6 @@
         "details": "test_semantic_config.py (tokenization), test_bm25_search.py (BM25 + performance), test_embeddings.py (generation + staleness), test_semantic_search.py (similarity), test_hybrid_search.py (orchestration + strategy), test_integration.py (end-to-end workflow). Target >80% coverage."
       }
     },
-
     "task-5-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/doc_query/SKILL.md",
@@ -1546,7 +1673,6 @@
         "details": "Add sections: Search Strategies, Installation, Generating Embeddings, Usage Examples, When to Use Each Strategy, Performance Characteristics"
       }
     },
-
     "task-5-3": {
       "type": "task",
       "title": "docs/SEMANTIC_SEARCH_MIGRATION.md",
@@ -1568,23 +1694,27 @@
         "details": "No breaking changes section, how to enable semantic search, performance expectations, troubleshooting guide"
       }
     },
-
     "phase-5-verify": {
       "type": "group",
       "title": "Verification",
       "status": "pending",
       "parent": "phase-5",
-      "children": ["verify-5-1", "verify-5-2", "verify-5-3"],
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-5-files"],
+        "blocked_by": [
+          "phase-5-files"
+        ],
         "depends": []
       },
       "total_tasks": 3,
       "completed_tasks": 0,
       "metadata": {}
     },
-
     "verify-5-1": {
       "type": "verify",
       "title": "All tests pass with >80% coverage",
@@ -1604,7 +1734,6 @@
         "expected": "All tests pass, coverage >80% for semantic_config, bm25_search, embeddings, semantic_search, hybrid_search"
       }
     },
-
     "verify-5-2": {
       "type": "verify",
       "title": "Performance targets met",
@@ -1624,7 +1753,6 @@
         "expected": "BM25 <50ms, Semantic <500ms (after first load), Hybrid <300ms for 1000 entities"
       }
     },
-
     "verify-5-3": {
       "type": "verify",
       "title": "No breaking changes for existing users",

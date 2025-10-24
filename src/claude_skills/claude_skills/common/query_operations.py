@@ -104,7 +104,8 @@ def get_task(
     spec_id: str,
     task_id: str,
     specs_dir: Path,
-    printer: Optional[PrettyPrinter] = None
+    printer: Optional[PrettyPrinter] = None,
+    include_journal: bool = False
 ) -> Optional[Dict]:
     """
     Get detailed information about a specific task.
@@ -114,6 +115,7 @@ def get_task(
         task_id: Task ID to retrieve
         specs_dir: Path to specs directory
         printer: Optional printer for output
+        include_journal: If True, include journal entries for this task
 
     Returns:
         Task data dictionary, or None if not found
@@ -129,6 +131,14 @@ def get_task(
         if printer:
             printer.error(f"Task '{task_id}' not found")
         return None
+
+    # Get journal entries if requested
+    journal_entries = None
+    if include_journal:
+        all_entries = spec_data.get("journal", [])
+        journal_entries = [entry for entry in all_entries if entry.get("task_id") == task_id]
+        # Add to task dict for JSON output
+        task["journal_entries"] = journal_entries
 
     # Display task details (only if printer is provided)
     if printer:
@@ -161,6 +171,26 @@ def get_task(
             printer.info("\nDependencies:")
             if deps.get("blocked_by"):
                 printer.detail(f"Blocked by: {', '.join(deps['blocked_by'])}")
+
+        # Display journal entries if included
+        if include_journal and journal_entries:
+            printer.info(f"\nJournal Entries ({len(journal_entries)}):")
+            for entry in journal_entries:
+                # Format timestamp
+                timestamp_str = entry.get("timestamp", "Unknown")
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(str(timestamp_str).replace('Z', '+00:00'))
+                    timestamp_str = dt.strftime("%Y-%m-%d %H:%M")
+                except Exception:
+                    pass
+
+                printer.detail(f"• {timestamp_str} - {entry.get('title', 'Untitled')} [{entry.get('entry_type', 'note')}]")
+                content = entry.get("content", "")
+                if len(content) > 150:
+                    printer.detail(f"  {content[:150]}...")
+                else:
+                    printer.detail(f"  {content}")
 
     return task
 
@@ -368,3 +398,110 @@ def list_blockers(
                 printer.info("")
 
     return blockers if blockers else []
+
+
+def get_journal_entries(
+    spec_id: str,
+    specs_dir: Path,
+    task_id: Optional[str] = None,
+    printer: Optional[PrettyPrinter] = None
+) -> Optional[List[Dict]]:
+    """
+    Get journal entries for a spec, optionally filtered by task_id.
+
+    Args:
+        spec_id: Specification ID
+        specs_dir: Path to specs directory
+        task_id: Optional task ID to filter entries
+        printer: Optional printer for output
+
+    Returns:
+        List of journal entry dictionaries, or None on error
+    """
+    # Load spec
+    spec_data = load_json_spec(spec_id, specs_dir)
+    if not spec_data:
+        return None
+
+    # Get journal entries
+    all_entries = spec_data.get("journal", [])
+
+    # Filter by task_id if provided
+    if task_id:
+        entries = [entry for entry in all_entries if entry.get("task_id") == task_id]
+    else:
+        entries = all_entries
+
+    # Display results (only if printer is provided)
+    if printer:
+        if not entries:
+            if task_id:
+                printer.info(f"No journal entries found for task {task_id}")
+            else:
+                printer.info("No journal entries found")
+        else:
+            if task_id:
+                printer.header(f"Journal Entries for Task {task_id} ({len(entries)})")
+            else:
+                printer.header(f"Journal Entries ({len(entries)})")
+            printer.info("")
+
+            for entry in entries:
+                # Format timestamp
+                timestamp_str = entry.get("timestamp", "Unknown")
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(str(timestamp_str).replace('Z', '+00:00'))
+                    timestamp_str = dt.strftime("%Y-%m-%d %H:%M")
+                except Exception:
+                    pass
+
+                # Entry type emoji
+                entry_type = entry.get("entry_type", "note")
+                type_emoji = {
+                    "status_change": "📊",
+                    "deviation": "⚠️",
+                    "blocker": "🚫",
+                    "decision": "💡",
+                    "note": "📝"
+                }.get(entry_type, "📝")
+
+                printer.detail(f"{type_emoji} {timestamp_str} - {entry.get('title', 'Untitled')}")
+                printer.detail(f"   Type: {entry_type}")
+                if entry.get("author"):
+                    printer.detail(f"   Author: {entry['author']}")
+                if entry.get("task_id"):
+                    printer.detail(f"   Task: {entry['task_id']}")
+
+                # Show content (truncate if too long)
+                content = entry.get("content", "")
+                if len(content) > 200:
+                    printer.detail(f"   {content[:200]}...")
+                else:
+                    printer.detail(f"   {content}")
+                printer.info("")
+
+    return entries
+
+
+def get_task_journal(
+    spec_id: str,
+    task_id: str,
+    specs_dir: Path,
+    printer: Optional[PrettyPrinter] = None
+) -> Optional[List[Dict]]:
+    """
+    Get journal entries specifically for a task.
+
+    This is a convenience wrapper around get_journal_entries.
+
+    Args:
+        spec_id: Specification ID
+        task_id: Task ID
+        specs_dir: Path to specs directory
+        printer: Optional printer for output
+
+    Returns:
+        List of journal entry dictionaries for the task, or None on error
+    """
+    return get_journal_entries(spec_id, specs_dir, task_id=task_id, printer=printer)

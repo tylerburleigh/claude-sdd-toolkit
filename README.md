@@ -1,36 +1,32 @@
 # SDD Toolkit - Claude Code Plugin
 
-> Professional spec-driven development workflows for Claude Code
+> Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-2.0.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
 ## What is This?
 
-The SDD Toolkit brings **plan-first development** to Claude Code. Instead of diving straight into code, you create detailed specifications that guide implementation, track progress, and ensure nothing gets missed.
+The SDD Toolkit is a set of Claude skills and Python CLI tools that enable spec-driven development. It puts Claude on guardrails by having it work from machine-readable JSON specs that define tasks, dependencies, and track progress.
 
-**Perfect for**:
-- Building complex features with multiple steps
-- Maintaining consistency across large codebases
-- Tracking progress on multi-day projects
-- Getting AI-assisted code reviews and debugging
-- Generating and querying codebase documentation
+**What it includes:**
+- **Claude skills** - Interactive workflows like `sdd-plan`, `sdd-next`, and `sdd-update`
+- **Python CLI** - Commands for creating, reading, and updating spec files
+- **Integration** - Skills invoke CLI commands to systematically work through tasks
+
+This was built to keep Claude focused on one task at a time while maintaining a complete record of what's planned, what's done, and what's next.
 
 ## Why Use This?
 
-Traditional AI-assisted coding can lead to:
-- ❌ Forgotten edge cases and requirements
-- ❌ Implementation drift from original goals
-- ❌ Lost context when resuming work
-- ❌ Unclear progress tracking
+Working on complex projects with Claude can lead to scope drift, forgotten requirements, and lost context. The toolkit addresses this by:
 
-SDD Toolkit solves this with:
-- ✅ **Detailed specifications** before coding
-- ✅ **Task-by-task implementation** with clear checkpoints
-- ✅ **Resume anytime** with full context
-- ✅ **Multi-model review** for better specs
-- ✅ **Automated documentation** of your codebase
+- Defining all work upfront in a spec before implementation starts
+- Breaking execution into one task at a time with approval gates
+- Tracking progress automatically so you can resume anytime
+- Journaling decisions and changes for a complete project record
+
+Specs live in your project as JSON files, giving you a machine-readable history of what was planned and what was actually done.
 
 ## Quick Start
 
@@ -92,6 +88,10 @@ Resume anytime with:
 ```
 /sdd-start
 ```
+
+### See It In Action
+
+Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-start` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
 
 ## Core Concepts
 
@@ -464,4 +464,4 @@ Ready to get started?
 
 ---
 
-**Version**: 2.0.0 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.1.0 | **License**: MIT | **Author**: Tyler Burleigh

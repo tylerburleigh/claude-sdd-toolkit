@@ -24,7 +24,7 @@ Options for generate:
 
 Examples:
     sdd doc generate ./src
-    sdd doc generate ./src --name MyProject --version 2.0.0
+    sdd doc generate ./src --name MyProject --version 0.1.0
     sdd doc generate ./src --format json --output-dir ./docs
     sdd doc analyze ./src --verbose
     sdd doc validate ./docs/documentation.json
