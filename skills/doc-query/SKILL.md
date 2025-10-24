@@ -37,6 +37,79 @@ The `Skill(sdd-toolkit:doc-query)` skill provides targeted query capabilities fo
 3. You need to analyze runtime behavior (use debugging tools)
 4. Documentation is stale (regenerate with `Skill(sdd-toolkit:code-doc)` first)
 
+---
+
+## Exploration Workflows Quick Reference
+
+Use these workflows to systematically explore any codebase. All workflows are **codebase-agnostic** and work across languages, frameworks, and architectures.
+
+| Workflow | Goal | When to Use It |
+|----------|------|----------------|
+| **TRACE-ENTRY-POINT** | Understand how a request/event flows through the system | "How does [action] work?" |
+| **TRACE-DATA-OBJECT** | Follow a data structure through the codebase | "What happens to [entity]?" |
+| **IMPACT-ANALYSIS** | Find all code affected by a change | "What breaks if I modify X?" |
+| **EXPLORE-FEATURE-AREA** | Gather all code related to a feature | "Tell me about the [feature] system" |
+| **FIND-PATTERN** | Discover how a pattern is implemented | "How do we do [validation/auth/caching]?" |
+| **REFACTOR-PRIORITY** | Identify high-complexity refactoring candidates | "What should I refactor first?" |
+| **ONBOARD-TO-CODEBASE** | Get oriented in a new codebase | "I'm new here, where do I start?" |
+| **TRACE-ERROR-FLOW** | Understand error handling mechanisms | "How are errors handled?" |
+| **TRACE-CONFIGURATION** | Track configuration usage | "Where is [config/flag] used?" |
+| **TRACE-TEST-COVERAGE** | Understand testing strategy | "What tests cover [feature]?" |
+
+### Decision Tree: Which Workflow Should I Use?
+
+```
+START: What do you want to know?
+│
+├─ "How does [action/request/event] work?"
+│  └─ TRACE-ENTRY-POINT
+│
+├─ "What happens to [data/entity]?"
+│  └─ TRACE-DATA-OBJECT
+│
+├─ "What breaks if I change [X]?"
+│  └─ IMPACT-ANALYSIS
+│
+├─ "Tell me about [feature/module/system]"
+│  └─ EXPLORE-FEATURE-AREA
+│
+├─ "How do we do [pattern] here?" (e.g., validation, auth, caching)
+│  └─ FIND-PATTERN
+│
+├─ "What should I refactor?"
+│  └─ REFACTOR-PRIORITY
+│
+├─ "I'm new here, where do I start?"
+│  └─ ONBOARD-TO-CODEBASE
+│
+├─ "How are errors handled?"
+│  └─ TRACE-ERROR-FLOW
+│
+├─ "Where is [config/flag] used?"
+│  └─ TRACE-CONFIGURATION
+│
+└─ "What tests cover [feature]?"
+   └─ TRACE-TEST-COVERAGE
+```
+
+### Workflow Tiers
+
+**Tier 1: Core Workflows** (Daily essential tasks)
+- TRACE-ENTRY-POINT
+- TRACE-DATA-OBJECT
+- IMPACT-ANALYSIS
+- EXPLORE-FEATURE-AREA
+
+**Tier 2: Specialized Workflows** (Targeted use cases)
+- FIND-PATTERN
+- REFACTOR-PRIORITY
+- ONBOARD-TO-CODEBASE
+- TRACE-ERROR-FLOW
+- TRACE-CONFIGURATION
+- TRACE-TEST-COVERAGE
+
+---
+
 ## Tool Verification
 
 **Before using this skill**, verify the required tools are available:
@@ -316,56 +389,927 @@ sdd doc list-modules
 - Browsing codebase structure
 - Verifying documentation completeness
 
-## Common Workflows
+## Exploratory Research Workflows
 
-### Workflow 1: Starting a New Task
+These workflows provide systematic approaches to understanding any codebase. All patterns use generic placeholders like `[feature]`, `[entity]`, `[pattern]` - substitute with your domain-specific terms.
 
+---
+
+### Tier 1: Core Workflows
+
+#### TRACE-ENTRY-POINT: How does [action/request/event] work?
+
+**Goal:** Understand the end-to-end flow of a user action, API request, or system event.
+
+**When to use:**
+- "How does the scoring process work?"
+- "What happens when a user clicks 'Submit'?"
+- "How are webhook events processed?"
+
+**Generic Pattern:**
 ```bash
-# 1. Get overview
+# Step 1: Find the entry point
+sdd doc search "[endpoint|route|handler|controller|action].*[feature]"
+# Examples: search "POST.*scoring", search ".*submit.*handler"
+
+# Step 2: Understand the entry module
+sdd doc describe-module [entry-point-file]
+# Shows: functions, complexity, what it imports
+
+# Step 3: Follow dependencies (business logic)
+sdd doc dependencies [entry-point-file]
+# Shows: services/utils/models it uses
+
+# Step 4: Describe business logic layers
+sdd doc describe-module [service-file]
+
+# Step 5: Find data models/persistence
+sdd doc search "[model|entity|schema|table].*[domain-concept]"
+
+# Step 6: Find external integrations
+sdd doc search "[client|api|service|integration].*[external-system]"
+```
+
+**Framework Examples:**
+```bash
+# FastAPI/Flask: REST endpoint
+sdd doc search "POST /api/scoring"
+sdd doc describe-module app/routers/scoring.py
+sdd doc dependencies app/routers/scoring.py
+
+# React/Vue: Component action
+sdd doc search "handleSubmit|onSubmit"
+sdd doc describe-module components/ScoreForm.jsx
+sdd doc dependencies components/ScoreForm.jsx
+
+# Event-driven: Event handler
+sdd doc search "ScoringRequestedEvent|scoring.*event"
+sdd doc describe-module handlers/scoring_handler.py
+sdd doc dependencies handlers/scoring_handler.py
+```
+
+**Synthesis Output:**
+- Entry point location & signature
+- Complete execution flow across layers
+- Data structures involved
+- External system calls
+- Error handling path
+
+---
+
+#### TRACE-DATA-OBJECT: What happens to [entity/data]?
+
+**Goal:** Follow a specific data structure or entity through its lifecycle in the codebase.
+
+**When to use:**
+- "What happens to a User object?"
+- "How is OrderData transformed?"
+- "Where is ConfigSettings used?"
+
+**Generic Pattern:**
+```bash
+# Step 1: Find the data definition
+sdd doc search "[class|type|interface|struct|schema].*[Entity]"
+sdd doc find-class [EntityName]
+
+# Step 2: Find where it's created
+sdd doc search "create.*[Entity]|new.*[Entity]|[Entity].*factory|build.*[Entity]"
+
+# Step 3: Find where it's modified
+sdd doc search "update.*[Entity]|modify.*[Entity]|set.*[Entity]|mutate.*[Entity]"
+
+# Step 4: Find where it's read
+sdd doc search "get.*[Entity]|find.*[Entity]|fetch.*[Entity]|load.*[Entity]|query.*[Entity]"
+
+# Step 5: Find where it's deleted
+sdd doc search "delete.*[Entity]|remove.*[Entity]|destroy.*[Entity]"
+
+# Step 6: Understand each module
+sdd doc describe-module [file-from-above]
+```
+
+**Examples:**
+```bash
+# Database entity (User)
+sdd doc find-class User
+sdd doc search "create.*User|User.*create"
+sdd doc search "update.*User"
+sdd doc search "delete.*User"
+
+# API DTO (OrderRequest)
+sdd doc find-class OrderRequest
+sdd doc search "OrderRequest"
+sdd doc describe-module api/schemas/order.py
+
+# Configuration (AppSettings)
+sdd doc find-class AppSettings
+sdd doc search "get_settings|load_config"
+sdd doc dependencies config.py --reverse
+```
+
+**Synthesis Output:**
+- Data structure definition
+- Creation points
+- Transformation pipeline
+- Usage locations
+- Deletion/cleanup
+
+---
+
+#### IMPACT-ANALYSIS: What breaks if I change [X]?
+
+**Goal:** Identify all code that would be affected by modifying a function, class, or module.
+
+**When to use:**
+- "What breaks if I refactor this function?"
+- "What depends on this API endpoint?"
+- "Can I safely delete this class?"
+
+**Generic Pattern:**
+```bash
+# Step 1: Find the target
+sdd doc find-module [target-file]
+sdd doc find-class [TargetClass]
+sdd doc find-function [target_function]
+
+# Step 2: Find direct dependents (1st degree)
+sdd doc dependencies [target-file] --reverse
+
+# Step 3: Assess complexity risk
+sdd doc complexity --module [target-file]
+
+# Step 4: Search for usage references
+sdd doc search "[exact-name]"
+
+# Step 5: Describe each dependent
+for dependent in [dependents]:
+    sdd doc describe-module $dependent
+```
+
+**Examples:**
+```bash
+# Impact of changing a utility function
+sdd doc find-function calculate_score
+sdd doc dependencies utils/scoring.py --reverse
+sdd doc search "calculate_score"
+
+# Impact of refactoring a class
+sdd doc find-class DataProcessor
+sdd doc dependencies processors/data.py --reverse
+sdd doc complexity --module processors/data.py
+
+# Impact of modifying an API
+sdd doc search "POST /api/submit"
+sdd doc dependencies routes/api.py --reverse
+```
+
+**Blast Radius Matrix:**
+```
+                # of Dependents
+                Low (0-3)    High (4+)
+Complexity High │ Medium    │ CRITICAL │
+          Low   │ Safe      │ Review   │
+```
+
+**Synthesis Output:**
+- Direct dependents
+- Indirect dependents (2nd degree)
+- Complexity assessment
+- Risk level (Safe/Medium/Critical)
+- Testing recommendations
+
+---
+
+#### EXPLORE-FEATURE-AREA: Tell me about the [feature] system
+
+**Goal:** Gather comprehensive context for a feature or module to understand its scope and implementation.
+
+**When to use:**
+- "Tell me about the authentication system"
+- "How does billing work?"
+- "What's in the notification module?"
+
+**Generic Pattern:**
+```bash
+# Step 1: Gather everything related
+sdd doc context "[feature-keyword]"
+# Returns: classes, functions, modules with that keyword
+
+# Step 2: Identify architectural layers
+# Look for patterns in file paths:
+# - Entry: */routes/*, */controllers/*, */handlers/*, */api/*
+# - Business: */services/*, */use-cases/*, */domain/*, */core/*
+# - Data: */models/*, */entities/*, */repositories/*, */dao/*, */stores/*
+# - External: */clients/*, */adapters/*, */integrations/*, */gateways/*
+
+# Step 3: Describe each layer
+sdd doc describe-module [entry-layer-files]
+sdd doc describe-module [business-layer-files]
+sdd doc describe-module [data-layer-files]
+
+# Step 4: Find complexity hot spots
+sdd doc complexity --threshold 10 | grep "[feature]"
+
+# Step 5: Map inter-layer dependencies
+sdd doc dependencies [business-layer-file]
+sdd doc dependencies [business-layer-file] --reverse
+```
+
+**Examples:**
+```bash
+# Explore authentication
+sdd doc context "auth"
+sdd doc describe-module middleware/auth.py
+sdd doc describe-module services/auth_service.py
+sdd doc describe-module models/user.py
+sdd doc complexity | grep "auth"
+
+# Explore payment processing
+sdd doc context "payment|billing"
+sdd doc describe-module routes/payment.py
+sdd doc describe-module services/payment_processor.py
+sdd doc describe-module integrations/stripe_client.py
+```
+
+**Synthesis Output:**
+- Component inventory (all classes, functions, modules)
+- Architectural layers identified
+- Complexity assessment per layer
+- Dependency map
+- Entry points and key flows
+
+---
+
+### Tier 2: Specialized Workflows
+
+#### FIND-PATTERN: How do we do [pattern] in this codebase?
+
+**Goal:** Discover how a specific pattern (validation, caching, auth, etc.) is implemented.
+
+**When to use:**
+- "How do we validate inputs?"
+- "How is caching implemented?"
+- "What's our error handling pattern?"
+
+**Generic Pattern:**
+```bash
+# Step 1: Search for existing implementations
+sdd doc search "[pattern-keyword]"
+# Examples: ".*validate.*", ".*cache.*", ".*auth.*"
+
+# Step 2: Find classes that implement pattern
+sdd doc find-class ".*[Pattern].*" --pattern
+# Examples: .*Validator.*, .*Cache.*, .*Authenticator.*
+
+# Step 3: Find functions that use pattern
+sdd doc find-function ".*[pattern].*" --pattern
+
+# Step 4: Understand the pattern's module
+sdd doc describe-module [pattern-implementation-file]
+
+# Step 5: Find usage examples
+sdd doc search "[pattern-class-name]"
+
+# Step 6: Identify the pattern architecture
+# Look for: base classes, decorators, middleware, utilities
+```
+
+**Examples:**
+```bash
+# Find validation pattern
+sdd doc search "validat"
+sdd doc find-class ".*Validator.*" --pattern
+sdd doc describe-module validators/base.py
+sdd doc search "BaseValidator"
+
+# Find caching pattern
+sdd doc search "cache"
+sdd doc find-function ".*cached.*" --pattern
+sdd doc describe-module utils/cache.py
+
+# Find auth pattern
+sdd doc search "auth|authenticate"
+sdd doc find-class ".*Auth.*" --pattern
+sdd doc describe-module middleware/auth.py
+```
+
+**Synthesis Output:**
+- Pattern implementation location
+- Base classes/interfaces
+- Usage examples
+- Common conventions
+- Extension points
+
+---
+
+#### REFACTOR-PRIORITY: What should I refactor first?
+
+**Goal:** Identify high-complexity, high-impact code that would benefit most from refactoring.
+
+**When to use:**
+- Technical debt reduction planning
+- Code quality improvement
+- Performance optimization planning
+
+**Generic Pattern:**
+```bash
+# Step 1: Get codebase overview
 sdd doc stats
 
-# 2. Find relevant entities
-sdd doc context "feature-name"
+# Step 2: Find high-complexity functions
+sdd doc complexity --threshold 15
 
-# 3. Check dependencies
-sdd doc dependencies app/services/relevant_module.py
+# Step 3: For each high-complexity function, assess impact
+sdd doc dependencies [module-with-complex-function] --reverse
+
+# Step 4: Prioritize by: complexity × impact
+# High complexity + high dependents = TOP PRIORITY
+# High complexity + low dependents = SAFE TO REFACTOR
+# Low complexity + high dependents = RISKY
 ```
 
-### Workflow 2: Bug Fixing
+**Prioritization Matrix:**
+```
+                # of Dependents
+                Low (0-5)    High (6+)
+Complexity High │ Medium    │ CRITICAL │ ← Refactor first
+          Low   │ Skip      │ Review   │
+```
 
+**Example:**
 ```bash
-# 1. Find the function with the bug
-sdd doc find-function problematic_function
+# Find refactoring candidates
+sdd doc stats  # Baseline: avg complexity, max complexity
+sdd doc complexity --threshold 20
 
-# 2. Understand its module context
-sdd doc find-module app/services/module.py
-
-# 3. Check what depends on it
-sdd doc dependencies app/services/module.py --reverse
+# For each hot spot:
+sdd doc find-function [complex-function]
+sdd doc dependencies [module] --reverse
+sdd doc search "[function-name]"  # Find all call sites
 ```
 
-### Workflow 3: Refactoring
+**Synthesis Output:**
+- Prioritized list of refactoring candidates
+- Impact assessment for each
+- Risk level (Safe/Medium/Critical)
+- Recommended refactoring approach
 
+---
+
+#### ONBOARD-TO-CODEBASE: I'm new here, where do I start?
+
+**Goal:** Get oriented in an unfamiliar codebase quickly and systematically.
+
+**When to use:**
+- First day on a new project
+- Open source contribution
+- Code review of unfamiliar code
+
+**Generic Pattern:**
 ```bash
-# 1. Find high-complexity functions
-sdd doc complexity --threshold 8
+# Step 1: Overview
+sdd doc stats
+# Understand: size, languages, complexity baseline
 
-# 2. Analyze impact of refactoring
-sdd doc dependencies app/services/complex_module.py --reverse
+# Step 2: Find entry points
+sdd doc search "main|index|app|server|handler|root"
+sdd doc list-modules | grep -E "(main|index|app|routes|api)"
 
-# 3. Find similar implementations for patterns
-sdd doc search "similar_feature"
+# Step 3: Understand architecture layers
+sdd doc list-modules
+# Look for directory patterns to identify layers
+
+# Step 4: Find core domain models
+sdd doc list-classes
+# Look for business entities, not utilities
+
+# Step 5: Identify complexity hot spots
+sdd doc complexity --threshold 10
+# Know what NOT to touch initially
+
+# Step 6: Read AI_CONTEXT.md if available
+# (Generated by code-doc skill)
 ```
 
-### Workflow 4: Feature Implementation
-
+**Example:**
 ```bash
-# 1. Find similar existing features
-sdd doc search "similar.*feature" --pattern
-
-# 2. Gather full context
-sdd doc context "feature-area"
+# Day 1 exploration
+sdd doc stats
+sdd doc search "main|app|index"
+sdd doc describe-module main.py
+sdd doc list-modules
+sdd doc list-classes
+sdd doc complexity --threshold 15
 ```
+
+**Synthesis Output:**
+- Codebase size & structure
+- Entry points identified
+- Architectural layers
+- Core domain concepts
+- Areas to avoid initially
+- Areas to explore first
+
+---
+
+#### TRACE-ERROR-FLOW: How are errors handled?
+
+**Goal:** Understand error propagation, logging, and recovery mechanisms.
+
+**When to use:**
+- Debugging production errors
+- Adding error handling
+- Understanding resilience patterns
+
+**Generic Pattern:**
+```bash
+# Step 1: Find error/exception types
+sdd doc find-class ".*Error.*|.*Exception.*" --pattern
+
+# Step 2: Find error raising patterns
+sdd doc search "raise|throw|except|catch|try"
+
+# Step 3: Understand error handling modules
+sdd doc describe-module [error-handling-file]
+
+# Step 4: Trace error handling chain
+sdd doc dependencies [error-module]
+sdd doc dependencies [error-module] --reverse
+
+# Step 5: Find error recovery mechanisms
+sdd doc search "retry|fallback|recovery"
+```
+
+**Example:**
+```bash
+# Trace error handling
+sdd doc find-class ".*Error" --pattern
+sdd doc search "ValidationError|AuthenticationError"
+sdd doc describe-module errors/exceptions.py
+sdd doc dependencies middleware/error_handler.py
+sdd doc search "retry|fallback"
+```
+
+**Synthesis Output:**
+- Error types hierarchy
+- Error raising locations
+- Error handling middleware
+- Recovery mechanisms
+- Logging patterns
+
+---
+
+#### TRACE-CONFIGURATION: Where is [config/flag] used?
+
+**Goal:** Track how configuration values and feature flags affect system behavior.
+
+**When to use:**
+- Understanding environment-specific behavior
+- Feature flag management
+- Configuration refactoring
+
+**Generic Pattern:**
+```bash
+# Step 1: Find config/settings classes
+sdd doc find-class "[Config|Settings|Env].*" --pattern
+
+# Step 2: Search for config access patterns
+sdd doc search "get_settings|config|env|getenv"
+
+# Step 3: Understand config modules
+sdd doc describe-module config.py
+
+# Step 4: Find config consumers
+sdd doc dependencies config-module --reverse
+
+# Step 5: Search for specific config keys
+sdd doc search "[CONFIG_KEY|feature_flag_name]"
+```
+
+**Example:**
+```bash
+# Trace configuration
+sdd doc find-class ".*Settings.*" --pattern
+sdd doc search "get_settings|load_config"
+sdd doc describe-module config/settings.py
+sdd doc dependencies config/settings.py --reverse
+sdd doc search "REDIS_URL|DEBUG"
+```
+
+**Synthesis Output:**
+- Configuration definition location
+- Configuration access patterns
+- Modules consuming config
+- Environment-specific behavior
+- Feature flag usage
+
+---
+
+#### TRACE-TEST-COVERAGE: What tests cover [feature]?
+
+**Goal:** Understand testing strategy, coverage, and patterns.
+
+**When to use:**
+- Planning test additions
+- Understanding test gaps
+- Refactoring with confidence
+
+**Generic Pattern:**
+```bash
+# Step 1: Find test files
+sdd doc find-module "test_.*|.*_test\\..*" --pattern
+sdd doc list-modules | grep -E "(test|spec)"
+
+# Step 2: Describe test modules
+sdd doc describe-module tests/[feature]_test.py
+
+# Step 3: Search for test patterns
+sdd doc search "test.*[feature]|[feature].*test"
+
+# Step 4: Find test dependencies
+sdd doc dependencies tests/[feature]_test.py
+
+# Step 5: Understand test organization
+sdd doc context "test|spec"
+```
+
+**Example:**
+```bash
+# Trace test coverage
+sdd doc list-modules | grep "test"
+sdd doc describe-module tests/test_scoring.py
+sdd doc search "test.*scoring"
+sdd doc dependencies tests/test_scoring.py
+sdd doc complexity --module tests/
+```
+
+**Synthesis Output:**
+- Test file organization
+- Testing patterns (unit, integration, e2e)
+- Coverage areas
+- Test utilities and fixtures
+- Gap analysis
+
+---
+
+## Synthesis Patterns
+
+Synthesis is the process of combining multiple query results into coheren insights. These patterns help you connect the dots.
+
+### Pattern 1: Call Chain Synthesis
+
+**What:** Build a complete execution flow by chaining function calls across multiple layers.
+
+**How:**
+1. Start with entry point: `find-function [entry]`
+2. Find what it calls: `dependencies [entry-module]`
+3. Describe each dependency: `describe-module [dep]`
+4. Continue following the chain
+5. Find callers at each level: `search "[function-name]"`
+
+**Example:**
+```bash
+# Build execution chain for scoring
+sdd doc find-function run_scoring
+sdd doc dependencies app/services/scoring.py
+sdd doc describe-module app/services/llm_service.py
+sdd doc dependencies app/services/llm_service.py
+sdd doc find-class BinaryScoringResult
+```
+
+**Result:** Complete call stack from entry point to external system.
+
+**Tip:** Visualize as: Entry → Business Logic → Data Access → External
+
+---
+
+### Pattern 2: Dependency Graph Synthesis
+
+**What:** Build bidirectional dependency map showing both "uses" and "used by" relationships.
+
+**How:**
+1. Forward dependencies: `dependencies [module]`
+2. Reverse dependencies: `dependencies [module] --reverse`
+3. Merge results into complete graph
+4. Repeat for key dependencies
+
+**Example:**
+```bash
+# Build dependency graph for scoring module
+sdd doc dependencies app/services/scoring.py
+sdd doc dependencies app/services/scoring.py --reverse
+
+# For each dependency, get its reverse deps
+sdd doc dependencies app/services/llm_service.py --reverse
+sdd doc dependencies app/models/session.py --reverse
+```
+
+**Result:** Complete bidirectional dependency graph.
+
+**Tip:** Use to understand: "What does this depend on?" AND "What depends on this?"
+
+---
+
+### Pattern 3: Feature Context Synthesis
+
+**What:** Aggregate all information about a feature area into comprehensive overview.
+
+**How:**
+1. Broad search: `context "[feature]"`
+2. Describe each module: `describe-module [module]` for top results
+3. Assess complexity: `complexity | grep "[feature]"`
+4. Map dependencies: `dependencies [key-modules]`
+5. Synthesize into layers (entry, business, data)
+
+**Example:**
+```bash
+# Synthesize scoring feature context
+sdd doc context "scoring"
+sdd doc describe-module app/services/scoring.py
+sdd doc describe-module app/routers/hx/scoring.py
+sdd doc describe-module app/llm/chains.py
+sdd doc complexity | grep "scoring"
+sdd doc dependencies app/services/scoring.py
+```
+
+**Result:** Complete feature inventory with architecture, complexity, and relationships.
+
+**Tip:** Identify layers by file paths: routes/ → services/ → models/ → clients/
+
+---
+
+### Pattern 4: Complexity-Driven Exploration
+
+**What:** Start with high-complexity code and explore outward to understand system hotspots.
+
+**How:**
+1. Find hot spots: `complexity --threshold N`
+2. For each hot spot:
+   - Understand context: `describe-module`
+   - Find why it's complex: `dependencies`
+   - Find impact: `dependencies --reverse`
+   - Assess risk: Complexity × Dependents
+
+**Example:**
+```bash
+# Explore from complexity hot spots
+sdd doc complexity --threshold 20
+sdd doc describe-module app/dependencies.py  # get_session = 85 complexity
+sdd doc dependencies app/dependencies.py
+sdd doc dependencies app/dependencies.py --reverse
+sdd doc search "get_session"
+```
+
+**Result:** Understanding of why code is complex and what's affected.
+
+**Tip:** High complexity + high dependents = CRITICAL refactoring priority.
+
+---
+
+### Synthesis Best Practices
+
+1. **Layer Identification** - Recognize architectural patterns:
+   - Entry: `*/routes/`, `*/api/`, `*/handlers/`, `*/controllers/`
+   - Business: `*/services/`, `*/use-cases/`, `*/domain/`
+   - Data: `*/models/`, `*/repositories/`, `*/dao/`
+   - External: `*/clients/`, `*/adapters/`, `*/integrations/`
+
+2. **Flow Tracing** - Generic execution flow:
+   ```
+   Entry Point (user/external trigger)
+       ↓
+   Validation/Auth Layer
+       ↓
+   Business Logic Layer
+       ↓
+   Data Access Layer
+       ↓
+   Storage/External System
+   ```
+
+3. **Find Each Layer:**
+   - Entry: `search "route|handler|controller|endpoint"`
+   - Validation: `search "validate|check|verify"`
+   - Business: `search "service|use-case|process"`
+   - Data: `search "repository|dao|model"`
+   - External: `search "client|adapter|api"`
+
+4. **Build Mental Model:**
+   - Start broad (`context`, `stats`)
+   - Drill down (`describe-module`, `find-class`)
+   - Connect dots (`dependencies`, `search`)
+   - Synthesize understanding (combine insights)
+
+---
+
+## Complete Examples
+
+### Example 1: Tracing `run_scoring` Function (FastAPI)
+
+**Scenario:** Understand how the scoring feature works end-to-end.
+
+**Step 1: Find the function**
+```bash
+$ sdd doc find-function run_scoring
+```
+**Output:**
+```
+Found 1 result(s):
+
+1. Function: run_scoring
+  File: app/services/scoring.py
+  Line: 46
+  Complexity: 13
+  Parameters: job_id, session_id, problem_data, responses, ...
+```
+
+**Step 2: Understand its module**
+```bash
+$ sdd doc describe-module app/services/scoring.py --include-docstrings
+```
+**Output:**
+```
+Module: app/services/scoring.py
+  Docstring: Background scoring service for LLM-based response evaluation
+  Classes: 0 | Functions: 3 | Avg Complexity: 6.67
+  Key Functions:
+    - run_scoring (complexity: 13)
+    - safe_redis_set (complexity: 4)
+    - format_results (complexity: 3)
+```
+
+**Insight:** This is a background service with moderate complexity.
+
+**Step 3: Find dependencies**
+```bash
+$ sdd doc dependencies app/services/scoring.py
+```
+**Output:**
+```
+Found 11 result(s):
+  1. app.services.llm_service.get_llm_service
+  2. app.services.llm_service.BinaryScoringResult
+  3. app.models.session.WizardSession
+  4. app.services.scoring_metrics
+  ...
+```
+
+**Insight:** Depends on LLM service, session models, and metrics.
+
+**Step 4: Understand LLM service**
+```bash
+$ sdd doc describe-module app/services/llm_service.py
+```
+**Output:**
+```
+Module: app/services/llm_service.py
+  Classes: 4 | Functions: 1
+  Classes:
+    - ScoringModel
+    - ScoringResult
+    - BinaryScoringResult
+    - LLMService
+```
+
+**Insight:** LLM integration layer with result models.
+
+**Step 5: Find who calls this**
+```bash
+$ sdd doc search "start_scoring"
+```
+**Output:**
+```
+Found 2 result(s):
+  1. Function: start_scoring (app/routers/hx/scoring.py)
+  2. Function: _start_scoring_impl (app/routers/hx/scoring.py)
+```
+
+**Insight:** Called by HTMX router endpoints.
+
+**Step 6: Understand the router**
+```bash
+$ sdd doc describe-module app/routers/hx/scoring.py
+```
+**Output:**
+```
+Module: app/routers/hx/scoring.py
+  Docstring: HTMX router for scoring endpoints - per-criterion workflow
+  Functions:
+    - start_scoring (complexity: 14)
+    - scoring_status (complexity: 35)
+    - _start_scoring_impl (complexity: 6)
+```
+
+**Insight:** HTMX endpoints with high complexity in `scoring_status`.
+
+**Step 7: Find LangChain integration**
+```bash
+$ sdd doc find-class ScoringChain
+```
+**Output:**
+```
+Found 1 result(s):
+  1. Class: ScoringChain
+    File: app/llm/chains.py
+```
+
+**Synthesis - Complete Understanding:**
+
+```
+User Action (Frontend)
+    ↓
+start_scoring (app/routers/hx/scoring.py:26)
+    ↓ [validates session, criterion]
+_start_scoring_impl (app/routers/hx/scoring.py:127)
+    ↓ [creates background task]
+run_scoring (app/services/scoring.py:46) ← TARGET FUNCTION
+    ↓ [orchestrates scoring]
+LLMService (app/services/llm_service.py)
+    ↓ [calls LangChain]
+ScoringChain (app/llm/chains.py)
+    ↓ [LCEL chain]
+OpenAI API (external)
+    ↓ [returns scores]
+BinaryScoringResult
+    ↓ [formatted results]
+Redis (stores progress & results)
+    ↓
+scoring_status (polls for completion)
+    ↓
+User sees results
+```
+
+**Key Insights:**
+- `run_scoring` is the core orchestrator (complexity: 13)
+- Runs as background task for async execution
+- Uses LangChain for LLM abstraction
+- Progress tracked in Redis
+- HTMX polls `scoring_status` (complexity: 35 - refactor candidate!)
+
+---
+
+### Example 2: Impact Analysis for Refactoring
+
+**Scenario:** Want to refactor `get_session` (complexity: 85).
+
+**Step 1: Assess the function**
+```bash
+$ sdd doc complexity --threshold 20
+```
+**Output:**
+```
+1. Function: get_session
+  File: app/dependencies.py
+  Complexity: 85  ← CRITICAL
+```
+
+**Step 2: Find reverse dependencies**
+```bash
+$ sdd doc dependencies app/dependencies.py --reverse
+```
+**Output:**
+```
+# (Hypothetical - reverse deps may not be tracked)
+# Use search as fallback
+```
+
+**Step 3: Search for usage**
+```bash
+$ sdd doc search "get_session"
+```
+**Output:**
+```
+Found 50+ references across:
+  - app/routers/wizard.py
+  - app/routers/api/criteria.py
+  - app/routers/hx/scoring.py
+  [... many more]
+```
+
+**Insight:** Widely used - high impact!
+
+**Blast Radius Assessment:**
+```
+get_session:
+  Complexity: 85 (CRITICAL)
+  Dependents: 50+ (HIGH)
+  Risk Level: CRITICAL
+
+Priority Matrix:
+                Dependents
+                Low    High
+Complexity High │      │  X  │ ← TOP PRIORITY
+          Low   │      │     │
+```
+
+**Recommendation:**
+1. Understand why it's complex (session loading, cookie fallback, Redis, validation)
+2. Break into smaller functions
+3. Add comprehensive tests before refactoring
+4. Refactor incrementally with feature flags
+5. Monitor closely after deployment
+
+---
 
 ## Performance Notes
 
@@ -442,42 +1386,140 @@ output:
 ### Issue: "Import errors in Python scripts"
 **Solution:** Ensure scripts are run from the correct directory or use full paths
 
-## Examples
+## Future Enhancements
 
-### Example 1: Starting work on authentication feature
+The following enhancements are planned for future releases to make the skill even more powerful.
+
+### Phase 2: High-Level Wrapper Commands (Planned)
+
+Add convenience commands that automate common workflows:
 
 ```bash
-# Get context
-sdd doc context "auth"
+# TRACE-ENTRY-POINT wrapper
+sdd doc trace-entry [function-name]
+# Automatically runs: find-function → describe-module → dependencies → search
 
-# Find similar implementations
-sdd doc search "auth.*"
+# TRACE-DATA-OBJECT wrapper
+sdd doc trace-data [class-name]
+# Automatically runs: find-class → search (create/update/delete) → describe-modules
 
-# Check dependencies
-sdd doc dependencies app/services/auth.py
+# EXPLORE-FEATURE-AREA wrapper
+sdd doc explore [feature-keyword]
+# Automatically runs: context → describe-modules → complexity → dependencies
+
+# IMPACT-ANALYSIS wrapper
+sdd doc impact [entity-name]
+# Automatically runs: find → dependencies --reverse → complexity → risk assessment
+
+# REFACTOR-PRIORITY wrapper
+sdd doc refactor-candidates [--threshold=N]
+# Automatically runs: complexity → dependencies --reverse → prioritization matrix
 ```
 
-### Example 2: Refactoring high-complexity code
+### Phase 3: Framework-Aware Queries (Planned)
+
+Detect and adapt to specific frameworks:
 
 ```bash
-# Find candidates
-sdd doc complexity --threshold 10
+# FastAPI/Flask
+sdd doc find-endpoint [path]
+sdd doc find-router [name]
 
-# Analyze impact
-sdd doc dependencies app/services/complex_module.py --reverse
+# React/Vue
+sdd doc find-component [name]
+sdd doc find-hook [name]
+
+# Django
+sdd doc find-view [name]
+sdd doc find-model [name]
 ```
 
-### Example 3: Bug fix in scoring logic
+### Phase 4: Enhanced Documentation Schema (Planned)
+
+Add workflow metadata to `documentation.json`:
+
+```json
+{
+  "metadata": {
+    "workflows": {
+      "entry_points": ["run_scoring", "next_step"],
+      "data_objects": ["WizardSession", "Criterion"],
+      "feature_areas": ["scoring", "session_management"]
+    }
+  }
+}
+```
+
+### Phase 5: Interactive Exploration Mode (Planned)
+
+Guided interactive exploration:
 
 ```bash
-# Find the function
-sdd doc find-function calculate_final_score
+$ sdd doc explore-interactive
 
-# Get module context
-sdd doc find-module scoring.py
+> What would you like to explore?
+  1. Trace an entry point
+  2. Explore a feature area
+  3. Analyze impact of changes
+  4. Find refactoring opportunities
+  5. Onboard to codebase
 
-# Check what depends on it
-sdd doc dependencies app/services/scoring.py --reverse
+> [User selects 1]
+> Enter function name: run_scoring
+> [Tool executes TRACE-ENTRY-POINT workflow]
+> Would you like to drill deeper into dependencies? (y/n)
+```
+
+### Phase 6: Language & Framework Detection (Planned)
+
+Automatic detection and optimization:
+
+```bash
+# Detect architecture patterns
+sdd doc detect-patterns
+# Output: "MVC detected", "Microservices architecture", etc.
+
+# Detect frameworks
+sdd doc detect-frameworks
+# Output: "FastAPI (Python)", "React (JavaScript)", etc.
+
+# Language-aware queries
+sdd doc find-class User --language=python
+sdd doc search "component" --language=javascript
+```
+
+### Phase 7: Cross-Reference Generation (Planned)
+
+Automatically link entities in documentation:
+
+```json
+{
+  "functions": [{
+    "name": "run_scoring",
+    "callers": [
+      {"file": "app/routers/hx/scoring.py", "line": 123}
+    ],
+    "calls": [
+      {"name": "score_response", "file": "app/services/llm_service.py"}
+    ]
+  }]
+}
+```
+
+### Phase 8: Quality Metrics (Planned)
+
+Documentation quality indicators:
+
+```json
+{
+  "modules": [{
+    "name": "scoring.py",
+    "docstring_coverage": 0.85,
+    "type_hint_coverage": 0.90,
+    "complexity": 12,
+    "documentation_quality": "high"
+  }]
+}
 ```
 
 ---
