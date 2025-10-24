@@ -1,0 +1,96 @@
+# doc-query Configuration
+
+# Default paths
+default_docs_path: "docs"  # Relative to project root
+documentation_file: "documentation.json"
+
+# Complexity thresholds
+complexity:
+  low:
+    min: 1
+    max: 3
+    description: "Simple functions with straightforward logic"
+  medium:
+    min: 4
+    max: 7
+    description: "Moderate complexity, may benefit from review"
+  high:
+    min: 8
+    max: 15
+    description: "High complexity, should consider refactoring"
+  very_high:
+    min: 16
+    max: 999
+    description: "Very high complexity, requires immediate attention"
+  default_threshold: 5
+  refactoring_threshold: 8
+
+# Search settings
+search:
+  max_results: 100
+  include_docstrings: true
+  case_sensitive: false
+  min_relevance_score: 0.0
+
+# Context gathering
+context:
+  max_entities_per_type: 50
+  include_dependencies: true
+  include_test_files: true
+  keyword_min_length: 3
+
+# SDD Integration
+sdd:
+  enabled: true
+  auto_suggest_files: true
+  impact_analysis_enabled: true
+  test_context_enabled: true
+
+# Impact analysis thresholds
+impact:
+  isolated: 0           # No dependencies
+  low: 1-3              # Few dependencies
+  medium: 4-10          # Moderate dependencies
+  high: 11+             # Many dependencies
+
+# Output settings
+output:
+  verbose: false
+  format: "text"  # text or json
+  show_line_numbers: true
+  show_complexity: true
+  show_docstrings: false  # Enable with --verbose
+  color_enabled: false     # For future terminal color support
+
+# File patterns
+patterns:
+  test_files:
+    - "test_*.py"
+    - "*_test.py"
+    - "tests/*.py"
+    - "*/tests/*.py"
+  exclude_patterns:
+    - "*.pyc"
+    - "__pycache__/*"
+    - "*.pyo"
+    - ".git/*"
+    - "venv/*"
+    - "env/*"
+
+# Documentation freshness
+freshness:
+  warning_threshold_hours: 24    # Warn if docs older than 24 hours
+  stale_threshold_hours: 168      # Consider stale after 1 week
+  check_on_query: false           # Don't check freshness on every query
+
+# Query performance
+performance:
+  cache_enabled: true
+  cache_ttl_minutes: 60
+  max_search_results: 1000
+
+# Logging
+logging:
+  enabled: false
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: null     # Set to path for file logging

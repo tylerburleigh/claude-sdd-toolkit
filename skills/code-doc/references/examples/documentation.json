@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "project_name": "example_project",
+    "version": "1.0.0",
+    "generated_at": "2025-10-20T14:26:20.967520",
+    "language": "python"
+  },
+  "statistics": {
+    "total_files": 1,
+    "total_lines": 176,
+    "total_classes": 2,
+    "total_functions": 2,
+    "avg_complexity": 5.0,
+    "max_complexity": 8,
+    "high_complexity_functions": []
+  },
+  "modules": [
+    {
+      "name": "calculator",
+      "file": "calculator.py",
+      "docstring": "Example calculator module.\nProvides basic mathematical operations.",
+      "classes": [
+        "Calculator",
+        "ScientificCalculator"
+      ],
+      "functions": [
+        "format_result",
+        "batch_calculate"
+      ],
+      "imports": [
+        "typing.Union",
+        "typing.List",
+        "math"
+      ],
+      "lines": 176
+    }
+  ],
+  "classes": [
+    {
+      "name": "Calculator",
+      "file": "calculator.py",
+      "line": 10,
+      "docstring": "A simple calculator class that performs basic arithmetic operations.\n\nThis calculator supports addition, subtraction, multiplication, division,\nand some advanced mathematical operations.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "power",
+        "clear_history"
+      ],
+      "properties": [
+        "last_operation"
+      ]
+    },
+    {
+      "name": "ScientificCalculator",
+      "file": "calculator.py",
+      "line": 91,
+      "docstring": "Extended calculator with scientific functions.\n\nInherits from Calculator and adds trigonometric and logarithmic operations.",
+      "bases": [
+        "Calculator"
+      ],
+      "methods": [
+        "sin",
+        "cos",
+        "log"
+      ],
+      "properties": []
+    }
+  ],
+  "functions": [
+    {
+      "name": "format_result",
+      "file": "calculator.py",
+      "line": 120,
+      "docstring": "Format a calculation result for display.\n\nArgs:\n    value: The numeric value to format\n    units: Optional units to append (e.g., 'm', 'kg')\n    \nReturns:\n    Formatted string representation",
+      "parameters": [
+        {
+          "name": "value",
+          "type": "Union[float, int]"
+        },
+        {
+          "name": "units",
+          "type": "str"
+        }
+      ],
+      "return_type": "str",
+      "decorators": [],
+      "complexity": 2,
+      "is_async": false
+    },
+    {
+      "name": "batch_calculate",
+      "file": "calculator.py",
+      "line": 136,
+      "docstring": "Perform multiple calculations in batch.\n\nThis function takes a list of operations and executes them sequentially.\nEach operation is a tuple of (operation_name, arg1, arg2).\n\nArgs:\n    calculator: Calculator instance to use\n    operations: List of operation tuples\n    \nReturns:\n    List of results\n    \nExample:\n    >>> calc = Calculator()\n    >>> ops = [('add', 1, 2), ('multiply', 3, 4)]\n    >>> results = batch_calculate(calc, ops)\n    >>> results\n    [3.0, 12.0]",
+      "parameters": [
+        {
+          "name": "calculator",
+          "type": "Calculator"
+        },
+        {
+          "name": "operations",
+          "type": "List[tuple]"
+        }
+      ],
+      "return_type": "List[float]",
+      "decorators": [],
+      "complexity": 8,
+      "is_async": false
+    }
+  ],
+  "dependencies": {
+    "calculator.py": [
+      "typing.Union",
+      "typing.List",
+      "math"
+    ]
+  }
+}

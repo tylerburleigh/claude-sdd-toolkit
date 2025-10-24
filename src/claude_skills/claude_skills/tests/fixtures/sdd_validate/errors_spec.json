@@ -1,0 +1,45 @@
+{
+  "spec_id": "errors-test-2025-01-20-003",
+  "title": "Errors Test Specification",
+  "version": "1.0.0",
+  "generated": "2025-01-20T10:00:00Z",
+  "last_updated": "2025-01-20T10:00:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "status": "in_progress",
+      "title": "Errors Test Spec",
+      "children": ["phase-1", "missing-phase"],
+      "parent": null,
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "status": "pending",
+      "title": "Phase 1",
+      "parent": "spec-root",
+      "children": ["task-1-1"],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "status": "pending",
+      "title": "Task 1.1 - References Missing Parent",
+      "parent": "nonexistent-parent",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "task-1-1.md"
+      },
+      "dependencies": ["missing-dependency"]
+    }
+  }
+}

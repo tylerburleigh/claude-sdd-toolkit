@@ -1,0 +1,37 @@
+{
+  "spec_id": "test-spec-002",
+  "title": "Spec with Fixable Issues",
+  "version": "1.0.0",
+  "generated": "2025-01-20T10:00:00Z",
+  "last_updated": "2025-01-20T10:00:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "root",
+      "title": "Test Spec Root",
+      "status": "in_progress",
+      "children": ["phase-1"],
+      "total_tasks": 5,
+      "completed_tasks": 0
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Phase 1",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": ["task-1-1"],
+      "total_tasks": 3,
+      "completed_tasks": 0
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Task without metadata",
+      "description": "Task missing metadata block",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": []
+    }
+  }
+}

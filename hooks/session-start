@@ -1,0 +1,310 @@
+#!/bin/bash
+#
+# SessionStart Hook: SDD Project Status Detection
+#
+# This hook runs when a Claude Code session starts and outputs JSON describing:
+# 1. Whether project needs SDD permission setup
+# 2. Active spec files that can be resumed
+#
+# Claude reads this JSON and presents interactive options to the user.
+#
+# Hook behavior:
+# - Exits silently if nothing to do
+# - Outputs JSON if permissions needed or active specs found
+# - No user interaction (Claude handles that)
+# - Always non-blocking (exit 0)
+#
+
+set -euo pipefail
+
+# Ensure SDD wrapper scripts are in PATH
+export PATH="${HOME}/.claude/bin:$PATH"
+
+# Configuration
+PROJECT_ROOT=$(pwd)
+SETTINGS_FILE="${HOME}/.claude/settings.json"
+SPECS_ACTIVE_DIR="${PROJECT_ROOT}/specs/active"
+DEBUG_LOG="/tmp/session-start.log"
+MARKER_DIR="/tmp"
+MARKER_PREFIX=".claude-sdd-start"
+
+# =============================================================================
+# DEBUG LOGGING
+# =============================================================================
+
+log_debug() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$DEBUG_LOG"
+}
+
+# Log hook start
+log_debug "SessionStart hook triggered from: $PROJECT_ROOT"
+
+# =============================================================================
+# CONFIGURATION LOADING
+# =============================================================================
+
+is_auto_offer_enabled() {
+    if [ ! -f "$SETTINGS_FILE" ]; then
+        echo "true"
+        return
+    fi
+
+    python3 -c "
+import json
+try:
+    with open('$SETTINGS_FILE', 'r') as f:
+        settings = json.load(f)
+    enabled = settings.get('sdd', {}).get('auto_offer_permissions', True)
+    print('true' if enabled else 'false')
+except:
+    print('true')
+" 2>/dev/null || echo "true"
+}
+
+# =============================================================================
+# PERMISSION CHECKING
+# =============================================================================
+
+needs_permission_setup() {
+    # Check if user previously declined (using local marker file)
+    local declined_marker="${HOME}/.claude/.sdd-permissions-declined"
+    if [ -f "$declined_marker" ]; then
+        if grep -q "^$PROJECT_ROOT$" "$declined_marker" 2>/dev/null; then
+            echo "false"
+            return
+        fi
+    fi
+
+    # Check if project needs setup
+    local check_result=$(skills-dev setup-permissions -- check "$PROJECT_ROOT" 2>/dev/null)
+    local needs_setup=$(echo "$check_result" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    configured = data.get('configured', False)
+    print('false' if configured else 'true')
+except:
+    print('false')
+" 2>/dev/null)
+
+    echo "$needs_setup"
+}
+
+# =============================================================================
+# ACTIVE SPEC DETECTION
+# =============================================================================
+
+get_active_specs_json() {
+    # Check if specs/active directory exists
+    if [ ! -d "$SPECS_ACTIVE_DIR" ]; then
+        echo "[]"
+        return
+    fi
+
+    # Find all markdown files and build JSON array
+    python3 <<EOF
+import os
+import json
+import re
+
+specs = []
+spec_dir = "$SPECS_ACTIVE_DIR"
+
+if os.path.exists(spec_dir):
+    for filename in os.listdir(spec_dir):
+        if filename.endswith('.md'):
+            spec_file = os.path.join(spec_dir, filename)
+            spec_id = filename[:-3]  # Remove .md extension
+
+            # Try to determine status
+            status = "unknown"
+            try:
+                with open(spec_file, 'r') as f:
+                    content = f.read()
+                    if re.search(r'status:\s*(?:in[-_\s]progress|pending)', content, re.IGNORECASE):
+                        status = "has pending/in-progress tasks"
+                    elif re.search(r'status:\s*completed', content, re.IGNORECASE):
+                        status = "all tasks completed"
+            except:
+                pass
+
+            specs.append({
+                "spec_id": spec_id,
+                "file": spec_file,
+                "status": status
+            })
+
+print(json.dumps(specs))
+EOF
+}
+
+# =============================================================================
+# MARKER FILE MANAGEMENT
+# =============================================================================
+
+cleanup_old_markers() {
+    # Remove marker files older than 1 hour
+    log_debug "Cleaning up old marker files..."
+    find "$MARKER_DIR" -name "${MARKER_PREFIX}-*.json" -type f -mmin +60 -delete 2>/dev/null || true
+}
+
+create_marker_file() {
+    local needs_perms=$1
+    local active_specs_json=$2
+    local system_msg=$3
+
+    # Generate timestamp for unique filename
+    local timestamp=$(date +%s)
+    local marker_file="${MARKER_DIR}/${MARKER_PREFIX}-${timestamp}.json"
+
+    log_debug "Creating marker file: $marker_file"
+
+    # Convert bash true/false to Python True/False
+    local py_bool="False"
+    if [ "$needs_perms" = "true" ]; then
+        py_bool="True"
+    fi
+
+    # Create marker file with JSON data using proper escaping
+    python3 -c "
+import json
+import sys
+
+marker = {
+    'project_root': '''$PROJECT_ROOT''',
+    'needs_permissions': $py_bool,
+    'active_specs': $active_specs_json,
+    'message': '''$system_msg''',
+    'timestamp': $timestamp
+}
+
+print(json.dumps(marker, indent=2))
+" > "$marker_file"
+
+    log_debug "Marker file created successfully"
+}
+
+# =============================================================================
+# MAIN LOGIC
+# =============================================================================
+
+main() {
+    # Clean up old marker files first
+    cleanup_old_markers
+
+    log_debug "Checking if auto-offer is enabled..."
+    # Check if auto-offer is enabled
+    if [ "$(is_auto_offer_enabled)" != "true" ]; then
+        log_debug "Auto-offer disabled, exiting"
+        exit 0
+    fi
+    log_debug "Auto-offer enabled, proceeding..."
+
+    # FIRST: Check if this is an SDD project (has specs/active folder)
+    log_debug "Checking if SDD project exists..."
+    if [ ! -d "$SPECS_ACTIVE_DIR" ]; then
+        log_debug "No specs/active directory found, not an SDD project - exiting silently"
+        exit 0
+    fi
+    log_debug "SDD project detected (specs/active exists)"
+
+    # Detect what's needed
+    log_debug "Checking permission setup..."
+    local needs_perms=$(needs_permission_setup)
+    log_debug "Needs permissions: $needs_perms"
+
+    log_debug "Getting active specs..."
+    local active_specs_json=$(get_active_specs_json)
+    local has_specs=$(echo "$active_specs_json" | python3 -c "import json, sys; print('true' if len(json.load(sys.stdin)) > 0 else 'false')")
+    log_debug "Has active specs: $has_specs"
+
+    # If nothing to do, exit silently
+    if [ "$needs_perms" != "true" ] && [ "$has_specs" != "true" ]; then
+        log_debug "Nothing to do, exiting silently"
+        exit 0
+    fi
+
+    log_debug "Generating JSON output..."
+
+    # Build system message for user (visible in CLI)
+    local system_msg=""
+
+    if [ "$needs_perms" = "true" ]; then
+        system_msg="📋 This project needs SDD permission setup. Run /sdd-start to configure."
+    fi
+
+    if [ "$has_specs" = "true" ]; then
+        # Add spec information to system message
+        local spec_list=$(echo "$active_specs_json" | python3 -c "
+import json, sys
+specs = json.load(sys.stdin)
+if specs:
+    result = '📝 Active specs: ' + ', '.join([spec['spec_id'] for spec in specs])
+    print(result)
+" 2>/dev/null || echo "")
+
+        if [ -n "$spec_list" ]; then
+            if [ -n "$system_msg" ]; then
+                system_msg="$system_msg | $spec_list"
+            else
+                system_msg="$spec_list. Run /sdd-start to resume work."
+            fi
+        fi
+    fi
+
+    # Build additional context for Claude (not visible to user, but Claude can read it)
+    local additional_context=""
+    if [ "$needs_perms" = "true" ]; then
+        additional_context="SDD project detected at $PROJECT_ROOT. Permissions not yet configured."
+    fi
+    if [ "$has_specs" = "true" ]; then
+        local spec_details=$(echo "$active_specs_json" | python3 -c "
+import json, sys
+specs = json.load(sys.stdin)
+if specs:
+    details = ' Active specifications: '
+    details += ', '.join([f\"{s['spec_id']} ({s['status']})\" for s in specs])
+    print(details)
+" 2>/dev/null || echo "")
+
+        if [ -n "$additional_context" ]; then
+            additional_context="$additional_context$spec_details"
+        else
+            additional_context="SDD project at $PROJECT_ROOT.$spec_details"
+        fi
+    fi
+
+    # Convert bash booleans to Python format for marker file
+    local py_needs_perms="false"
+    if [ "$needs_perms" = "true" ]; then
+        py_needs_perms="true"
+    fi
+
+    # Create marker file for Claude to read proactively
+    log_debug "Creating marker file..."
+    create_marker_file "$py_needs_perms" "$active_specs_json" "$system_msg"
+
+    # Also output JSON in the format Claude Code expects (for system message display)
+    python3 <<EOF
+import json
+
+output = {
+    "hookSpecificOutput": {
+        "hookEventName": "SessionStart",
+        "additionalContext": "$additional_context"
+    }
+}
+
+# Only add systemMessage if we have one (it will be shown to user)
+if "$system_msg":
+    output["systemMessage"] = "$system_msg"
+
+print(json.dumps(output, indent=2))
+EOF
+
+    log_debug "Marker file and JSON output complete, hook finished successfully"
+    exit 0
+}
+
+# Run main
+main

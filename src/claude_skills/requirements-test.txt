@@ -1,0 +1,16 @@
+# Testing dependencies for SDD Python Tools
+
+# Core testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0          # Coverage reporting
+pytest-mock>=3.12.0        # Mocking support
+pytest-xdist>=3.5.0        # Parallel test execution
+
+# Additional testing utilities
+coverage[toml]>=7.3.0      # Coverage configuration
+pytest-timeout>=2.2.0      # Timeout support for long-running tests
+
+# Code quality tools (optional but recommended)
+black>=23.0.0              # Code formatting
+ruff>=0.1.0                # Fast Python linter
+mypy>=1.7.0                # Type checking

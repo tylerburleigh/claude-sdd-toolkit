@@ -1,0 +1,48 @@
+{
+  "name": "sdd-toolkit",
+  "displayName": "SDD Toolkit - Spec-Driven Development",
+  "description": "Professional spec-driven development tools for Claude Code. Create detailed specifications, track tasks, generate documentation, and manage test execution with AI assistance.",
+  "version": "0.1",
+  "author": {
+    "name": "Tyler Burleigh",
+    "email": "tylerburleigh@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tylerburleigh/claude-sdd-toolkit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "specification",
+    "planning",
+    "testing",
+    "documentation",
+    "workflow",
+    "development"
+  ],
+  "requirements": {
+    "python": ">=3.9"
+  },
+  "setup": {
+    "postInstall": "Please run: cd ~/.claude/plugins/sdd-toolkit/src/claude_skills && pip install -e ."
+  },
+  "components": {
+    "skills": [
+      "sdd-plan",
+      "sdd-next",
+      "sdd-update",
+      "sdd-validate",
+      "sdd-plan-review",
+      "code-doc",
+      "doc-query",
+      "run-tests"
+    ],
+    "commands": [
+      "sdd-start"
+    ],
+    "hooks": [
+      "session-start",
+      "pre-tool-use"
+    ]
+  }
+}

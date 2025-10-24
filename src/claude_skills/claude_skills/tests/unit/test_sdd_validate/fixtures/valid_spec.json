@@ -1,0 +1,52 @@
+{
+  "spec_id": "test-spec-001",
+  "title": "Test Specification",
+  "version": "1.0.0",
+  "generated": "2025-01-20T10:00:00Z",
+  "last_updated": "2025-01-20T10:00:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "root",
+      "title": "Test Spec Root",
+      "status": "in_progress",
+      "children": ["phase-1"],
+      "total_tasks": 2,
+      "completed_tasks": 1
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Phase 1",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": ["task-1-1", "task-1-2"],
+      "total_tasks": 2,
+      "completed_tasks": 1
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Task 1",
+      "description": "First task",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [],
+      "metadata": {
+        "file_path": "task-1-1.md"
+      }
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Task 2",
+      "description": "Second task",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "metadata": {
+        "file_path": "task-1-2.md"
+      }
+    }
+  }
+}

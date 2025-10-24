@@ -1,0 +1,83 @@
+{
+  "spec_id": "autofix-test-2025-01-20-004",
+  "title": "Auto-Fix Test Specification",
+  "version": "1.0.0",
+  "generated": "2025-01-20T10:00:00Z",
+  "last_updated": "2025-01-20T10:00:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "status": "in_progress",
+      "title": "Auto-Fix Test Spec",
+      "children": ["phase-1"],
+      "parent": null,
+      "total_tasks": 3,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "status": "in_progress",
+      "title": "Phase 1",
+      "parent": "spec-root",
+      "children": ["task-1-1", "task-1-2", "task-1-3"],
+      "total_tasks": 3,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "status": "completed",
+      "title": "Task 1.1 - Missing Metadata",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {}
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "status": "todo",
+      "title": "Task 1.2 - Bad Status (todo instead of pending)",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "task-1-2.md"
+      }
+    },
+    "task-1-3": {
+      "id": "task-1-3",
+      "type": "task",
+      "status": "done",
+      "title": "Task 1.3 - Another Bad Status (done instead of completed)",
+      "parent": "wrong-parent",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "task-1-3.md"
+      }
+    }
+  }
+}

@@ -1,0 +1,269 @@
+#!/bin/bash
+#
+# Pre-Tool-Use Hook: SDD Permission Setup
+#
+# This hook detects when SDD-related skills are invoked and offers to set up
+# project-level permission rules automatically for a seamless UX.
+#
+# Hook behavior:
+# - Triggers on Skill() and SlashCommand() for SDD tools
+# - Checks if project needs permission setup
+# - Prompts user once per project
+# - Non-blocking (always exits 0)
+#
+
+set -euo pipefail
+
+# Configuration
+SETTINGS_FILE="${HOME}/.claude/settings.json"
+
+# SDD-related tools that trigger this hook
+SDD_SKILLS=(
+    "sdd-plan"
+    "sdd-next"
+    "sdd-update"
+    "sdd-plan-review"
+    "sdd-validate"
+    "code-doc"
+    "doc-query"
+)
+
+SDD_COMMANDS=(
+    "/sdd-start"
+)
+
+# =============================================================================
+# CONFIGURATION LOADING
+# =============================================================================
+
+# Check if auto-offer is enabled in settings
+is_auto_offer_enabled() {
+    if [ ! -f "$SETTINGS_FILE" ]; then
+        echo "true"  # Default to enabled
+        return
+    fi
+
+    python3 -c "
+import json
+import sys
+try:
+    with open('$SETTINGS_FILE', 'r') as f:
+        settings = json.load(f)
+    enabled = settings.get('sdd', {}).get('auto_offer_permissions', True)
+    print('true' if enabled else 'false')
+except:
+    print('true')  # Default to enabled on error
+" 2>/dev/null || echo "true"
+}
+
+# =============================================================================
+# TOOL DETECTION
+# =============================================================================
+
+# Check if this is an SDD-related skill invocation
+is_sdd_tool() {
+    local tool_name="$1"
+    local tool_input="$2"
+
+    # Check if it's a Skill() invocation with SDD skill
+    if [ "$tool_name" = "Skill" ]; then
+        local command=$(echo "$tool_input" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('command', ''))
+except:
+    pass
+" 2>/dev/null)
+
+        for skill in "${SDD_SKILLS[@]}"; do
+            if [ "$command" = "$skill" ]; then
+                return 0
+            fi
+        done
+    fi
+
+    # Check if it's a SlashCommand() invocation
+    if [ "$tool_name" = "SlashCommand" ]; then
+        local command=$(echo "$tool_input" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('command', ''))
+except:
+    pass
+" 2>/dev/null)
+
+        for cmd in "${SDD_COMMANDS[@]}"; do
+            if [ "$command" = "$cmd" ]; then
+                return 0
+            fi
+        done
+    fi
+
+    return 1
+}
+
+# =============================================================================
+# PROJECT DETECTION
+# =============================================================================
+
+# Find project root (git root or cwd)
+find_project_root() {
+    local cwd="$1"
+
+    # Try git root first
+    if git -C "$cwd" rev-parse --show-toplevel 2>/dev/null; then
+        return 0
+    fi
+
+    # Fall back to cwd
+    echo "$cwd"
+}
+
+# =============================================================================
+# MAIN LOGIC
+# =============================================================================
+
+main() {
+    # Read hook input
+    local input=$(cat)
+
+    # Parse input fields
+    local tool_name=$(echo "$input" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('tool_name', ''))
+except:
+    pass
+" 2>/dev/null)
+
+    local tool_input=$(echo "$input" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(json.dumps(data.get('tool_input', {})))
+except:
+    print('{}')
+" 2>/dev/null)
+
+    local cwd=$(echo "$input" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('cwd', '.'))
+except:
+    print('.')
+" 2>/dev/null)
+
+    # Check if this is an SDD tool invocation
+    if ! is_sdd_tool "$tool_name" "$tool_input"; then
+        exit 0  # Not an SDD tool, exit silently
+    fi
+
+    # Check if auto-offer is enabled
+    if [ "$(is_auto_offer_enabled)" != "true" ]; then
+        exit 0  # Disabled, exit silently
+    fi
+
+    # Find project root
+    local project_root=$(find_project_root "$cwd")
+
+    # Check if user previously declined (using local marker file)
+    local declined_marker="${HOME}/.claude/.sdd-permissions-declined"
+    if [ -f "$declined_marker" ]; then
+        if grep -q "^$project_root$" "$declined_marker" 2>/dev/null; then
+            exit 0  # User declined before
+        fi
+    fi
+
+    # Check if project needs setup
+    local check_result=$(skills-dev setup-permissions -- check "$project_root" 2>/dev/null)
+    local needs_setup=$(echo "$check_result" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    configured = data.get('configured', False)
+    print('False' if configured else 'True')
+except:
+    print('False')
+" 2>/dev/null)
+
+    if [ "$needs_setup" != "True" ]; then
+        # Already set up, no need to prompt
+        exit 0
+    fi
+
+    # Prompt user
+    cat >&2 <<'EOF'
+
+┌─────────────────────────────────────────────────────────┐
+│ 📋 SDD Skill Permissions Setup                          │
+├─────────────────────────────────────────────────────────┤
+│ This project doesn't have SDD permission rules setup.   │
+│                                                          │
+│ Would you like to add these to .claude/settings.json?   │
+│ • Enables seamless skill usage without prompts          │
+│ • Scoped to this project's specs/ directory only        │
+│ • Can be reviewed/modified anytime                      │
+│                                                          │
+│ Add permissions? [Y/n]:                                 │
+└─────────────────────────────────────────────────────────┘
+
+EOF
+
+    # Read user response (with timeout to avoid blocking)
+    local response=""
+    if read -t 10 response 2>/dev/null; then
+        response=$(echo "$response" | tr '[:upper:]' '[:lower:]')
+    else
+        response="n"  # Timeout = decline
+    fi
+
+    # Handle response
+    if [ "$response" = "y" ] || [ "$response" = "yes" ] || [ -z "$response" ]; then
+        # User accepted
+        cat >&2 <<EOF
+📝 Setting up permissions...
+EOF
+
+        # Run update
+        local update_result=$(skills-dev setup-permissions -- update "$project_root" 2>&1)
+        local status=$(echo "$update_result" | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    print(data.get('status', 'error'))
+except:
+    print('error')
+" 2>/dev/null)
+
+        if [ "$status" = "created" ] || [ "$status" = "updated" ]; then
+            cat >&2 <<EOF
+✓ Permissions $status successfully!
+EOF
+        else
+            cat >&2 <<EOF
+✗ Failed to update permissions. Check .claude/settings.json manually.
+EOF
+            # Mark as declined to prevent re-prompting after failure
+            echo "$project_root" >> "${HOME}/.claude/.sdd-permissions-declined"
+        fi
+    else
+        # User declined
+        cat >&2 <<EOF
+Skipped. You can manually set up permissions later using:
+  skills-dev setup-permissions -- update "$project_root"
+EOF
+        # Mark as declined
+        mkdir -p "${HOME}/.claude"
+        echo "$project_root" >> "${HOME}/.claude/.sdd-permissions-declined"
+    fi
+
+    # Always exit 0 (non-blocking)
+    exit 0
+}
+
+# Run main
+main

@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claude-skills"
+version = "2.0.0"
+description = "Multi-language codebase documentation and spec-driven development skills for Claude Code"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "tree-sitter>=0.20.0",
+    "tree-sitter-python>=0.20.0",
+    "tree-sitter-javascript>=0.20.0",
+    "tree-sitter-typescript>=0.20.0",
+    "tree-sitter-go>=0.20.0",
+    "tree-sitter-html>=0.20.0",
+    "tree-sitter-css>=0.20.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.0",
+    "pytest-mock>=3.12.0",
+]
+
+[project.scripts]
+# Unified SDD CLI - Single entry point for all SDD, doc, test, and skills-dev commands
+# Usage:
+#   sdd <cmd>          - SDD commands (next, update, validate, plan, review)
+#   sdd doc <cmd>      - Documentation commands (generate, find-class, etc.)
+#   sdd test <cmd>     - Testing commands (run, consult, discover, etc.)
+#   sdd skills-dev <cmd> - Development utilities (gendocs, etc.)
+sdd = "claude_skills.cli.sdd:main"
+
+# Legacy SDD commands (⚠️ DEPRECATED - Will be removed in v3.0.0)
+# Please migrate to the unified sdd CLI:
+#   sdd-next → sdd next-task, sdd verify-tools, sdd find-specs, etc.
+#   sdd-update → sdd update-status, sdd add-journal, sdd mark-blocked, etc.
+#   sdd-validate → sdd validate, sdd fix, sdd report, etc.
+# See MIGRATION_GUIDE.md for details
+sdd-next = "claude_skills.sdd_next.cli:main"
+sdd-update = "claude_skills.sdd_update.cli:main"
+sdd-validate = "claude_skills.sdd_validate.cli:main"
+
+# Other tools
+sdd-integration = "claude_skills.doc_query.sdd_integration:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["claude_skills*"]
+
+[tool.pytest.ini_options]
+testpaths = ["claude_skills/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

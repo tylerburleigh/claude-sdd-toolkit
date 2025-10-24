@@ -1,0 +1,15 @@
+{
+  "marketplaces": [
+    {
+      "name": "Team Plugins",
+      "plugins": [
+        {
+          "name": "sdd-toolkit",
+          "source": "git",
+          "url": "https://github.com/tylerburleigh/claude-sdd-toolkit",
+          "branch": "main"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "spec_id": "sdd-update-cli-test-2025-10-23-001",
+  "title": "Sample Feature Implementation",
+  "generated": "2025-10-23T12:00:00Z",
+  "last_updated": "2025-10-23T12:00:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "title": "Sample Feature Implementation",
+      "status": "in_progress",
+      "parent": null,
+      "children": ["phase-1", "phase-2"],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Phase 1: Setup and Configuration",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": ["task-1-1", "task-1-2"],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10.0
+      }
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Configure development environment",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/config/setup.py",
+        "estimated_hours": 4.0,
+        "actual_hours": 5.0,
+        "completed_at": "2025-10-23T14:00:00Z"
+      }
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Set up database schema",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": ["task-1-1"],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/db/schema.sql",
+        "estimated_hours": 6.0
+      }
+    },
+    "phase-2": {
+      "id": "phase-2",
+      "type": "phase",
+      "title": "Phase 2: Feature Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["task-2-1", "task-2-2"],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10.0
+      }
+    },
+    "task-2-1": {
+      "id": "task-2-1",
+      "type": "task",
+      "title": "Implement core API endpoints",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": ["task-1-2"],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/api/endpoints.py",
+        "estimated_hours": 6.0
+      }
+    },
+    "task-2-2": {
+      "id": "task-2-2",
+      "type": "task",
+      "title": "Write integration tests",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": ["task-2-1"],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "tests/test_api.py",
+        "estimated_hours": 4.0
+      }
+    }
+  }
+}
