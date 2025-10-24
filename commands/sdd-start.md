@@ -5,6 +5,8 @@ description: Resume or start spec-driven development work by detecting active ta
 
 # SDD Session Start Helper
 
+**⛔ CRITICAL: NEVER manually read .json spec files. Always use `sdd-next` skill or `sdd skills-dev` helper commands.**
+
 This command helps you resume spec-driven development (SDD) work at the start of a session. It will:
 1. Scan for active SDD specifications
 2. Show you resumable work with progress indicators
@@ -57,6 +59,8 @@ echo "✅ SDD permissions configured! You can now use SDD skills in this project
 
 ### Phase 1: Discover Active Work
 
+**⚠️ USE HELPER SCRIPT ONLY - DO NOT READ SPEC FILES DIRECTLY**
+
 Use the helper script to find and format active specifications:
 
 ```bash
@@ -65,8 +69,11 @@ sdd skills-dev start-helper -- format-output
 
 The script will return properly formatted text with active specs, their progress, and status.
 
-**IMPORTANT**: The `format-output` command returns pre-formatted text with proper newlines and indentation.
-Display this output EXACTLY as returned - do not reformat or modify it.
+**IMPORTANT**:
+- The `format-output` command returns pre-formatted text with proper newlines and indentation
+- Display this output EXACTLY as returned - do not reformat or modify it
+- **NEVER use Read() on .json spec files** - the helper script handles all spec parsing efficiently
+- JSON specs can be 50KB+ and waste context tokens when read directly
 
 ### Phase 2: Present Options Based on Findings
 
@@ -197,14 +204,16 @@ Use AskUserQuestion to let them choose the spec, then invoke sdd-next with that 
 
 ## Important Notes
 
+- **⛔ NEVER READ SPECS DIRECTLY**: Do NOT use Read() on .json spec files. Always use `sdd-next` skill or helper commands.
 - **Auto-execution**: This command automatically invokes skills based on user choice (no additional confirmation needed)
 - **Non-intrusive**: If no active work found, gracefully offer to start new or exit
-- **Fast**: Discovery should complete in <500ms using the Python helper
+- **Fast**: Discovery should complete in <500ms using helper commands
 - **Robust**: Handle missing directories or malformed JSON spec files gracefully
+- **Token efficiency**: Helper scripts parse specs efficiently - reading 50KB JSON files wastes tokens
 
 ## Helper Script Reference
 
-The `sdd_start_helper.py` script (accessed via `skills-dev start-helper --`) provides:
+The `skills-dev start-helper --` CLI provides:
 - `check-permissions` - Check if SDD permissions are configured (returns JSON)
 - `format-output` - Returns human-readable formatted text with last-accessed task info (PREFERRED - use this for display)
 - `get-session-info` - Returns session state with last-accessed task as JSON (for programmatic access)

@@ -39,7 +39,6 @@ SDD_PERMISSIONS = [
     "Bash(sdd-integration:*)",
     "Bash(sdd-start-helper:*)",
     "Bash(setup-project-permissions:*)",
-    "Bash(claude-skills-gendocs:*)",
 
     # AI CLI tool permissions
     "Bash(cursor-agent:*)",

@@ -38,10 +38,20 @@ def find_specs_directory(provided_path: Optional[str] = None) -> Optional[Path]:
         if is_valid_specs_dir(path):
             return path
 
+        # Check if there's a 'specs' subdirectory
+        specs_subdir = path / "specs"
+        if specs_subdir.is_dir() and is_valid_specs_dir(specs_subdir):
+            return specs_subdir
+
         # Traverse upward to find a valid specs directory (max 5 levels)
         for parent in list(path.parents)[:5]:
             if is_valid_specs_dir(parent):
                 return parent
+
+            # Also check for 'specs' subdirectory in each parent
+            parent_specs = parent / "specs"
+            if parent_specs.is_dir() and is_valid_specs_dir(parent_specs):
+                return parent_specs
 
         # If no valid directory found in traversal, return None
         return None

@@ -92,7 +92,6 @@ The setup adds these permissions to `.claude/settings.json`:
 - Bash(sdd-integration:*)
 - Bash(sdd-start-helper:*)
 - Bash(setup-project-permissions:*)
-- Bash(claude-skills-gendocs:*)
 
 **File Access:**
 - Read(//Users/tylerburleigh/.claude/skills/**)

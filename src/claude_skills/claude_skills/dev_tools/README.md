@@ -2,7 +2,7 @@
 
 This package contains development utilities for maintaining the `claude_skills` package.
 
-## claude-skills-gendocs
+## Documentation Generation (gendocs)
 
 Generates markdown documentation from CLI argparse definitions.
 
@@ -19,24 +19,26 @@ After installing `claude-skills` package:
 cd /path/to/claude_skills
 pip install -e .
 
-# The command is now available
-claude-skills-gendocs --help
+# The unified SDD CLI is now available
+sdd --help
 ```
 
 ### Usage
 
+The legacy `claude-skills-gendocs` command has been removed. Documentation generation is now accessed through the unified CLI:
+
 ```bash
 # Generate documentation for a skill (outputs to stdout)
-claude-skills-gendocs sdd-validate
+sdd skills-dev gendocs -- sdd-validate
 
 # Save to file
-claude-skills-gendocs sdd-validate --output-file docs/commands.md
+sdd skills-dev gendocs -- sdd-validate --output-file docs/commands.md
 
 # Generate only specific sections
-claude-skills-gendocs doc-query --sections global commands
+sdd skills-dev gendocs -- doc-query --sections global commands
 
-# See all available skills
-claude-skills-gendocs --help
+# See help
+sdd skills-dev --help
 ```
 
 ### Supported Skills
@@ -68,7 +70,7 @@ Workflow for updating skill documentation:
 
 ```bash
 # 1. Generate the command reference
-claude-skills-gendocs sdd-validate > /tmp/commands.md
+sdd skills-dev gendocs -- sdd-validate > /tmp/commands.md
 
 # 2. Copy the relevant sections into SKILL.md
 # 3. Keep the hand-written sections (Overview, When to Use, Examples)
@@ -141,7 +143,7 @@ def main():
 
 3. Test:
 ```bash
-claude-skills-gendocs my-new-skill
+sdd skills-dev gendocs -- my-new-skill
 ```
 
 ### Design Notes
@@ -165,7 +167,7 @@ claude-skills-gendocs my-new-skill
 
 #### Basic usage
 ```bash
-$ claude-skills-gendocs sdd-validate
+$ sdd skills-dev gendocs -- sdd-validate
 # sdd-validate Command Reference
 
 *This section is auto-generated from CLI definitions.*
@@ -176,7 +178,7 @@ $ claude-skills-gendocs sdd-validate
 
 #### Selective sections
 ```bash
-$ claude-skills-gendocs doc-query --sections commands
+$ sdd skills-dev gendocs -- doc-query --sections commands
 ## Command Reference
 
 ### find-class
@@ -186,7 +188,7 @@ $ claude-skills-gendocs doc-query --sections commands
 #### Integration with CI/CD
 ```bash
 # Verify documentation is up-to-date
-claude-skills-gendocs sdd-validate > /tmp/current.md
+sdd skills-dev gendocs -- sdd-validate > /tmp/current.md
 diff /tmp/current.md skills/sdd-validate/COMMANDS.md || {
   echo "Documentation is out of date!"
   exit 1

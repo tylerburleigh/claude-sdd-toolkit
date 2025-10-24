@@ -283,12 +283,17 @@ def cmd_find_specs(args, printer):
     print(f"{specs_dir}")
 
     if args.verbose:
-        # List spec files
-        spec_files = list(specs_dir.glob("*.json"))
+        # List spec files from all subdirectories
+        spec_files = []
+        for subdir in ["active", "completed", "archived"]:
+            subdir_path = specs_dir / subdir
+            if subdir_path.is_dir():
+                spec_files.extend([(spec, subdir) for spec in subdir_path.glob("*.json")])
+
         if spec_files:
             printer.info(f"Found {len(spec_files)} spec file(s):")
-            for spec in spec_files:
-                printer.detail(f"• {spec.name}")
+            for spec, status in sorted(spec_files, key=lambda x: (x[1], x[0].name)):
+                printer.detail(f"• [{status}] {spec.name}")
 
     return 0
 
