@@ -290,14 +290,39 @@ class BaseParser(ABC):
         """
         Check if a file should be excluded based on patterns.
 
+        Uses path component matching to avoid false positives.
+        For example, '.git' will match '.git/' but not '.github/'.
+
         Args:
             file_path: Path to check
 
         Returns:
             True if file should be excluded
         """
+        path_parts = file_path.parts
         path_str = str(file_path)
-        return any(pattern in path_str for pattern in self.exclude_patterns)
+
+        for pattern in self.exclude_patterns:
+            # Check if pattern matches any path component exactly
+            if pattern in path_parts:
+                return True
+
+            # Handle wildcards (e.g., '*.egg-info')
+            if '*' in pattern:
+                # Simple wildcard matching for file/directory names
+                import fnmatch
+                for part in path_parts:
+                    if fnmatch.fnmatch(part, pattern):
+                        return True
+
+            # Special case for multi-part patterns like '.env.local'
+            # Only match if pattern has multiple dots or is clearly a file pattern
+            if pattern.count('.') > 1:
+                # For patterns like '.env.local', match as substring
+                if pattern in path_str:
+                    return True
+
+        return False
 
     def _get_relative_path(self, file_path: Path) -> str:
         """

@@ -22,6 +22,27 @@ description: Multi-language codebase documentation generation supporting Python,
 
 ---
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd doc CLI is installed and accessible
+sdd doc --help
+```
+
+**Expected output**: Help text showing available commands (analyze, generate, validate-json, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd doc` CLI wrapper commands (e.g., `sdd doc analyze`, `sdd doc generate`, `sdd doc validate-json`)
+- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python src/claude_skills/code_doc/cli.py`, `bash python analyze.py`)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
+---
+
 ## Quick Start
 
 ### Option 1: AI-Enhanced Documentation (Recommended)

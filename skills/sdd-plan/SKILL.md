@@ -57,6 +57,25 @@ This skill is part of the **Spec-Driven Development** family:
 - Creates auditable development process
 - Early feedback checkpoint reduces rework (staged approach)
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd CLI is installed and accessible
+sdd --help
+```
+
+**Expected output**: Help text showing available commands (validate, fix, report, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd` CLI wrapper commands (e.g., `sdd validate`, `sdd fix`, `sdd report`)
+- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python sdd_plan.py`, `bash python3 scripts/plan.py`)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail. All spec operations should go through the CLI.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
 ## When to Use This Skill
 
 Use Skill(sdd-plan) for:

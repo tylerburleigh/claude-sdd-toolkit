@@ -8,18 +8,61 @@ Supports multi-language projects.
 from typing import Dict, List, Any, Optional, Set
 from pathlib import Path
 from collections import defaultdict
+import fnmatch
 
 
-def detect_languages(project_root: Path) -> Set[str]:
+def _should_exclude_path(file_path: Path, exclude_patterns: List[str]) -> bool:
+    """
+    Check if a file path should be excluded based on patterns.
+
+    Uses path component matching to avoid false positives.
+    For example, '.git' will match '.git/' but not '.github/'.
+
+    Args:
+        file_path: Path to check
+        exclude_patterns: List of patterns to exclude
+
+    Returns:
+        True if file should be excluded
+    """
+    path_parts = file_path.parts
+    path_str = str(file_path)
+
+    for pattern in exclude_patterns:
+        # Check if pattern matches any path component exactly
+        if pattern in path_parts:
+            return True
+
+        # Handle wildcards (e.g., '*.egg-info')
+        if '*' in pattern:
+            for part in path_parts:
+                if fnmatch.fnmatch(part, pattern):
+                    return True
+
+        # Special case for multi-part patterns like '.env.local'
+        # Only match if pattern has multiple dots or is clearly a file pattern
+        if pattern.count('.') > 1:
+            # For patterns like '.env.local', match as substring
+            if pattern in path_str:
+                return True
+
+    return False
+
+
+def detect_languages(project_root: Path, exclude_patterns: Optional[List[str]] = None) -> Set[str]:
     """
     Detect programming languages present in a project.
 
     Args:
         project_root: Root directory of the project
+        exclude_patterns: Optional list of patterns to exclude from scanning
 
     Returns:
         Set of detected language names
     """
+    if exclude_patterns is None:
+        exclude_patterns = []
+
     language_extensions = {
         'python': {'.py'},
         'javascript': {'.js', '.jsx', '.mjs', '.cjs'},
@@ -35,7 +78,7 @@ def detect_languages(project_root: Path) -> Set[str]:
 
     detected = set()
     for file_path in project_root.rglob('*'):
-        if file_path.is_file():
+        if file_path.is_file() and not _should_exclude_path(file_path, exclude_patterns):
             ext = file_path.suffix.lower()
             for lang, exts in language_extensions.items():
                 if ext in exts:

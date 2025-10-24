@@ -60,7 +60,23 @@ from claude_skills.code_doc.ai_consultation import (
     compose_ai_context_doc,
 )
 
-BASE_EXCLUDES = ['__pycache__', '.git', 'venv', '.env', 'node_modules']
+BASE_EXCLUDES = [
+    # Version control
+    '.git', '.svn', '.hg', '.bzr',
+    # Python
+    '__pycache__', 'venv', '.venv', '.tox', '.mypy_cache', '.pytest_cache',
+    '*.egg-info', 'build', 'dist', '.eggs',
+    # JavaScript/Node
+    'node_modules', '.next', '.nuxt', 'coverage', '.nyc_output',
+    # IDE
+    '.idea', '.vscode', '.vs', '.fleet', '.sublime-project', '.sublime-workspace',
+    # Build/Cache
+    '.cache', 'tmp', 'temp', 'target', 'out',
+    # Environment
+    '.env', '.env.local', '.env.*.local',
+    # OS
+    '.DS_Store', 'Thumbs.db',
+]
 
 
 def _dump_json(payload: object) -> None:

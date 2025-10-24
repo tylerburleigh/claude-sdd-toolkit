@@ -29,6 +29,25 @@ Reach for `Skill(sdd-validate)` when you need to:
 - Analyze spec statistics and complexity metrics
 - Detect dependency issues including cycles, orphans, and bottlenecks
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd CLI is installed and accessible
+sdd --help
+```
+
+**Expected output**: Help text showing available commands (validate, fix, report, stats, check-deps, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd` CLI wrapper commands (e.g., `sdd validate`, `sdd fix`, `sdd report`, `sdd stats`)
+- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python sdd_validate.py`, `bash python cli.py`)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
 ## Quick Start
 
 ```bash

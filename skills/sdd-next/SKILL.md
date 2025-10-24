@@ -78,6 +78,25 @@ This skill is part of the **Spec-Driven Development** family:
 - **Avoid compound commands with &&** when possible - use separate command invocations instead
 - **Never use inline environment variable assignment with &&** - this adds unnecessary complexity
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd CLI is installed and accessible
+sdd --help
+```
+
+**Expected output**: Help text showing available commands (prepare-task, verify-tools, task-info, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd` CLI wrapper commands (e.g., `sdd prepare-task`, `sdd verify-tools`, `sdd task-info`)
+- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python sdd_next.py`, `bash python3 scripts/next_task.py`)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
 ## Automated Workflow (Skill Invocation)
 
 When this skill is invoked automatically (via `Skill(sdd-next)`), use these simplified commands:

@@ -114,6 +114,30 @@ Review Type Selection:
 └─ Default → full (when unsure)
 ```
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd review CLI is installed and accessible
+sdd --help
+```
+
+**Expected output**: Help text showing available commands (including review, list-review-tools)
+
+**Check which AI CLI tools are available:**
+```bash
+sdd list-review-tools
+```
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd review` CLI wrapper commands (e.g., `sdd review`, `sdd list-review-tools`)
+- ❌ **DO NOT**: Execute Python scripts directly or call AI CLIs directly (e.g., `python sdd_review.py`, `bash gemini ...`, `codex ...`)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. It orchestrates AI CLI calls automatically. Direct script or AI CLI execution bypasses these safeguards and may fail.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
 ## Quick Start
 
 ### Check Available Tools

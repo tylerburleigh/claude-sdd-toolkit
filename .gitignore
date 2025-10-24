@@ -40,3 +40,4 @@ Thumbs.db
 settings.local.json
 settings.json
 .cache/
+.claude/

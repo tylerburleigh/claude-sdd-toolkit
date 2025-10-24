@@ -82,6 +82,25 @@ This skill is part of the **Spec-Driven Development** family:
   - Verification results
   - All metadata
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd CLI is installed and accessible
+sdd --help
+```
+
+**Expected output**: Help text showing available commands (update-status, add-journal, complete-spec, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd` CLI wrapper commands (e.g., `sdd update-status`, `sdd add-journal`, `sdd complete-spec`)
+- ❌ **DO NOT**: Execute Python scripts directly or manipulate JSON files directly (e.g., `python sdd_update.py`, direct JSON editing via scripts)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. All update operations should go through the CLI for consistency.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
 ## Quick Reference: Common Operations
 
 This table shows the most frequently used commands:

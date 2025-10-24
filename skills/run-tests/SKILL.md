@@ -74,6 +74,27 @@ See ["Choosing Your Workflow Path"](#choosing-your-workflow-path) for detailed g
 
 ---
 
+## Tool Verification
+
+**Before using this skill**, verify the required tools are available:
+
+```bash
+# Verify sdd test CLI is installed and accessible
+sdd test --help
+```
+
+**Expected output**: Help text showing available commands (run, consult, check-tools, discover, etc.)
+
+**IMPORTANT - CLI Usage Only**:
+- ✅ **DO**: Use `sdd test` CLI wrapper commands (e.g., `sdd test run`, `sdd test consult`, `sdd test check-tools`)
+- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python run_tests.py`, `bash pytest`, direct Python script execution)
+
+The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail.
+
+If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
+
+---
+
 ## Quick Start
 
 **Command Formatting Guidelines:**
