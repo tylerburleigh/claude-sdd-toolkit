@@ -204,33 +204,3 @@ sdd doc generate ./src \
 6. **Multi-language projects**: Tool auto-detects all supported languages; use `--language` to focus on specific stack
 7. **Per-language stats**: Check `statistics.by_language` in JSON output for language-specific metrics
 8. **Mixed codebases**: Exclude language-specific artifacts (e.g., `node_modules` for JS, `venv` for Python, `vendor` for Go)
-
-## Troubleshooting
-
-### Command not found
-
-Make sure you're using the full path to the script:
-```bash
-python /full/path/to/scripts/code_doc_tools.py generate ./src
-```
-
-### Import errors
-
-Run from the skill directory or ensure PYTHONPATH includes the parent:
-```bash
-cd /path/to/code-documentation
-sdd doc generate ./target_project
-```
-
-### Syntax errors in analyzed code
-
-The tool will skip files with syntax errors and continue. Use `--verbose` to see warnings.
-
-### Schema validation requires jsonschema
-
-For full validation, install jsonschema:
-```bash
-pip install jsonschema
-```
-
-Without it, basic validation still works.

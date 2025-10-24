@@ -300,9 +300,7 @@ The JSON file can be used for tooling, analysis, or integration."
 
 ## CLI Tools
 
-### Main CLI: `code_doc_tools.py`
-
-Located at: `scripts/code_doc_tools.py`
+### Main CLI: `sdd doc`
 
 **Four subcommands:**
 
@@ -747,36 +745,6 @@ Full schema: `documentation-schema.json`
 
 ---
 
-### Helper Scripts Location
-
-All CLI tools are in `scripts/` directory:
-- `scripts/code_doc_tools.py` - Main CLI (use this)
-- `scripts/generator.py` - Orchestration (internal)
-- `scripts/parser.py` - AST parsing (internal)
-- `scripts/calculator.py` - Metrics (internal)
-- `scripts/formatter.py` - Output formatting (internal)
-
-**Only use `code_doc_tools.py`** - the other scripts are internal modules.
-
----
-
-### Additional References
-
-Located in `references/` directory:
-
-1. **quick-reference.md** - CLI command reference and common workflows
-2. **examples.md** - 12+ real-world usage scenarios
-3. **patterns.md** - Best practices for different project types
-4. **examples/** - Sample input/output files
-
-Read these files for:
-- Detailed command examples
-- CI/CD integration patterns
-- Project-type-specific recommendations
-- Pre-commit hook setups
-
----
-
 ## Success Criteria
 
 **Documentation generation is successful when:**
@@ -807,7 +775,7 @@ Read these files for:
    - gemini CLI
    - codex CLI
 
-Using `Skill(run-tests) check-tools`.
+Using `sdd test check-tools`.
 
 ---
 
