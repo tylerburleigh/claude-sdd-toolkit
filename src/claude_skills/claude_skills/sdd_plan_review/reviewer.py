@@ -119,53 +119,58 @@ def call_tool(
     start_time = time.time()
 
     try:
-        # Write prompt to temp file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-            f.write(prompt)
-            prompt_file = f.name
+        # Build command based on tool-specific CLI interface
+        # Each tool has different requirements for non-interactive use
 
-        try:
-            # Attempt to call the tool
-            # Note: Real implementation would vary by tool's actual CLI interface
-            # This is a simplified version that may need tool-specific adjustments
-            if tool_name == "codex":
-                # Codex CLI: codex chat "prompt"
-                cmd = [tool_config["command"], "chat", prompt[:1000]]  # Truncate for safety
-            elif tool_name == "gemini":
-                # Gemini CLI might use: gemini generate --prompt "..."
-                cmd = [tool_config["command"], "generate", "--prompt", prompt[:1000]]
-            else:
-                # Generic approach: pass prompt as stdin
-                cmd = [tool_config["command"]]
+        if tool_name == "codex":
+            # Codex: Use positional argument, prompt via stdin
+            cmd = [tool_config["command"]]
+            stdin_input = prompt
 
-            # For now, just return a placeholder response indicating the tool was called
-            # Real implementation would parse actual tool output
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                input=prompt if tool_name not in ["codex", "gemini"] else None
-            )
+        elif tool_name == "gemini":
+            # Gemini: Use positional argument with JSON output and telemetry disabled
+            cmd = [
+                tool_config["command"],
+                "-o", "json",           # JSON output for structured parsing
+                "--telemetry", "false", # Disable telemetry for cleaner output
+                prompt                   # Positional prompt argument
+            ]
+            stdin_input = None
 
-            duration = time.time() - start_time
+        elif tool_name == "cursor-agent":
+            # Cursor Agent: Use --print for non-interactive mode with JSON output
+            cmd = [
+                tool_config["command"],
+                "--print",                    # Non-interactive mode with all tools
+                "--output-format", "json",    # JSON output for parsing
+                prompt                         # Positional prompt argument
+            ]
+            stdin_input = None
 
-            # Note: In production, this would parse the actual tool response
-            # For now, return a structured response indicating success
-            return {
-                "success": result.returncode == 0,
-                "tool": tool_name,
-                "output": result.stdout if result.returncode == 0 else None,
-                "error": result.stderr if result.returncode != 0 else None,
-                "duration": duration,
-            }
+        else:
+            # Generic approach: pass prompt via stdin
+            cmd = [tool_config["command"]]
+            stdin_input = prompt
 
-        finally:
-            # Clean up temp file
-            try:
-                Path(prompt_file).unlink()
-            except:
-                pass
+        # Execute the command
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            input=stdin_input
+        )
+
+        duration = time.time() - start_time
+
+        # Return structured response
+        return {
+            "success": result.returncode == 0,
+            "tool": tool_name,
+            "output": result.stdout if result.returncode == 0 else None,
+            "error": result.stderr if result.returncode != 0 else None,
+            "duration": duration,
+        }
 
     except subprocess.TimeoutExpired:
         duration = time.time() - start_time
