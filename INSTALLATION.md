@@ -81,14 +81,14 @@ pip install -e .
 ```bash
 # Check unified CLI commands are available
 sdd --help
-doc --help
-test --help
+sdd doc --help
+sdd test --help
 sdd skills-dev --help
 
 # Test specific commands
 sdd validate --help
-doc generate --help
-test run --help
+sdd doc generate --help
+sdd test run --help
 ```
 
 **Expected output**: Help text for each command

@@ -95,12 +95,12 @@ Verify the installation was successful:
 ```bash
 # Check CLI commands are available
 sdd --help
-doc --help
-test --help
+sdd doc --help
+sdd test --help
 
 # Check specific commands
 sdd validate --help
-doc generate --help
+sdd doc generate --help
 ```
 
 You should see help text for each command.

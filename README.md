@@ -58,8 +58,8 @@ That's it! The plugin is now ready to use.
 ```bash
 # Check that CLI tools are available (examples)
 sdd --help
-doc --help
-test --help
+sdd doc --help
+sdd test --help
 
 # Check that skills are installed
 ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
@@ -399,19 +399,17 @@ sdd validate <spec.json>          # Validate spec
 sdd render <spec-id|spec.json>    # Render spec to markdown
 
 # Documentation
-doc generate .                    # Generate docs
-doc query "search term"           # Search docs
-doc search "pattern"              # Pattern search
+sdd doc generate .                    # Generate docs
+sdd doc query "search term"           # Search docs
+sdd doc search "pattern"              # Pattern search
 
 # Testing
-test run tests/                   # Run tests with AI debugging
+sdd test run tests/                   # Run tests with AI debugging
 
 # Development tools
 sdd skills-dev setup-permissions -- update .   # Set up permissions
 sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
 ```
-
-See [CLI Reference](src/claude_skills/docs/cli-reference.md) for complete documentation.
 
 ## Prerequisites
 
@@ -437,9 +435,8 @@ The plugin installs these components:
 - `src/claude_skills/` - Python CLI tools
 
 **In your PATH:**
-- `sdd` - SDD workflow commands
-- `doc` - Documentation commands
-- `test` - Testing commands
+- `sdd` - Unified CLI for all SDD, documentation, testing, and development commands
+- `sdd-integration` - Integration utilities
 
 ## Tips for Success
 

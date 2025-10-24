@@ -348,8 +348,8 @@ pip install -e .
 
 # 3. Verify installation
 sdd --help
-doc --help
-test --help
+sdd doc --help
+sdd test --help
 
 # 4. Run tests
 python -m pytest tests/
