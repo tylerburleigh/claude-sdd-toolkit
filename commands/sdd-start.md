@@ -22,7 +22,7 @@ This command helps you resume spec-driven development (SDD) work at the start of
 **FIRST**, check if SDD permissions are configured for this project:
 
 ```bash
-sdd skills-dev start-helper -- check-permissions
+sdd skills-dev start-helper check-permissions
 ```
 
 **If `needs_setup: true`** (permissions not configured):
@@ -44,7 +44,7 @@ Then use the AskUserQuestion tool:
 **If user chooses "Yes, set up permissions":**
 ```bash
 # Run the setup helper to configure .claude/settings.json
-sdd skills-dev setup-permissions -- update .
+sdd skills-dev setup-permissions update .
 
 # Inform the user
 echo "✅ SDD permissions configured! You can now use SDD skills in this project."
@@ -64,7 +64,7 @@ echo "✅ SDD permissions configured! You can now use SDD skills in this project
 Use the helper script to find and format active specifications:
 
 ```bash
-sdd skills-dev start-helper -- format-output
+sdd skills-dev start-helper format-output
 ```
 
 The script will return properly formatted text with active specs, their progress, and status.
@@ -92,7 +92,7 @@ Simply display the formatted output directly.
 
 Run `get-session-info` to get structured session data:
 ```bash
-sdd skills-dev start-helper -- get-session-info
+sdd skills-dev start-helper get-session-info
 ```
 
 **If last-accessed task exists:**
@@ -221,7 +221,7 @@ The `skills-dev start-helper --` CLI provides:
 
 **Always use `format-output` for presenting information to the user** - it ensures proper newlines, indentation, and formatting. Use `get-session-info` when you need programmatic access to last-accessed task data.
 
-**Note**: All commands use the unified CLI: `sdd skills-dev start-helper -- <command>`
+**Note**: All commands use the unified CLI: `sdd skills-dev start-helper <command>`
 
 ## Example Output
 

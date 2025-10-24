@@ -11,13 +11,21 @@ from claude_skills.common import PrettyPrinter
 def register_all_subcommands(subparsers: Any, parent_parser: argparse.ArgumentParser) -> None:
     """Register all skills-dev subcommands.
 
-    This is a placeholder for future native skills-dev commands.
-    The legacy dev_tools commands have been removed.
+    Provides development utilities for maintaining the claude_skills package.
     """
     if not isinstance(
         subparsers, argparse._SubParsersAction
     ):  # pragma: no cover - defensive
         raise TypeError("subparsers must be an argparse._SubParsersAction")
 
-    # Placeholder for future native commands
-    # Native commands can be registered here when implemented
+    # Import and register all skills-dev commands
+    from .start_helper import register_start_helper
+    from .setup_permissions import register_setup_permissions
+    from .gendocs import register_gendocs
+    from .migrate import register_migrate
+
+    # Register commands
+    register_start_helper(subparsers, parent_parser)
+    register_setup_permissions(subparsers, parent_parser)
+    register_gendocs(subparsers, parent_parser)
+    register_migrate(subparsers, parent_parser)
