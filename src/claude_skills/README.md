@@ -22,14 +22,14 @@ pip install -e .
 sdd --help
 doc --help
 test --help
-skills-dev --help
+sdd skills-dev --help
 ```
 
 This installs the unified CLIs:
 - `sdd` – Spec-driven development workflows
 - `doc` – Documentation generation and querying
 - `test` – Test execution, consultation, and discovery
-- `skills-dev` – Internal development utilities (wrapping legacy tools)
+- `sdd skills-dev` – Internal development utilities (wrapping legacy tools)
 
 ## Available Commands
 
@@ -100,11 +100,11 @@ test check-tools --json
 test consult assertion --error "Expected 1 == 2" --hypothesis "off-by-one"
 ```
 
-### Skills Development CLI (`skills-dev`)
+### Skills Development CLI (`sdd skills-dev`)
 ```bash
-skills-dev gendocs -- sdd-validate --sections commands
-skills-dev start-helper -- check-permissions .
-skills-dev setup-permissions -- update .
+sdd skills-dev gendocs -- sdd-validate --sections commands
+sdd skills-dev start-helper -- check-permissions .
+sdd skills-dev setup-permissions -- update .
 ```
 
 ## Development

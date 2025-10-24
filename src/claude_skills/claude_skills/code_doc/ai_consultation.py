@@ -8,6 +8,7 @@ Based on run-tests/consultation.py pattern.
 """
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -17,9 +18,9 @@ import time
 # CONFIGURATION
 # =============================================================================
 
-# Default models - cursor-agent with gpt-4.1 preferred for large context (1M tokens)
+# Default models - cursor-agent with cheetah for fast analysis
 DEFAULT_MODELS = {
-    "cursor-agent": "gpt-4.1",        # 1M context - perfect for large codebases
+    "cursor-agent": "cheetah",        # Fast model for analysis
     "gemini": "gemini-2.5-pro",       # Good for structured analysis
     "codex": "gpt-5-codex",           # Good for code understanding
 }
@@ -33,7 +34,7 @@ TOOL_COMMANDS = {
 
 # Documentation type routing (which tool is best for which doc type)
 DOC_TYPE_ROUTING = {
-    "architecture": ("cursor-agent", "gemini"),   # cursor-agent best for architecture (1M context)
+    "architecture": ("cursor-agent", "gemini"),   # cursor-agent good for architecture
     "ai_context": ("gemini", "cursor-agent"),     # gemini good for quick context
     "developer_guide": ("codex", "gemini"),       # codex good for code examples
 }
@@ -374,7 +375,8 @@ def run_consultation(
     tool: str,
     prompt: str,
     dry_run: bool = False,
-    verbose: bool = False
+    verbose: bool = False,
+    printer: Optional['PrettyPrinter'] = None
 ) -> Tuple[bool, str]:
     """
     Run consultation with an AI tool.
@@ -384,6 +386,7 @@ def run_consultation(
         prompt: Formatted prompt
         dry_run: If True, show command without running
         verbose: Enable verbose output
+        printer: Optional PrettyPrinter for consistent output (falls back to print if None)
 
     Returns:
         Tuple of (success: bool, output: str)
@@ -395,7 +398,12 @@ def run_consultation(
     cmd.append(prompt)
 
     if dry_run:
-        print(f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>")
+        msg = f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>"
+        if printer:
+            printer.detail(msg)
+        else:
+            print(msg)
+            sys.stdout.flush()
         return True, "Dry run - no output"
 
     # Determine what type of research from prompt
@@ -410,10 +418,17 @@ def run_consultation(
         task_areas = "code structure and patterns"
 
     # Print status message before running (this may take a while)
-    print(f"\n🤖 Consulting {tool} for {task_type}...")
-    print(f"   Analyzing: {task_areas}")
-    if verbose:
-        print("=" * 60)
+    if printer:
+        printer.detail(f"\n🤖 Consulting {tool} for {task_type}...")
+        printer.detail(f"   Analyzing: {task_areas}")
+        if verbose:
+            printer.info("=" * 60)
+    else:
+        print(f"\n🤖 Consulting {tool} for {task_type}...")
+        print(f"   Analyzing: {task_areas}")
+        if verbose:
+            print("=" * 60)
+        sys.stdout.flush()
 
     try:
         result = subprocess.run(
@@ -440,7 +455,8 @@ def consult_multi_agent(
     prompt: str,
     pair: str = "default",
     dry_run: bool = False,
-    verbose: bool = False
+    verbose: bool = False,
+    printer: Optional['PrettyPrinter'] = None
 ) -> Dict[str, any]:
     """
     Consult multiple AI tools in parallel and synthesize responses.
@@ -451,6 +467,7 @@ def consult_multi_agent(
         pair: Which multi-agent pair to use
         dry_run: If True, show what would run
         verbose: Enable verbose output
+        printer: Optional PrettyPrinter for consistent output (falls back to print if None)
 
     Returns:
         Dictionary with synthesis results
@@ -474,7 +491,7 @@ def consult_multi_agent(
             available_from_pair = [t for t in priority_order if t in available_tools][:2]
         elif len(available_tools) == 1:
             # Fallback to single tool
-            success, output = run_consultation(available_tools[0], prompt, dry_run, verbose)
+            success, output = run_consultation(available_tools[0], prompt, dry_run, verbose, printer)
             return {
                 "success": success,
                 "primary_tool": available_tools[0],
@@ -493,9 +510,15 @@ def consult_multi_agent(
             }
 
     if dry_run:
-        print(f"Would consult {len(available_from_pair)} tools in parallel:")
-        for tool in available_from_pair:
-            print(f"  - {tool}")
+        if printer:
+            printer.detail(f"Would consult {len(available_from_pair)} tools in parallel:")
+            for tool in available_from_pair:
+                printer.detail(f"  - {tool}")
+        else:
+            print(f"Would consult {len(available_from_pair)} tools in parallel:")
+            for tool in available_from_pair:
+                print(f"  - {tool}")
+            sys.stdout.flush()
         return {"success": True, "responses": []}
 
     # Determine task description and areas (always show, regardless of verbose)
@@ -506,11 +529,19 @@ def consult_multi_agent(
         task_areas = "Project Overview, Domain Concepts, Critical Files, Common Workflows, Potential Gotchas, Extension Patterns"
 
     # Print status message before running (this may take a while)
-    print(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
-    print(f"   Tools: {', '.join(available_from_pair)}")
-    print(f"   Analyzing: {task_areas}")
-    if verbose:
-        print("=" * 60)
+    if printer:
+        printer.detail(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
+        printer.detail(f"   Tools: {', '.join(available_from_pair)}")
+        printer.detail(f"   Analyzing: {task_areas}")
+        if verbose:
+            printer.info("=" * 60)
+    else:
+        print(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
+        print(f"   Tools: {', '.join(available_from_pair)}")
+        print(f"   Analyzing: {task_areas}")
+        if verbose:
+            print("=" * 60)
+        sys.stdout.flush()
 
     # Run consultations in parallel
     responses = []
@@ -534,7 +565,12 @@ def consult_multi_agent(
                 })
                 if verbose:
                     status = "✓" if success else "✗"
-                    print(f"{status} {tool} completed ({duration:.1f}s)")
+                    msg = f"{status} {tool} completed ({duration:.1f}s)"
+                    if printer:
+                        printer.info(msg)
+                    else:
+                        print(msg)
+                        sys.stdout.flush()
             except Exception as e:
                 responses.append({
                     "tool": tool,
@@ -589,7 +625,8 @@ def generate_architecture_docs(
     tool: str = "auto",
     use_multi_agent: bool = True,
     dry_run: bool = False,
-    verbose: bool = False
+    verbose: bool = False,
+    printer: Optional['PrettyPrinter'] = None
 ) -> Tuple[bool, str]:
     """
     Get architecture research findings from AI consultation.
@@ -602,6 +639,7 @@ def generate_architecture_docs(
         use_multi_agent: Use multiple agents if available
         dry_run: Show what would run without running
         verbose: Enable verbose output
+        printer: Optional PrettyPrinter for consistent output
 
     Returns:
         Tuple of (success: bool, research_findings: str)
@@ -609,7 +647,7 @@ def generate_architecture_docs(
     prompt = format_architecture_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("architecture", prompt, "default", dry_run, verbose)
+        result = consult_multi_agent("architecture", prompt, "default", dry_run, verbose, printer)
         return result["success"], result.get("output", "")
     else:
         if tool == "auto":
@@ -617,7 +655,7 @@ def generate_architecture_docs(
             if not tool:
                 return False, "No AI tools available"
 
-        return run_consultation(tool, prompt, dry_run, verbose)
+        return run_consultation(tool, prompt, dry_run, verbose, printer)
 
 
 def generate_ai_context_docs(
@@ -627,7 +665,8 @@ def generate_ai_context_docs(
     tool: str = "auto",
     use_multi_agent: bool = True,
     dry_run: bool = False,
-    verbose: bool = False
+    verbose: bool = False,
+    printer: Optional['PrettyPrinter'] = None
 ) -> Tuple[bool, str]:
     """
     Get AI context research findings from AI consultation.
@@ -640,6 +679,7 @@ def generate_ai_context_docs(
         use_multi_agent: Use multiple agents if available
         dry_run: Show what would run without running
         verbose: Enable verbose output
+        printer: Optional PrettyPrinter for consistent output
 
     Returns:
         Tuple of (success: bool, research_findings: str)
@@ -647,7 +687,7 @@ def generate_ai_context_docs(
     prompt = format_ai_context_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("ai_context", prompt, "default", dry_run, verbose)
+        result = consult_multi_agent("ai_context", prompt, "default", dry_run, verbose, printer)
         return result["success"], result.get("output", "")
     else:
         if tool == "auto":
@@ -655,4 +695,4 @@ def generate_ai_context_docs(
             if not tool:
                 return False, "No AI tools available"
 
-        return run_consultation(tool, prompt, dry_run, verbose)
+        return run_consultation(tool, prompt, dry_run, verbose, printer)

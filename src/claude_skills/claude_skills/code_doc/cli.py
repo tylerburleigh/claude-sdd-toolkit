@@ -359,6 +359,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 use_multi_agent=use_multi_agent,
                 dry_run=args.dry_run,
                 verbose=getattr(args, 'verbose', False),
+                printer=printer,
             )
             if arch_success and arch_research:
                 printer.detail("   📝 Composing ARCHITECTURE.md from research findings...")
@@ -381,6 +382,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 use_multi_agent=use_multi_agent,
                 dry_run=args.dry_run,
                 verbose=getattr(args, 'verbose', False),
+                printer=printer,
             )
             if context_success and context_research:
                 printer.detail("   📝 Composing AI_CONTEXT.md from research findings...")

@@ -17,7 +17,7 @@ This directory contains Claude Code hooks that automate SDD (Spec-Driven Develop
 - Outputs JSON with project context
 
 **Dependencies**:
-- `skills-dev setup-permissions --` - Checks/manages SDD permissions
+- `sdd skills-dev setup-permissions --` - Checks/manages SDD permissions
 - Python 3 - For JSON processing
 
 ### 2. pre-tool-use
@@ -31,7 +31,7 @@ This directory contains Claude Code hooks that automate SDD (Spec-Driven Develop
 - Non-blocking (always exits 0)
 
 **Dependencies**:
-- `skills-dev setup-permissions --` - Manages permission configuration
+- `sdd skills-dev setup-permissions --` - Manages permission configuration
 - Python 3 - For JSON processing
 
 **Tracked State**:
@@ -58,7 +58,6 @@ The following permissions are required for hooks to function:
 {
   "permissions": {
     "allow": [
-      "Bash(skills-dev:*)",
       "Bash(sdd:*)",
       "Write(//**/specs/active/**)",
       "Write(//**/specs/completed/**)",
@@ -94,22 +93,22 @@ Hook behavior is controlled via settings:
 
 ## Helper Scripts
 
-### skills-dev setup-permissions
-**Accessed via**: `skills-dev setup-permissions -- <command>`
+### sdd skills-dev setup-permissions
+**Accessed via**: `sdd skills-dev setup-permissions -- <command>`
 **Commands**:
 - `check <project_root>` - Check if permissions are configured
 - `update <project_root>` - Add SDD permissions to project settings
 
 **Output**: JSON with configuration status
 
-### skills-dev start-helper
-**Accessed via**: `skills-dev start-helper -- <command>`
+### sdd skills-dev start-helper
+**Accessed via**: `sdd skills-dev start-helper -- <command>`
 **Commands**:
 - `check-permissions` - Verify SDD permissions
 - `find-active-work` - Locate active specifications
 - `format-output` - Format SDD status for display
 
-**Note**: All helper commands now use the unified CLI: `skills-dev <tool> -- <command>`
+**Note**: All helper commands now use the unified CLI: `sdd skills-dev <tool> -- <command>`
 
 ## Troubleshooting
 
@@ -121,7 +120,7 @@ Hook behavior is controlled via settings:
 ### Permission prompts not appearing
 1. Verify `auto_offer_permissions` is `true` in settings
 2. Check if project was declined (remove from `~/.claude/.sdd-permissions-declined`)
-3. Run manually: `skills-dev setup-permissions -- check /path/to/project`
+3. Run manually: `sdd skills-dev setup-permissions -- check /path/to/project`
 
 ### Session detection not working
 1. Ensure `specs/active/` directory exists

@@ -800,6 +800,8 @@ sdd doc validate-json ./docs/documentation.json
 
 5. **Run from skill directory** or provide absolute paths to scripts
 
+6. **Always report AI model errors to the user** - If any AI models fail during `analyze-with-ai`, inform the user which models failed, which succeeded, and the impact on the generated documentation
+
 ### MUST NOT DO:
 
 1. **Never document everything indiscriminately** - Exclude tests, generated code, migrations
@@ -811,6 +813,8 @@ sdd doc validate-json ./docs/documentation.json
 4. **Never modify the JSON output manually** - Regenerate if changes needed
 
 5. **Never ignore syntax errors** - Note them for the user (tool will skip and continue)
+
+6. **Never hide AI model failures** - Always report which models failed during AI-enhanced documentation, even if the process succeeded with fallback models
 
 ---
 
@@ -883,6 +887,30 @@ Now generating comprehensive documentation..."
 - legacy_code.py (line 123: unexpected indent)
 
 Documentation generated for the remaining 43 valid files."
+```
+
+**Report AI model errors transparently:**
+```
+"⚠️ AI model consultation encountered an error:
+- cursor-agent failed (model 'gpt-4.1' not available)
+- gemini succeeded
+
+Documentation was generated successfully using gemini's analysis.
+For better coverage in the future, consider updating cursor-agent configuration
+or using --single-agent with gemini."
+```
+
+**Or for complete AI failure:**
+```
+"⚠️ All AI models failed during consultation:
+- cursor-agent: Model not available
+- gemini: API rate limit exceeded
+
+Falling back to structural documentation only.
+DOCUMENTATION.md and documentation.json were generated successfully,
+but ARCHITECTURE.md and AI_CONTEXT.md could not be created.
+
+You can retry later with: sdd doc analyze-with-ai ..."
 ```
 
 ---
@@ -1204,10 +1232,27 @@ sdd doc generate ./src --name MyProject
 4. Check disk space and permissions
 
 **If AI-enhanced docs fail:**
-1. Verify AI tool installation
-2. Check API rate limits
-3. Try `--single-agent` instead of multi-agent
-4. Fall back to structural docs only
+
+**IMPORTANT: Always report model errors to the user with specifics.**
+
+1. **Check the tool output** - Look for ✓ (success) or ✗ (failure) symbols for each model
+2. **Report which models failed and why** - Include the specific error (e.g., "model not available", "API error")
+3. **Report which models succeeded** - Let user know if partial success occurred
+4. **Explain the impact** - Was fallback successful? Which docs were/weren't generated?
+5. **Provide next steps** - Suggest fixes or alternatives
+
+**Actions to suggest:**
+- Verify AI tool installation (`cursor-agent --version`, `gemini --version`, `codex --version`)
+- Check API rate limits or authentication
+- Try `--single-agent` with a working model instead of multi-agent
+- Update model configuration if model name is invalid
+- Fall back to structural docs only (`sdd doc generate`)
+
+**Always be transparent about:**
+- Which models were attempted
+- Which succeeded/failed and why
+- Whether documentation was still generated (with what limitations)
+- How to fix the issue for future runs
 
 ---
 

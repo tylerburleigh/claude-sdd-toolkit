@@ -76,7 +76,7 @@ needs_permission_setup() {
     fi
 
     # Check if project needs setup
-    local check_result=$(skills-dev setup-permissions -- check "$PROJECT_ROOT" 2>/dev/null)
+    local check_result=$(sdd skills-dev setup-permissions -- check "$PROJECT_ROOT" 2>/dev/null)
     local needs_setup=$(echo "$check_result" | python3 -c "
 import json, sys
 try:

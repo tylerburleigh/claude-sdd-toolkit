@@ -83,7 +83,7 @@ pip install -e .
 sdd --help
 doc --help
 test --help
-skills-dev --help
+sdd skills-dev --help
 
 # Test specific commands
 sdd validate --help
@@ -215,7 +215,7 @@ Hooks in `~/.claude/hooks/` run automatically on events.
 vim ~/.claude/settings.json
 
 # Or use the helper command
-skills-dev setup-permissions -- update ~/.claude
+sdd skills-dev setup-permissions -- update ~/.claude
 ```
 
 ## Part 3: Project-Level Setup
@@ -251,7 +251,7 @@ Option 2: Configure manually:
 
 ```bash
 # In your project root
-skills-dev setup-permissions -- update .
+sdd skills-dev setup-permissions -- update .
 
 # This creates/updates:
 # ./claude/settings.json
@@ -261,7 +261,7 @@ skills-dev setup-permissions -- update .
 
 ```bash
 # Check permissions are configured
-skills-dev setup-permissions -- check .
+sdd skills-dev setup-permissions -- check .
 
 # Expected output:
 # {
@@ -455,7 +455,7 @@ export PATH="$HOME/Library/Python/3.9/bin:$PATH"
 cat ~/.claude/settings.json | grep "Bash(sdd:"
 
 # If missing, add with helper
-skills-dev setup-permissions -- update ~/.claude
+sdd skills-dev setup-permissions -- update ~/.claude
 
 # Or edit manually
 ```

@@ -123,13 +123,13 @@ def register_all_subcommands(subparsers: Any, parent_parser: argparse.ArgumentPa
 def _show_migration_info(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     printer.header("Skills-Dev CLI Migration")
     printer.detail(
-        "Legacy commands are now available under the unified 'skills-dev' CLI."
+        "Legacy commands are now available under the unified 'sdd' CLI as 'sdd skills-dev'."
     )
     printer.blank()
     for cmd in LEGACY_COMMANDS:
         legacy_name = cmd.entry_point.split(".")[-1]
-        printer.item(f"skills-dev {cmd.name} -- → {legacy_name}")
+        printer.item(f"sdd skills-dev {cmd.name} -- → {legacy_name}")
     printer.blank()
     printer.detail("Pass legacy arguments after '--'. Example:")
-    printer.detail("skills-dev gendocs -- sdd-validate --sections commands", indent=1)
+    printer.detail("sdd skills-dev gendocs -- sdd-validate --sections commands", indent=1)
     return 0

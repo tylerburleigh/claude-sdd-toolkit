@@ -87,7 +87,7 @@ pip install -e .
 sdd --help
 doc --help
 test --help
-skills-dev --help
+sdd skills-dev --help
 
 # Check Claude Code integration
 ls ~/.claude/skills/
@@ -287,7 +287,7 @@ Each project can have `.claude/settings.json`:
 
 **Setup automatically**:
 ```bash
-skills-dev setup-permissions -- update .
+sdd skills-dev setup-permissions -- update .
 ```
 
 Or let Claude Code prompt you when first using SDD tools.

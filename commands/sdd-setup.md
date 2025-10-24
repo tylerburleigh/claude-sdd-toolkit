@@ -18,7 +18,7 @@ Configures `.claude/settings.json` with the necessary permissions for SDD skills
 First, check if SDD permissions are already configured:
 
 ```bash
-skills-dev setup-permissions -- check .
+sdd skills-dev setup-permissions -- check .
 ```
 
 The script will return JSON with a `configured` field indicating whether permissions are set up.
@@ -43,7 +43,7 @@ Setting up SDD permissions for this project...
 
 Then run:
 ```bash
-skills-dev setup-permissions -- update .
+sdd skills-dev setup-permissions -- update .
 ```
 
 This will:
