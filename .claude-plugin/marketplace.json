@@ -1,0 +1,16 @@
+{
+  "name": "claude-sdd-toolkit",
+  "owner": {
+    "name": "tylerburleigh",
+    "email": "tylerburleigh@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "sdd-toolkit",
+      "source": {
+        "source": "github",
+        "repo": "tylerburleigh/claude-sdd-toolkit"
+      }
+    }
+  ]
+}
