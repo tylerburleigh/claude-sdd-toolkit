@@ -101,7 +101,7 @@
       "total_tasks": 2,
       "completed_tasks": 0,
       "metadata": {
-        "status_note": "Reset to pending status per user request"
+        "file_path": "src/claude_skills/pyproject.toml"
       }
     },
     "task-1-1-1": {
