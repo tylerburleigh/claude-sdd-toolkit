@@ -712,11 +712,14 @@ Show progress at every level of hierarchy:
 
 **Automatic Task Count Calculation:**
 
-You don't need to manually calculate task counts - the `fix-state` command handles this automatically:
+You don't need to manually calculate task counts - the `sdd fix` command handles this automatically:
 
 ```bash
-# Auto-fix task counts and hierarchy integrity
-sdd-plan fix-state specs/active/your-spec.json
+# Preview fixes without applying (recommended first step)
+sdd fix specs/active/your-spec.json --preview
+
+# Apply fixes to task counts and hierarchy integrity
+sdd fix specs/active/your-spec.json
 ```
 
 **How it works:**
@@ -732,7 +735,7 @@ sdd-plan fix-state specs/active/your-spec.json
 - Before running sdd-next (ensures accurate counts)
 - Any time counts seem out of sync
 
-**Common pitfall:** Don't manually update `total_tasks` or `completed_tasks` in the JSON - let `fix-state` or `sdd-update` handle it automatically to avoid arithmetic errors.
+**Common pitfall:** Don't manually update `total_tasks` or `completed_tasks` in the JSON - let `sdd fix` or `sdd-update` handle it automatically to avoid arithmetic errors.
 
 ### Task ID Format
 
@@ -995,6 +998,126 @@ sdd stats specs/active/your-spec.json
 ```
 
 **Note:** JSON remains the source of truth. Markdown reports generated via `sdd-validate` are helpful for review, but edits must be made in the JSON and re-rendered.
+
+### Phase 3: Rendering Specs to Human-Readable Markdown
+
+After creating and validating your JSON spec, you can generate comprehensive human-readable markdown documentation using the `sdd render` command. This is useful for:
+- Reviewing spec structure and progress
+- Sharing plans with team members
+- Creating documentation for project tracking
+- Generating readable versions for non-technical stakeholders
+
+#### 3.1 Using sdd render
+
+The `sdd render` command converts JSON specifications into well-formatted markdown with full hierarchy visualization, progress tracking, and status indicators.
+
+**Basic Usage:**
+
+```bash
+# Render by spec ID (searches specs directory)
+sdd render semantic-search-2025-10-24-001 --path specs
+
+# Render by direct file path
+sdd render specs/active/my-spec.json
+
+# Custom output location
+sdd render my-spec --path specs -o documentation/my-spec.md
+```
+
+**Default Output Location:**
+
+By default, rendered markdown is saved to:
+```
+.specs/human-readable/<status>/<spec-id>.md
+```
+
+Where `<status>` is the spec's status (active, approved, completed, etc.) from the metadata.
+
+**Example:**
+```bash
+# Renders to: .specs/human-readable/approved/semantic-search-2025-10-24-001.md
+sdd render semantic-search-2025-10-24-001 --path specs
+```
+
+#### 3.2 Generated Markdown Format
+
+The rendered markdown includes:
+
+**Header Section:**
+- Spec ID and title
+- Status and progress (completed/total tasks, percentage)
+- Estimated effort and complexity
+- Description and objectives
+
+**Phase Sections:**
+- Phase title with progress tracking
+- Purpose, risk level, and estimated hours
+- Dependencies (blocked by, blocks)
+- File modifications grouped by type
+- Detailed task breakdown with subtasks
+- Verification steps with commands
+
+**Status Icons:**
+- ⏳ Pending tasks
+- 🔄 In progress
+- ✅ Completed
+- 🚫 Blocked
+- ❌ Failed
+
+**Example Output Structure:**
+```markdown
+# Semantic Search for Documentation Query
+
+**Spec ID:** `semantic-search-2025-10-24-001`
+**Status:** approved (5/62 tasks, 8%)
+**Estimated Effort:** 80 hours
+**Complexity:** high
+
+## Objectives
+- Enable semantic search for natural language code queries
+- Improve keyword search relevance with BM25
+...
+
+## Foundation & Configuration (2/8 tasks, 25%)
+
+**Purpose:** Set up dependencies and configuration
+**Risk Level:** low
+**Estimated Hours:** 6
+
+### File Modifications (2/6 tasks)
+
+#### ⏳ src/claude_skills/pyproject.toml
+
+**File:** `src/claude_skills/pyproject.toml`
+**Status:** pending
+**Changes:** Add optional dependency groups
+...
+```
+
+#### 3.3 When to Render Specs
+
+**Recommended Times:**
+- After initial spec creation for team review
+- Before starting implementation to confirm understanding
+- At phase boundaries to track progress
+- When presenting project status to stakeholders
+- For archival documentation of completed work
+
+**Integration with Workflow:**
+```bash
+# 1. Create spec (this skill)
+# 2. Validate
+sdd validate specs/active/my-spec.json
+
+# 3. Render for review
+sdd render my-spec --path specs
+
+# 4. Share rendered markdown for team feedback
+# 5. Update spec based on feedback
+# 6. Re-render after updates
+```
+
+**Note:** The `.specs/` directory (with dot prefix) is meant for generated artifacts, similar to build directories. Consider adding it to `.gitignore` if you don't want rendered documentation in version control.
 
 #### 2.2 Validation Checklist
 

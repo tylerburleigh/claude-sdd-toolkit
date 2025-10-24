@@ -197,6 +197,13 @@ def track_metrics(skill_name: str):
                 exit_code = func(*args, **kwargs) or 0
                 return exit_code
 
+            except SystemExit as e:
+                # Capture exit code from sys.exit() calls
+                exit_code = e.code if e.code is not None else 0
+                if exit_code != 0:
+                    error_message = f"Command exited with code {exit_code}"
+                raise
+
             except Exception as e:
                 error_message = str(e)
                 exit_code = 1

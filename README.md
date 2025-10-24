@@ -1,6 +1,6 @@
 # SDD Toolkit - Claude Code Plugin
 
-> Professional spec-driven development tools for Claude Code
+> Professional spec-driven development workflows for Claude Code
 
 [![Plugin Version](https://img.shields.io/badge/version-2.0.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
@@ -8,276 +8,276 @@
 
 ## What is This?
 
-A comprehensive Claude Code plugin that brings professional, plan-first development workflows to your AI-assisted coding sessions.
+The SDD Toolkit brings **plan-first development** to Claude Code. Instead of diving straight into code, you create detailed specifications that guide implementation, track progress, and ensure nothing gets missed.
 
-**Installation**: See [PLUGIN_INSTALL.md](PLUGIN_INSTALL.md)
+**Perfect for**:
+- Building complex features with multiple steps
+- Maintaining consistency across large codebases
+- Tracking progress on multi-day projects
+- Getting AI-assisted code reviews and debugging
+- Generating and querying codebase documentation
 
-**For Development Setup**: See [INSTALLATION.md](INSTALLATION.md)
+## Why Use This?
 
-## Quick Start
+Traditional AI-assisted coding can lead to:
+- ❌ Forgotten edge cases and requirements
+- ❌ Implementation drift from original goals
+- ❌ Lost context when resuming work
+- ❌ Unclear progress tracking
 
-1. Install the plugin (see [PLUGIN_INSTALL.md](PLUGIN_INSTALL.md))
-2. In Claude Code, say: "Create a spec for adding user authentication"
-3. Claude uses the SDD toolkit to create a detailed specification
-4. Resume anytime with `/sdd-start`
-
-## About This Directory
-
-This is your `~/.claude/` directory (or the plugin installation at `~/.claude/plugins/sdd-toolkit/`) - the home for Claude Code configuration, skills, and automation. It contains:
-
-✅ **SDD Toolkit** - Spec-Driven Development workflow
-✅ **Documentation Tools** - Generate and query codebase docs
-✅ **Test Management** - AI-assisted test execution and debugging
-✅ **Automation** - Hooks, commands, and CLI utilities
-
-## Directory Structure
-
-```
-~/.claude/
-├── INSTALLATION.md           # Complete installation guide ← START HERE
-├── README.md                 # This file
-├── settings.json             # Global Claude Code settings
-│
-├── skills/                   # Claude Code skills (auto-detected)
-│   ├── sdd-plan/            # Create specifications
-│   ├── sdd-next/            # Find next task
-│   ├── sdd-update/          # Track progress
-│   ├── sdd-validate/        # Validate specs
-│   ├── sdd-plan-review/     # Multi-model review
-│   ├── doc-query/           # Query documentation
-│   ├── run-tests/           # Execute tests
-│   └── code-doc/            # Generate docs
-│
-├── commands/                 # Slash commands
-│   └── sdd-start.md         # /sdd-start - Resume work
-│
-├── hooks/                    # Event hooks (auto-run)
-│   ├── session-start        # Detect active work on session start
-│   └── pre-tool-use         # Offer permission setup
-│
-└── src/                      # Source code
-    └── claude_skills/       # Python package (CLI tools)
-        ├── sdd_next/        # Task discovery
-        ├── sdd_update/      # Progress tracking
-        ├── sdd_validate/    # Validation
-        ├── doc_query/       # Doc queries
-        ├── run_tests/       # Test execution
-        ├── code_doc/        # Doc generation
-        ├── dev_tools/       # Development utilities
-        └── common/          # Shared utilities
-```
+SDD Toolkit solves this with:
+- ✅ **Detailed specifications** before coding
+- ✅ **Task-by-task implementation** with clear checkpoints
+- ✅ **Resume anytime** with full context
+- ✅ **Multi-model review** for better specs
+- ✅ **Automated documentation** of your codebase
 
 ## Quick Start
 
-### 1. Installation
+### Installation
+
+1. Launch Claude Code (`claude` command)
+2. Type `/plugin` and press Enter
+3. Select **"Add from marketplace"**
+4. Enter: `tylerburleigh/claude-sdd-toolkit`
+5. Wait for the repository to clone
+6. Click **"Install"** when prompted
+7. **Exit Claude Code completely**
+8. Install Python dependencies:
+   ```bash
+   cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+   pip install -e .
+   ```
+9. **Restart Claude Code**
+10. **Configure your project**: Open your project in Claude Code and run:
+    ```
+    /sdd-setup
+    ```
+    This configures the necessary permissions for SDD tools to work in your project.
+
+That's it! The plugin is now ready to use.
+
+### Verify Installation
 
 ```bash
-# See complete guide
-cat INSTALLATION.md
-
-# Or quick install
-cd ~/.claude/src/claude_skills
-pip install -e .
-```
-
-### 2. Verify Setup
-
-```bash
-# Check unified CLI commands
+# Check that CLI tools are available (examples)
 sdd --help
 doc --help
 test --help
-sdd skills-dev --help
 
-# Check Claude Code integration
-ls ~/.claude/skills/
+# Check that skills are installed
+ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
 ```
 
-### 3. First Workflow
+You should see: `sdd-plan`, `sdd-next`, `sdd-update`, and other skills.
 
-In Claude Code:
+**Test in Claude Code**: Navigate to a project and run `/sdd-setup`. If it completes successfully, everything is working!
+
+### Your First Workflow
+
+In Claude Code, try this:
 
 ```
-I want to create a feature: Add user authentication
+Create a spec for adding user authentication with email and password
 ```
 
-Claude invokes `sdd-plan` skill automatically to create a specification.
+Claude will:
+1. Explore your codebase
+2. Create a detailed specification
+3. Break it into actionable tasks
+4. Save it as `specs/active/user-auth-YYYY-MM-DD-001.json`
 
-Then resume work anytime with:
+Resume anytime with:
 
 ```
 /sdd-start
 ```
 
-## What's in Each Directory
+## Core Concepts
 
-### `/skills` - Claude Code Skills
+### Specifications (Specs)
 
-**Purpose**: Extend Claude's capabilities with specialized workflows
+A **spec** is a JSON file containing:
+- Feature overview and goals
+- File-by-file implementation plan
+- Task breakdown with dependencies
+- Verification steps
+- Edge cases and considerations
 
-**How they work**:
-- Claude Code auto-detects skills in this directory
-- Each skill has `SKILL.md` with instructions for Claude
-- Invoke via: `Skill(skill-name)` or through natural conversation
-- Claude decides when to use based on context
+Specs live in your project's `specs/` directory:
+- `specs/active/` - Current work
+- `specs/completed/` - Finished features
+- `specs/archived/` - Old/cancelled work
 
-**Available skills**:
+### Skills
 
-| Skill | Use Case | Example |
-|-------|----------|---------|
-| `sdd-plan` | Create specs | "Plan a new feature for rate limiting" |
+**Skills** extend Claude's capabilities. The toolkit provides:
+
+| Skill | What It Does | When To Use |
+|-------|-------------|-------------|
+| `sdd-plan` | Create specifications | "Plan a feature for rate limiting" |
 | `sdd-next` | Find next task | "What should I work on next?" |
-| `sdd-update` | Track progress | "Mark task as complete" |
-| `sdd-validate` | Validate specs | "Check if my spec is valid" |
-| `sdd-plan-review` | Multi-model review | "Get feedback on this spec" |
-| `doc-query` | Query docs | "What classes handle auth?" |
-| `run-tests` | Run tests | "Run all tests and help debug failures" |
+| `sdd-update` | Track progress | Automatic when tasks complete |
+| `sdd-validate` | Check spec validity | "Is my spec valid?" |
+| `sdd-render` | Render specs to markdown | Generate human-readable documentation |
+| `sdd-plan-review` | Multi-model review | "Review my spec" |
 | `code-doc` | Generate docs | "Document this codebase" |
+| `doc-query` | Query docs | "What handles authentication?" |
+| `run-tests` | Run & debug tests | "Run tests and fix failures" |
 
-### `/commands` - Slash Commands
+Claude uses skills automatically based on your requests.
 
-**Purpose**: User-invoked commands in Claude Code
+### Commands
 
-**How they work**:
-- Type `/command-name` in Claude Code
-- Claude reads the `.md` file and follows instructions
-- Great for interactive, step-by-step workflows
+**Commands** are interactive workflows you invoke with `/`:
 
-**Available commands**:
+- `/sdd-start` - Resume work on active specs
 
-| Command | Purpose |
-|---------|---------|
-| `/sdd-start` | Resume or start SDD work with interactive menu |
+Type `/` in Claude Code to see all available commands.
 
-**Create your own**:
-
-```bash
-cat > ~/.claude/commands/my-command.md << 'EOF'
----
-name: my-command
-description: What it does
----
-
-Instructions for Claude...
-EOF
-```
-
-### `/hooks` - Event Hooks
-
-**Purpose**: Automatic actions triggered by events
-
-**How they work**:
-- Bash scripts that run on specific events
-- Must be executable (`chmod +x`)
-- Output JSON (optional)
-- Always exit 0 (non-blocking)
-
-**Available hooks**:
-
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `session-start` | New session | Detect SDD projects, show active specs |
-| `pre-tool-use` | Before tool | Offer permission setup |
-
-**Hook events**:
-- `session-start` - When Claude Code session begins
-- `session-end` - When session ends
-- `pre-tool-use` - Before any tool is used
-- `post-tool-use` - After any tool is used
-- `user-prompt-submit` - When user submits a message
-
-**Create your own**:
-
-```bash
-cat > ~/.claude/hooks/my-hook << 'EOF'
-#!/bin/bash
-# Do something useful
-echo '{"status": "success"}'
-exit 0
-EOF
-chmod +x ~/.claude/hooks/my-hook
-```
-
-### `/src/claude_skills` - Python Package
-
-**Purpose**: CLI tools and shared libraries
-
-**How it works**:
-- Installed via `pip install -e .`
-- Creates CLI commands in your PATH
-- Used by skills and hooks
-- Shared utilities for all tools
-
-**CLI commands provided** (unified architecture):
-
-| Command | Purpose | Example |
-|---------|---------|---------|
-| `sdd` | SDD workflows | `sdd next-task my-spec-001` |
-| `sdd` | Progress tracking | `sdd update-status my-spec-001 task-1 completed` |
-| `sdd` | Spec validation | `sdd validate specs/active/my-spec.json` |
-| `doc` | Doc queries | `doc search "authentication"` |
-| `doc` | Doc generation | `doc generate .` |
-| `test` | Test execution | `test run tests/` |
-| `skills-dev` | Session management | `skills-dev start-helper -- format-output` |
-| `skills-dev` | Permission setup | `skills-dev setup-permissions -- update .` |
-| `skills-dev` | Generate skill docs | `skills-dev gendocs -- sdd-validate` |
-
-**Note**: See [MIGRATION_GUIDE.md](src/claude_skills/MIGRATION_GUIDE.md) for details on the unified CLI architecture.
-
-**Package structure**:
+### The SDD Workflow
 
 ```
-claude_skills/
-├── sdd_next/           # Task discovery module
-├── sdd_update/         # Progress tracking module
-├── sdd_validate/       # Validation module
-├── doc_query/          # Documentation queries
-├── run_tests/          # Test execution
-├── code_doc/           # Doc generation
-├── dev_tools/          # Development utilities
-├── common/             # Shared utilities
-└── tests/              # Test suite
+1. Create Spec
+   "Plan feature X"
+   ↓
+2. Review & Refine
+   Claude generates detailed spec
+   ↓
+3. Implement Tasks
+   /sdd-start → pick next task
+   ↓
+4. Track Progress
+   Tasks auto-marked as complete
+   ↓
+5. Resume Anytime
+   /sdd-start shows progress
 ```
+
+## Common Workflows
+
+### Create and Implement a Feature
+
+```
+You: Create a spec for adding rate limiting to the API
+
+Claude: [Creates detailed spec at specs/active/rate-limiting-001.json]
+
+You: /sdd-start
+
+Claude: Found active spec "rate-limiting-001". Continue with next task?
+
+You: Yes
+
+Claude: Task 1: Create RateLimiter middleware class
+        [Implements the task]
+
+You: /sdd-start
+
+Claude: Task 2: Add rate limit configuration...
+        [Continues through all tasks]
+```
+
+### Resume Work After a Break
+
+```
+You: /sdd-start
+
+Claude: Found 2 active specs:
+        1. rate-limiting-001 (3/7 tasks complete)
+        2. user-auth-002 (1/5 tasks complete)
+
+        Which would you like to continue?
+
+You: 1
+
+Claude: Continuing rate-limiting-001
+        Next task: Add rate limit headers to responses
+        [Shows task details and helps implement]
+```
+
+### Generate and Query Documentation
+
+```
+You: Document this codebase
+
+Claude: [Uses code-doc skill to generate docs/documentation.json]
+
+You: What classes handle authentication?
+
+Claude: [Uses doc-query skill to search documentation]
+        Found 3 classes:
+        - AuthManager (src/auth/manager.py)
+        - TokenValidator (src/auth/tokens.py)
+        - SessionStore (src/auth/sessions.py)
+```
+
+### Get Multi-Model Review
+
+```
+You: Review my spec with multiple AI models
+
+Claude: [Uses sdd-plan-review skill]
+        Consulting Gemini, GPT-5, and Codex...
+
+        Feedback summary:
+        - All models agree on the approach
+        - Gemini suggests adding retry logic
+        - GPT-5 recommends error boundary patterns
+        - Codex warns about performance implications
+```
+
+## Project Structure
+
+After using the toolkit, your project will have:
+
+```
+your-project/
+├── specs/                    # Specifications
+│   ├── active/              # Current work
+│   │   └── feature-001.json
+│   ├── completed/           # Finished
+│   └── archived/            # Old/cancelled
+│
+├── .claude/                 # Project settings (optional)
+│   └── settings.json        # Permissions
+│
+└── docs/                    # Generated docs (optional)
+    ├── documentation.json   # Machine-readable
+    └── documentation.md     # Human-readable
+```
+
+The `specs/` directory can be:
+- **Gitignored** for personal use
+- **Committed** for team collaboration
 
 ## Configuration
 
-### Global Settings
+### Project Setup (Recommended)
 
-`~/.claude/settings.json` contains your Claude Code configuration:
+Run the setup command in your project:
+
+```
+/sdd-setup
+```
+
+This automatically:
+- Creates `.claude/settings.json` in your project
+- Adds all required permissions for SDD skills and tools
+- Prepares your project for spec-driven development
+
+You only need to run this once per project.
+
+### What Gets Configured
+
+The setup creates `.claude/settings.json` with permissions like:
 
 ```json
 {
   "permissions": {
     "allow": [
       "Skill(sdd-plan)",
-      "Bash(sdd:*)",
-      "Bash(doc:*)",
-      "Bash(test:*)",
-      "Read(//**/specs/**)"
-    ]
-  },
-  "sdd": {
-    "auto_suggest_resume": true,
-    "recent_activity_days": 7
-  }
-}
-```
-
-**Key sections**:
-- `permissions.allow` - Pre-approved operations
-- `permissions.deny` - Blocked operations
-- `permissions.ask` - Prompt before use
-- `sdd` - SDD-specific settings
-- `hooks` - Hook configuration
-
-### Project Settings
-
-Each project can have `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
+      "Skill(sdd-next)",
       "Read(//**/specs/**)",
       "Write(//**/specs/active/**)"
     ]
@@ -285,269 +285,183 @@ Each project can have `.claude/settings.json`:
 }
 ```
 
-**Setup automatically**:
+### Advanced: Manual Setup
+
+If you prefer to configure manually via CLI:
+
 ```bash
+# In your project directory
 sdd skills-dev setup-permissions -- update .
 ```
 
-Or let Claude Code prompt you when first using SDD tools.
+This does the same thing as `/sdd-setup` but from the command line.
 
-## Common Workflows
+### Global Settings
 
-### Create a New Feature
+Your global settings at `~/.claude/settings.json` control default behavior:
 
-```
-1. In Claude Code: "Create a spec for adding rate limiting"
-2. Claude uses sdd-plan skill automatically
-3. Result: specs/active/rate-limiting-2025-10-23-001.json
-4. Later: /sdd-start to resume
-5. Complete tasks iteratively
-```
-
-### Resume Work
-
-```
-1. Open Claude Code in project
-2. Type: /sdd-start
-3. Claude shows active specs and progress
-4. Choose "Continue with next task"
-5. Claude uses sdd-next skill
-6. Implement, complete, repeat
-```
-
-### Generate Documentation
-
-```
-1. "Use code-doc skill to document this project"
-2. Claude generates docs/documentation.json
-3. Query with: "What classes handle authentication?"
-4. Claude uses doc-query skill to search
-```
-
-### Run and Debug Tests
-
-```
-1. "Use run-tests skill to run all tests"
-2. Claude executes tests
-3. If failures: Claude analyzes and suggests fixes
-4. Implement fixes
-5. Re-run tests
-```
-
-## How Everything Works Together
-
-### The Flow
-
-```
-User Request
-    ↓
-Claude Code (reads CLAUDE.md, skills, commands)
-    ↓
-Skills (invoke CLI tools)
-    ↓
-CLI Tools (from claude_skills package)
-    ↓
-Project Files (specs/, code, tests)
-    ↓
-Results back to Claude
-    ↓
-Response to User
-```
-
-### Example: Creating a Spec
-
-```
-User: "Create a spec for user authentication"
-    ↓
-Claude detects intent, invokes Skill(sdd-plan)
-    ↓
-sdd-plan skill reads SKILL.md instructions
-    ↓
-sdd-plan uses doc-query CLI to explore codebase
-    ↓
-sdd-plan generates specification
-    ↓
-Spec saved to specs/active/user-auth-2025-10-23-001.json
-    ↓
-Claude shows spec summary to user
-```
-
-### Example: Resuming Work
-
-```
-User: /sdd-start
-    ↓
-SlashCommand triggers commands/sdd-start.md
-    ↓
-Claude runs skills-dev start-helper CLI to find active specs
-    ↓
-Claude presents options to user
-    ↓
-User chooses "Continue with next task"
-    ↓
-Claude invokes Skill(sdd-next)
-    ↓
-sdd-next CLI finds next task in spec
-    ↓
-Claude shows task details and helps implement
-```
-
-### Example: Session Hook
-
-```
-User opens Claude Code
-    ↓
-session-start hook runs automatically
-    ↓
-Hook checks for specs/active/ directory
-    ↓
-Hook finds active specifications
-    ↓
-Hook creates marker file with spec info
-    ↓
-Claude reads marker proactively
-    ↓
-Claude greets: "I found active specs. Run /sdd-start to resume?"
-```
-
-## Extending the System
-
-### Add a New Skill
-
-```bash
-# 1. Create directory
-mkdir ~/.claude/skills/my-skill
-
-# 2. Create SKILL.md
-cat > ~/.claude/skills/my-skill/SKILL.md << 'EOF'
----
-name: my-skill
-description: What this skill does
----
-
-# My Skill
-
-When invoked, you should:
-1. Do this
-2. Then that
-3. Return results
-EOF
-
-# 3. Use it
-# In Claude Code: "Use my-skill to do something"
-```
-
-### Add a New Command
-
-```bash
-# 1. Create command file
-cat > ~/.claude/commands/my-command.md << 'EOF'
----
-name: my-command
-description: Interactive command
----
-
-# My Command
-
-Guide the user through:
-1. Step one
-2. Step two
-3. Step three
-EOF
-
-# 2. Use it
-# In Claude Code: /my-command
-```
-
-### Add a New Hook
-
-```bash
-# 1. Create hook script
-cat > ~/.claude/hooks/post-task-complete << 'EOF'
-#!/bin/bash
-task_data=$(cat)  # Read from stdin
-echo "$task_data" >> ~/task-log.txt
-exit 0
-EOF
-
-# 2. Make executable
-chmod +x ~/.claude/hooks/post-task-complete
-```
-
-### Add a New CLI Tool
-
-```bash
-# 1. Add to claude_skills package
-cd ~/.claude/src/claude_skills/claude_skills
-mkdir my_tool
-# ... implement your tool ...
-
-# 2. Add entry point to pyproject.toml
-[project.scripts]
-my-tool = "claude_skills.my_tool.cli:main"
-
-# 3. Reinstall
-cd ~/.claude/src/claude_skills
-pip install -e .
-
-# 4. Use it
-my-tool --help
+```json
+{
+  "sdd": {
+    "auto_suggest_resume": true,
+    "recent_activity_days": 7
+  }
+}
 ```
 
 ## Troubleshooting
 
-### Skills not working
+### Skills Not Working
 
 ```bash
-# Check skills directory
-ls ~/.claude/skills/*/SKILL.md
+# Verify skills are installed
+ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
 
-# Check permissions
-cat ~/.claude/settings.json | grep Skill
+# Should show: sdd-plan, sdd-next, sdd-update, etc.
 
-# Restart Claude Code
+# If missing, reinstall the plugin
+# See "Reinstallation" section
 ```
 
-### CLI commands not found
+### CLI Commands Not Found
 
 ```bash
-# Reinstall package
+# Reinstall the Python package
 cd ~/.claude/src/claude_skills
 pip install -e .
 
-# Check unified CLIs
+# Verify
 sdd --help
 doc --help
 test --help
 ```
 
-### Hooks not running
+### Permission Errors
 
 ```bash
-# Check executable
-ls -l ~/.claude/hooks/
+# Set up project permissions
+cd /path/to/your/project
+sdd skills-dev setup-permissions -- update .
 
-# Make executable
-chmod +x ~/.claude/hooks/*
-
-# Test manually
-~/.claude/hooks/session-start
+# Or tell Claude: "Set up SDD permissions for this project"
 ```
 
-## Documentation
+### Hooks Not Running
 
-- **Installation Guide**: [INSTALLATION.md](INSTALLATION.md) - Complete setup
-- **Quick Start**: [src/claude_skills/GETTING_STARTED.md](src/claude_skills/GETTING_STARTED.md)
-- **Workflows**: [src/claude_skills/docs/workflows.md](src/claude_skills/docs/workflows.md)
-- **CLI Reference**: [src/claude_skills/docs/cli-reference.md](src/claude_skills/docs/cli-reference.md)
-- **Skills Reference**: Each skill has README.md in its directory
+```bash
+# Check if hooks are executable
+ls -l ~/.claude/hooks/
+
+# Make them executable
+chmod +x ~/.claude/hooks/*
+```
+
+## Reinstallation
+
+If you need to reinstall the plugin:
+
+1. In Claude Code, type `/plugin`
+2. Select **"Manage and install plugins"**
+3. Find `sdd-toolkit` and click **"Uninstall"**
+4. Exit Claude Code
+5. Delete plugin cache:
+   ```bash
+   rm -rf ~/.claude/plugins/marketplaces/claude-sdd-toolkit
+   rm -rf ~/.claude/plugins/cache/sdd-toolkit
+   ```
+6. Restart Claude Code
+7. Follow the installation steps again
+
+## Advanced Usage
+
+### For Developers
+
+Want to extend the toolkit or contribute?
+- **[DEVELOPER.md](DEVELOPER.md)** - Add custom skills, commands, hooks
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System design and data flow
+
+### For Teams
+
+Want to use this with your team?
+- Commit `specs/` directory to git for collaboration
+- Share `.claude/settings.json` for consistent permissions
+- Use spec templates for common patterns
+
+### CLI Reference
+
+The toolkit provides unified CLI commands:
+
+```bash
+# SDD workflows
+sdd next-task <spec-id>           # Find next task
+sdd update-status <spec> <task>   # Update progress
+sdd validate <spec.json>          # Validate spec
+sdd render <spec-id|spec.json>    # Render spec to markdown
+
+# Documentation
+doc generate .                    # Generate docs
+doc query "search term"           # Search docs
+doc search "pattern"              # Pattern search
+
+# Testing
+test run tests/                   # Run tests with AI debugging
+
+# Development tools
+sdd skills-dev setup-permissions -- update .   # Set up permissions
+sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
+```
+
+See [CLI Reference](src/claude_skills/docs/cli-reference.md) for complete documentation.
+
+## Prerequisites
+
+- **Claude Code** - Latest version
+- **Python 3.9+** - For CLI tools
+- **pip** - Python package manager
+- **Git** (optional) - For version control
 
 ## Getting Help
 
-- **Claude Code Docs**: https://docs.claude.com/claude-code
-- **GitHub Issues**: Report bugs or request features
-- **Community**: Share workflows and customizations
+- **Issues**: Report bugs at [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
+- **Docs**: Full documentation at [Claude Code Docs](https://docs.claude.com/claude-code)
+- **Examples**: Check `examples/` directory for sample workflows
+
+## What's Included
+
+The plugin installs these components:
+
+**In `~/.claude/`:**
+- `skills/` - 8 specialized skills for Claude
+- `commands/` - Slash commands like `/sdd-start`
+- `hooks/` - Automatic session detection
+- `src/claude_skills/` - Python CLI tools
+
+**In your PATH:**
+- `sdd` - SDD workflow commands
+- `doc` - Documentation commands
+- `test` - Testing commands
+
+## Tips for Success
+
+1. **Start with a spec** - Always create a spec before major work
+2. **Use /sdd-start often** - It keeps you on track
+3. **Review specs** - Use multi-model review for important features
+4. **Keep specs active** - Move completed specs to `completed/`
+5. **Document as you go** - Run `code-doc` periodically
+6. **Trust the process** - The workflow prevents forgotten requirements
+
+## Next Steps
+
+Ready to get started?
+
+1. ✅ Install the plugin (see above)
+2. ✅ Verify installation works
+3. 📝 Create your first spec: "Plan a feature for X"
+4. 🚀 Implement with `/sdd-start`
+5. 🎉 Track progress and stay organized
+
+**Questions?** Check [INSTALLATION.md](INSTALLATION.md) for detailed setup or [DEVELOPER.md](DEVELOPER.md) for customization.
 
 ---
 
-**Ready to get started?** See [INSTALLATION.md](INSTALLATION.md) for step-by-step setup instructions.
+**Version**: 2.0.0 | **License**: MIT | **Author**: Tyler Burleigh

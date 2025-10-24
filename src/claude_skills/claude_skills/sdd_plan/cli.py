@@ -7,14 +7,13 @@ import argparse
 import sys
 import json
 from pathlib import Path
-from claude_skills.common import PrettyPrinter
+from claude_skills.common import PrettyPrinter, find_specs_directory
 from claude_skills.sdd_plan import (
     list_templates,
     get_template_description,
     create_spec_interactive,
     analyze_codebase,
     get_project_context,
-    find_specs_directory,
 )
 
 
@@ -26,7 +25,7 @@ def cmd_create(args, printer):
     template = args.template or "medium"
 
     # Find specs directory
-    specs_dir = find_specs_directory()
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None))
     if not specs_dir:
         printer.warning("No specs/ directory found, creating specs/active/")
         specs_dir = Path("specs")

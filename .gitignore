@@ -42,3 +42,6 @@ settings.json
 .cache/
 .claude/
 *.cache/
+
+# SDD Toolkit
+.specs/

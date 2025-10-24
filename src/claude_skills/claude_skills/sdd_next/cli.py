@@ -273,7 +273,7 @@ def cmd_verify_tools(args, printer):
 def cmd_find_specs(args, printer):
     """Find specs directories."""
     printer.action("Searching for specs directory...")
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
 
     if not specs_dir:
         printer.error("No specs/active directory found")
@@ -298,7 +298,12 @@ def cmd_next_task(args, printer):
     if not args.json:
         printer.action("Finding next actionable task...")
 
-    specs_dir = find_specs_directory(args.path)
+    # Debug: print args
+    import sys
+    print(f"DEBUG: args.path = {getattr(args, 'path', 'NOT SET')}", file=sys.stderr)
+    print(f"DEBUG: args.specs_dir = {getattr(args, 'specs_dir', 'NOT SET')}", file=sys.stderr)
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -339,7 +344,7 @@ def cmd_task_info(args, printer):
     if not args.json:
         printer.action(f"Retrieving information for task {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -380,7 +385,7 @@ def cmd_check_deps(args, printer):
     if not args.json:
         printer.action(f"Checking dependencies for {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -427,7 +432,7 @@ def cmd_progress(args, printer):
     if not args.json:
         printer.action("Calculating progress...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -485,7 +490,7 @@ def cmd_prepare_task(args, printer):
     if not args.json:
         printer.action("Preparing task for implementation...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -529,7 +534,7 @@ def cmd_prepare_task(args, printer):
 
 def cmd_format_plan(args, printer):
     """Format execution plan for display."""
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -723,7 +728,7 @@ def cmd_find_circular_deps(args, printer):
     if not args.json:
         printer.action("Analyzing dependency graph...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1

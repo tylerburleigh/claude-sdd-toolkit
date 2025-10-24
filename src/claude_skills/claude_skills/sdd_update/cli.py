@@ -49,7 +49,7 @@ def cmd_execute_verify(args, printer):
     """Execute a verification task automatically (Priority 1 Integration)."""
     printer.action(f"Executing verification task {args.verify_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -156,7 +156,7 @@ def cmd_update_status(args, printer):
     """Update task status."""
     printer.action(f"Updating status for {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -179,7 +179,7 @@ def cmd_mark_blocked(args, printer):
     """Mark task as blocked."""
     printer.action(f"Marking task {args.task_id} as blocked...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -202,7 +202,7 @@ def cmd_unblock_task(args, printer):
     """Unblock a task."""
     printer.action(f"Unblocking task {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -223,7 +223,7 @@ def cmd_add_journal(args, printer):
     """Add journal entry."""
     printer.action("Adding journal entry...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -247,7 +247,7 @@ def cmd_add_revision(args, printer):
     """Add revision entry."""
     printer.action("Adding revision entry...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -293,7 +293,7 @@ def cmd_add_verification(args, printer):
     """Add verification result."""
     printer.action(f"Recording verification result for {args.verify_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -367,7 +367,7 @@ def cmd_complete_spec(args, printer):
     """Mark spec as completed and move to completed folder."""
     printer.action(f"Completing spec {args.spec_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -390,7 +390,7 @@ def cmd_track_time(args, printer):
     """Track time spent on task."""
     printer.action(f"Recording time for task {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -412,7 +412,7 @@ def cmd_time_report(args, printer):
     if not args.json:
         printer.action("Generating time report...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -436,7 +436,7 @@ def cmd_status_report(args, printer):
     if not args.json:
         printer.action(f"Generating status report for {args.spec_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -458,7 +458,7 @@ def cmd_audit_spec(args, printer):
     if not args.json:
         printer.action(f"Auditing JSON spec for {args.spec_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -480,7 +480,7 @@ def cmd_query_tasks(args, printer):
     if not args.json and args.format != "simple":
         printer.action("Querying tasks...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -513,7 +513,7 @@ def cmd_get_task(args, printer):
     if not args.json:
         printer.action(f"Retrieving task {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -536,7 +536,7 @@ def cmd_list_phases(args, printer):
     if not args.json:
         printer.action("Listing phases...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -558,7 +558,7 @@ def cmd_check_complete(args, printer):
     if not args.json:
         printer.action("Checking completion status...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -581,7 +581,7 @@ def cmd_phase_time(args, printer):
     if not args.json:
         printer.action(f"Calculating time for phase {args.phase_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -604,7 +604,7 @@ def cmd_list_blockers(args, printer):
     if not args.json:
         printer.action("Finding blocked tasks...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -625,7 +625,7 @@ def cmd_reconcile_state(args, printer):
     """Reconcile JSON spec to fix inconsistent task statuses."""
     printer.action(f"Reconciling state for {args.spec_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -645,7 +645,7 @@ def cmd_check_journaling(args, printer):
     if not args.json:
         printer.action(f"Checking for unjournaled tasks in {args.spec_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -683,7 +683,7 @@ def cmd_bulk_journal(args, printer):
     """Bulk journal completed tasks."""
     printer.action("Bulk journaling tasks...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -710,7 +710,7 @@ def cmd_complete_task(args, printer):
     """Complete task workflow (status, journaling, metadata sync)."""
     printer.action(f"Completing task {args.task_id}...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
@@ -744,7 +744,7 @@ def cmd_sync_metadata(args, printer):
     """Synchronize spec metadata with hierarchy data."""
     printer.action("Synchronizing metadata from hierarchy...")
 
-    specs_dir = find_specs_directory(args.path)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
