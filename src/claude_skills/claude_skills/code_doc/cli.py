@@ -4,9 +4,9 @@ Codebase Documentation Generator CLI
 Main command-line interface for generating comprehensive codebase documentation.
 
 Usage:
-    python code_doc_tools.py generate <project_directory> [options]
-    python code_doc_tools.py validate <json_file>
-    python code_doc_tools.py analyze <project_directory> [options]
+    sdd doc generate <project_directory> [options]
+    sdd doc validate <json_file>
+    sdd doc analyze <project_directory> [options]
 
 Subcommands:
     generate    Generate documentation (Markdown/JSON)
@@ -23,11 +23,11 @@ Options for generate:
     --verbose, -v        Verbose output
 
 Examples:
-    python code_doc_tools.py generate ./src
-    python code_doc_tools.py generate ./src --name MyProject --version 2.0.0
-    python code_doc_tools.py generate ./src --format json --output-dir ./docs
-    python code_doc_tools.py analyze ./src --verbose
-    python code_doc_tools.py validate ./docs/documentation.json
+    sdd doc generate ./src
+    sdd doc generate ./src --name MyProject --version 2.0.0
+    sdd doc generate ./src --format json --output-dir ./docs
+    sdd doc analyze ./src --verbose
+    sdd doc validate ./docs/documentation.json
 """
 
 from __future__ import annotations

@@ -51,41 +51,7 @@ echo "✅ SDD permissions configured! You can now use SDD skills in this project
 ```
 
 **If user chooses "No, skip for now"** OR **if permissions already configured**:
-- Proceed directly to Phase 0.5
-
----
-
-### Phase 0.5: Ensure Wrapper Scripts Installed
-
-**Check if SDD wrapper scripts are installed in ~/.claude/bin:**
-
-```bash
-skills-dev start-helper -- check-wrappers
-```
-
-**If wrappers not installed** (exit code 1 or `all_installed: false`):
-
-Present this message:
-```
-Setting up SDD command-line tools...
-```
-
-Then run:
-```bash
-skills-dev start-helper -- install-wrappers
-```
-
-This will:
-- Copy wrapper scripts from the SDD plugin to ~/.claude/bin
-- Make them executable
-- Enable short SDD commands via PATH
-
-Display the success message from the script output.
-
-**Then proceed to Phase 1**
-
-**If wrappers already installed** (exit code 0 or `all_installed: true`):
-- Silently proceed to Phase 1 (no message needed)
+- Proceed directly to Phase 1
 
 ---
 
@@ -240,10 +206,8 @@ Use AskUserQuestion to let them choose the spec, then invoke sdd-next with that 
 
 The `sdd_start_helper.py` script (accessed via `skills-dev start-helper --`) provides:
 - `check-permissions` - Check if SDD permissions are configured (returns JSON)
-- `check-wrappers` - Check if wrapper scripts are installed in ~/.claude/bin (returns JSON, exit code 0 if all installed)
-- `install-wrappers` - Install wrapper scripts from source to ~/.claude/bin (returns JSON with created/errors)
 - `format-output` - Returns human-readable formatted text with last-accessed task info (PREFERRED - use this for display)
-- `get-session-info` - Returns session state with last-accessed task as JSON (NEW - for programmatic access)
+- `get-session-info` - Returns session state with last-accessed task as JSON (for programmatic access)
 - `find-active-work` - Returns JSON with all resumable specs (for programmatic use)
 
 **Always use `format-output` for presenting information to the user** - it ensures proper newlines, indentation, and formatting. Use `get-session-info` when you need programmatic access to last-accessed task data.

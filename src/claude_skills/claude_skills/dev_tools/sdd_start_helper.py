@@ -7,16 +7,12 @@ Provides commands for /sdd-start slash command and session management:
 - format-output: Human-readable formatted text for active specs with last-accessed task
 - find-active-work: JSON with all resumable specs
 - get-session-info: Session state with last-accessed task (JSON)
-- check-wrappers: Check if wrapper scripts are installed in ~/.claude/bin
-- install-wrappers: Install wrapper scripts from this project to ~/.claude/bin
 """
 
 import argparse
 import json
 import os
 import sys
-import stat
-import shutil
 from pathlib import Path
 from datetime import datetime
 
@@ -26,17 +22,7 @@ from common.integrations import get_session_state
 
 # Configuration
 CLAUDE_HOME = Path.home() / ".claude"
-GLOBAL_BIN_DIR = CLAUDE_HOME / "bin"
-GLOBAL_SKILLS_DIR = CLAUDE_HOME / "skills"
 SETTINGS_FILE = CLAUDE_HOME / "settings.json"
-
-# Source locations (this project or installed location)
-SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent.parent  # Go up from .claude/scripts/ to project root
-SOURCE_BIN_DIR = SCRIPT_DIR.parent / "bin"  # .claude/bin in this project
-
-# Wrapper script names
-WRAPPER_NAMES = ["sdd-next", "sdd-update", "sdd-plan", "doc-query", "sdd-validate"]
 
 
 def check_permissions(project_root=None):
@@ -268,102 +254,6 @@ def get_session_info(project_root=None):
     return 0
 
 
-def check_wrappers():
-    """Check if wrapper scripts are installed in ~/.claude/bin."""
-    result = {
-        "bin_dir_exists": GLOBAL_BIN_DIR.exists(),
-        "wrappers_installed": {},
-        "missing_wrappers": [],
-        "path_configured": str(GLOBAL_BIN_DIR) in os.environ.get('PATH', ''),
-        "global_bin_dir": str(GLOBAL_BIN_DIR),
-    }
-
-    for name in WRAPPER_NAMES:
-        wrapper_path = GLOBAL_BIN_DIR / name
-        exists = wrapper_path.exists()
-        executable = wrapper_path.is_file() and os.access(wrapper_path, os.X_OK) if exists else False
-
-        result["wrappers_installed"][name] = {
-            "exists": exists,
-            "executable": executable,
-            "path": str(wrapper_path)
-        }
-
-        if not exists or not executable:
-            result["missing_wrappers"].append(name)
-
-    result["all_installed"] = len(result["missing_wrappers"]) == 0 and result["bin_dir_exists"]
-
-    print(json.dumps(result, indent=2))
-    return 0 if result["all_installed"] else 1
-
-
-def install_wrappers():
-    """Install wrapper scripts from source to ~/.claude/bin."""
-    # Ensure global bin directory exists
-    GLOBAL_BIN_DIR.mkdir(parents=True, exist_ok=True)
-
-    created = []
-    skipped = []
-    errors = []
-
-    # Check if source directory exists
-    if not SOURCE_BIN_DIR.exists():
-        error_msg = f"Source bin directory not found: {SOURCE_BIN_DIR}"
-        print(json.dumps({"success": False, "error": error_msg}, indent=2))
-        print(f"❌ {error_msg}", file=sys.stderr)
-        return 1
-
-    for name in WRAPPER_NAMES:
-        source_wrapper = SOURCE_BIN_DIR / name
-        dest_wrapper = GLOBAL_BIN_DIR / name
-
-        # Check if source wrapper exists
-        if not source_wrapper.exists():
-            errors.append(f"{name}: Source wrapper not found at {source_wrapper}")
-            continue
-
-        try:
-            # Copy wrapper script
-            shutil.copy2(source_wrapper, dest_wrapper)
-
-            # Ensure it's executable
-            st = os.stat(dest_wrapper)
-            os.chmod(dest_wrapper, st.st_mode | stat.S_IEXEC | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-            created.append(name)
-        except Exception as e:
-            errors.append(f"{name}: {str(e)}")
-
-    result = {
-        "bin_dir": str(GLOBAL_BIN_DIR),
-        "source_dir": str(SOURCE_BIN_DIR),
-        "created": created,
-        "skipped": skipped,
-        "errors": errors,
-        "success": len(errors) == 0
-    }
-
-    print(json.dumps(result, indent=2))
-
-    # Also print human-readable summary to stderr
-    if created:
-        print(f"\n✅ Installed {len(created)} wrapper script(s) to {GLOBAL_BIN_DIR}", file=sys.stderr)
-        for name in created:
-            print(f"   - {name}", file=sys.stderr)
-
-    if errors:
-        print(f"\n❌ Encountered {len(errors)} error(s):", file=sys.stderr)
-        for error in errors:
-            print(f"   - {error}", file=sys.stderr)
-
-    if result["success"]:
-        # Check if PATH is configured
-        if str(GLOBAL_BIN_DIR) not in os.environ.get('PATH', ''):
-            print(f"\n💡 Add to PATH: export PATH=\"{GLOBAL_BIN_DIR}:$PATH\"", file=sys.stderr)
-            print(f"   (This will be done automatically by session-start hook)", file=sys.stderr)
-
-    return 0 if result["success"] else 1
 
 
 def main():
@@ -386,12 +276,6 @@ def main():
     session_info = subparsers.add_parser('get-session-info', help='Get session state with last-accessed task (JSON)')
     session_info.add_argument('project_root', nargs='?', help='Project root directory')
 
-    # check-wrappers command
-    subparsers.add_parser('check-wrappers', help='Check if wrapper scripts are installed in ~/.claude/bin')
-
-    # install-wrappers command
-    subparsers.add_parser('install-wrappers', help='Install wrapper scripts from source to ~/.claude/bin')
-
     args = parser.parse_args()
 
     if args.command == 'check-permissions':
@@ -402,10 +286,6 @@ def main():
         return format_output(args.project_root)
     elif args.command == 'get-session-info':
         return get_session_info(args.project_root)
-    elif args.command == 'check-wrappers':
-        return check_wrappers()
-    elif args.command == 'install-wrappers':
-        return install_wrappers()
     else:
         parser.print_help()
         return 1
