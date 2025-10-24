@@ -61,7 +61,7 @@ sdd doc analyze-with-ai <directory> --name ProjectName --version X.Y.Z --verbose
 
 **Requirements:**
 - At least one AI CLI tool installed: cursor-agent (with gpt-4.1), gemini, or codex
-- Uses multi-agent consultation by default for comprehensive analysis
+- Uses 2-model consultation by default for comprehensive analysis (falls back to single-model if only 1 tool available)
 
 **After generation, you can query the documentation:**
 ```bash
@@ -382,7 +382,9 @@ sdd doc analyze-with-ai <directory> [options]
 - **codex** - Good for code understanding
 
 **Multi-Agent Mode (Default):**
-- Consults multiple AI models in parallel
+- Consults 2 AI models in parallel for comprehensive analysis
+- Uses priority order: cursor-agent → gemini → codex
+- Automatically selects best 2 available models (or falls back to 1 if only 1 tool installed)
 - Synthesizes responses for comprehensive coverage
 - Recommended for production documentation
 
@@ -752,7 +754,9 @@ codex --version
 ### Multi-Agent vs Single-Agent
 
 **Multi-Agent (Default - Recommended)**
-- Consults 2+ AI models in parallel
+- Consults exactly 2 AI models in parallel
+- Uses priority order to select best 2: cursor-agent → gemini → codex
+- Automatically adapts: if predefined pair unavailable, selects ANY 2 available tools
 - Synthesizes responses for comprehensive coverage
 - Best for production documentation
 - Slower but more thorough
@@ -760,7 +764,11 @@ codex --version
 **Single-Agent (--single-agent flag)**
 - Uses one AI model
 - Faster
-- Good for quick iterations or when only one tool is available
+- Good for quick iterations
+
+**Automatic Fallback:**
+- If only 1 AI tool is installed system-wide → automatically uses single-agent mode
+- If 2+ AI tools are installed → always uses 2 models in parallel (unless --single-agent flag is set)
 
 ## Critical Rules
 

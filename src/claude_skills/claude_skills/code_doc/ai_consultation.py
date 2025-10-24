@@ -398,7 +398,6 @@ def run_consultation(
         print(f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>")
         return True, "Dry run - no output"
 
-    # Always show what we're asking the AI (even in non-verbose mode)
     # Determine what type of research from prompt
     if "Architecture" in prompt:
         task_type = "architecture analysis"
@@ -410,8 +409,9 @@ def run_consultation(
         task_type = "analysis"
         task_areas = "code structure and patterns"
 
-    print(f"   Asking external AI ({tool}) to analyze: {task_areas}")
-
+    # Print status message before running (this may take a while)
+    print(f"\n🤖 Consulting {tool} for {task_type}...")
+    print(f"   Analyzing: {task_areas}")
     if verbose:
         print("=" * 60)
 
@@ -464,18 +464,23 @@ def consult_multi_agent(
 
     tools_to_use = MULTI_AGENT_PAIRS[pair]
     available_tools = get_available_tools()
-    available_from_pair = [t for t in tools_to_use if t in available_tools]
+    available_from_pair = [t for t in tools_to_use if t in available_tools][:2]  # Cap at 2 models
 
+    # If predefined pair doesn't have 2 tools, find ANY 2 available tools
     if len(available_from_pair) < 2:
-        # Fallback to single tool
-        if available_from_pair:
-            success, output = run_consultation(available_from_pair[0], prompt, dry_run, verbose)
+        if len(available_tools) >= 2:
+            # Use priority order to pick best 2 available tools
+            priority_order = ["cursor-agent", "gemini", "codex"]
+            available_from_pair = [t for t in priority_order if t in available_tools][:2]
+        elif len(available_tools) == 1:
+            # Fallback to single tool
+            success, output = run_consultation(available_tools[0], prompt, dry_run, verbose)
             return {
                 "success": success,
-                "primary_tool": available_from_pair[0],
+                "primary_tool": available_tools[0],
                 "output": output,
                 "responses": [{
-                    "tool": available_from_pair[0],
+                    "tool": available_tools[0],
                     "success": success,
                     "output": output
                 }]
@@ -500,11 +505,10 @@ def consult_multi_agent(
     else:
         task_areas = "Project Overview, Domain Concepts, Critical Files, Common Workflows, Potential Gotchas, Extension Patterns"
 
-    # Always show what we're asking the AI to do
-    print(f"   Asking {len(available_from_pair)} external AI model(s) to analyze:")
-    print(f"   - {task_areas}")
-    print(f"   Using: {', '.join(available_from_pair)}")
-
+    # Print status message before running (this may take a while)
+    print(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
+    print(f"   Tools: {', '.join(available_from_pair)}")
+    print(f"   Analyzing: {task_areas}")
     if verbose:
         print("=" * 60)
 

@@ -41,6 +41,11 @@ SDD_PERMISSIONS = [
     "Bash(setup-project-permissions:*)",
     "Bash(claude-skills-gendocs:*)",
 
+    # AI CLI tool permissions
+    "Bash(cursor-agent:*)",
+    "Bash(gemini:*)",
+    "Bash(codex:*)",
+
     # File access permissions
     "Read(//Users/tylerburleigh/.claude/skills/**)",
     "Read(//**/specs/**)",
