@@ -10,7 +10,12 @@ import argparse
 import sys
 import json
 from pathlib import Path
-from claude_skills.common import PrettyPrinter, load_json_spec
+from claude_skills.common import (
+    PrettyPrinter,
+    load_json_spec,
+    find_specs_directory,
+    ensure_reviews_directory
+)
 from claude_skills.sdd_plan_review import (
     check_tool_available,
     detect_available_tools,
@@ -128,29 +133,40 @@ def cmd_review(args, printer):
     )
     print(markdown_report)
 
-    # Save output if requested
+    # Determine output path
     if args.output:
         output_path = Path(args.output)
-        try:
-            # Determine output format based on extension
-            if output_path.suffix == '.json':
-                # JSON report
-                json_report = generate_json_report(
-                    consensus,
-                    spec_id,
-                    spec_title,
-                    args.type
-                )
-                with open(output_path, 'w') as f:
-                    json.dump(json_report, f, indent=2)
-            else:
-                # Markdown report (default)
-                with open(output_path, 'w') as f:
-                    f.write(markdown_report)
+    else:
+        # Find specs directory and use .reviews/ for default output
+        specs_dir = find_specs_directory(str(spec_file))
+        if specs_dir:
+            reviews_dir = ensure_reviews_directory(specs_dir)
+            output_path = reviews_dir / f"{spec_file.stem}-review.md"
+        else:
+            # Fallback to spec file's parent directory
+            output_path = spec_file.parent / f"{spec_file.stem}-review.md"
 
-            printer.success(f"\nReport saved to: {output_path}")
-        except Exception as e:
-            printer.error(f"Failed to save output: {str(e)}")
+    # Save output
+    try:
+        # Determine output format based on extension
+        if output_path.suffix == '.json':
+            # JSON report
+            json_report = generate_json_report(
+                consensus,
+                spec_id,
+                spec_title,
+                args.type
+            )
+            with open(output_path, 'w') as f:
+                json.dump(json_report, f, indent=2)
+        else:
+            # Markdown report (default)
+            with open(output_path, 'w') as f:
+                f.write(markdown_report)
+
+        printer.success(f"\nReport saved to: {output_path}")
+    except Exception as e:
+        printer.error(f"Failed to save output: {str(e)}")
 
     return 0
 

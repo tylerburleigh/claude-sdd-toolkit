@@ -7,7 +7,7 @@ import argparse
 import sys
 import json
 from pathlib import Path
-from claude_skills.common import PrettyPrinter, find_specs_directory
+from claude_skills.common import PrettyPrinter, find_specs_directory, ensure_reports_directory
 from claude_skills.sdd_plan import (
     list_templates,
     get_template_description,
@@ -29,6 +29,9 @@ def cmd_create(args, printer):
     if not specs_dir:
         printer.warning("No specs/ directory found, creating specs/active/")
         specs_dir = Path("specs")
+
+    # Ensure .reports/ directory exists (defensive)
+    ensure_reports_directory(specs_dir)
 
     # Create spec (in active subfolder)
     success, message, spec = create_spec_interactive(

@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
 
-from .paths import find_spec_file
+from .paths import find_spec_file, ensure_backups_directory
 
 
 def extract_frontmatter(spec_file: Union[str, Path]) -> Dict[str, Any]:
@@ -246,7 +246,7 @@ def save_json_spec(
 
 def backup_json_spec(spec_id: str, specs_dir: Path, suffix: str = ".backup") -> Optional[Path]:
     """
-    Create a backup copy of the JSON spec file.
+    Create a backup copy of the JSON spec file in the .backups/ directory.
 
     Args:
         spec_id: Specification ID
@@ -261,7 +261,11 @@ def backup_json_spec(spec_id: str, specs_dir: Path, suffix: str = ".backup") -> 
     if not spec_file:
         return None
 
-    backup_file = spec_file.with_suffix(spec_file.suffix + suffix)
+    # Ensure .backups/ directory exists (creates directory and README if needed)
+    backups_dir = ensure_backups_directory(specs_dir)
+
+    # Create backup in .backups/ directory with spec_id as filename
+    backup_file = backups_dir / f"{spec_id}{suffix}"
 
     try:
         shutil.copy2(spec_file, backup_file)
@@ -335,6 +339,9 @@ def update_node(spec_data: Dict, node_id: str, updates: Dict) -> bool:
     """
     Update a node in the state hierarchy.
 
+    Special handling for metadata: existing metadata fields are preserved
+    and merged with new metadata fields, rather than being replaced entirely.
+
     Args:
         spec_data: JSON spec file data
         node_id: Node identifier
@@ -348,5 +355,18 @@ def update_node(spec_data: Dict, node_id: str, updates: Dict) -> bool:
     if node_id not in hierarchy:
         return False
 
-    hierarchy[node_id].update(updates)
+    node = hierarchy[node_id]
+
+    # Special handling for metadata: merge instead of replace
+    if "metadata" in updates:
+        existing_metadata = node.get("metadata", {})
+        new_metadata = updates["metadata"]
+
+        # Create a shallow copy of updates to avoid modifying the input
+        updates = updates.copy()
+
+        # Merge existing metadata with new metadata
+        updates["metadata"] = {**existing_metadata, **new_metadata}
+
+    node.update(updates)
     return True

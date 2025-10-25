@@ -2,7 +2,7 @@
   "spec_id": "specs-reorganization-2025-10-24-001",
   "title": "Specs Directory Reorganization",
   "generated": "2025-10-24T17:35:00Z",
-  "last_updated": "2025-10-25T13:35:49.579787+00:00",
+  "last_updated": "2025-10-25T13:35:33.455854+00:00",
   "metadata": {
     "status": "draft",
     "complexity": "low",
@@ -156,9 +156,8 @@
         "changes": "mkdir -p specs/.backups && add README.md explaining purpose",
         "parallel_safe": false,
         "completed_at": "2025-10-25T13:35:33.455682+00:00",
-        "needs_journaling": false,
-        "status_note": "Implemented as automated feature following .reports/.reviews pattern",
-        "journaled_at": "2025-10-25T13:35:49.579722+00:00"
+        "needs_journaling": true,
+        "status_note": "Implemented as automated feature following .reports/.reviews pattern"
       }
     },
     "phase-1-verify": {
@@ -908,15 +907,6 @@
       "author": "claude-code",
       "content": "Implemented automated generation of specs/.reviews/ directory following the same pattern as .reports/. Created template file at common/templates/reviews_readme.md with comprehensive documentation. Added generate_reviews_readme_content() and ensure_reviews_directory() functions to common/paths.py. Exported functions in common/__init__.py. Integrated with sdd_plan_review/cli.py to automatically save review outputs to .reviews/ directory (defaults to .reviews/, can override with --output). Template is already included in pyproject.toml package data pattern. Tested successfully - directory and README auto-generate on first use.",
       "metadata": {}
-    },
-    {
-      "timestamp": "2025-10-25T13:35:49.579702+00:00",
-      "entry_type": "decision",
-      "title": "Automated .backups/ Directory Implementation",
-      "author": "claude-code",
-      "content": "Implemented .backups/ directory creation as an automated feature following the established pattern used for .reports/ and .reviews/ directories.\n\nImplementation Details:\n- Created template file: common/templates/backups_readme.md (comprehensive README explaining purpose, usage, and best practices)\n- Added helper functions to common/paths.py:\n  * generate_backups_readme_content() - reads template and returns content\n  * ensure_backups_directory(specs_dir) - creates directory and README automatically\n- Exported new functions from common/__init__.py for public API\n- Modified backup_json_spec() in common/spec.py to:\n  * Call ensure_backups_directory() before creating backups\n  * Store backups in specs/.backups/ instead of next to spec files\n  * Changed backup path from 'specs/active/spec.json.backup' to 'specs/.backups/spec-id.backup'\n\nBenefits:\n- Consistent with existing .reports/ and .reviews/ automation patterns\n- No manual intervention needed - directory created automatically when backups are needed\n- README documentation included automatically\n- Cleaner directory structure - backups don't clutter specs/active/\n- Works defensively from any entry point that creates backups\n\nTesting:\n- All Python files compile without errors\n- Backup function successfully creates .backups/ directory\n- README.md automatically generated from template\n- Backup files created in correct location\n\nThis approach is superior to manual directory creation as it ensures consistency, reduces maintenance burden, and follows established toolkit conventions.",
-      "metadata": {},
-      "task_id": "task-1-3"
     }
   ]
 }

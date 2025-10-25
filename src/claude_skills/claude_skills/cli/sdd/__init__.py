@@ -14,70 +14,85 @@ from claude_skills.cli.sdd.registry import register_all_subcommands
 
 def reorder_args_for_subcommand(cmd_line):
     """
-    Reorder command line arguments to support global options before subcommand.
-    
-    Argparse doesn't natively support global options before subcommand names.
-    This function reorders arguments to put global options after the subcommand.
-    
+    Reorder command line arguments to support global options anywhere.
+
+    Uses argparse.parse_known_args() to robustly extract global options,
+    then reorders to place them after the subcommand.
+
     Args:
         cmd_line: List of command line arguments
-        
+
     Returns:
         Reordered list of arguments
     """
-    # Define global options that take values
-    global_opts_with_values = {'--path', '--specs-dir', '--docs-path'}
-    
-    # Find the subcommand position (first non-option argument that's not a value)
-    subcommand_pos = None
+    if not cmd_line:
+        return cmd_line
+
+    # Create a temporary parser with only global options
+    temp_parser = argparse.ArgumentParser(add_help=False)
+    add_global_options(temp_parser)
+
+    # Parse known global options, leaving everything else in remaining_args
+    try:
+        known_args, remaining_args = temp_parser.parse_known_args(cmd_line)
+    except SystemExit:
+        # If parsing fails (e.g., -h/--help), return as-is and let main parser handle it
+        return cmd_line
+
+    # Find the subcommand (first non-option argument in remaining_args)
+    # Skip unknown options and their potential values
+    subcommand = None
+    subcommand_idx = None
     i = 0
-    while i < len(cmd_line):
-        arg = cmd_line[i]
+    while i < len(remaining_args):
+        arg = remaining_args[i]
         if arg.startswith('-'):
-            # This is an option
-            if arg in global_opts_with_values and i + 1 < len(cmd_line):
-                # Skip the option and its value
-                i += 2
+            # Unknown option - skip it and potentially its value
+            # Peek ahead: if next arg doesn't start with -, it's likely the option's value
+            if i + 1 < len(remaining_args) and not remaining_args[i + 1].startswith('-'):
+                i += 2  # Skip option and its value
             else:
-                # Boolean option, skip it
-                i += 1
+                i += 1  # Skip just the option
         else:
-            # This is a non-option argument - it's the subcommand
-            subcommand_pos = i
+            # Found potential subcommand
+            subcommand = arg
+            subcommand_idx = i
             break
-    
-    # If no subcommand found or it's already first, return as-is
-    if subcommand_pos is None or subcommand_pos == 0:
+
+    # If no subcommand found, return as-is
+    if subcommand is None:
         return cmd_line
-    
-    # Extract global options and their values
+
+    # Extract unknown options before subcommand and args after
+    before_subcommand = remaining_args[:subcommand_idx]
+    after_subcommand = remaining_args[subcommand_idx + 1:]
+
+    # Reconstruct global options as list of arguments (only non-default values)
     global_opts = []
-    i = 0
-    while i < subcommand_pos:
-        arg = cmd_line[i]
-        if arg.startswith('-'):
-            global_opts.append(arg)
-            # If it's an option with a value, add the next arg too
-            if arg in global_opts_with_values and i + 1 < subcommand_pos:
-                global_opts.append(cmd_line[i + 1])
-                i += 2
-            else:
-                i += 1
+    defaults = {'path': '.', 'quiet': False, 'json': False, 'debug': False, 'verbose': False, 'no_color': False}
+
+    for opt, value in vars(known_args).items():
+        # Skip None and default values to avoid cluttering the command line
+        if value is None or value == defaults.get(opt):
+            continue
+        if value is True:
+            # Boolean flag
+            opt_name = f"--{opt.replace('_', '-')}"
+            global_opts.append(opt_name)
         else:
-            i += 1
-    
-    # If no global options before subcommand, return as-is
-    if not global_opts:
-        return cmd_line
-    
-    # Reorder: subcommand first, then global options, then remaining args
-    subcommand = cmd_line[subcommand_pos]
-    remaining = cmd_line[subcommand_pos + 1:]
-    
-    # Remove global options from remaining (they're already in global_opts)
-    remaining = [arg for arg in remaining if arg not in global_opts]
-    
-    return [subcommand] + global_opts + remaining
+            # Option with value
+            opt_name = f"--{opt.replace('_', '-')}"
+            global_opts.append(opt_name)
+            global_opts.append(str(value))
+
+    # Reconstruct: subcommand, global options, unknown options, then remaining args
+    return [subcommand] + global_opts + before_subcommand + after_subcommand
+
+
+# Common command mistakes and their corrections
+COMMAND_SUGGESTIONS = {
+    'update': 'update-status',
+}
 
 
 @track_metrics('sdd')
@@ -85,12 +100,15 @@ def main():
     """Main entry point for unified SDD CLI."""
     # Reorder arguments to support global options before subcommand
     cmd_line = reorder_args_for_subcommand(sys.argv[1:])
-    
+
     parser = argparse.ArgumentParser(
         prog='sdd',
         description='Spec-Driven Development unified CLI',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
+
+    # Add global options to main parser so they work in any position
+    add_global_options(parser)
 
     # Create parent parser with global options for inheritance by subcommands
     global_parent = create_global_parent_parser()
@@ -107,7 +125,26 @@ def main():
     register_all_subcommands(subparsers, global_parent)
 
     # Parse args with reordered command line
-    args = parser.parse_args(cmd_line)
+    try:
+        args = parser.parse_args(cmd_line)
+    except SystemExit as e:
+        # Check if it's an invalid command error and provide helpful suggestion
+        if e.code != 0 and len(cmd_line) > 0:
+            attempted_cmd = cmd_line[0]
+            if attempted_cmd in COMMAND_SUGGESTIONS:
+                suggestion = COMMAND_SUGGESTIONS[attempted_cmd]
+
+                # For 'update', check second word for context-aware suggestion
+                if attempted_cmd == 'update' and len(cmd_line) > 1:
+                    second_word = cmd_line[1].lower()
+                    if second_word in ['frontmatter', 'metadata']:
+                        suggestion = 'update-frontmatter'
+                    # else: keep default 'update-status' for task/status/etc
+
+                print(f"\n❌ Unknown command: '{attempted_cmd}'", file=sys.stderr)
+                print(f"💡 Did you mean: sdd {suggestion}?", file=sys.stderr)
+                print(f"\nRun 'sdd --help' to see all available commands.\n", file=sys.stderr)
+        raise
 
     # Initialize printer based on parsed global flags
     # When JSON output is requested, suppress all printer output (quiet mode)

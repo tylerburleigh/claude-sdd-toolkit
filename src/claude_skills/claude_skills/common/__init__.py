@@ -21,7 +21,13 @@ from .paths import (
     normalize_path,
     batch_check_paths_exist,
     find_files_by_pattern,
-    ensure_directory
+    ensure_directory,
+    ensure_reports_directory,
+    generate_reports_readme_content,
+    ensure_reviews_directory,
+    generate_reviews_readme_content,
+    ensure_backups_directory,
+    generate_backups_readme_content
 )
 from .printer import PrettyPrinter
 from .validation import (
@@ -122,6 +128,12 @@ __all__ = [
     "batch_check_paths_exist",
     "find_files_by_pattern",
     "ensure_directory",
+    "ensure_reports_directory",
+    "generate_reports_readme_content",
+    "ensure_reviews_directory",
+    "generate_reviews_readme_content",
+    "ensure_backups_directory",
+    "generate_backups_readme_content",
 
     # Output formatting
     "PrettyPrinter",

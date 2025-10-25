@@ -14,7 +14,6 @@ from pathlib import Path
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
-    # Skills
     "Skill(sdd-toolkit:run-tests)",
     "Skill(sdd-toolkit:sdd-plan)",
     "Skill(sdd-toolkit:sdd-next)",
@@ -22,36 +21,17 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:code-doc)",
-    "Skill(sdd-toolkit:doc-query)",
-
-    # Slash commands
-    "SlashCommand(/sdd-start)",
-
-    # CLI command permissions (via Python package)
-    "Bash(sdd-next:*)",
-    "Bash(sdd-update:*)",
-    "Bash(sdd-plan:*)",
-    "Bash(doc-query:*)",
-    "Bash(sdd-validate:*)",
-    "Bash(run-tests:*)",
-    "Bash(code-doc:*)",
-    "Bash(sdd-review:*)",
-    "Bash(sdd-integration:*)",
-    "Bash(sdd-start-helper:*)",
-    "Bash(setup-project-permissions:*)",
-
-    # AI CLI tool permissions
+    "Skill(sdd-toolkit:doc-query)",  
+    "SlashCommand(/sdd-start)",  
+    "Bash(sdd:*)",
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
-    "Bash(codex:*)",
-
-    # File access permissions
-    "Read(//Users/tylerburleigh/.claude/skills/**)",
+    "Bash(codex:*)",  
     "Read(//**/specs/**)",
     "Write(//**/specs/active/**)",
     "Write(//**/specs/completed/**)",
     "Write(//**/specs/archived/**)",
-    "Edit(//**/specs/active/**)",
+    "Edit(//**/specs/active/**)"
 ]
 
 
