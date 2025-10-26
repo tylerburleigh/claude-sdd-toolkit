@@ -500,3 +500,67 @@ def ensure_backups_directory(specs_dir: Path) -> Path:
             print(f"Warning: Could not create README.md in .backups: {e}", file=sys.stderr)
 
     return backups_dir
+
+
+def generate_human_readable_readme_content() -> str:
+    """
+    Generate README content for the specs/.human-readable/ directory.
+
+    Reads from the template file in common/templates/human_readable_readme.md.
+
+    Returns:
+        Markdown content for README.md explaining the human-readable directory
+    """
+    # Get the path to the template file
+    template_path = Path(__file__).parent / "templates" / "human_readable_readme.md"
+
+    try:
+        return template_path.read_text()
+    except FileNotFoundError:
+        # Fallback to a minimal README if template is missing
+        print(f"Warning: Template file not found: {template_path}", file=sys.stderr)
+        return "# Human-Readable Spec Documentation\n\nThis directory stores human-readable markdown documentation generated from JSON spec files by the SDD toolkit.\n"
+
+
+def ensure_human_readable_directory(specs_dir: Path) -> Path:
+    """
+    Ensure the .human-readable/ directory exists within the specs directory.
+
+    Creates specs/.human-readable/ and its README.md if they don't exist.
+    This is called defensively from multiple entry points to ensure
+    the directory structure is always available.
+
+    Args:
+        specs_dir: Path to the specs directory (containing active/completed/archived)
+
+    Returns:
+        Path to the .human-readable directory
+
+    Example:
+        >>> specs_dir = Path("/project/specs")
+        >>> hr_dir = ensure_human_readable_directory(specs_dir)
+        >>> print(hr_dir)  # /project/specs/.human-readable
+    """
+    hr_dir = specs_dir / ".human-readable"
+
+    # Create directory if it doesn't exist
+    if not hr_dir.exists():
+        try:
+            hr_dir.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            # Log warning but don't fail - rendering can still proceed
+            print(f"Warning: Could not create .human-readable directory: {e}", file=sys.stderr)
+            return hr_dir
+
+    # Create README if it doesn't exist
+    readme_path = hr_dir / "README.md"
+    if not readme_path.exists():
+        try:
+            readme_content = generate_human_readable_readme_content()
+            readme_path.write_text(readme_content)
+        except (OSError, PermissionError) as e:
+            # Log warning but don't fail
+            print(f"Warning: Could not create README.md in .human-readable: {e}", file=sys.stderr)
+
+    return hr_dir
+
