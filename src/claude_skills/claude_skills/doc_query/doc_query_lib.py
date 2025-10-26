@@ -1464,6 +1464,250 @@ def check_docs_exist(docs_path: Optional[str] = None) -> bool:
     return docs_path.exists()
 
 
+def check_documentation_staleness(
+    docs_path: Optional[str] = None,
+    source_dir: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Check if documentation is stale by comparing generation time with source file modifications.
+
+    Args:
+        docs_path: Path to docs directory or documentation.json
+        source_dir: Path to source directory to check. If None, uses parent of docs directory.
+
+    Returns:
+        Dictionary with staleness information:
+        {
+            'is_stale': bool,
+            'docs_generated_at': str (ISO timestamp),
+            'latest_source_modification': str (ISO timestamp),
+            'message': str (human-readable message),
+            'docs_age_seconds': int,
+            'newest_file': str (path to newest source file),
+            'checked_files_count': int
+        }
+    """
+    from datetime import datetime, timezone, timedelta
+    import os
+    import time
+
+    # Resolve docs path
+    if docs_path is None:
+        docs_path = Path.cwd() / "docs"
+    else:
+        docs_path = Path(docs_path)
+
+    if docs_path.is_dir():
+        docs_path = docs_path / "documentation.json"
+
+    # Check if docs exist
+    if not docs_path.exists():
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': 'Documentation does not exist',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Documentation not found'
+        }
+
+    # Load docs to get generation time
+    try:
+        with open(docs_path, 'r') as f:
+            docs_data = json.load(f)
+    except Exception as e:
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': f'Error loading documentation: {e}',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    # Get generation timestamp
+    generated_at_str = docs_data.get('metadata', {}).get('generated_at')
+    if not generated_at_str:
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': 'Documentation metadata missing generation timestamp',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Missing timestamp'
+        }
+
+    # Parse generation timestamp
+    try:
+        generated_at = datetime.fromisoformat(generated_at_str.replace('Z', '+00:00'))
+    except Exception as e:
+        return {
+            'is_stale': True,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Invalid timestamp format: {e}',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    # Determine source directory to scan
+    if source_dir is None:
+        # Default: scan parent directory of docs
+        source_dir = docs_path.parent.parent
+    else:
+        source_dir = Path(source_dir)
+
+    if not source_dir.exists():
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Source directory not found: {source_dir}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Source directory not found'
+        }
+
+    # Scan source directory for Python files
+    latest_mtime = 0
+    newest_file = None
+    checked_count = 0
+
+    # File extensions to check based on documentation languages
+    languages = docs_data.get('metadata', {}).get('languages', ['python'])
+    extensions = set()
+    for lang in languages:
+        if lang == 'python':
+            extensions.add('.py')
+        elif lang == 'javascript' or lang == 'typescript':
+            extensions.update(['.js', '.jsx', '.ts', '.tsx'])
+        elif lang == 'go':
+            extensions.add('.go')
+        elif lang == 'html':
+            extensions.add('.html')
+        elif lang == 'css':
+            extensions.add('.css')
+
+    # If no extensions found, default to Python
+    if not extensions:
+        extensions.add('.py')
+
+    # Scan recursively
+    try:
+        for root, dirs, files in os.walk(source_dir):
+            # Skip common non-source directories
+            dirs[:] = [d for d in dirs if d not in {
+                '__pycache__', '.git', 'node_modules', 'venv', '.venv',
+                'build', 'dist', '.pytest_cache', '.mypy_cache', 'docs'
+            }]
+
+            for file in files:
+                if any(file.endswith(ext) for ext in extensions):
+                    file_path = Path(root) / file
+                    try:
+                        mtime = file_path.stat().st_mtime
+                        checked_count += 1
+                        if mtime > latest_mtime:
+                            latest_mtime = mtime
+                            newest_file = str(file_path)
+                    except Exception:
+                        # Skip files we can't stat
+                        continue
+    except Exception as e:
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Error scanning source directory: {e}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    if checked_count == 0:
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'No source files found in {source_dir}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0
+        }
+
+    # Compare timestamps
+    latest_source_dt = datetime.fromtimestamp(latest_mtime, tz=timezone.utc)
+
+    # Make generated_at timezone-aware if needed
+    # Naive timestamps from datetime.now() are in local time, not UTC
+    if generated_at.tzinfo is None:
+        # Assume it's local time and convert to UTC
+        local_offset = time.timezone if time.daylight == 0 else time.altzone
+        generated_at = generated_at.replace(tzinfo=timezone(timedelta(seconds=-local_offset)))
+        # Convert to UTC for comparison
+        generated_at = generated_at.astimezone(timezone.utc)
+
+    is_stale = latest_source_dt > generated_at
+
+    # Calculate age
+    now = datetime.now(timezone.utc)
+    docs_age = now - generated_at
+    docs_age_seconds = int(docs_age.total_seconds())
+
+    # Format message
+    if is_stale:
+        time_diff = latest_source_dt - generated_at
+        if time_diff.days > 0:
+            time_str = f"{time_diff.days} day{'s' if time_diff.days > 1 else ''}"
+        elif time_diff.seconds >= 3600:
+            hours = time_diff.seconds // 3600
+            time_str = f"{hours} hour{'s' if hours > 1 else ''}"
+        elif time_diff.seconds >= 60:
+            minutes = time_diff.seconds // 60
+            time_str = f"{minutes} minute{'s' if minutes > 1 else ''}"
+        else:
+            time_str = f"{time_diff.seconds} second{'s' if time_diff.seconds > 1 else ''}"
+
+        message = f"Documentation is stale (generated {_format_age(docs_age_seconds)} ago, source modified {time_str} after generation)"
+    else:
+        message = f"Documentation is fresh (generated {_format_age(docs_age_seconds)} ago)"
+
+    return {
+        'is_stale': is_stale,
+        'docs_generated_at': generated_at_str,
+        'latest_source_modification': latest_source_dt.isoformat(),
+        'message': message,
+        'docs_age_seconds': docs_age_seconds,
+        'newest_file': newest_file,
+        'checked_files_count': checked_count
+    }
+
+
+def _format_age(seconds: int) -> str:
+    """Format age in seconds as human-readable string."""
+    if seconds < 60:
+        return f"{seconds} second{'s' if seconds != 1 else ''}"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''}"
+    elif seconds < 86400:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''}"
+    else:
+        days = seconds // 86400
+        return f"{days} day{'s' if days != 1 else ''}"
+
+
 def load_documentation(docs_path: Optional[str] = None) -> DocumentationQuery:
     """
     Convenience function to load documentation.

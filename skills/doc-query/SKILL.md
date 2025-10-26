@@ -66,7 +66,8 @@ These commands combine 6-8 manual steps into single operations with intelligent 
 1. Documentation hasn't been generated yet (run `Skill(sdd-toolkit:code-doc)` skill first)
 2. You need to read actual source code (use `Explore` or `Read` tool instead)
 3. You need to analyze runtime behavior (use debugging tools)
-4. Documentation is stale (regenerate with `Skill(sdd-toolkit:code-doc)` first)
+
+**Note**: Documentation staleness is automatically detected and you'll be warned if docs are out of date. Use `--refresh` to auto-regenerate or `--no-staleness-check` to skip the check.
 
 ---
 
@@ -193,6 +194,95 @@ sdd doc stats --docs-path /path/to/project/docs
 ```bash
 sdd doc stats
 # Output includes: "Found documentation at: /path/to/docs"
+```
+
+---
+
+## Documentation Staleness Detection
+
+**NEW**: `doc-query` now automatically detects when documentation is out of date!
+
+### How It Works
+
+Every query command automatically checks if source files have been modified since documentation was generated:
+
+1. **Compares timestamps**: Documentation generation time vs. latest source file modification
+2. **Warns you if stale**: Shows friendly warning with recommended actions
+3. **Continues anyway**: Queries still execute - you decide if refresh is needed
+4. **Performance**: Staleness check adds ~10-50ms (negligible overhead)
+
+### Default Behavior
+
+```bash
+$ sdd doc find-function calculate_score
+
+⚠️  Documentation is stale (generated 3 days ago, source modified 2 hours after generation)
+    To refresh: run 'sdd doc generate' or use --refresh flag
+    To suppress this warning: use --no-staleness-check
+
+Found 1 result(s):
+...
+```
+
+### Flags to Control Behavior
+
+#### `--refresh`: Auto-regenerate if Stale
+
+Automatically regenerates documentation before querying if it's out of date:
+
+```bash
+$ sdd doc find-function calculate_score --refresh
+
+🔄 Documentation is stale, regenerating...
+✅ Documentation regenerated successfully
+
+Found 1 result(s):
+...
+```
+
+**When to use:**
+- You want guaranteed fresh results
+- You're okay with potential 30-60s delay
+- Before important queries (refactoring decisions, impact analysis)
+
+#### `--no-staleness-check`: Skip Check Entirely
+
+Disables staleness detection for maximum speed:
+
+```bash
+$ sdd doc find-function calculate_score --no-staleness-check
+
+Found 1 result(s):
+...
+```
+
+**When to use:**
+- You know docs are fresh
+- Speed is critical
+- You're running many queries in succession
+- You're working in CI/CD where docs are just generated
+
+### Examples
+
+**Workflow 1: Safe refactoring**
+```bash
+# Always work with fresh data for refactoring decisions
+sdd doc impact UserService --refresh
+```
+
+**Workflow 2: Fast exploration**
+```bash
+# Quick lookups don't need staleness checks
+sdd doc find-class User --no-staleness-check
+sdd doc describe-module auth.py --no-staleness-check
+```
+
+**Workflow 3: Default behavior (recommended)**
+```bash
+# Let the tool warn you, then decide
+sdd doc search "validation"
+# If warned, manually regenerate if needed:
+# sdd doc generate ./src
 ```
 
 ---

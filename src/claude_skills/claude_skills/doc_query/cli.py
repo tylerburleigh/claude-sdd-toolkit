@@ -14,6 +14,7 @@ from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
     QueryResult,
     check_docs_exist,
+    check_documentation_staleness,
 )
 from claude_skills.doc_query.workflows.trace_entry import (
     trace_execution_flow,
@@ -55,6 +56,8 @@ def _maybe_json(args: argparse.Namespace, payload: Any) -> bool:
 
 
 def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[DocumentationQuery]:
+    import subprocess
+
     docs_path = getattr(args, 'docs_path', None)
     if docs_path and not check_docs_exist(docs_path):
         message = f"Documentation not found at {docs_path}. Run 'doc generate' first."
@@ -70,6 +73,83 @@ def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[
             return None
         printer.error(message)
         return None
+
+    # Check staleness unless disabled
+    no_staleness_check = getattr(args, 'no_staleness_check', False)
+    refresh = getattr(args, 'refresh', False)
+
+    if not no_staleness_check:
+        staleness_info = check_documentation_staleness(
+            docs_path=str(query.docs_path),
+            source_dir=getattr(args, 'source_dir', None)
+        )
+
+        # If --refresh flag is set and docs are stale, regenerate
+        if refresh and staleness_info.get('is_stale'):
+            if not _maybe_json(args, {"status": "info", "message": "Regenerating stale documentation..."}):
+                printer.info("\n🔄 Documentation is stale, regenerating...")
+
+            # Determine source directory for regeneration
+            from pathlib import Path
+            source_dir = Path(getattr(args, 'source_dir', None) or query.docs_path.parent.parent / 'src')
+            if not source_dir.exists():
+                source_dir = query.docs_path.parent.parent
+
+            # Run doc generate command
+            try:
+                # Build regeneration command
+                regen_cmd = [
+                    'sdd', 'doc', 'generate',
+                    str(source_dir),
+                    '--output-dir', str(query.docs_path.parent),
+                    '--format', 'both'
+                ]
+
+                result = subprocess.run(
+                    regen_cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+
+                if result.returncode == 0:
+                    if not _maybe_json(args, {"status": "success", "message": "Documentation regenerated successfully"}):
+                        printer.success("✅ Documentation regenerated successfully\n")
+                    # Reload the query with fresh docs
+                    query = DocumentationQuery(docs_path)
+                    if not query.load():
+                        message = "Failed to load regenerated documentation"
+                        if _maybe_json(args, {"status": "error", "message": message}):
+                            return None
+                        printer.error(message)
+                        return None
+                else:
+                    error_msg = f"Failed to regenerate documentation: {result.stderr}"
+                    if not _maybe_json(args, {"status": "warning", "message": error_msg}):
+                        printer.warning(f"⚠️  {error_msg}")
+                        printer.warning("Continuing with stale documentation...\n")
+            except Exception as e:
+                error_msg = f"Error regenerating documentation: {e}"
+                if not _maybe_json(args, {"status": "warning", "message": error_msg}):
+                    printer.warning(f"⚠️  {error_msg}")
+                    printer.warning("Continuing with stale documentation...\n")
+
+        # Show warning if stale (and not using --refresh)
+        elif staleness_info.get('is_stale') and not refresh:
+            warning_msg = staleness_info.get('message', 'Documentation may be stale')
+            refresh_hint = "To refresh: run 'sdd doc generate' or use --refresh flag"
+            suppress_hint = "To suppress this warning: use --no-staleness-check"
+
+            if not _maybe_json(args, {
+                "status": "warning",
+                "message": warning_msg,
+                "hints": [refresh_hint, suppress_hint],
+                "staleness_info": staleness_info
+            }):
+                printer.warning(f"\n⚠️  {warning_msg}")
+                printer.info(f"    {refresh_hint}")
+                printer.info(f"    {suppress_hint}\n")
+
     return query
 
 
@@ -507,6 +587,10 @@ def cmd_list_classes(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             for item in filtered
         ]
 
+    # Apply limit if provided
+    if hasattr(args, 'limit') and args.limit:
+        results = results[:args.limit]
+
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
     _print_results(args, results)
@@ -540,6 +624,10 @@ def cmd_list_functions(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             for item in filtered
         ]
 
+    # Apply limit if provided
+    if hasattr(args, 'limit') and args.limit:
+        results = results[:args.limit]
+
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
     _print_results(args, results)
@@ -572,6 +660,10 @@ def cmd_list_modules(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             )
             for item in filtered
         ]
+
+    # Apply limit if provided
+    if hasattr(args, 'limit') and args.limit:
+        results = results[:args.limit]
 
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
@@ -942,15 +1034,18 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
     list_classes = subparsers.add_parser('list-classes', parents=[parent_parser], help='List all classes')
     list_classes.add_argument('--module', help='Filter by module')
     list_classes.add_argument('--pattern', help='Filter classes by regex pattern (case-insensitive)')
+    list_classes.add_argument('--limit', type=int, default=None, help='Limit number of results shown')
     list_classes.set_defaults(func=cmd_list_classes)
 
     list_functions = subparsers.add_parser('list-functions', parents=[parent_parser], help='List all functions')
     list_functions.add_argument('--module', help='Filter by module')
     list_functions.add_argument('--pattern', help='Filter functions by regex pattern (case-insensitive)')
+    list_functions.add_argument('--limit', type=int, default=None, help='Limit number of results shown')
     list_functions.set_defaults(func=cmd_list_functions)
 
     list_modules = subparsers.add_parser('list-modules', parents=[parent_parser], help='List all modules')
     list_modules.add_argument('--pattern', help='Filter modules by regex pattern (case-insensitive)')
+    list_modules.add_argument('--limit', type=int, default=None, help='Limit number of results shown')
     list_modules.set_defaults(func=cmd_list_modules)
 
     callers = subparsers.add_parser('callers', parents=[parent_parser], help='Show functions that call the specified function')

@@ -46,6 +46,16 @@ def add_global_options(parser):
         help='Path to generated documentation (auto-detected when omitted, used by doc commands)'
     )
     parser.add_argument(
+        '--refresh',
+        action='store_true',
+        help='Auto-regenerate documentation if stale before querying (doc commands only)'
+    )
+    parser.add_argument(
+        '--no-staleness-check',
+        action='store_true',
+        help='Skip documentation staleness check for faster queries (doc commands only)'
+    )
+    parser.add_argument(
         '--debug',
         action='store_true',
         help='Enable debug mode with full stack traces'
