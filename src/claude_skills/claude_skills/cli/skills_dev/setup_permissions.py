@@ -29,7 +29,6 @@ SDD_PERMISSIONS = [
 
     # CLI command permissions (unified sdd CLI + legacy standalone commands)
     "Bash(sdd:*)",      # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
-    "Bash(sdd-*:*)",    # Covers: sdd-next, sdd-update, sdd-validate, sdd-integration
 
     # AI CLI tool permissions
     "Bash(cursor-agent:*)",
