@@ -1,0 +1,1230 @@
+{
+  "spec_id": "task-category-metadata-2025-10-26-001",
+  "generated": "2025-10-26T00:00:00Z",
+  "last_updated": "2025-10-26T00:00:00Z",
+  "metadata": {
+    "title": "Task Category Metadata Enhancement",
+    "description": "Add metadata.task_category field to distinguish implementation tasks from investigation/research/decision tasks, making file_path conditionally required",
+    "status": "active",
+    "priority": "high",
+    "estimated_hours": 32,
+    "complexity": "medium",
+    "objectives": [
+      "Remove semantic misuse of file_path with placeholder strings",
+      "Enable proper categorization of non-implementation tasks",
+      "Maintain backward compatibility with existing specs",
+      "Improve sdd-plan's task structure generation",
+      "Provide migration path for specs using workarounds"
+    ],
+    "success_criteria": [
+      "file_path only required for task_category: implementation",
+      "All validation passes with category-aware logic",
+      "Existing specs with investigation/tbd can be auto-fixed",
+      "sdd-plan generates appropriate task_category values",
+      "Documentation reflects new schema structure"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Task Category Metadata Enhancement",
+      "status": "pending",
+      "parent": null,
+      "children": ["phase-1", "phase-2", "phase-3", "phase-4"],
+      "total_tasks": 36,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "phase-1": {
+      "type": "phase",
+      "title": "Schema Definition & Validation Logic",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-1-files", "phase-1-verify"],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update JSON schema and validation rules to support task categories",
+        "risk_level": "medium",
+        "estimated_hours": 10,
+        "dependencies": "None - foundational work"
+      },
+      "dependencies": {
+        "blocks": ["phase-2", "phase-3", "phase-4"],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["task-1-1", "task-1-2", "task-1-3"],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": ["phase-1-verify"],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/schemas/sdd-spec-schema.json",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": ["task-1-1-1", "task-1-1-2", "task-1-1-3"],
+      "dependencies": {
+        "blocks": ["task-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/schemas/sdd-spec-schema.json",
+        "description": "Add task_category enum to schema metadata definition",
+        "estimated_hours": 2
+      }
+    },
+
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Add task_category enum field to metadata properties",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add task_category to metadata.properties",
+          "Define enum: [investigation, implementation, refactoring, decision, research]",
+          "Add description for each category value",
+          "Mark as optional (not required) for backward compatibility"
+        ]
+      }
+    },
+
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Update file_path to be conditionally required",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-1-3"],
+        "blocked_by": ["task-1-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Move file_path from required to optional in base schema",
+          "Add conditional requirement documentation",
+          "Update description to clarify when file_path is needed"
+        ]
+      }
+    },
+
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Add schema documentation and examples",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add task_category usage examples in schema comments",
+          "Document backward compatibility behavior",
+          "Clarify default behavior when category is omitted"
+        ]
+      }
+    },
+
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/hierarchy_validation.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": ["task-1-2-1", "task-1-2-2", "task-1-2-3"],
+      "dependencies": {
+        "blocks": ["task-1-3"],
+        "blocked_by": ["task-1-1"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/hierarchy_validation.py",
+        "description": "Update validate_metadata() to enforce category-aware file_path requirement",
+        "estimated_hours": 4
+      }
+    },
+
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Update validate_metadata() function logic",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Check task_category field if present",
+          "Only require file_path when task_category == 'implementation'",
+          "Default to 'implementation' if task_category is missing (backward compat)",
+          "Update error messages to reference task_category"
+        ]
+      }
+    },
+
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Add validation for task_category enum values",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-2-3"],
+        "blocked_by": ["task-1-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Validate task_category is in allowed enum",
+          "Provide clear error if invalid category used",
+          "Add warning if investigation task has file_path"
+        ]
+      }
+    },
+
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Update auto-fix logic for task_category",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-2-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Update _is_auto_fixable() to handle missing task_category",
+          "Update _suggest_fix() to recommend adding task_category",
+          "Add guidance for choosing appropriate category"
+        ]
+      }
+    },
+
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_metadata_validation.py (new)",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": ["task-1-3-1", "task-1-3-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-2"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_metadata_validation.py",
+        "description": "Add unit tests for category-aware validation",
+        "estimated_hours": 4,
+        "is_new_file": true
+      }
+    },
+
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Test file_path requirement based on task_category",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Test implementation task requires file_path",
+          "Test investigation task doesn't require file_path",
+          "Test missing category defaults to implementation",
+          "Test invalid category values rejected"
+        ]
+      }
+    },
+
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Test backward compatibility behavior",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Test specs without task_category still validate",
+          "Test old-style specs with file_path work correctly",
+          "Test warning generated for investigation + file_path combination"
+        ]
+      }
+    },
+
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["verify-1-1", "verify-1-2", "verify-1-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1-files"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Schema validation accepts new structure",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m jsonschema -i specs/active/task-category-metadata-2025-10-26-001.json src/claude_skills/schemas/sdd-spec-schema.json",
+        "expected": "Schema validation passes with task_category field present"
+      }
+    },
+
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Validation logic correctly enforces conditional file_path",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_metadata_validation.py -v",
+        "expected": "All unit tests pass for category-aware validation"
+      }
+    },
+
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Backward compatibility maintained for old specs",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd validate specs/completed/*.json",
+        "expected": "Existing specs without task_category still validate successfully"
+      }
+    },
+
+    "phase-2": {
+      "type": "phase",
+      "title": "Planning Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-2-files", "phase-2-verify"],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update sdd-plan skill to generate appropriate task categories",
+        "risk_level": "low",
+        "estimated_hours": 8,
+        "dependencies": "Phase 1 (needs schema and validation)"
+      },
+      "dependencies": {
+        "blocks": ["phase-4"],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      }
+    },
+
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["task-2-1", "task-2-2", "task-2-3"],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": ["phase-2-verify"],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan/templates.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": ["task-2-1-1", "task-2-1-2"],
+      "dependencies": {
+        "blocks": ["task-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan/templates.py",
+        "description": "Add task_category to task node templates",
+        "estimated_hours": 2
+      }
+    },
+
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Update task node template with task_category field",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-2-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add task_category field to task metadata template",
+          "Include category selection guidance in comments",
+          "Provide examples for each category type"
+        ]
+      }
+    },
+
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add helper function to infer task_category",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Create infer_task_category() helper function",
+          "Use keywords in task title to suggest category",
+          "Return 'implementation' as safe default"
+        ]
+      }
+    },
+
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan/planner.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": ["task-2-2-1", "task-2-2-2"],
+      "dependencies": {
+        "blocks": ["task-2-3"],
+        "blocked_by": ["task-2-1"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan/planner.py",
+        "description": "Update planner to set task_category based on task type",
+        "estimated_hours": 3
+      }
+    },
+
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Integrate category inference into task generation",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-2-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Call infer_task_category() when creating tasks",
+          "Set metadata.task_category in generated nodes",
+          "Skip file_path for non-implementation categories"
+        ]
+      }
+    },
+
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Update planner CLI to support --category flag",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add optional --default-category CLI argument",
+          "Allow override of automatic category inference",
+          "Update CLI help text with category options"
+        ]
+      }
+    },
+
+    "task-2-3": {
+      "type": "task",
+      "title": "skills/sdd-plan/SKILL.md",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": ["task-2-3-1", "task-2-3-2", "task-2-3-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-2"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "description": "Document task_category usage in sdd-plan skill guide",
+        "estimated_hours": 3
+      }
+    },
+
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Add task_category section to documentation",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-2-3-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add new section explaining task_category field",
+          "Define each category with examples",
+          "Explain when file_path is required vs optional"
+        ]
+      }
+    },
+
+    "task-2-3-2": {
+      "type": "subtask",
+      "title": "Update JSON spec template examples",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-2-3-3"],
+        "blocked_by": ["task-2-3-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Add task_category to example task nodes",
+          "Show investigation task example without file_path",
+          "Show implementation task example with file_path"
+        ]
+      }
+    },
+
+    "task-2-3-3": {
+      "type": "subtask",
+      "title": "Add best practices guidance",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-3-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Guidance on choosing appropriate category",
+          "When to use investigation vs implementation",
+          "Best practices for mixed-type phases"
+        ]
+      }
+    },
+
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["verify-2-1", "verify-2-2", "verify-2-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-2-files"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Planner generates appropriate task_category values",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create test spec with mixed task types and verify category assignment",
+        "expected": "Investigation tasks get 'investigation', file modifications get 'implementation'"
+      }
+    },
+
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Generated specs validate successfully",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate <newly-generated-spec.json>",
+        "expected": "Specs with task_category pass validation without errors"
+      }
+    },
+
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Documentation examples are accurate",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Review SKILL.md examples and verify they match implementation",
+        "expected": "All examples compile and match actual behavior"
+      }
+    },
+
+    "phase-3": {
+      "type": "phase",
+      "title": "Migration & Auto-Fix Tooling",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-3-files", "phase-3-verify"],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Provide tooling to migrate existing specs with workarounds",
+        "risk_level": "low",
+        "estimated_hours": 6,
+        "dependencies": "Phase 1 (needs validation rules)"
+      },
+      "dependencies": {
+        "blocks": ["phase-4"],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      }
+    },
+
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["task-3-1", "task-3-2"],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": ["phase-3-verify"],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": ["task-3-1-1", "task-3-1-2", "task-3-1-3"],
+      "dependencies": {
+        "blocks": ["task-3-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+        "description": "Add auto-fix logic for detecting and migrating placeholder file_path values",
+        "estimated_hours": 4
+      }
+    },
+
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Add detection for placeholder file_path values",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-3-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Detect file_path values matching: investigation, tbd, TBD, N/A, none",
+          "Case-insensitive pattern matching",
+          "Flag tasks with placeholder values for migration"
+        ]
+      }
+    },
+
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement category inference from context",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-3-1-3"],
+        "blocked_by": ["task-3-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Analyze task title and description for keywords",
+          "Map 'investigation' → task_category: investigation",
+          "Map 'tbd' → task_category: decision",
+          "Remove placeholder file_path after categorization"
+        ]
+      }
+    },
+
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Add migration to auto-fix workflow",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-1-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Integrate into existing fix_spec() function",
+          "Add --migrate-categories flag for explicit migration",
+          "Report migrated tasks in fix output"
+        ]
+      }
+    },
+
+    "task-3-2": {
+      "type": "task",
+      "title": "specs/active/doc-query-enhancements-2025-10-24-001.json",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": ["task-3-2-1", "task-3-2-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-1"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "specs/active/doc-query-enhancements-2025-10-24-001.json",
+        "description": "Run migration on existing spec using workarounds",
+        "estimated_hours": 2
+      }
+    },
+
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Run auto-fix migration on doc-query spec",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-3-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Run: sdd fix specs/active/doc-query-enhancements-2025-10-24-001.json --migrate-categories",
+          "Verify task-1-1 gets task_category: investigation",
+          "Verify task-4-1 gets task_category: decision",
+          "Verify file_path placeholders removed"
+        ]
+      }
+    },
+
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Validate migrated spec",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Run: sdd validate specs/active/doc-query-enhancements-2025-10-24-001.json",
+          "Ensure no errors related to file_path",
+          "Verify task_category values are valid"
+        ]
+      }
+    },
+
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["verify-3-1", "verify-3-2", "verify-3-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-3-files"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Auto-fix detects placeholder values correctly",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Run sdd fix --preview on test spec with various placeholder patterns",
+        "expected": "All placeholder patterns (investigation, tbd, TBD, etc.) detected"
+      }
+    },
+
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Migrated specs validate successfully",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/doc-query-enhancements-2025-10-24-001.json",
+        "expected": "Zero validation errors after migration"
+      }
+    },
+
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Migration preserves spec functionality",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test sdd-next on migrated spec",
+        "expected": "sdd-next correctly identifies next tasks from migrated spec"
+      }
+    },
+
+    "phase-4": {
+      "type": "phase",
+      "title": "Testing & Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-4-files", "phase-4-verify"],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Comprehensive test coverage and documentation updates",
+        "risk_level": "low",
+        "estimated_hours": 8,
+        "dependencies": "Phases 1-3 (test the implementation)"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1", "phase-2", "phase-3"],
+        "depends": []
+      }
+    },
+
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": ["task-4-1", "task-4-2"],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": ["phase-4-verify"],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py (new)",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": ["task-4-1-1", "task-4-1-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py",
+        "description": "End-to-end integration tests for task_category workflow",
+        "estimated_hours": 4,
+        "is_new_file": true
+      }
+    },
+
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Test full workflow: plan → validate → migrate",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Create spec with mixed task categories",
+          "Validate spec passes",
+          "Test migration of placeholder specs",
+          "Verify sdd-next works with categorized tasks"
+        ]
+      }
+    },
+
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Test backward compatibility scenarios",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Test old specs without task_category",
+          "Test mixed old/new format specs",
+          "Test gradual migration path",
+          "Verify no breaking changes to existing workflows"
+        ]
+      }
+    },
+
+    "task-4-2": {
+      "type": "task",
+      "title": "docs/ARCHITECTURE.md",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": ["task-4-2-1", "task-4-2-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/ARCHITECTURE.md",
+        "description": "Update architecture documentation with task_category design",
+        "estimated_hours": 4
+      }
+    },
+
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Add task_category section to schema documentation",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-4-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Document task_category field and values",
+          "Explain conditional file_path requirement",
+          "Show examples of each category type",
+          "Document migration strategy"
+        ]
+      }
+    },
+
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Update schema evolution and versioning section",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-4-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": [
+          "Document this schema enhancement",
+          "Add to version history",
+          "Note backward compatibility approach",
+          "Reference related changes in validation and planning"
+        ]
+      }
+    },
+
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": ["verify-4-1", "verify-4-2", "verify-4-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-4-files"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "verify-4-1": {
+      "type": "verify",
+      "title": "All integration tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py -v",
+        "expected": "All integration tests pass successfully"
+      }
+    },
+
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Documentation is complete and accurate",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Review all documentation files for consistency and completeness",
+        "expected": "All docs mention task_category where relevant, examples are accurate"
+      }
+    },
+
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Full test suite passes",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/ -v",
+        "expected": "All unit and integration tests pass with no regressions"
+      }
+    }
+  }
+}

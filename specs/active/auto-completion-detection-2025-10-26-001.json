@@ -1,0 +1,967 @@
+{
+  "spec_id": "auto-completion-detection-2025-10-26-001",
+  "generated": "2025-10-26T00:00:00Z",
+  "last_updated": "2025-10-26T00:00:00Z",
+  "metadata": {
+    "title": "Automatic Spec Completion Detection",
+    "description": "Add intelligent detection of when specs are ready to be completed, prompting users to move specs from specs/active to specs/completed when all tasks are done",
+    "status": "draft",
+    "priority": "medium",
+    "estimated_hours": 16,
+    "risk_level": "medium",
+    "objectives": [
+      "Automatically detect when all tasks in a spec are completed",
+      "Prompt users for confirmation with option to add actual hours",
+      "Integrate detection into sdd-update and sdd-next workflows",
+      "Add completion visibility to sdd status-report command",
+      "Maintain consistency with existing complete-spec command behavior"
+    ],
+    "risk_areas": [
+      {
+        "name": "Workflow Integration",
+        "description": "Modifying existing update_task_status and prepare_task flows",
+        "mitigation": "Thorough testing, ensure no breaking changes to existing behavior"
+      },
+      {
+        "name": "Edge Cases",
+        "description": "Handling blocked tasks, partial completion, verification failures",
+        "mitigation": "Explicit checks for blocked tasks, comprehensive edge case testing"
+      }
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Automatic Spec Completion Detection",
+      "status": "pending",
+      "parent": null,
+      "children": ["phase-1", "phase-2", "phase-3", "phase-4", "phase-5"],
+      "total_tasks": 30,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core Completion Detection Logic",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-1-files", "phase-1-verify"],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create reusable completion detection functionality that can be called from multiple workflows",
+        "risk_level": "low",
+        "estimated_hours": 3
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["task-1-1"],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/completion.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": ["task-1-1-1", "task-1-1-2", "task-1-1-3"],
+      "dependencies": {
+        "blocks": ["task-2-1", "task-3-1", "task-4-1"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/completion.py",
+        "estimated_hours": 2,
+        "changes": [
+          "Create new module for completion detection logic",
+          "Implement check_spec_completion() function",
+          "Implement should_prompt_completion() function with blocked task checks",
+          "Implement format_completion_prompt() function for user interaction"
+        ],
+        "reasoning": "Centralized completion detection logic enables reuse across sdd-update, sdd-next, and status-report",
+        "integration_points": [
+          "Uses check_complete() from common/query_operations.py",
+          "Returns structured data for use by calling workflows",
+          "Explicitly blocks prompts if any tasks are blocked"
+        ]
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Create check_spec_completion() function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Function that checks if all tasks in spec are completed, returns completion status with metadata"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Create should_prompt_completion() function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Function that determines if completion prompt should be shown, blocks prompt if any tasks are blocked"
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Create format_completion_prompt() function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Function that generates user-friendly completion prompt with actual hours input option"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["verify-1-1", "verify-1-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Unit tests pass for completion detection",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_common/test_completion.py -v",
+        "expected": "All completion detection tests pass"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Blocked tasks prevent completion prompts",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Verify should_prompt_completion() returns False when blocked tasks exist"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Integration into sdd-update Workflow",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-2-files", "phase-2-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add completion detection after task status updates in sdd-update",
+        "risk_level": "medium",
+        "estimated_hours": 3
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["task-2-1"],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/status.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": ["task-2-1-1", "task-2-1-2", "task-2-1-3", "task-2-1-4"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1"],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/status.py",
+        "estimated_hours": 2,
+        "changes": [
+          "Modify update_task_status() to check for completion after marking tasks complete",
+          "Add user prompt with confirmation and actual_hours input",
+          "Call complete_spec() from lifecycle.py if user confirms",
+          "Skip prompt if spec has blocked tasks or incomplete tasks"
+        ],
+        "reasoning": "Natural integration point - users marking tasks complete is when completion is most likely",
+        "integration_points": [
+          "Calls check_spec_completion() from common/completion.py",
+          "Calls complete_spec() from sdd_update/lifecycle.py",
+          "Only triggers on status change to 'completed'"
+        ]
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Add completion check after status update",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Call check_spec_completion() after successfully updating task status to 'completed'"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Implement user prompt for completion",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Display prompt asking if user wants to complete spec, with actual hours input"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Call complete_spec() on confirmation",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-1-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "If user confirms, call complete_spec() with provided actual hours"
+      }
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "Handle blocked tasks edge case",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Skip completion prompt entirely if any tasks are blocked"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["verify-2-1", "verify-2-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-2-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Integration tests pass for sdd-update",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py::test_completion_detection -v",
+        "expected": "Completion prompt shown when last task marked complete"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Manual test: completion flow in sdd-update",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Mark last task complete, verify prompt appears, test both confirm and decline paths"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Integration into sdd-next Workflow",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-3-files", "phase-3-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add completion detection when preparing tasks (discovering no actionable tasks remain)",
+        "risk_level": "medium",
+        "estimated_hours": 4
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["task-3-1", "task-3-2"],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/workflow.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": ["task-3-1-1", "task-3-1-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/workflow.py",
+        "estimated_hours": 2,
+        "changes": [
+          "Modify prepare_task_workflow() to check for completion when no tasks found",
+          "Distinguish 'all blocked' from 'all completed' scenarios",
+          "Add user prompt similar to sdd-update integration"
+        ],
+        "reasoning": "When sdd-next finds no actionable tasks, it's a signal that spec might be complete",
+        "integration_points": [
+          "Calls check_spec_completion() from common/completion.py",
+          "Only prompts if no tasks found AND all tasks completed (not blocked)"
+        ]
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Add completion check when no tasks found",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "When prepare_task finds no actionable tasks, check if spec is complete"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Distinguish blocked vs completed scenarios",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Clear messaging: 'All tasks blocked' vs 'All tasks completed, ready to finalize'"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": ["task-3-2-1", "task-3-2-2", "task-3-2-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-1"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "estimated_hours": 1,
+        "changes": [
+          "Update prepare-task CLI command to handle completion detection",
+          "Add user prompt and confirmation flow",
+          "Call complete_spec() if user confirms"
+        ],
+        "reasoning": "CLI layer needs to handle user interaction for completion confirmation",
+        "integration_points": [
+          "Calls workflow.prepare_task_workflow() which does detection",
+          "Calls complete_spec() from sdd_update/lifecycle.py on confirmation"
+        ]
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Handle completion signal from workflow",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Catch completion signal returned from prepare_task_workflow()"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Display completion prompt to user",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show user-friendly prompt asking if they want to complete spec"
+      }
+    },
+    "task-3-2-3": {
+      "type": "subtask",
+      "title": "Execute complete_spec() on confirmation",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-2-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Call complete_spec() with user-provided actual hours"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["verify-3-1", "verify-3-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-3-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Integration tests pass for sdd-next",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py::test_completion_detection -v",
+        "expected": "Completion prompt shown when prepare_task finds all tasks complete"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Manual test: completion flow in sdd-next",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Run prepare-task on completed spec, verify prompt appears with correct messaging"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Integration into sdd status-report",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-4-files", "phase-4-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add completion detection to status-report for visibility during progress checks",
+        "risk_level": "low",
+        "estimated_hours": 2
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": ["task-4-1"],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/status.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": ["task-4-1-1", "task-4-1-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1"],
+        "depends": ["task-2-1"]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/status.py",
+        "estimated_hours": 1,
+        "changes": [
+          "Modify status_report() to check for completion at end of output",
+          "Display informational message if spec is ready to complete",
+          "Include command hint: 'Run sdd complete-spec SPEC_ID to finalize'",
+          "No interactive prompt (status-report remains non-interactive)"
+        ],
+        "reasoning": "Status-report is a natural place to show completion status for visibility",
+        "integration_points": [
+          "Calls check_spec_completion() from common/completion.py",
+          "Read-only operation, no state changes",
+          "Non-interactive by design"
+        ]
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add completion check to status_report()",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Call check_spec_completion() at end of status report generation"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Display completion status message",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-4-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show informational message with command hint if spec is ready to complete"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": ["verify-4-1", "verify-4-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-4-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Status report shows completion message",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Run status-report on completed spec, verify completion message appears"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Status report remains non-interactive",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Verify status-report does not prompt for user input, only displays information"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing & Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-5-files", "phase-5-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-2", "phase-3", "phase-4"],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure completion detection works correctly across all integration points",
+        "risk_level": "low",
+        "estimated_hours": 4
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "Test Files",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": ["task-5-1", "task-5-2", "task-5-3", "task-5-4"],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/unit/test_common/test_completion.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_common/test_completion.py",
+        "estimated_hours": 1,
+        "changes": [
+          "Unit tests for check_spec_completion()",
+          "Unit tests for should_prompt_completion()",
+          "Unit tests for format_completion_prompt()",
+          "Edge case: blocked tasks prevent prompts",
+          "Edge case: partial completion",
+          "Edge case: all verification tasks pending"
+        ],
+        "reasoning": "Comprehensive unit test coverage ensures core logic works correctly"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py",
+        "estimated_hours": 1,
+        "changes": [
+          "Add test_completion_detection_after_update()",
+          "Test completion prompt appears when last task marked complete",
+          "Test completion prompt skipped when blocked tasks exist",
+          "Test user confirmation and decline flows"
+        ],
+        "reasoning": "Integration tests ensure sdd-update workflow integration works end-to-end"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-3-1", "task-3-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py",
+        "estimated_hours": 1,
+        "changes": [
+          "Add test_completion_detection_prepare_task()",
+          "Test completion prompt appears when prepare_task finds all complete",
+          "Test 'all blocked' vs 'all completed' messaging",
+          "Test user confirmation flow"
+        ],
+        "reasoning": "Integration tests ensure sdd-next workflow integration works end-to-end"
+      }
+    },
+    "task-5-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/integration/test_status_report.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-4-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_status_report.py",
+        "estimated_hours": 0.5,
+        "changes": [
+          "Add test_completion_message_in_status_report()",
+          "Test completion message appears in status report",
+          "Test non-interactive behavior (no prompts)",
+          "Test command hint is displayed correctly"
+        ],
+        "reasoning": "Integration tests ensure status-report integration shows completion status"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": ["verify-5-1", "verify-5-2", "verify-5-3", "verify-5-4"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-5-files"],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "All unit tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_common/test_completion.py -v",
+        "expected": "All completion unit tests pass"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "All integration tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/ -k completion -v",
+        "expected": "All completion integration tests pass"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "End-to-end manual testing",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test full workflow: mark last task complete in real spec, verify prompt, test both confirm and decline"
+      }
+    },
+    "verify-5-4": {
+      "type": "verify",
+      "title": "Edge case verification",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test edge cases: blocked tasks prevent prompt, partial completion, already completed specs"
+      }
+    }
+  },
+  "journal": []
+}

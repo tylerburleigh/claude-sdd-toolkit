@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-validate-docs-2025-10-24-001",
   "generated": "2025-10-24T21:30:00Z",
-  "last_updated": "2025-10-24T21:30:00Z",
+  "last_updated": "2025-10-26T12:00:00Z",
   "metadata": {
     "title": "sdd-validate Documentation Improvements",
     "description": "Improve SKILL.md to clarify exit codes, iterative workflow, auto-fix limitations, and add troubleshooting guidance",
@@ -17,11 +17,187 @@
       "title": "sdd-validate Documentation Improvements",
       "status": "pending",
       "parent": null,
-      "children": ["phase-1", "phase-2"],
-      "total_tasks": 11,
+      "children": ["phase-0", "phase-1", "phase-2"],
+      "total_tasks": 16,
       "completed_tasks": 0,
       "metadata": {
-        "description": "Address confusion around exit codes, iterative fixing, and auto-fix limitations based on real user experience"
+        "description": "Fix auto-fix path resolution bug and address confusion around exit codes, iterative fixing, and auto-fix limitations based on real user experience"
+      }
+    },
+
+    "phase-0": {
+      "type": "phase",
+      "title": "Bug Fixes",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-0-files", "phase-0-verify"],
+      "dependencies": {
+        "blocks": ["phase-1"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Fix auto-fix path resolution bug that prevents fixes from being saved",
+        "risk_level": "low",
+        "estimated_hours": 2
+      }
+    },
+
+    "phase-0-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-0",
+      "children": ["task-0-1"],
+      "dependencies": {
+        "blocks": ["phase-0-verify"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "task-0-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+      "status": "pending",
+      "parent": "phase-0-files",
+      "children": ["task-0-1-1", "task-0-1-2", "task-0-1-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+        "estimated_hours": 1,
+        "changes": "Fix path resolution in apply_fix_actions function for both backup_json_spec (line 125) and save_json_spec (line 157) calls to use find_specs_directory utility",
+        "reasoning": "Current implementation passes specs/active as specs_dir, but find_spec_file expects specs/ parent directory. This causes backup_json_spec to fail (resulting in .backup files in specs/active/ instead of specs/.backups/) and save_json_spec to fail silently.",
+        "integration_points": [
+          "Uses find_specs_directory from common.paths",
+          "Maintains backward compatibility with fallback",
+          "No API changes, purely internal fix",
+          "Fixes both backup creation and save operations"
+        ]
+      }
+    },
+
+    "task-0-1-1": {
+      "type": "subtask",
+      "title": "Import find_specs_directory utility",
+      "status": "pending",
+      "parent": "task-0-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-0-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add find_specs_directory to imports from claude_skills.common at top of file",
+        "location": "Line 17 (import section)"
+      }
+    },
+
+    "task-0-1-2": {
+      "type": "subtask",
+      "title": "Update apply_fix_actions path resolution",
+      "status": "pending",
+      "parent": "task-0-1",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-0-1-3"],
+        "blocked_by": ["task-0-1-1"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Replace both line 125 backup_json_spec call and line 157 save_json_spec call to use find_specs_directory(str(spec_path)) instead of Path(spec_path).parent",
+        "location": "Lines 125 and 157 in apply_fix_actions function"
+      }
+    },
+
+    "task-0-1-3": {
+      "type": "subtask",
+      "title": "Add fallback for non-standard layouts",
+      "status": "pending",
+      "parent": "task-0-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-0-1-2"],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add conditional logic: if find_specs_directory returns None, fall back to current behavior (Path(spec_path).parent) to maintain backward compatibility",
+        "location": "Line 157 in apply_fix_actions function"
+      }
+    },
+
+    "phase-0-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-0",
+      "children": ["verify-0-1", "verify-0-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-0-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+
+    "verify-0-1": {
+      "type": "verify",
+      "title": "Test fix with failing auto-completion spec",
+      "status": "pending",
+      "parent": "phase-0-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/auto-completion-detection-2025-10-26-001.json && sdd fix specs/active/auto-completion-detection-2025-10-26-001.json && sdd validate specs/active/auto-completion-detection-2025-10-26-001.json",
+        "expected": "Fix command successfully applies fixes and reduces error count on re-validation"
+      }
+    },
+
+    "verify-0-2": {
+      "type": "verify",
+      "title": "Test with different directory structures",
+      "status": "pending",
+      "parent": "phase-0-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "# Test fix command with: (1) standard layout specs/active/, (2) direct specs/ path, (3) nested project structure",
+        "expected": "Fix command works correctly regardless of where spec file is located in directory hierarchy"
       }
     },
 
@@ -33,7 +209,7 @@
       "children": ["phase-1-files", "phase-1-verify"],
       "dependencies": {
         "blocks": ["phase-2", "task-2-1"],
-        "blocked_by": [],
+        "blocked_by": ["phase-0"],
         "depends": []
       },
       "total_tasks": 7,
