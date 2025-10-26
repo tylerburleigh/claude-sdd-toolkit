@@ -2,12 +2,14 @@
   "spec_id": "specs-reorganization-2025-10-24-001",
   "title": "Specs Directory Reorganization",
   "generated": "2025-10-24T17:35:00Z",
-  "last_updated": "2025-10-26T00:07:46.496666+00:00",
+  "last_updated": "2025-10-26T00:11:03.932706+00:00",
   "metadata": {
-    "status": "draft",
+    "status": "completed",
     "complexity": "low",
     "estimated_hours": 4,
-    "description": "Separate generated metadata files (validation reports, review outputs, backups) from actual spec JSON files by creating dedicated hidden directories and updating all CLI code to use new paths."
+    "description": "Separate generated metadata files (validation reports, review outputs, backups) from actual spec JSON files by creating dedicated hidden directories and updating all CLI code to use new paths.",
+    "completed_date": "2025-10-26T00:11:03.932544+00:00",
+    "actual_hours": 1.0
   },
   "hierarchy": {
     "spec-root": {
