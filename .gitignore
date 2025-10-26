@@ -45,3 +45,7 @@ settings.json
 
 # SDD Toolkit
 .specs/
+specs/.reports/
+specs/.reviews/
+specs/.backups/
+specs/.human-readable/

@@ -30,17 +30,28 @@ def cmd_check_permissions(args, printer: PrettyPrinter) -> int:
 
     # Check if permissions are in settings
     needs_setup = False
-    if has_specs and SETTINGS_FILE.exists():
+    if has_specs:
         try:
-            with open(SETTINGS_FILE, 'r') as f:
-                settings = json.load(f)
+            # Collect permissions from both global and project-local settings
+            all_permissions = []
 
-            permissions = settings.get('permissions', {}).get('allow', [])
+            # Check global settings
+            if SETTINGS_FILE.exists():
+                with open(SETTINGS_FILE, 'r') as f:
+                    global_settings = json.load(f)
+                all_permissions.extend(global_settings.get('permissions', {}).get('allow', []))
+
+            # Check project-local settings
+            local_settings_file = project_root / ".claude" / "settings.local.json"
+            if local_settings_file.exists():
+                with open(local_settings_file, 'r') as f:
+                    local_settings = json.load(f)
+                all_permissions.extend(local_settings.get('permissions', {}).get('allow', []))
 
             # Check for key SDD permissions
             has_permissions = any(
                 any(req in perm for req in ['specs', 'sdd-next', 'sdd-update'])
-                for perm in permissions
+                for perm in all_permissions
             )
 
             needs_setup = not has_permissions

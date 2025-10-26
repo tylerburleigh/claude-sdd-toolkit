@@ -21,6 +21,8 @@ try:
         analyze_dependencies,
         DEFAULT_BOTTLENECK_THRESHOLD,
         PrettyPrinter,
+        find_specs_directory,
+        ensure_reports_directory,
     )
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
@@ -216,7 +218,16 @@ def cmd_validate(args, printer):
                 },
             )
             suffix = ".md" if report_format == "markdown" else ".json"
-            report_file = spec_file.parent / f"{spec_file.stem}-validation-report{suffix}"
+
+            # Find specs directory and ensure .reports/ exists
+            specs_dir = find_specs_directory(str(spec_file))
+            if specs_dir:
+                reports_dir = ensure_reports_directory(specs_dir)
+                report_file = reports_dir / f"{spec_file.stem}-validation-report{suffix}"
+            else:
+                # Fallback to old location if specs dir not found
+                report_file = spec_file.parent / f"{spec_file.stem}-validation-report{suffix}"
+
             with open(report_file, 'w') as f:
                 f.write(report)
             printer.success(f"\nReport saved to: {report_file}")
@@ -397,7 +408,19 @@ def cmd_report(args, printer):
         print(report)
         return 0
 
-    output_path = Path(args.output) if args.output else spec_file.parent / f"{spec_file.stem}-validation-report"
+    # Determine output path
+    if args.output:
+        output_path = Path(args.output)
+    else:
+        # Find specs directory and use .reports/ for default output
+        specs_dir = find_specs_directory(str(spec_file))
+        if specs_dir:
+            reports_dir = ensure_reports_directory(specs_dir)
+            output_path = reports_dir / f"{spec_file.stem}-validation-report"
+        else:
+            # Fallback to old location if specs dir not found
+            output_path = spec_file.parent / f"{spec_file.stem}-validation-report"
+
     if args.format == "markdown":
         output_path = output_path.with_suffix(".md")
     elif args.format == "json":

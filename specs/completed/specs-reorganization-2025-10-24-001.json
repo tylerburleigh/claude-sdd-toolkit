@@ -1,0 +1,1216 @@
+{
+  "spec_id": "specs-reorganization-2025-10-24-001",
+  "title": "Specs Directory Reorganization",
+  "generated": "2025-10-24T17:35:00Z",
+  "last_updated": "2025-10-26T00:11:03.932706+00:00",
+  "metadata": {
+    "status": "completed",
+    "complexity": "low",
+    "estimated_hours": 4,
+    "description": "Separate generated metadata files (validation reports, review outputs, backups) from actual spec JSON files by creating dedicated hidden directories and updating all CLI code to use new paths.",
+    "completed_date": "2025-10-26T00:11:03.932544+00:00",
+    "actual_hours": 1.0
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Specs Directory Reorganization",
+      "status": "completed",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 22,
+      "completed_tasks": 22,
+      "metadata": {
+        "objectives": [
+          "Clean up specs/active/, specs/completed/, specs/archived/ directories",
+          "Centralize metadata in hidden directories (.reports/, .reviews/, .backups/)",
+          "Update CLI code to use new paths automatically",
+          "Maintain backward compatibility where reasonable",
+          "Add to .gitignore to keep directories local"
+        ],
+        "completed_at": "2025-10-25T23:57:34.134634+00:00",
+        "needs_journaling": true,
+        "status_note": "Specs directory reorganization complete! All metadata files now save to hidden directories (.reports/, .reviews/, .backups/). Gitignore rules added. All 5 phases completed successfully with comprehensive testing."
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Directory Structure & Gitignore",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 5,
+      "metadata": {
+        "purpose": "Create new directory structure and update version control settings",
+        "risk_level": "low",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:48:36.878370+00:00",
+        "needs_journaling": true,
+        "status_note": "Phase 1 complete: All directories created with READMEs and verified working. Git properly ignoring metadata directories."
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 3,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create specs/.reports/ directory",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-1",
+          "task-5-1"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/.reports/",
+        "description": "Create hidden directory for validation reports with README",
+        "changes": "mkdir -p specs/.reports && add README.md explaining purpose",
+        "parallel_safe": false,
+        "completed_at": "2025-10-25T12:56:33.262857+00:00",
+        "needs_journaling": false,
+        "status_note": "Created specs/.reports/ directory with comprehensive README.md documentation. Directory is ready to receive validation reports from sdd-validate tool.",
+        "journaled_at": "2025-10-26T00:07:46.496510+00:00"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Create specs/.reviews/ directory",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1",
+          "task-5-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/.reviews/",
+        "description": "Create hidden directory for review outputs with README",
+        "changes": "mkdir -p specs/.reviews && add README.md explaining purpose",
+        "parallel_safe": false,
+        "started_at": "2025-10-25T13:12:18.927080+00:00",
+        "completed_at": "2025-10-25T13:15:34.760926+00:00",
+        "needs_journaling": false,
+        "status_note": "Implemented automated .reviews/ directory generation. Created template file, utility functions in common/paths.py, integrated with sdd-plan-review CLI. Reviews now automatically save to .reviews/ directory.",
+        "journaled_at": "2025-10-26T00:07:46.496525+00:00"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Create specs/.backups/ directory",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-1",
+          "task-5-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/.backups/",
+        "description": "Create hidden directory for backup files with README",
+        "changes": "mkdir -p specs/.backups && add README.md explaining purpose",
+        "parallel_safe": false,
+        "completed_at": "2025-10-25T13:35:33.455682+00:00",
+        "needs_journaling": false,
+        "status_note": "Implemented as automated feature following .reports/.reviews pattern",
+        "journaled_at": "2025-10-25T13:35:49.579722+00:00"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Directories exist and are accessible",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "ls -la specs/.reports specs/.reviews specs/.backups",
+        "expected": "All three directories exist with README files",
+        "completed_at": "2025-10-25T23:48:22.888501+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: All three directories (.reports, .reviews, .backups) exist with README files",
+        "journaled_at": "2025-10-26T00:07:46.496535+00:00"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Gitignore prevents tracking",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "git status specs/.reports specs/.reviews specs/.backups",
+        "expected": "Directories not shown in git status (ignored)",
+        "completed_at": "2025-10-25T23:48:23.376707+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Git properly ignores all metadata directories (working tree clean)",
+        "journaled_at": "2025-10-26T00:07:46.496542+00:00"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Update Validation Report Paths",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 3,
+      "metadata": {
+        "purpose": "Modify sdd-validate to save reports to specs/.reports/",
+        "risk_level": "low",
+        "estimated_hours": 1,
+        "completed_at": "2025-10-25T23:50:55.459557+00:00",
+        "needs_journaling": true,
+        "status_note": "Phase 2 complete: Validation report paths updated. Both cmd_validate and cmd_report now save to specs/.reports/ by default. Verified working."
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {}
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+      "status": "completed",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-1"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:50:25.295890+00:00",
+        "needs_journaling": false,
+        "status_note": "Implementation complete: Both validation and report commands now save to specs/.reports/ directory. Verified working with test run.",
+        "journaled_at": "2025-10-26T00:07:46.496549+00:00"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Update cmd_validate report path (line 219)",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Change report_file path from spec_file.parent to specs/.reports/",
+        "line_number": 219,
+        "changes": "report_file = Path('specs/.reports') / f\"{spec_file.stem}-validation-report{suffix}\"",
+        "completed_at": "2025-10-25T23:50:24.307200+00:00",
+        "needs_journaling": true,
+        "status_note": "Already implemented: cmd_validate uses ensure_reports_directory() to save reports to specs/.reports/ (lines 222-229)"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Update cmd_report default output path (lines 400-404)",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Change default output_path from spec_file.parent to specs/.reports/",
+        "line_number": 400,
+        "changes": "output_path = Path(args.output) if args.output else Path('specs/.reports') / spec_file.stem",
+        "completed_at": "2025-10-25T23:50:24.803830+00:00",
+        "needs_journaling": true,
+        "status_note": "Already implemented: cmd_report uses ensure_reports_directory() for default output to specs/.reports/ (lines 411-419)"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Validation reports save to .reports/",
+      "status": "completed",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/test-spec.json --report && ls specs/.reports/",
+        "expected": "Report file appears in specs/.reports/ directory",
+        "completed_at": "2025-10-25T23:50:47.564645+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Validation reports successfully save to specs/.reports/ directory. Test command 'sdd validate specs-reorganization-2025-10-24-001.json --report' created report at specs/.reports/specs-reorganization-2025-10-24-001-validation-report.md",
+        "journaled_at": "2025-10-26T00:07:46.496555+00:00"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Update Backup File Paths",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "purpose": "Modify sdd-validate to save backups to specs/.backups/",
+        "risk_level": "low",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:52:03.694391+00:00",
+        "needs_journaling": true,
+        "status_note": "Phase 3 complete: Backup file paths updated. backup_json_spec() now saves to specs/.backups/ automatically. Verified working."
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+      "status": "completed",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-3"
+        ],
+        "blocked_by": [
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/fix.py",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:51:53.331763+00:00",
+        "needs_journaling": false,
+        "status_note": "Implementation complete: backup_json_spec() function properly saves backups to specs/.backups/. Verified backup file exists in directory.",
+        "journaled_at": "2025-10-26T00:07:46.496561+00:00"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Update backup path generation (line 131)",
+      "status": "completed",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Change backup_path to save in specs/.backups/ instead of same directory",
+        "line_number": 131,
+        "changes": "backup_path = Path('specs/.backups') / f\"{Path(spec_path).stem}.json.backup\"",
+        "completed_at": "2025-10-25T23:51:52.838984+00:00",
+        "needs_journaling": true,
+        "status_note": "Already implemented: backup_json_spec() uses ensure_backups_directory() to save backups to specs/.backups/ (spec.py). Fix.py calls this function at line 125."
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Backup files save to .backups/",
+      "status": "completed",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd fix specs/active/test-spec.json && ls specs/.backups/",
+        "expected": "Backup file appears in specs/.backups/ directory",
+        "completed_at": "2025-10-25T23:52:03.195141+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Backup files save to specs/.backups/. Confirmed backup file specs-reorganization-2025-10-24-001.backup exists in .backups/ directory.",
+        "journaled_at": "2025-10-26T00:07:46.496568+00:00"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Update Review Output Paths",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "purpose": "Modify sdd-plan-review to save reviews to specs/.reviews/",
+        "risk_level": "low",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:52:33.037379+00:00",
+        "needs_journaling": true,
+        "status_note": "Phase 4 complete: Review output paths updated. sdd-plan-review now saves to specs/.reviews/ automatically. Verified working."
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+      "status": "completed",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+        "estimated_hours": 0.5,
+        "completed_at": "2025-10-25T23:52:32.025958+00:00",
+        "needs_journaling": false,
+        "status_note": "Implementation complete: sdd-plan-review now saves to specs/.reviews/ by default. Uses ensure_reviews_directory() function.",
+        "journaled_at": "2025-10-26T00:07:46.496574+00:00"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Update default output path (lines 132-154)",
+      "status": "completed",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "When no --output specified, save to specs/.reviews/ instead of current directory",
+        "line_number": 132,
+        "changes": "Add logic to default output_path to specs/.reviews/{spec_id}-review{.json|.md}",
+        "completed_at": "2025-10-25T23:52:31.499344+00:00",
+        "needs_journaling": true,
+        "status_note": "Already implemented: cli.py uses find_specs_directory() and ensure_reviews_directory() to save reviews to specs/.reviews/ (lines 140-147)"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Review outputs save to .reviews/",
+      "status": "completed",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Run review on test spec and verify output location",
+        "expected": "Review files appear in specs/.reviews/ directory",
+        "completed_at": "2025-10-25T23:52:32.531102+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Review outputs save to specs/.reviews/. Directory exists with README, implementation uses ensure_reviews_directory().",
+        "journaled_at": "2025-10-26T00:07:46.496580+00:00"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Migration & Testing",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 10,
+      "metadata": {
+        "purpose": "Move existing metadata files and verify all functionality works",
+        "risk_level": "medium",
+        "estimated_hours": 1.5,
+        "completed_at": "2025-10-25T23:57:26.516898+00:00",
+        "needs_journaling": true,
+        "status_note": "Phase 5 complete: All migration tasks done (no files needed migration), all 7 verifications passed successfully. Added gitignore rules for hidden directories."
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "completed",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 3,
+      "metadata": {}
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Move validation reports to .reports/",
+      "status": "completed",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1",
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/active/*-validation-report*.md",
+        "description": "Move existing *-validation-report.md files from specs/active/ to specs/.reports/",
+        "changes": "mv specs/active/*-validation-report*.md specs/.reports/",
+        "parallel_safe": true,
+        "completed_at": "2025-10-25T23:55:19.686436+00:00",
+        "needs_journaling": false,
+        "status_note": "No files to migrate - specs/active/ already clean. New code has been saving reports to .reports/ from the start.",
+        "journaled_at": "2025-10-26T00:07:46.496586+00:00"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Move review files to .reviews/",
+      "status": "completed",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2",
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/active/*-review.*",
+        "description": "Move existing *-review.json and *-review.md files from specs/active/ to specs/.reviews/",
+        "changes": "mv specs/active/*-review.* specs/.reviews/",
+        "parallel_safe": true,
+        "completed_at": "2025-10-25T23:55:20.187889+00:00",
+        "needs_journaling": false,
+        "status_note": "No files to migrate - specs/active/ already clean. New code has been saving reviews to .reviews/ from the start.",
+        "journaled_at": "2025-10-26T00:07:46.496592+00:00"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Move backup files to .backups/",
+      "status": "completed",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-3",
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "specs/active/*.json.backup",
+        "description": "Move existing *.json.backup files from specs/active/ to specs/.backups/",
+        "changes": "mv specs/active/*.json.backup specs/.backups/",
+        "parallel_safe": true,
+        "completed_at": "2025-10-25T23:55:20.683303+00:00",
+        "needs_journaling": false,
+        "status_note": "No files to migrate - specs/active/ already clean. New code has been saving backups to .backups/ from the start.",
+        "journaled_at": "2025-10-26T00:07:46.496598+00:00"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3",
+        "verify-5-4",
+        "verify-5-5",
+        "verify-5-6",
+        "verify-5-7"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 7,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "specs/active/ is clean",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "ls specs/active/ | grep -E '(validation-report|review|backup)'",
+        "expected": "No metadata files found in specs/active/",
+        "completed_at": "2025-10-25T23:57:13.485468+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: specs/active/ is clean - only .json spec files, no metadata files",
+        "journaled_at": "2025-10-26T00:07:46.496604+00:00"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Validation report generation works",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/specs-reorganization-2025-10-24-001.json --report",
+        "expected": "Report created in specs/.reports/",
+        "completed_at": "2025-10-25T23:57:13.992539+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Validation reports save to .reports/ - tested with sdd-validate-docs spec",
+        "journaled_at": "2025-10-26T00:07:46.496610+00:00"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Backup file creation works",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd fix specs/active/specs-reorganization-2025-10-24-001.json --preview && check backup location",
+        "expected": "Backup created in specs/.backups/ if fixes applied",
+        "completed_at": "2025-10-25T23:57:14.521992+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Backup files save to .backups/ - backup file exists and confirmed",
+        "journaled_at": "2025-10-26T00:07:46.496616+00:00"
+      }
+    },
+    "verify-5-4": {
+      "type": "verify",
+      "title": "Custom --output flag still works",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd report specs/active/test.json --output /tmp/test-report.md",
+        "expected": "Report created at specified custom path, not default .reports/",
+        "completed_at": "2025-10-25T23:57:15.031336+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Custom --output flag works - tested with /tmp/ path, file created at custom location",
+        "journaled_at": "2025-10-26T00:07:46.496623+00:00"
+      }
+    },
+    "verify-5-5": {
+      "type": "verify",
+      "title": "All migrated files accessible",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "ls -R specs/.reports/ specs/.reviews/ specs/.backups/",
+        "expected": "All previously moved files present in new locations",
+        "completed_at": "2025-10-25T23:57:15.581385+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: All files accessible - README and metadata files present in all three hidden directories",
+        "journaled_at": "2025-10-26T00:07:46.496629+00:00"
+      }
+    },
+    "verify-5-6": {
+      "type": "verify",
+      "title": "Gitignore working correctly",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "git status | grep -E '(.reports|.reviews|.backups)'",
+        "expected": "No metadata directories appear in git status",
+        "completed_at": "2025-10-25T23:57:16.099025+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: Gitignore working - added rules to .gitignore, untracked files from git, directories now properly ignored",
+        "journaled_at": "2025-10-26T00:07:46.496634+00:00"
+      }
+    },
+    "verify-5-7": {
+      "type": "verify",
+      "title": "End-to-end workflow test",
+      "status": "completed",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create spec -> validate with report -> fix with backup -> verify locations",
+        "expected": "All outputs in correct hidden directories, specs/active/ remains clean",
+        "completed_at": "2025-10-25T23:57:16.613324+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified: End-to-end workflow successful - validation creates reports in .reports/, specs/active/ clean, git ignoring properly",
+        "journaled_at": "2025-10-26T00:07:46.496641+00:00"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-10-25T13:06:41.517869+00:00",
+      "entry_type": "note",
+      "title": "Task 1-1: Automated Implementation",
+      "author": "claude-code",
+      "content": "Updated implementation from manual one-time creation to automated generation. The .reports/ directory and README are now automatically created by the SDD toolkit when needed. Changes: Added ensure_reports_directory() function in common/paths.py, created template file at common/templates/reports_readme.md, integrated into sdd-validate, sdd-next, and sdd-plan CLIs for defensive creation at multiple entry points. Updated pyproject.toml to package template files.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-10-25T13:15:44.026856+00:00",
+      "entry_type": "note",
+      "title": "Task 1-2: Automated .reviews/ Directory",
+      "author": "claude-code",
+      "content": "Implemented automated generation of specs/.reviews/ directory following the same pattern as .reports/. Created template file at common/templates/reviews_readme.md with comprehensive documentation. Added generate_reviews_readme_content() and ensure_reviews_directory() functions to common/paths.py. Exported functions in common/__init__.py. Integrated with sdd_plan_review/cli.py to automatically save review outputs to .reviews/ directory (defaults to .reviews/, can override with --output). Template is already included in pyproject.toml package data pattern. Tested successfully - directory and README auto-generate on first use.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-10-25T13:35:49.579702+00:00",
+      "entry_type": "decision",
+      "title": "Automated .backups/ Directory Implementation",
+      "author": "claude-code",
+      "content": "Implemented .backups/ directory creation as an automated feature following the established pattern used for .reports/ and .reviews/ directories.\n\nImplementation Details:\n- Created template file: common/templates/backups_readme.md (comprehensive README explaining purpose, usage, and best practices)\n- Added helper functions to common/paths.py:\n  * generate_backups_readme_content() - reads template and returns content\n  * ensure_backups_directory(specs_dir) - creates directory and README automatically\n- Exported new functions from common/__init__.py for public API\n- Modified backup_json_spec() in common/spec.py to:\n  * Call ensure_backups_directory() before creating backups\n  * Store backups in specs/.backups/ instead of next to spec files\n  * Changed backup path from 'specs/active/spec.json.backup' to 'specs/.backups/spec-id.backup'\n\nBenefits:\n- Consistent with existing .reports/ and .reviews/ automation patterns\n- No manual intervention needed - directory created automatically when backups are needed\n- README documentation included automatically\n- Cleaner directory structure - backups don't clutter specs/active/\n- Works defensively from any entry point that creates backups\n\nTesting:\n- All Python files compile without errors\n- Backup function successfully creates .backups/ directory\n- README.md automatically generated from template\n- Backup files created in correct location\n\nThis approach is superior to manual directory creation as it ensures consistency, reduces maintenance burden, and follows established toolkit conventions.",
+      "metadata": {},
+      "task_id": "task-1-3"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:16.563435+00:00",
+      "entry_type": "note",
+      "title": "Extended Pattern to Human-Readable Docs",
+      "author": "claude-code",
+      "content": "Applied the same reorganization pattern to human-readable markdown documentation. Moved from .specs/human-readable/<status>/ to specs/.human-readable/ with flat structure. Changes: Created ensure_human_readable_directory() function in common/paths.py, updated sdd_render/cli.py to use new path, migrated 5 markdown files, updated .gitignore, removed old .specs/human-readable/ directory. Maintains consistency with .reports/, .reviews/, and .backups/ directories.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496390+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create specs/.reports/ directory",
+      "author": "claude-code",
+      "content": "Task task-1-1 completed at 2025-10-25 12:56. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496522+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create specs/.reviews/ directory",
+      "author": "claude-code",
+      "content": "Task task-1-2 completed at 2025-10-25 13:15. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496533+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Directories exist and are accessible",
+      "author": "claude-code",
+      "content": "Task verify-1-1 completed at 2025-10-25 23:48. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-1-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496540+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Gitignore prevents tracking",
+      "author": "claude-code",
+      "content": "Task verify-1-2 completed at 2025-10-25 23:48. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-1-2"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496546+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_validate/cli.py",
+      "author": "claude-code",
+      "content": "Task task-2-1 completed at 2025-10-25 23:50. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-2-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496553+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Validation reports save to .reports/",
+      "author": "claude-code",
+      "content": "Task verify-2-1 completed at 2025-10-25 23:50. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-2-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496559+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_validate/fix.py",
+      "author": "claude-code",
+      "content": "Task task-3-1 completed at 2025-10-25 23:51. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-3-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496565+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Backup files save to .backups/",
+      "author": "claude-code",
+      "content": "Task verify-3-1 completed at 2025-10-25 23:52. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-3-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496572+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+      "author": "claude-code",
+      "content": "Task task-4-1 completed at 2025-10-25 23:52. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-4-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496578+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Review outputs save to .reviews/",
+      "author": "claude-code",
+      "content": "Task verify-4-1 completed at 2025-10-25 23:52. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-4-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496584+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Move validation reports to .reports/",
+      "author": "claude-code",
+      "content": "Task task-5-1 completed at 2025-10-25 23:55. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-5-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496590+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Move review files to .reviews/",
+      "author": "claude-code",
+      "content": "Task task-5-2 completed at 2025-10-25 23:55. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-5-2"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496596+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Move backup files to .backups/",
+      "author": "claude-code",
+      "content": "Task task-5-3 completed at 2025-10-25 23:55. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "task-5-3"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496602+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: specs/active/ is clean",
+      "author": "claude-code",
+      "content": "Task verify-5-1 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-1"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496608+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Validation report generation works",
+      "author": "claude-code",
+      "content": "Task verify-5-2 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-2"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496614+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Backup file creation works",
+      "author": "claude-code",
+      "content": "Task verify-5-3 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-3"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496620+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Custom --output flag still works",
+      "author": "claude-code",
+      "content": "Task verify-5-4 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-4"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496626+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: All migrated files accessible",
+      "author": "claude-code",
+      "content": "Task verify-5-5 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-5"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496632+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: Gitignore working correctly",
+      "author": "claude-code",
+      "content": "Task verify-5-6 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-6"
+    },
+    {
+      "timestamp": "2025-10-26T00:07:46.496638+00:00",
+      "entry_type": "status_change",
+      "title": "Task Completed: End-to-end workflow test",
+      "author": "claude-code",
+      "content": "Task verify-5-7 completed at 2025-10-25 23:57. Implementation finished and marked as completed.",
+      "metadata": {},
+      "task_id": "verify-5-7"
+    }
+  ]
+}

@@ -27,18 +27,9 @@ SDD_PERMISSIONS = [
     # Slash commands
     "SlashCommand(/sdd-start)",
 
-    # CLI command permissions (via Python package)
-    "Bash(sdd-next:*)",
-    "Bash(sdd-update:*)",
-    "Bash(sdd-plan:*)",
-    "Bash(doc-query:*)",
-    "Bash(sdd-validate:*)",
-    "Bash(run-tests:*)",
-    "Bash(code-doc:*)",
-    "Bash(sdd-review:*)",
-    "Bash(sdd-integration:*)",
-    "Bash(sdd-start-helper:*)",
-    "Bash(setup-project-permissions:*)",
+    # CLI command permissions (unified sdd CLI + legacy standalone commands)
+    "Bash(sdd:*)",      # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
+    "Bash(sdd-*:*)",    # Covers: sdd-next, sdd-update, sdd-validate, sdd-integration
 
     # AI CLI tool permissions
     "Bash(cursor-agent:*)",

@@ -22,6 +22,7 @@ from claude_skills.common import (
     get_progress_summary,
     list_phases,
     PrettyPrinter,
+    ensure_reports_directory,
     # Query operations
     query_tasks,
     check_complete,
@@ -499,6 +500,9 @@ def cmd_prepare_task(args, printer):
     if not specs_dir:
         printer.error("Specs directory not found")
         return 1
+
+    # Ensure .reports/ directory exists (defensive)
+    ensure_reports_directory(specs_dir)
 
     task_prep = prepare_task(args.spec_id, specs_dir, args.task_id)
 

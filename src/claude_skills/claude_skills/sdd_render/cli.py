@@ -7,6 +7,7 @@ from typing import Optional
 from claude_skills.common import (
     find_specs_directory,
     load_json_spec,
+    ensure_human_readable_directory,
     PrettyPrinter
 )
 from .renderer import SpecRenderer
@@ -53,14 +54,20 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     # Determine output path
     if args.output:
         output_path = Path(args.output)
+        # Create output directory if needed
+        output_path.parent.mkdir(parents=True, exist_ok=True)
     else:
-        # Default: .specs/human-readable/<status>/<spec_id>.md
-        status = spec_data.get('metadata', {}).get('status') or spec_data.get('hierarchy', {}).get('spec-root', {}).get('status', 'active')
-        output_dir = Path('.specs') / 'human-readable' / status
-        output_path = output_dir / f"{spec_data.get('spec_id', spec_id)}.md"
-
-    # Create output directory if needed
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Default: specs/.human-readable/<spec_id>.md
+        # Find specs directory and use .human-readable/ subdirectory
+        specs_dir = find_specs_directory(args.path or '.')
+        if specs_dir:
+            hr_dir = ensure_human_readable_directory(specs_dir)
+            output_path = hr_dir / f"{spec_data.get('spec_id', spec_id)}.md"
+        else:
+            # Fallback to old location if specs dir not found
+            output_dir = Path('.specs') / 'human-readable'
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_path = output_dir / f"{spec_data.get('spec_id', spec_id)}.md"
 
     # Render spec to markdown
     try:
@@ -107,7 +114,7 @@ def register_render(subparsers, parent_parser):
 
     parser.add_argument(
         '--output', '-o',
-        help='Output file path (default: .specs/human-readable/<status>/<spec_id>.md)'
+        help='Output file path (default: specs/.human-readable/<spec_id>.md)'
     )
 
     parser.add_argument(

@@ -81,17 +81,7 @@ The setup adds these permissions to `.claude/settings.json`:
 - SlashCommand(/sdd-start)
 
 **CLI Tools:**
-- Bash(sdd-next:*)
-- Bash(sdd-update:*)
-- Bash(sdd-plan:*)
-- Bash(doc-query:*)
-- Bash(sdd-validate:*)
-- Bash(run-tests:*)
-- Bash(code-doc:*)
-- Bash(sdd-review:*)
-- Bash(sdd-integration:*)
-- Bash(sdd-start-helper:*)
-- Bash(setup-project-permissions:*)
+- Bash(sdd:*) - Unified CLI for all sdd commands (doc, test, skills-dev, etc.)
 
 **File Access:**
 - Read(//Users/tylerburleigh/.claude/skills/**)
