@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import time
+import shlex
 import functools
 from pathlib import Path
 from datetime import datetime
@@ -180,19 +181,10 @@ def track_metrics(skill_name: str):
             command = 'main'
 
             try:
-                # Try to extract subcommand(s) from sys.argv
+                # Extract command from sys.argv, reconstructing quotes where needed
                 if len(sys.argv) > 1:
-                    # Collect all non-flag arguments as subcommands
-                    # For "sdd doc generate" -> ["doc", "generate"] -> "doc-generate"
-                    # For "sdd next-task" -> ["next-task"]
-                    subcommands = []
-                    for arg in sys.argv[1:]:
-                        if not arg.startswith('-'):
-                            subcommands.append(arg)
-
-                    # Join with hyphens for consistency with existing format
-                    if subcommands:
-                        command = '-'.join(subcommands)
+                    # Use shlex.quote to add quotes around arguments with spaces/special chars
+                    command = ' '.join(shlex.quote(arg) for arg in sys.argv[1:])
 
                 exit_code = func(*args, **kwargs) or 0
                 return exit_code

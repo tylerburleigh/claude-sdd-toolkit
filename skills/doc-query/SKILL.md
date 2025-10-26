@@ -305,6 +305,83 @@ sdd doc dependencies app/models/session.py --reverse
 - Identifying circular dependencies
 - Planning refactoring
 
+#### Understanding Reverse Dependencies
+
+**How it works:**
+- Forward dependencies: Shows what a module **imports** (from its import statements)
+- Reverse dependencies: Shows what modules **import this module** (who depends on it)
+
+**Important: Import Names vs File Paths**
+
+The dependency system tracks **import strings as they appear in code**, not normalized file paths.
+
+**✅ Forward dependencies** work with file paths:
+```bash
+# This works - shows what this file imports
+sdd doc dependencies src/myapp/services/auth.py
+```
+
+**⚠️ Reverse dependencies** require import names:
+```bash
+# ✅ CORRECT - Use the import name
+sdd doc dependencies "myapp.services.auth" --reverse
+sdd doc dependencies "auth" --reverse  # May work for short names
+
+# ❌ INCORRECT - File path won't match import strings
+sdd doc dependencies src/myapp/services/auth.py --reverse
+# Returns: No results (even if modules import this)
+```
+
+**Why the difference?**
+
+When Python code imports a module:
+```python
+from myapp.services.auth import login  # Import string: "myapp.services.auth"
+import myapp.services.auth             # Import string: "myapp.services.auth"
+```
+
+The dependency tracker stores `"myapp.services.auth"` (the import string), not `"src/myapp/services/auth.py"` (the file path).
+
+**Finding the correct import name:**
+
+If you're not sure of the import name, use forward dependencies first:
+```bash
+# 1. Check what imports this module (look at the output)
+sdd doc dependencies src/myapp/services/auth.py
+
+# 2. Look for project-internal imports (not stdlib)
+# Output might show: "myapp.models", "myapp.config", etc.
+
+# 3. Use similar patterns for reverse lookups
+sdd doc dependencies "myapp.services.auth" --reverse
+```
+
+**Practical workflow for impact analysis:**
+
+```bash
+# Step 1: Find the module you want to analyze
+sdd doc find-module "auth" --pattern
+
+# Step 2: Check forward deps (what it uses)
+sdd doc dependencies src/myapp/services/auth.py
+
+# Step 3: Infer import name from file structure
+# File: src/myapp/services/auth.py
+# Likely import: myapp.services.auth
+
+# Step 4: Check reverse deps (who uses it)
+sdd doc dependencies "myapp.services.auth" --reverse
+
+# Step 5: Analyze the blast radius
+# Combine results to understand full impact
+```
+
+**Edge cases:**
+
+- **Standard library imports** (e.g., `argparse`, `json`): These will show reverse dependencies for all modules that import them
+- **Re-exported modules** (e.g., `__init__.py`): These may not show direct imports if other modules import from the parent package
+- **Relative imports** (e.g., `from . import foo`): Stored as relative strings, may need exact match
+
 ### 6. Search
 
 Search across all entities (classes, functions, modules).
@@ -569,6 +646,19 @@ sdd doc dependencies routes/api.py --reverse
                 Low (0-3)    High (4+)
 Complexity High │ Medium    │ CRITICAL │
           Low   │ Safe      │ Review   │
+```
+
+**Important Note on Reverse Dependencies:**
+
+If `sdd doc dependencies [target-file] --reverse` returns no results, you may need to use the **import name** instead of the file path. See the [Understanding Reverse Dependencies](#understanding-reverse-dependencies) section for details.
+
+**Quick fix:**
+```bash
+# If this returns no results:
+sdd doc dependencies utils/scoring.py --reverse
+
+# Try the import name instead:
+sdd doc dependencies "myapp.utils.scoring" --reverse
 ```
 
 **Synthesis Output:**

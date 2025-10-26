@@ -14,6 +14,59 @@ from claude_skills.common import (
 )
 
 
+def is_unblocked(spec_data: Dict, task_id: str, task_data: Dict) -> bool:
+    """
+    Check if all blocking dependencies are completed.
+
+    Args:
+        spec_data: JSON spec file data
+        task_id: Task identifier
+        task_data: Task data dictionary
+
+    Returns:
+        True if task has no blockers or all blockers are completed
+    """
+    blocked_by = task_data.get("dependencies", {}).get("blocked_by", [])
+    if not blocked_by:
+        return True
+
+    hierarchy = spec_data.get("hierarchy", {})
+    for blocker_id in blocked_by:
+        blocker = hierarchy.get(blocker_id)
+        if not blocker or blocker.get("status") != "completed":
+            return False
+    return True
+
+
+def is_in_current_phase(spec_data: Dict, task_id: str, phase_id: str) -> bool:
+    """
+    Check if task belongs to current phase (including nested groups).
+
+    Args:
+        spec_data: JSON spec file data
+        task_id: Task identifier
+        phase_id: Phase identifier to check against
+
+    Returns:
+        True if task is within the phase hierarchy
+    """
+    hierarchy = spec_data.get("hierarchy", {})
+    task = hierarchy.get(task_id)
+    if not task:
+        return False
+
+    # Walk up parent chain to find phase
+    current = task
+    while current:
+        parent_id = current.get("parent")
+        if parent_id == phase_id:
+            return True
+        if not parent_id:
+            return False
+        current = hierarchy.get(parent_id)
+    return False
+
+
 def get_next_task(spec_data: Dict) -> Optional[Tuple[str, Dict]]:
     """
     Find the next actionable task.
@@ -43,15 +96,23 @@ def get_next_task(spec_data: Dict) -> Optional[Tuple[str, Dict]]:
     if not current_phase:
         return None
 
-    # Find first available task in current phase
+    # Find first available task or subtask in current phase
+    # Prefer leaf tasks (no children) over parent tasks
+    candidates = []
     for key, value in hierarchy.items():
-        if (value.get("type") == "task" and
+        if (value.get("type") in ["task", "subtask"] and
             value.get("status") == "pending" and
-            len(value.get("dependencies", {}).get("blocked_by", [])) == 0 and
-            value.get("parent", "").startswith(current_phase)):
-            return (key, value)
+            is_unblocked(spec_data, key, value) and
+            is_in_current_phase(spec_data, key, current_phase)):
+            has_children = len(value.get("children", [])) > 0
+            candidates.append((key, value, has_children))
 
-    return None
+    if not candidates:
+        return None
+
+    # Sort: leaf tasks first (has_children=False), then by ID
+    candidates.sort(key=lambda x: (x[2], x[0]))
+    return (candidates[0][0], candidates[0][1])
 
 
 def get_task_info(spec_data: Dict, task_id: str) -> Optional[Dict]:
@@ -92,7 +153,7 @@ def check_dependencies(spec_data: Dict, task_id: str) -> Dict:
 
     result = {
         "task_id": task_id,
-        "can_start": len(blocked_by) == 0,
+        "can_start": is_unblocked(spec_data, task_id, task),
         "blocked_by": [],
         "soft_depends": [],
         "blocks": []

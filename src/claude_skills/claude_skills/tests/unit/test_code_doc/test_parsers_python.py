@@ -309,3 +309,252 @@ def process_data(items: List[str], config: Dict[str, int]) -> Optional[str]:
         result = parser.parse_file(py_file)
         func = result.functions[0]
         assert func.return_type is not None
+
+
+class TestPythonParserCrossReferences:
+    """Test cross-reference tracking in Python parser."""
+
+    @pytest.fixture
+    def parser(self, tmp_path):
+        """Create a Python parser instance."""
+        return PythonParser(tmp_path, [])
+
+    def test_track_simple_function_call(self, parser, tmp_path):
+        """Test tracking a simple function call."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def helper():
+    return 42
+
+def main():
+    result = helper()
+    return result
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+        assert len(result.cross_references.calls) >= 1
+
+        # Find the call to helper()
+        helper_calls = [c for c in result.cross_references.calls if c.callee == 'helper']
+        assert len(helper_calls) >= 1
+        call = helper_calls[0]
+        assert call.caller == 'main'
+        assert call.callee == 'helper'
+
+    def test_track_nested_function_calls(self, parser, tmp_path):
+        """Test tracking nested function calls."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def add(a, b):
+    return a + b
+
+def multiply(x, y):
+    return x * y
+
+def calculate():
+    a = add(1, 2)
+    b = multiply(3, 4)
+    return add(a, b)
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+
+        # Should have tracked calls from calculate to add and multiply
+        add_calls = [c for c in result.cross_references.calls if c.callee == 'add']
+        assert len(add_calls) >= 2  # Two calls to add
+
+        multiply_calls = [c for c in result.cross_references.calls if c.callee == 'multiply']
+        assert len(multiply_calls) >= 1  # One call to multiply
+
+    def test_track_method_calls(self, parser, tmp_path):
+        """Test tracking method calls."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+class Calculator:
+    def add(self, a, b):
+        return a + b
+
+    def compute(self):
+        result = self.add(1, 2)
+        return result
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+
+        # Should have tracked the method call
+        add_calls = [c for c in result.cross_references.calls if c.callee == 'add']
+        assert len(add_calls) >= 1
+        call = add_calls[0]
+        assert call.caller == 'compute'
+
+    def test_track_calls_in_class_methods(self, parser, tmp_path):
+        """Test tracking calls inside class methods."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+class MyClass:
+    def method1(self):
+        return 42
+
+    def method2(self):
+        value = self.method1()
+        return value * 2
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+        assert len(result.cross_references.calls) >= 1
+
+        # Verify the call was tracked with class context
+        calls = result.cross_references.calls
+        assert any(c.metadata.get('in_class') == 'MyClass' for c in calls)
+
+    def test_track_module_level_calls(self, parser, tmp_path):
+        """Test tracking calls at module level."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def setup():
+    return "initialized"
+
+# Module-level call
+config = setup()
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+
+        # Should have tracked module-level call
+        setup_calls = [c for c in result.cross_references.calls if c.callee == 'setup']
+        assert len(setup_calls) >= 1
+        call = setup_calls[0]
+        assert call.caller == '<module>'
+
+    def test_cross_reference_bidirectional(self, parser, tmp_path):
+        """Test that cross-references maintain bidirectional indexing."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def helper():
+    return 42
+
+def caller1():
+    return helper()
+
+def caller2():
+    return helper()
+""")
+
+        result = parser.parse_file(py_file)
+        graph = result.cross_references
+        assert graph is not None
+
+        # Test get_callers (reverse lookup)
+        callers = graph.get_callers('helper')
+        assert len(callers) >= 2
+        caller_names = {c.caller for c in callers}
+        assert 'caller1' in caller_names
+        assert 'caller2' in caller_names
+
+        # Test get_callees (forward lookup)
+        callees1 = graph.get_callees('caller1')
+        assert len(callees1) >= 1
+        assert callees1[0].callee == 'helper'
+
+    def test_cross_reference_in_result(self, parser, tmp_path):
+        """Test that cross-references are included in ParseResult."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def foo():
+    bar()
+
+def bar():
+    pass
+""")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+        assert hasattr(result.cross_references, 'calls')
+        assert hasattr(result.cross_references, 'callers')
+        assert hasattr(result.cross_references, 'callees')
+
+    def test_multiple_callers(self, parser, tmp_path):
+        """Test tracking multiple callers to the same function."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def shared():
+    return 42
+
+def caller1():
+    return shared()
+
+def caller2():
+    return shared()
+
+def caller3():
+    return shared()
+""")
+
+        result = parser.parse_file(py_file)
+        graph = result.cross_references
+        assert graph is not None
+
+        # Should have three calls to shared
+        shared_calls = graph.get_callers('shared')
+        assert len(shared_calls) == 3
+
+        # Verify statistics
+        assert graph.stats['total_calls'] >= 3
+
+    def test_call_tracking_with_decorators(self, parser, tmp_path):
+        """Test that decorators don't interfere with call tracking."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def decorator(func):
+    return func
+
+@decorator
+def decorated_func():
+    return helper()
+
+def helper():
+    return 42
+""")
+
+        result = parser.parse_file(py_file)
+        graph = result.cross_references
+        assert graph is not None
+
+        # Should still track the call to helper from decorated_func
+        helper_calls = [c for c in graph.calls if c.callee == 'helper']
+        assert len(helper_calls) >= 1
+        assert helper_calls[0].caller == 'decorated_func'
+
+    def test_empty_file_has_graph(self, parser, tmp_path):
+        """Test that even empty files have a cross-reference graph."""
+        py_file = tmp_path / "empty.py"
+        py_file.write_text("")
+
+        result = parser.parse_file(py_file)
+        assert result.cross_references is not None
+        assert len(result.cross_references.calls) == 0
+        assert result.cross_references.stats['total_calls'] == 0
+
+    def test_line_numbers_tracked(self, parser, tmp_path):
+        """Test that call line numbers are tracked correctly."""
+        py_file = tmp_path / "test.py"
+        py_file.write_text("""
+def helper():
+    return 42
+
+def main():
+    x = helper()  # Line 6
+    return x
+""")
+
+        result = parser.parse_file(py_file)
+        graph = result.cross_references
+        helper_calls = [c for c in graph.calls if c.callee == 'helper']
+        assert len(helper_calls) >= 1
+        call = helper_calls[0]
+        assert call.caller_line == 6

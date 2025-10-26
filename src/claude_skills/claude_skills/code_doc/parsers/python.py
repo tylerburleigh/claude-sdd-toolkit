@@ -20,6 +20,12 @@ from .base import (
     ParsedFunction,
     ParsedParameter,
 )
+from ..ast_analysis import (
+    CrossReferenceGraph,
+    CallSite,
+    ReferenceType,
+    create_cross_reference_graph,
+)
 
 
 class PythonParser(BaseParser):
@@ -34,6 +40,133 @@ class PythonParser(BaseParser):
     def file_extensions(self) -> List[str]:
         """Python file extensions."""
         return ['py']
+
+    class _CallTracker(ast.NodeVisitor):
+        """
+        AST visitor that tracks function calls and builds cross-reference graph.
+
+        Walks the entire AST tree to find function/method calls, maintaining
+        context about which function is currently being analyzed (the caller).
+        """
+
+        def __init__(self, graph: CrossReferenceGraph, file_path: str):
+            """
+            Initialize call tracker.
+
+            Args:
+                graph: CrossReferenceGraph to populate with calls
+                file_path: Path to file being analyzed (for caller_file)
+            """
+            self.graph = graph
+            self.file_path = file_path
+            self.context_stack = []  # Stack of (type, name) tuples for current context
+            self.current_function = None  # Name of current function being analyzed
+            self.current_class = None  # Name of current class being analyzed
+
+        def _push_context(self, context_type: str, name: str):
+            """Push a new context onto the stack."""
+            self.context_stack.append((context_type, name))
+            if context_type == 'function':
+                self.current_function = name
+            elif context_type == 'class':
+                self.current_class = name
+
+        def _pop_context(self):
+            """Pop context from stack and update current function/class."""
+            if self.context_stack:
+                self.context_stack.pop()
+
+            # Update current_function to the most recent function in stack
+            self.current_function = None
+            self.current_class = None
+            for context_type, name in reversed(self.context_stack):
+                if context_type == 'function' and self.current_function is None:
+                    self.current_function = name
+                elif context_type == 'class' and self.current_class is None:
+                    self.current_class = name
+
+        def visit_FunctionDef(self, node: ast.FunctionDef):
+            """Track entry into a function definition."""
+            self._push_context('function', node.name)
+            self.generic_visit(node)  # Visit children
+            self._pop_context()
+
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
+            """Track entry into an async function definition."""
+            self._push_context('function', node.name)
+            self.generic_visit(node)  # Visit children
+            self._pop_context()
+
+        def visit_ClassDef(self, node: ast.ClassDef):
+            """Track entry into a class definition."""
+            self._push_context('class', node.name)
+            self.generic_visit(node)  # Visit children
+            self._pop_context()
+
+        def visit_Call(self, node: ast.Call):
+            """Track function/method calls."""
+            # Extract callee name from the call node
+            callee_name = self._extract_callee_name(node.func)
+
+            if callee_name:
+                # Determine caller name (function or module-level)
+                caller_name = self.current_function if self.current_function else '<module>'
+
+                # Determine call type (method call vs function call)
+                call_type = ReferenceType.METHOD_CALL if isinstance(node.func, ast.Attribute) else ReferenceType.FUNCTION_CALL
+
+                # Create CallSite object
+                call_site = CallSite(
+                    caller=caller_name,
+                    caller_file=self.file_path,
+                    caller_line=node.lineno,
+                    callee=callee_name,
+                    callee_file=None,  # Unknown at parse time, resolved later
+                    call_type=call_type,
+                    metadata={
+                        'in_class': self.current_class,
+                        'context': [name for _, name in self.context_stack]
+                    }
+                )
+
+                # Add to graph
+                self.graph.add_call(call_site)
+
+            # Continue visiting children
+            self.generic_visit(node)
+
+        def _extract_callee_name(self, node) -> str:
+            """
+            Extract the callee name from a call node.
+
+            Handles:
+            - Simple function calls: foo()
+            - Method calls: obj.method()
+            - Chained calls: obj.foo().bar() (extracts 'bar')
+            - Attribute access: module.submodule.func()
+
+            Args:
+                node: AST node representing the function being called
+
+            Returns:
+                Callee name as string, or None if cannot extract
+            """
+            if isinstance(node, ast.Name):
+                # Simple function call: foo()
+                return node.id
+
+            elif isinstance(node, ast.Attribute):
+                # Method call or attribute access: obj.method()
+                # For now, just return the method name
+                return node.attr
+
+            elif isinstance(node, ast.Call):
+                # Chained call: foo().bar()
+                # Recursively extract from the result of inner call
+                return self._extract_callee_name(node.func)
+
+            # For complex expressions (subscripts, lambda, etc.), skip for now
+            return None
 
     def parse_file(self, file_path: Path) -> ParseResult:
         """
@@ -53,6 +186,10 @@ class PythonParser(BaseParser):
                 source = f.read()
 
             tree = ast.parse(source)
+
+            # Create cross-reference graph and tracker
+            graph = create_cross_reference_graph()
+            tracker = self._CallTracker(graph, relative_path)
 
             # Create module info
             module = ParsedModule(
@@ -82,6 +219,12 @@ class PythonParser(BaseParser):
                     imports = self._extract_imports(node)
                     module.imports.extend(imports)
                     dependencies.extend(imports)
+
+            # Walk the entire AST to track function calls
+            tracker.visit(tree)
+
+            # Add cross-reference graph to result
+            result.cross_references = graph
 
             # Add module to result
             result.modules.append(module)

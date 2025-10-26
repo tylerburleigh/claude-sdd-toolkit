@@ -1,7 +1,7 @@
 {
   "spec_id": "doc-query-enhancements-2025-10-24-001",
   "generated": "2025-10-24T00:00:00Z",
-  "last_updated": "2025-10-24T17:40:00Z",
+  "last_updated": "2025-10-26T13:11:33.632181+00:00",
   "metadata": {
     "title": "Doc-Query CLI Enhancement",
     "description": "Enhance doc-query skill with workflow automation, cross-reference tracking, and improved UX to reduce manual command chaining from 6-8 steps to 1 step for common workflows",
@@ -46,7 +46,7 @@
     "spec-root": {
       "type": "spec",
       "title": "Doc-Query CLI Enhancement",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -55,20 +55,20 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {}
     },
     "phase-1": {
       "type": "phase",
       "title": "P0: Foundation - Critical Fixes",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 21,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Fix critical blockers: reverse dependency support and cross-reference generation",
         "risk_level": "high",
@@ -86,7 +86,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -96,7 +96,7 @@
         "task-1-5"
       ],
       "total_tasks": 16,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -109,7 +109,7 @@
     "task-1-1": {
       "type": "task",
       "title": "Verify reverse dependency support",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -124,17 +124,21 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Inspect documentation.json schema and test reverse dependency functionality",
         "estimated_hours": 4,
-        "file_path": "investigation"
+        "file_path": "investigation",
+        "completed_at": "2025-10-26T12:49:43.900206+00:00",
+        "needs_journaling": false,
+        "status_note": "Verified reverse dependency support is implemented and working. Added comprehensive documentation to SKILL.md clarifying import names vs file paths. Created findings report and enhancement summary.",
+        "journaled_at": "2025-10-26T13:11:33.632127+00:00"
       }
     },
     "task-1-1-1": {
       "type": "subtask",
       "title": "Inspect documentation.json schema for reverse dependency data",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -145,18 +149,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "actions": [
           "Check if imported_by field exists in modules",
           "Verify reverse dependency tracking in current schema"
-        ]
+        ],
+        "completed_at": "2025-10-26T12:49:57.511971+00:00",
+        "needs_journaling": true,
+        "status_note": "Inspected documentation.json schema - reverse dependency data structure confirmed"
       }
     },
     "task-1-1-2": {
       "type": "subtask",
       "title": "Test sdd doc dependencies --reverse on real codebase",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -169,18 +176,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "actions": [
           "Run dependencies --reverse on multiple modules",
           "Verify completeness and accuracy of results"
-        ]
+        ],
+        "completed_at": "2025-10-26T12:50:03.613182+00:00",
+        "needs_journaling": true,
+        "status_note": "Tested sdd doc dependencies --reverse - verified it works with import names, identified file path limitation"
       }
     },
     "task-1-1-3": {
       "type": "subtask",
       "title": "Document findings and determine if fix needed",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -191,19 +201,22 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "actions": [
           "Create report of reverse dependency status",
           "Identify gaps if any",
           "Estimate effort to fix"
-        ]
+        ],
+        "completed_at": "2025-10-26T12:50:08.718817+00:00",
+        "needs_journaling": true,
+        "status_note": "Created comprehensive findings report and documentation enhancement. Determined no fix needed - feature working as designed."
       }
     },
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/code_doc/ast_analysis.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-2-1",
@@ -221,17 +234,19 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/code_doc/ast_analysis.py",
         "description": "Add cross-reference tracking during AST analysis to capture caller/callee relationships",
-        "estimated_hours": 16
+        "estimated_hours": 16,
+        "started_at": "2025-10-26T13:04:56.533668+00:00",
+        "status_note": "Starting Python parser integration for function call tracking"
       }
     },
     "task-1-2-1": {
       "type": "subtask",
       "title": "Implement function call tracking during AST traversal",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-2",
       "children": [],
       "dependencies": {
@@ -242,14 +257,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "changes": [
           "Add call tracking in AST visitor",
           "Capture function call expressions",
           "Store caller/callee relationships",
           "Track call locations (file, line)"
-        ]
+        ],
+        "started_at": "2025-10-26T13:10:36.152165+00:00",
+        "status_note": "CallTracker AST visitor implemented with 11 passing tests. Tracks 82 calls in python.py successfully.",
+        "completed_at": "2025-10-26T13:11:06.412486+00:00",
+        "needs_journaling": true
       }
     },
     "task-1-2-2": {
@@ -1631,5 +1650,33 @@
         "file_path": "tbd"
       }
     }
-  }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-10-26T12:59:08.437990+00:00",
+      "entry_type": "note",
+      "title": "Progress Update: Cross-Reference Tracking Foundation Complete",
+      "author": "claude-code",
+      "content": "Completed foundational work for task-1-2 (approximately 25% of 16-hour estimate):\n\n**Files Created:**\n- ast_analysis.py: Core data structures for cross-reference tracking\n  - CrossReferenceGraph class with bidirectional indexing\n  - CallSite and InstantiationSite tracking\n  - DynamicPatternWarning system for accuracy limitations\n  - Full serialization support for JSON output\n\n**Files Modified:**\n- base.py: Updated ParseResult to include cross_references field\n  - Added merge() logic for combining graphs from multiple files\n  - Integrated cross-references into to_dict() for JSON output\n\n**Design Decisions:**\n1. Bidirectional Indexing: Separate forward/reverse lookup dictionaries for O(1) query performance\n2. Modular Design: CrossReferenceGraph is independent class, can be used standalone\n3. Extensible Metadata: Each reference has metadata dict for future enhancements\n4. Warning System: Explicit tracking of dynamic patterns (decorators, reflection, etc.) that affect accuracy\n\n**Remaining Work (est. 12 hours):**\n- Python parser integration (3-4 hours)\n- Class instantiation tracking (3-4 hours)  \n- Dynamic pattern detection (3-4 hours)\n- Testing and documentation (2-3 hours)\n\n**Status:** Foundation complete, ready for parser integration.",
+      "metadata": {},
+      "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-10-26T13:08:53.954143+00:00",
+      "entry_type": "note",
+      "title": "Task-1-2-1: Function Call Tracking Implementation",
+      "author": "claude-code",
+      "content": "Implemented function call tracking during AST traversal in Python parser.\n\n## Implementation Details\n\n**CallTracker Class (_CallTracker)**:\n- Nested class in PythonParser inheriting from ast.NodeVisitor\n- Maintains context stack to track current function/class being analyzed\n- Overrides visit_FunctionDef, visit_AsyncFunctionDef, visit_ClassDef for context tracking\n- Overrides visit_Call to capture function and method calls\n\n**Context Tracking**:\n- Uses context_stack to handle nested functions and classes\n- Identifies caller as current_function or '<module>' for module-level calls\n- Records class context in metadata for method calls\n\n**Call Detection**:\n- Distinguishes between function calls (ast.Name) and method calls (ast.Attribute)\n- Extracts callee name from simple calls, method calls, and chained calls\n- Creates CallSite objects with caller, callee, line numbers, and metadata\n- Adds to CrossReferenceGraph for bidirectional indexing\n\n**Integration**:\n- Creates CrossReferenceGraph in parse_file() before parsing\n- Calls tracker.visit(tree) after AST parse to walk entire tree\n- Assigns graph to result.cross_references\n\n## Verification\n\n**Test Results**:\n- 11 new tests added (TestPythonParserCrossReferences class)\n- All 27 total tests pass (16 existing + 11 new)\n- Tests cover: simple calls, nested calls, method calls, class methods, module-level calls, bidirectional lookups, multiple callers, decorators, empty files, line numbers\n\n**Manual Testing**:\n- Tested on python.py itself: tracked 82 calls across 38 callees and 12 callers\n- Sample calls verified: _push_context->append, _pop_context->pop, etc.\n\n## Key Design Decisions\n\n1. **Context Stack**: Maintains full context path for nested functions\n2. **Module-level Calls**: Tracked with caller='<module>' for top-level code\n3. **Method Call Type**: Uses ast.Attribute to distinguish methods from functions\n4. **Metadata**: Stores class context and full context path for future analysis\n5. **Graceful Degradation**: Returns None for complex call expressions (lambdas, subscripts)\n\n## Edge Cases Handled\n\n- Nested functions and classes\n- Decorator functions (don't confuse decorator with call)\n- Module-level calls\n- Empty files (creates empty graph)\n- Method calls vs function calls\n- Chained calls (extracts final method name)\n\n## Performance\n\n- O(n) traversal of AST tree where n = number of nodes\n- O(1) bidirectional lookups via callers/callees dictionaries\n- Minimal memory overhead per call site (~200 bytes)\n\n## Next Steps\n\n- task-1-2-2: Implement class instantiation tracking\n- task-1-2-3: Build bidirectional reference graph (may already be complete)\n- task-1-2-4: Add warning system for dynamic Python patterns\n\n## Files Modified\n\n- src/claude_skills/claude_skills/code_doc/parsers/python.py\n- src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-10-26T13:11:33.632112+00:00",
+      "entry_type": "note",
+      "title": "Task-1-1: Reverse Dependency Support Verified",
+      "author": "claude-code",
+      "content": "Verified that reverse dependency support is already fully implemented and working in the doc-query skill.\n\n## Investigation Results\n\n**Schema Inspection (task-1-1-1)**:\n- Confirmed imported_by field exists in module schema\n- Reverse dependency tracking structure validated in documentation.json\n- Data structure supports bidirectional dependency lookups\n\n**Functional Testing (task-1-1-2)**:\n- Tested 'sdd doc dependencies --reverse' on real codebase\n- Command works correctly with import names (e.g., 'claude_skills.sdd_next.next_task')\n- Identified limitation: requires import names, not file paths\n- This is by design - consistent with forward dependency behavior\n\n**Documentation (task-1-1-3)**:\n- Created comprehensive findings report\n- Enhanced SKILL.md documentation clarifying import name vs file path usage\n- Added usage examples for reverse dependency queries\n- Documented query patterns and best practices\n\n## Conclusion\n\nNo implementation fix needed - feature is working as designed. The perceived gap was actually a documentation gap, which has been resolved.\n\n## Impact\n\n- Unblocked task-1-2 (cross-reference tracking implementation)\n- Confirmed foundation for Phase 1 is solid\n- Documentation improvements benefit all doc-query users",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ]
 }
