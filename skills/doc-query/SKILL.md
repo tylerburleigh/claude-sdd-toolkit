@@ -466,6 +466,164 @@ sdd doc list-modules
 - Browsing codebase structure
 - Verifying documentation completeness
 
+---
+
+## High-Level Workflow Commands
+
+These commands automate common workflows by combining multiple queries into single, purpose-built commands.
+
+### 10. Trace Entry Point
+
+Trace execution flow from an entry function, showing the complete call chain with architectural layers and complexity analysis.
+
+```bash
+sdd doc trace-entry <function> [--max-depth N] [--format text|json] [--docs-path PATH]
+```
+
+**Options:**
+- `--max-depth N` - Maximum call chain depth (default: 5)
+- `--format` - Output format: text or json (default: text)
+
+**Examples:**
+```bash
+# Trace execution flow from main
+sdd doc trace-entry main
+
+# Trace with custom depth
+sdd doc trace-entry process_request --max-depth 3
+
+# JSON output for programmatic use
+sdd doc trace-entry main --format json
+```
+
+**Output includes:**
+- Complete call chain tree visualization
+- Architectural layer classification (Presentation, Business Logic, Data, etc.)
+- Complexity scores for each function
+- Hot spot identification (high complexity or high fan-out)
+- Summary statistics
+
+**When to use:**
+- Understanding how a feature works end-to-end
+- Finding performance bottlenecks in execution paths
+- Identifying complex call chains that need refactoring
+- Documenting system flows
+
+### 11. Trace Data Lifecycle
+
+Trace how a data object (class) flows through the codebase, showing CRUD operations and usage patterns.
+
+```bash
+sdd doc trace-data <classname> [--include-properties] [--format text|json] [--docs-path PATH]
+```
+
+**Options:**
+- `--include-properties` - Include detailed property access analysis
+- `--format` - Output format: text or json (default: text)
+
+**Examples:**
+```bash
+# Trace User class lifecycle
+sdd doc trace-data User
+
+# Include property access patterns
+sdd doc trace-data User --include-properties
+
+# JSON output
+sdd doc trace-data DocumentationQuery --format json
+```
+
+**Output includes:**
+- CREATE operations (where instances are created)
+- READ operations (functions that access the data)
+- UPDATE operations (functions that modify the data)
+- DELETE operations (where data is destroyed)
+- Usage map organized by architectural layer
+- Property access analysis (when --include-properties is used)
+
+**When to use:**
+- Understanding data flow through the system
+- Finding all places where data is modified
+- Identifying mutation hot spots
+- Planning data model refactoring
+
+### 12. Impact Analysis
+
+Analyze the impact of changing a function or class, calculating the blast radius with risk assessment.
+
+```bash
+sdd doc impact <entity> [--depth N] [--format text|json] [--docs-path PATH]
+```
+
+**Options:**
+- `--depth N` - Maximum depth for indirect dependency traversal (default: 2)
+- `--format` - Output format: text or json (default: text)
+
+**Examples:**
+```bash
+# Analyze impact of changing a function
+sdd doc impact calculate_score
+
+# Deep analysis with 3 levels
+sdd doc impact UserService --depth 3
+
+# JSON output
+sdd doc impact main --format json
+```
+
+**Output includes:**
+- Direct dependents (functions/classes that directly use this entity)
+- Indirect dependents (2nd+ degree dependencies)
+- Test coverage estimation
+- Risk score and level (high/medium/low)
+- Actionable recommendations based on risk level
+- Layer-by-layer impact breakdown
+
+**When to use:**
+- Pre-refactoring risk assessment
+- Understanding blast radius before changes
+- Planning safe refactoring strategies
+- Identifying coordination needs for changes
+
+### 13. Refactor Candidates
+
+Find high-priority refactoring candidates by combining complexity metrics with usage data.
+
+```bash
+sdd doc refactor-candidates [--min-complexity N] [--limit N] [--format text|json] [--docs-path PATH]
+```
+
+**Options:**
+- `--min-complexity N` - Minimum complexity threshold (default: 10)
+- `--limit N` - Maximum number of candidates to return (default: 20)
+- `--format` - Output format: text or json (default: text)
+
+**Examples:**
+```bash
+# Find refactoring candidates
+sdd doc refactor-candidates
+
+# Focus on high-complexity functions
+sdd doc refactor-candidates --min-complexity 20 --limit 10
+
+# JSON output for tooling integration
+sdd doc refactor-candidates --format json
+```
+
+**Output includes:**
+- Prioritized list sorted by priority score (complexity × dependents)
+- Risk level categorization (high/medium/low)
+- Quick wins (high complexity, low dependents - safe to refactor)
+- Major refactors (high complexity, high dependents - need planning)
+- Actionable recommendations for each candidate
+- Summary statistics and risk distribution
+
+**When to use:**
+- Planning technical debt reduction
+- Prioritizing refactoring work
+- Identifying quick wins vs major efforts
+- Code quality improvement initiatives
+
 ## Exploratory Research Workflows
 
 These workflows provide systematic approaches to understanding any codebase. All patterns use generic placeholders like `[feature]`, `[entity]`, `[pattern]` - substitute with your domain-specific terms.
@@ -1479,32 +1637,6 @@ output:
 ## Future Enhancements
 
 The following enhancements are planned for future releases to make the skill even more powerful.
-
-### Phase 2: High-Level Wrapper Commands (Planned)
-
-Add convenience commands that automate common workflows:
-
-```bash
-# TRACE-ENTRY-POINT wrapper
-sdd doc trace-entry [function-name]
-# Automatically runs: find-function → describe-module → dependencies → search
-
-# TRACE-DATA-OBJECT wrapper
-sdd doc trace-data [class-name]
-# Automatically runs: find-class → search (create/update/delete) → describe-modules
-
-# EXPLORE-FEATURE-AREA wrapper
-sdd doc explore [feature-keyword]
-# Automatically runs: context → describe-modules → complexity → dependencies
-
-# IMPACT-ANALYSIS wrapper
-sdd doc impact [entity-name]
-# Automatically runs: find → dependencies --reverse → complexity → risk assessment
-
-# REFACTOR-PRIORITY wrapper
-sdd doc refactor-candidates [--threshold=N]
-# Automatically runs: complexity → dependencies --reverse → prioritization matrix
-```
 
 ### Phase 3: Framework-Aware Queries (Planned)
 

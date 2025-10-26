@@ -39,16 +39,42 @@ This directory contains Claude Code hooks that automate SDD (Spec-Driven Develop
 
 ## Configuration
 
-Hooks are registered in `.claude/settings.json`:
+Hooks are configured in this plugin via `hooks/hooks.json`:
 
 ```json
 {
   "hooks": {
-    "session-start": ".claude/hooks/session-start",
-    "pre-tool-use": ".claude/hooks/pre-tool-use"
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Skill|SlashCommand",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
+
+**How it works**:
+- Hooks are **plugin-level** configuration (not project-level)
+- Claude Code automatically loads hooks from installed plugins
+- `${CLAUDE_PLUGIN_ROOT}` ensures portable paths across installations
+- The `matcher` field matches tool names (e.g., "Skill", "SlashCommand", "Write", "Edit")
+- The pre-tool-use script filters for SDD-specific tools internally
 
 ## Permissions
 
@@ -113,9 +139,10 @@ Hook behavior is controlled via settings:
 ## Troubleshooting
 
 ### Hooks not running
-1. Check hooks are registered in `.claude/settings.json`
-2. Verify hook scripts are executable: `chmod +x .claude/hooks/*`
+1. Verify `hooks/hooks.json` exists in the plugin root
+2. Check hook scripts are executable: `chmod +x hooks/*`
 3. Check hook scripts have proper shebang: `#!/bin/bash`
+4. Restart Claude Code to reload plugin configuration
 
 ### Permission prompts not appearing
 1. Verify `auto_offer_permissions` is `true` in settings
@@ -146,12 +173,13 @@ rm /tmp/.claude-sdd-start-*.json
 tail -f /tmp/session-start.log
 ```
 
-## Integration with CLAUDE.md
+## Plugin Integration
 
-These hooks integrate with the instructions in `~/.claude/CLAUDE.md`:
+These hooks are automatically loaded by Claude Code when the plugin is installed:
 
-1. **Session Start**: Claude checks for marker files and proactively greets users with SDD context
-2. **Permission Setup**: Hooks ensure required permissions are configured before skill usage
+1. **Session Start**: Hook runs when a session starts, checks for active specs, and creates marker files for Claude to read
+2. **Permission Setup**: PreToolUse hook ensures required permissions are configured before SDD skills run
 3. **State Tracking**: Declined projects are tracked to avoid repeated prompts
+4. **Non-intrusive**: Hooks only activate in projects with `specs/active/` directories
 
-See `~/.claude/CLAUDE.md` for Claude's session start behavior and workflow guidance.
+**No manual registration needed** - Claude Code automatically discovers and loads plugin hooks from `hooks/hooks.json`.

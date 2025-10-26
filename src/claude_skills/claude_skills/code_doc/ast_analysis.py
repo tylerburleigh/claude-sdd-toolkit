@@ -220,6 +220,28 @@ class CrossReferenceGraph:
         """
         return self.instantiated_by.get(class_name, [])
 
+    def get_instantiators(self, function_name: str, file: Optional[str] = None) -> List[InstantiationSite]:
+        """
+        Get all classes instantiated by a given function.
+
+        Args:
+            function_name: Name of the function
+            file: Optional file path for disambiguation
+
+        Returns:
+            List of InstantiationSite objects
+        """
+        if file:
+            key = f"{file}:{function_name}"
+            return self.instantiators.get(key, [])
+
+        # Without file, return all matches
+        results = []
+        for key, inst_sites in self.instantiators.items():
+            if key.endswith(f":{function_name}"):
+                results.extend(inst_sites)
+        return results
+
     def get_imported_by(self, module_name: str) -> Set[str]:
         """
         Get all files that import a given module.
@@ -231,6 +253,18 @@ class CrossReferenceGraph:
             Set of file paths
         """
         return self.imported_by.get(module_name, set())
+
+    def get_imports(self, file: str) -> Set[str]:
+        """
+        Get all modules imported by a given file.
+
+        Args:
+            file: File path
+
+        Returns:
+            Set of imported module names
+        """
+        return self.imports.get(file, set())
 
     def to_dict(self) -> Dict[str, Any]:
         """

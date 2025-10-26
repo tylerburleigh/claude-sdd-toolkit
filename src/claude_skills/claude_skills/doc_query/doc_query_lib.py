@@ -137,6 +137,10 @@ class DocumentationQuery:
             normalized.setdefault('decorators', [])
             normalized.setdefault('complexity', 0)
             normalized.setdefault('is_async', False)
+            # Schema v2.0: Cross-reference fields
+            normalized.setdefault('callers', [])
+            normalized.setdefault('calls', [])
+            normalized.setdefault('call_count', None)
             functions.append(normalized)
         data['functions'] = functions
 
@@ -401,6 +405,89 @@ class DocumentationQuery:
             'reverse_dependencies': list(module_info.get('reverse_dependencies', [])),
             'statistics': dict(module_info.get('statistics', {}))
         }
+
+    @staticmethod
+    def apply_pattern_filter(
+        items: Iterable[Dict[str, Any]],
+        name: str,
+        pattern: bool = False,
+        key_func: Optional[callable] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Filter items by name or pattern.
+
+        Provides consistent pattern matching behavior across query methods.
+        Supports both exact string matching and regex pattern matching.
+
+        Args:
+            items: Iterable of items to filter (typically dicts with 'name' key)
+            name: Name or regex pattern to match against
+            pattern: If True, treat name as regex pattern (case-insensitive).
+                    If False, perform exact string match.
+            key_func: Optional function to extract the field to match.
+                     Defaults to lambda x: x.get('name', '').
+                     Should return a string to match against.
+
+        Returns:
+            List of matching items from the input iterable.
+
+        Raises:
+            re.error: If pattern=True and name is an invalid regex pattern.
+
+        Examples:
+            >>> items = [{'name': 'Calculator'}, {'name': 'Validator'}]
+            >>> # Exact match
+            >>> results = apply_pattern_filter(items, 'Calculator', pattern=False)
+            >>> len(results)
+            1
+
+            >>> # Regex pattern (case-insensitive)
+            >>> results = apply_pattern_filter(items, 'calc', pattern=True)
+            >>> len(results)
+            1
+
+            >>> # Custom key function
+            >>> items = [{'file': 'src/calc.py'}, {'file': 'src/valid.py'}]
+            >>> results = apply_pattern_filter(
+            ...     items, 'calc', pattern=True,
+            ...     key_func=lambda x: x.get('file', '')
+            ... )
+            >>> len(results)
+            1
+
+        Note:
+            - Pattern matching is case-insensitive
+            - Items where key_func returns empty string or None are skipped
+            - Invalid regex patterns will raise re.error (not caught internally)
+        """
+        if key_func is None:
+            key_func = lambda x: x.get('name', '')
+
+        results = []
+
+        if pattern:
+            # Compile regex once before loop (case-insensitive)
+            regex = re.compile(name, re.IGNORECASE)
+            for item in items:
+                try:
+                    value = key_func(item)
+                    if value and regex.search(str(value)):
+                        results.append(item)
+                except (KeyError, AttributeError, TypeError):
+                    # Skip items where key extraction fails
+                    continue
+        else:
+            # Exact match
+            for item in items:
+                try:
+                    value = key_func(item)
+                    if value == name:
+                        results.append(item)
+                except (KeyError, AttributeError, TypeError):
+                    # Skip items where key extraction fails
+                    continue
+
+        return results
 
     def _ensure_loaded(self):
         """Ensure documentation is loaded."""
@@ -998,6 +1085,362 @@ class DocumentationQuery:
             ))
 
         return results
+
+    def get_callers(
+        self,
+        function_name: str,
+        include_file: bool = True,
+        include_line: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all functions that call the specified function.
+
+        Queries the 'callers' field from schema v2.0 to return functions
+        that call the specified function. This enables "who calls this?" queries.
+
+        Args:
+            function_name: Name of the function to query
+            include_file: Include file path in results (default: True)
+            include_line: Include line numbers in results (default: True)
+
+        Returns:
+            List of caller information dictionaries with keys:
+            - name: Name of the calling function
+            - call_type: Type of call (e.g., 'function_call', 'method_call')
+            - file: File path (if include_file=True)
+            - line: Line number (if include_line=True)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> callers = query.get_callers("process_data")
+            >>> for caller in callers:
+            ...     print(f"{caller['name']} calls process_data at {caller['file']}:{caller['line']}")
+
+        Note:
+            Returns empty list if function not found or if using schema v1.0
+            documentation without cross-reference data.
+        """
+        self._ensure_loaded()
+
+        # Find the function
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return []
+
+        # Get callers from the first matching function
+        func = functions[0]
+        callers_data = func.get('callers', [])
+
+        # Format results
+        results = []
+        for caller in callers_data:
+            if not isinstance(caller, dict):
+                continue
+
+            result = {
+                'name': caller.get('name', ''),
+                'call_type': caller.get('call_type', 'unknown')
+            }
+
+            if include_file:
+                result['file'] = caller.get('file', '')
+
+            if include_line:
+                result['line'] = caller.get('line')
+
+            results.append(result)
+
+        return results
+
+    def get_callees(
+        self,
+        function_name: str,
+        include_file: bool = True,
+        include_line: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all functions called by the specified function.
+
+        Queries the 'calls' field from schema v2.0 to return functions
+        called by the specified function. This enables "what does this call?" queries.
+
+        Args:
+            function_name: Name of the function to query
+            include_file: Include file path in results (default: True)
+            include_line: Include line numbers in results (default: True)
+
+        Returns:
+            List of callee information dictionaries with keys:
+            - name: Name of the called function
+            - call_type: Type of call (e.g., 'function_call', 'method_call')
+            - file: File path (if include_file=True)
+            - line: Line number (if include_line=True)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> callees = query.get_callees("main")
+            >>> for callee in callees:
+            ...     print(f"main calls {callee['name']} at {callee['file']}:{callee['line']}")
+
+        Note:
+            Returns empty list if function not found or if using schema v1.0
+            documentation without cross-reference data.
+        """
+        self._ensure_loaded()
+
+        # Find the function
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return []
+
+        # Get calls from the first matching function
+        func = functions[0]
+        calls_data = func.get('calls', [])
+
+        # Format results
+        results = []
+        for callee in calls_data:
+            if not isinstance(callee, dict):
+                continue
+
+            result = {
+                'name': callee.get('name', ''),
+                'call_type': callee.get('call_type', 'unknown')
+            }
+
+            if include_file:
+                result['file'] = callee.get('file', '')
+
+            if include_line:
+                result['line'] = callee.get('line')
+
+            results.append(result)
+
+        return results
+
+    def get_call_count(self, function_name: str) -> Optional[int]:
+        """
+        Get the total number of times a function is called across the codebase.
+
+        Returns the call_count field from schema v2.0 if available.
+
+        Args:
+            function_name: Name of the function to query
+
+        Returns:
+            Call count as an integer, or None if:
+            - Function not found
+            - Using schema v1.0 without call_count field
+            - Call count not computed
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> count = query.get_call_count("process_data")
+            >>> if count is not None:
+            ...     print(f"process_data is called {count} times")
+        """
+        self._ensure_loaded()
+
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return None
+
+        return functions[0].get('call_count')
+
+    def _create_graph_node(
+        self,
+        function_name: str,
+        depth: int,
+        include_metadata: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Create a graph node with function metadata.
+
+        Helper method for build_call_graph() that creates a node
+        dictionary with function information.
+
+        Args:
+            function_name: Name of the function
+            depth: Depth in the graph from the root
+            include_metadata: Include file path and metadata
+
+        Returns:
+            Dictionary with node data
+        """
+        node = {
+            "name": function_name,
+            "depth": depth
+        }
+
+        if include_metadata:
+            # Find function in data
+            functions = [f for f in self.data.get('functions', [])
+                         if f.get('name') == function_name]
+
+            if functions:
+                func = functions[0]
+                node['file'] = func.get('file', '')
+                node['line'] = func.get('line')
+                call_count = func.get('call_count')
+                if call_count is not None:
+                    node['call_count'] = call_count
+
+        return node
+
+    def build_call_graph(
+        self,
+        function_name: str,
+        direction: str = "both",
+        max_depth: int = 3,
+        include_metadata: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Build a call graph starting from the specified function.
+
+        Recursively traverses function call relationships to build a complete
+        graph of callers, callees, or both. Useful for impact analysis and
+        visualizing function dependencies.
+
+        Uses breadth-first search (BFS) to explore the graph, tracking visited
+        nodes to handle cycles and respecting max_depth to prevent excessive
+        recursion.
+
+        Args:
+            function_name: Starting function for the graph
+            direction: Direction to traverse (default: "both"):
+                - "callers": Functions that call this function (upstream)
+                - "callees": Functions called by this function (downstream)
+                - "both": Both directions (full dependency graph)
+            max_depth: Maximum recursion depth (default: 3).
+                       Depth 0 is the root function.
+            include_metadata: Include file paths and metadata in nodes
+                             (default: True)
+
+        Returns:
+            Dictionary with keys:
+            - root: Starting function name
+            - direction: Direction traversed
+            - max_depth: Maximum depth used
+            - nodes: Dict mapping function names to node data
+            - edges: List of call relationships (from -> to)
+            - truncated: True if max_depth was reached (graph incomplete)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> graph = query.build_call_graph("process_data", direction="both", max_depth=2)
+            >>> print(f"Graph has {len(graph['nodes'])} nodes and {len(graph['edges'])} edges")
+            Graph has 5 nodes and 6 edges
+            >>> for edge in graph['edges']:
+            ...     print(f"{edge['from']} -> {edge['to']}")
+            main -> process_data
+            process_data -> validate
+            process_data -> save
+
+        Note:
+            - Handles cycles by tracking visited nodes (won't revisit)
+            - Respects max_depth to prevent excessive recursion
+            - Returns empty graph if function not found
+            - Works with schema v2.0 cross-reference data
+            - Returns minimal graph for v1.0 docs (no cross-references)
+        """
+        self._ensure_loaded()
+
+        # Validate direction parameter
+        if direction not in ["callers", "callees", "both"]:
+            raise ValueError(f"Invalid direction: {direction}. Must be 'callers', 'callees', or 'both'")
+
+        # Initialize graph structure
+        graph: Dict[str, Any] = {
+            "root": function_name,
+            "direction": direction,
+            "max_depth": max_depth,
+            "nodes": {},
+            "edges": [],
+            "truncated": False
+        }
+
+        # Check if function exists
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            # Function not found - return empty graph
+            return graph
+
+        # Add root node
+        root_node = self._create_graph_node(function_name, 0, include_metadata)
+        graph["nodes"][function_name] = root_node
+
+        # BFS traversal
+        queue = [(function_name, 0)]  # (function_name, depth)
+        visited = {function_name}
+
+        while queue:
+            current_func, current_depth = queue.pop(0)
+
+            # Check if we've reached max depth
+            if current_depth >= max_depth:
+                graph["truncated"] = True
+                continue
+
+            # Get neighbors based on direction
+            neighbors = []
+
+            # Upstream: who calls this function?
+            if direction in ["callers", "both"]:
+                callers = self.get_callers(current_func, include_file=True, include_line=True)
+                for caller in callers:
+                    caller_name = caller['name']
+                    neighbors.append(caller_name)
+
+                    # Add edge: caller -> current_func
+                    edge = {
+                        "from": caller_name,
+                        "to": current_func,
+                        "type": "calls",
+                        "call_type": caller.get('call_type', 'unknown')
+                    }
+                    if edge not in graph["edges"]:
+                        graph["edges"].append(edge)
+
+            # Downstream: what does this function call?
+            if direction in ["callees", "both"]:
+                callees = self.get_callees(current_func, include_file=True, include_line=True)
+                for callee in callees:
+                    callee_name = callee['name']
+                    neighbors.append(callee_name)
+
+                    # Add edge: current_func -> callee
+                    edge = {
+                        "from": current_func,
+                        "to": callee_name,
+                        "type": "calls",
+                        "call_type": callee.get('call_type', 'unknown')
+                    }
+                    if edge not in graph["edges"]:
+                        graph["edges"].append(edge)
+
+            # Add unvisited neighbors to queue
+            for neighbor_name in neighbors:
+                if neighbor_name not in visited:
+                    visited.add(neighbor_name)
+                    # Create and add node
+                    node = self._create_graph_node(neighbor_name, current_depth + 1, include_metadata)
+                    graph["nodes"][neighbor_name] = node
+                    # Add to queue for further exploration
+                    queue.append((neighbor_name, current_depth + 1))
+
+        return graph
 
 
 def check_docs_exist(docs_path: Optional[str] = None) -> bool:

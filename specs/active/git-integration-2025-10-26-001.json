@@ -1,0 +1,2028 @@
+{
+  "spec_id": "git-integration-2025-10-26-001",
+  "generated": "2025-10-26T00:00:00Z",
+  "last_updated": "2025-10-26T18:14:07.082407+00:00",
+  "metadata": {
+    "title": "Git Integration for SDD Workflow",
+    "description": "Integrate git operations into the SDD workflow with optional, permission-based branch creation, commits, and PR management",
+    "status": "active",
+    "version": "1.0",
+    "author": "claude-code",
+    "estimated_hours": 70,
+    "complexity": "high",
+    "objectives": [
+      "Enable automatic branch creation when starting work on a spec",
+      "Support atomic commits when completing tasks",
+      "Generate pull requests when specs are completed",
+      "Maintain git metadata in spec JSON files",
+      "Provide manual CLI commands for explicit git operations",
+      "Keep git integration optional and configurable"
+    ],
+    "progress_percentage": 0,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Git Integration for SDD Workflow",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6",
+        "phase-7"
+      ],
+      "total_tasks": 64,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core Git Operations Module",
+      "description": "Create the foundational git utility module with all core git operations needed by other components",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "low",
+        "complexity": "medium"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6",
+          "phase-7"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create git_operations.py module",
+      "description": "Core git operations module with repository detection, branch management, commits, and error handling",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3",
+        "task-1-1-4",
+        "task-1-1-5"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/git_operations.py",
+        "estimated_hours": 4,
+        "changes": "Create new module with core git functions",
+        "reasoning": "Foundation for all git integration features"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Repository detection functions",
+      "description": "Implement check_git_repo(), get_current_branch(), get_base_branch(), get_remote_url()",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-2",
+          "task-1-1-3",
+          "task-1-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Branch management functions",
+      "description": "Implement create_branch(name, base), switch_branch(name), delete_branch(name)",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-5"
+        ],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Commit creation functions",
+      "description": "Implement get_staged_changes(), create_commit(message, files), get_commit_history()",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-5"
+        ],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-4": {
+      "type": "subtask",
+      "title": "PR creation functions",
+      "description": "Implement check_gh_cli(), create_pr(title, body, base, draft), get_pr_status()",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-5"
+        ],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 0.5
+      }
+    },
+    "task-1-1-5": {
+      "type": "subtask",
+      "title": "Error handling and edge cases",
+      "description": "Add error handling for: detached HEAD, network failures, merge conflicts, dirty working directory, no remote",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1-2",
+          "task-1-1-3",
+          "task-1-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 0.5
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Create git_operations unit tests",
+      "description": "Comprehensive unit tests for all git operations using mock git repository",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_git_operations.py",
+        "estimated_hours": 4,
+        "test_path": "src/claude_skills/claude_skills/tests/unit/test_git_operations.py"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Test repository detection",
+      "description": "Test check_git_repo, branch detection, remote detection in various scenarios",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Test branch and commit operations",
+      "description": "Test branch creation, commit creation, change staging with mock git",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Test error scenarios",
+      "description": "Test all error handling: detached HEAD, network failures, conflicts, etc.",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Update common __init__.py exports",
+      "description": "Export git operations functions from common module for easy imports",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/__init__.py",
+        "estimated_hours": 0.25,
+        "parallel_safe": true
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Git operations unit tests pass",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_git_operations.py -v",
+        "expected": "All tests pass with 100% coverage of git_operations.py"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Manual test with real git repo",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Functions work correctly in real git repository: detect repo, create branch, make commit"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Configuration & Metadata Support",
+      "description": "Add configuration system for project-level git settings and extend spec metadata schema to track git state",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6",
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 6,
+        "risk_level": "low",
+        "complexity": "low"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Create git_config.py module",
+      "description": "Configuration loading, validation, and default settings for git integration",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/git_config.py",
+        "estimated_hours": 2
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Config loading functions",
+      "description": "Implement load_git_config(project_path), get_config_value(key), has_git_integration_enabled()",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Config validation and defaults",
+      "description": "Define default config schema, validation rules, and fallback values",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Template generation",
+      "description": "Implement create_default_config(output_path) for initialization",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Update sdd-spec-schema.json",
+      "description": "Add git metadata schema to spec JSON schema definition",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/schemas/sdd-spec-schema.json",
+        "estimated_hours": 1
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add git metadata schema",
+      "description": "Add metadata.git section with fields: branch_name, base_branch, created_at, commits[], pr_url, pr_number, pr_status",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Create default config template",
+      "description": "JSON template file with default git integration settings",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/templates/git/default_config.json",
+        "estimated_hours": 0.5,
+        "parallel_safe": true
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "Create git_config unit tests",
+      "description": "Unit tests for configuration loading, validation, and defaults",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_git_config.py",
+        "estimated_hours": 2,
+        "test_path": "src/claude_skills/claude_skills/tests/unit/test_git_config.py"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Config unit tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_git_config.py -v",
+        "expected": "All config tests pass"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Schema validation accepts git metadata",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/git-integration-2025-10-26-001.json",
+        "expected": "Validation passes with git metadata in spec"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "CLI Commands",
+      "description": "Create standalone CLI commands for manual git operations, usable independently of workflow integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4",
+          "phase-5",
+          "phase-6",
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 12,
+        "risk_level": "low",
+        "complexity": "medium"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Create git_integration CLI module",
+      "description": "CLI command handlers for all git commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4",
+        "task-3-1-5",
+        "task-3-1-6"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/git_integration/cli.py",
+        "estimated_hours": 6
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Implement git-init command",
+      "description": "cmd_git_init(): Initialize git integration, create config, verify repo and gh CLI",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement git-branch command",
+      "description": "cmd_git_branch(): Create/switch branch for spec with options --name, --base",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Implement git-commit command",
+      "description": "cmd_git_commit(): Commit changes for task with options --message, --files, --all, --amend",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-4": {
+      "type": "subtask",
+      "title": "Implement git-pr command",
+      "description": "cmd_git_pr(): Create PR for spec with options --draft, --title, --body, --base",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-5": {
+      "type": "subtask",
+      "title": "Implement git-status command",
+      "description": "cmd_git_status(): Display git status for spec (branch, commits, PR)",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-6": {
+      "type": "subtask",
+      "title": "Implement git-sync command",
+      "description": "cmd_git_sync(): Sync spec metadata with actual git state (commits, PR status)",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Register git commands in CLI registry",
+      "description": "Add git command registration to unified SDD CLI",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/registry.py",
+        "estimated_hours": 1
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add _register_git_cli function",
+      "description": "Create registration function and call it from register_all_subcommands()",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Create git CLI integration tests",
+      "description": "Integration tests for all git commands with real git repo",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_git_cli.py",
+        "estimated_hours": 4,
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_git_cli.py"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "CLI integration tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_git_cli.py -v",
+        "expected": "All CLI tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "All git commands accessible via sdd CLI",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "sdd --help shows git subcommands; each command runs without errors"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Manual workflow test",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Successfully run: sdd git-init, sdd git-branch <spec>, sdd git-commit <spec> <task>, sdd git-status <spec>"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "sdd-next Integration",
+      "description": "Integrate branch creation prompts into sdd-next workflow when starting work on a spec",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "medium",
+        "complexity": "medium-high"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Add branch creation to sdd_next/discovery.py",
+      "description": "Integrate branch creation prompt into prepare_task() workflow",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3",
+        "task-4-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/discovery.py",
+        "estimated_hours": 4
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Check git integration enabled",
+      "description": "At start of prepare_task(), check if git integration is enabled via config",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Check if spec has branch",
+      "description": "Check spec metadata for existing branch_name; skip prompt if already exists",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-3"
+        ],
+        "blocked_by": [
+          "task-4-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Add branch creation prompt",
+      "description": "Use AskUserQuestion to prompt: Create branch? Show suggested name. Options: Create, Use existing, Skip",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-4"
+        ],
+        "blocked_by": [
+          "task-4-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-4": {
+      "type": "subtask",
+      "title": "Save branch to spec metadata",
+      "description": "If branch created, update spec metadata.git.branch_name and save",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Update sdd-next skill documentation",
+      "description": "Add git integration section to SKILL.md explaining branch creation workflow",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-next/SKILL.md",
+        "estimated_hours": 1,
+        "parallel_safe": true
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Create sdd-next git integration tests",
+      "description": "Integration tests for branch creation workflow in prepare_task()",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_next_git.py",
+        "estimated_hours": 3,
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_next_git.py"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "sdd-next integration tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_next_git.py -v",
+        "expected": "All sdd-next git integration tests pass"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "End-to-end branch creation test",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Use sdd-next skill on test spec, verify branch creation prompt appears, branch is created, metadata is saved"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "sdd-update Integration (Commits)",
+      "description": "Integrate commit creation into task completion workflow with permission-based prompts",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6",
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 12,
+        "risk_level": "medium",
+        "complexity": "medium-high"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3",
+        "task-5-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Add commit logic to sdd_update/workflow.py",
+      "description": "Integrate commit creation into complete_task_workflow()",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2",
+        "task-5-1-3",
+        "task-5-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+        "estimated_hours": 5
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Check git integration and changes",
+      "description": "After task completion and journaling, check if git enabled and working dir has changes",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Generate commit message",
+      "description": "Use template from config: {task-id}: {task-title}",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-1-3"
+        ],
+        "blocked_by": [
+          "task-5-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-3": {
+      "type": "subtask",
+      "title": "Add commit creation prompt",
+      "description": "Use AskUserQuestion: Commit changes? Show message preview, staged files. Options: Commit all, Select files, Skip",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-1-4"
+        ],
+        "blocked_by": [
+          "task-5-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-1-4": {
+      "type": "subtask",
+      "title": "Save commit to spec metadata",
+      "description": "If committed, add to metadata.git.commits[] with task_id, sha, message, timestamp",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Update journal.py to reference commits",
+      "description": "Add commit references to journal entries when commits are created",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/journal.py",
+        "estimated_hours": 1
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Add commit reference to journal entries",
+      "description": "In add_journal_entry(), check if commit exists for task and add commit_sha to entry metadata",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Update sdd-update skill documentation",
+      "description": "Add git integration section for commit workflow",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-update/SKILL.md",
+        "estimated_hours": 1,
+        "parallel_safe": true
+      }
+    },
+    "task-5-4": {
+      "type": "task",
+      "title": "Create sdd-update commit integration tests",
+      "description": "Integration tests for commit workflow in complete_task_workflow()",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_commit.py",
+        "estimated_hours": 4,
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_commit.py"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Commit integration tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_commit.py -v",
+        "expected": "All commit integration tests pass"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "End-to-end commit workflow test",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Complete a task via sdd-update, verify commit prompt appears, commit is created, metadata and journal are updated"
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "sdd-update Integration (Pull Requests)",
+      "description": "Integrate PR creation into spec completion workflow with generated PR templates",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "medium",
+        "complexity": "medium"
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3",
+        "task-6-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ]
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "Create PR template",
+      "description": "Default PR body template using spec metadata and journal entries",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-6-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/templates/git/pr_template.md",
+        "estimated_hours": 1
+      }
+    },
+    "task-6-1-1": {
+      "type": "subtask",
+      "title": "Design PR template format",
+      "description": "Template with: Overview, Completed Tasks, Changes Summary, Journal Highlights, Test Plan",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "Add PR logic to sdd_update/lifecycle.py",
+      "description": "Integrate PR creation into complete_spec()",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-2-1",
+        "task-6-2-2",
+        "task-6-2-3",
+        "task-6-2-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-6-4"
+        ],
+        "blocked_by": [
+          "task-6-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+        "estimated_hours": 4
+      }
+    },
+    "task-6-2-1": {
+      "type": "subtask",
+      "title": "Check git integration and commits",
+      "description": "After spec validation, check if git enabled and spec has commits",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2-2": {
+      "type": "subtask",
+      "title": "Generate PR body from template",
+      "description": "Render PR template with spec data: title, description, tasks, journal entries",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-2-3"
+        ],
+        "blocked_by": [
+          "task-6-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2-3": {
+      "type": "subtask",
+      "title": "Add PR creation prompt",
+      "description": "Use AskUserQuestion: Create PR? Show title, body preview. Options: Create PR, Create draft, Skip",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-2-4"
+        ],
+        "blocked_by": [
+          "task-6-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2-4": {
+      "type": "subtask",
+      "title": "Save PR to spec metadata",
+      "description": "If PR created, update metadata.git.pr_url, pr_number, pr_status",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "Update sdd-update skill documentation",
+      "description": "Add git integration section for PR workflow",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-update/SKILL.md",
+        "estimated_hours": 1,
+        "parallel_safe": true
+      }
+    },
+    "task-6-4": {
+      "type": "task",
+      "title": "Create sdd-update PR integration tests",
+      "description": "Integration tests for PR workflow in complete_spec()",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_pr.py",
+        "estimated_hours": 3,
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_pr.py"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "PR integration tests pass",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_pr.py -v",
+        "expected": "All PR integration tests pass"
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "End-to-end PR workflow test",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Complete a spec via sdd-update, verify PR prompt appears, PR is created with correct body, metadata is updated"
+      }
+    },
+    "phase-7": {
+      "type": "phase",
+      "title": "Testing & Documentation",
+      "description": "Comprehensive testing, edge case coverage, and user-facing documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-7-files",
+        "phase-7-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 15,
+        "risk_level": "low",
+        "complexity": "medium"
+      }
+    },
+    "phase-7-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "task-7-1",
+        "task-7-2",
+        "task-7-3",
+        "task-7-4",
+        "task-7-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-7-verify"
+        ]
+      }
+    },
+    "task-7-1": {
+      "type": "task",
+      "title": "Create edge case tests",
+      "description": "Test all edge cases: detached HEAD, conflicts, network failures, already on branch, dirty working dir, no remote, multiple remotes",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_git_edge_cases.py",
+        "estimated_hours": 4,
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_git_edge_cases.py"
+      }
+    },
+    "task-7-2": {
+      "type": "task",
+      "title": "Create user guide",
+      "description": "Comprehensive guide with setup, configuration, workflow examples, and best practices",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-7-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/git-integration.md",
+        "estimated_hours": 3
+      }
+    },
+    "task-7-3": {
+      "type": "task",
+      "title": "Create troubleshooting guide",
+      "description": "Common issues and solutions: permission errors, gh CLI not found, branch conflicts, PR creation failures",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/git-integration-troubleshooting.md",
+        "estimated_hours": 2
+      }
+    },
+    "task-7-4": {
+      "type": "task",
+      "title": "Update main README",
+      "description": "Add git integration feature overview to main README with links to detailed docs",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-7-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "estimated_hours": 1
+      }
+    },
+    "task-7-5": {
+      "type": "task",
+      "title": "Update sdd-setup command docs",
+      "description": "Add git integration setup instructions to sdd-setup.md",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "commands/sdd-setup.md",
+        "estimated_hours": 1,
+        "parallel_safe": true
+      }
+    },
+    "phase-7-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "verify-7-1",
+        "verify-7-2",
+        "verify-7-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-7-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-7-1": {
+      "type": "verify",
+      "title": "All tests pass",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/ -k git -v",
+        "expected": "All git-related tests pass"
+      }
+    },
+    "verify-7-2": {
+      "type": "verify",
+      "title": "Documentation is complete and accurate",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "User guide covers all features, examples work, troubleshooting addresses common issues"
+      }
+    },
+    "verify-7-3": {
+      "type": "verify",
+      "title": "Full workflow end-to-end test",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Complete workflow: sdd git-init \u2192 sdd-next (branch) \u2192 implement \u2192 sdd-update (commit) \u2192 complete spec \u2192 sdd-update (PR)"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-10-26T18:14:00.748221+00:00",
+      "entry_type": "decision",
+      "title": "Implementation: Repository Detection Functions",
+      "author": "claude-code",
+      "content": "Implemented all four core git repository detection functions in src/claude_skills/claude_skills/common/git_operations.py:\n\n**Functions Implemented:**\n1. check_git_repo(path) - Uses 'git rev-parse --is-inside-work-tree' to detect git repositories\n2. get_current_branch(path) - Uses 'git rev-parse --abbrev-ref HEAD' with special handling for detached HEAD states\n3. get_base_branch(path) - Intelligently detects main vs master by checking both local and remote branches\n4. get_remote_url(path, remote) - Retrieves remote URLs with support for custom remote names\n\n**Key Design Decisions:**\n- Custom GitError exception for git-specific failures provides clear error context\n- All functions accept optional path parameter for flexibility (defaults to current directory)\n- Comprehensive error handling for timeouts, missing git binary, and non-git directories\n- 5-second timeout on all git commands prevents hanging on slow operations\n- Subprocess module used for clean command execution with proper error capture\n\n**Code Quality:**\n- Full type hints on all functions and parameters\n- Comprehensive docstrings with usage examples\n- Follows existing patterns from paths.py and spec.py modules\n- Exported via common/__init__.py for easy importing\n\n**Testing:**\n- Created 25 unit tests with 100% pass rate\n- Tests use mocking to avoid actual git operations (faster, more reliable)\n- Coverage includes happy paths, error conditions, timeouts, and edge cases\n- Verified with actual repository: detected feat2 branch, main base, GitHub remote\n\n**Integration:**\n- Added to common module alongside existing utilities\n- Updated __all__ exports in common/__init__.py\n- Ready for use by Phase 1 tasks (branch management, commits, PRs)\n\n**Next Steps:**\nThis task unblocks task-1-1-2 (branch management), task-1-1-3 (commit creation), and task-1-1-4 (PR creation functions).",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
+}

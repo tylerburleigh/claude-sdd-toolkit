@@ -67,15 +67,15 @@ Next steps:
 
 The setup adds these permissions to `.claude/settings.json`:
 
-**Skills:**
-- Skill(sdd-toolkit:run-tests)
-- Skill(sdd-toolkit:sdd-plan)
-- Skill(sdd-toolkit:sdd-next)
-- Skill(sdd-toolkit:sdd-update)
-- Skill(sdd-toolkit:sdd-plan-review)
-- Skill(sdd-toolkit:sdd-validate)
-- Skill(sdd-toolkit:code-doc)
-- Skill(sdd-toolkit:doc-query)
+**Skills (both forms for compatibility):**
+- Skill(sdd-toolkit:run-tests) + Skill(run-tests)
+- Skill(sdd-toolkit:sdd-plan) + Skill(sdd-plan)
+- Skill(sdd-toolkit:sdd-next) + Skill(sdd-next)
+- Skill(sdd-toolkit:sdd-update) + Skill(sdd-update)
+- Skill(sdd-toolkit:sdd-plan-review) + Skill(sdd-plan-review)
+- Skill(sdd-toolkit:sdd-validate) + Skill(sdd-validate)
+- Skill(sdd-toolkit:code-doc) + Skill(code-doc)
+- Skill(sdd-toolkit:doc-query) + Skill(doc-query)
 
 **Commands:**
 - SlashCommand(/sdd-start)

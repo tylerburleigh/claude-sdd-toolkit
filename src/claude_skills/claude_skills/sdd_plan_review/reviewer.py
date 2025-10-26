@@ -123,17 +123,23 @@ def call_tool(
         # Each tool has different requirements for non-interactive use
 
         if tool_name == "codex":
-            # Codex: Use positional argument, prompt via stdin
-            cmd = [tool_config["command"]]
-            stdin_input = prompt
-
-        elif tool_name == "gemini":
-            # Gemini: Use positional argument with JSON output and telemetry disabled
+            # Codex: Use exec subcommand for non-interactive mode
+            # Note: Don't use --json as it outputs JSONL stream; let it output markdown
             cmd = [
                 tool_config["command"],
-                "-o", "json",           # JSON output for structured parsing
-                "--telemetry", "false", # Disable telemetry for cleaner output
-                prompt                   # Positional prompt argument
+                "exec",                    # Non-interactive subcommand
+                "--color", "never",        # No color codes in captured output
+                prompt                     # Prompt as positional argument
+            ]
+            stdin_input = None
+
+        elif tool_name == "gemini":
+            # Gemini: Use plain text output (AI synthesis doesn't need JSON)
+            cmd = [
+                tool_config["command"],
+                "-m", "gemini-2.5-pro",  # Model specification
+                "--telemetry", "false",   # Disable telemetry for cleaner output
+                "-p", prompt              # Prompt argument
             ]
             stdin_input = None
 
@@ -307,9 +313,13 @@ def review_with_tools(
                     "duration": raw_response.get("duration", 0),
                 })
 
-    # Build consensus from parsed responses
+    # Build consensus from parsed responses using AI synthesis
     if results["parsed_responses"]:
-        results["consensus"] = build_consensus(results["parsed_responses"])
+        results["consensus"] = build_consensus(
+            results["parsed_responses"],
+            spec_id=spec_id,
+            spec_title=spec_title
+        )
     else:
         results["consensus"] = {
             "success": False,

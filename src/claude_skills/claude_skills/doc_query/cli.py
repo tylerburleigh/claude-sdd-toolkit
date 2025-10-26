@@ -15,6 +15,26 @@ from claude_skills.doc_query.doc_query_lib import (
     QueryResult,
     check_docs_exist,
 )
+from claude_skills.doc_query.workflows.trace_entry import (
+    trace_execution_flow,
+    format_text_output,
+    format_json_output
+)
+from claude_skills.doc_query.workflows.trace_data import (
+    trace_data_lifecycle,
+    format_text_output as format_trace_data_text,
+    format_json_output as format_trace_data_json
+)
+from claude_skills.doc_query.workflows.impact_analysis import (
+    analyze_impact,
+    format_text_output as format_impact_text,
+    format_json_output as format_impact_json
+)
+from claude_skills.doc_query.workflows.refactor_candidates import (
+    find_refactor_candidates,
+    format_text_output as format_refactor_text,
+    format_json_output as format_refactor_json
+)
 
 
 # ---------------------------------------------------------------------------
@@ -153,6 +173,41 @@ def format_result(result: QueryResult, verbose: bool = False) -> str:
         if 'depended_by' in result.data:
             lines.append(f"  Depended by: {result.data['depended_by']}")
 
+    return '\n'.join(lines)
+
+
+def format_call_graph_as_dot(graph: Dict[str, Any]) -> str:
+    """Format call graph as GraphViz DOT format."""
+    lines = []
+    lines.append(f"digraph call_graph {{")
+    lines.append(f"  label=\"Call Graph for {graph['root']}\";")
+    lines.append(f"  labelloc=\"t\";")
+    lines.append("")
+
+    # Add nodes with metadata
+    for node_name, node_data in graph.get('nodes', {}).items():
+        label = node_name
+        if node_data.get('file'):
+            label += f"\\n{node_data['file']}"
+        if node_data.get('call_count') is not None:
+            label += f"\\nCalls: {node_data['call_count']}"
+
+        # Different shape for root node
+        if node_name == graph['root']:
+            lines.append(f'  "{node_name}" [label="{label}", shape=box, style=filled, fillcolor=lightblue];')
+        else:
+            lines.append(f'  "{node_name}" [label="{label}"];')
+
+    lines.append("")
+
+    # Add edges
+    for edge in graph.get('edges', []):
+        from_node = edge.get('from', '')
+        to_node = edge.get('to', '')
+        call_type = edge.get('call_type', 'unknown')
+        lines.append(f'  "{from_node}" -> "{to_node}" [label="{call_type}"];')
+
+    lines.append("}")
     return '\n'.join(lines)
 
 
@@ -315,6 +370,29 @@ def cmd_complexity(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.get_high_complexity(threshold=args.threshold, module=args.module)
+
+    # Apply module-pattern filter if provided
+    if hasattr(args, 'module_pattern') and args.module_pattern:
+        # Extract list of result dicts for filtering
+        items = [result.data for result in results]
+        # Filter using apply_pattern_filter - match on 'file' field
+        filtered = DocumentationQuery.apply_pattern_filter(
+            items,
+            args.module_pattern,
+            pattern=True,
+            key_func=lambda x: x.get('file', '')
+        )
+        # Rebuild QueryResult list with preserved relevance_score (complexity)
+        results = [
+            QueryResult(
+                entity_type='function',
+                name=item.get('name', ''),
+                data=item,
+                relevance_score=item.get('complexity', 0)
+            )
+            for item in filtered
+        ]
+
     if _maybe_json(args, _results_to_json(results, include_meta=True)):
         return 0
     _print_results(args, results)
@@ -407,6 +485,28 @@ def cmd_list_classes(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.list_classes(module=args.module)
+
+    # Apply pattern filter if provided
+    if hasattr(args, 'pattern') and args.pattern:
+        # Extract list of result dicts for filtering
+        items = [result.data for result in results]
+        # Filter using apply_pattern_filter - match on 'name' field
+        filtered = DocumentationQuery.apply_pattern_filter(
+            items,
+            args.pattern,
+            pattern=True,
+            key_func=lambda x: x.get('name', '')
+        )
+        # Rebuild QueryResult list
+        results = [
+            QueryResult(
+                entity_type='class',
+                name=item.get('name', ''),
+                data=item
+            )
+            for item in filtered
+        ]
+
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
     _print_results(args, results)
@@ -418,6 +518,28 @@ def cmd_list_functions(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.list_functions(module=args.module)
+
+    # Apply pattern filter if provided
+    if hasattr(args, 'pattern') and args.pattern:
+        # Extract list of result dicts for filtering
+        items = [result.data for result in results]
+        # Filter using apply_pattern_filter - match on 'name' field
+        filtered = DocumentationQuery.apply_pattern_filter(
+            items,
+            args.pattern,
+            pattern=True,
+            key_func=lambda x: x.get('name', '')
+        )
+        # Rebuild QueryResult list
+        results = [
+            QueryResult(
+                entity_type='function',
+                name=item.get('name', ''),
+                data=item
+            )
+            for item in filtered
+        ]
+
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
     _print_results(args, results)
@@ -429,9 +551,337 @@ def cmd_list_modules(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.list_modules()
+
+    # Apply pattern filter if provided
+    if hasattr(args, 'pattern') and args.pattern:
+        # Extract list of result dicts for filtering
+        items = [result.data for result in results]
+        # Filter using apply_pattern_filter - match on both 'name' and 'file' fields
+        filtered = DocumentationQuery.apply_pattern_filter(
+            items,
+            args.pattern,
+            pattern=True,
+            key_func=lambda x: f"{x.get('name', '')} {x.get('file', '')}"
+        )
+        # Rebuild QueryResult list
+        results = [
+            QueryResult(
+                entity_type='module',
+                name=item.get('file', item.get('name', '')),
+                data=item
+            )
+            for item in filtered
+        ]
+
     if _maybe_json(args, _results_to_json(results, include_meta=False)):
         return 0
     _print_results(args, results)
+    return 0
+
+
+def cmd_callers(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Show functions that call the specified function."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    callers = query.get_callers(
+        args.function_name,
+        include_file=True,
+        include_line=True
+    )
+
+    if _maybe_json(args, callers):
+        return 0
+
+    # Text output
+    if not callers:
+        print(f"\nNo callers found for function '{args.function_name}'")
+        print("(Note: Requires schema v2.0 documentation with cross-reference data)")
+        return 0
+
+    print(f"\nFound {len(callers)} caller(s) for '{args.function_name}':\n")
+    for idx, caller in enumerate(callers, 1):
+        name = caller.get('name', 'unknown')
+        call_type = caller.get('call_type', 'unknown')
+        file_path = caller.get('file', '')
+        line = caller.get('line')
+
+        location = f"{file_path}:{line}" if line else file_path
+        print(f"{idx}. {name} ({call_type})")
+        print(f"   Location: {location}")
+        print()
+
+    return 0
+
+
+def cmd_callees(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Show functions called by the specified function."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    callees = query.get_callees(
+        args.function_name,
+        include_file=True,
+        include_line=True
+    )
+
+    if _maybe_json(args, callees):
+        return 0
+
+    # Text output
+    if not callees:
+        print(f"\nNo callees found for function '{args.function_name}'")
+        print("(Note: Requires schema v2.0 documentation with cross-reference data)")
+        return 0
+
+    print(f"\nFound {len(callees)} function(s) called by '{args.function_name}':\n")
+    for idx, callee in enumerate(callees, 1):
+        name = callee.get('name', 'unknown')
+        call_type = callee.get('call_type', 'unknown')
+        file_path = callee.get('file', '')
+        line = callee.get('line')
+
+        location = f"{file_path}:{line}" if line else file_path
+        print(f"{idx}. {name} ({call_type})")
+        print(f"   Location: {location}")
+        print()
+
+    return 0
+
+
+def cmd_call_graph(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Build and display call graph for a function."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    # Build the call graph
+    graph = query.build_call_graph(
+        args.function_name,
+        direction=args.direction,
+        max_depth=args.max_depth,
+        include_metadata=True
+    )
+
+    # Check if function exists
+    if not graph.get('nodes'):
+        print(f"\nFunction '{args.function_name}' not found in documentation")
+        return 1
+
+    # Handle output format
+    output_format = getattr(args, 'format', 'text')
+
+    if output_format == 'json' or _maybe_json(args, graph):
+        return 0
+
+    if output_format == 'dot':
+        print(format_call_graph_as_dot(graph))
+        return 0
+
+    # Text output (default)
+    print(f"\nCall Graph for '{args.function_name}':")
+    print(f"  Direction: {graph['direction']}")
+    print(f"  Max Depth: {graph['max_depth']}")
+    print(f"  Nodes: {len(graph.get('nodes', {}))}")
+    print(f"  Edges: {len(graph.get('edges', []))}")
+
+    if graph.get('truncated'):
+        print(f"  ⚠️  Graph truncated at max depth")
+
+    print("\nNodes:")
+    for node_name, node_data in graph.get('nodes', {}).items():
+        depth = node_data.get('depth', 0)
+        indent = "  " * (depth + 1)
+        file_info = f" ({node_data.get('file', 'unknown')})" if node_data.get('file') else ""
+        marker = "→ " if node_name == graph['root'] else "  "
+        print(f"{indent}{marker}{node_name}{file_info}")
+
+    print("\nEdges:")
+    for edge in graph.get('edges', []):
+        from_node = edge.get('from', 'unknown')
+        to_node = edge.get('to', 'unknown')
+        call_type = edge.get('call_type', 'unknown')
+        print(f"  {from_node} --[{call_type}]--> {to_node}")
+
+    print()
+    return 0
+
+
+def cmd_trace_entry(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Trace execution flow from an entry function."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    # Get parameters
+    function_name = args.function
+    max_depth = getattr(args, 'max_depth', 5)
+    output_format = getattr(args, 'format', 'text')
+
+    # Trace execution flow
+    try:
+        trace_result = trace_execution_flow(query, function_name, max_depth)
+    except Exception as e:
+        error_msg = f"Error tracing function '{function_name}': {str(e)}"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Check if function was found
+    if trace_result['summary']['total_functions'] == 0:
+        error_msg = f"Function '{function_name}' not found in documentation"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Handle output format
+    if _maybe_json(args, trace_result):
+        return 0
+
+    if output_format == 'json':
+        output = format_json_output(trace_result)
+        print(output)
+        return 0
+
+    # Text output (default)
+    output = format_text_output(trace_result)
+    print(output)
+    return 0
+
+
+def cmd_trace_data(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Trace data object lifecycle through the codebase."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    # Get parameters
+    class_name = args.classname
+    include_properties = getattr(args, 'include_properties', False)
+    output_format = getattr(args, 'format', 'text')
+
+    # Trace data lifecycle
+    try:
+        trace_result = trace_data_lifecycle(query, class_name, include_properties)
+    except Exception as e:
+        error_msg = f"Error tracing class '{class_name}': {str(e)}"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Check if class was found
+    if not trace_result['summary']['class_found']:
+        error_msg = f"Class '{class_name}' not found in documentation"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Handle output format
+    if _maybe_json(args, trace_result):
+        return 0
+
+    if output_format == 'json':
+        output = format_trace_data_json(trace_result)
+        print(output)
+        return 0
+
+    # Text output (default)
+    output = format_trace_data_text(trace_result)
+    print(output)
+    return 0
+
+
+def cmd_impact(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Analyze impact of changing a function or class."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    # Get parameters
+    entity_name = args.entity
+    depth = getattr(args, 'depth', 2)
+    output_format = getattr(args, 'format', 'text')
+
+    # Analyze impact
+    try:
+        impact_result = analyze_impact(query, entity_name, depth)
+    except Exception as e:
+        error_msg = f"Error analyzing impact for '{entity_name}': {str(e)}"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Check if entity was found
+    if not impact_result['summary']['entity_found']:
+        error_msg = f"Entity '{entity_name}' not found in documentation"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Handle output format
+    if _maybe_json(args, impact_result):
+        return 0
+
+    if output_format == 'json':
+        output = format_impact_json(impact_result)
+        print(output)
+        return 0
+
+    # Text output (default)
+    output = format_impact_text(impact_result)
+    print(output)
+    return 0
+
+
+def cmd_refactor_candidates(args: argparse.Namespace, printer: PrettyPrinter) -> int:
+    """Find high-priority refactoring candidates."""
+    query = _ensure_query(args, printer)
+    if not query:
+        return 1
+
+    # Get parameters
+    min_complexity = getattr(args, 'min_complexity', 10)
+    limit = getattr(args, 'limit', 20)
+    output_format = getattr(args, 'format', 'text')
+
+    # Find refactor candidates
+    try:
+        result = find_refactor_candidates(query, min_complexity, limit)
+    except Exception as e:
+        error_msg = f"Error finding refactor candidates: {str(e)}"
+        if _maybe_json(args, {"status": "error", "message": error_msg}):
+            return 1
+        printer.error(error_msg)
+        return 1
+
+    # Check if any candidates found
+    if result['summary']['total_candidates'] == 0:
+        msg = f"No refactoring candidates found with complexity >= {min_complexity}"
+        if _maybe_json(args, {"status": "success", "message": msg, "candidates": []}):
+            return 0
+        print(msg)
+        return 0
+
+    # Handle output format
+    if _maybe_json(args, result):
+        return 0
+
+    if output_format == 'json':
+        output = format_refactor_json(result)
+        print(output)
+        return 0
+
+    # Text output (default)
+    output = format_refactor_text(result)
+    print(output)
     return 0
 
 
@@ -460,6 +910,7 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
     complexity = subparsers.add_parser('complexity', parents=[parent_parser], help='Show high-complexity functions')
     complexity.add_argument('--threshold', type=int, default=5, help='Minimum complexity (default: 5)')
     complexity.add_argument('--module', help='Filter by module')
+    complexity.add_argument('--module-pattern', help='Filter modules by regex pattern (case-insensitive)')
     complexity.set_defaults(func=cmd_complexity)
 
     deps = subparsers.add_parser('dependencies', parents=[parent_parser], help='Show module dependencies')
@@ -490,11 +941,53 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
 
     list_classes = subparsers.add_parser('list-classes', parents=[parent_parser], help='List all classes')
     list_classes.add_argument('--module', help='Filter by module')
+    list_classes.add_argument('--pattern', help='Filter classes by regex pattern (case-insensitive)')
     list_classes.set_defaults(func=cmd_list_classes)
 
     list_functions = subparsers.add_parser('list-functions', parents=[parent_parser], help='List all functions')
     list_functions.add_argument('--module', help='Filter by module')
+    list_functions.add_argument('--pattern', help='Filter functions by regex pattern (case-insensitive)')
     list_functions.set_defaults(func=cmd_list_functions)
 
     list_modules = subparsers.add_parser('list-modules', parents=[parent_parser], help='List all modules')
+    list_modules.add_argument('--pattern', help='Filter modules by regex pattern (case-insensitive)')
     list_modules.set_defaults(func=cmd_list_modules)
+
+    callers = subparsers.add_parser('callers', parents=[parent_parser], help='Show functions that call the specified function')
+    callers.add_argument('function_name', help='Name of the function to query')
+    callers.set_defaults(func=cmd_callers)
+
+    callees = subparsers.add_parser('callees', parents=[parent_parser], help='Show functions called by the specified function')
+    callees.add_argument('function_name', help='Name of the function to query')
+    callees.set_defaults(func=cmd_callees)
+
+    call_graph = subparsers.add_parser('call-graph', parents=[parent_parser], help='Build and display call graph for a function')
+    call_graph.add_argument('function_name', help='Name of the function to analyze')
+    call_graph.add_argument('--direction', choices=['callers', 'callees', 'both'], default='both', help='Direction to traverse (default: both)')
+    call_graph.add_argument('--max-depth', type=int, default=3, help='Maximum recursion depth (default: 3)')
+    call_graph.add_argument('--format', choices=['text', 'json', 'dot'], default='text', help='Output format (default: text)')
+    call_graph.set_defaults(func=cmd_call_graph)
+
+    trace_entry = subparsers.add_parser('trace-entry', parents=[parent_parser], help='Trace execution flow from entry function')
+    trace_entry.add_argument('function', help='Name of the entry function to trace from')
+    trace_entry.add_argument('--max-depth', type=int, default=5, help='Maximum call chain depth (default: 5)')
+    trace_entry.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    trace_entry.set_defaults(func=cmd_trace_entry)
+
+    trace_data = subparsers.add_parser('trace-data', parents=[parent_parser], help='Trace data object lifecycle through codebase')
+    trace_data.add_argument('classname', help='Name of the class to trace')
+    trace_data.add_argument('--include-properties', action='store_true', help='Include detailed property access analysis')
+    trace_data.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    trace_data.set_defaults(func=cmd_trace_data)
+
+    impact = subparsers.add_parser('impact', parents=[parent_parser], help='Analyze impact of changing a function or class')
+    impact.add_argument('entity', help='Name of the function or class to analyze')
+    impact.add_argument('--depth', type=int, default=2, help='Maximum depth for indirect dependency traversal (default: 2)')
+    impact.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    impact.set_defaults(func=cmd_impact)
+
+    refactor = subparsers.add_parser('refactor-candidates', parents=[parent_parser], help='Find high-priority refactoring candidates')
+    refactor.add_argument('--min-complexity', type=int, default=10, help='Minimum complexity threshold (default: 10)')
+    refactor.add_argument('--limit', type=int, default=20, help='Maximum number of candidates to return (default: 20)')
+    refactor.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    refactor.set_defaults(func=cmd_refactor_candidates)
