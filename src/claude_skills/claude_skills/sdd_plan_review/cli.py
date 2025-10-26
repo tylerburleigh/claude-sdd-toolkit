@@ -129,7 +129,8 @@ def cmd_review(args, printer):
         consensus,
         spec_id,
         spec_title,
-        args.type
+        args.type,
+        parsed_responses=results.get('parsed_responses', [])
     )
     print(markdown_report)
 

@@ -137,6 +137,10 @@ class DocumentationQuery:
             normalized.setdefault('decorators', [])
             normalized.setdefault('complexity', 0)
             normalized.setdefault('is_async', False)
+            # Schema v2.0: Cross-reference fields
+            normalized.setdefault('callers', [])
+            normalized.setdefault('calls', [])
+            normalized.setdefault('call_count', None)
             functions.append(normalized)
         data['functions'] = functions
 
@@ -401,6 +405,89 @@ class DocumentationQuery:
             'reverse_dependencies': list(module_info.get('reverse_dependencies', [])),
             'statistics': dict(module_info.get('statistics', {}))
         }
+
+    @staticmethod
+    def apply_pattern_filter(
+        items: Iterable[Dict[str, Any]],
+        name: str,
+        pattern: bool = False,
+        key_func: Optional[callable] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Filter items by name or pattern.
+
+        Provides consistent pattern matching behavior across query methods.
+        Supports both exact string matching and regex pattern matching.
+
+        Args:
+            items: Iterable of items to filter (typically dicts with 'name' key)
+            name: Name or regex pattern to match against
+            pattern: If True, treat name as regex pattern (case-insensitive).
+                    If False, perform exact string match.
+            key_func: Optional function to extract the field to match.
+                     Defaults to lambda x: x.get('name', '').
+                     Should return a string to match against.
+
+        Returns:
+            List of matching items from the input iterable.
+
+        Raises:
+            re.error: If pattern=True and name is an invalid regex pattern.
+
+        Examples:
+            >>> items = [{'name': 'Calculator'}, {'name': 'Validator'}]
+            >>> # Exact match
+            >>> results = apply_pattern_filter(items, 'Calculator', pattern=False)
+            >>> len(results)
+            1
+
+            >>> # Regex pattern (case-insensitive)
+            >>> results = apply_pattern_filter(items, 'calc', pattern=True)
+            >>> len(results)
+            1
+
+            >>> # Custom key function
+            >>> items = [{'file': 'src/calc.py'}, {'file': 'src/valid.py'}]
+            >>> results = apply_pattern_filter(
+            ...     items, 'calc', pattern=True,
+            ...     key_func=lambda x: x.get('file', '')
+            ... )
+            >>> len(results)
+            1
+
+        Note:
+            - Pattern matching is case-insensitive
+            - Items where key_func returns empty string or None are skipped
+            - Invalid regex patterns will raise re.error (not caught internally)
+        """
+        if key_func is None:
+            key_func = lambda x: x.get('name', '')
+
+        results = []
+
+        if pattern:
+            # Compile regex once before loop (case-insensitive)
+            regex = re.compile(name, re.IGNORECASE)
+            for item in items:
+                try:
+                    value = key_func(item)
+                    if value and regex.search(str(value)):
+                        results.append(item)
+                except (KeyError, AttributeError, TypeError):
+                    # Skip items where key extraction fails
+                    continue
+        else:
+            # Exact match
+            for item in items:
+                try:
+                    value = key_func(item)
+                    if value == name:
+                        results.append(item)
+                except (KeyError, AttributeError, TypeError):
+                    # Skip items where key extraction fails
+                    continue
+
+        return results
 
     def _ensure_loaded(self):
         """Ensure documentation is loaded."""
@@ -999,6 +1086,362 @@ class DocumentationQuery:
 
         return results
 
+    def get_callers(
+        self,
+        function_name: str,
+        include_file: bool = True,
+        include_line: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all functions that call the specified function.
+
+        Queries the 'callers' field from schema v2.0 to return functions
+        that call the specified function. This enables "who calls this?" queries.
+
+        Args:
+            function_name: Name of the function to query
+            include_file: Include file path in results (default: True)
+            include_line: Include line numbers in results (default: True)
+
+        Returns:
+            List of caller information dictionaries with keys:
+            - name: Name of the calling function
+            - call_type: Type of call (e.g., 'function_call', 'method_call')
+            - file: File path (if include_file=True)
+            - line: Line number (if include_line=True)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> callers = query.get_callers("process_data")
+            >>> for caller in callers:
+            ...     print(f"{caller['name']} calls process_data at {caller['file']}:{caller['line']}")
+
+        Note:
+            Returns empty list if function not found or if using schema v1.0
+            documentation without cross-reference data.
+        """
+        self._ensure_loaded()
+
+        # Find the function
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return []
+
+        # Get callers from the first matching function
+        func = functions[0]
+        callers_data = func.get('callers', [])
+
+        # Format results
+        results = []
+        for caller in callers_data:
+            if not isinstance(caller, dict):
+                continue
+
+            result = {
+                'name': caller.get('name', ''),
+                'call_type': caller.get('call_type', 'unknown')
+            }
+
+            if include_file:
+                result['file'] = caller.get('file', '')
+
+            if include_line:
+                result['line'] = caller.get('line')
+
+            results.append(result)
+
+        return results
+
+    def get_callees(
+        self,
+        function_name: str,
+        include_file: bool = True,
+        include_line: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all functions called by the specified function.
+
+        Queries the 'calls' field from schema v2.0 to return functions
+        called by the specified function. This enables "what does this call?" queries.
+
+        Args:
+            function_name: Name of the function to query
+            include_file: Include file path in results (default: True)
+            include_line: Include line numbers in results (default: True)
+
+        Returns:
+            List of callee information dictionaries with keys:
+            - name: Name of the called function
+            - call_type: Type of call (e.g., 'function_call', 'method_call')
+            - file: File path (if include_file=True)
+            - line: Line number (if include_line=True)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> callees = query.get_callees("main")
+            >>> for callee in callees:
+            ...     print(f"main calls {callee['name']} at {callee['file']}:{callee['line']}")
+
+        Note:
+            Returns empty list if function not found or if using schema v1.0
+            documentation without cross-reference data.
+        """
+        self._ensure_loaded()
+
+        # Find the function
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return []
+
+        # Get calls from the first matching function
+        func = functions[0]
+        calls_data = func.get('calls', [])
+
+        # Format results
+        results = []
+        for callee in calls_data:
+            if not isinstance(callee, dict):
+                continue
+
+            result = {
+                'name': callee.get('name', ''),
+                'call_type': callee.get('call_type', 'unknown')
+            }
+
+            if include_file:
+                result['file'] = callee.get('file', '')
+
+            if include_line:
+                result['line'] = callee.get('line')
+
+            results.append(result)
+
+        return results
+
+    def get_call_count(self, function_name: str) -> Optional[int]:
+        """
+        Get the total number of times a function is called across the codebase.
+
+        Returns the call_count field from schema v2.0 if available.
+
+        Args:
+            function_name: Name of the function to query
+
+        Returns:
+            Call count as an integer, or None if:
+            - Function not found
+            - Using schema v1.0 without call_count field
+            - Call count not computed
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> count = query.get_call_count("process_data")
+            >>> if count is not None:
+            ...     print(f"process_data is called {count} times")
+        """
+        self._ensure_loaded()
+
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            return None
+
+        return functions[0].get('call_count')
+
+    def _create_graph_node(
+        self,
+        function_name: str,
+        depth: int,
+        include_metadata: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Create a graph node with function metadata.
+
+        Helper method for build_call_graph() that creates a node
+        dictionary with function information.
+
+        Args:
+            function_name: Name of the function
+            depth: Depth in the graph from the root
+            include_metadata: Include file path and metadata
+
+        Returns:
+            Dictionary with node data
+        """
+        node = {
+            "name": function_name,
+            "depth": depth
+        }
+
+        if include_metadata:
+            # Find function in data
+            functions = [f for f in self.data.get('functions', [])
+                         if f.get('name') == function_name]
+
+            if functions:
+                func = functions[0]
+                node['file'] = func.get('file', '')
+                node['line'] = func.get('line')
+                call_count = func.get('call_count')
+                if call_count is not None:
+                    node['call_count'] = call_count
+
+        return node
+
+    def build_call_graph(
+        self,
+        function_name: str,
+        direction: str = "both",
+        max_depth: int = 3,
+        include_metadata: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Build a call graph starting from the specified function.
+
+        Recursively traverses function call relationships to build a complete
+        graph of callers, callees, or both. Useful for impact analysis and
+        visualizing function dependencies.
+
+        Uses breadth-first search (BFS) to explore the graph, tracking visited
+        nodes to handle cycles and respecting max_depth to prevent excessive
+        recursion.
+
+        Args:
+            function_name: Starting function for the graph
+            direction: Direction to traverse (default: "both"):
+                - "callers": Functions that call this function (upstream)
+                - "callees": Functions called by this function (downstream)
+                - "both": Both directions (full dependency graph)
+            max_depth: Maximum recursion depth (default: 3).
+                       Depth 0 is the root function.
+            include_metadata: Include file paths and metadata in nodes
+                             (default: True)
+
+        Returns:
+            Dictionary with keys:
+            - root: Starting function name
+            - direction: Direction traversed
+            - max_depth: Maximum depth used
+            - nodes: Dict mapping function names to node data
+            - edges: List of call relationships (from -> to)
+            - truncated: True if max_depth was reached (graph incomplete)
+
+        Example:
+            >>> query = DocumentationQuery()
+            >>> query.load()
+            >>> graph = query.build_call_graph("process_data", direction="both", max_depth=2)
+            >>> print(f"Graph has {len(graph['nodes'])} nodes and {len(graph['edges'])} edges")
+            Graph has 5 nodes and 6 edges
+            >>> for edge in graph['edges']:
+            ...     print(f"{edge['from']} -> {edge['to']}")
+            main -> process_data
+            process_data -> validate
+            process_data -> save
+
+        Note:
+            - Handles cycles by tracking visited nodes (won't revisit)
+            - Respects max_depth to prevent excessive recursion
+            - Returns empty graph if function not found
+            - Works with schema v2.0 cross-reference data
+            - Returns minimal graph for v1.0 docs (no cross-references)
+        """
+        self._ensure_loaded()
+
+        # Validate direction parameter
+        if direction not in ["callers", "callees", "both"]:
+            raise ValueError(f"Invalid direction: {direction}. Must be 'callers', 'callees', or 'both'")
+
+        # Initialize graph structure
+        graph: Dict[str, Any] = {
+            "root": function_name,
+            "direction": direction,
+            "max_depth": max_depth,
+            "nodes": {},
+            "edges": [],
+            "truncated": False
+        }
+
+        # Check if function exists
+        functions = [f for f in self.data.get('functions', [])
+                     if f.get('name') == function_name]
+
+        if not functions:
+            # Function not found - return empty graph
+            return graph
+
+        # Add root node
+        root_node = self._create_graph_node(function_name, 0, include_metadata)
+        graph["nodes"][function_name] = root_node
+
+        # BFS traversal
+        queue = [(function_name, 0)]  # (function_name, depth)
+        visited = {function_name}
+
+        while queue:
+            current_func, current_depth = queue.pop(0)
+
+            # Check if we've reached max depth
+            if current_depth >= max_depth:
+                graph["truncated"] = True
+                continue
+
+            # Get neighbors based on direction
+            neighbors = []
+
+            # Upstream: who calls this function?
+            if direction in ["callers", "both"]:
+                callers = self.get_callers(current_func, include_file=True, include_line=True)
+                for caller in callers:
+                    caller_name = caller['name']
+                    neighbors.append(caller_name)
+
+                    # Add edge: caller -> current_func
+                    edge = {
+                        "from": caller_name,
+                        "to": current_func,
+                        "type": "calls",
+                        "call_type": caller.get('call_type', 'unknown')
+                    }
+                    if edge not in graph["edges"]:
+                        graph["edges"].append(edge)
+
+            # Downstream: what does this function call?
+            if direction in ["callees", "both"]:
+                callees = self.get_callees(current_func, include_file=True, include_line=True)
+                for callee in callees:
+                    callee_name = callee['name']
+                    neighbors.append(callee_name)
+
+                    # Add edge: current_func -> callee
+                    edge = {
+                        "from": current_func,
+                        "to": callee_name,
+                        "type": "calls",
+                        "call_type": callee.get('call_type', 'unknown')
+                    }
+                    if edge not in graph["edges"]:
+                        graph["edges"].append(edge)
+
+            # Add unvisited neighbors to queue
+            for neighbor_name in neighbors:
+                if neighbor_name not in visited:
+                    visited.add(neighbor_name)
+                    # Create and add node
+                    node = self._create_graph_node(neighbor_name, current_depth + 1, include_metadata)
+                    graph["nodes"][neighbor_name] = node
+                    # Add to queue for further exploration
+                    queue.append((neighbor_name, current_depth + 1))
+
+        return graph
+
 
 def check_docs_exist(docs_path: Optional[str] = None) -> bool:
     """
@@ -1019,6 +1462,250 @@ def check_docs_exist(docs_path: Optional[str] = None) -> bool:
         docs_path = docs_path / "documentation.json"
 
     return docs_path.exists()
+
+
+def check_documentation_staleness(
+    docs_path: Optional[str] = None,
+    source_dir: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Check if documentation is stale by comparing generation time with source file modifications.
+
+    Args:
+        docs_path: Path to docs directory or documentation.json
+        source_dir: Path to source directory to check. If None, uses parent of docs directory.
+
+    Returns:
+        Dictionary with staleness information:
+        {
+            'is_stale': bool,
+            'docs_generated_at': str (ISO timestamp),
+            'latest_source_modification': str (ISO timestamp),
+            'message': str (human-readable message),
+            'docs_age_seconds': int,
+            'newest_file': str (path to newest source file),
+            'checked_files_count': int
+        }
+    """
+    from datetime import datetime, timezone, timedelta
+    import os
+    import time
+
+    # Resolve docs path
+    if docs_path is None:
+        docs_path = Path.cwd() / "docs"
+    else:
+        docs_path = Path(docs_path)
+
+    if docs_path.is_dir():
+        docs_path = docs_path / "documentation.json"
+
+    # Check if docs exist
+    if not docs_path.exists():
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': 'Documentation does not exist',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Documentation not found'
+        }
+
+    # Load docs to get generation time
+    try:
+        with open(docs_path, 'r') as f:
+            docs_data = json.load(f)
+    except Exception as e:
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': f'Error loading documentation: {e}',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    # Get generation timestamp
+    generated_at_str = docs_data.get('metadata', {}).get('generated_at')
+    if not generated_at_str:
+        return {
+            'is_stale': True,
+            'docs_generated_at': None,
+            'latest_source_modification': None,
+            'message': 'Documentation metadata missing generation timestamp',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Missing timestamp'
+        }
+
+    # Parse generation timestamp
+    try:
+        generated_at = datetime.fromisoformat(generated_at_str.replace('Z', '+00:00'))
+    except Exception as e:
+        return {
+            'is_stale': True,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Invalid timestamp format: {e}',
+            'docs_age_seconds': None,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    # Determine source directory to scan
+    if source_dir is None:
+        # Default: scan parent directory of docs
+        source_dir = docs_path.parent.parent
+    else:
+        source_dir = Path(source_dir)
+
+    if not source_dir.exists():
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Source directory not found: {source_dir}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': 'Source directory not found'
+        }
+
+    # Scan source directory for Python files
+    latest_mtime = 0
+    newest_file = None
+    checked_count = 0
+
+    # File extensions to check based on documentation languages
+    languages = docs_data.get('metadata', {}).get('languages', ['python'])
+    extensions = set()
+    for lang in languages:
+        if lang == 'python':
+            extensions.add('.py')
+        elif lang == 'javascript' or lang == 'typescript':
+            extensions.update(['.js', '.jsx', '.ts', '.tsx'])
+        elif lang == 'go':
+            extensions.add('.go')
+        elif lang == 'html':
+            extensions.add('.html')
+        elif lang == 'css':
+            extensions.add('.css')
+
+    # If no extensions found, default to Python
+    if not extensions:
+        extensions.add('.py')
+
+    # Scan recursively
+    try:
+        for root, dirs, files in os.walk(source_dir):
+            # Skip common non-source directories
+            dirs[:] = [d for d in dirs if d not in {
+                '__pycache__', '.git', 'node_modules', 'venv', '.venv',
+                'build', 'dist', '.pytest_cache', '.mypy_cache', 'docs'
+            }]
+
+            for file in files:
+                if any(file.endswith(ext) for ext in extensions):
+                    file_path = Path(root) / file
+                    try:
+                        mtime = file_path.stat().st_mtime
+                        checked_count += 1
+                        if mtime > latest_mtime:
+                            latest_mtime = mtime
+                            newest_file = str(file_path)
+                    except Exception:
+                        # Skip files we can't stat
+                        continue
+    except Exception as e:
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'Error scanning source directory: {e}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0,
+            'error': str(e)
+        }
+
+    if checked_count == 0:
+        return {
+            'is_stale': False,
+            'docs_generated_at': generated_at_str,
+            'latest_source_modification': None,
+            'message': f'No source files found in {source_dir}',
+            'docs_age_seconds': 0,
+            'newest_file': None,
+            'checked_files_count': 0
+        }
+
+    # Compare timestamps
+    latest_source_dt = datetime.fromtimestamp(latest_mtime, tz=timezone.utc)
+
+    # Make generated_at timezone-aware if needed
+    # Naive timestamps from datetime.now() are in local time, not UTC
+    if generated_at.tzinfo is None:
+        # Assume it's local time and convert to UTC
+        local_offset = time.timezone if time.daylight == 0 else time.altzone
+        generated_at = generated_at.replace(tzinfo=timezone(timedelta(seconds=-local_offset)))
+        # Convert to UTC for comparison
+        generated_at = generated_at.astimezone(timezone.utc)
+
+    is_stale = latest_source_dt > generated_at
+
+    # Calculate age
+    now = datetime.now(timezone.utc)
+    docs_age = now - generated_at
+    docs_age_seconds = int(docs_age.total_seconds())
+
+    # Format message
+    if is_stale:
+        time_diff = latest_source_dt - generated_at
+        if time_diff.days > 0:
+            time_str = f"{time_diff.days} day{'s' if time_diff.days > 1 else ''}"
+        elif time_diff.seconds >= 3600:
+            hours = time_diff.seconds // 3600
+            time_str = f"{hours} hour{'s' if hours > 1 else ''}"
+        elif time_diff.seconds >= 60:
+            minutes = time_diff.seconds // 60
+            time_str = f"{minutes} minute{'s' if minutes > 1 else ''}"
+        else:
+            time_str = f"{time_diff.seconds} second{'s' if time_diff.seconds > 1 else ''}"
+
+        message = f"Documentation is stale (generated {_format_age(docs_age_seconds)} ago, source modified {time_str} after generation)"
+    else:
+        message = f"Documentation is fresh (generated {_format_age(docs_age_seconds)} ago)"
+
+    return {
+        'is_stale': is_stale,
+        'docs_generated_at': generated_at_str,
+        'latest_source_modification': latest_source_dt.isoformat(),
+        'message': message,
+        'docs_age_seconds': docs_age_seconds,
+        'newest_file': newest_file,
+        'checked_files_count': checked_count
+    }
+
+
+def _format_age(seconds: int) -> str:
+    """Format age in seconds as human-readable string."""
+    if seconds < 60:
+        return f"{seconds} second{'s' if seconds != 1 else ''}"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''}"
+    elif seconds < 86400:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''}"
+    else:
+        days = seconds // 86400
+        return f"{days} day{'s' if days != 1 else ''}"
 
 
 def load_documentation(docs_path: Optional[str] = None) -> DocumentationQuery:

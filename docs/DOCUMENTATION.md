@@ -1,17 +1,17 @@
-# claude-sdd-toolkit Documentation
+# SDD Toolkit Documentation
 
 **Version:** 0.1.0
-**Generated:** 2025-10-24 16:18:59
+**Generated:** 2025-10-26 17:35:36
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 92
-- **Total Lines:** 26428
-- **Total Classes:** 38
-- **Total Functions:** 436
-- **Avg Complexity:** 6.92
+- **Total Files:** 97
+- **Total Lines:** 30737
+- **Total Classes:** 42
+- **Total Functions:** 490
+- **Avg Complexity:** 6.74
 - **Max Complexity:** 40
 - **High Complexity Functions:**
   - generate_report (40)
@@ -28,7 +28,7 @@
 
 **Language:** python
 **Inherits from:** `ABC`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:196`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:252`
 
 **Description:**
 > Abstract base class for language-specific parsers.
@@ -54,7 +54,7 @@ the required abstract methods.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/css.py:38`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/css.py:38`
 
 **Description:**
 > Parser for CSS files using tree-sitter.
@@ -73,10 +73,55 @@ the required abstract methods.
 
 ---
 
+### `CallReference`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/schema.py:108`
+
+**Description:**
+> Represents a reference to a function call.
+
+This structure is used to represent both:
+- callers: functions that call this function
+- calls: functions called by this function
+
+Attributes:
+    name: Name of the function
+    file: File path where the function is defined/called
+    line: Line number of the call site or definition
+    call_type: Type of call (e.g., "function_call", "method_call",
+               "class_instantiation")
+
+Example:
+    >>> ref = CallReference(
+    ...     name="process_data",
+    ...     file="src/utils.py",
+    ...     line=42,
+    ...     call_type="function_call"
+    ... )
+    >>> ref.to_dict()
+    {'name': 'process_data', 'file': 'src/utils.py', 'line': 42,
+     'call_type': 'function_call'}
+
+**Methods:**
+- `to_dict()`
+
+---
+
+### `CallSite`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:34`
+
+**Description:**
+> Represents a location where a function/method is called.
+
+---
+
 ### `CodebaseAnalyzer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parser.py:12`
+**Defined in:** `claude_skills/claude_skills/code_doc/parser.py:12`
 
 **Description:**
 > Analyzes Python codebase and extracts structure.
@@ -94,74 +139,46 @@ the required abstract methods.
 
 ---
 
-### `Command`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:19`
-
-**Description:**
-> Represents an extracted sdd command.
-
----
-
-### `Command`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:21`
-
-**Description:**
-> Represents an extracted sdd command.
-
----
-
-### `CommandExtractor`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:139`
-
-**Description:**
-> Extract sdd commands from SKILL.md files.
-
-**Methods:**
-- `__init__()`
-- `find_skill_files()`
-- `extract_from_file()`
-- `extract_all()`
-
----
-
-### `CommandRegistry`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:38`
-
-**Description:**
-> Registry of valid sdd commands.
-
-**Methods:**
-- `__init__()`
-- `add_command()`
-- `add_alias()`
-- `is_valid()`
-- `get_similar_commands()`
-
----
-
 ### `ConsultationResponse`
 
 **Language:** python
 **Inherits from:** `NamedTuple`
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:679`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:679`
 
 **Description:**
 > Represents a response from a tool consultation.
 
 ---
 
+### `CrossReferenceGraph`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:66`
+
+**Description:**
+> Bidirectional graph tracking caller/callee relationships and
+class instantiations across the codebase.
+
+**Methods:**
+- `__init__()`
+- `add_call()`
+- `add_instantiation()`
+- `add_import()`
+- `add_warning()`
+- `get_callers()`
+- `get_callees()`
+- `get_instantiation_sites()`
+- `get_instantiators()`
+- `get_imported_by()`
+- `get_imports()`
+- `to_dict()`
+
+---
+
 ### `DependencyAnalysis`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:8`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:8`
 
 **Description:**
 > Structured dependency diagnostics used by sdd-validate.
@@ -171,7 +188,7 @@ the required abstract methods.
 ### `DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:22`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:22`
 
 **Description:**
 > Complete diff report between before and after states.
@@ -181,7 +198,7 @@ the required abstract methods.
 ### `DocumentationGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/generator.py:21`
+**Defined in:** `claude_skills/claude_skills/code_doc/generator.py:39`
 
 **Description:**
 > Main orchestrator for documentation generation.
@@ -201,7 +218,7 @@ Supports multiple programming languages.
 ### `DocumentationQuery`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/doc_query_lib.py:26`
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:26`
 
 **Description:**
 > Main class for querying codebase documentation.
@@ -218,6 +235,7 @@ Supports multiple programming languages.
 - `_get_docstring_excerpt()`
 - `_resolve_module_key()`
 - `_copy_module_info()`
+- `apply_pattern_filter()`
 - `_ensure_loaded()`
 - `find_class()`
 - `find_function()`
@@ -232,13 +250,39 @@ Supports multiple programming languages.
 - `list_classes()`
 - `list_functions()`
 - `list_modules()`
+- `get_callers()`
+- `get_callees()`
+- `get_call_count()`
+- `_create_graph_node()`
+- `build_call_graph()`
+
+---
+
+### `DynamicPattern`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:23`
+
+**Description:**
+> Dynamic patterns that may affect cross-reference accuracy.
+
+---
+
+### `DynamicPatternWarning`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:56`
+
+**Description:**
+> Warning about a dynamic pattern that may affect accuracy.
 
 ---
 
 ### `EnhancedError`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:12`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:12`
 
 **Description:**
 > Enhanced error message with detailed location and fix information
@@ -251,7 +295,7 @@ Supports multiple programming languages.
 ### `FieldChange`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:12`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:12`
 
 **Description:**
 > Represents a single field change.
@@ -261,7 +305,7 @@ Supports multiple programming languages.
 ### `FixAction`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:29`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:29`
 
 **Description:**
 > Represents a candidate auto-fix operation.
@@ -271,7 +315,7 @@ Supports multiple programming languages.
 ### `FixReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:42`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:42`
 
 **Description:**
 > Outcome of applying a set of fix actions.
@@ -282,7 +326,7 @@ Supports multiple programming languages.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/go.py:40`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/go.py:40`
 
 **Description:**
 > Parser for Go files using tree-sitter.
@@ -311,7 +355,7 @@ Supports multiple programming languages.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/html.py:38`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/html.py:38`
 
 **Description:**
 > Parser for HTML files using tree-sitter.
@@ -329,10 +373,86 @@ Supports multiple programming languages.
 
 ---
 
+### `ImportReference`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/schema.py:256`
+
+**Description:**
+> Represents a location where a class/module is imported.
+
+Tracks import statements to enable dependency analysis and
+understand how classes/modules are being used across the codebase.
+
+Attributes:
+    importer: File that imports the class/module
+    line: Line number of import statement
+    import_type: Type of import ("direct", "from", "dynamic")
+    alias: Optional import alias (e.g., "import pandas as pd")
+
+Example:
+    >>> ref = ImportReference(
+    ...     importer="app.py",
+    ...     line=5,
+    ...     import_type="from",
+    ...     alias="User"
+    ... )
+    >>> ref.to_dict()
+    {'importer': 'app.py', 'line': 5, 'import_type': 'from',
+     'alias': 'User'}
+
+**Methods:**
+- `to_dict()`
+
+---
+
+### `InstantiationReference`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/schema.py:214`
+
+**Description:**
+> Represents a location where a class is instantiated.
+
+Used to track where classes are being used/constructed throughout
+the codebase, enabling reverse lookup from class to instantiation sites.
+
+Attributes:
+    instantiator: Name of function/method creating the instance
+    file: File containing the instantiation
+    line: Line number of instantiation
+    context: Optional context (e.g., "module", "function", "method")
+
+Example:
+    >>> ref = InstantiationReference(
+    ...     instantiator="create_user",
+    ...     file="services/user.py",
+    ...     line=42,
+    ...     context="function"
+    ... )
+    >>> ref.to_dict()
+    {'instantiator': 'create_user', 'file': 'services/user.py',
+     'line': 42, 'context': 'function'}
+
+**Methods:**
+- `to_dict()`
+
+---
+
+### `InstantiationSite`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:46`
+
+**Description:**
+> Represents a location where a class is instantiated.
+
+---
+
 ### `JSONGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/formatter.py:195`
+**Defined in:** `claude_skills/claude_skills/code_doc/formatter.py:201`
 
 **Description:**
 > Generates JSON documentation.
@@ -347,7 +467,7 @@ Supports multiple programming languages.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/javascript.py:41`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/javascript.py:41`
 
 **Description:**
 > Parser for JavaScript and TypeScript files using tree-sitter.
@@ -373,7 +493,7 @@ Supports multiple programming languages.
 ### `JsonSpecValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:130`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:130`
 
 **Description:**
 > Results of JSON spec file validation
@@ -388,7 +508,7 @@ Supports multiple programming languages.
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:15`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:15`
 
 **Description:**
 > Supported programming languages.
@@ -401,7 +521,7 @@ Supports multiple programming languages.
 ### `MarkdownGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/formatter.py:12`
+**Defined in:** `claude_skills/claude_skills/code_doc/formatter.py:18`
 
 **Description:**
 > Generates Markdown documentation.
@@ -421,7 +541,7 @@ Supports multiple programming languages.
 ### `NormalizedValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:12`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:12`
 
 **Description:**
 > Aggregated validation statistics derived from a raw validation result.
@@ -436,7 +556,7 @@ Supports multiple programming languages.
 ### `ParseResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:164`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:164`
 
 **Description:**
 > Result of parsing a file or codebase.
@@ -450,7 +570,7 @@ Supports multiple programming languages.
 ### `ParsedClass`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:102`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:102`
 
 **Description:**
 > Represents a class, struct, or interface in any language.
@@ -463,7 +583,7 @@ Supports multiple programming languages.
 ### `ParsedFunction`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:60`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:60`
 
 **Description:**
 > Represents a function or method in any language.
@@ -476,7 +596,7 @@ Supports multiple programming languages.
 ### `ParsedModule`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:134`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:134`
 
 **Description:**
 > Represents a module, file, or compilation unit.
@@ -489,7 +609,7 @@ Supports multiple programming languages.
 ### `ParsedParameter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/base.py:52`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/base.py:52`
 
 **Description:**
 > Represents a function/method parameter.
@@ -499,7 +619,7 @@ Supports multiple programming languages.
 ### `ParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:15`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/factory.py:15`
 
 **Description:**
 > Factory for creating and managing language-specific parsers.
@@ -523,7 +643,7 @@ parsing across multiple languages.
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/printer.py:8`
+**Defined in:** `claude_skills/claude_skills/common/printer.py:8`
 
 **Description:**
 > Utility for consistent, pretty console output optimized for Claude Code.
@@ -548,7 +668,7 @@ parsing across multiple languages.
 
 **Language:** python
 **Inherits from:** `BaseParser`
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/python.py:25`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/python.py:34`
 
 **Description:**
 > Parser for Python source files using AST analysis.
@@ -569,17 +689,28 @@ parsing across multiple languages.
 ### `QueryResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/doc_query_lib.py:18`
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:18`
 
 **Description:**
 > Represents a query result with metadata.
 
 ---
 
+### `ReferenceType`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:14`
+
+**Description:**
+> Types of cross-references that can be tracked.
+
+---
+
 ### `SDDContextGatherer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:16`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:16`
 
 **Description:**
 > Helper class for gathering context for SDD tasks.
@@ -600,7 +731,7 @@ parsing across multiple languages.
 ### `SpecRenderer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_render/renderer.py:7`
+**Defined in:** `claude_skills/claude_skills/sdd_render/renderer.py:7`
 
 **Description:**
 > Renders JSON spec data to human-readable markdown.
@@ -621,7 +752,7 @@ parsing across multiple languages.
 ### `SpecStatistics`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:13`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/stats.py:13`
 
 **Description:**
 > Calculated statistics for a spec file.
@@ -631,7 +762,7 @@ parsing across multiple languages.
 ### `SpecValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:56`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:56`
 
 **Description:**
 > Results of spec document validation
@@ -643,23 +774,13 @@ parsing across multiple languages.
 
 ---
 
-### `ValidationResult`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:30`
-
-**Description:**
-> Result of validating a command.
-
----
-
 
 ## ⚡ Functions
 
 ### `_auto_register_parsers(factory) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:249`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/factory.py:249`
 **Complexity:** 6
 
 **Description:**
@@ -676,7 +797,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_bidirectional_deps_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:550`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:550`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -691,7 +812,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_counts_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:162`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:162`
 **Complexity:** 4
 
 **Parameters:**
@@ -703,7 +824,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_date_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:262`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:262`
 **Complexity:** 5
 
 **Parameters:**
@@ -715,7 +836,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_empty_title_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:429`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:429`
 **Complexity:** 7
 
 **Description:**
@@ -730,7 +851,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_enhanced_errors(messages) -> List[EnhancedError]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:118`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:118`
 **Complexity:** 4
 
 **Parameters:**
@@ -741,7 +862,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_hierarchy_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:226`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:226`
 **Complexity:** 9
 
 **Parameters:**
@@ -753,7 +874,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_invalid_type_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:461`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:461`
 **Complexity:** 6
 
 **Description:**
@@ -768,7 +889,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_journal_entry(title, content, entry_type, author, task_id) -> Tuple[Dict[str, Any], str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:88`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:88`
 **Complexity:** 2
 
 **Description:**
@@ -786,7 +907,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_leaf_count_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:646`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:646`
 **Complexity:** 9
 
 **Description:**
@@ -801,7 +922,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_metadata_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:184`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:184`
 **Complexity:** 8
 
 **Parameters:**
@@ -813,7 +934,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_missing_deps_structure_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:610`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:610`
 **Complexity:** 7
 
 **Description:**
@@ -828,7 +949,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_missing_fields_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:374`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:374`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -843,7 +964,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_orphan_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:679`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:679`
 **Complexity:** 9
 
 **Description:**
@@ -858,7 +979,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_status_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:287`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:287`
 **Complexity:** 8
 
 **Parameters:**
@@ -870,7 +991,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_build_tool_commands(failure_type) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:299`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:299`
 **Complexity:** 1
 
 **Description:**
@@ -890,7 +1011,7 @@ Returns:
 ### `_build_verification_type_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:517`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:517`
 **Complexity:** 9
 
 **Description:**
@@ -905,7 +1026,7 @@ Returns:
 ### `_bump_version(current_version, bump) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:48`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:48`
 **Complexity:** 5
 
 **Description:**
@@ -920,7 +1041,7 @@ Returns:
 ### `_calculate_diff(before, after, task_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:167`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:167`
 **Complexity:** 8
 
 **Parameters:**
@@ -933,7 +1054,7 @@ Returns:
 ### `_category_from_field(field) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:57`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:57`
 **Complexity:** 3
 
 **Parameters:**
@@ -944,7 +1065,7 @@ Returns:
 ### `_coerce_scalar(value) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:139`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:139`
 **Complexity:** 5
 
 **Parameters:**
@@ -955,7 +1076,7 @@ Returns:
 ### `_collect_messages(result, fields, severity) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:65`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:65`
 **Complexity:** 4
 
 **Parameters:**
@@ -968,7 +1089,7 @@ Returns:
 ### `_compare_dicts(node_id, dict_name, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:142`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:142`
 **Complexity:** 5
 
 **Description:**
@@ -985,7 +1106,7 @@ Returns:
 ### `_compare_nodes(node_id, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:89`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:89`
 **Complexity:** 6
 
 **Description:**
@@ -1001,7 +1122,7 @@ Returns:
 ### `_context_to_json(context) -> Dict[str, List[Dict[str, Any]]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:70`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:170`
 **Complexity:** 1
 
 **Parameters:**
@@ -1012,7 +1133,7 @@ Returns:
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:47`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:49`
 **Complexity:** 2
 
 **Parameters:**
@@ -1023,7 +1144,7 @@ Returns:
 ### `_derive_default_journal(task_id, task_title, actual_hours, note) -> Tuple[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:30`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:30`
 **Complexity:** 4
 
 **Parameters:**
@@ -1037,7 +1158,7 @@ Returns:
 ### `_detect_source_directory() -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:17`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:17`
 **Complexity:** 7
 
 **Description:**
@@ -1048,10 +1169,30 @@ Returns:
 
 ---
 
+### `_determine_layer(file_path) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:303`
+**Complexity:** 5
+
+**Description:**
+> Determine architectural layer from file path.
+
+Args:
+    file_path: Path to file
+
+Returns:
+    Layer name (Presentation, Business Logic, Data, Utility, Core, External)
+
+**Parameters:**
+- `file_path`: str
+
+---
+
 ### `_determine_severity(message, severity_hint) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:40`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:40`
 **Complexity:** 7
 
 **Parameters:**
@@ -1063,7 +1204,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:82`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:82`
 **Complexity:** 1
 
 **Parameters:**
@@ -1074,7 +1215,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:25`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:46`
 **Complexity:** 1
 
 **Parameters:**
@@ -1085,7 +1226,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:38`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:38`
 **Complexity:** 1
 
 **Parameters:**
@@ -1096,7 +1237,7 @@ Returns:
 ### `_ensure_journal_container(spec_data) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:114`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:114`
 **Complexity:** 3
 
 **Description:**
@@ -1110,7 +1251,7 @@ Returns:
 ### `_ensure_metrics_dir() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:51`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:52`
 **Complexity:** 1
 
 **Description:**
@@ -1121,8 +1262,8 @@ Returns:
 ### `_ensure_query(args, printer) -> Optional[DocumentationQuery]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:37`
-**Complexity:** 6
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:58`
+⚠️ **Complexity:** 22 (High)
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -1133,7 +1274,7 @@ Returns:
 ### `_exclude_patterns(extra) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:94`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:94`
 **Complexity:** 2
 
 **Parameters:**
@@ -1144,7 +1285,7 @@ Returns:
 ### `_extract_json_frontmatter(path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:52`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:52`
 **Complexity:** 10
 
 **Parameters:**
@@ -1155,7 +1296,7 @@ Returns:
 ### `_extract_location(message) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:30`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:30`
 **Complexity:** 4
 
 **Description:**
@@ -1169,7 +1310,7 @@ Returns:
 ### `_extract_markdown_frontmatter(path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:87`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:87`
 ⚠️ **Complexity:** 14 (High)
 
 **Parameters:**
@@ -1180,7 +1321,7 @@ Returns:
 ### `_filter_actions_by_selection(actions, selection_criteria) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:82`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:84`
 **Complexity:** 6
 
 **Description:**
@@ -1192,10 +1333,46 @@ Returns:
 
 ---
 
+### `_find_entity(query, entity_name) -> Tuple[Optional[str], Optional[Dict[str, Any]]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:128`
+**Complexity:** 3
+
+**Description:**
+> Find entity and determine its type.
+
+Args:
+    query: DocumentationQuery instance
+    entity_name: Name to search for
+
+Returns:
+    Tuple of (entity_type, entity_info) or (None, None) if not found
+
+**Parameters:**
+- `query`: Any
+- `entity_name`: str
+
+---
+
+### `_format_age(seconds) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:1696`
+**Complexity:** 4
+
+**Description:**
+> Format age in seconds as human-readable string.
+
+**Parameters:**
+- `seconds`: int
+
+---
+
 ### `_format_issue(number, issue, brief) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:280`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:119`
 **Complexity:** 5
 
 **Description:**
@@ -1208,10 +1385,30 @@ Returns:
 
 ---
 
+### `_format_model_summary(model_data) -> List[str]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:145`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Format individual model response for display.
+
+Args:
+    model_data: Normalized model response data
+
+Returns:
+    List of formatted lines
+
+**Parameters:**
+- `model_data`: Dict[str, Any]
+
+---
+
 ### `_format_value(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:256`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:256`
 **Complexity:** 4
 
 **Description:**
@@ -1225,7 +1422,7 @@ Returns:
 ### `_generate_feasibility_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:225`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:257`
 **Complexity:** 1
 
 **Description:**
@@ -1241,7 +1438,7 @@ Returns:
 ### `_generate_full_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:68`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:100`
 **Complexity:** 1
 
 **Description:**
@@ -1257,7 +1454,7 @@ Returns:
 ### `_generate_quick_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:130`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:162`
 **Complexity:** 1
 
 **Description:**
@@ -1273,7 +1470,7 @@ Returns:
 ### `_generate_security_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:167`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:199`
 **Complexity:** 1
 
 **Description:**
@@ -1289,7 +1486,7 @@ Returns:
 ### `_get_presets() -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:48`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:48`
 **Complexity:** 2
 
 **Description:**
@@ -1305,7 +1502,7 @@ Returns:
 ### `_get_recommendation_summary(consensus, recommendation) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:245`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:84`
 **Complexity:** 3
 
 **Description:**
@@ -1320,7 +1517,7 @@ Returns:
 ### `_get_score_assessment(score) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:266`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:105`
 **Complexity:** 5
 
 **Description:**
@@ -1334,7 +1531,7 @@ Returns:
 ### `_get_timestamp() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:26`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:26`
 **Complexity:** 1
 
 ---
@@ -1342,7 +1539,7 @@ Returns:
 ### `_handle_error(args, printer, exc) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:98`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:98`
 **Complexity:** 3
 
 **Parameters:**
@@ -1355,7 +1552,7 @@ Returns:
 ### `_interactive_select_fixes(actions, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:100`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:102`
 **Complexity:** 10
 
 **Description:**
@@ -1370,7 +1567,7 @@ Returns:
 ### `_is_auto_fixable(category, normalized_message) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:51`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:51`
 ⚠️ **Complexity:** 20 (High)
 
 **Parameters:**
@@ -1382,7 +1579,7 @@ Returns:
 ### `_is_test_environment() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:27`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:28`
 **Complexity:** 4
 
 **Description:**
@@ -1395,10 +1592,24 @@ Returns True if any of the following conditions are met:
 
 ---
 
+### `_is_test_file(file_path) -> bool`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:392`
+**Complexity:** 1
+
+**Description:**
+> Check if file path indicates a test file.
+
+**Parameters:**
+- `file_path`: str
+
+---
+
 ### `_maybe_json(args, payload) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:30`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:51`
 **Complexity:** 2
 
 **Parameters:**
@@ -1410,7 +1621,7 @@ Returns True if any of the following conditions are met:
 ### `_maybe_json(args, payload) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:43`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:43`
 **Complexity:** 2
 
 **Parameters:**
@@ -1422,7 +1633,7 @@ Returns True if any of the following conditions are met:
 ### `_merge_enhanced_issues(issues, enhanced_errors) -> Tuple[List[Dict[str, Any]], int, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:83`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:83`
 **Complexity:** 8
 
 **Parameters:**
@@ -1434,7 +1645,7 @@ Returns True if any of the following conditions are met:
 ### `_normalize_node_type(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:496`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:496`
 **Complexity:** 3
 
 **Description:**
@@ -1448,7 +1659,7 @@ Returns True if any of the following conditions are met:
 ### `_normalize_status(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:353`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:353`
 **Complexity:** 3
 
 **Parameters:**
@@ -1459,7 +1670,7 @@ Returns True if any of the following conditions are met:
 ### `_normalize_timestamp(value) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:322`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:322`
 **Complexity:** 5
 
 **Parameters:**
@@ -1470,7 +1681,7 @@ Returns True if any of the following conditions are met:
 ### `_normalized_to_dict(normalized) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:59`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:61`
 **Complexity:** 1
 
 **Parameters:**
@@ -1481,7 +1692,7 @@ Returns True if any of the following conditions are met:
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:215`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:215`
 **Complexity:** 8
 
 **Parameters:**
@@ -1493,7 +1704,7 @@ Returns True if any of the following conditions are met:
 ### `_print_if_json(args, payload, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:87`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:87`
 **Complexity:** 2
 
 **Parameters:**
@@ -1506,7 +1717,7 @@ Returns True if any of the following conditions are met:
 ### `_print_results(args, results) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:77`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:177`
 **Complexity:** 3
 
 **Parameters:**
@@ -1518,7 +1729,7 @@ Returns True if any of the following conditions are met:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:54`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/registry.py:54`
 **Complexity:** 1
 
 **Description:**
@@ -1533,7 +1744,7 @@ Returns True if any of the following conditions are met:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:92`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/registry.py:92`
 **Complexity:** 1
 
 **Description:**
@@ -1548,7 +1759,7 @@ Returns True if any of the following conditions are met:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:74`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/registry.py:74`
 **Complexity:** 1
 
 **Description:**
@@ -1563,7 +1774,7 @@ Returns True if any of the following conditions are met:
 ### `_render_template(template_name, context) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:375`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:375`
 **Complexity:** 2
 
 **Description:**
@@ -1578,7 +1789,7 @@ Returns True if any of the following conditions are met:
 ### `_resolve_node_id(error, hierarchy) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:343`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:343`
 **Complexity:** 5
 
 **Parameters:**
@@ -1590,7 +1801,7 @@ Returns True if any of the following conditions are met:
 ### `_results_to_json(results, include_meta) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:56`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:156`
 **Complexity:** 3
 
 **Parameters:**
@@ -1602,7 +1813,7 @@ Returns True if any of the following conditions are met:
 ### `_rotate_metrics_file_if_needed() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:56`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:57`
 **Complexity:** 5
 
 **Description:**
@@ -1613,7 +1824,7 @@ Returns True if any of the following conditions are met:
 ### `_run_tool_capture(tool, prompt) -> Tuple[bool, str, float]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:607`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:607`
 **Complexity:** 1
 
 **Description:**
@@ -1631,7 +1842,7 @@ Returns:
 ### `_serialize_fix_action(action) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:63`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:65`
 **Complexity:** 1
 
 **Parameters:**
@@ -1642,7 +1853,7 @@ Returns:
 ### `_should_exclude_path(file_path, exclude_patterns) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:14`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:14`
 **Complexity:** 8
 
 **Description:**
@@ -1667,7 +1878,7 @@ Returns:
 ### `_simulate_workflow(state, task_id, actual_hours, note, journal_title, journal_content, journal_entry_type, author, revision_version, revision_changes) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:73`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:73`
 ⚠️ **Complexity:** 13 (High)
 
 **Parameters:**
@@ -1687,7 +1898,7 @@ Returns:
 ### `_stats_to_dict(stats) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:43`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:45`
 **Complexity:** 1
 
 **Parameters:**
@@ -1698,7 +1909,7 @@ Returns:
 ### `_status_to_exit_code(status) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:74`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:76`
 **Complexity:** 3
 
 **Parameters:**
@@ -1709,7 +1920,7 @@ Returns:
 ### `_suggest_fix(category, normalized_message) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:80`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:80`
 ⚠️ **Complexity:** 22 (High)
 
 **Parameters:**
@@ -1721,7 +1932,7 @@ Returns:
 ### `_validate_spec_structure(spec_data) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:274`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:278`
 **Complexity:** 9
 
 **Description:**
@@ -1741,7 +1952,7 @@ Returns:
 ### `add_global_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:20`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/options.py:20`
 **Complexity:** 1
 
 **Description:**
@@ -1755,7 +1966,7 @@ Returns:
 ### `add_journal_entry(spec_id, title, content, task_id, entry_type, author, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:120`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:120`
 **Complexity:** 10
 
 **Description:**
@@ -1791,7 +2002,7 @@ Returns:
 ### `add_revision_entry(spec_id, version, changes, author, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:281`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:281`
 **Complexity:** 10
 
 **Description:**
@@ -1823,7 +2034,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:65`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/options.py:75`
 **Complexity:** 1
 
 **Description:**
@@ -1837,7 +2048,7 @@ Returns:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:73`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/options.py:83`
 **Complexity:** 1
 
 **Description:**
@@ -1851,7 +2062,7 @@ Returns:
 ### `add_verification_result(spec_id, verify_id, status, command, output, issues, notes, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/verification.py:17`
+**Defined in:** `claude_skills/claude_skills/sdd_update/verification.py:17`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -1886,30 +2097,10 @@ Returns:
 
 ---
 
-### `aggregate_issues(responses) -> List[Dict[str, Any]]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:308`
-**Complexity:** 4
-
-**Description:**
-> Aggregate and deduplicate issues from all models.
-
-Args:
-    responses: List of model responses
-
-Returns:
-    Deduplicated list of issues with model attribution
-
-**Parameters:**
-- `responses`: List[Dict[str, Any]]
-
----
-
 ### `analyze_code_quality(statistics) -> Dict[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:108`
+**Defined in:** `claude_skills/claude_skills/code_doc/calculator.py:108`
 **Complexity:** 5
 
 **Description:**
@@ -1929,7 +2120,7 @@ Returns:
 ### `analyze_codebase(directory) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:15`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:15`
 **Complexity:** 5
 
 **Description:**
@@ -1949,7 +2140,7 @@ Returns:
 ### `analyze_conftest(file_path) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:121`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:121`
 **Complexity:** 7
 
 **Description:**
@@ -1969,7 +2160,7 @@ Returns:
 ### `analyze_dependencies(spec_data) -> DependencyAnalysis`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:21`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:21`
 ⚠️ **Complexity:** 32 (High)
 
 **Description:**
@@ -2000,10 +2191,83 @@ Example:
 
 ---
 
+### `analyze_impact(query, entity_name, depth) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:13`
+**Complexity:** 3
+
+**Description:**
+> Analyze the impact of changing a function or class.
+
+Calculates the "blast radius" showing all directly and indirectly affected code,
+test coverage, and risk assessment with refactoring recommendations.
+
+Args:
+    query: DocumentationQuery instance
+    entity_name: Name of the function or class to analyze
+    depth: Maximum depth for indirect dependency traversal (default: 2)
+
+Returns:
+    Dictionary with keys:
+    - entity_name: Name of the analyzed entity
+    - entity_type: 'function' or 'class'
+    - entity_info: Basic entity information
+    - blast_radius: Dict with direct_dependents, indirect_dependents
+    - test_coverage: Dict with test files and estimated coverage
+    - risk_assessment: Dict with score, level, factors
+    - recommendations: List of actionable recommendations
+    - summary: Statistics about the impact
+
+Example:
+    >>> query = DocumentationQuery()
+    >>> query.load()
+    >>> result = analyze_impact(query, "load", depth=2)
+    >>> print(f"Risk level: {result['risk_assessment']['level']}")
+
+**Parameters:**
+- `query`: Any
+- `entity_name`: str
+- `depth`: int
+
+---
+
+### `analyze_property_access(query, class_name, class_info, crud_ops) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:298`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Analyze property access patterns for the class.
+
+Identifies which properties are accessed in which operations,
+highlighting frequently accessed or modified properties.
+
+Args:
+    query: DocumentationQuery instance
+    class_name: Name of the class
+    class_info: Class information dictionary
+    crud_ops: CRUD operations from detect_crud_operations()
+
+Returns:
+    Dictionary with property access statistics:
+    - properties: List of property names
+    - access_patterns: Dict mapping properties to access counts
+    - mutation_hot_spots: Properties frequently modified
+
+**Parameters:**
+- `query`: Any
+- `class_name`: str
+- `class_info`: Dict[str, Any]
+- `crud_ops`: Dict[str, List[Dict[str, Any]]]
+
+---
+
 ### `analyze_response_similarity(response1, response2) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:759`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:759`
 **Complexity:** 5
 
 **Description:**
@@ -2025,7 +2289,7 @@ Returns:
 ### `analyze_spec_complexity(spec_file) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec_analysis.py:188`
+**Defined in:** `claude_skills/claude_skills/common/spec_analysis.py:188`
 **Complexity:** 4
 
 **Description:**
@@ -2055,7 +2319,7 @@ Example:
 ### `analyze_test_file(file_path) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:55`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:55`
 **Complexity:** 6
 
 **Description:**
@@ -2075,7 +2339,7 @@ Returns:
 ### `apply_fix_actions(actions, spec_path) -> FixReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:98`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:98`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -2090,7 +2354,7 @@ Returns:
 ### `audit_spec(spec_id, specs_dir, printer) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:146`
+**Defined in:** `claude_skills/claude_skills/sdd_update/validation.py:146`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -2119,11 +2383,11 @@ Returns:
 ### `backup_json_spec(spec_id, specs_dir, suffix) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:247`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:247`
 **Complexity:** 3
 
 **Description:**
-> Create a backup copy of the JSON spec file.
+> Create a backup copy of the JSON spec file in the .backups/ directory.
 
 Args:
     spec_id: Specification ID
@@ -2143,7 +2407,7 @@ Returns:
 ### `batch_check_paths_exist(paths, base_directory) -> Dict[str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:244`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:244`
 **Complexity:** 3
 
 **Description:**
@@ -2167,30 +2431,68 @@ Example:
 
 ---
 
-### `build_consensus(responses) -> Dict[str, Any]`
+### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:208`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/synthesis.py:222`
+**Complexity:** 3
 
 **Description:**
-> Build consensus from multiple model responses.
+> Build consensus from multiple model responses using AI synthesis.
+
+This replaces fragile regex parsing with AI-based natural language synthesis.
 
 Args:
-    responses: List of normalized response dictionaries
+    responses: List of response dicts from parse_response()
+    spec_id: Specification ID
+    spec_title: Specification title
 
 Returns:
-    Consensus dictionary with aggregated scores and recommendations
+    Consensus dictionary with synthesis results
 
 **Parameters:**
 - `responses`: List[Dict[str, Any]]
+- `spec_id`: str
+- `spec_title`: str
+
+---
+
+### `build_data_flow(query, class_name, crud_ops) -> Dict[str, Dict[str, List[str]]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:230`
+**Complexity:** 10
+
+**Description:**
+> Build data flow organized by architectural layer.
+
+Groups CRUD operations by layer (Presentation, Business Logic, Data, etc.)
+to show how data flows through the architecture.
+
+Args:
+    query: DocumentationQuery instance
+    class_name: Name of the class being traced
+    crud_ops: CRUD operations from detect_crud_operations()
+
+Returns:
+    Dictionary mapping layer names to operation categories:
+    {
+        'Presentation': {'create': [...], 'read': [...], ...},
+        'Business Logic': {'create': [...], 'read': [...], ...},
+        ...
+    }
+
+**Parameters:**
+- `query`: Any
+- `class_name`: str
+- `crud_ops`: Dict[str, List[Dict[str, Any]]]
 
 ---
 
 ### `build_pytest_command(preset, path, pattern, extra_args) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:129`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:129`
 **Complexity:** 6
 
 **Description:**
@@ -2213,24 +2515,10 @@ Returns:
 
 ---
 
-### `build_registry() -> CommandRegistry`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:238`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Build the command registry from sdd --help output.
-
-Returns:
-    CommandRegistry with all valid commands
-
----
-
 ### `bulk_journal_tasks(spec_id, specs_dir, task_ids, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:386`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:386`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -2260,10 +2548,42 @@ Returns:
 
 ---
 
+### `calculate_blast_radius(query, entity_name, entity_type, entity_info, depth) -> Dict[str, List[Dict[str, Any]]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:170`
+⚠️ **Complexity:** 18 (High)
+
+**Description:**
+> Calculate the blast radius of changing an entity.
+
+Finds all direct dependents and indirect dependents up to specified depth.
+
+Args:
+    query: DocumentationQuery instance
+    entity_name: Name of the entity
+    entity_type: 'function' or 'class'
+    entity_info: Entity information dictionary
+    depth: Maximum depth for traversal
+
+Returns:
+    Dictionary with:
+    - direct_dependents: List of functions/classes that directly depend on entity
+    - indirect_dependents: List of 2nd+ degree dependents
+
+**Parameters:**
+- `query`: Any
+- `entity_name`: str
+- `entity_type`: str
+- `entity_info`: Dict[str, Any]
+- `depth`: int
+
+---
+
 ### `calculate_complexity(node) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:12`
+**Defined in:** `claude_skills/claude_skills/code_doc/calculator.py:12`
 **Complexity:** 4
 
 **Description:**
@@ -2280,30 +2600,10 @@ Returns:
 
 ---
 
-### `calculate_consensus_level(responses) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:347`
-**Complexity:** 5
-
-**Description:**
-> Calculate consensus level based on score variance.
-
-Args:
-    responses: List of model responses
-
-Returns:
-    Consensus level string
-
-**Parameters:**
-- `responses`: List[Dict[str, Any]]
-
----
-
 ### `calculate_language_statistics(modules, functions) -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:66`
+**Defined in:** `claude_skills/claude_skills/code_doc/calculator.py:66`
 **Complexity:** 5
 
 **Description:**
@@ -2322,10 +2622,69 @@ Returns:
 
 ---
 
+### `calculate_priority_score(func) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:99`
+**Complexity:** 1
+
+**Description:**
+> Calculate priority score for a function.
+
+Priority score = complexity × dependent_count
+Higher score = higher priority for refactoring
+
+Args:
+    func: Function dictionary from documentation
+
+Returns:
+    Dictionary with:
+    - name: Function name
+    - file: File path
+    - line: Line number
+    - complexity: Cyclomatic complexity
+    - dependent_count: Number of callers
+    - priority_score: complexity × dependents
+    - risk_level: 'high', 'medium', or 'low'
+
+**Parameters:**
+- `func`: Dict[str, Any]
+
+---
+
+### `calculate_risk_score(blast_radius, test_coverage, entity_info) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:399`
+**Complexity:** 3
+
+**Description:**
+> Calculate risk score for changing the entity.
+
+Uses formula: Risk = (direct * 3) + (indirect * 1) + (layers * 5) - (coverage * 0.1)
+
+Args:
+    blast_radius: Blast radius from calculate_blast_radius()
+    test_coverage: Test coverage from find_test_coverage()
+    entity_info: Entity information
+
+Returns:
+    Dictionary with:
+    - score: Numeric risk score
+    - level: 'low', 'medium', or 'high'
+    - factors: Breakdown of risk factors
+
+**Parameters:**
+- `blast_radius`: Dict[str, List[Dict[str, Any]]]
+- `test_coverage`: Dict[str, Any]
+- `entity_info`: Dict[str, Any]
+
+---
+
 ### `calculate_statistics(modules, functions) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/calculator.py:31`
+**Defined in:** `claude_skills/claude_skills/code_doc/calculator.py:31`
 **Complexity:** 1
 
 **Description:**
@@ -2347,7 +2706,7 @@ Returns:
 ### `calculate_statistics(spec_data) -> SpecStatistics`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:29`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/stats.py:29`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -2361,7 +2720,7 @@ Returns:
 ### `call_tool(tool_name, prompt, timeout) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:92`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reviewer.py:92`
 **Complexity:** 8
 
 **Description:**
@@ -2385,7 +2744,7 @@ Returns:
 ### `capture_metrics(skill, command) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:123`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:124`
 **Complexity:** 4
 
 **Decorators:** `@contextmanager`
@@ -2408,10 +2767,39 @@ Args:
 
 ---
 
+### `categorize_risk_level(priority_score, complexity, dependent_count) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:145`
+**Complexity:** 3
+
+**Description:**
+> Categorize risk level for refactoring.
+
+Args:
+    priority_score: Priority score (complexity × dependents)
+    complexity: Cyclomatic complexity
+    dependent_count: Number of dependents
+
+Returns:
+    Risk level: 'high', 'medium', or 'low'
+
+Risk Level Criteria:
+    - High: score > 100 (complex + widely used)
+    - Medium: score 50-100 (moderately risky)
+    - Low: score < 50 (safer to refactor)
+
+**Parameters:**
+- `priority_score`: int
+- `complexity`: int
+- `dependent_count`: int
+
+---
+
 ### `check_complete(spec_id, specs_dir, phase_id, printer) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:248`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:248`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -2437,7 +2825,7 @@ Returns:
 ### `check_dependencies(spec_data, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:71`
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:132`
 **Complexity:** 8
 
 **Description:**
@@ -2459,7 +2847,7 @@ Returns:
 ### `check_doc_query_available() -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/doc_helper.py:15`
+**Defined in:** `claude_skills/claude_skills/common/doc_helper.py:15`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -2483,7 +2871,7 @@ Example:
 ### `check_docs_exist(docs_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/doc_query_lib.py:1003`
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:1446`
 **Complexity:** 3
 
 **Description:**
@@ -2500,10 +2888,41 @@ Returns:
 
 ---
 
+### `check_documentation_staleness(docs_path, source_dir) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:1467`
+⚠️ **Complexity:** 29 (High)
+
+**Description:**
+> Check if documentation is stale by comparing generation time with source file modifications.
+
+Args:
+    docs_path: Path to docs directory or documentation.json
+    source_dir: Path to source directory to check. If None, uses parent of docs directory.
+
+Returns:
+    Dictionary with staleness information:
+    {
+        'is_stale': bool,
+        'docs_generated_at': str (ISO timestamp),
+        'latest_source_modification': str (ISO timestamp),
+        'message': str (human-readable message),
+        'docs_age_seconds': int,
+        'newest_file': str (path to newest source file),
+        'checked_files_count': int
+    }
+
+**Parameters:**
+- `docs_path`: Optional[str]
+- `source_dir`: Optional[str]
+
+---
+
 ### `check_environment(directory, required_deps) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/project.py:224`
+**Defined in:** `claude_skills/claude_skills/sdd_next/project.py:224`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -2525,7 +2944,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:28`
+**Defined in:** `claude_skills/claude_skills/dev_tools/sdd_start_helper.py:28`
 **Complexity:** 6
 
 **Description:**
@@ -2539,7 +2958,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:119`
+**Defined in:** `claude_skills/claude_skills/dev_tools/setup_project_permissions.py:116`
 **Complexity:** 2
 
 **Description:**
@@ -2553,7 +2972,7 @@ Returns:
 ### `check_sdd_integration_available() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/doc_helper.py:90`
+**Defined in:** `claude_skills/claude_skills/common/doc_helper.py:90`
 **Complexity:** 1
 
 **Description:**
@@ -2571,7 +2990,7 @@ Example:
 ### `check_tool_availability() -> Dict[str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:111`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:111`
 **Complexity:** 2
 
 **Description:**
@@ -2587,7 +3006,7 @@ Returns:
 ### `check_tool_available(tool_name) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
 **Complexity:** 4
 
 **Description:**
@@ -2607,7 +3026,7 @@ Returns:
 ### `cmd_add_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:222`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:222`
 **Complexity:** 3
 
 **Description:**
@@ -2622,7 +3041,7 @@ Returns:
 ### `cmd_add_revision(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:246`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:246`
 **Complexity:** 3
 
 **Description:**
@@ -2637,7 +3056,7 @@ Returns:
 ### `cmd_add_verification(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:292`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:292`
 **Complexity:** 3
 
 **Description:**
@@ -2652,7 +3071,7 @@ Returns:
 ### `cmd_analyze(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:215`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:215`
 **Complexity:** 10
 
 **Parameters:**
@@ -2664,7 +3083,7 @@ Returns:
 ### `cmd_analyze(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:61`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/cli.py:64`
 **Complexity:** 6
 
 **Description:**
@@ -2679,7 +3098,7 @@ Returns:
 ### `cmd_analyze_with_ai(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:272`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:272`
 ⚠️ **Complexity:** 17 (High)
 
 **Parameters:**
@@ -2691,7 +3110,7 @@ Returns:
 ### `cmd_audit_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:456`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:456`
 **Complexity:** 5
 
 **Description:**
@@ -2706,7 +3125,7 @@ Returns:
 ### `cmd_bulk_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:712`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:712`
 **Complexity:** 4
 
 **Description:**
@@ -2718,10 +3137,55 @@ Returns:
 
 ---
 
+### `cmd_call_graph(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:746`
+**Complexity:** 9
+
+**Description:**
+> Build and display call graph for a function.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
+### `cmd_callees(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:710`
+**Complexity:** 5
+
+**Description:**
+> Show functions called by the specified function.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
+### `cmd_callers(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:674`
+**Complexity:** 5
+
+**Description:**
+> Show functions that call the specified function.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:119`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:119`
 **Complexity:** 5
 
 **Description:**
@@ -2736,7 +3200,7 @@ Returns:
 ### `cmd_check_complete(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:586`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:586`
 **Complexity:** 5
 
 **Description:**
@@ -2751,7 +3215,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:388`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:389`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -2766,7 +3230,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:443`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:466`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -2781,7 +3245,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:688`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:692`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -2796,7 +3260,7 @@ Returns:
 ### `cmd_check_journaling(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:673`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:673`
 **Complexity:** 8
 
 **Description:**
@@ -2811,8 +3275,8 @@ Returns:
 ### `cmd_check_permissions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:22`
-**Complexity:** 7
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/start_helper.py:22`
+**Complexity:** 8
 
 **Description:**
 > Check if SDD permissions are configured for the project.
@@ -2826,7 +3290,7 @@ Returns:
 ### `cmd_check_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:55`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:55`
 **Complexity:** 3
 
 **Parameters:**
@@ -2838,7 +3302,7 @@ Returns:
 ### `cmd_complete_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:366`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:366`
 **Complexity:** 3
 
 **Description:**
@@ -2853,7 +3317,7 @@ Returns:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:739`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:739`
 **Complexity:** 6
 
 **Description:**
@@ -2868,8 +3332,8 @@ Returns:
 ### `cmd_complexity(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:313`
-**Complexity:** 3
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:448`
+**Complexity:** 5
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -2880,7 +3344,7 @@ Returns:
 ### `cmd_consult(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:67`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:67`
 ⚠️ **Complexity:** 15 (High)
 
 **Parameters:**
@@ -2892,7 +3356,7 @@ Returns:
 ### `cmd_context(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:346`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:504`
 **Complexity:** 3
 
 **Parameters:**
@@ -2904,7 +3368,7 @@ Returns:
 ### `cmd_create(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:20`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/cli.py:20`
 **Complexity:** 4
 
 **Description:**
@@ -2919,7 +3383,7 @@ Returns:
 ### `cmd_dependencies(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:324`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:482`
 **Complexity:** 3
 
 **Parameters:**
@@ -2931,7 +3395,7 @@ Returns:
 ### `cmd_describe_module(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:362`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:520`
 **Complexity:** 3
 
 **Parameters:**
@@ -2943,7 +3407,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:617`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:621`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -2958,7 +3422,7 @@ Returns:
 ### `cmd_discover(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:134`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:134`
 **Complexity:** 1
 
 **Parameters:**
@@ -2970,7 +3434,7 @@ Returns:
 ### `cmd_execute_verify(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:48`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:48`
 ⚠️ **Complexity:** 29 (High)
 
 **Description:**
@@ -2985,7 +3449,7 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:69`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/start_helper.py:80`
 **Complexity:** 4
 
 **Description:**
@@ -3000,7 +3464,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:731`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:735`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -3015,7 +3479,7 @@ Returns:
 ### `cmd_find_class(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:280`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:415`
 **Complexity:** 3
 
 **Parameters:**
@@ -3027,7 +3491,7 @@ Returns:
 ### `cmd_find_function(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:291`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:426`
 **Complexity:** 3
 
 **Parameters:**
@@ -3039,7 +3503,7 @@ Returns:
 ### `cmd_find_module(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:302`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:437`
 **Complexity:** 3
 
 **Parameters:**
@@ -3051,7 +3515,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:596`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:600`
 **Complexity:** 5
 
 **Description:**
@@ -3066,7 +3530,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:771`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:775`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -3081,7 +3545,7 @@ Returns:
 ### `cmd_find_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:273`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:274`
 **Complexity:** 8
 
 **Description:**
@@ -3096,7 +3560,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:656`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:660`
 **Complexity:** 9
 
 **Description:**
@@ -3111,7 +3575,7 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:231`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:242`
 ⚠️ **Complexity:** 33 (High)
 
 **Description:**
@@ -3126,7 +3590,7 @@ Returns:
 ### `cmd_format_output(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:123`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/start_helper.py:134`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -3141,7 +3605,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:540`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:544`
 **Complexity:** 4
 
 **Description:**
@@ -3156,7 +3620,7 @@ Returns:
 ### `cmd_format_verification_summary(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:317`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:317`
 **Complexity:** 6
 
 **Description:**
@@ -3171,7 +3635,7 @@ Returns:
 ### `cmd_gendocs(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py:14`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/gendocs.py:14`
 **Complexity:** 4
 
 **Description:**
@@ -3186,7 +3650,7 @@ Returns:
 ### `cmd_generate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:108`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:108`
 **Complexity:** 9
 
 **Parameters:**
@@ -3198,7 +3662,7 @@ Returns:
 ### `cmd_get_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:535`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:535`
 **Complexity:** 7
 
 **Description:**
@@ -3213,7 +3677,7 @@ Returns:
 ### `cmd_get_session_info(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:219`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/start_helper.py:230`
 **Complexity:** 2
 
 **Description:**
@@ -3228,7 +3692,7 @@ Returns:
 ### `cmd_get_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:511`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:511`
 **Complexity:** 6
 
 **Description:**
@@ -3240,10 +3704,25 @@ Returns:
 
 ---
 
+### `cmd_impact(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:892`
+**Complexity:** 8
+
+**Description:**
+> Analyze impact of changing a function or class.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:468`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:469`
 **Complexity:** 6
 
 **Description:**
@@ -3258,7 +3737,7 @@ Returns:
 ### `cmd_list_blockers(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:632`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:632`
 **Complexity:** 6
 
 **Description:**
@@ -3273,8 +3752,8 @@ Returns:
 ### `cmd_list_classes(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:405`
-**Complexity:** 3
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:563`
+**Complexity:** 7
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -3285,8 +3764,8 @@ Returns:
 ### `cmd_list_functions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:416`
-**Complexity:** 3
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:600`
+**Complexity:** 7
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -3297,8 +3776,8 @@ Returns:
 ### `cmd_list_modules(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:427`
-**Complexity:** 3
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:637`
+**Complexity:** 7
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -3309,7 +3788,7 @@ Returns:
 ### `cmd_list_phases(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:564`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:564`
 **Complexity:** 6
 
 **Description:**
@@ -3324,7 +3803,7 @@ Returns:
 ### `cmd_list_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:158`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/cli.py:175`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -3339,7 +3818,7 @@ Returns:
 ### `cmd_mark_blocked(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:178`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:178`
 **Complexity:** 3
 
 **Description:**
@@ -3354,7 +3833,7 @@ Returns:
 ### `cmd_migrate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/migrate.py:65`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/migrate.py:65`
 **Complexity:** 1
 
 **Description:**
@@ -3369,7 +3848,7 @@ Returns:
 ### `cmd_move_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:350`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:350`
 **Complexity:** 1
 
 **Description:**
@@ -3384,7 +3863,7 @@ Returns:
 ### `cmd_next_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:301`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:302`
 **Complexity:** 8
 
 **Description:**
@@ -3399,7 +3878,7 @@ Returns:
 ### `cmd_phase_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:609`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:609`
 **Complexity:** 6
 
 **Description:**
@@ -3414,7 +3893,7 @@ Returns:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:493`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:494`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -3429,7 +3908,7 @@ Returns:
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:435`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:436`
 **Complexity:** 7
 
 **Description:**
@@ -3444,7 +3923,7 @@ Returns:
 ### `cmd_query_tasks(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:478`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:478`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -3459,7 +3938,7 @@ Returns:
 ### `cmd_reconcile_state(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:654`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:654`
 **Complexity:** 3
 
 **Description:**
@@ -3471,11 +3950,26 @@ Returns:
 
 ---
 
+### `cmd_refactor_candidates(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:936`
+**Complexity:** 8
+
+**Description:**
+> Find high-priority refactoring candidates.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_render(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_render/cli.py:15`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_render/cli.py:16`
+⚠️ **Complexity:** 12 (High)
 
 **Description:**
 > Render JSON spec to human-readable markdown.
@@ -3496,8 +3990,8 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:360`
-**Complexity:** 8
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:371`
+**Complexity:** 10
 
 **Description:**
 > Generate detailed validation report.
@@ -3511,8 +4005,8 @@ Returns:
 ### `cmd_review(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:25`
-⚠️ **Complexity:** 17 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/cli.py:30`
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Review a specification file using multiple AI models.
@@ -3526,7 +4020,7 @@ Returns:
 ### `cmd_run(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:146`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:146`
 **Complexity:** 5
 
 **Parameters:**
@@ -3538,7 +4032,7 @@ Returns:
 ### `cmd_search(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:335`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:493`
 **Complexity:** 3
 
 **Parameters:**
@@ -3550,7 +4044,7 @@ Returns:
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:834`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:838`
 **Complexity:** 10
 
 **Description:**
@@ -3565,7 +4059,7 @@ Returns:
 ### `cmd_stats(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:378`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:536`
 **Complexity:** 4
 
 **Parameters:**
@@ -3577,7 +4071,7 @@ Returns:
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:413`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:436`
 **Complexity:** 5
 
 **Description:**
@@ -3592,7 +4086,7 @@ Returns:
 ### `cmd_status_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:434`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:434`
 **Complexity:** 6
 
 **Description:**
@@ -3607,7 +4101,7 @@ Returns:
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:773`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:773`
 **Complexity:** 3
 
 **Description:**
@@ -3622,7 +4116,7 @@ Returns:
 ### `cmd_task_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:347`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:348`
 **Complexity:** 9
 
 **Description:**
@@ -3637,7 +4131,7 @@ Returns:
 ### `cmd_template(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:118`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/cli.py:121`
 **Complexity:** 7
 
 **Description:**
@@ -3652,7 +4146,7 @@ Returns:
 ### `cmd_time_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:410`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:410`
 **Complexity:** 6
 
 **Description:**
@@ -3664,10 +4158,40 @@ Returns:
 
 ---
 
+### `cmd_trace_data(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:848`
+**Complexity:** 8
+
+**Description:**
+> Trace data object lifecycle through the codebase.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
+### `cmd_trace_entry(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:804`
+**Complexity:** 8
+
+**Description:**
+> Trace execution flow from an entry function.
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_track_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:389`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:389`
 **Complexity:** 3
 
 **Description:**
@@ -3682,7 +4206,7 @@ Returns:
 ### `cmd_unblock_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:201`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:201`
 **Complexity:** 3
 
 **Description:**
@@ -3697,7 +4221,7 @@ Returns:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:58`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:58`
 **Complexity:** 8
 
 **Description:**
@@ -3712,7 +4236,7 @@ Returns:
 ### `cmd_update_frontmatter(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:268`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:268`
 **Complexity:** 1
 
 **Description:**
@@ -3727,7 +4251,7 @@ Returns:
 ### `cmd_update_status(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:155`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:155`
 **Complexity:** 3
 
 **Description:**
@@ -3742,7 +4266,7 @@ Returns:
 ### `cmd_validate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:163`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:163`
 ⚠️ **Complexity:** 12 (High)
 
 **Parameters:**
@@ -3754,8 +4278,8 @@ Returns:
 ### `cmd_validate(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:145`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:147`
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Validate JSON spec file.
@@ -3769,7 +4293,7 @@ Returns:
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:807`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:811`
 **Complexity:** 7
 
 **Description:**
@@ -3784,7 +4308,7 @@ Returns:
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:559`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:563`
 **Complexity:** 10
 
 **Description:**
@@ -3799,7 +4323,7 @@ Returns:
 ### `cmd_verify_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:254`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:255`
 **Complexity:** 3
 
 **Description:**
@@ -3814,7 +4338,7 @@ Returns:
 ### `collect_all_fixtures(conftest_files, root) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:257`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:257`
 **Complexity:** 4
 
 **Description:**
@@ -3836,7 +4360,7 @@ Returns:
 ### `collect_all_markers(test_files) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:283`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:283`
 **Complexity:** 3
 
 **Description:**
@@ -3856,7 +4380,7 @@ Returns:
 ### `collect_fix_actions(result) -> List[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:54`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/fix.py:54`
 **Complexity:** 9
 
 **Description:**
@@ -3870,7 +4394,7 @@ Returns:
 ### `compare_spec_files(md_spec_file, json_spec_file) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec_analysis.py:246`
+**Defined in:** `claude_skills/claude_skills/common/spec_analysis.py:246`
 **Complexity:** 6
 
 **Description:**
@@ -3900,7 +4424,7 @@ Example:
 ### `complete_spec(spec_id, spec_file, specs_dir, actual_hours, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:80`
+**Defined in:** `claude_skills/claude_skills/sdd_update/lifecycle.py:80`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -3935,7 +4459,7 @@ Returns:
 ### `complete_task_workflow() -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:239`
+**Defined in:** `claude_skills/claude_skills/sdd_update/workflow.py:239`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -3946,7 +4470,7 @@ Returns:
 ### `compose_ai_context_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:323`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:323`
 **Complexity:** 1
 
 **Description:**
@@ -3970,7 +4494,7 @@ Returns:
 ### `compose_architecture_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:271`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:271`
 **Complexity:** 1
 
 **Description:**
@@ -3994,7 +4518,7 @@ Returns:
 ### `compute_diff(before, after) -> DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:30`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:30`
 **Complexity:** 6
 
 **Description:**
@@ -4016,7 +4540,7 @@ Returns:
 ### `consult_multi_agent(doc_type, prompt, pair, dry_run, verbose, printer) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:453`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:453`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -4046,7 +4570,7 @@ Returns:
 ### `consult_multi_agent(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, pair, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:970`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:970`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -4084,7 +4608,7 @@ Returns:
 ### `consult_with_auto_routing(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, tool, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:585`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:585`
 **Complexity:** 10
 
 **Description:**
@@ -4122,7 +4646,7 @@ Returns:
 ### `count_spec_elements(spec_content) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec_analysis.py:100`
+**Defined in:** `claude_skills/claude_skills/common/spec_analysis.py:100`
 **Complexity:** 1
 
 **Description:**
@@ -4149,7 +4673,7 @@ Example:
 ### `create_context_summary(framework_info, key_files, layers, statistics, readme_content) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:381`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:381`
 **Complexity:** 9
 
 **Description:**
@@ -4174,10 +4698,24 @@ Returns:
 
 ---
 
+### `create_cross_reference_graph() -> CrossReferenceGraph`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/ast_analysis.py:317`
+**Complexity:** 1
+
+**Description:**
+> Factory function to create a new CrossReferenceGraph.
+
+Returns:
+    New CrossReferenceGraph instance
+
+---
+
 ### `create_global_parent_parser() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:5`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/options.py:5`
 **Complexity:** 1
 
 **Description:**
@@ -4194,7 +4732,7 @@ Returns:
 ### `create_parser_factory(project_root, exclude_patterns, languages) -> ParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/parsers/factory.py:288`
+**Defined in:** `claude_skills/claude_skills/code_doc/parsers/factory.py:288`
 **Complexity:** 1
 
 **Description:**
@@ -4218,7 +4756,7 @@ Returns:
 ### `create_spec_interactive(title, template, specs_dir) -> Tuple[bool, str, Optional[Dict[str, Any]]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:88`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:88`
 **Complexity:** 6
 
 **Description:**
@@ -4242,7 +4780,7 @@ Returns:
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:78`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reviewer.py:78`
 **Complexity:** 3
 
 **Description:**
@@ -4253,10 +4791,42 @@ Returns:
 
 ---
 
+### `detect_crud_operations(query, class_name, class_info) -> Dict[str, List[Dict[str, Any]]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:120`
+**Complexity:** 10
+
+**Description:**
+> Detect Create, Read, Update, Delete operations for a class.
+
+Uses heuristic analysis of function names, instantiation data,
+and method calls to classify operations.
+
+Args:
+    query: DocumentationQuery instance
+    class_name: Name of the class being traced
+    class_info: Class information dictionary
+
+Returns:
+    Dictionary with keys 'create', 'read', 'update', 'delete',
+    each containing a list of operation dictionaries with:
+    - function: Function name performing the operation
+    - file: File path
+    - line: Line number
+    - operation_type: Specific operation (e.g., 'constructor', 'getter', 'setter')
+
+**Parameters:**
+- `query`: Any
+- `class_name`: str
+- `class_info`: Dict[str, Any]
+
+---
+
 ### `detect_framework(modules) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:120`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:120`
 **Complexity:** 9
 
 **Description:**
@@ -4276,7 +4846,7 @@ Returns:
 ### `detect_languages(project_root, exclude_patterns) -> Set[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:52`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:52`
 **Complexity:** 7
 
 **Description:**
@@ -4298,7 +4868,7 @@ Returns:
 ### `detect_layers(modules) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:256`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:256`
 **Complexity:** 10
 
 **Description:**
@@ -4318,7 +4888,7 @@ Returns:
 ### `detect_project(directory) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/project.py:13`
+**Defined in:** `claude_skills/claude_skills/sdd_next/project.py:13`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -4338,7 +4908,7 @@ Returns:
 ### `detect_unjournaled_tasks(spec_id, specs_dir, printer) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:323`
+**Defined in:** `claude_skills/claude_skills/sdd_update/validation.py:323`
 **Complexity:** 7
 
 **Description:**
@@ -4365,10 +4935,158 @@ Returns:
 
 ---
 
+### `enhance_class_with_usage_tracking(cls, instantiated_by, imported_by, instantiation_count) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/schema.py:297`
+**Complexity:** 4
+
+**Description:**
+> Enhance ParsedClass with usage tracking fields for schema v1.1+.
+
+This function extends the base ParsedClass schema with usage information
+to enable queries like:
+- "Where is this class instantiated?" (instantiated_by)
+- "Which files import this class?" (imported_by)
+- "How many times is this class instantiated?" (instantiation_count)
+
+Args:
+    cls: Base ParsedClass instance from parser
+    instantiated_by: List of locations where class is instantiated
+    imported_by: List of files that import this class
+    instantiation_count: Optional count of total instantiations across
+                        the entire codebase
+
+Returns:
+    Enhanced dictionary with all base ParsedClass fields plus:
+    - instantiated_by: array of InstantiationReference objects
+    - imported_by: array of ImportReference objects
+    - instantiation_count: optional integer (only if provided)
+
+Example:
+    >>> from claude_skills.code_doc.parsers.python import PythonParser
+    >>> parser = PythonParser(root_path, [])
+    >>> result = parser.parse_file("models.py")
+    >>> cls = result.classes[0]
+    >>>
+    >>> # Add usage tracking data
+    >>> instantiations = [InstantiationReference("main", "app.py", 10)]
+    >>> imports = [ImportReference("app.py", 1, "from", "User")]
+    >>>
+    >>> enhanced = enhance_class_with_usage_tracking(
+    ...     cls,
+    ...     instantiated_by=instantiations,
+    ...     imported_by=imports,
+    ...     instantiation_count=5
+    ... )
+    >>> assert 'instantiated_by' in enhanced
+    >>> assert 'imported_by' in enhanced
+    >>> assert enhanced['instantiation_count'] == 5
+
+Note:
+    This is a non-breaking enhancement. The base ParsedClass.to_dict()
+    remains unchanged. This function provides an opt-in way to include
+    usage tracking data in the output schema.
+
+**Parameters:**
+- `cls`: BaseParsedClass
+- `instantiated_by`: Optional[List[InstantiationReference]]
+- `imported_by`: Optional[List[ImportReference]]
+- `instantiation_count`: Optional[int]
+
+---
+
+### `enhance_function_with_cross_refs(func, callers, calls, call_count) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/code_doc/schema.py:149`
+**Complexity:** 4
+
+**Description:**
+> Enhance ParsedFunction with cross-reference fields for schema v1.1+.
+
+This function extends the base ParsedFunction schema with bidirectional
+cross-reference information, enabling queries like:
+- "What functions call this function?" (callers)
+- "What functions does this function call?" (calls)
+- "How many times is this function called?" (call_count)
+
+Args:
+    func: Base ParsedFunction instance from parser
+    callers: List of functions that call this function (who calls me)
+    calls: List of functions called by this function (who do I call)
+    call_count: Optional total count of calls to this function across
+               the entire codebase
+
+Returns:
+    Enhanced dictionary with all base ParsedFunction fields plus:
+    - callers: array of CallReference objects
+    - calls: array of CallReference objects
+    - call_count: optional integer (only if provided)
+
+Example:
+    >>> from claude_skills.code_doc.parsers.python import PythonParser
+    >>> parser = PythonParser(root_path, [])
+    >>> result = parser.parse_file("example.py")
+    >>> func = result.functions[0]
+    >>>
+    >>> # Add cross-reference data
+    >>> callers = [CallReference("main", "app.py", 10, "function_call")]
+    >>> calls = [CallReference("helper", "utils.py", 5, "function_call")]
+    >>>
+    >>> enhanced = enhance_function_with_cross_refs(
+    ...     func, callers=callers, calls=calls, call_count=3
+    ... )
+    >>> assert 'callers' in enhanced
+    >>> assert 'calls' in enhanced
+    >>> assert enhanced['call_count'] == 3
+
+Note:
+    This is a non-breaking enhancement. The base ParsedFunction.to_dict()
+    remains unchanged. This function provides an opt-in way to include
+    cross-reference data in the output schema.
+
+**Parameters:**
+- `func`: BaseParsedFunction
+- `callers`: Optional[List[CallReference]]
+- `calls`: Optional[List[CallReference]]
+- `call_count`: Optional[int]
+
+---
+
+### `ensure_backups_directory(specs_dir) -> Path`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:462`
+**Complexity:** 5
+
+**Description:**
+> Ensure the .backups/ directory exists within the specs directory.
+
+Creates specs/.backups/ and its README.md if they don't exist.
+This is called defensively from multiple entry points to ensure
+the directory structure is always available.
+
+Args:
+    specs_dir: Path to the specs directory (containing active/completed/archived)
+
+Returns:
+    Path to the .backups directory
+
+Example:
+    >>> specs_dir = Path("/project/specs")
+    >>> backups_dir = ensure_backups_directory(specs_dir)
+    >>> print(backups_dir)  # /project/specs/.backups
+
+**Parameters:**
+- `specs_dir`: Path
+
+---
+
 ### `ensure_directory(path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:128`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:128`
 **Complexity:** 2
 
 **Description:**
@@ -4388,7 +5106,7 @@ Returns:
 ### `ensure_documentation_exists(project_root, prompt_user, auto_generate) -> tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/doc_helper.py:210`
+**Defined in:** `claude_skills/claude_skills/common/doc_helper.py:210`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -4426,10 +5144,97 @@ Example:
 
 ---
 
+### `ensure_human_readable_directory(specs_dir) -> Path`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:525`
+**Complexity:** 5
+
+**Description:**
+> Ensure the .human-readable/ directory exists within the specs directory.
+
+Creates specs/.human-readable/ and its README.md if they don't exist.
+This is called defensively from multiple entry points to ensure
+the directory structure is always available.
+
+Args:
+    specs_dir: Path to the specs directory (containing active/completed/archived)
+
+Returns:
+    Path to the .human-readable directory
+
+Example:
+    >>> specs_dir = Path("/project/specs")
+    >>> hr_dir = ensure_human_readable_directory(specs_dir)
+    >>> print(hr_dir)  # /project/specs/.human-readable
+
+**Parameters:**
+- `specs_dir`: Path
+
+---
+
+### `ensure_reports_directory(specs_dir) -> Path`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:336`
+**Complexity:** 5
+
+**Description:**
+> Ensure the .reports/ directory exists within the specs directory.
+
+Creates specs/.reports/ and its README.md if they don't exist.
+This is called defensively from multiple entry points to ensure
+the directory structure is always available.
+
+Args:
+    specs_dir: Path to the specs directory (containing active/completed/archived)
+
+Returns:
+    Path to the .reports directory
+
+Example:
+    >>> specs_dir = Path("/project/specs")
+    >>> reports_dir = ensure_reports_directory(specs_dir)
+    >>> print(reports_dir)  # /project/specs/.reports
+
+**Parameters:**
+- `specs_dir`: Path
+
+---
+
+### `ensure_reviews_directory(specs_dir) -> Path`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:399`
+**Complexity:** 5
+
+**Description:**
+> Ensure the .reviews/ directory exists within the specs directory.
+
+Creates specs/.reviews/ and its README.md if they don't exist.
+This is called defensively from multiple entry points to ensure
+the directory structure is always available.
+
+Args:
+    specs_dir: Path to the specs directory (containing active/completed/archived)
+
+Returns:
+    Path to the .reviews directory
+
+Example:
+    >>> specs_dir = Path("/project/specs")
+    >>> reviews_dir = ensure_reviews_directory(specs_dir)
+    >>> print(reviews_dir)  # /project/specs/.reviews
+
+**Parameters:**
+- `specs_dir`: Path
+
+---
+
 ### `execute_verify_task(spec_data, task_id, spec_root, retry_count) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/integrations.py:161`
+**Defined in:** `claude_skills/claude_skills/common/integrations.py:161`
 ⚠️ **Complexity:** 38 (High)
 
 **Description:**
@@ -4468,50 +5273,10 @@ Example:
 
 ---
 
-### `extract_all_commands(skills_dir) -> Dict[Path, List[Command]]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:67`
-**Complexity:** 3
-
-**Description:**
-> Extract commands from all SKILL.md files.
-
-Args:
-    skills_dir: Path to skills directory
-
-Returns:
-    Dictionary mapping file paths to lists of commands
-
-**Parameters:**
-- `skills_dir`: Path
-
----
-
-### `extract_commands_from_file(file_path) -> List[Command]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:27`
-**Complexity:** 4
-
-**Description:**
-> Extract all sdd commands from a SKILL.md file.
-
-Args:
-    file_path: Path to SKILL.md file
-
-Returns:
-    List of extracted commands
-
-**Parameters:**
-- `file_path`: Path
-
----
-
 ### `extract_frontmatter(spec_file) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:16`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:16`
 **Complexity:** 5
 
 **Description:**
@@ -4535,7 +5300,7 @@ Returns:
 ### `extract_readme(project_root) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:359`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:359`
 **Complexity:** 4
 
 **Description:**
@@ -4555,7 +5320,7 @@ Returns:
 ### `extract_subparsers(parser) -> Optional[Dict[str, argparse.ArgumentParser]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:148`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:148`
 **Complexity:** 4
 
 **Description:**
@@ -4566,30 +5331,10 @@ Returns:
 
 ---
 
-### `extract_with_regex(text) -> Optional[Dict[str, Any]]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:80`
-**Complexity:** 4
-
-**Description:**
-> Extract structured data using regex patterns.
-
-Args:
-    text: Raw text to parse
-
-Returns:
-    Extracted data dictionary or None
-
-**Parameters:**
-- `text`: str
-
----
-
 ### `find_active_work(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:70`
+**Defined in:** `claude_skills/claude_skills/dev_tools/sdd_start_helper.py:70`
 **Complexity:** 5
 
 **Description:**
@@ -4603,7 +5348,7 @@ Returns:
 ### `find_blocking_tasks(spec_data, task_id) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:345`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:345`
 **Complexity:** 5
 
 **Description:**
@@ -4629,7 +5374,7 @@ Example:
 ### `find_circular_dependencies(spec_data) -> Dict[str, object]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:161`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:161`
 **Complexity:** 1
 
 **Description:**
@@ -4643,7 +5388,7 @@ Example:
 ### `find_circular_dependencies(spec_data) -> Dict[str, object]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:176`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:176`
 **Complexity:** 1
 
 **Description:**
@@ -4657,7 +5402,7 @@ Example:
 ### `find_circular_deps(spec_data) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/validation.py:48`
+**Defined in:** `claude_skills/claude_skills/sdd_next/validation.py:48`
 **Complexity:** 1
 
 **Description:**
@@ -4671,7 +5416,7 @@ Example:
 ### `find_conftest_files(root_dir) -> List[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:41`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:41`
 **Complexity:** 1
 
 **Description:**
@@ -4691,7 +5436,7 @@ Returns:
 ### `find_files_by_pattern(directory, pattern, recursive, max_depth) -> List[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:274`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:274`
 **Complexity:** 5
 
 **Description:**
@@ -4721,7 +5466,7 @@ Example:
 ### `find_pattern(pattern, directory) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/workflow.py:57`
+**Defined in:** `claude_skills/claude_skills/sdd_next/workflow.py:57`
 **Complexity:** 4
 
 **Description:**
@@ -4740,10 +5485,47 @@ Returns:
 
 ---
 
+### `find_refactor_candidates(query, min_complexity, limit) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:14`
+**Complexity:** 4
+
+**Description:**
+> Find high-priority refactoring candidates.
+
+Identifies functions that would benefit most from refactoring by combining
+complexity metrics with usage data. Priority score = complexity × dependents.
+
+Args:
+    query: DocumentationQuery instance
+    min_complexity: Minimum complexity threshold (default: 10)
+    limit: Maximum number of candidates to return (default: 20)
+
+Returns:
+    Dictionary with keys:
+    - candidates: List of candidate dictionaries sorted by priority
+    - quick_wins: Subset with high complexity, low dependents
+    - major_refactors: Subset with high complexity, high dependents
+    - summary: Statistics about the analysis
+
+Example:
+    >>> query = DocumentationQuery()
+    >>> query.load()
+    >>> result = find_refactor_candidates(query, min_complexity=15, limit=10)
+    >>> print(f"Found {len(result['candidates'])} candidates")
+
+**Parameters:**
+- `query`: Any
+- `min_complexity`: int
+- `limit`: int
+
+---
+
 ### `find_related_files(file_path, directory) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/project.py:303`
+**Defined in:** `claude_skills/claude_skills/sdd_next/project.py:303`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -4765,7 +5547,7 @@ Returns:
 ### `find_similar_implementations(feature_name, docs_path) -> List[QueryResult]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:344`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:344`
 **Complexity:** 1
 
 **Description:**
@@ -4787,7 +5569,7 @@ Returns:
 ### `find_spec_file(spec_id, specs_dir) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:83`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:83`
 **Complexity:** 3
 
 **Description:**
@@ -4811,7 +5593,7 @@ Returns:
 ### `find_specs_directory(provided_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:10`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:10`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -4831,7 +5613,7 @@ Returns:
 ### `find_specs_directory() -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:140`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:140`
 **Complexity:** 4
 
 **Description:**
@@ -4842,10 +5624,40 @@ Returns:
 
 ---
 
+### `find_test_coverage(query, entity_name, entity_type, entity_info) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:334`
+**Complexity:** 5
+
+**Description:**
+> Find test files that cover the entity.
+
+Uses heuristics to identify tests that exercise the code.
+
+Args:
+    query: DocumentationQuery instance
+    entity_name: Name of the entity
+    entity_type: 'function' or 'class'
+    entity_info: Entity information dictionary
+
+Returns:
+    Dictionary with:
+    - test_files: List of test files that reference the entity
+    - estimated_coverage: Percentage estimate (0-100)
+
+**Parameters:**
+- `query`: Any
+- `entity_name`: str
+- `entity_type`: str
+- `entity_info`: Dict[str, Any]
+
+---
+
 ### `find_test_files(root_dir) -> List[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:18`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:18`
 **Complexity:** 2
 
 **Description:**
@@ -4865,7 +5677,7 @@ Returns:
 ### `find_tests(directory, source_file) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/project.py:118`
+**Defined in:** `claude_skills/claude_skills/sdd_next/project.py:118`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -4887,7 +5699,7 @@ Returns:
 ### `find_verify_tasks_for_task(spec_data, task_id) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:17`
+**Defined in:** `claude_skills/claude_skills/sdd_update/status.py:17`
 **Complexity:** 5
 
 **Description:**
@@ -4914,7 +5726,7 @@ Returns:
 ### `format_ai_context_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:190`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:190`
 **Complexity:** 2
 
 **Description:**
@@ -4938,7 +5750,7 @@ Returns:
 ### `format_architecture_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:104`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:104`
 **Complexity:** 3
 
 **Description:**
@@ -4962,7 +5774,7 @@ Returns:
 ### `format_argument(action) -> Tuple[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:105`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:105`
 **Complexity:** 8
 
 **Description:**
@@ -4973,10 +5785,86 @@ Returns:
 
 ---
 
+### `format_call_graph_as_dot(graph) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:259`
+**Complexity:** 6
+
+**Description:**
+> Format call graph as GraphViz DOT format.
+
+**Parameters:**
+- `graph`: Dict[str, Any]
+
+---
+
+### `format_candidate_entry(candidate, rank) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:289`
+**Complexity:** 1
+
+**Description:**
+> Format a single candidate entry.
+
+Args:
+    candidate: Candidate dictionary
+    rank: Overall rank (1-based)
+
+Returns:
+    Formatted string for one candidate
+
+**Parameters:**
+- `candidate`: Dict[str, Any]
+- `rank`: int
+
+---
+
+### `format_candidates_list(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:228`
+**Complexity:** 10
+
+**Description:**
+> Format candidates list organized by risk level.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with prioritized candidate list
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
+### `format_dependency_tree(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:539`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Format dependency tree visualization.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with dependency tree
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
 ### `format_diff_json(report) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:234`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:234`
 **Complexity:** 2
 
 **Description:**
@@ -4990,7 +5878,7 @@ Returns:
 ### `format_diff_markdown(report, spec_id) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:171`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/diff.py:171`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -5005,7 +5893,7 @@ Returns:
 ### `format_execution_plan(spec_id, task_id, specs_dir) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:56`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:57`
 ⚠️ **Complexity:** 39 (High)
 
 **Description:**
@@ -5026,10 +5914,170 @@ Returns:
 
 ---
 
+### `format_hot_spots(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:365`
+**Complexity:** 3
+
+**Description:**
+> Format hot spots table.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    Formatted string with hot spots table
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:756`
+**Complexity:** 1
+
+**Description:**
+> Format impact result as JSON.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    JSON string
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:510`
+**Complexity:** 1
+
+**Description:**
+> Format result as JSON.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    JSON string
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
+### `format_json_output(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:593`
+**Complexity:** 1
+
+**Description:**
+> Format trace result as JSON.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    JSON string
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:451`
+**Complexity:** 1
+
+**Description:**
+> Format trace result as JSON.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    JSON string
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_layer_summary(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:339`
+**Complexity:** 4
+
+**Description:**
+> Format layer breakdown summary.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    Formatted string with layer statistics
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_lifecycle_view(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:376`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Format lifecycle visualization showing CRUD flow.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    Formatted string with lifecycle stages
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_major_refactors(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:349`
+**Complexity:** 4
+
+**Description:**
+> Format major refactors section.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with major refactors
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
 ### `format_output(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:126`
+**Defined in:** `claude_skills/claude_skills/dev_tools/sdd_start_helper.py:126`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -5043,7 +6091,7 @@ Returns:
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:363`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:363`
 **Complexity:** 6
 
 **Description:**
@@ -5072,10 +6120,90 @@ Returns:
 
 ---
 
+### `format_property_analysis(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:490`
+**Complexity:** 8
+
+**Description:**
+> Format property access analysis.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    Formatted string with property analysis
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_quick_wins(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:313`
+**Complexity:** 4
+
+**Description:**
+> Format quick wins section.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with quick wins
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
+### `format_recommendations(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:669`
+**Complexity:** 3
+
+**Description:**
+> Format recommendations section.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with recommendations
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_recommendations(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:386`
+**Complexity:** 4
+
+**Description:**
+> Format general recommendations section.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with recommendations
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
 ### `format_result(result, verbose) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:88`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:188`
 ⚠️ **Complexity:** 29 (High)
 
 **Parameters:**
@@ -5084,10 +6212,110 @@ Returns:
 
 ---
 
+### `format_risk_assessment(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:633`
+**Complexity:** 2
+
+**Description:**
+> Format risk assessment display.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with risk assessment
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_summary(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:693`
+**Complexity:** 1
+
+**Description:**
+> Format summary statistics.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with summary
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_summary(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:440`
+**Complexity:** 1
+
+**Description:**
+> Format summary statistics.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with summary
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
+### `format_summary(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:538`
+**Complexity:** 1
+
+**Description:**
+> Format summary statistics.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    Formatted string with summary
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_summary(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:393`
+**Complexity:** 2
+
+**Description:**
+> Format summary statistics.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    Formatted string with summary statistics
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
 ### `format_synthesis_output(synthesis, responses, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:880`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:880`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -5105,10 +6333,160 @@ Args:
 
 ---
 
+### `format_test_coverage(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:603`
+**Complexity:** 4
+
+**Description:**
+> Format test coverage report.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with test coverage
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_text_output(impact_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:719`
+**Complexity:** 2
+
+**Description:**
+> Format complete text output for impact command.
+
+Args:
+    impact_result: Output from analyze_impact()
+
+Returns:
+    Formatted string with all sections
+
+**Parameters:**
+- `impact_result`: Dict[str, Any]
+
+---
+
+### `format_text_output(result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:472`
+**Complexity:** 3
+
+**Description:**
+> Format complete text output for refactor-candidates command.
+
+Args:
+    result: Output from find_refactor_candidates()
+
+Returns:
+    Formatted string with all sections
+
+**Parameters:**
+- `result`: Dict[str, Any]
+
+---
+
+### `format_text_output(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:562`
+**Complexity:** 2
+
+**Description:**
+> Format complete text output for trace-data command.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    Formatted string with all sections
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_text_output(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:417`
+**Complexity:** 1
+
+**Description:**
+> Format complete text output for trace-entry command.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    Formatted string with all sections
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_tree_view(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:254`
+**Complexity:** 8
+
+**Description:**
+> Format trace result as an ASCII tree visualization.
+
+Creates a hierarchical tree showing the call chain from the entry function,
+with layer annotations, complexity scores, and hot spot markers.
+
+Args:
+    trace_result: Output from trace_execution_flow()
+
+Returns:
+    Formatted tree string with Unicode box-drawing characters
+
+Example Output:
+    main [Presentation] (complexity: 8)
+    ├─ process_data [Business Logic] (complexity: 15) 🔥
+    │  ├─ validate [Utility] (complexity: 3)
+    │  └─ save [Data] (complexity: 5)
+    └─ format_output [Presentation] (complexity: 2)
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
+### `format_usage_map(trace_result) -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:450`
+**Complexity:** 7
+
+**Description:**
+> Format usage map organized by architectural layer.
+
+Args:
+    trace_result: Output from trace_data_lifecycle()
+
+Returns:
+    Formatted string with layer breakdown
+
+**Parameters:**
+- `trace_result`: Dict[str, Any]
+
+---
+
 ### `format_validation_summary(result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:171`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:171`
 **Complexity:** 7
 
 **Description:**
@@ -5122,7 +6500,7 @@ Args:
 ### `format_verification_summary(verification_results) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/verification.py:143`
+**Defined in:** `claude_skills/claude_skills/sdd_update/verification.py:143`
 **Complexity:** 6
 
 **Description:**
@@ -5148,7 +6526,7 @@ Returns:
 ### `generate_ai_context_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:661`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:661`
 **Complexity:** 4
 
 **Description:**
@@ -5182,7 +6560,7 @@ Returns:
 ### `generate_architecture_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:620`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:620`
 **Complexity:** 4
 
 **Description:**
@@ -5213,10 +6591,26 @@ Returns:
 
 ---
 
+### `generate_backups_readme_content() -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:442`
+**Complexity:** 2
+
+**Description:**
+> Generate README content for the specs/.backups/ directory.
+
+Reads from the template file in common/templates/backups_readme.md.
+
+Returns:
+    Markdown content for README.md explaining the backups directory
+
+---
+
 ### `generate_combined_report(spec_result, json_spec_result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/reporting.py:149`
+**Defined in:** `claude_skills/claude_skills/common/reporting.py:149`
 **Complexity:** 4
 
 **Description:**
@@ -5238,7 +6632,7 @@ Returns:
 ### `generate_command_reference(subparsers, skill_name) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:160`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:160`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -5253,7 +6647,7 @@ Returns:
 ### `generate_documentation(skill_name, sections) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:267`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:267`
 **Complexity:** 9
 
 **Description:**
@@ -5276,7 +6670,7 @@ Returns:
 ### `generate_global_options(parser, skill_name) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:128`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:128`
 **Complexity:** 5
 
 **Description:**
@@ -5288,10 +6682,26 @@ Returns:
 
 ---
 
+### `generate_human_readable_readme_content() -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:505`
+**Complexity:** 2
+
+**Description:**
+> Generate README content for the specs/.human-readable/ directory.
+
+Reads from the template file in common/templates/human_readable_readme.md.
+
+Returns:
+    Markdown content for README.md explaining the human-readable directory
+
+---
+
 ### `generate_json_report(consensus, spec_id, spec_title, review_type) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:306`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:221`
 **Complexity:** 1
 
 **Description:**
@@ -5317,7 +6727,7 @@ Returns:
 ### `generate_json_spec_report(result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/reporting.py:94`
+**Defined in:** `claude_skills/claude_skills/common/reporting.py:94`
 **Complexity:** 9
 
 **Description:**
@@ -5334,20 +6744,24 @@ Returns:
 
 ---
 
-### `generate_markdown_report(consensus, spec_id, spec_title, review_type) -> str`
+### `generate_markdown_report(consensus, spec_id, spec_title, review_type, parsed_responses) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:12`
-⚠️ **Complexity:** 34 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reporting.py:12`
+**Complexity:** 5
 
 **Description:**
 > Generate comprehensive markdown review report.
 
+With AI synthesis, the consensus already contains structured markdown.
+This function wraps it with header and model details.
+
 Args:
-    consensus: Consensus data from synthesis
+    consensus: Consensus data from AI synthesis
     spec_id: Specification ID
     spec_title: Specification title
     review_type: Type of review performed
+    parsed_responses: Individual model responses (optional)
 
 Returns:
     Formatted markdown report
@@ -5357,13 +6771,42 @@ Returns:
 - `spec_id`: str
 - `spec_title`: str
 - `review_type`: str
+- `parsed_responses`: List[Dict[str, Any]]
+
+---
+
+### `generate_recommendations(entity_name, entity_type, blast_radius, test_coverage, risk_assessment) -> List[str]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py:456`
+**Complexity:** 9
+
+**Description:**
+> Generate actionable refactoring recommendations.
+
+Args:
+    entity_name: Name of the entity
+    entity_type: 'function' or 'class'
+    blast_radius: Blast radius data
+    test_coverage: Test coverage data
+    risk_assessment: Risk assessment data
+
+Returns:
+    List of recommendation strings
+
+**Parameters:**
+- `entity_name`: str
+- `entity_type`: str
+- `blast_radius`: Dict[str, List[Dict[str, Any]]]
+- `test_coverage`: Dict[str, Any]
+- `risk_assessment`: Dict[str, Any]
 
 ---
 
 ### `generate_report(result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/reporting.py:11`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/reporting.py:11`
 ⚠️ **Complexity:** 40 (High)
 
 **Description:**
@@ -5374,10 +6817,26 @@ Returns:
 
 ---
 
+### `generate_reports_readme_content() -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:316`
+**Complexity:** 2
+
+**Description:**
+> Generate README content for the specs/.reports/ directory.
+
+Reads from the template file in common/templates/reports_readme.md.
+
+Returns:
+    Markdown content for README.md explaining the reports directory
+
+---
+
 ### `generate_review_prompt(spec_content, review_type, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:40`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:72`
 **Complexity:** 4
 
 **Description:**
@@ -5400,10 +6859,26 @@ Returns:
 
 ---
 
+### `generate_reviews_readme_content() -> str`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/common/paths.py:379`
+**Complexity:** 2
+
+**Description:**
+> Generate README content for the specs/.reviews/ directory.
+
+Reads from the template file in common/templates/reviews_readme.md.
+
+Returns:
+    Markdown content for README.md explaining the reviews directory
+
+---
+
 ### `generate_simple_usage(parser, skill_name) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:220`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:220`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -5418,7 +6893,7 @@ Returns:
 ### `generate_spec_from_template(template_id, title, spec_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/templates.py:76`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/templates.py:76`
 **Complexity:** 4
 
 **Description:**
@@ -5443,7 +6918,7 @@ Returns:
 ### `generate_spec_report(result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/reporting.py:18`
+**Defined in:** `claude_skills/claude_skills/common/reporting.py:18`
 ⚠️ **Complexity:** 22 (High)
 
 **Description:**
@@ -5463,7 +6938,7 @@ Returns:
 ### `generate_time_report(spec_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:84`
+**Defined in:** `claude_skills/claude_skills/sdd_update/time_tracking.py:84`
 **Complexity:** 9
 
 **Description:**
@@ -5487,7 +6962,7 @@ Returns:
 ### `get_auto_trigger_failures() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:358`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:358`
 **Complexity:** 3
 
 **Description:**
@@ -5501,7 +6976,7 @@ Returns:
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:49`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:49`
 **Complexity:** 5
 
 **Description:**
@@ -5515,7 +6990,7 @@ Returns:
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:130`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:130`
 **Complexity:** 1
 
 **Description:**
@@ -5529,7 +7004,7 @@ Returns:
 ### `get_best_tool(doc_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:74`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:74`
 **Complexity:** 6
 
 **Description:**
@@ -5551,7 +7026,7 @@ Returns:
 ### `get_best_tool(failure_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:330`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:330`
 **Complexity:** 8
 
 **Description:**
@@ -5573,7 +7048,7 @@ Returns:
 ### `get_config_path() -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:37`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:37`
 **Complexity:** 1
 
 **Description:**
@@ -5587,7 +7062,7 @@ Returns:
 ### `get_consensus_info() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:378`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:378`
 **Complexity:** 2
 
 **Description:**
@@ -5601,7 +7076,7 @@ Returns:
 ### `get_consensus_pair_for_failure(failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:177`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:177`
 **Complexity:** 5
 
 **Description:**
@@ -5627,7 +7102,7 @@ Returns:
 ### `get_consensus_pairs() -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:214`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:214`
 **Complexity:** 3
 
 **Description:**
@@ -5643,7 +7118,7 @@ Returns:
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:232`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:232`
 **Complexity:** 5
 
 **Description:**
@@ -5657,7 +7132,7 @@ Returns:
 ### `get_dependency_chain(spec_data, task_id) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:283`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:283`
 **Complexity:** 7
 
 **Description:**
@@ -5686,7 +7161,7 @@ Example:
 ### `get_directory_structure(test_files, root) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:179`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:179`
 **Complexity:** 3
 
 **Description:**
@@ -5708,7 +7183,7 @@ Returns:
 ### `get_enabled_tools() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:96`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:96`
 **Complexity:** 1
 
 **Description:**
@@ -5722,7 +7197,7 @@ Returns:
 ### `get_flags_for_tool(tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:91`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:91`
 **Complexity:** 3
 
 **Description:**
@@ -5742,7 +7217,7 @@ Returns:
 ### `get_impact_analysis(module_path, docs_path) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:374`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:374`
 **Complexity:** 1
 
 **Description:**
@@ -5764,7 +7239,7 @@ Returns:
 ### `get_journal_entries(spec_id, specs_dir, task_id, printer) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:403`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:403`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -5790,7 +7265,7 @@ Returns:
 ### `get_json_spec_metadata(spec_data) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec_analysis.py:143`
+**Defined in:** `claude_skills/claude_skills/common/spec_analysis.py:143`
 **Complexity:** 3
 
 **Description:**
@@ -5816,7 +7291,7 @@ Example:
 ### `get_language_for_extension(extension) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:90`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:90`
 **Complexity:** 1
 
 **Description:**
@@ -5836,7 +7311,7 @@ Returns:
 ### `get_metrics_file_path() -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:221`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:213`
 **Complexity:** 1
 
 **Description:**
@@ -5847,7 +7322,7 @@ Returns:
 ### `get_missing_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:141`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:141`
 **Complexity:** 1
 
 **Description:**
@@ -5861,7 +7336,7 @@ Returns:
 ### `get_model_for_tool(tool, failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:53`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:53`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -5885,8 +7360,8 @@ Returns:
 ### `get_next_task(spec_data) -> Optional[Tuple[str, Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:17`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:70`
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
 > Find the next actionable task.
@@ -5905,7 +7380,7 @@ Returns:
 ### `get_node(spec_data, node_id) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:319`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:323`
 **Complexity:** 1
 
 **Description:**
@@ -5927,7 +7402,7 @@ Returns:
 ### `get_parser_from_module(module_name) -> argparse.ArgumentParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:35`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:35`
 **Complexity:** 10
 
 **Description:**
@@ -5946,7 +7421,7 @@ This function attempts to get the parser by:
 ### `get_preset_description(preset) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:266`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:266`
 **Complexity:** 2
 
 **Description:**
@@ -5966,7 +7441,7 @@ Returns:
 ### `get_preset_flags(preset) -> Optional[List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:281`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:281`
 **Complexity:** 2
 
 **Description:**
@@ -5986,7 +7461,7 @@ Returns:
 ### `get_presets() -> Dict[str, Dict[str, str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:221`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:221`
 **Complexity:** 1
 
 **Description:**
@@ -6000,7 +7475,7 @@ Returns:
 ### `get_progress_summary(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:151`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:151`
 **Complexity:** 8
 
 **Description:**
@@ -6022,7 +7497,7 @@ Returns:
 ### `get_project_context(directory) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:180`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:180`
 **Complexity:** 2
 
 **Description:**
@@ -6042,7 +7517,7 @@ Returns:
 ### `get_quick_routing(failure_type, available_tools) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:211`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:211`
 **Complexity:** 7
 
 **Description:**
@@ -6064,7 +7539,7 @@ Returns:
 ### `get_routing_suggestions(available_tools) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:152`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:152`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -6084,7 +7559,7 @@ Returns:
 ### `get_session_info(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:224`
+**Defined in:** `claude_skills/claude_skills/dev_tools/sdd_start_helper.py:224`
 **Complexity:** 3
 
 **Description:**
@@ -6098,7 +7573,7 @@ Returns:
 ### `get_session_state(specs_dir) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/integrations.py:391`
+**Defined in:** `claude_skills/claude_skills/common/integrations.py:391`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -6130,7 +7605,7 @@ Example:
 ### `get_spec_statistics(spec_file, json_spec_file) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec_analysis.py:19`
+**Defined in:** `claude_skills/claude_skills/common/spec_analysis.py:19`
 **Complexity:** 9
 
 **Description:**
@@ -6162,7 +7637,7 @@ Example:
 ### `get_stance_instruction(stance) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:275`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/prompts.py:307`
 **Complexity:** 3
 
 **Description:**
@@ -6182,7 +7657,7 @@ Returns:
 ### `get_status_report(spec_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:73`
+**Defined in:** `claude_skills/claude_skills/sdd_update/validation.py:73`
 **Complexity:** 7
 
 **Description:**
@@ -6206,7 +7681,7 @@ Returns:
 ### `get_summary_stats(test_files, conftest_files) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:225`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:225`
 **Complexity:** 3
 
 **Description:**
@@ -6228,7 +7703,7 @@ Returns:
 ### `get_task(spec_id, task_id, specs_dir, printer, include_journal) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:103`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:103`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -6256,7 +7731,7 @@ Returns:
 ### `get_task_context(task_description, docs_path) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:314`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:314`
 **Complexity:** 1
 
 **Description:**
@@ -6278,7 +7753,7 @@ Returns:
 ### `get_task_context_from_docs(task_description, project_root) -> Optional[dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/doc_helper.py:104`
+**Defined in:** `claude_skills/claude_skills/common/doc_helper.py:104`
 **Complexity:** 6
 
 **Description:**
@@ -6310,7 +7785,7 @@ Example:
 ### `get_task_counts_by_status(spec_data) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:252`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:252`
 **Complexity:** 5
 
 **Description:**
@@ -6330,7 +7805,7 @@ Returns:
 ### `get_task_info(spec_data, task_id) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:57`
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:118`
 **Complexity:** 1
 
 **Description:**
@@ -6352,7 +7827,7 @@ Returns:
 ### `get_task_journal(spec_id, task_id, specs_dir, printer) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:487`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:487`
 **Complexity:** 1
 
 **Description:**
@@ -6380,7 +7855,7 @@ Returns:
 ### `get_template(template_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/templates.py:63`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/templates.py:63`
 **Complexity:** 1
 
 **Description:**
@@ -6400,7 +7875,7 @@ Returns:
 ### `get_template_description(template_id) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/templates.py:161`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/templates.py:161`
 **Complexity:** 3
 
 **Description:**
@@ -6420,7 +7895,7 @@ Returns:
 ### `get_test_context(module_path, docs_path) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:359`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:359`
 **Complexity:** 1
 
 **Description:**
@@ -6442,7 +7917,7 @@ Returns:
 ### `get_tool_status_dict() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:303`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:303`
 **Complexity:** 1
 
 **Description:**
@@ -6453,30 +7928,10 @@ Returns:
 
 ---
 
-### `get_unique_commands(commands_by_file) -> List[str]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:87`
-**Complexity:** 3
-
-**Description:**
-> Get sorted list of unique command patterns.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-Returns:
-    Sorted list of unique command strings
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `has_dependency_cycle(graph, node) -> Tuple[bool, Optional[List[str]]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:191`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:191`
 **Complexity:** 6
 
 **Description:**
@@ -6501,30 +7956,40 @@ Example:
 
 ---
 
-### `identify_agreements(responses) -> Tuple[List[str], List[Dict[str, Any]]]`
+### `identify_hot_spots(nodes) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:378`
-**Complexity:** 6
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:177`
+⚠️ **Complexity:** 12 (High)
 
 **Description:**
-> Identify points of agreement and disagreement.
+> Identify complexity hot spots in the call chain.
+
+Hot spots are functions that exhibit concerning characteristics:
+- High cyclomatic complexity (> 10)
+- High fan-out (many direct calls, > 5)
+- Both high complexity AND high fan-out (critical)
 
 Args:
-    responses: List of model responses
+    nodes: Dictionary of function nodes with complexity and calls_count
 
 Returns:
-    Tuple of (agreements list, disagreements list)
+    List of hot spot dictionaries with:
+    - function: Function name
+    - reason: Why it's flagged
+    - severity: 'high', 'medium', or 'low'
+    - complexity: Complexity score
+    - fan_out: Number of direct calls
 
 **Parameters:**
-- `responses`: List[Dict[str, Any]]
+- `nodes`: Dict[str, Dict[str, Any]]
 
 ---
 
 ### `identify_key_files(modules, project_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:183`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:183`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -6543,10 +8008,90 @@ Returns:
 
 ---
 
+### `identify_layers(nodes) -> Dict[str, str]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:123`
+**Complexity:** 8
+
+**Description:**
+> Identify architectural layer for each function based on file path patterns.
+
+Uses heuristic matching on file paths to classify functions into
+architectural layers (Presentation, Business Logic, Data, Utility, Core).
+
+Args:
+    nodes: Dictionary of function nodes with 'file' attribute
+
+Returns:
+    Dictionary mapping function name to layer name
+
+Layer Classification Rules:
+    - Presentation: routes/, cli/, api/, handlers/, controllers/
+    - Business Logic: services/, business/, workflows/, processors/
+    - Data: models/, database/, repositories/, dao/, persistence/
+    - Utility: utils/, helpers/, common/, lib/
+    - Core: Everything else
+
+**Parameters:**
+- `nodes`: Dict[str, Dict[str, Any]]
+
+---
+
+### `identify_major_refactors(candidates) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:201`
+**Complexity:** 4
+
+**Description:**
+> Identify major refactoring candidates.
+
+Major refactors are functions with high complexity AND high dependent count,
+meaning they require careful planning and coordination.
+
+Criteria: complexity > 20 AND dependents > 10
+
+Args:
+    candidates: List of candidate dictionaries
+
+Returns:
+    Subset of candidates that are major refactors
+
+**Parameters:**
+- `candidates`: List[Dict[str, Any]]
+
+---
+
+### `identify_quick_wins(candidates) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py:174`
+**Complexity:** 4
+
+**Description:**
+> Identify quick win refactoring candidates.
+
+Quick wins are functions with high complexity but low dependent count,
+meaning they're isolated complexity that's safe to refactor.
+
+Criteria: complexity > 15 AND dependents <= 3
+
+Args:
+    candidates: List of candidate dictionaries
+
+Returns:
+    Subset of candidates that are quick wins
+
+**Parameters:**
+- `candidates`: List[Dict[str, Any]]
+
+---
+
 ### `init_environment(spec_path) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/workflow.py:15`
+**Defined in:** `claude_skills/claude_skills/sdd_next/workflow.py:15`
 **Complexity:** 3
 
 **Description:**
@@ -6563,10 +8108,34 @@ Returns:
 
 ---
 
+### `is_in_current_phase(spec_data, task_id, phase_id) -> bool`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:41`
+**Complexity:** 5
+
+**Description:**
+> Check if task belongs to current phase (including nested groups).
+
+Args:
+    spec_data: JSON spec file data
+    task_id: Task identifier
+    phase_id: Phase identifier to check against
+
+Returns:
+    True if task is within the phase hierarchy
+
+**Parameters:**
+- `spec_data`: Dict
+- `task_id`: str
+- `phase_id`: str
+
+---
+
 ### `is_metrics_enabled() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:226`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:218`
 **Complexity:** 1
 
 **Description:**
@@ -6574,10 +8143,34 @@ Returns:
 
 ---
 
+### `is_unblocked(spec_data, task_id, task_data) -> bool`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:17`
+**Complexity:** 5
+
+**Description:**
+> Check if all blocking dependencies are completed.
+
+Args:
+    spec_data: JSON spec file data
+    task_id: Task identifier
+    task_data: Task data dictionary
+
+Returns:
+    True if task has no blockers or all blockers are completed
+
+**Parameters:**
+- `spec_data`: Dict
+- `task_id`: str
+- `task_data`: Dict
+
+---
+
 ### `list_blockers(spec_id, specs_dir, printer) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:340`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:340`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -6601,7 +8194,7 @@ Returns:
 ### `list_phases(spec_data) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:215`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:215`
 **Complexity:** 4
 
 **Description:**
@@ -6621,7 +8214,7 @@ Returns:
 ### `list_phases(spec_id, specs_dir, printer) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:198`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:198`
 **Complexity:** 6
 
 **Description:**
@@ -6645,7 +8238,7 @@ Returns:
 ### `list_presets(printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:231`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:231`
 **Complexity:** 3
 
 **Description:**
@@ -6662,7 +8255,7 @@ Args:
 ### `list_templates() -> Dict[str, Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/templates.py:53`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/templates.py:53`
 **Complexity:** 1
 
 **Description:**
@@ -6676,7 +8269,7 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:116`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:116`
 **Complexity:** 5
 
 **Description:**
@@ -6690,7 +8283,7 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:333`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:333`
 **Complexity:** 5
 
 **Description:**
@@ -6704,7 +8297,7 @@ Returns:
 ### `load_documentation(docs_path) -> DocumentationQuery`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/doc_query_lib.py:1024`
+**Defined in:** `claude_skills/claude_skills/doc_query/doc_query_lib.py:1711`
 **Complexity:** 1
 
 **Description:**
@@ -6724,7 +8317,7 @@ Returns:
 ### `load_json_spec(spec_id, specs_dir) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:156`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:156`
 **Complexity:** 4
 
 **Description:**
@@ -6748,7 +8341,7 @@ Returns:
 ### `load_model_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:24`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:24`
 **Complexity:** 5
 
 **Description:**
@@ -6764,7 +8357,7 @@ Returns:
 ### `load_tool_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:49`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:49`
 **Complexity:** 7
 
 **Description:**
@@ -6778,30 +8371,8 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:194`
-**Complexity:** 8
-
-**Description:**
-> Main entry point.
-
----
-
-### `main() -> None`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:451`
-**Complexity:** 2
-
-**Description:**
-> Main entry point.
-
----
-
-### `main() -> None`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:84`
-**Complexity:** 5
+**Defined in:** `claude_skills/claude_skills/cli/sdd/__init__.py:122`
+⚠️ **Complexity:** 12 (High)
 
 **Decorators:** `@track_metrics('sdd')`
 
@@ -6813,7 +8384,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:316`
+**Defined in:** `claude_skills/claude_skills/dev_tools/generate_docs.py:316`
 **Complexity:** 3
 
 **Description:**
@@ -6824,7 +8395,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:259`
+**Defined in:** `claude_skills/claude_skills/dev_tools/sdd_start_helper.py:259`
 **Complexity:** 5
 
 ---
@@ -6832,7 +8403,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:160`
+**Defined in:** `claude_skills/claude_skills/dev_tools/setup_project_permissions.py:157`
 **Complexity:** 3
 
 ---
@@ -6840,7 +8411,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:389`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:389`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -6851,7 +8422,7 @@ Returns:
 ### `mark_task_blocked(spec_id, task_id, reason, specs_dir, blocker_type, ticket, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:259`
+**Defined in:** `claude_skills/claude_skills/sdd_update/status.py:259`
 **Complexity:** 10
 
 **Description:**
@@ -6885,7 +8456,7 @@ Returns:
 ### `mark_task_journaled(spec_id, task_id, specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:24`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:24`
 **Complexity:** 9
 
 **Description:**
@@ -6913,7 +8484,7 @@ Returns:
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:18`
+**Defined in:** `claude_skills/claude_skills/sdd_update/lifecycle.py:18`
 **Complexity:** 8
 
 **Description:**
@@ -6939,7 +8510,7 @@ Returns:
 ### `normalize_message_text(raw) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:226`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:226`
 **Complexity:** 9
 
 **Description:**
@@ -6953,7 +8524,7 @@ Returns:
 ### `normalize_path(path, base_directory) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:216`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:216`
 **Complexity:** 3
 
 **Description:**
@@ -6976,46 +8547,10 @@ Example:
 
 ---
 
-### `normalize_response(data, tool_name) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:116`
-⚠️ **Complexity:** 22 (High)
-
-**Description:**
-> Normalize and validate response data.
-
-Args:
-    data: Raw parsed data
-    tool_name: Tool name for context
-
-Returns:
-    Normalized response
-
-**Parameters:**
-- `data`: Dict[str, Any]
-- `tool_name`: str
-
----
-
-### `normalize_severity(severity) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:192`
-**Complexity:** 8
-
-**Description:**
-> Normalize severity to standard values.
-
-**Parameters:**
-- `severity`: str
-
----
-
 ### `normalize_validation_result(result) -> NormalizedValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/formatting.py:133`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/formatting.py:133`
 **Complexity:** 3
 
 **Description:**
@@ -7029,7 +8564,7 @@ Returns:
 ### `parse_doc_query_stats(output) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:59`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:59`
 **Complexity:** 5
 
 **Description:**
@@ -7049,24 +8584,21 @@ Returns:
 ### `parse_response(tool_output, tool_name) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:15`
-**Complexity:** 9
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/synthesis.py:15`
+**Complexity:** 8
 
 **Description:**
-> Parse AI tool response into structured format.
+> Extract raw response from tool output.
 
-Tries multiple parsing strategies:
-1. Extract JSON from code blocks
-2. Extract JSON from raw text
-3. Regex extraction of key fields
-4. Return error with raw output
+Handles wrapper formats (like gemini CLI) but returns raw markdown/text.
+No parsing or structuring - that's done by AI synthesis.
 
 Args:
     tool_output: Raw output from AI tool
     tool_name: Name of the tool for logging
 
 Returns:
-    Parsed response dictionary
+    Response dictionary with raw text
 
 **Parameters:**
 - `tool_output`: str
@@ -7077,7 +8609,7 @@ Returns:
 ### `phase_time(spec_id, phase_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/query.py:35`
+**Defined in:** `claude_skills/claude_skills/sdd_update/query.py:35`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -7105,7 +8637,7 @@ Returns:
 ### `prepare_task(spec_id, specs_dir, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:137`
+**Defined in:** `claude_skills/claude_skills/sdd_next/discovery.py:198`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -7129,27 +8661,10 @@ Returns:
 
 ---
 
-### `print_by_file(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:103`
-**Complexity:** 3
-
-**Description:**
-> Print commands grouped by file.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `print_context(context, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:159`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:294`
 ⚠️ **Complexity:** 17 (High)
 
 **Parameters:**
@@ -7161,7 +8676,7 @@ Args:
 ### `print_discovery_report(root_dir, show_summary, show_tree, show_fixtures, show_markers, show_detailed, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:303`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:303`
 ⚠️ **Complexity:** 35 (High)
 
 **Description:**
@@ -7190,44 +8705,10 @@ Returns:
 
 ---
 
-### `print_grouped(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:139`
-**Complexity:** 5
-
-**Description:**
-> Print commands grouped by command pattern.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
-### `print_json_output(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:163`
-**Complexity:** 2
-
-**Description:**
-> Print commands in JSON format.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `print_module_summary(summary, verbose) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:220`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:355`
 ⚠️ **Complexity:** 18 (High)
 
 **Parameters:**
@@ -7236,31 +8717,10 @@ Args:
 
 ---
 
-### `print_report(results, verbose, json_output) -> None`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:357`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Print validation report.
-
-Args:
-    results: Validation results grouped by file
-    verbose: Whether to print verbose output
-    json_output: Whether to output JSON
-
-**Parameters:**
-- `results`: Dict[Path, List[ValidationResult]]
-- `verbose`: bool
-- `json_output`: bool
-
----
-
 ### `print_routing_matrix(printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:568`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:568`
 **Complexity:** 3
 
 **Description:**
@@ -7277,7 +8737,7 @@ Args:
 ### `print_tool_status(printer, include_routing) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:256`
+**Defined in:** `claude_skills/claude_skills/run_tests/tool_checking.py:256`
 **Complexity:** 6
 
 **Description:**
@@ -7299,7 +8759,7 @@ Returns:
 ### `print_tree_structure(structure, indent) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/test_discovery.py:204`
+**Defined in:** `claude_skills/claude_skills/run_tests/test_discovery.py:204`
 **Complexity:** 4
 
 **Description:**
@@ -7315,27 +8775,10 @@ Args:
 
 ---
 
-### `print_unique(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:124`
-**Complexity:** 2
-
-**Description:**
-> Print unique commands.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `query_tasks(spec_id, specs_dir, status, task_type, parent, format_type, printer) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/query_operations.py:15`
+**Defined in:** `claude_skills/claude_skills/common/query_operations.py:15`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -7367,7 +8810,7 @@ Returns:
 ### `read_code_file(file_path) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:451`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:451`
 **Complexity:** 7
 
 **Description:**
@@ -7387,7 +8830,7 @@ Returns:
 ### `recalculate_progress(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:9`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:9`
 **Complexity:** 5
 
 **Description:**
@@ -7412,7 +8855,7 @@ Returns:
 ### `reconcile_state(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:227`
+**Defined in:** `claude_skills/claude_skills/sdd_update/validation.py:227`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -7442,7 +8885,7 @@ Returns:
 ### `record_metric(skill, command, duration_ms, status, exit_code, error_message) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:73`
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:74`
 **Complexity:** 4
 
 **Description:**
@@ -7469,7 +8912,7 @@ Args:
 ### `register_all_subcommands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:7`
+**Defined in:** `claude_skills/claude_skills/cli/sdd/registry.py:7`
 **Complexity:** 2
 
 **Description:**
@@ -7495,7 +8938,7 @@ Note:
 ### `register_all_subcommands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/registry.py:11`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/registry.py:11`
 **Complexity:** 2
 
 **Description:**
@@ -7512,7 +8955,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_code_doc(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:437`
+**Defined in:** `claude_skills/claude_skills/code_doc/cli.py:437`
 **Complexity:** 1
 
 **Description:**
@@ -7527,7 +8970,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:443`
+**Defined in:** `claude_skills/claude_skills/doc_query/cli.py:985`
 **Complexity:** 1
 
 **Description:**
@@ -7542,7 +8985,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_gendocs(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py:39`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/gendocs.py:39`
 **Complexity:** 1
 
 **Description:**
@@ -7557,7 +9000,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_migrate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/migrate.py:71`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/migrate.py:71`
 **Complexity:** 1
 
 **Description:**
@@ -7572,7 +9015,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:881`
+**Defined in:** `claude_skills/claude_skills/sdd_next/cli.py:885`
 **Complexity:** 1
 
 **Description:**
@@ -7587,7 +9030,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_plan(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:153`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/cli.py:156`
 **Complexity:** 1
 
 **Description:**
@@ -7602,7 +9045,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_plan_review(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:216`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/cli.py:233`
 **Complexity:** 1
 
 **Description:**
@@ -7617,7 +9060,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_render(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_render/cli.py:90`
+**Defined in:** `claude_skills/claude_skills/sdd_render/cli.py:97`
 **Complexity:** 1
 
 **Description:**
@@ -7636,7 +9079,7 @@ Args:
 ### `register_run_tests(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:172`
+**Defined in:** `claude_skills/claude_skills/run_tests/cli.py:172`
 **Complexity:** 2
 
 **Parameters:**
@@ -7648,7 +9091,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:170`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:170`
 **Complexity:** 1
 
 **Description:**
@@ -7663,7 +9106,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:250`
+**Defined in:** `claude_skills/claude_skills/cli/skills_dev/start_helper.py:261`
 **Complexity:** 1
 
 **Description:**
@@ -7678,7 +9121,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:792`
+**Defined in:** `claude_skills/claude_skills/sdd_update/cli.py:792`
 **Complexity:** 1
 
 **Description:**
@@ -7697,7 +9140,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:503`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/cli.py:526`
 **Complexity:** 1
 
 **Description:**
@@ -7719,7 +9162,7 @@ Note:
 ### `render_statistics(stats) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:104`
+**Defined in:** `claude_skills/claude_skills/sdd_validate/stats.py:104`
 **Complexity:** 6
 
 **Description:**
@@ -7733,18 +9176,18 @@ Note:
 ### `reorder_args_for_subcommand(cmd_line) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:15`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `claude_skills/claude_skills/cli/sdd/__init__.py:15`
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
-> Reorder command line arguments to support global options before subcommand.
+> Reorder command line arguments to support global options anywhere.
 
-Argparse doesn't natively support global options before subcommand names.
-This function reorders arguments to put global options after the subcommand.
+Uses argparse.parse_known_args() to robustly extract global options,
+then reorders to place them after the subcommand.
 
 Args:
     cmd_line: List of command line arguments
-    
+
 Returns:
     Reordered list of arguments
 
@@ -7756,7 +9199,7 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:191`
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/reviewer.py:202`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -7786,7 +9229,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, verbose, printer) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:374`
+**Defined in:** `claude_skills/claude_skills/code_doc/ai_consultation.py:374`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -7814,7 +9257,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, printer, failure_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:489`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:489`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -7842,7 +9285,7 @@ Returns:
 ### `run_pytest(preset, path, pattern, extra_args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:168`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:168`
 **Complexity:** 8
 
 **Description:**
@@ -7870,7 +9313,7 @@ Returns:
 ### `run_tool_parallel(tool, prompt, failure_type) -> ConsultationResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:688`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:688`
 **Complexity:** 5
 
 **Description:**
@@ -7894,7 +9337,7 @@ Returns:
 ### `save_json_spec(spec_id, specs_dir, spec_data, backup, validate) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:187`
+**Defined in:** `claude_skills/claude_skills/common/spec.py:187`
 **Complexity:** 8
 
 **Description:**
@@ -7924,7 +9367,7 @@ Returns:
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:143`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:143`
 **Complexity:** 5
 
 **Description:**
@@ -7949,7 +9392,7 @@ Returns:
 ### `should_generate_docs(project_root, interactive) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/doc_helper.py:161`
+**Defined in:** `claude_skills/claude_skills/common/doc_helper.py:161`
 **Complexity:** 3
 
 **Description:**
@@ -7982,7 +9425,7 @@ Example:
 ### `spec_stats(spec_file, json_spec_file) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/validation.py:58`
+**Defined in:** `claude_skills/claude_skills/sdd_next/validation.py:58`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -7997,7 +9440,7 @@ Example:
 ### `suggest_documentation_generation(directory) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/planner.py:158`
+**Defined in:** `claude_skills/claude_skills/sdd_plan/planner.py:158`
 **Complexity:** 1
 
 **Description:**
@@ -8017,7 +9460,7 @@ Returns:
 ### `suggest_files_for_task(task_description, docs_path) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/sdd_integration.py:329`
+**Defined in:** `claude_skills/claude_skills/doc_query/sdd_integration.py:329`
 **Complexity:** 1
 
 **Description:**
@@ -8039,7 +9482,7 @@ Returns:
 ### `suggest_reading_order(key_files, framework_info) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/detectors.py:310`
+**Defined in:** `claude_skills/claude_skills/code_doc/detectors.py:310`
 **Complexity:** 7
 
 **Description:**
@@ -8061,7 +9504,7 @@ Returns:
 ### `sync_metadata_from_state(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:537`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:537`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -8093,7 +9536,7 @@ Returns:
 ### `synthesize_responses(responses) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:811`
+**Defined in:** `claude_skills/claude_skills/run_tests/consultation.py:811`
 **Complexity:** 6
 
 **Description:**
@@ -8110,11 +9553,117 @@ Returns:
 
 ---
 
+### `synthesize_with_ai(responses, spec_id, spec_title, working_dir) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/sdd_plan_review/synthesis.py:61`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Use AI to synthesize multiple model reviews into consensus.
+
+Instead of fragile regex parsing, let AI read natural language reviews
+and create structured synthesis.
+
+Args:
+    responses: List of response dicts with "tool" and "raw_review" keys
+    spec_id: Specification ID
+    spec_title: Specification title
+    working_dir: Working directory for AI tool
+
+Returns:
+    Synthesized consensus dictionary
+
+**Parameters:**
+- `responses`: List[Dict[str, Any]]
+- `spec_id`: str
+- `spec_title`: str
+- `working_dir`: str
+
+---
+
+### `trace_data_lifecycle(query, class_name, include_properties) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_data.py:13`
+**Complexity:** 3
+
+**Description:**
+> Trace the lifecycle of a data object (class) through the codebase.
+
+Analyzes how instances of a class are created, used, modified, and destroyed,
+providing insights into data flow patterns and usage across architectural layers.
+
+Args:
+    query: DocumentationQuery instance
+    class_name: Name of the class to trace
+    include_properties: Whether to include detailed property access analysis
+
+Returns:
+    Dictionary with keys:
+    - class_name: Name of the traced class
+    - class_info: Basic class information
+    - lifecycle: Dict with creation, read, update, delete operations
+    - data_flow: Flow organized by architectural layer
+    - property_analysis: Property access patterns (if include_properties=True)
+    - summary: Statistics about the lifecycle
+
+Example:
+    >>> query = DocumentationQuery()
+    >>> query.load()
+    >>> result = trace_data_lifecycle(query, "User", include_properties=True)
+    >>> print(f"Found {result['summary']['total_operations']} operations")
+
+**Parameters:**
+- `query`: Any
+- `class_name`: str
+- `include_properties`: bool
+
+---
+
+### `trace_execution_flow(query, function_name, max_depth) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `claude_skills/claude_skills/doc_query/workflows/trace_entry.py:13`
+**Complexity:** 6
+
+**Description:**
+> Trace the execution flow starting from an entry function.
+
+Builds a call chain showing all functions called (directly or indirectly)
+from the specified entry function, with architectural layer detection
+and complexity analysis.
+
+Args:
+    query: DocumentationQuery instance
+    function_name: Name of the entry function to trace from
+    max_depth: Maximum call chain depth to traverse (default: 5)
+
+Returns:
+    Dictionary with keys:
+    - entry_function: Starting function name
+    - max_depth: Maximum depth used
+    - call_chain: Dict with nodes, edges, layers, hot_spots
+    - summary: Statistics about the trace
+
+Example:
+    >>> query = DocumentationQuery()
+    >>> query.load()
+    >>> result = trace_execution_flow(query, "main", max_depth=3)
+    >>> print(f"Traced {result['summary']['total_functions']} functions")
+
+**Parameters:**
+- `query`: Any
+- `function_name`: str
+- `max_depth`: int
+
+---
+
 ### `track_metrics(skill_name) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/metrics.py:157`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `claude_skills/claude_skills/common/metrics.py:158`
+**Complexity:** 8
 
 **Description:**
 > Decorator for tracking metrics on CLI main() functions.
@@ -8136,7 +9685,7 @@ Args:
 ### `track_time(spec_id, task_id, actual_hours, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:15`
+**Defined in:** `claude_skills/claude_skills/sdd_update/time_tracking.py:15`
 **Complexity:** 9
 
 **Description:**
@@ -8166,7 +9715,7 @@ Returns:
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:353`
+**Defined in:** `claude_skills/claude_skills/sdd_update/status.py:353`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -8196,7 +9745,7 @@ Returns:
 ### `update_metadata(spec_id, key, value, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/journal.py:210`
+**Defined in:** `claude_skills/claude_skills/sdd_update/journal.py:210`
 **Complexity:** 9
 
 **Description:**
@@ -8226,11 +9775,14 @@ Returns:
 ### `update_node(spec_data, node_id, updates) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/spec.py:334`
-**Complexity:** 2
+**Defined in:** `claude_skills/claude_skills/common/spec.py:338`
+**Complexity:** 3
 
 **Description:**
 > Update a node in the state hierarchy.
+
+Special handling for metadata: existing metadata fields are preserved
+and merged with new metadata fields, rather than being replaced entirely.
 
 Args:
     spec_data: JSON spec file data
@@ -8250,7 +9802,7 @@ Returns:
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:60`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:60`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -8272,7 +9824,7 @@ Args:
 ### `update_parent_status(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:115`
+**Defined in:** `claude_skills/claude_skills/common/progress.py:115`
 **Complexity:** 5
 
 **Description:**
@@ -8296,7 +9848,7 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:58`
+**Defined in:** `claude_skills/claude_skills/dev_tools/setup_project_permissions.py:55`
 **Complexity:** 7
 
 **Description:**
@@ -8310,7 +9862,7 @@ Returns:
 ### `update_task_status(spec_id, task_id, new_status, specs_dir, note, dry_run, verify, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:52`
+**Defined in:** `claude_skills/claude_skills/sdd_update/status.py:52`
 ⚠️ **Complexity:** 37 (High)
 
 **Description:**
@@ -8344,7 +9896,7 @@ Returns:
 ### `validate_and_normalize_paths(paths, base_directory) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:145`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:145`
 **Complexity:** 7
 
 **Description:**
@@ -8374,32 +9926,10 @@ Example:
 
 ---
 
-### `validate_commands(commands_by_file, registry) -> Dict[Path, List[ValidationResult]]`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:312`
-**Complexity:** 4
-
-**Description:**
-> Validate all commands against the registry.
-
-Args:
-    commands_by_file: Commands grouped by file
-    registry: Command registry
-
-Returns:
-    Validation results grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-- `registry`: CommandRegistry
-
----
-
 ### `validate_dependencies(hierarchy) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:427`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:427`
 ⚠️ **Complexity:** 29 (High)
 
 **Description:**
@@ -8419,7 +9949,7 @@ Returns:
 ### `validate_dependency_graph(spec_data) -> Tuple[bool, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/dependency_analysis.py:233`
+**Defined in:** `claude_skills/claude_skills/common/dependency_analysis.py:233`
 **Complexity:** 7
 
 **Description:**
@@ -8450,7 +9980,7 @@ Example:
 ### `validate_hierarchy(hierarchy) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:206`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:206`
 ⚠️ **Complexity:** 22 (High)
 
 **Description:**
@@ -8470,7 +10000,7 @@ Returns:
 ### `validate_iso8601_date(date_str) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:216`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:216`
 **Complexity:** 1
 
 **Description:**
@@ -8484,7 +10014,7 @@ Returns:
 ### `validate_metadata(hierarchy) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:540`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:540`
 **Complexity:** 10
 
 **Description:**
@@ -8504,7 +10034,7 @@ Returns:
 ### `validate_node_type(node_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:204`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:204`
 **Complexity:** 1
 
 **Description:**
@@ -8518,7 +10048,7 @@ Returns:
 ### `validate_nodes(hierarchy) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:305`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:305`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -8538,7 +10068,7 @@ Returns:
 ### `validate_path(path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/paths.py:109`
+**Defined in:** `claude_skills/claude_skills/common/paths.py:109`
 **Complexity:** 3
 
 **Description:**
@@ -8558,7 +10088,7 @@ Returns:
 ### `validate_paths(paths, base_directory) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/validation.py:53`
+**Defined in:** `claude_skills/claude_skills/sdd_next/validation.py:53`
 **Complexity:** 1
 
 **Description:**
@@ -8573,7 +10103,7 @@ Returns:
 ### `validate_preset(preset) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_runner.py:253`
+**Defined in:** `claude_skills/claude_skills/run_tests/pytest_runner.py:253`
 **Complexity:** 1
 
 **Description:**
@@ -8593,7 +10123,7 @@ Returns:
 ### `validate_spec(spec_file, specs_dir) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/validation.py:16`
+**Defined in:** `claude_skills/claude_skills/sdd_next/validation.py:16`
 **Complexity:** 5
 
 **Description:**
@@ -8608,7 +10138,7 @@ Returns:
 ### `validate_spec(spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:16`
+**Defined in:** `claude_skills/claude_skills/sdd_update/validation.py:16`
 **Complexity:** 6
 
 **Description:**
@@ -8640,7 +10170,7 @@ Returns:
 ### `validate_spec_before_proceed(spec_path, quiet) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/integrations.py:18`
+**Defined in:** `claude_skills/claude_skills/common/integrations.py:18`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -8676,7 +10206,7 @@ Example:
 ### `validate_spec_hierarchy(spec_data) -> JsonSpecValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:587`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:587`
 **Complexity:** 3
 
 **Description:**
@@ -8696,7 +10226,7 @@ Returns:
 ### `validate_spec_id_format(spec_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:210`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:210`
 **Complexity:** 1
 
 **Description:**
@@ -8710,7 +10240,7 @@ Returns:
 ### `validate_status(status) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/validation.py:198`
+**Defined in:** `claude_skills/claude_skills/common/validation.py:198`
 **Complexity:** 1
 
 **Description:**
@@ -8724,7 +10254,7 @@ Returns:
 ### `validate_structure(spec_data) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:148`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:148`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -8744,7 +10274,7 @@ Returns:
 ### `validate_task_counts(hierarchy) -> Tuple[bool, List[str], List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:359`
+**Defined in:** `claude_skills/claude_skills/common/hierarchy_validation.py:359`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -8764,40 +10294,13 @@ Returns:
 
 ## 📦 Dependencies
 
-### `scripts/extract_sdd_commands.py`
-
-- `argparse`
-- `collections.defaultdict`
-- `dataclasses.dataclass`
-- `json`
-- `pathlib.Path`
-- `re`
-- `typing.Dict`
-- `typing.List`
-
-### `scripts/validate_sdd_commands.py`
-
-- `argparse`
-- `collections.defaultdict`
-- `dataclasses.dataclass`
-- `json`
-- `pathlib.Path`
-- `re`
-- `subprocess`
-- `sys`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Set`
-- `typing.Tuple`
-
-### `src/claude_skills/claude_skills/__init__.py`
+### `claude_skills/claude_skills/__init__.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.load_json_spec`
 
-### `src/claude_skills/claude_skills/cli/sdd/__init__.py`
+### `claude_skills/claude_skills/cli/sdd/__init__.py`
 
 - `argparse`
 - `claude_skills.cli.sdd.options.add_global_options`
@@ -8808,39 +10311,39 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/cli/sdd/options.py`
+### `claude_skills/claude_skills/cli/sdd/options.py`
 
 - `argparse`
 
-### `src/claude_skills/claude_skills/cli/sdd/registry.py`
+### `claude_skills/claude_skills/cli/sdd/registry.py`
 
 - `logging`
 
-### `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py`
+### `claude_skills/claude_skills/cli/skills_dev/gendocs.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/cli/skills_dev/migrate.py`
+### `claude_skills/claude_skills/cli/skills_dev/migrate.py`
 
 - `claude_skills.common.PrettyPrinter`
 
-### `src/claude_skills/claude_skills/cli/skills_dev/registry.py`
+### `claude_skills/claude_skills/cli/skills_dev/registry.py`
 
 - `__future__.annotations`
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
 - `typing.Any`
 
-### `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py`
+### `claude_skills/claude_skills/cli/skills_dev/setup_permissions.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `json`
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py`
+### `claude_skills/claude_skills/cli/skills_dev/start_helper.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.integrations.get_session_state`
@@ -8850,7 +10353,7 @@ Returns:
 - `sys`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/__init__.py`
+### `claude_skills/claude_skills/code_doc/__init__.py`
 
 - `calculator.calculate_complexity`
 - `calculator.calculate_statistics`
@@ -8859,7 +10362,7 @@ Returns:
 - `generator.DocumentationGenerator`
 - `parser.CodebaseAnalyzer`
 
-### `src/claude_skills/claude_skills/code_doc/ai_consultation.py`
+### `claude_skills/claude_skills/code_doc/ai_consultation.py`
 
 - `concurrent.futures.ThreadPoolExecutor`
 - `concurrent.futures.as_completed`
@@ -8872,7 +10375,18 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/code_doc/calculator.py`
+### `claude_skills/claude_skills/code_doc/ast_analysis.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+
+### `claude_skills/claude_skills/code_doc/calculator.py`
 
 - `ast`
 - `collections.defaultdict`
@@ -8880,7 +10394,7 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/code_doc/cli.py`
+### `claude_skills/claude_skills/code_doc/cli.py`
 
 - `__future__.annotations`
 - `argparse`
@@ -8908,7 +10422,7 @@ Returns:
 - `typing.Iterable`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/detectors.py`
+### `claude_skills/claude_skills/code_doc/detectors.py`
 
 - `collections.defaultdict`
 - `fnmatch`
@@ -8919,7 +10433,7 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 
-### `src/claude_skills/claude_skills/code_doc/formatter.py`
+### `claude_skills/claude_skills/code_doc/formatter.py`
 
 - `collections.defaultdict`
 - `datetime.datetime`
@@ -8927,7 +10441,7 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/code_doc/generator.py`
+### `claude_skills/claude_skills/code_doc/generator.py`
 
 - `json`
 - `pathlib.Path`
@@ -8936,7 +10450,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parser.py`
+### `claude_skills/claude_skills/code_doc/parser.py`
 
 - `ast`
 - `collections.defaultdict`
@@ -8945,7 +10459,7 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/__init__.py`
+### `claude_skills/claude_skills/code_doc/parsers/__init__.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -8958,7 +10472,7 @@ Returns:
 - `factory.create_parser_factory`
 - `python.PythonParser`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/base.py`
+### `claude_skills/claude_skills/code_doc/parsers/base.py`
 
 - `abc.ABC`
 - `abc.abstractmethod`
@@ -8971,7 +10485,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/css.py`
+### `claude_skills/claude_skills/code_doc/parsers/css.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -8984,7 +10498,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/factory.py`
+### `claude_skills/claude_skills/code_doc/parsers/factory.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -8997,7 +10511,7 @@ Returns:
 - `typing.Set`
 - `typing.Type`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/go.py`
+### `claude_skills/claude_skills/code_doc/parsers/go.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -9011,7 +10525,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/html.py`
+### `claude_skills/claude_skills/code_doc/parsers/html.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -9024,7 +10538,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/javascript.py`
+### `claude_skills/claude_skills/code_doc/parsers/javascript.py`
 
 - `base.BaseParser`
 - `base.Language`
@@ -9038,9 +10552,16 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/code_doc/parsers/python.py`
+### `claude_skills/claude_skills/code_doc/parsers/python.py`
 
 - `ast`
+- `ast_analysis.CallSite`
+- `ast_analysis.CrossReferenceGraph`
+- `ast_analysis.DynamicPattern`
+- `ast_analysis.DynamicPatternWarning`
+- `ast_analysis.InstantiationSite`
+- `ast_analysis.ReferenceType`
+- `ast_analysis.create_cross_reference_graph`
 - `base.BaseParser`
 - `base.Language`
 - `base.ParseResult`
@@ -9053,7 +10574,18 @@ Returns:
 - `sys`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/common/__init__.py`
+### `claude_skills/claude_skills/code_doc/schema.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `parsers.base.ParsedClass`
+- `parsers.base.ParsedFunction`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `claude_skills/claude_skills/common/__init__.py`
 
 - `dependency_analysis.DEFAULT_BOTTLENECK_THRESHOLD`
 - `dependency_analysis.analyze_dependencies`
@@ -9083,9 +10615,17 @@ Returns:
 - `metrics.record_metric`
 - `metrics.track_metrics`
 - `paths.batch_check_paths_exist`
+- `paths.ensure_backups_directory`
 - `paths.ensure_directory`
+- `paths.ensure_human_readable_directory`
+- `paths.ensure_reports_directory`
+- `paths.ensure_reviews_directory`
 - `paths.find_files_by_pattern`
 - `paths.find_specs_directory`
+- `paths.generate_backups_readme_content`
+- `paths.generate_human_readable_readme_content`
+- `paths.generate_reports_readme_content`
+- `paths.generate_reviews_readme_content`
 - `paths.normalize_path`
 - `paths.validate_and_normalize_paths`
 - `paths.validate_path`
@@ -9117,7 +10657,7 @@ Returns:
 - `validation.validate_spec_id_format`
 - `validation.validate_status`
 
-### `src/claude_skills/claude_skills/common/dependency_analysis.py`
+### `claude_skills/claude_skills/common/dependency_analysis.py`
 
 - `dataclasses.dataclass`
 - `typing.Dict`
@@ -9127,7 +10667,7 @@ Returns:
 - `typing.Set`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/common/doc_helper.py`
+### `claude_skills/claude_skills/common/doc_helper.py`
 
 - `json`
 - `pathlib.Path`
@@ -9135,7 +10675,7 @@ Returns:
 - `subprocess`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/hierarchy_validation.py`
+### `claude_skills/claude_skills/common/hierarchy_validation.py`
 
 - `claude_skills.common.EnhancedError`
 - `claude_skills.common.JsonSpecValidationResult`
@@ -9153,7 +10693,7 @@ Returns:
 - `typing.Set`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/common/integrations.py`
+### `claude_skills/claude_skills/common/integrations.py`
 
 - `datetime.datetime`
 - `hierarchy_validation.validate_spec_hierarchy`
@@ -9163,7 +10703,7 @@ Returns:
 - `time`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/metrics.py`
+### `claude_skills/claude_skills/common/metrics.py`
 
 - `contextlib.contextmanager`
 - `datetime.datetime`
@@ -9171,13 +10711,14 @@ Returns:
 - `json`
 - `os`
 - `pathlib.Path`
+- `shlex`
 - `sys`
 - `time`
 - `typing.Any`
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/paths.py`
+### `claude_skills/claude_skills/common/paths.py`
 
 - `pathlib.Path`
 - `sys`
@@ -9185,16 +10726,16 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/printer.py`
+### `claude_skills/claude_skills/common/printer.py`
 
 - `sys`
 
-### `src/claude_skills/claude_skills/common/progress.py`
+### `claude_skills/claude_skills/common/progress.py`
 
 - `typing.Dict`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/common/query_operations.py`
+### `claude_skills/claude_skills/common/query_operations.py`
 
 - `pathlib.Path`
 - `printer.PrettyPrinter`
@@ -9205,7 +10746,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/reporting.py`
+### `claude_skills/claude_skills/common/reporting.py`
 
 - `claude_skills.common.JsonSpecValidationResult`
 - `claude_skills.common.SpecValidationResult`
@@ -9213,12 +10754,13 @@ Returns:
 - `pathlib.Path`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/common/spec.py`
+### `claude_skills/claude_skills/common/spec.py`
 
 - `datetime.datetime`
 - `datetime.timezone`
 - `json`
 - `pathlib.Path`
+- `paths.ensure_backups_directory`
 - `paths.find_spec_file`
 - `shutil`
 - `sys`
@@ -9227,7 +10769,7 @@ Returns:
 - `typing.Optional`
 - `typing.Union`
 
-### `src/claude_skills/claude_skills/common/spec_analysis.py`
+### `claude_skills/claude_skills/common/spec_analysis.py`
 
 - `json`
 - `pathlib.Path`
@@ -9236,7 +10778,7 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/common/validation.py`
+### `claude_skills/claude_skills/common/validation.py`
 
 - `dataclasses.dataclass`
 - `dataclasses.field`
@@ -9247,7 +10789,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/dev_tools/generate_docs.py`
+### `claude_skills/claude_skills/dev_tools/generate_docs.py`
 
 - `argparse`
 - `contextlib.redirect_stderr`
@@ -9261,7 +10803,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py`
+### `claude_skills/claude_skills/dev_tools/sdd_start_helper.py`
 
 - `argparse`
 - `common.integrations.get_session_state`
@@ -9271,14 +10813,14 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py`
+### `claude_skills/claude_skills/dev_tools/setup_project_permissions.py`
 
 - `argparse`
 - `json`
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/doc_query/cli.py`
+### `claude_skills/claude_skills/doc_query/cli.py`
 
 - `__future__.annotations`
 - `argparse`
@@ -9287,6 +10829,19 @@ Returns:
 - `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
 - `claude_skills.doc_query.doc_query_lib.QueryResult`
 - `claude_skills.doc_query.doc_query_lib.check_docs_exist`
+- `claude_skills.doc_query.doc_query_lib.check_documentation_staleness`
+- `claude_skills.doc_query.workflows.impact_analysis.analyze_impact`
+- `claude_skills.doc_query.workflows.impact_analysis.format_json_output`
+- `claude_skills.doc_query.workflows.impact_analysis.format_text_output`
+- `claude_skills.doc_query.workflows.refactor_candidates.find_refactor_candidates`
+- `claude_skills.doc_query.workflows.refactor_candidates.format_json_output`
+- `claude_skills.doc_query.workflows.refactor_candidates.format_text_output`
+- `claude_skills.doc_query.workflows.trace_data.format_json_output`
+- `claude_skills.doc_query.workflows.trace_data.format_text_output`
+- `claude_skills.doc_query.workflows.trace_data.trace_data_lifecycle`
+- `claude_skills.doc_query.workflows.trace_entry.format_json_output`
+- `claude_skills.doc_query.workflows.trace_entry.format_text_output`
+- `claude_skills.doc_query.workflows.trace_entry.trace_execution_flow`
 - `json`
 - `sys`
 - `typing.Any`
@@ -9294,7 +10849,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/doc_query/doc_query_lib.py`
+### `claude_skills/claude_skills/doc_query/doc_query_lib.py`
 
 - `dataclasses.dataclass`
 - `json`
@@ -9308,7 +10863,7 @@ Returns:
 - `typing.Optional`
 - `typing.Union`
 
-### `src/claude_skills/claude_skills/doc_query/sdd_integration.py`
+### `claude_skills/claude_skills/doc_query/sdd_integration.py`
 
 - `doc_query_lib.DocumentationQuery`
 - `doc_query_lib.QueryResult`
@@ -9319,7 +10874,54 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 
-### `src/claude_skills/claude_skills/run_tests/cli.py`
+### `claude_skills/claude_skills/doc_query/workflows/__init__.py`
+
+- `impact_analysis.analyze_impact`
+- `refactor_candidates.find_refactor_candidates`
+- `trace_data.trace_data_lifecycle`
+- `trace_entry.trace_execution_flow`
+
+### `claude_skills/claude_skills/doc_query/workflows/impact_analysis.py`
+
+- `json`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `typing.Tuple`
+
+### `claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py`
+
+- `json`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `typing.Tuple`
+
+### `claude_skills/claude_skills/doc_query/workflows/trace_data.py`
+
+- `json`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `typing.Tuple`
+
+### `claude_skills/claude_skills/doc_query/workflows/trace_entry.py`
+
+- `json`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `typing.Tuple`
+
+### `claude_skills/claude_skills/run_tests/cli.py`
 
 - `__future__.annotations`
 - `argparse`
@@ -9349,7 +10951,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/run_tests/consultation.py`
+### `claude_skills/claude_skills/run_tests/consultation.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.run_tests.tool_checking.check_tool_availability`
@@ -9366,7 +10968,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/run_tests/pytest_runner.py`
+### `claude_skills/claude_skills/run_tests/pytest_runner.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `pathlib.Path`
@@ -9375,7 +10977,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/run_tests/test_discovery.py`
+### `claude_skills/claude_skills/run_tests/test_discovery.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `collections.defaultdict`
@@ -9387,7 +10989,7 @@ Returns:
 - `typing.Set`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/run_tests/tool_checking.py`
+### `claude_skills/claude_skills/run_tests/tool_checking.py`
 
 - `claude_skills.common.PrettyPrinter`
 - `pathlib.Path`
@@ -9397,7 +10999,7 @@ Returns:
 - `typing.Optional`
 - `yaml`
 
-### `src/claude_skills/claude_skills/sdd_next/__init__.py`
+### `claude_skills/claude_skills/sdd_next/__init__.py`
 
 - `discovery.check_dependencies`
 - `discovery.get_next_task`
@@ -9414,11 +11016,12 @@ Returns:
 - `workflow.find_pattern`
 - `workflow.init_environment`
 
-### `src/claude_skills/claude_skills/sdd_next/cli.py`
+### `claude_skills/claude_skills/sdd_next/cli.py`
 
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.check_complete`
+- `claude_skills.common.ensure_reports_directory`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.get_progress_summary`
 - `claude_skills.common.list_blockers`
@@ -9445,7 +11048,7 @@ Returns:
 - `sys`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/sdd_next/discovery.py`
+### `claude_skills/claude_skills/sdd_next/discovery.py`
 
 - `claude_skills.common.check_doc_query_available`
 - `claude_skills.common.get_node`
@@ -9457,7 +11060,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_next/project.py`
+### `claude_skills/claude_skills/sdd_next/project.py`
 
 - `json`
 - `pathlib.Path`
@@ -9465,7 +11068,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_next/validation.py`
+### `claude_skills/claude_skills/sdd_next/validation.py`
 
 - `claude_skills.common.find_circular_dependencies`
 - `claude_skills.common.load_json_spec`
@@ -9477,7 +11080,7 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_next/workflow.py`
+### `claude_skills/claude_skills/sdd_next/workflow.py`
 
 - `claude_skills.common.ensure_directory`
 - `claude_skills.common.find_specs_directory`
@@ -9486,7 +11089,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_plan/__init__.py`
+### `claude_skills/claude_skills/sdd_plan/__init__.py`
 
 - `claude_skills.sdd_plan.planner.analyze_codebase`
 - `claude_skills.sdd_plan.planner.create_spec_interactive`
@@ -9497,10 +11100,11 @@ Returns:
 - `claude_skills.sdd_plan.templates.get_template_description`
 - `claude_skills.sdd_plan.templates.list_templates`
 
-### `src/claude_skills/claude_skills/sdd_plan/cli.py`
+### `claude_skills/claude_skills/sdd_plan/cli.py`
 
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ensure_reports_directory`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.sdd_plan.analyze_codebase`
 - `claude_skills.sdd_plan.create_spec_interactive`
@@ -9511,7 +11115,7 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/sdd_plan/planner.py`
+### `claude_skills/claude_skills/sdd_plan/planner.py`
 
 - `datetime.datetime`
 - `json`
@@ -9522,13 +11126,13 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_plan/templates.py`
+### `claude_skills/claude_skills/sdd_plan/templates.py`
 
 - `datetime.datetime`
 - `typing.Any`
 - `typing.Dict`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/__init__.py`
+### `claude_skills/claude_skills/sdd_plan_review/__init__.py`
 
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.reporting.generate_json_report`
@@ -9539,10 +11143,12 @@ Returns:
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
 - `claude_skills.sdd_plan_review.synthesis.parse_response`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/cli.py`
+### `claude_skills/claude_skills/sdd_plan_review/cli.py`
 
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ensure_reviews_directory`
+- `claude_skills.common.find_specs_directory`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.sdd_plan_review.check_tool_available`
 - `claude_skills.sdd_plan_review.detect_available_tools`
@@ -9553,19 +11159,19 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/prompts.py`
+### `claude_skills/claude_skills/sdd_plan_review/prompts.py`
 
 - `typing.Any`
 - `typing.Dict`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/reporting.py`
+### `claude_skills/claude_skills/sdd_plan_review/reporting.py`
 
 - `datetime.datetime`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py`
+### `claude_skills/claude_skills/sdd_plan_review/reviewer.py`
 
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
@@ -9584,7 +11190,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py`
+### `claude_skills/claude_skills/sdd_plan_review/synthesis.py`
 
 - `json`
 - `re`
@@ -9596,13 +11202,14 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_render/__init__.py`
+### `claude_skills/claude_skills/sdd_render/__init__.py`
 
 - `renderer.SpecRenderer`
 
-### `src/claude_skills/claude_skills/sdd_render/cli.py`
+### `claude_skills/claude_skills/sdd_render/cli.py`
 
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ensure_human_readable_directory`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.load_json_spec`
 - `json`
@@ -9610,7 +11217,7 @@ Returns:
 - `renderer.SpecRenderer`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_render/renderer.py`
+### `claude_skills/claude_skills/sdd_render/renderer.py`
 
 - `pathlib.Path`
 - `typing.Any`
@@ -9618,7 +11225,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/__init__.py`
+### `claude_skills/claude_skills/sdd_update/__init__.py`
 
 - `journal.add_journal_entry`
 - `journal.update_metadata`
@@ -9640,7 +11247,7 @@ Returns:
 - `validation.validate_spec`
 - `verification.add_verification_result`
 
-### `src/claude_skills/claude_skills/sdd_update/cli.py`
+### `claude_skills/claude_skills/sdd_update/cli.py`
 
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
@@ -9677,7 +11284,7 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
-### `src/claude_skills/claude_skills/sdd_update/journal.py`
+### `claude_skills/claude_skills/sdd_update/journal.py`
 
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -9694,7 +11301,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_update/lifecycle.py`
+### `claude_skills/claude_skills/sdd_update/lifecycle.py`
 
 - `claude_skills.common.paths.ensure_directory`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -9706,7 +11313,7 @@ Returns:
 - `shutil`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/query.py`
+### `claude_skills/claude_skills/sdd_update/query.py`
 
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.query_operations.check_complete`
@@ -9720,7 +11327,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/status.py`
+### `claude_skills/claude_skills/sdd_update/status.py`
 
 - `claude_skills.common.execute_verify_task`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -9734,7 +11341,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/time_tracking.py`
+### `claude_skills/claude_skills/sdd_update/time_tracking.py`
 
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
@@ -9744,7 +11351,7 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/validation.py`
+### `claude_skills/claude_skills/sdd_update/validation.py`
 
 - `claude_skills.common.dependency_analysis.find_circular_dependencies`
 - `claude_skills.common.hierarchy_validation.validate_spec_hierarchy`
@@ -9758,7 +11365,7 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/verification.py`
+### `claude_skills/claude_skills/sdd_update/verification.py`
 
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -9770,7 +11377,7 @@ Returns:
 - `pathlib.Path`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_update/workflow.py`
+### `claude_skills/claude_skills/sdd_update/workflow.py`
 
 - `__future__.annotations`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -9793,7 +11400,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_validate/__init__.py`
+### `claude_skills/claude_skills/sdd_validate/__init__.py`
 
 - `diff.DiffReport`
 - `diff.compute_diff`
@@ -9811,7 +11418,7 @@ Returns:
 - `stats.calculate_statistics`
 - `stats.render_statistics`
 
-### `src/claude_skills/claude_skills/sdd_validate/cli.py`
+### `claude_skills/claude_skills/sdd_validate/cli.py`
 
 - `argparse`
 - `dataclasses.asdict`
@@ -9821,7 +11428,7 @@ Returns:
 - `typing.Any`
 - `typing.Dict`
 
-### `src/claude_skills/claude_skills/sdd_validate/diff.py`
+### `claude_skills/claude_skills/sdd_validate/diff.py`
 
 - `__future__.annotations`
 - `copy`
@@ -9834,7 +11441,7 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_validate/fix.py`
+### `claude_skills/claude_skills/sdd_validate/fix.py`
 
 - `__future__.annotations`
 - `claude_skills.common.backup_json_spec`
@@ -9863,7 +11470,7 @@ Returns:
 - `typing.Sequence`
 - `typing.Set`
 
-### `src/claude_skills/claude_skills/sdd_validate/formatting.py`
+### `claude_skills/claude_skills/sdd_validate/formatting.py`
 
 - `__future__.annotations`
 - `claude_skills.common.validation.EnhancedError`
@@ -9878,7 +11485,7 @@ Returns:
 - `typing.Sequence`
 - `typing.Tuple`
 
-### `src/claude_skills/claude_skills/sdd_validate/reporting.py`
+### `claude_skills/claude_skills/sdd_validate/reporting.py`
 
 - `__future__.annotations`
 - `claude_skills.common.JsonSpecValidationResult`
@@ -9888,7 +11495,7 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
-### `src/claude_skills/claude_skills/sdd_validate/stats.py`
+### `claude_skills/claude_skills/sdd_validate/stats.py`
 
 - `__future__.annotations`
 - `dataclasses.dataclass`

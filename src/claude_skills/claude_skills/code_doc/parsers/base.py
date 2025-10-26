@@ -168,16 +168,23 @@ class ParseResult:
     functions: List[ParsedFunction] = field(default_factory=list)
     dependencies: Dict[str, List[str]] = field(default_factory=dict)
     errors: List[str] = field(default_factory=list)
+    cross_references: Optional[Any] = None  # CrossReferenceGraph (Any to avoid circular import)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        return {
+        result = {
             'modules': [m.to_dict() for m in self.modules],
             'classes': [c.to_dict() for c in self.classes],
             'functions': [f.to_dict() for f in self.functions],
             'dependencies': self.dependencies,
             'errors': self.errors
         }
+
+        # Include cross-references if available
+        if self.cross_references and hasattr(self.cross_references, 'to_dict'):
+            result['cross_references'] = self.cross_references.to_dict()
+
+        return result
 
     def merge(self, other: 'ParseResult') -> 'ParseResult':
         """Merge another ParseResult into this one."""
@@ -190,6 +197,55 @@ class ParseResult:
             else:
                 self.dependencies[file] = deps
         self.errors.extend(other.errors)
+
+        # Merge cross-references if both have them
+        if self.cross_references and other.cross_references:
+            # Merge calls
+            self.cross_references.calls.extend(other.cross_references.calls)
+            for callee, sites in other.cross_references.callers.items():
+                if callee not in self.cross_references.callers:
+                    self.cross_references.callers[callee] = []
+                self.cross_references.callers[callee].extend(sites)
+            for caller, sites in other.cross_references.callees.items():
+                if caller not in self.cross_references.callees:
+                    self.cross_references.callees[caller] = []
+                self.cross_references.callees[caller].extend(sites)
+
+            # Merge instantiations
+            self.cross_references.instantiations.extend(other.cross_references.instantiations)
+            for class_name, sites in other.cross_references.instantiated_by.items():
+                if class_name not in self.cross_references.instantiated_by:
+                    self.cross_references.instantiated_by[class_name] = []
+                self.cross_references.instantiated_by[class_name].extend(sites)
+            for instantiator, sites in other.cross_references.instantiators.items():
+                if instantiator not in self.cross_references.instantiators:
+                    self.cross_references.instantiators[instantiator] = []
+                self.cross_references.instantiators[instantiator].extend(sites)
+
+            # Merge imports
+            for file, modules in other.cross_references.imports.items():
+                if file not in self.cross_references.imports:
+                    self.cross_references.imports[file] = set()
+                self.cross_references.imports[file].update(modules)
+            for module, files in other.cross_references.imported_by.items():
+                if module not in self.cross_references.imported_by:
+                    self.cross_references.imported_by[module] = set()
+                self.cross_references.imported_by[module].update(files)
+
+            # Merge warnings
+            self.cross_references.warnings.extend(other.cross_references.warnings)
+
+            # Update statistics
+            self.cross_references.stats['total_calls'] += other.cross_references.stats['total_calls']
+            self.cross_references.stats['total_instantiations'] += other.cross_references.stats['total_instantiations']
+            self.cross_references.stats['total_warnings'] += other.cross_references.stats['total_warnings']
+            for pattern, count in other.cross_references.stats.get('dynamic_patterns', {}).items():
+                if pattern not in self.cross_references.stats['dynamic_patterns']:
+                    self.cross_references.stats['dynamic_patterns'][pattern] = 0
+                self.cross_references.stats['dynamic_patterns'][pattern] += count
+        elif other.cross_references:
+            self.cross_references = other.cross_references
+
         return self
 
 

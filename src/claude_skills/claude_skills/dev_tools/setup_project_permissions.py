@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
+    # Skills (fully qualified with plugin namespace)
     "Skill(sdd-toolkit:run-tests)",
     "Skill(sdd-toolkit:sdd-plan)",
     "Skill(sdd-toolkit:sdd-next)",
@@ -21,12 +22,28 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:code-doc)",
-    "Skill(sdd-toolkit:doc-query)",  
-    "SlashCommand(/sdd-start)",  
+    "Skill(sdd-toolkit:doc-query)",
+
+    # Skills (short form without namespace - also needed)
+    "Skill(run-tests)",
+    "Skill(sdd-plan)",
+    "Skill(sdd-next)",
+    "Skill(sdd-update)",
+    "Skill(sdd-plan-review)",
+    "Skill(sdd-validate)",
+    "Skill(code-doc)",
+    "Skill(doc-query)",
+
+    # Slash commands
+    "SlashCommand(/sdd-start)",
+
+    # CLI command permissions
     "Bash(sdd:*)",
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
-    "Bash(codex:*)",  
+    "Bash(codex:*)",
+
+    # File access permissions
     "Read(//**/specs/**)",
     "Write(//**/specs/active/**)",
     "Write(//**/specs/completed/**)",

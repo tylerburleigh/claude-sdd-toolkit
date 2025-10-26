@@ -69,7 +69,18 @@ def reorder_args_for_subcommand(cmd_line):
 
     # Reconstruct global options as list of arguments (only non-default values)
     global_opts = []
-    defaults = {'path': '.', 'quiet': False, 'json': False, 'debug': False, 'verbose': False, 'no_color': False}
+    defaults = {
+        'path': '.',
+        'quiet': False,
+        'json': False,
+        'debug': False,
+        'verbose': False,
+        'no_color': False,
+        'refresh': False,
+        'no_staleness_check': False,
+        'specs_dir': None,
+        'docs_path': None
+    }
 
     for opt, value in vars(known_args).items():
         # Skip None and default values to avoid cluttering the command line
@@ -85,8 +96,20 @@ def reorder_args_for_subcommand(cmd_line):
             global_opts.append(opt_name)
             global_opts.append(str(value))
 
-    # Reconstruct: subcommand, global options, unknown options, then remaining args
-    return [subcommand] + global_opts + before_subcommand + after_subcommand
+    # Check if there's a nested subcommand (e.g., "doc stats")
+    # If after_subcommand starts with a non-option argument, it's likely a nested subcommand
+    # In this case, put global options at the END for proper argparse handling with nested subparsers
+    has_nested_subcommand = False
+    if after_subcommand and not after_subcommand[0].startswith('-'):
+        # First argument after subcommand doesn't start with '-', likely a nested subcommand
+        has_nested_subcommand = True
+
+    if has_nested_subcommand:
+        # For nested subparsers: subcommand, before options, nested args, then global options at end
+        return [subcommand] + before_subcommand + after_subcommand + global_opts
+    else:
+        # For single-level subparsers: subcommand, global options, before options, then remaining args
+        return [subcommand] + global_opts + before_subcommand + after_subcommand
 
 
 # Common command mistakes and their corrections
@@ -159,6 +182,10 @@ def main():
     try:
         exit_code = args.func(args, printer)
         sys.exit(exit_code or 0)
+    except BrokenPipeError:
+        # Silently exit when pipe is closed (e.g., when using head/tail)
+        # This is standard Unix behavior - not an error
+        sys.exit(0)
     except Exception as e:
         printer.error(f"Command failed: {e}")
         if getattr(args, 'debug', False):

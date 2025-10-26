@@ -8,6 +8,12 @@ from datetime import datetime
 from typing import Dict, List, Any
 from collections import defaultdict
 
+# Handle both direct execution and module import
+try:
+    from .schema import SCHEMA_VERSION
+except ImportError:
+    from schema import SCHEMA_VERSION
+
 
 class MarkdownGenerator:
     """Generates Markdown documentation."""
@@ -213,7 +219,8 @@ class JSONGenerator:
                 "project_name": self.project_name,
                 "version": self.version,
                 "generated_at": datetime.now().isoformat(),
-                "languages": sorted(list(languages)) if languages else ["unknown"]
+                "languages": sorted(list(languages)) if languages else ["unknown"],
+                "schema_version": SCHEMA_VERSION
             },
             "statistics": statistics,
             "modules": analysis['modules'],

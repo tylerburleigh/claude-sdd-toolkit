@@ -14,7 +14,7 @@ from claude_skills.common import PrettyPrinter
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
-    # Skills
+    # Skills (fully qualified with plugin namespace)
     "Skill(sdd-toolkit:run-tests)",
     "Skill(sdd-toolkit:sdd-plan)",
     "Skill(sdd-toolkit:sdd-next)",
@@ -23,6 +23,16 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
+
+    # Skills (short form without namespace - also needed)
+    "Skill(run-tests)",
+    "Skill(sdd-plan)",
+    "Skill(sdd-next)",
+    "Skill(sdd-update)",
+    "Skill(sdd-plan-review)",
+    "Skill(sdd-validate)",
+    "Skill(code-doc)",
+    "Skill(doc-query)",
 
     # Slash commands
     "SlashCommand(/sdd-start)",

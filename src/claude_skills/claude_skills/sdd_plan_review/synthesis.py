@@ -14,206 +14,228 @@ from statistics import mean, median
 
 def parse_response(tool_output: str, tool_name: str) -> Dict[str, Any]:
     """
-    Parse AI tool response into structured format.
+    Extract raw response from tool output.
 
-    Tries multiple parsing strategies:
-    1. Extract JSON from code blocks
-    2. Extract JSON from raw text
-    3. Regex extraction of key fields
-    4. Return error with raw output
+    Handles wrapper formats (like gemini CLI) but returns raw markdown/text.
+    No parsing or structuring - that's done by AI synthesis.
 
     Args:
         tool_output: Raw output from AI tool
         tool_name: Name of the tool for logging
 
     Returns:
-        Parsed response dictionary
+        Response dictionary with raw text
     """
     result = {
-        "success": False,
+        "success": True,
         "tool": tool_name,
         "raw_output": tool_output,
         "parsed_data": None,
         "error": None,
     }
 
-    # Strategy 1: Extract JSON from code blocks
-    json_match = re.search(r'```json\s*(\{.+?\})\s*```', tool_output, re.DOTALL)
-    if json_match:
+    # Handle gemini CLI wrapper format
+    if '{"response":' in tool_output and '"stats":' in tool_output:
         try:
-            data = json.loads(json_match.group(1))
-            result["success"] = True
-            result["parsed_data"] = normalize_response(data, tool_name)
-            return result
-        except json.JSONDecodeError as e:
-            result["error"] = f"JSON in code block invalid: {str(e)}"
+            # Extract JSON wrapper
+            start = tool_output.find('{')
+            end = tool_output.rfind('}') + 1
+            if start != -1 and end > start:
+                wrapper_data = json.loads(tool_output[start:end])
+                if isinstance(wrapper_data, dict) and "response" in wrapper_data:
+                    tool_output = wrapper_data["response"]
+                    result["raw_output"] = tool_output
+        except (json.JSONDecodeError, ValueError):
+            # If unwrapping fails, use original output
+            pass
 
-    # Strategy 2: Extract JSON from raw text
-    try:
-        # Try to find JSON object in output
-        start = tool_output.find('{')
-        end = tool_output.rfind('}') + 1
-        if start != -1 and end > start:
-            json_str = tool_output[start:end]
-            data = json.loads(json_str)
-            result["success"] = True
-            result["parsed_data"] = normalize_response(data, tool_name)
-            return result
-    except (json.JSONDecodeError, ValueError) as e:
-        result["error"] = f"No valid JSON found: {str(e)}"
+    # Store raw text - AI will synthesize it
+    result["parsed_data"] = {
+        "tool": tool_name,
+        "raw_review": tool_output
+    }
 
-    # Strategy 3: Regex extraction (fallback)
-    try:
-        data = extract_with_regex(tool_output)
-        if data:
-            result["success"] = True
-            result["parsed_data"] = normalize_response(data, tool_name)
-            return result
-    except Exception as e:
-        result["error"] = f"Regex extraction failed: {str(e)}"
-
-    # All strategies failed
-    result["error"] = result.get("error") or "Could not parse response"
     return result
 
 
-def extract_with_regex(text: str) -> Optional[Dict[str, Any]]:
+def synthesize_with_ai(
+    responses: List[Dict[str, Any]],
+    spec_id: str,
+    spec_title: str,
+    working_dir: str = "/tmp"
+) -> Dict[str, Any]:
     """
-    Extract structured data using regex patterns.
+    Use AI to synthesize multiple model reviews into consensus.
+
+    Instead of fragile regex parsing, let AI read natural language reviews
+    and create structured synthesis.
 
     Args:
-        text: Raw text to parse
+        responses: List of response dicts with "tool" and "raw_review" keys
+        spec_id: Specification ID
+        spec_title: Specification title
+        working_dir: Working directory for AI tool
 
     Returns:
-        Extracted data dictionary or None
+        Synthesized consensus dictionary
     """
-    data = {
-        "overall_score": None,
-        "dimensions": {},
-        "issues": [],
-        "strengths": [],
-        "recommendations": [],
-        "recommendation": None,
-    }
+    import subprocess
+    import tempfile
+    import os
 
-    # Extract overall score
-    score_match = re.search(r'overall[_\s]score["\s:]+(\d+(?:\.\d+)?)', text, re.IGNORECASE)
-    if score_match:
-        data["overall_score"] = float(score_match.group(1))
+    if not responses:
+        return {
+            "success": False,
+            "error": "No responses to synthesize"
+        }
 
-    # Extract recommendation
-    rec_match = re.search(r'recommendation["\s:]+([A-Z]+)', text)
-    if rec_match:
-        data["recommendation"] = rec_match.group(1)
+    # Build synthesis prompt
+    prompt_parts = [
+        f"You are synthesizing {len(responses)} independent AI reviews of a specification.",
+        "",
+        f"**Specification**: {spec_title} (`{spec_id}`)",
+        "",
+        "**Your Task**: Read all reviews below and create a comprehensive synthesis.",
+        "",
+        "**Required Output** (Markdown format):",
+        "",
+        "```markdown",
+        "# Synthesis",
+        "",
+        "## Overall Assessment",
+        "- **Consensus Score**: X.X/10 (explain how you calculated from individual scores)",
+        "- **Final Recommendation**: APPROVE/REVISE/REJECT",
+        "- **Consensus Level**: Strong/Moderate/Weak/Conflicted (based on score variance)",
+        "",
+        "## Key Findings",
+        "",
+        "### Critical Issues (Must Fix)",
+        "- Issue title - flagged by: [model names]",
+        "  - Impact: ...",
+        "  - Recommended fix: ...",
+        "",
+        "### High Priority Issues",
+        "- Issue title - flagged by: [model names]",
+        "",
+        "### Medium/Low Priority",
+        "- (Summarize briefly)",
+        "",
+        "## Points of Agreement",
+        "- What all/most models agree on",
+        "",
+        "## Points of Disagreement  ",
+        "- Where models conflict",
+        "- Your assessment of the disagreement",
+        "",
+        "## Strengths Identified",
+        "- Common strengths across reviews",
+        "",
+        "## Recommendations",
+        "- Actionable next steps",
+        "```",
+        "",
+        "**Important**:",
+        "- Extract ALL scores mentioned and calculate consensus",
+        "- Attribute issues to specific models (e.g., \"flagged by: gemini, codex\")",
+        "- Note where models agree vs. disagree",
+        "- Make a clear APPROVE/REVISE/REJECT recommendation with reasoning",
+        "",
+        "---",
+        ""
+    ]
 
-    # If we got at least overall score, consider it a partial success
-    if data["overall_score"] is not None:
-        return data
+    # Add each model's review
+    for i, resp in enumerate(responses, 1):
+        tool_name = resp.get("tool", f"Model {i}")
+        raw_review = resp.get("raw_review", "")
 
-    return None
+        prompt_parts.append(f"## Review {i}: {tool_name}")
+        prompt_parts.append("")
+        prompt_parts.append("```")
+        prompt_parts.append(raw_review)
+        prompt_parts.append("```")
+        prompt_parts.append("")
+
+    prompt = "\n".join(prompt_parts)
+
+    # Call AI for synthesis using gemini (fast and capable)
+    try:
+        cmd = [
+            "gemini",
+            "-m", "gemini-2.5-pro",
+            "--telemetry", "false",
+            "-p", prompt
+        ]
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd=working_dir
+        )
+
+        if result.returncode != 0:
+            return {
+                "success": False,
+                "error": f"AI synthesis failed: {result.stderr}"
+            }
+
+        synthesis_text = result.stdout
+
+        # Handle gemini wrapper format
+        if '{"response":' in synthesis_text and '"stats":' in synthesis_text:
+            try:
+                start = synthesis_text.find('{')
+                end = synthesis_text.rfind('}') + 1
+                wrapper = json.loads(synthesis_text[start:end])
+                if "response" in wrapper:
+                    synthesis_text = wrapper["response"]
+            except:
+                pass
+
+        return {
+            "success": True,
+            "synthesis_text": synthesis_text,
+            "num_models": len(responses),
+            "models": [r.get("tool") for r in responses]
+        }
+
+    except subprocess.TimeoutExpired:
+        return {
+            "success": False,
+            "error": "AI synthesis timed out after 120s"
+        }
+    except FileNotFoundError:
+        return {
+            "success": False,
+            "error": "gemini CLI not found - required for synthesis"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Synthesis error: {str(e)}"
+        }
 
 
-def normalize_response(data: Dict[str, Any], tool_name: str) -> Dict[str, Any]:
+
+def build_consensus(
+    responses: List[Dict[str, Any]],
+    spec_id: str = "unknown",
+    spec_title: str = "Specification"
+) -> Dict[str, Any]:
     """
-    Normalize and validate response data.
+    Build consensus from multiple model responses using AI synthesis.
+
+    This replaces fragile regex parsing with AI-based natural language synthesis.
 
     Args:
-        data: Raw parsed data
-        tool_name: Tool name for context
+        responses: List of response dicts from parse_response()
+        spec_id: Specification ID
+        spec_title: Specification title
 
     Returns:
-        Normalized response
-    """
-    normalized = {
-        "tool": tool_name,
-        "overall_score": None,
-        "dimensions": {},
-        "issues": [],
-        "strengths": [],
-        "recommendations": [],
-        "recommendation": None,
-    }
-
-    # Normalize overall score
-    if "overall_score" in data:
-        score = data["overall_score"]
-        if isinstance(score, (int, float)):
-            normalized["overall_score"] = max(1, min(10, float(score)))
-
-    # Normalize dimensions
-    if "dimensions" in data and isinstance(data["dimensions"], dict):
-        for dim_name, dim_data in data["dimensions"].items():
-            if isinstance(dim_data, dict) and "score" in dim_data:
-                score = dim_data["score"]
-                if isinstance(score, (int, float)):
-                    normalized["dimensions"][dim_name] = {
-                        "score": max(1, min(10, float(score))),
-                        "notes": dim_data.get("notes", "")
-                    }
-
-    # Normalize issues
-    if "issues" in data and isinstance(data["issues"], list):
-        for issue in data["issues"]:
-            if isinstance(issue, dict):
-                normalized_issue = {
-                    "severity": normalize_severity(issue.get("severity", "MEDIUM")),
-                    "title": issue.get("title", "Untitled issue"),
-                    "description": issue.get("description", ""),
-                    "impact": issue.get("impact", ""),
-                    "recommendation": issue.get("recommendation", ""),
-                }
-                normalized["issues"].append(normalized_issue)
-
-    # Normalize strengths
-    if "strengths" in data and isinstance(data["strengths"], list):
-        normalized["strengths"] = [str(s) for s in data["strengths"] if s]
-
-    # Normalize recommendations
-    if "recommendations" in data and isinstance(data["recommendations"], list):
-        normalized["recommendations"] = [str(r) for r in data["recommendations"] if r]
-
-    # Normalize overall recommendation
-    if "recommendation" in data:
-        rec = str(data["recommendation"]).upper()
-        if rec in ["APPROVE", "REVISE", "REJECT"]:
-            normalized["recommendation"] = rec
-        elif normalized["overall_score"]:
-            # Infer from score
-            if normalized["overall_score"] >= 8:
-                normalized["recommendation"] = "APPROVE"
-            elif normalized["overall_score"] >= 5:
-                normalized["recommendation"] = "REVISE"
-            else:
-                normalized["recommendation"] = "REJECT"
-
-    return normalized
-
-
-def normalize_severity(severity: str) -> str:
-    """Normalize severity to standard values."""
-    severity = str(severity).upper()
-    valid = ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
-    if severity in valid:
-        return severity
-    # Map common variations
-    if "CRIT" in severity or "BLOCKER" in severity:
-        return "CRITICAL"
-    if "HIGH" in severity or "MAJOR" in severity:
-        return "HIGH"
-    if "LOW" in severity or "MINOR" in severity:
-        return "LOW"
-    return "MEDIUM"
-
-
-def build_consensus(responses: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Build consensus from multiple model responses.
-
-    Args:
-        responses: List of normalized response dictionaries
-
-    Returns:
-        Consensus dictionary with aggregated scores and recommendations
+        Consensus dictionary with synthesis results
     """
     if not responses:
         return {
@@ -221,198 +243,35 @@ def build_consensus(responses: List[Dict[str, Any]]) -> Dict[str, Any]:
             "error": "No valid responses to synthesize",
         }
 
-    consensus = {
+    # Call AI synthesis
+    synthesis_result = synthesize_with_ai(
+        responses=responses,
+        spec_id=spec_id,
+        spec_title=spec_title,
+        working_dir="/tmp"
+    )
+
+    if not synthesis_result.get("success"):
+        return {
+            "success": False,
+            "error": synthesis_result.get("error", "Synthesis failed"),
+        }
+
+    # Return synthesis in format expected by downstream code
+    # The synthesis_text contains the full markdown synthesis
+    return {
         "success": True,
-        "num_models": len(responses),
-        "models": [r["tool"] for r in responses],
+        "num_models": synthesis_result.get("num_models", 0),
+        "models": synthesis_result.get("models", []),
+        "synthesis_text": synthesis_result.get("synthesis_text", ""),
+        # These are kept for compatibility but will be empty
+        # The synthesis_text contains all the information
         "overall_score": None,
-        "overall_score_avg": None,
-        "overall_score_median": None,
-        "dimension_scores": {},
+        "final_recommendation": None,
+        "consensus_level": None,
         "all_issues": [],
         "all_strengths": [],
         "all_recommendations": [],
-        "final_recommendation": None,
-        "consensus_level": None,
         "agreements": [],
         "disagreements": [],
     }
-
-    # Aggregate overall scores
-    scores = [r["overall_score"] for r in responses if r["overall_score"] is not None]
-    if scores:
-        consensus["overall_score_avg"] = round(mean(scores), 1)
-        consensus["overall_score_median"] = round(median(scores), 1)
-        consensus["overall_score"] = consensus["overall_score_avg"]
-
-    # Aggregate dimension scores
-    all_dimensions = set()
-    for r in responses:
-        all_dimensions.update(r["dimensions"].keys())
-
-    for dim in all_dimensions:
-        dim_scores = []
-        for r in responses:
-            if dim in r["dimensions"]:
-                dim_scores.append(r["dimensions"][dim]["score"])
-
-        if dim_scores:
-            consensus["dimension_scores"][dim] = {
-                "avg": round(mean(dim_scores), 1),
-                "median": round(median(dim_scores), 1),
-                "min": min(dim_scores),
-                "max": max(dim_scores),
-                "count": len(dim_scores),
-            }
-
-    # Aggregate issues (with deduplication)
-    consensus["all_issues"] = aggregate_issues(responses)
-
-    # Aggregate strengths and recommendations
-    for r in responses:
-        consensus["all_strengths"].extend(r["strengths"])
-        consensus["all_recommendations"].extend(r["recommendations"])
-
-    # Deduplicate strengths/recommendations
-    consensus["all_strengths"] = list(set(consensus["all_strengths"]))
-    consensus["all_recommendations"] = list(set(consensus["all_recommendations"]))
-
-    # Determine final recommendation
-    recommendations = [r["recommendation"] for r in responses if r["recommendation"]]
-    if recommendations:
-        # Count votes
-        votes = {"APPROVE": 0, "REVISE": 0, "REJECT": 0}
-        for rec in recommendations:
-            if rec in votes:
-                votes[rec] += 1
-
-        # Majority wins, bias toward caution (REVISE > APPROVE, REJECT > REVISE)
-        if votes["REJECT"] > 0:
-            consensus["final_recommendation"] = "REJECT"
-        elif votes["REVISE"] > votes["APPROVE"]:
-            consensus["final_recommendation"] = "REVISE"
-        elif votes["APPROVE"] > 0:
-            consensus["final_recommendation"] = "APPROVE"
-        else:
-            consensus["final_recommendation"] = "REVISE"  # default to caution
-
-    # Calculate consensus level
-    consensus["consensus_level"] = calculate_consensus_level(responses)
-
-    # Identify agreements and disagreements
-    consensus["agreements"], consensus["disagreements"] = identify_agreements(responses)
-
-    return consensus
-
-
-def aggregate_issues(responses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Aggregate and deduplicate issues from all models.
-
-    Args:
-        responses: List of model responses
-
-    Returns:
-        Deduplicated list of issues with model attribution
-    """
-    all_issues = []
-    seen_titles = {}
-
-    for response in responses:
-        for issue in response["issues"]:
-            title = issue["title"].lower().strip()
-
-            # Check if similar issue already exists
-            if title in seen_titles:
-                # Add model to existing issue
-                existing = seen_titles[title]
-                existing["flagged_by"].append(response["tool"])
-            else:
-                # New issue
-                new_issue = issue.copy()
-                new_issue["flagged_by"] = [response["tool"]]
-                all_issues.append(new_issue)
-                seen_titles[title] = new_issue
-
-    # Sort by severity
-    severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
-    all_issues.sort(key=lambda x: (
-        severity_order.get(x["severity"], 4),
-        -len(x["flagged_by"])  # More models = higher priority
-    ))
-
-    return all_issues
-
-
-def calculate_consensus_level(responses: List[Dict[str, Any]]) -> str:
-    """
-    Calculate consensus level based on score variance.
-
-    Args:
-        responses: List of model responses
-
-    Returns:
-        Consensus level string
-    """
-    scores = [r["overall_score"] for r in responses if r["overall_score"] is not None]
-
-    if len(scores) < 2:
-        return "single_model"
-
-    # Calculate standard deviation
-    avg = mean(scores)
-    variance = sum((x - avg) ** 2 for x in scores) / len(scores)
-    std_dev = variance ** 0.5
-
-    # Classify consensus
-    if std_dev < 1.0:
-        return "strong"
-    elif std_dev < 2.0:
-        return "moderate"
-    elif std_dev < 3.0:
-        return "weak"
-    else:
-        return "conflicted"
-
-
-def identify_agreements(responses: List[Dict[str, Any]]) -> Tuple[List[str], List[Dict[str, Any]]]:
-    """
-    Identify points of agreement and disagreement.
-
-    Args:
-        responses: List of model responses
-
-    Returns:
-        Tuple of (agreements list, disagreements list)
-    """
-    agreements = []
-    disagreements = []
-
-    # Check recommendation agreement
-    recommendations = [r["recommendation"] for r in responses if r["recommendation"]]
-    if recommendations:
-        unique_recs = set(recommendations)
-        if len(unique_recs) == 1:
-            agreements.append(f"All models recommend: {recommendations[0]}")
-        else:
-            rec_counts = {rec: recommendations.count(rec) for rec in unique_recs}
-            disagreements.append({
-                "topic": "Overall Recommendation",
-                "positions": rec_counts,
-                "description": "Models disagree on whether to approve, revise, or reject",
-            })
-
-    # Check score agreement
-    scores = [r["overall_score"] for r in responses if r["overall_score"] is not None]
-    if scores:
-        score_range = max(scores) - min(scores)
-        if score_range <= 1.5:
-            agreements.append(f"Scores closely aligned (range: {score_range:.1f})")
-        elif score_range >= 4.0:
-            disagreements.append({
-                "topic": "Overall Score",
-                "positions": {r["tool"]: r["overall_score"] for r in responses if r["overall_score"]},
-                "description": f"Wide score variation (range: {score_range:.1f})",
-            })
-
-    return agreements, disagreements

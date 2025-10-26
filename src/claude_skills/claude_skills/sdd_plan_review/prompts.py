@@ -11,29 +11,61 @@ from typing import Dict, Any
 
 # Response schema that models must follow
 RESPONSE_SCHEMA = """
-{
-  "overall_score": <1-10>,
-  "dimensions": {
-    "completeness": {"score": <1-10>, "notes": "..."},
-    "clarity": {"score": <1-10>, "notes": "..."},
-    "feasibility": {"score": <1-10>, "notes": "..."},
-    "architecture": {"score": <1-10>, "notes": "..."},
-    "risk_management": {"score": <1-10>, "notes": "..."},
-    "verification": {"score": <1-10>, "notes": "..."}
-  },
-  "issues": [
-    {
-      "severity": "CRITICAL|HIGH|MEDIUM|LOW",
-      "title": "Brief issue title",
-      "description": "What's wrong",
-      "impact": "Consequences if not fixed",
-      "recommendation": "Specific actionable fix"
-    }
-  ],
-  "strengths": ["What the spec does well", "..."],
-  "recommendations": ["Actionable improvement", "..."],
-  "recommendation": "APPROVE|REVISE|REJECT"
-}
+# Review Summary
+
+Overall Score: <1-10>/10
+Recommendation: <APPROVE|REVISE|REJECT>
+
+## Dimension Scores
+
+- **Completeness**: <1-10>/10 - <brief notes on what's missing or well-defined>
+- **Clarity**: <1-10>/10 - <brief notes on clarity issues or strengths>
+- **Feasibility**: <1-10>/10 - <brief notes on realistic estimates>
+- **Architecture**: <1-10>/10 - <brief notes on design quality>
+- **Risk Management**: <1-10>/10 - <brief notes on risk handling>
+- **Verification**: <1-10>/10 - <brief notes on testing approach>
+
+## Critical Issues
+
+- **[CRITICAL]** <Issue title>
+  - Description: <What's wrong>
+  - Impact: <Consequences if not fixed>
+  - Fix: <Specific actionable recommendation>
+
+## High Priority Issues
+
+- **[HIGH]** <Issue title>
+  - Description: <What's wrong>
+  - Impact: <Consequences if not fixed>
+  - Fix: <Specific actionable recommendation>
+
+## Medium Priority Issues
+
+- **[MEDIUM]** <Issue title>
+  - Description: <What's wrong>
+  - Fix: <Specific actionable recommendation>
+
+## Low Priority Issues
+
+- **[LOW]** <Issue title>
+  - Fix: <Specific actionable recommendation>
+
+## Strengths
+
+- <What the spec does well>
+- <Another strength>
+
+## Recommendations
+
+- <Actionable improvement suggestion>
+- <Another recommendation>
+
+---
+
+**Important**:
+- Use exact severity tags: [CRITICAL], [HIGH], [MEDIUM], [LOW]
+- Include all sections even if empty (write "None identified" for empty sections)
+- Be specific and actionable in all feedback
 """
 
 
@@ -119,7 +151,7 @@ LLMs have sycophantic tendencies (agreeing with users). This undermines review q
 
 ---
 
-**Required Output Format** (JSON):
+**Required Output Format** (Markdown):
 
 {RESPONSE_SCHEMA}
 
@@ -156,7 +188,7 @@ def _generate_quick_review_prompt(spec_content: str, spec_id: str, title: str) -
 
 ---
 
-**Required Output Format** (JSON):
+**Required Output Format** (Markdown):
 
 {RESPONSE_SCHEMA}
 
@@ -214,7 +246,7 @@ def _generate_security_review_prompt(spec_content: str, spec_id: str, title: str
 
 ---
 
-**Required Output Format** (JSON):
+**Required Output Format** (Markdown):
 
 {RESPONSE_SCHEMA}
 
@@ -264,7 +296,7 @@ def _generate_feasibility_review_prompt(spec_content: str, spec_id: str, title: 
 
 ---
 
-**Required Output Format** (JSON):
+**Required Output Format** (Markdown):
 
 {RESPONSE_SCHEMA}
 
