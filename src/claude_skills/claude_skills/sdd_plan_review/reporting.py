@@ -5,7 +5,7 @@ Comprehensive report generation for spec reviews.
 Generates markdown and JSON reports from multi-model consensus data.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List
 
 
@@ -240,7 +240,7 @@ def generate_json_report(
         "spec_id": spec_id,
         "spec_title": spec_title,
         "review_type": review_type,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "models_consulted": consensus["models"],
         "num_models": consensus["num_models"],
         "recommendation": consensus.get("final_recommendation"),

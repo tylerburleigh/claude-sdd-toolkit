@@ -76,7 +76,7 @@ def add_verification_result(
     status_emoji = {"PASSED": "✅", "FAILED": "❌", "PARTIAL": "⚠️"}.get(status, "")
 
     # Generate timestamp
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     # Create verification result object
     verification_result = {

@@ -16,6 +16,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set
 
 from claude_skills.common import (
     backup_json_spec,
+    find_specs_directory,
     recalculate_progress,
     save_json_spec,
     validate_status,
@@ -122,7 +123,7 @@ def apply_fix_actions(
 
     if create_backup:
         # Try using backup_json_spec first (for standard spec directory structure)
-        backup = backup_json_spec(Path(spec_path).stem, Path(spec_path).parent)
+        backup = backup_json_spec(Path(spec_path).stem, find_specs_directory(str(spec_path)) or Path(spec_path).parent)
 
         # If that fails (e.g., file not in active/completed/archived), create backup directly
         if not backup:
@@ -154,7 +155,7 @@ def apply_fix_actions(
     post_validation = validate_spec_hierarchy(data)
     report.post_validation = asdict(normalize_validation_result(post_validation))
 
-    save_json_spec(Path(spec_path).stem, Path(spec_path).parent, data, backup=False, validate=False)
+    save_json_spec(Path(spec_path).stem, find_specs_directory(str(spec_path)) or Path(spec_path).parent, data, backup=False, validate=False)
 
     return report
 

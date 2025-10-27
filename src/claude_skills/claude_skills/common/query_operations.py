@@ -19,7 +19,8 @@ def query_tasks(
     task_type: Optional[str] = None,
     parent: Optional[str] = None,
     format_type: str = "table",
-    printer: Optional[PrettyPrinter] = None
+    printer: Optional[PrettyPrinter] = None,
+    limit: Optional[int] = 20
 ) -> Optional[List[Dict]]:
     """
     Query and filter tasks by various criteria.
@@ -32,6 +33,7 @@ def query_tasks(
         parent: Filter by parent node ID
         format_type: Output format (table/json/simple)
         printer: Optional printer for output
+        limit: Maximum number of results to return (default 20, use 0 for unlimited)
 
     Returns:
         List of matching task dictionaries, or None on error
@@ -69,10 +71,25 @@ def query_tasks(
             "metadata": node_data.get("metadata", {})
         })
 
+    # Apply limit if specified
+    total_count = len(matches)
+    limited = False
+    if limit and limit > 0 and len(matches) > limit:
+        matches = matches[:limit]
+        limited = True
+
     # Display based on format (only if printer is provided)
     if printer:
         if format_type == "table":
-            printer.header(f"Tasks matching filters (found {len(matches)})")
+            if limited:
+                printer.header(f"Tasks matching filters (showing {len(matches)} of {total_count})")
+            else:
+                printer.header(f"Tasks matching filters (found {len(matches)})")
+
+            if limited:
+                printer.detail(f"💡 Use --limit=0 to see all {total_count} results")
+                printer.info("")
+
             if status:
                 printer.detail(f"Status: {status}")
             if task_type:
@@ -249,15 +266,17 @@ def check_complete(
     spec_id: str,
     specs_dir: Path,
     phase_id: Optional[str] = None,
+    task_id: Optional[str] = None,
     printer: Optional[PrettyPrinter] = None
 ) -> Dict:
     """
-    Check if spec or phase is ready to be marked complete.
+    Check if spec, phase, or task is ready to be marked complete.
 
     Args:
         spec_id: Specification ID
         specs_dir: Path to specs directory
         phase_id: Optional phase ID to check (if None, checks entire spec)
+        task_id: Optional task ID to check (mutually exclusive with phase_id)
         printer: Optional printer for output
 
     Returns:
@@ -270,8 +289,22 @@ def check_complete(
 
     hierarchy = spec_data.get("hierarchy", {})
 
+    # Validate mutually exclusive parameters
+    if phase_id and task_id:
+        if printer:
+            printer.error("Cannot specify both --phase and --task")
+        return {"error": "Cannot specify both phase_id and task_id"}
+
     # Determine what to check
-    if phase_id:
+    if task_id:
+        if task_id not in hierarchy:
+            if printer:
+                printer.error(f"Task '{task_id}' not found")
+            return {"error": f"Task not found: {task_id}"}
+        root_node_id = task_id
+        node_type = hierarchy[task_id].get("type", "node")
+        check_label = f"{node_type.capitalize()} {task_id}"
+    elif phase_id:
         if phase_id not in hierarchy:
             if printer:
                 printer.error(f"Phase '{phase_id}' not found")

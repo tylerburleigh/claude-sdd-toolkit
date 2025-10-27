@@ -4,7 +4,7 @@ Generates Markdown and JSON documentation from analyzed codebase data.
 Supports multi-language projects.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Any
 from collections import defaultdict
 
@@ -218,7 +218,7 @@ class JSONGenerator:
             "metadata": {
                 "project_name": self.project_name,
                 "version": self.version,
-                "generated_at": datetime.now().isoformat(),
+                "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                 "languages": sorted(list(languages)) if languages else ["unknown"],
                 "schema_version": SCHEMA_VERSION
             },

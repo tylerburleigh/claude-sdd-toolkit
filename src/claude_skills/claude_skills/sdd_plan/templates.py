@@ -6,7 +6,7 @@ Provides predefined templates for different types of specifications.
 """
 
 from typing import Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 TEMPLATES = {
@@ -101,7 +101,7 @@ def generate_spec_from_template(
         safe_title = title.lower().replace(" ", "-")[:30]
         spec_id = f"{safe_title}-{timestamp}"
 
-    now = datetime.now().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     # Build base spec structure
     spec = {

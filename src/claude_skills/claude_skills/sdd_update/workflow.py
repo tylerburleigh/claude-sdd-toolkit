@@ -24,7 +24,7 @@ from .time_tracking import track_time
 
 
 def _get_timestamp() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _derive_default_journal(

@@ -137,7 +137,7 @@ def complete_spec(
     printer.success(f"All {total_tasks} tasks completed!")
 
     # Update JSON metadata
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     if "metadata" not in spec_data:
         spec_data["metadata"] = {}
