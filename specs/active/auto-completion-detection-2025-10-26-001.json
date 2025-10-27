@@ -1,7 +1,7 @@
 {
   "spec_id": "auto-completion-detection-2025-10-26-001",
   "generated": "2025-10-26T00:00:00Z",
-  "last_updated": "2025-10-26T00:00:00Z",
+  "last_updated": "2025-10-27T11:43:56.307762+00:00",
   "metadata": {
     "title": "Automatic Spec Completion Detection",
     "description": "Add intelligent detection of when specs are ready to be completed, prompting users to move specs from specs/active to specs/completed when all tasks are done",
@@ -35,7 +35,13 @@
       "title": "Automatic Spec Completion Detection",
       "status": "pending",
       "parent": null,
-      "children": ["phase-1", "phase-2", "phase-3", "phase-4", "phase-5"],
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
       "total_tasks": 30,
       "completed_tasks": 0,
       "metadata": {}
@@ -45,13 +51,23 @@
       "title": "Core Completion Detection Logic",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-1-files", "phase-1-verify"],
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
       "total_tasks": 5,
       "completed_tasks": 0,
       "metadata": {
         "purpose": "Create reusable completion detection functionality that can be called from multiple workflows",
         "risk_level": "low",
         "estimated_hours": 3
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ]
       }
     },
     "phase-1-files": {
@@ -59,19 +75,34 @@
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-1",
-      "children": ["task-1-1"],
+      "children": [
+        "task-1-1"
+      ],
       "total_tasks": 3,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
     },
     "task-1-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/completion.py",
       "status": "pending",
       "parent": "phase-1-files",
-      "children": ["task-1-1-1", "task-1-1-2", "task-1-1-3"],
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3"
+      ],
       "dependencies": {
-        "blocks": ["task-2-1", "task-3-1", "task-4-1"],
+        "blocks": [
+          "task-2-1",
+          "task-3-1",
+          "task-4-1"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -101,7 +132,9 @@
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
+        "blocks": [
+          "task-1-1-2"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -118,8 +151,12 @@
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-1-1-1"],
+        "blocks": [
+          "task-1-1-3"
+        ],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -136,7 +173,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-1-1-2"],
+        "blocked_by": [
+          "task-1-1-2"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -150,10 +189,15 @@
       "title": "Verification",
       "status": "pending",
       "parent": "phase-1",
-      "children": ["verify-1-1", "verify-1-2"],
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-1-files"],
+        "blocked_by": [
+          "phase-1-files"
+        ],
         "depends": []
       },
       "total_tasks": 2,
@@ -194,7 +238,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Verify should_prompt_completion() returns False when blocked tasks exist"
+        "expected": "Verify should_prompt_completion() returns False when blocked tasks exist",
+        "command": ""
       }
     },
     "phase-2": {
@@ -202,10 +247,17 @@
       "title": "Integration into sdd-update Workflow",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-2-files", "phase-2-verify"],
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-1"],
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
         "depends": []
       },
       "total_tasks": 6,
@@ -221,20 +273,36 @@
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-2",
-      "children": ["task-2-1"],
+      "children": [
+        "task-2-1"
+      ],
       "total_tasks": 4,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
     },
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/status.py",
       "status": "pending",
       "parent": "phase-2-files",
-      "children": ["task-2-1-1", "task-2-1-2", "task-2-1-3", "task-2-1-4"],
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-1-1"],
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 4,
@@ -263,7 +331,9 @@
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
+        "blocks": [
+          "task-2-1-2"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -280,8 +350,12 @@
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-2-1-1"],
+        "blocks": [
+          "task-2-1-3"
+        ],
+        "blocked_by": [
+          "task-2-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -298,7 +372,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-2-1-2"],
+        "blocked_by": [
+          "task-2-1-2"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -329,10 +405,15 @@
       "title": "Verification",
       "status": "pending",
       "parent": "phase-2",
-      "children": ["verify-2-1", "verify-2-2"],
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-2-files"],
+        "blocked_by": [
+          "phase-2-files"
+        ],
         "depends": []
       },
       "total_tasks": 2,
@@ -373,7 +454,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Mark last task complete, verify prompt appears, test both confirm and decline paths"
+        "expected": "Mark last task complete, verify prompt appears, test both confirm and decline paths",
+        "command": ""
       }
     },
     "phase-3": {
@@ -381,10 +463,17 @@
       "title": "Integration into sdd-next Workflow",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-3-files", "phase-3-verify"],
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-1"],
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
         "depends": []
       },
       "total_tasks": 7,
@@ -400,20 +489,36 @@
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-3",
-      "children": ["task-3-1", "task-3-2"],
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
       "total_tasks": 5,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
     },
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_next/workflow.py",
       "status": "pending",
       "parent": "phase-3-files",
-      "children": ["task-3-1-1", "task-3-1-2"],
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-1-1"],
+        "blocks": [
+          "task-3-2",
+          "task-5-3"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 2,
@@ -440,7 +545,9 @@
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
+        "blocks": [
+          "task-3-1-2"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -458,7 +565,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-3-1-1"],
+        "blocked_by": [
+          "task-3-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -472,10 +581,18 @@
       "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
       "status": "pending",
       "parent": "phase-3-files",
-      "children": ["task-3-2-1", "task-3-2-2", "task-3-2-3"],
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2",
+        "task-3-2-3"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-3-1"],
+        "blocks": [
+          "task-5-3"
+        ],
+        "blocked_by": [
+          "task-3-1"
+        ],
         "depends": []
       },
       "total_tasks": 3,
@@ -502,7 +619,9 @@
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
-        "blocks": [],
+        "blocks": [
+          "task-3-2-2"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -519,8 +638,12 @@
       "parent": "task-3-2",
       "children": [],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-3-2-1"],
+        "blocks": [
+          "task-3-2-3"
+        ],
+        "blocked_by": [
+          "task-3-2-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -537,7 +660,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-3-2-2"],
+        "blocked_by": [
+          "task-3-2-2"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -551,10 +676,15 @@
       "title": "Verification",
       "status": "pending",
       "parent": "phase-3",
-      "children": ["verify-3-1", "verify-3-2"],
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-3-files"],
+        "blocked_by": [
+          "phase-3-files"
+        ],
         "depends": []
       },
       "total_tasks": 2,
@@ -595,7 +725,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Run prepare-task on completed spec, verify prompt appears with correct messaging"
+        "expected": "Run prepare-task on completed spec, verify prompt appears with correct messaging",
+        "command": ""
       }
     },
     "phase-4": {
@@ -603,10 +734,17 @@
       "title": "Integration into sdd status-report",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-4-files", "phase-4-verify"],
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["phase-1"],
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
         "depends": []
       },
       "total_tasks": 4,
@@ -622,21 +760,37 @@
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-4",
-      "children": ["task-4-1"],
+      "children": [
+        "task-4-1"
+      ],
       "total_tasks": 2,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
     },
     "task-4-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/status.py",
       "status": "pending",
       "parent": "phase-4-files",
-      "children": ["task-4-1-1", "task-4-1-2"],
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
       "dependencies": {
-        "blocks": [],
-        "blocked_by": ["task-1-1"],
-        "depends": ["task-2-1"]
+        "blocks": [
+          "task-5-4"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": [
+          "task-2-1"
+        ]
       },
       "total_tasks": 2,
       "completed_tasks": 0,
@@ -664,7 +818,9 @@
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
-        "blocks": [],
+        "blocks": [
+          "task-4-1-2"
+        ],
         "blocked_by": [],
         "depends": []
       },
@@ -682,7 +838,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-4-1-1"],
+        "blocked_by": [
+          "task-4-1-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -696,10 +854,15 @@
       "title": "Verification",
       "status": "pending",
       "parent": "phase-4",
-      "children": ["verify-4-1", "verify-4-2"],
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-4-files"],
+        "blocked_by": [
+          "phase-4-files"
+        ],
         "depends": []
       },
       "total_tasks": 2,
@@ -721,7 +884,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Run status-report on completed spec, verify completion message appears"
+        "expected": "Run status-report on completed spec, verify completion message appears",
+        "command": ""
       }
     },
     "verify-4-2": {
@@ -739,7 +903,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Verify status-report does not prompt for user input, only displays information"
+        "expected": "Verify status-report does not prompt for user input, only displays information",
+        "command": ""
       }
     },
     "phase-5": {
@@ -747,10 +912,17 @@
       "title": "Testing & Verification",
       "status": "pending",
       "parent": "spec-root",
-      "children": ["phase-5-files", "phase-5-verify"],
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-2", "phase-3", "phase-4"],
+        "blocked_by": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
         "depends": []
       },
       "total_tasks": 8,
@@ -766,10 +938,20 @@
       "title": "Test Files",
       "status": "pending",
       "parent": "phase-5",
-      "children": ["task-5-1", "task-5-2", "task-5-3", "task-5-4"],
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3",
+        "task-5-4"
+      ],
       "total_tasks": 4,
       "completed_tasks": 0,
-      "metadata": {}
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
     },
     "task-5-1": {
       "type": "task",
@@ -806,7 +988,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-2-1"],
+        "blocked_by": [
+          "task-2-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -831,7 +1015,10 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-3-1", "task-3-2"],
+        "blocked_by": [
+          "task-3-1",
+          "task-3-2"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -856,7 +1043,9 @@
       "children": [],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["task-4-1"],
+        "blocked_by": [
+          "task-4-1"
+        ],
         "depends": []
       },
       "total_tasks": 1,
@@ -878,10 +1067,17 @@
       "title": "Verification",
       "status": "pending",
       "parent": "phase-5",
-      "children": ["verify-5-1", "verify-5-2", "verify-5-3", "verify-5-4"],
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3",
+        "verify-5-4"
+      ],
       "dependencies": {
         "blocks": [],
-        "blocked_by": ["phase-5-files"],
+        "blocked_by": [
+          "phase-5-files"
+        ],
         "depends": []
       },
       "total_tasks": 4,
@@ -941,7 +1137,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Test full workflow: mark last task complete in real spec, verify prompt, test both confirm and decline"
+        "expected": "Test full workflow: mark last task complete in real spec, verify prompt, test both confirm and decline",
+        "command": ""
       }
     },
     "verify-5-4": {
@@ -959,7 +1156,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Test edge cases: blocked tasks prevent prompt, partial completion, already completed specs"
+        "expected": "Test edge cases: blocked tasks prevent prompt, partial completion, already completed specs",
+        "command": ""
       }
     }
   },

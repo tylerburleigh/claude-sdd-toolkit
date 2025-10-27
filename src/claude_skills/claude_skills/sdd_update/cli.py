@@ -372,7 +372,8 @@ def cmd_complete_spec(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    spec_file = Path(args.spec_file).resolve()
+    # If spec_file is provided, use it; otherwise let complete_spec find it
+    spec_file = Path(args.spec_file).resolve() if args.spec_file else None
 
     success = complete_spec(
         spec_id=args.spec_id,
@@ -495,7 +496,8 @@ def cmd_query_tasks(args, printer):
         task_type=args.type,
         parent=args.parent,
         format_type=args.format,
-        printer=printer if use_printer else None
+        printer=printer if use_printer else None,
+        limit=args.limit
     )
 
     # Handle output for simple format
@@ -584,7 +586,7 @@ def cmd_list_phases(args, printer):
 
 
 def cmd_check_complete(args, printer):
-    """Check if spec or phase is ready to complete."""
+    """Check if spec, phase, or task is ready to complete."""
     if not args.json:
         printer.action("Checking completion status...")
 
@@ -596,7 +598,8 @@ def cmd_check_complete(args, printer):
     result = check_complete(
         spec_id=args.spec_id,
         specs_dir=specs_dir,
-        phase_id=args.phase,
+        phase_id=getattr(args, 'phase', None),
+        task_id=getattr(args, 'task', None),
         printer=printer if not args.json else None
     )
 
@@ -880,7 +883,7 @@ def register_update(subparsers, parent_parser):
     # complete-spec command
     p_complete = subparsers.add_parser("complete-spec", help="Mark spec as completed", parents=[parent_parser])
     p_complete.add_argument("spec_id", help="Specification ID")
-    p_complete.add_argument("spec_file", help="Path to spec file")
+    p_complete.add_argument("spec_file", nargs='?', help="Path to spec file (optional - will be auto-detected if not provided)")
     p_complete.add_argument("--actual-hours", type=float, help="Actual hours spent")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
@@ -916,6 +919,7 @@ def register_update(subparsers, parent_parser):
     p_query.add_argument("--type", choices=["task", "verify", "group", "phase", "spec"], help="Filter by type")
     p_query.add_argument("--parent", help="Filter by parent node ID")
     p_query.add_argument("--format", default="table", choices=["table", "json", "simple"], help="Output format")
+    p_query.add_argument("--limit", type=int, default=20, help="Maximum number of results to return (use 0 for unlimited, default: 20)")
     p_query.set_defaults(func=cmd_query_tasks)
 
     # get-task command
@@ -937,9 +941,11 @@ def register_update(subparsers, parent_parser):
     p_phases.set_defaults(func=cmd_list_phases)
 
     # check-complete command
-    p_check = subparsers.add_parser("check-complete", help="Check if spec/phase is ready to complete", parents=[parent_parser])
+    p_check = subparsers.add_parser("check-complete", help="Check if spec/phase/task is ready to complete", parents=[parent_parser])
     p_check.add_argument("spec_id", help="Specification ID")
-    p_check.add_argument("--phase", help="Optional phase ID to check (if omitted, checks entire spec)")
+    check_group = p_check.add_mutually_exclusive_group()
+    check_group.add_argument("--phase", help="Optional phase ID to check")
+    check_group.add_argument("--task", help="Optional task ID to check")
     p_check.set_defaults(func=cmd_check_complete)
 
     # phase-time command

@@ -220,7 +220,7 @@ def save_json_spec(
             return False
 
     # Update last_updated timestamp
-    spec_data["last_updated"] = datetime.now(timezone.utc).isoformat()
+    spec_data["last_updated"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     # Create backup if backup is requested
     if backup:

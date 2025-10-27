@@ -103,7 +103,7 @@ def update_task_status(
     updates = {"status": new_status}
 
     # Add timestamps
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     if "metadata" not in task:
         task["metadata"] = {}
 
@@ -221,7 +221,7 @@ def update_task_status(
                     "status": revert_status,
                     "metadata": {
                         **task.get("metadata", {}),
-                        "verification_failed_at": datetime.now(timezone.utc).isoformat(),
+                        "verification_failed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                         "verification_failure_note": "Automatic verification failed after completion",
                         "verification_actions": actions_summary
                     }
@@ -304,7 +304,7 @@ def mark_task_blocked(
     task = hierarchy[task_id]
 
     # Prepare blocker metadata
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     blocker_info = {
         "blocked_at": timestamp,
         "blocker_type": blocker_type,
@@ -394,7 +394,7 @@ def unblock_task(
         return False
 
     # Prepare updates
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     metadata = task.get("metadata", {}).copy()
 
     # Move blocker info to resolved_blockers

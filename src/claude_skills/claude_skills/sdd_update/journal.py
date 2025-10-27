@@ -67,7 +67,7 @@ def mark_task_journaled(
     # Clear the needs_journaling flag
     if "needs_journaling" in metadata:
         updates = {
-            "metadata": {**metadata, "needs_journaling": False, "journaled_at": datetime.now(timezone.utc).isoformat()}
+            "metadata": {**metadata, "needs_journaling": False, "journaled_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")}
         }
 
         if not update_node(spec_data, task_id, updates):
@@ -94,7 +94,7 @@ def _build_journal_entry(
 ) -> Tuple[Dict[str, Any], str]:
     """Construct a journal entry payload and return entry plus timestamp."""
 
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     entry = {
         "timestamp": timestamp,
@@ -263,7 +263,7 @@ def update_metadata(
         spec_data["metadata"][key] = value
 
         # Update last_updated timestamp
-        spec_data["last_updated"] = datetime.now(timezone.utc).isoformat()
+        spec_data["last_updated"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
         # Save JSON spec file
         if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
@@ -318,7 +318,7 @@ def add_revision_entry(
         printer.error(f"Could not load spec file for {spec_id}")
         return False
 
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     # Create revision entry
     revision = {
@@ -628,7 +628,7 @@ def sync_metadata_from_state(
             spec_data["metadata"][key] = value
 
         # Update last_updated timestamp
-        spec_data["last_updated"] = datetime.now(timezone.utc).isoformat()
+        spec_data["last_updated"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
         # Save JSON spec file
         if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):

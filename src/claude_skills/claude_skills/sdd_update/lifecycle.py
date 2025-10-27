@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 # Import from sdd-common
 from claude_skills.common.spec import load_json_spec, save_json_spec
-from claude_skills.common.paths import ensure_directory
+from claude_skills.common.paths import ensure_directory, find_spec_file
 from claude_skills.common.printer import PrettyPrinter
 
 
@@ -79,7 +79,7 @@ def move_spec(
 
 def complete_spec(
     spec_id: str,
-    spec_file: Path,
+    spec_file: Optional[Path],
     specs_dir: Path,
     actual_hours: Optional[float] = None,
     dry_run: bool = False,
@@ -95,7 +95,7 @@ def complete_spec(
 
     Args:
         spec_id: Specification ID
-        spec_file: Path to JSON spec file
+        spec_file: Path to JSON spec file (optional - will be auto-detected if not provided)
         specs_dir: Path to specs directory
         actual_hours: Optional actual hours spent
         dry_run: If True, show changes without executing
@@ -106,6 +106,14 @@ def complete_spec(
     """
     if not printer:
         printer = PrettyPrinter()
+
+    # Find spec file if not provided
+    if spec_file is None:
+        spec_file = find_spec_file(spec_id, specs_dir)
+        if not spec_file:
+            printer.error(f"Spec file not found for {spec_id}")
+            printer.error(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
+            return False
 
     # Load and verify spec
     printer.action(f"Loading spec for {spec_id}...")
@@ -137,7 +145,7 @@ def complete_spec(
     printer.success(f"All {total_tasks} tasks completed!")
 
     # Update JSON metadata
-    timestamp = datetime.now(timezone.utc).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     if "metadata" not in spec_data:
         spec_data["metadata"] = {}

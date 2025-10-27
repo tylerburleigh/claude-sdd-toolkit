@@ -216,7 +216,7 @@ def validate_spec_id_format(spec_id: str) -> bool:
 def validate_iso8601_date(date_str: str) -> bool:
     """Validate ISO 8601 date format"""
     import re
-    return bool(re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$', str(date_str)))
+    return bool(re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z?$', str(date_str)))
 
 
 _LEADING_MARKERS = ("❌", "⚠️", "ℹ️", "✅", "❓", "ℹ", "⚠")

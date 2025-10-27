@@ -304,11 +304,6 @@ def cmd_next_task(args, printer):
     if not args.json:
         printer.action("Finding next actionable task...")
 
-    # Debug: print args
-    import sys
-    print(f"DEBUG: args.path = {getattr(args, 'path', 'NOT SET')}", file=sys.stderr)
-    print(f"DEBUG: args.specs_dir = {getattr(args, 'specs_dir', 'NOT SET')}", file=sys.stderr)
-
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
@@ -388,9 +383,6 @@ def cmd_task_info(args, printer):
 
 def cmd_check_deps(args, printer):
     """Check task dependencies."""
-    if not args.json:
-        printer.action(f"Checking dependencies for {args.task_id}...")
-
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
@@ -399,6 +391,14 @@ def cmd_check_deps(args, printer):
     spec_data = load_json_spec(args.spec_id, specs_dir)
     if not spec_data:
         return 1
+
+    # If no task_id provided, check all tasks
+    if args.task_id is None:
+        return _check_all_task_deps(spec_data, args, printer)
+
+    # Single task check (existing behavior)
+    if not args.json:
+        printer.action(f"Checking dependencies for {args.task_id}...")
 
     deps = check_dependencies(spec_data, args.task_id)
 
@@ -429,6 +429,55 @@ def cmd_check_deps(args, printer):
             print("\n⏳ This task blocks:")
             for dep in deps['blocks']:
                 printer.detail(f"• {dep['id']}: {dep['title']}", indent=1)
+
+    return 0
+
+
+def _check_all_task_deps(spec_data, args, printer):
+    """Check dependencies for all tasks in the spec."""
+    if not args.json:
+        printer.action("Checking dependencies for all tasks...")
+
+    hierarchy = spec_data.get("hierarchy", {})
+    all_results = []
+
+    # Iterate through hierarchy and check only task nodes
+    for task_id, task_data in hierarchy.items():
+        if task_data.get("type") == "task":
+            deps = check_dependencies(spec_data, task_id)
+            if "error" not in deps:
+                all_results.append(deps)
+
+    if args.json:
+        print(json.dumps(all_results, indent=2))
+    else:
+        # Categorize tasks
+        ready = [d for d in all_results if d['can_start']]
+        blocked = [d for d in all_results if not d['can_start']]
+        has_soft_deps = [d for d in all_results if d['soft_depends']]
+
+        printer.success("Dependency analysis complete")
+        printer.result("Total tasks", str(len(all_results)))
+        printer.result("Ready to start", str(len(ready)))
+        printer.result("Blocked", str(len(blocked)))
+        printer.result("With soft dependencies", str(len(has_soft_deps)))
+
+        if ready:
+            print("\n✓ Ready to start:")
+            for dep in ready:
+                printer.detail(f"• {dep['task_id']}", indent=1)
+
+        if blocked:
+            print("\n✗ Blocked:")
+            for dep in blocked:
+                blockers = ", ".join([b['id'] for b in dep['blocked_by']])
+                printer.detail(f"• {dep['task_id']} (blocked by: {blockers})", indent=1)
+
+        if has_soft_deps:
+            print("\n⚠️  With soft dependencies:")
+            for dep in has_soft_deps:
+                soft = ", ".join([s['id'] for s in dep['soft_depends']])
+                printer.detail(f"• {dep['task_id']} (depends on: {soft})", indent=1)
 
     return 0
 
@@ -908,7 +957,7 @@ def register_next(subparsers, parent_parser):
     # check-deps
     parser_deps = subparsers.add_parser('check-deps', parents=[parent_parser], help='Check task dependencies')
     parser_deps.add_argument('spec_id', help='Specification ID')
-    parser_deps.add_argument('task_id', help='Task ID')
+    parser_deps.add_argument('task_id', nargs='?', help='Task ID (optional, checks all tasks if not provided)')
     parser_deps.set_defaults(func=cmd_check_deps)
 
     # progress
