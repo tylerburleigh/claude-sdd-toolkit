@@ -372,7 +372,8 @@ def cmd_complete_spec(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    spec_file = Path(args.spec_file).resolve()
+    # If spec_file is provided, use it; otherwise let complete_spec find it
+    spec_file = Path(args.spec_file).resolve() if args.spec_file else None
 
     success = complete_spec(
         spec_id=args.spec_id,
@@ -882,7 +883,7 @@ def register_update(subparsers, parent_parser):
     # complete-spec command
     p_complete = subparsers.add_parser("complete-spec", help="Mark spec as completed", parents=[parent_parser])
     p_complete.add_argument("spec_id", help="Specification ID")
-    p_complete.add_argument("spec_file", help="Path to spec file")
+    p_complete.add_argument("spec_file", nargs='?', help="Path to spec file (optional - will be auto-detected if not provided)")
     p_complete.add_argument("--actual-hours", type=float, help="Actual hours spent")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
