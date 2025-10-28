@@ -77,6 +77,7 @@ def generate_spec_from_template(
     template_id: str,
     title: str,
     spec_id: str = None,
+    default_category: str = None,
     **kwargs
 ) -> Dict[str, Any]:
     """
@@ -86,6 +87,8 @@ def generate_spec_from_template(
         template_id: Template to use
         title: Specification title
         spec_id: Optional spec ID (auto-generated if not provided)
+        default_category: Optional default task category (overrides automatic inference)
+                         One of: investigation, implementation, refactoring, decision, research
         **kwargs: Additional metadata to override template defaults
 
     Returns:
@@ -129,6 +132,10 @@ def generate_spec_from_template(
             }
         }
     }
+
+    # Add default_category to metadata if provided
+    if default_category:
+        spec["metadata"]["default_category"] = default_category
 
     # Override with any provided kwargs
     spec["metadata"].update(kwargs)
@@ -186,3 +193,105 @@ def get_template_description(template_id: str) -> str:
         lines.append("Security sensitive: Yes")
 
     return "\n".join(lines)
+
+
+def infer_task_category(task_title: str, task_type: str = "task") -> str:
+    """
+    Infer task_category based on keywords in the task title.
+
+    Analyzes the task title for category-specific keywords and returns
+    the most likely task category. Defaults to 'implementation' when
+    keywords are ambiguous or absent.
+
+    The function checks keywords in priority order:
+    1. investigation - exploring/analyzing existing code
+    2. refactoring - improving code structure
+    3. decision - architectural/design choices
+    4. research - gathering external information
+    5. implementation - creating new functionality (default)
+
+    Args:
+        task_title: The task title to analyze
+        task_type: Type of node (task, subtask, verify, etc.) - currently unused
+                   but reserved for future enhancements
+
+    Returns:
+        One of: 'investigation', 'implementation', 'refactoring', 'decision', 'research'
+
+    Examples:
+        >>> infer_task_category("Analyze current authentication flow")
+        'investigation'
+
+        >>> infer_task_category("Create user service")
+        'implementation'
+
+        >>> infer_task_category("Extract validation to utility")
+        'refactoring'
+
+        >>> infer_task_category("Choose between JWT vs sessions")
+        'decision'
+
+        >>> infer_task_category("Research OAuth 2.0 best practices")
+        'research'
+
+        >>> infer_task_category("")
+        'implementation'
+    """
+    if not task_title:
+        return "implementation"
+
+    title_lower = task_title.lower()
+
+    # Investigation keywords (exploring existing code)
+    # Priority: Check first as understanding should precede implementation
+    investigation_keywords = [
+        "analyze", "understand", "trace", "map",
+        "investigate", "review existing", "examine", "inspect",
+        "study existing", "audit", "assess current", "explore existing"
+    ]
+    if any(keyword in title_lower for keyword in investigation_keywords):
+        return "investigation"
+
+    # Refactoring keywords (improving code structure)
+    # Priority: Second as these are modifications, not new features
+    refactoring_keywords = [
+        "refactor", "reorganize", "extract", "improve code",
+        "restructure", "simplify", "split", "combine",
+        "consolidate", "clean up", "optimize structure"
+    ]
+    if any(keyword in title_lower for keyword in refactoring_keywords):
+        return "refactoring"
+
+    # Decision keywords (architectural choices)
+    # Priority: Third as decisions often inform implementation
+    decision_keywords = [
+        "choose", "decide", "select", "compare", "evaluate",
+        "architectural", "design choice", "between", "vs",
+        "determine approach", "pick"
+    ]
+    if any(keyword in title_lower for keyword in decision_keywords):
+        return "decision"
+
+    # Research keywords (external learning)
+    # Priority: Fourth as research informs decisions and implementation
+    # Use specific phrases to avoid false positives
+    research_keywords = [
+        "research", "learn about", "gather information",
+        "best practices", "review oauth", "investigate external",
+        "read documentation", "review docs", "explore external", "study external"
+    ]
+    if any(keyword in title_lower for keyword in research_keywords):
+        return "research"
+
+    # Implementation keywords (creating new code)
+    # Priority: Checked last as it's the most common and serves as default
+    implementation_keywords = [
+        "create", "add", "implement", "build", "write",
+        "develop", "generate", "new", "setup", "configure",
+        "integrate", "construct", "update"
+    ]
+    if any(keyword in title_lower for keyword in implementation_keywords):
+        return "implementation"
+
+    # Safe default for ambiguous or unmatched titles
+    return "implementation"

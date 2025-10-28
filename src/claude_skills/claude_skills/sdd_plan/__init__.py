@@ -7,6 +7,7 @@ from claude_skills.sdd_plan.templates import (
     get_template,
     generate_spec_from_template,
     get_template_description,
+    infer_task_category,
 )
 from claude_skills.sdd_plan.planner import (
     analyze_codebase,
@@ -20,6 +21,7 @@ __all__ = [
     "get_template",
     "generate_spec_from_template",
     "get_template_description",
+    "infer_task_category",
     "analyze_codebase",
     "create_spec_interactive",
     "find_specs_directory",

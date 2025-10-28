@@ -34,7 +34,7 @@ class ParserFactory:
             exclude_patterns: Patterns to exclude from analysis
             languages: Specific languages to parse (None = auto-detect all)
         """
-        self.project_root = project_root
+        self.project_root = project_root.resolve()
         self.exclude_patterns = exclude_patterns or [
             '__pycache__', '.git', 'node_modules', 'venv', '.venv',
             'build', 'dist', '.egg-info'

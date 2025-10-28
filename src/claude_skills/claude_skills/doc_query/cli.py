@@ -76,6 +76,8 @@ def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[
 
     # Check staleness unless disabled
     no_staleness_check = getattr(args, 'no_staleness_check', False)
+    skip_refresh = getattr(args, 'skip_refresh', False)
+    # Keep refresh for backwards compatibility, but it's now redundant
     refresh = getattr(args, 'refresh', False)
 
     if not no_staleness_check:
@@ -84,8 +86,8 @@ def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[
             source_dir=getattr(args, 'source_dir', None)
         )
 
-        # If --refresh flag is set and docs are stale, regenerate
-        if refresh and staleness_info.get('is_stale'):
+        # Auto-regenerate by default if docs are stale (unless --skip-refresh is set)
+        if staleness_info.get('is_stale') and not skip_refresh:
             if not _maybe_json(args, {"status": "info", "message": "Regenerating stale documentation..."}):
                 printer.info("\n🔄 Documentation is stale, regenerating...")
 
@@ -134,10 +136,10 @@ def _ensure_query(args: argparse.Namespace, printer: PrettyPrinter) -> Optional[
                     printer.warning(f"⚠️  {error_msg}")
                     printer.warning("Continuing with stale documentation...\n")
 
-        # Show warning if stale (and not using --refresh)
-        elif staleness_info.get('is_stale') and not refresh:
+        # Show warning if stale and user explicitly skipped refresh
+        elif staleness_info.get('is_stale') and skip_refresh:
             warning_msg = staleness_info.get('message', 'Documentation may be stale')
-            refresh_hint = "To refresh: run 'sdd doc generate' or use --refresh flag"
+            refresh_hint = "To auto-refresh: remove --skip-refresh flag or run 'sdd doc generate'"
             suppress_hint = "To suppress this warning: use --no-staleness-check"
 
             if not _maybe_json(args, {

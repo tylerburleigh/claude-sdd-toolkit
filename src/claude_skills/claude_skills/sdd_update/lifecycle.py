@@ -5,6 +5,7 @@ All operations work with JSON spec files only. No markdown files are used.
 """
 
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Optional
 from datetime import datetime, timezone
@@ -77,11 +78,60 @@ def move_spec(
         return False
 
 
+def _regenerate_documentation(specs_dir: Path, printer: PrettyPrinter) -> bool:
+    """
+    Regenerate codebase documentation.
+
+    Args:
+        specs_dir: Path to specs directory (used to locate project root)
+        printer: Printer for output messages
+
+    Returns:
+        True if regeneration succeeded, False otherwise
+    """
+    # Determine project root and source directory
+    project_root = specs_dir.parent
+    source_dir = project_root / 'src'
+
+    if not source_dir.exists():
+        source_dir = project_root
+
+    docs_dir = project_root / 'docs'
+
+    printer.action("Regenerating codebase documentation...")
+
+    try:
+        result = subprocess.run(
+            ['sdd', 'doc', 'generate', str(source_dir),
+             '--output-dir', str(docs_dir), '--format', 'both'],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+
+        if result.returncode == 0:
+            printer.success("✅ Documentation regenerated successfully")
+            return True
+        else:
+            printer.warning(f"⚠️  Documentation regeneration failed: {result.stderr}")
+            printer.warning("Continuing with spec completion...")
+            return False
+    except subprocess.TimeoutExpired:
+        printer.warning("⚠️  Documentation regeneration timed out (5 minutes)")
+        printer.warning("Continuing with spec completion...")
+        return False
+    except Exception as e:
+        printer.warning(f"⚠️  Error regenerating documentation: {e}")
+        printer.warning("Continuing with spec completion...")
+        return False
+
+
 def complete_spec(
     spec_id: str,
     spec_file: Optional[Path],
     specs_dir: Path,
     actual_hours: Optional[float] = None,
+    skip_doc_regen: bool = False,
     dry_run: bool = False,
     printer: Optional[PrettyPrinter] = None
 ) -> bool:
@@ -92,12 +142,14 @@ def complete_spec(
     1. Verifies all tasks are completed
     2. Updates JSON metadata (status, completed_date, actual_hours)
     3. Moves JSON spec file to completed/ folder
+    4. Regenerates codebase documentation (unless skip_doc_regen is True)
 
     Args:
         spec_id: Specification ID
         spec_file: Path to JSON spec file (optional - will be auto-detected if not provided)
         specs_dir: Path to specs directory
         actual_hours: Optional actual hours spent
+        skip_doc_regen: If True, skip documentation regeneration
         dry_run: If True, show changes without executing
         printer: Optional printer for output
 
@@ -182,4 +234,11 @@ def complete_spec(
         return False
 
     printer.success(f"Spec {spec_id} marked as completed and moved to completed/")
+
+    # Regenerate documentation unless skipped
+    if not skip_doc_regen:
+        _regenerate_documentation(specs_dir, printer)
+        # Note: We don't fail the completion if doc regeneration fails
+        # The spec completion is still successful
+
     return True

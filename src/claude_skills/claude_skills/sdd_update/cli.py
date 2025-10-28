@@ -380,6 +380,7 @@ def cmd_complete_spec(args, printer):
         spec_file=spec_file,
         specs_dir=specs_dir,
         actual_hours=args.actual_hours,
+        skip_doc_regen=getattr(args, 'skip_doc_regen', False),
         dry_run=args.dry_run,
         printer=printer
     )
@@ -703,11 +704,12 @@ def cmd_check_journaling(args, printer):
     # Display unjournaled tasks
     printer.warning(f"Found {len(unjournaled)} completed task(s) without journal entries:\n")
     for i, task in enumerate(unjournaled, 1):
-        printer.info(f"{i}. {task['task_id']}: {task['title']}")
-        printer.detail(f"   Completed: {task['completed_at']}")
+        printer.item(f"Task ID: {task['task_id']} - {task['title']}")
+        printer.detail(f"Completed: {task['completed_at']}", indent=2)
 
-    printer.info(f"\nTo journal these tasks, run:")
-    printer.info(f"  bulk-journal {args.spec_id} <spec-file>")
+    printer.blank()
+    printer.detail("To journal these tasks, run:")
+    printer.detail(f"  sdd bulk-journal {args.spec_id}", indent=1)
 
     return 1  # Exit with error code to indicate action needed
 
@@ -885,6 +887,7 @@ def register_update(subparsers, parent_parser):
     p_complete.add_argument("spec_id", help="Specification ID")
     p_complete.add_argument("spec_file", nargs='?', help="Path to spec file (optional - will be auto-detected if not provided)")
     p_complete.add_argument("--actual-hours", type=float, help="Actual hours spent")
+    p_complete.add_argument("--skip-doc-regen", action="store_true", help="Skip documentation regeneration for faster completion")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
 

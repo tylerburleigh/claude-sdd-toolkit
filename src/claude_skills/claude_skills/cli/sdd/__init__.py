@@ -77,6 +77,7 @@ def reorder_args_for_subcommand(cmd_line):
         'verbose': False,
         'no_color': False,
         'refresh': False,
+        'skip_refresh': False,
         'no_staleness_check': False,
         'specs_dir': None,
         'docs_path': None
