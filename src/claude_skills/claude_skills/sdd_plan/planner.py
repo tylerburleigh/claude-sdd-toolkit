@@ -88,7 +88,8 @@ def parse_doc_query_stats(output: str) -> Dict[str, Any]:
 def create_spec_interactive(
     title: Optional[str] = None,
     template: str = "medium",
-    specs_dir: Path = None
+    specs_dir: Path = None,
+    default_category: Optional[str] = None
 ) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
     """
     Create a new spec interactively.
@@ -97,6 +98,8 @@ def create_spec_interactive(
         title: Optional spec title (will prompt if not provided)
         template: Template to use (simple, medium, complex, security)
         specs_dir: Directory to save spec (defaults to specs/active)
+        default_category: Optional default task category (overrides automatic inference)
+                         One of: investigation, implementation, refactoring, decision, research
 
     Returns:
         Tuple of (success, message, spec_dict)
@@ -116,7 +119,7 @@ def create_spec_interactive(
 
     # Generate spec from template
     try:
-        spec = generate_spec_from_template(template, title)
+        spec = generate_spec_from_template(template, title, default_category=default_category)
     except Exception as e:
         return False, f"Failed to generate spec: {str(e)}", None
 

@@ -265,7 +265,9 @@ class BaseParser(ABC):
             project_root: Root directory of the project
             exclude_patterns: Patterns to exclude from parsing
         """
-        self.project_root = project_root
+        self.project_root = project_root.resolve()
+        # Store CWD for computing relative paths in output
+        self.cwd = Path.cwd()
         self.exclude_patterns = exclude_patterns or []
 
     @property
@@ -382,7 +384,7 @@ class BaseParser(ABC):
 
     def _get_relative_path(self, file_path: Path) -> str:
         """
-        Get path relative to project root.
+        Get path relative to current working directory.
 
         Args:
             file_path: Absolute file path
@@ -391,6 +393,8 @@ class BaseParser(ABC):
             Relative path as string
         """
         try:
-            return str(file_path.relative_to(self.project_root))
+            return str(file_path.relative_to(self.cwd))
         except ValueError:
-            return str(file_path)
+            # If file is not under cwd (e.g., temp directory in tests),
+            # use just the filename to keep paths simple and consistent
+            return file_path.name

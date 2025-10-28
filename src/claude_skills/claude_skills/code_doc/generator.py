@@ -61,7 +61,7 @@ class DocumentationGenerator:
             exclude_patterns: List of patterns to exclude from analysis
             languages: Specific languages to parse (None = auto-detect all)
         """
-        self.project_dir = project_dir
+        self.project_dir = project_dir.resolve()
         self.project_name = project_name
         self.version = version
         self.exclude_patterns = exclude_patterns or []
