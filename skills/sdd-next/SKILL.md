@@ -1171,23 +1171,35 @@ sdd check-complete {SPEC_ID} --phase phase-2
    If this task completes all tasks in the phase, the phase can be marked completed. This helps track major milestones in the spec.
 
 2. **Update Task Status**
-```bash
-# Mark task as completed using sdd-update
-sdd update-status {SPEC_ID} {TASK_ID} completed --note "Implementation finished and verified"
-```
 
-3. **Update Spec File**
-   - This will automatically recalculate progress across the hierarchy
-   - Unlock any tasks that were blocked by this task
-   - Update phase completion status if applicable
+Use `Skill(sdd-toolkit:sdd-update)` to mark the task as completed.
 
-4. **Document Deviations (if any)**
-```bash
-# Add journal entry if implementation deviated from plan
-sdd add-journal {SPEC_FILE} --title "Implementation Notes: {TASK_ID}" --content "Describe any deviations or decisions made during implementation"
-```
+**Information to provide:**
+- Spec ID and Task ID
+- New status: `completed`
+- Completion note: "Implementation finished and verified"
 
-5. **Check Context Usage Before Continuing**
+**What sdd-update will do:**
+- Update the task status in the spec file
+- Automatically recalculate progress across the hierarchy
+- Unlock any tasks that were blocked by this task
+- Update phase completion status if applicable
+
+3. **Document Deviations (if any)**
+
+If implementation deviated from plan, use `Skill(sdd-toolkit:sdd-update)` to add a journal entry.
+
+**Information to provide:**
+- Spec file path
+- Journal title: "Implementation Notes: {TASK_ID}"
+- Description of deviations or decisions made during implementation
+
+**What sdd-update will do:**
+- Add timestamped journal entry to spec metadata
+- Document the deviation for future reference
+- Maintain audit trail of implementation decisions
+
+4. **Check Context Usage Before Continuing**
 
 Before moving to the next task, check Claude's context window usage to avoid running out of context mid-task:
 
@@ -1218,11 +1230,11 @@ Before moving to the next task, check Claude's context window usage to avoid run
 
 **Important**: Always invoke `Skill(sdd-toolkit:sdd-update)` to save progress BEFORE running `/clear`, as clearing the conversation will lose any unsaved state.
 
-6. **Find Next Task** (only if user wants to continue AND context usage < 50%)
+5. **Find Next Task** (only if user wants to continue AND context usage < 50%)
 
 Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
 
-**Remember:** Always update task status after completion to:
+**Remember:** Always use `Skill(sdd-toolkit:sdd-update)` after completion to:
 - Keep the spec file current
 - Unlock dependent tasks waiting on this work
 - Maintain accurate progress tracking
