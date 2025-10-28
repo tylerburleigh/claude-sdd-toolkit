@@ -100,6 +100,15 @@
           "type": "object",
           "description": "Node-specific metadata",
           "properties": {
+            "task_category": {
+              "type": "string",
+              "enum": ["investigation", "implementation", "refactoring", "decision", "research"],
+              "description": "Category of task work. Optional field for backward compatibility. Values: 'investigation' (exploring/analyzing existing code), 'implementation' (writing new functionality), 'refactoring' (improving code structure without changing behavior), 'decision' (architectural/design choices), 'research' (gathering information, reading docs). Default behavior when omitted: inferred from task context."
+            },
+            "file_path": {
+              "type": "string",
+              "description": "Path to the primary file being modified by this task. DESIGN PRINCIPLE: Tasks are atomic - each task should modify exactly ONE file. This enables: (1) precise dependency tracking, (2) granular progress monitoring, (3) parallel implementation, (4) straightforward verification, (5) easy rollback. MULTI-FILE SCENARIOS: When a feature requires changes across multiple files, decompose into multiple tasks (each with its own file_path) with explicit dependencies, or use subtasks under a parent task. VALIDATION: Required for implementation/refactoring tasks. Optional for investigation/decision/research tasks (use placeholder values like 'investigation', 'decision', 'research' when no specific file). EXAMPLES: 'src/auth/middleware.js', 'models/user.py', 'docs/api.md'"
+            },
             "verification_type": {
               "type": "string",
               "enum": ["auto", "manual"],

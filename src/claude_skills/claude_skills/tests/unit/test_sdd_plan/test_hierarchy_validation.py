@@ -323,6 +323,178 @@ class TestValidateMetadata:
         # Should warn or error about missing file_path
         assert is_valid is False or len(errors) > 0
 
+    def test_implementation_task_requires_file_path(self):
+        """Test that implementation tasks require file_path."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Implement feature",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "task_category": "implementation"
+                    # Missing file_path - should error
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is False
+        assert len(errors) > 0
+        assert any("file_path" in err for err in errors)
+
+    def test_investigation_task_no_file_path_required(self):
+        """Test that investigation tasks don't require file_path."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Investigate issue",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "task_category": "investigation"
+                    # No file_path - should be valid
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is True
+        assert len(errors) == 0
+
+    def test_missing_category_defaults_to_implementation(self):
+        """Test that missing task_category defaults to implementation (requires file_path)."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Some task",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    # No task_category - defaults to implementation
+                    # No file_path - should error
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is False
+        assert len(errors) > 0
+        assert any("file_path" in err for err in errors)
+
+    def test_invalid_task_category_rejected(self):
+        """Test that invalid task_category values are rejected."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Some task",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "task_category": "invalid_category"
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is False
+        assert len(errors) > 0
+        assert any("invalid task_category" in err.lower() for err in errors)
+
+    def test_investigation_task_with_file_path_warns(self):
+        """Test that investigation tasks with file_path generate a warning."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Investigate",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "task_category": "investigation",
+                    "file_path": "src/something.py"  # Unusual but not wrong
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is True
+        assert len(errors) == 0
+        assert len(warnings) > 0
+        assert any("file_path" in warn.lower() for warn in warnings)
+
+    def test_backward_compat_no_category_with_file_path(self):
+        """Test backward compatibility: old specs without task_category but with file_path validate."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Some task",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "file_path": "src/feature.py"
+                    # No task_category - should validate (backward compat)
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is True
+        assert len(errors) == 0
+
+    def test_backward_compat_old_style_spec(self):
+        """Test that old-style specs (pre-task_category) still work correctly."""
+        hierarchy = {
+            "task-1-1": {
+                "id": "task-1-1",
+                "type": "task",
+                "title": "Implement auth",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "file_path": "src/auth.py",
+                    "estimated_hours": 4
+                    # No task_category - should work as before
+                }
+            },
+            "verify-1-1": {
+                "id": "verify-1-1",
+                "type": "verify",
+                "title": "Test auth",
+                "status": "pending",
+                "parent": None,
+                "children": [],
+                "dependencies": {},
+                "metadata": {
+                    "verification_type": "auto",
+                    "command": "pytest tests/test_auth.py"
+                }
+            }
+        }
+        is_valid, errors, warnings = validate_metadata(hierarchy)
+
+        assert is_valid is True
+        assert len(errors) == 0
+
 
 class TestValidateJsonSpec:
     """Tests for validate_spec_hierarchy main function."""

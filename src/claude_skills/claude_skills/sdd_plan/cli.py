@@ -24,6 +24,9 @@ def cmd_create(args, printer):
     # Determine template
     template = args.template or "medium"
 
+    # Extract category from args (if provided)
+    default_category = getattr(args, 'category', None)
+
     # Find specs directory
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None))
     if not specs_dir:
@@ -37,7 +40,8 @@ def cmd_create(args, printer):
     success, message, spec = create_spec_interactive(
         title=args.name,
         template=template,
-        specs_dir=specs_dir / "active"
+        specs_dir=specs_dir / "active",
+        default_category=default_category
     )
 
     if not success:
@@ -168,6 +172,12 @@ def register_plan(subparsers, parent_parser):
         choices=['simple', 'medium', 'complex', 'security'],
         default='medium',
         help='Template to use (default: medium)'
+    )
+    parser_create.add_argument(
+        '--category',
+        choices=['investigation', 'implementation', 'refactoring', 'decision', 'research'],
+        default=None,
+        help='Default task category (overrides automatic inference). Options: investigation, implementation, refactoring, decision, research'
     )
     parser_create.set_defaults(func=cmd_create)
 

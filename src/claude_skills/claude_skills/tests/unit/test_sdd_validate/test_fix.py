@@ -13,6 +13,8 @@ from claude_skills.sdd_validate.fix import (
     FixReport,
     _build_counts_action,
     _build_metadata_action,
+    _build_task_category_action,
+    _build_placeholder_file_path_action,
     _build_hierarchy_action,
     _build_date_action,
     _build_status_action,
@@ -147,6 +149,98 @@ def test_build_metadata_action_verify():
     assert "verification_type" in metadata
     assert "command" in metadata
     assert "expected" in metadata
+
+
+def test_build_task_category_action():
+    """Test building task_category fix action for implementation task."""
+    error = EnhancedError(
+        message="Missing task_category for task-1",
+        severity="warning",
+        category="metadata",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Infer and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "src/services/auth.py",
+                "metadata": {}
+            },
+        }
+    }
+
+    action = _build_task_category_action(error, spec_data)
+
+    assert action is not None
+    assert action.id == "task_category.infer:task-1"
+    assert action.category == "metadata"
+    assert action.auto_apply is True
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "src/services/auth.py",
+                "metadata": {}
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "implementation"
+
+
+def test_build_task_category_action_investigation():
+    """Test building task_category fix action for investigation task."""
+    error = EnhancedError(
+        message="Missing task_category for task-2",
+        severity="warning",
+        category="metadata",
+        location="task-2",
+        auto_fixable=True,
+        suggested_fix="Infer and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "title": "Analyze current authentication flow",
+                "metadata": {}
+            },
+        }
+    }
+
+    action = _build_task_category_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "title": "Analyze current authentication flow",
+                "metadata": {}
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-2"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "investigation"
+    assert metadata["file_path"] == "investigation"
 
 
 def test_build_hierarchy_action():
@@ -415,6 +509,608 @@ def test_collect_fix_actions_deduplicates():
 
     actions = collect_fix_actions(result)
 
-    # Should only create one metadata action for task-1
-    metadata_actions = [a for a in actions if a.category == "metadata" and "task-1" in a.id]
-    assert len(metadata_actions) == 1
+    # Should only create one of EACH TYPE of metadata action for task-1
+    # (metadata.ensure and task_category.infer are different action types)
+    metadata_ensure_actions = [a for a in actions if a.id == "metadata.ensure:task-1"]
+    task_category_actions = [a for a in actions if a.id == "task_category.infer:task-1"]
+
+    # Each specific action ID should only appear once (deduplication working)
+    assert len(metadata_ensure_actions) == 1
+    assert len(task_category_actions) == 1
+
+
+def test_build_placeholder_file_path_action_category_name():
+    """Test detecting file_path with category name as placeholder."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Analyze authentication flow",
+                "metadata": {"file_path": "investigation"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+    assert action.id == "file_path.remove_placeholder:task-1"
+    assert action.category == "migration"
+    assert action.severity == "info"
+    assert action.auto_apply is True
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Analyze authentication flow",
+                "metadata": {"file_path": "investigation"},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "investigation"
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_tbd():
+    """Test detecting file_path with TBD placeholder.
+
+    TBD (To Be Determined) maps to 'decision' category because it indicates
+    a decision needs to be made about what to implement.
+    """
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-2",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "title": "src/services/auth.py",
+                "metadata": {"file_path": "TBD"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "title": "src/services/auth.py",
+                "metadata": {"file_path": "TBD"},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-2"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "decision"  # TBD maps to decision category
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_case_insensitive():
+    """Test that placeholder detection is case-insensitive."""
+    placeholders = ["INVESTIGATION", "Implementation", "n/a", "Null", "TbD"]
+
+    for placeholder in placeholders:
+        error = EnhancedError(
+            message="Placeholder file_path detected",
+            severity="info",
+            category="migration",
+            location="task-1",
+            auto_fixable=True,
+            suggested_fix="Remove placeholder and set task_category",
+        )
+
+        spec_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Test task",
+                    "metadata": {"file_path": placeholder},
+                },
+            }
+        }
+
+        action = _build_placeholder_file_path_action(error, spec_data)
+
+        assert action is not None, f"Failed to detect placeholder: {placeholder}"
+
+        # Apply and verify
+        test_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Test task",
+                    "metadata": {"file_path": placeholder},
+                }
+            }
+        }
+        action.apply(test_data)
+
+        metadata = test_data["hierarchy"]["task-1"]["metadata"]
+        assert "task_category" in metadata
+        assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_all_placeholders():
+    """Test detection of all placeholder patterns."""
+    placeholders = [
+        "investigation",
+        "implementation",
+        "refactoring",
+        "decision",
+        "research",
+        "tbd",
+        "n/a",
+        "none",
+        "null",
+    ]
+
+    for placeholder in placeholders:
+        error = EnhancedError(
+            message="Placeholder file_path detected",
+            severity="info",
+            category="migration",
+            location="task-1",
+            auto_fixable=True,
+            suggested_fix="Remove placeholder and set task_category",
+        )
+
+        spec_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Test task",
+                    "metadata": {"file_path": placeholder},
+                },
+            }
+        }
+
+        action = _build_placeholder_file_path_action(error, spec_data)
+
+        assert action is not None, f"Failed to detect placeholder: {placeholder}"
+
+
+def test_build_placeholder_file_path_action_non_placeholder():
+    """Test that real file paths are not detected as placeholders."""
+    real_paths = [
+        "src/services/auth.py",
+        "investigation_results.txt",
+        "implementation_details.md",
+        "test_investigation.py",
+        "n/a.txt",
+    ]
+
+    for file_path in real_paths:
+        error = EnhancedError(
+            message="Test error",
+            severity="info",
+            category="migration",
+            location="task-1",
+            auto_fixable=True,
+            suggested_fix="Test",
+        )
+
+        spec_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Test task",
+                    "metadata": {"file_path": file_path},
+                },
+            }
+        }
+
+        action = _build_placeholder_file_path_action(error, spec_data)
+
+        assert action is None, f"Incorrectly detected real path as placeholder: {file_path}"
+
+
+def test_build_placeholder_file_path_action_no_file_path():
+    """Test that nodes without file_path are skipped."""
+    error = EnhancedError(
+        message="Test error",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Test",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is None
+
+
+def test_build_placeholder_file_path_action_subtask():
+    """Test that placeholder detection works for subtasks."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="subtask-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "subtask-1": {
+                "id": "subtask-1",
+                "type": "subtask",
+                "title": "Research API documentation",
+                "metadata": {"file_path": "research"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "subtask-1": {
+                "id": "subtask-1",
+                "type": "subtask",
+                "title": "Research API documentation",
+                "metadata": {"file_path": "research"},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["subtask-1"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "research"
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_non_task_node():
+    """Test that placeholder detection only applies to task/subtask nodes."""
+    node_types = ["phase", "verify", "root"]
+
+    for node_type in node_types:
+        error = EnhancedError(
+            message="Test error",
+            severity="info",
+            category="migration",
+            location="node-1",
+            auto_fixable=True,
+            suggested_fix="Test",
+        )
+
+        spec_data = {
+            "hierarchy": {
+                "node-1": {
+                    "id": "node-1",
+                    "type": node_type,
+                    "title": "Test node",
+                    "metadata": {"file_path": "investigation"},
+                },
+            }
+        }
+
+        action = _build_placeholder_file_path_action(error, spec_data)
+
+        assert action is None, f"Should not detect placeholder for {node_type} nodes"
+
+
+def test_build_placeholder_file_path_action_preserves_existing_category():
+    """Test that existing task_category is not overwritten."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {
+                    "file_path": "investigation",
+                    "task_category": "implementation",  # Already set
+                },
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {
+                    "file_path": "investigation",
+                    "task_category": "implementation",
+                },
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    # Should preserve existing category
+    assert metadata["task_category"] == "implementation"
+    # Should remove placeholder file_path
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_whitespace():
+    """Test that placeholders with whitespace are detected."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {"file_path": "  investigation  "},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {"file_path": "  investigation  "},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    assert "task_category" in metadata
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_tbd_maps_to_decision():
+    """Test that 'tbd' placeholder maps to 'decision' category."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Some task with TBD file path",
+                "metadata": {"file_path": "tbd"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Some task with TBD file path",
+                "metadata": {"file_path": "tbd"},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    assert "task_category" in metadata
+    assert metadata["task_category"] == "decision"
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_category_mapping():
+    """Test that category-name placeholders map directly to their category."""
+    category_placeholders = {
+        "investigation": "investigation",
+        "decision": "decision",
+        "research": "research",
+        "refactoring": "refactoring",
+        "implementation": "implementation",
+    }
+
+    for placeholder, expected_category in category_placeholders.items():
+        error = EnhancedError(
+            message="Placeholder file_path detected",
+            severity="info",
+            category="migration",
+            location="task-1",
+            auto_fixable=True,
+            suggested_fix="Remove placeholder and set task_category",
+        )
+
+        spec_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Generic task title",
+                    "metadata": {"file_path": placeholder},
+                },
+            }
+        }
+
+        action = _build_placeholder_file_path_action(error, spec_data)
+
+        assert action is not None, f"Failed to create action for placeholder: {placeholder}"
+
+        # Test applying the action
+        test_data = {
+            "hierarchy": {
+                "task-1": {
+                    "id": "task-1",
+                    "type": "task",
+                    "title": "Generic task title",
+                    "metadata": {"file_path": placeholder},
+                }
+            }
+        }
+        action.apply(test_data)
+
+        metadata = test_data["hierarchy"]["task-1"]["metadata"]
+        assert "task_category" in metadata, f"task_category not set for placeholder: {placeholder}"
+        assert metadata["task_category"] == expected_category, \
+            f"Expected {expected_category}, got {metadata['task_category']} for placeholder: {placeholder}"
+        assert "file_path" not in metadata, f"file_path not removed for placeholder: {placeholder}"
+
+
+def test_build_placeholder_file_path_action_generic_placeholder_uses_title():
+    """Test that generic placeholders (n/a, none, null) use title-based inference."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Analyze authentication flow",  # Should infer "investigation"
+                "metadata": {"file_path": "n/a"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+
+    # Test applying the action
+    test_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Analyze authentication flow",
+                "metadata": {"file_path": "n/a"},
+            }
+        }
+    }
+    action.apply(test_data)
+
+    metadata = test_data["hierarchy"]["task-1"]["metadata"]
+    assert "task_category" in metadata
+    # Should infer "investigation" from "Analyze" keyword in title
+    assert metadata["task_category"] == "investigation"
+    assert "file_path" not in metadata
+
+
+def test_build_placeholder_file_path_action_preview_shows_category():
+    """Test that the preview message shows the inferred category."""
+    error = EnhancedError(
+        message="Placeholder file_path detected",
+        severity="info",
+        category="migration",
+        location="task-1",
+        auto_fixable=True,
+        suggested_fix="Remove placeholder and set task_category",
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "title": "Test task",
+                "metadata": {"file_path": "investigation"},
+            },
+        }
+    }
+
+    action = _build_placeholder_file_path_action(error, spec_data)
+
+    assert action is not None
+    # Preview should show the category being set
+    assert "investigation" in action.preview.lower()
+    assert "task_category" in action.preview.lower()
+    # Should use arrow notation
+    assert "→" in action.preview or "->" in action.preview

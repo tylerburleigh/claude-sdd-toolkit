@@ -23,6 +23,7 @@ from claude_skills.common import (
     validate_spec_hierarchy,
 )
 from claude_skills.common.validation import EnhancedError, JsonSpecValidationResult
+from claude_skills.sdd_plan.templates import infer_task_category
 from claude_skills.sdd_validate.formatting import normalize_validation_result
 
 
@@ -66,6 +67,8 @@ def collect_fix_actions(result: JsonSpecValidationResult) -> List[FixAction]:
         _build_counts_action,
         _build_leaf_count_action,
         _build_metadata_action,
+        _build_task_category_action,
+        _build_placeholder_file_path_action,
         _build_verification_type_action,
         _build_hierarchy_action,
         _build_orphan_action,
@@ -92,6 +95,31 @@ def collect_fix_actions(result: JsonSpecValidationResult) -> List[FixAction]:
             except Exception:
                 # Builder doesn't apply to this error, continue
                 continue
+
+    # Proactive placeholder detection - scan all tasks regardless of errors
+    hierarchy = spec_data.get("hierarchy", {})
+    for node_id, node in hierarchy.items():
+        node_type = node.get("type")
+        if node_type not in ("task", "subtask"):
+            continue
+
+        # Create a dummy error for placeholder detection
+        dummy_error = EnhancedError(
+            message=f"Checking for placeholder in {node_id}",
+            severity="info",
+            category="migration",
+            location=node_id,
+            auto_fixable=True,
+            suggested_fix="Check for placeholder file_path",
+        )
+
+        try:
+            action = _build_placeholder_file_path_action(dummy_error, spec_data)
+            if action and action.id not in seen_ids:
+                actions.append(action)
+                seen_ids.add(action.id)
+        except Exception:
+            continue
 
     return actions
 
@@ -213,6 +241,70 @@ def _build_metadata_action(error: EnhancedError, spec_data: Dict[str, Any]) -> O
         description=error.suggested_fix or f"Add metadata defaults for {node_id}",
         category="metadata",
         severity=error.severity,
+        auto_apply=True,
+        preview=preview,
+        apply=apply,
+    )
+
+
+def _build_task_category_action(error: EnhancedError, spec_data: Dict[str, Any]) -> Optional[FixAction]:
+    """Build auto-fix for missing or invalid task_category in task nodes.
+
+    This builder is special - it can be triggered by any metadata-related error on a task node,
+    not just task_category-specific errors. It proactively adds task_category to tasks that are
+    missing it, even when the validation doesn't report it as an error (backward compatibility).
+    """
+    hierarchy = spec_data.get("hierarchy") or {}
+    node_id = _resolve_node_id(error, hierarchy)
+    if not node_id:
+        return None
+
+    node = hierarchy.get(node_id)
+    if not node:
+        return None
+
+    # Only apply to task and subtask nodes
+    node_type = node.get("type")
+    if node_type not in ("task", "subtask"):
+        return None
+
+    # Get current metadata
+    metadata = node.get("metadata", {})
+    current_category = metadata.get("task_category")
+
+    # Only create fix action if task_category is missing
+    # (If it's present, validation will handle invalid values differently)
+    if current_category is not None:
+        return None
+
+    task_title = node.get("title", "")
+
+    # Infer the appropriate category from the task title
+    inferred_category = infer_task_category(task_title, node_type)
+
+    preview = f"Set task_category='{inferred_category}' for {node_id}"
+
+    def apply(data: Dict[str, Any]) -> None:
+        hierarchy = data.setdefault("hierarchy", {})
+        node = hierarchy.get(node_id)
+        if not node:
+            return
+        metadata = node.setdefault("metadata", {})
+
+        # Set the inferred category
+        metadata["task_category"] = inferred_category
+
+        # Handle file_path based on category
+        # For non-implementation categories, set file_path to category name if not already set
+        if inferred_category in ("investigation", "decision", "research"):
+            if "file_path" not in metadata or metadata.get("file_path") == f"{node_id}.md":
+                metadata["file_path"] = inferred_category
+
+    return FixAction(
+        id=f"task_category.infer:{node_id}",
+        description=f"Infer and set task_category='{inferred_category}' for {node_id}",
+        category="metadata",
+        severity="warning",  # Use warning since it's not critical
         auto_apply=True,
         preview=preview,
         apply=apply,
@@ -717,6 +809,106 @@ def _build_orphan_action(error: EnhancedError, spec_data: Dict[str, Any]) -> Opt
         description=error.suggested_fix or preview,
         category="hierarchy",
         severity=error.severity,
+        auto_apply=True,
+        preview=preview,
+        apply=apply,
+    )
+
+
+def _build_placeholder_file_path_action(error: EnhancedError, spec_data: Dict[str, Any]) -> Optional[FixAction]:
+    """Detect and flag placeholder file_path values for migration.
+
+    Detects file_path values that are actually placeholders like:
+    - investigation, implementation, refactoring, decision, research (category names)
+    - TBD, tbd, N/A, none, null (placeholder text)
+
+    These indicate old specs that need migration to use task_category instead.
+    """
+    hierarchy = spec_data.get("hierarchy") or {}
+    node_id = _resolve_node_id(error, hierarchy)
+    if not node_id:
+        return None
+
+    node = hierarchy.get(node_id)
+    if not node:
+        return None
+
+    # Only apply to task and subtask nodes
+    node_type = node.get("type")
+    if node_type not in ("task", "subtask"):
+        return None
+
+    metadata = node.get("metadata", {})
+    file_path = metadata.get("file_path")
+
+    # Skip if no file_path
+    if not file_path or not isinstance(file_path, str):
+        return None
+
+    # Placeholder patterns (case-insensitive)
+    placeholder_patterns = [
+        "investigation",
+        "implementation",
+        "refactoring",
+        "decision",
+        "research",
+        "tbd",
+        "n/a",
+        "none",
+        "null",
+    ]
+
+    file_path_lower = file_path.lower().strip()
+
+    # Check if file_path matches a placeholder pattern
+    if file_path_lower not in placeholder_patterns:
+        return None
+
+    # This is a placeholder! Create a fix action to flag it
+    task_title = node.get("title", "")
+
+    # Infer category from placeholder value first, then fall back to title analysis
+    # Direct category mappings from placeholder values
+    category_from_placeholder = {
+        "investigation": "investigation",
+        "decision": "decision",
+        "research": "research",
+        "refactoring": "refactoring",
+        "implementation": "implementation",
+        "tbd": "decision",  # TBD usually indicates a decision needs to be made
+    }
+
+    # Use placeholder hint if available, otherwise infer from title
+    if file_path_lower in category_from_placeholder:
+        inferred_category = category_from_placeholder[file_path_lower]
+    else:
+        # Fall back to title-based inference for generic placeholders (n/a, none, null)
+        inferred_category = infer_task_category(task_title, node_type)
+
+    preview = f"Migrate placeholder file_path='{file_path}' → task_category='{inferred_category}' for {node_id}"
+
+    def apply(data: Dict[str, Any]) -> None:
+        hierarchy = data.setdefault("hierarchy", {})
+        node = hierarchy.get(node_id)
+        if not node:
+            return
+        metadata = node.setdefault("metadata", {})
+
+        # Set task_category if not already set
+        if "task_category" not in metadata:
+            metadata["task_category"] = inferred_category
+
+        # Remove placeholder file_path
+        if "file_path" in metadata:
+            # Only remove if it's still a placeholder
+            if metadata["file_path"].lower().strip() in placeholder_patterns:
+                del metadata["file_path"]
+
+    return FixAction(
+        id=f"file_path.remove_placeholder:{node_id}",
+        description=f"Remove placeholder file_path='{file_path}' and set task_category='{inferred_category}' for {node_id}",
+        category="migration",
+        severity="info",  # Info level since it's a migration aid, not an error
         auto_apply=True,
         preview=preview,
         apply=apply,

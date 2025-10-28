@@ -58,6 +58,7 @@ def _is_auto_fixable(category: str, normalized_message: str) -> bool:
             "metadata" in text
             or "file_path" in text
             or "verification" in text
+            or "task_category" in text
         )
     if category == "hierarchy":
         return ("parent/child mismatch" in text or
@@ -85,6 +86,11 @@ def _suggest_fix(category: str, normalized_message: str) -> Optional[str]:
     if category == "metadata":
         if "file_path" in text:
             return "Add metadata.file_path or provide a default placeholder."
+        if "task_category" in text:
+            if "invalid" in text:
+                return "Fix task_category to one of: investigation, implementation, refactoring, decision, research."
+            else:
+                return "Add metadata.task_category (choose: investigation for exploring, implementation for new code, refactoring for improving code, decision for design choices, research for gathering info)."
         if "metadata" in text:
             return "Add metadata object with required defaults."
         if "verification" in text:
@@ -575,10 +581,35 @@ def validate_metadata(hierarchy: Dict) -> Tuple[bool, List[str], List[str]]:
             if 'expected' not in metadata:
                 warnings.append(f"⚠️  WARNING: Verify node '{node_id}' missing metadata.expected")
 
-        # Task nodes should have file_path
+        # Task nodes should have file_path based on task_category
         if node_type == 'task':
-            if 'file_path' not in metadata:
-                errors.append(f"❌ ERROR: Task node '{node_id}' missing metadata.file_path")
+            # Define allowed task categories
+            allowed_categories = ['investigation', 'implementation', 'refactoring', 'decision', 'research']
+
+            # Get task_category, default to 'implementation' for backward compatibility
+            task_category = metadata.get('task_category', 'implementation')
+
+            # Validate task_category is in allowed enum values
+            if 'task_category' in metadata and task_category not in allowed_categories:
+                errors.append(
+                    f"❌ ERROR: Task node '{node_id}' has invalid task_category '{task_category}'. "
+                    f"Must be one of: {', '.join(allowed_categories)}"
+                )
+
+            # file_path required for implementation and refactoring tasks
+            if task_category in ['implementation', 'refactoring']:
+                if 'file_path' not in metadata:
+                    errors.append(
+                        f"❌ ERROR: Task node '{node_id}' with category '{task_category}' missing metadata.file_path"
+                    )
+
+            # Warning if non-code tasks have file_path (unusual but not wrong)
+            if task_category in ['investigation', 'decision', 'research']:
+                if 'file_path' in metadata:
+                    warnings.append(
+                        f"⚠️  WARNING: Task node '{node_id}' with category '{task_category}' has metadata.file_path "
+                        f"(usually not needed for this category)"
+                    )
 
     is_valid = len(errors) == 0
     return (is_valid, errors, warnings)

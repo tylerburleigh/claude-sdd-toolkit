@@ -49,6 +49,15 @@ This skill is part of the **Spec-Driven Development** family:
 
 **Staged Planning (Recommended)**: For complex features, create specifications in two stages: (1) high-level phase structure for user review and approval, then (2) detailed task breakdown. This reduces wasted effort and enables early course correction before detailed planning begins.
 
+**Atomic Tasks**: Each task represents a single, focused change to one file. Tasks are the fundamental unit of work in SDD, and keeping them atomic provides:
+- **Precise dependency tracking**: File-level dependencies are explicit and clear
+- **Granular progress monitoring**: Each completed task represents concrete, verifiable progress
+- **Parallel implementation**: Independent tasks can be worked on simultaneously
+- **Straightforward verification**: Each task has a focused scope and clear success criteria
+- **Easy rollback**: Changes can be reverted at the file level without affecting other work
+
+When a feature requires changes across multiple files, decompose it into multiple tasks with proper dependencies, or use subtasks to organize related file changes under a parent task. Never bundle multiple file changes into a single task. See [docs/BEST_PRACTICES.md](../../docs/BEST_PRACTICES.md) for detailed guidance on task decomposition.
+
 **Key Benefits:**
 - Reduces hallucinated APIs and misread intent
 - Prevents breaking existing functionality
@@ -790,7 +799,7 @@ sdd fix specs/active/your-spec.json
       "status": "pending",
       "parent": null,
       "children": ["phase-1", "phase-2", "phase-3"],
-      "total_tasks": 23,
+      "total_tasks": 24,
       "completed_tasks": 0,
       "metadata": {}
     },
@@ -801,7 +810,7 @@ sdd fix specs/active/your-spec.json
       "status": "pending",
       "parent": "spec-root",
       "children": ["phase-1-files", "phase-1-verify"],
-      "total_tasks": 7,
+      "total_tasks": 8,
       "completed_tasks": 0,
       "metadata": {}
     },
@@ -811,12 +820,31 @@ sdd fix specs/active/your-spec.json
       "title": "File Modifications",
       "status": "pending",
       "parent": "phase-1",
-      "children": ["task-1-1", "task-1-2", "task-1-3"],
-      "total_tasks": 3,
+      "children": ["task-1-0", "task-1-1", "task-1-2", "task-1-3"],
+      "total_tasks": 4,
       "completed_tasks": 0,
       "metadata": {}
     },
-    
+
+    "task-1-0": {
+      "type": "task",
+      "title": "Analyze existing user data schema",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-1"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 2
+      }
+    },
+
     "task-1-1": {
       "type": "task",
       "title": "db/migrations/001_add_users.sql",
@@ -825,14 +853,15 @@ sdd fix specs/active/your-spec.json
       "children": ["task-1-1-1", "task-1-1-2", "task-1-1-3"],
       "dependencies": {
         "blocks": [],
-        "blocked_by": [],
+        "blocked_by": ["task-1-0"],
         "depends": []
       },
       "total_tasks": 3,
       "completed_tasks": 0,
       "metadata": {
         "file_path": "db/migrations/001_add_users.sql",
-        "estimated_hours": 1
+        "estimated_hours": 1,
+        "task_category": "implementation"
       }
     },
     
@@ -897,8 +926,9 @@ sdd fix specs/active/your-spec.json
 3. All completed_tasks initially 0
 4. Parent-child relationships must be bidirectional
 5. Dependencies explicitly listed
-6. Metadata includes file_path for tasks
-7. Generated and last_updated timestamps at root
+6. Metadata includes file_path for tasks (required for implementation/refactoring tasks)
+7. Metadata should include task_category to classify work type (optional but recommended)
+8. Generated and last_updated timestamps at root
 
 **Critical:**
 - JSON spec file is the single source of truth
@@ -907,6 +937,151 @@ sdd fix specs/active/your-spec.json
 - Store in specs/active/, specs/completed/, or specs/archived/
 - Consider adding to .gitignore (user preference)
 - Human-readable views can be generated on-demand using `sdd report`
+
+#### Task Category Metadata
+
+Tasks should include a `task_category` field in their metadata to classify the type of work being performed. This helps with task planning, time estimation, and workflow optimization.
+
+**Available Categories:**
+
+- **`investigation`**: Exploring or analyzing existing code to understand behavior, trace bugs, or map dependencies
+- **`implementation`**: Writing new functionality, features, or code that adds capabilities
+- **`refactoring`**: Improving code structure, organization, or quality without changing external behavior
+- **`decision`**: Architectural or design choices requiring analysis, comparison, or selection between alternatives
+- **`research`**: Gathering information, reading documentation, exploring external libraries, or learning new technologies
+
+**Category Selection Guidelines:**
+
+| Category | When to Use | Typical Duration | Requires file_path |
+|----------|-------------|------------------|-------------------|
+| `investigation` | Need to understand existing code before making changes | Short-Medium | No (optional) |
+| `implementation` | Creating new files, adding features, writing new code | Medium-Long | Yes (required) |
+| `refactoring` | Reorganizing existing code without changing behavior | Medium | Yes (required) |
+| `decision` | Need to choose between approaches or make architectural decisions | Short | No |
+| `research` | Learning about external tools, reading specs, exploring patterns | Short-Medium | No |
+
+**Examples:**
+
+```json
+// Investigation task - analyzing existing code
+{
+  "task-1-1": {
+    "type": "subtask",
+    "title": "Analyze current authentication flow",
+    "status": "pending",
+    "parent": "phase-1",
+    "children": [],
+    "metadata": {
+      "task_category": "investigation",
+      "estimated_hours": 2
+    }
+  }
+}
+
+// Implementation task - writing new functionality
+{
+  "task-2-1": {
+    "type": "task",
+    "title": "src/services/authService.ts",
+    "status": "pending",
+    "parent": "phase-2-files",
+    "children": [],
+    "metadata": {
+      "file_path": "src/services/authService.ts",
+      "task_category": "implementation",
+      "estimated_hours": 4
+    }
+  }
+}
+
+// Refactoring task - improving code structure
+{
+  "task-3-1": {
+    "type": "task",
+    "title": "Extract validation logic to utility module",
+    "status": "pending",
+    "parent": "phase-3-files",
+    "children": [],
+    "metadata": {
+      "file_path": "src/utils/validation.ts",
+      "task_category": "refactoring",
+      "estimated_hours": 3
+    }
+  }
+}
+
+// Decision task - architectural choice
+{
+  "task-1-2": {
+    "type": "subtask",
+    "title": "Choose between JWT vs session-based authentication",
+    "status": "pending",
+    "parent": "phase-1",
+    "children": [],
+    "metadata": {
+      "task_category": "decision",
+      "estimated_hours": 1
+    }
+  }
+}
+
+// Research task - external learning
+{
+  "task-1-3": {
+    "type": "subtask",
+    "title": "Review OAuth 2.0 best practices and security guidelines",
+    "status": "pending",
+    "parent": "phase-1",
+    "children": [],
+    "metadata": {
+      "task_category": "research",
+      "estimated_hours": 2
+    }
+  }
+}
+```
+
+**Setting Default Category (CLI):**
+
+When creating specs via the CLI, you can set a default category that will be stored in the spec metadata:
+
+```bash
+# Create spec with explicit default category
+sdd create "User Authentication" --template medium --category investigation
+
+# Create spec without default category
+sdd create "User Authentication" --template medium
+```
+
+The `--category` flag is useful when most tasks in a spec will be the same type (e.g., an investigation-heavy spec or a refactoring-focused spec).
+
+**Best Practices:**
+
+**Choosing the Right Category:**
+- Use **`investigation`** when you need to understand existing code, trace dependencies, or analyze current behavior before making changes
+- Use **`implementation`** when creating new functionality, adding features, or writing new code files
+- Use **`refactoring`** when improving code structure without changing external behavior (e.g., extracting functions, renaming variables)
+- Use **`decision`** when you need to evaluate alternatives or make architectural choices (often early in phases)
+- Use **`research`** when gathering external information, reading documentation, or learning about libraries/tools
+
+**Task Ordering:**
+- **Always use `investigation` before `implementation`**: Understanding code first prevents mistakes and reduces rework
+- **Place `decision` and `research` tasks early in phases**: These inform later implementation work
+- **Group `refactoring` separately from `implementation`**: Keep behavioral changes distinct from structural improvements
+- **Combine `decision` with `research`**: Research tasks often provide the information needed for decision tasks
+
+**Mixed-Type Phases:**
+- Phases often contain multiple task categories (investigation → decision → implementation → verification)
+- Start phases with investigation/research tasks to gather context
+- Place decision tasks after investigation but before implementation
+- End phases with verification tasks to validate the work
+- Use dependencies to enforce proper ordering between different category types
+
+**Other Guidelines:**
+- **Always specify category for tasks**: Helps with accurate time estimation and resource planning
+- **Optional for subtasks**: If a subtask's category is obvious from its parent, it can be omitted
+- **Use file_path for implementation/refactoring**: These categories require specific files to modify
+- **Skip file_path for investigation/decision/research**: These categories often span multiple files or are conceptual
 
 ### Phase 2: Spec Validation
 
@@ -1251,6 +1426,23 @@ The `review` section tracks all reviews:
 - **Clear boundaries**: Minimize overlap between phases
 - **Dependency management**: Later phases build on earlier ones
 - **Reasonable scope**: Each phase should be completable in one sitting
+
+### Task Decomposition
+
+**Atomic Task Principle**: Each task should modify exactly one file. When a feature requires changes across multiple files:
+
+1. **Create multiple tasks** (one per file) with explicit dependencies, OR
+2. **Use subtasks** under a parent task (parent coordinates, each subtask has its own `file_path`)
+
+**Example**:
+```
+Feature: Add User Authentication
+├─ Task 1: Create auth middleware (middleware/auth.js)
+├─ Task 2: Update user model (models/user.js)  [depends on task-1]
+└─ Task 3: Add auth routes (routes/auth.js)    [depends on task-1, task-2]
+```
+
+See [docs/BEST_PRACTICES.md](../../docs/BEST_PRACTICES.md) for detailed guidance on task granularity, special cases, and identifying atomic units.
 
 ### Verification Rigor
 - **Automated where possible**: Prefer tests over manual checks

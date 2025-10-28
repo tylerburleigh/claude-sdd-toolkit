@@ -48,12 +48,17 @@ def add_global_options(parser):
     parser.add_argument(
         '--refresh',
         action='store_true',
-        help='Auto-regenerate documentation if stale before querying (doc commands only)'
+        help='(Deprecated: now default behavior) Auto-regenerate documentation if stale before querying (doc commands only)'
+    )
+    parser.add_argument(
+        '--skip-refresh',
+        action='store_true',
+        help='Skip auto-regeneration of stale documentation for faster queries (doc commands only)'
     )
     parser.add_argument(
         '--no-staleness-check',
         action='store_true',
-        help='Skip documentation staleness check for faster queries (doc commands only)'
+        help='Skip documentation staleness check entirely (implies --skip-refresh, doc commands only)'
     )
     parser.add_argument(
         '--debug',

@@ -329,20 +329,28 @@ def cmd_fix(args, printer):
             print(format_diff_markdown(diff_report, spec_id))
         print()
 
+    # Count migration actions
+    migration_actions = [a for a in report.applied_actions if a.category == "migration"]
+
     if args.json:
         payload = {
             "spec_id": getattr(result, "spec_id", "unknown"),
             "applied_action_count": len(report.applied_actions),
             "skipped_action_count": len(report.skipped_actions),
+            "migration_action_count": len(migration_actions),
             "backup_path": report.backup_path,
             "remaining_errors": report.post_validation.get("error_count", 0) if report.post_validation else 0,
             "remaining_warnings": report.post_validation.get("warning_count", 0) if report.post_validation else 0,
             "post_status": report.post_validation.get("status", "unknown") if report.post_validation else "unknown",
         }
+        if migration_actions:
+            payload["migrated_tasks"] = [a.id.replace("file_path.remove_placeholder:", "") for a in migration_actions]
         print(json.dumps(payload, indent=2))
     else:
         if report.applied_actions:
             printer.success(f"Applied {len(report.applied_actions)} fix(es)")
+            if migration_actions:
+                printer.info(f"  ├─ Migrated {len(migration_actions)} task(s) from file_path to task_category")
             if report.backup_path:
                 printer.info(f"Backup saved: {report.backup_path}")
         if report.skipped_actions:

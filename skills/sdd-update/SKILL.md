@@ -116,7 +116,7 @@ This table shows the most frequently used commands:
 | Track time | `sdd track-time {spec-id} {task-id} --actual {hours}` | Records actual hours spent |
 | Update metadata | `sdd update-frontmatter {spec-id} {key} "{value}"` | Updates spec-level metadata fields |
 | Get status report | `sdd status-report {spec-id}` | Shows overall progress and status |
-| Complete spec | `sdd complete-spec {spec-id} --actual-hours {hours}` | Marks complete and moves to completed/ |
+| Complete spec | `sdd complete-spec {spec-id} --actual-hours {hours}` | Marks complete, regenerates docs, and moves to completed/ (use `--skip-doc-regen` to skip doc regeneration) |
 
 ## Quick Start
 
@@ -160,7 +160,7 @@ For comprehensive command list, see Command Reference below.
 
 **Lifecycle:**
 - `move-spec` - Move spec between folders (active/completed/archived)
-- `complete-spec` - Mark spec complete and move to completed/
+- `complete-spec` - Mark spec complete, regenerate documentation (by default), and move to completed/ (use `--skip-doc-regen` to skip doc regeneration)
 
 **Time Tracking:**
 - `track-time` - Record actual time spent on task
@@ -185,6 +185,51 @@ For comprehensive command list, see Command Reference below.
 - `--path` - Specify specs directory location
 - `--verbose` - Show detailed operation logs
 - `--quiet` - Minimal output (suppress non-essential messages)
+
+## Documentation Regeneration
+
+**NEW**: The `complete-spec` command now automatically regenerates codebase documentation when marking a spec as complete!
+
+### How It Works
+
+When you run `sdd complete-spec`, the command:
+
+1. **Verifies all tasks are completed**
+2. **Updates spec metadata** (status, completed_date, actual_hours)
+3. **Moves the spec to completed/ folder**
+4. **Automatically regenerates documentation** (runs `sdd doc generate` with project auto-detection)
+
+### Default Behavior
+
+```bash
+$ sdd complete-spec user-auth-001 --actual-hours 18.5
+
+✅ All 12 tasks completed!
+📝 Updating metadata...
+✅ Spec user-auth-001 marked as completed and moved to completed/
+🔄 Regenerating codebase documentation...
+✅ Documentation regenerated successfully
+```
+
+### Skip Documentation Regeneration
+
+For faster completion (e.g., when docs don't need updating), use `--skip-doc-regen`:
+
+```bash
+$ sdd complete-spec user-auth-001 --actual-hours 18.5 --skip-doc-regen
+
+✅ All 12 tasks completed!
+📝 Updating metadata...
+✅ Spec user-auth-001 marked as completed and moved to completed/
+```
+
+**When to use `--skip-doc-regen`:**
+- Documentation was recently regenerated
+- Your changes don't affect public APIs or interfaces
+- You're completing a spec for documentation/planning work (not code changes)
+- You want to defer documentation updates to a batch regeneration later
+
+**Note:** Documentation regeneration failures don't block spec completion. If regeneration fails (timeout, errors), you'll see a warning but the spec will still be marked as complete.
 
 ## When to Use This Skill
 
