@@ -1178,12 +1178,17 @@ Use `Skill(sdd-toolkit:sdd-update)` to mark the task as completed.
 - Spec ID and Task ID
 - New status: `completed`
 - Completion note: "Implementation finished and verified"
+- **Actual hours**: Time spent implementing (if trackable) - enables variance analysis
+- **Entry type**: `status_change` (or `deviation`, `decision` if applicable)
+- **Author**: Attribution (e.g., "claude-sonnet-4.5" or developer name)
 
 **What sdd-update will do:**
 - Update the task status in the spec file
+- Record completion timestamp and actual hours
 - Automatically recalculate progress across the hierarchy
 - Unlock any tasks that were blocked by this task
 - Update phase completion status if applicable
+- Calculate time variance (actual vs. estimated hours)
 
 3. **Document Deviations (if any)**
 
@@ -1191,13 +1196,45 @@ If implementation deviated from plan, use `Skill(sdd-toolkit:sdd-update)` to add
 
 **Information to provide:**
 - Spec file path
+- Task ID (links journal to task, clears `needs_journaling` flag)
 - Journal title: "Implementation Notes: {TASK_ID}"
-- Description of deviations or decisions made during implementation
+- Entry type: `deviation` (or `decision`, `note` as appropriate)
+- Author: Attribution
+- Journal content with structured information:
+  - **What changed**: Specific deviations from plan
+  - **Why**: Rationale and justification
+  - **Testing**: Verification performed
+  - **Impact**: Effect on dependent tasks or architecture
 
 **What sdd-update will do:**
 - Add timestamped journal entry to spec metadata
+- Link entry to specific task (if task ID provided)
+- Clear `needs_journaling` flag on the task
 - Document the deviation for future reference
 - Maintain audit trail of implementation decisions
+- Enable traceability for post-implementation reviews
+
+**Best Practices for Complete Handoffs:**
+
+When providing information to sdd-update, consider including:
+
+- **Always provide**: Spec ID, Task ID, status, completion note
+- **Highly recommended**: Actual hours (improves future estimates)
+- **For deviations**: Entry type, structured rationale, impact assessment
+- **For decisions**: Why this approach was chosen over alternatives
+- **For blockers**: What's blocking, what's needed to unblock
+- **For verification**: Test results, command output, issues found
+
+**Example - Standard Completion:**
+- Actual hours: 2.5
+- Entry type: status_change
+- Note: "Implementation complete, all tests passing"
+
+**Example - Complex Completion with Deviation:**
+- Actual hours: 4.2
+- Entry type: deviation
+- Note: "Implemented with connection pooling (not in original spec) to handle concurrency"
+- Structured journal explaining what/why/testing/impact
 
 4. **Check Context Usage Before Continuing**
 
@@ -1215,7 +1252,8 @@ Before moving to the next task, check Claude's context window usage to avoid run
     ```
     ⚠️  Context usage is at X% (Y/200k tokens). To ensure smooth execution of the next task, I recommend:
 
-    1. First, if you haven't already, update task status: Skill(sdd-toolkit:sdd-update)
+    1. First, if you haven't already, complete the task with full context: Skill(sdd-toolkit:sdd-update)
+       (Include: status, actual hours, completion notes, any deviations)
     2. Then /clear to start a fresh conversation
     3. Then /sdd-start to resume work on this specification
 
