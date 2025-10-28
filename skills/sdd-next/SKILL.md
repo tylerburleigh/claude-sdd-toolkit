@@ -78,6 +78,16 @@ This skill is part of the **Spec-Driven Development** family:
 - **Avoid compound commands with &&** when possible - use separate command invocations instead
 - **Never use inline environment variable assignment with &&** - this adds unnecessary complexity
 
+**Context Usage Management:**
+- Monitor Claude's context window usage throughout task execution
+- Use `/context` command to check current usage percentage
+- **50% threshold**: At 50% or higher context usage, recommend pausing to preserve context for complex tasks
+- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-start`
+  - Always save progress with sdd-update BEFORE clearing context
+  - Use /sdd-start to resume from the saved state
+- **Why 50%?**: Complex tasks can consume 30-50% of context during preparation and implementation. Starting fresh ensures you won't hit limits mid-task
+- **Context preservation**: The /clear command wipes conversation history, so ensure all progress is saved to the spec file first
+
 ## Tool Verification
 
 **Before using this skill**, verify the required tools are available:
@@ -1177,7 +1187,38 @@ sdd update-status {SPEC_ID} {TASK_ID} completed --note "Implementation finished 
 sdd add-journal {SPEC_FILE} --title "Implementation Notes: {TASK_ID}" --content "Describe any deviations or decisions made during implementation"
 ```
 
-5. **Find Next Task**
+5. **Check Context Usage Before Continuing**
+
+Before moving to the next task, check Claude's context window usage to avoid running out of context mid-task:
+
+```bash
+/context
+```
+
+**Decision Logic:**
+
+- **If context usage >= 50%**: Strongly recommend starting fresh to ensure smooth execution of the next task
+  - First ensure task status is updated (step 2 above should already be complete)
+  - Message to user:
+    ```
+    ⚠️  Context usage is at X% (Y/200k tokens). To ensure smooth execution of the next task, I recommend:
+
+    1. First, if you haven't already, update task status: Skill(sdd-toolkit:sdd-update)
+    2. Then /clear to start a fresh conversation
+    3. Then /sdd-start to resume work on this specification
+
+    This will preserve your progress while giving us a clean context window for the next task.
+    ```
+
+- **If context usage < 50%**: Ask user if they want to continue
+  - Message to user:
+    ```
+    ✅ Task completed! Context usage is at X% (Y/200k tokens). Would you like me to prepare the next task now?
+    ```
+
+**Important**: Always invoke `Skill(sdd-toolkit:sdd-update)` to save progress BEFORE running `/clear`, as clearing the conversation will lose any unsaved state.
+
+6. **Find Next Task** (only if user wants to continue AND context usage < 50%)
 
 Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
 
@@ -1217,7 +1258,8 @@ This skill enables coordination across different implementation tools:
 2. Claude: Presents plan to developer
 3. Developer: Implements following the plan
 4. Developer: Uses sdd-update to update status
-5. Claude: Reads updated JSON spec file, finds next task
+5. Claude: Checks context usage with /context
+6. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise finds next task
 
 **Scenario: Claude creates plan, Cursor implements**
 1. Claude: Uses sdd-next to create plan
@@ -1226,7 +1268,8 @@ This skill enables coordination across different implementation tools:
 4. Cursor: Reads JSON spec file
 5. Cursor: Implements following Claude's plan
 6. Cursor: Updates JSON spec file when complete
-7. Claude: Reads updated JSON spec file, finds next task
+7. Claude: Checks context usage with /context
+8. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise reads updated JSON spec file and finds next task
 
 ## Common Workflows
 
@@ -1255,6 +1298,8 @@ Steps:
 6. Create execution plan
 7. Present plan with context of progress
 8. Continue implementation
+9. After completion, check context usage with /context
+10. If >= 50%, recommend sdd-update → /clear → /sdd-start workflow
 
 ### Workflow 3: Handling Blockers
 **Situation:** Next task is blocked by external issue
