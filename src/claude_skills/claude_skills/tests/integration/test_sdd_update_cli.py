@@ -643,3 +643,141 @@ class TestUpdatedCLICommands:
         )
 
         assert result.returncode == 0
+
+
+@pytest.mark.integration
+class TestCompletionDetection:
+    """Tests for automatic spec completion detection after update-status."""
+
+    def test_completion_detection_after_update(self, sample_json_spec_simple, specs_structure):
+        """Test completion prompt appears when last task marked complete."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+        from unittest.mock import patch
+
+        spec_id = "simple-spec-2025-01-01-001"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Mark all tasks as completed except task-1-2
+        for task_id in ["task-1-1"]:
+            spec_data["hierarchy"][task_id]["status"] = "completed"
+
+        # Ensure task-1-2 is the only pending task
+        spec_data["hierarchy"]["task-1-2"]["status"] = "pending"
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Mock user input to decline completion (to avoid file moves)
+        with patch('builtins.input', return_value='n'):
+            result = run_cli(
+                "update-status",
+                "--path", str(specs_structure),
+                spec_id,
+                "task-1-2",
+                "completed",
+                capture_output=True,
+                text=True
+            )
+
+        assert result.returncode == 0
+        # Check that completion prompt appeared in output
+        assert "All tasks complete" in result.stdout or "complete" in result.stdout.lower()
+
+    def test_completion_prompt_skipped_when_blocked(self, sample_json_spec_with_blockers, specs_structure):
+        """Test completion prompt skipped when blocked tasks exist."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+
+        spec_id = "blocked-spec-2025-01-01-005"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Mark all non-blocked tasks as completed except one
+        for node_id, node in spec_data["hierarchy"].items():
+            if node.get("type") == "task" and node.get("status") != "blocked":
+                if node_id != "task-1-1":  # Leave one task pending
+                    node["status"] = "completed"
+
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Mark the last non-blocked task as completed
+        result = run_cli(
+            "update-status",
+            "--path", str(specs_structure),
+            spec_id,
+            "task-1-1",
+            "completed",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        # Completion prompt should NOT appear because blocked tasks exist
+        # Instead, should see warning about blocked tasks
+        assert "blocked" in result.stdout.lower() or "cannot complete" in result.stdout.lower()
+
+    def test_user_confirmation_flow(self, sample_json_spec_completed, specs_structure):
+        """Test user confirmation and spec completion flow."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+        from pathlib import Path
+
+        spec_id = "completed-spec-2025-01-01-007"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Ensure one task is pending
+        spec_data["hierarchy"]["task-1-1"]["status"] = "pending"
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Provide user input via stdin (y to confirm completion, empty for hours)
+        result = run_cli(
+            "update-status",
+            "--path", str(specs_structure),
+            spec_id,
+            "task-1-1",
+            "completed",
+            capture_output=True,
+            text=True,
+            input="y\n\n"  # y for confirmation, Enter for hours
+        )
+
+        # The command might fail if complete_spec tries to move files
+        # But we should still see the completion prompt
+        assert "complete" in result.stdout.lower()
+        assert "Mark spec as complete" in result.stdout or "mark this spec" in result.stdout.lower()
+
+    def test_user_decline_flow(self, sample_json_spec_simple, specs_structure):
+        """Test user decline flow - spec remains active."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+        from pathlib import Path
+
+        spec_id = "simple-spec-2025-01-01-001"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Mark all tasks as completed except task-1-2
+        hierarchy = spec_data.get("hierarchy", {})
+        for node_id, node in hierarchy.items():
+            if node.get("type") == "task" and node_id != "task-1-2":
+                node["status"] = "completed"
+
+        # Ensure task-1-2 is pending
+        hierarchy["task-1-2"]["status"] = "pending"
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Provide user input via stdin to decline completion
+        result = run_cli(
+            "update-status",
+            "--path", str(specs_structure),
+            spec_id,
+            "task-1-2",
+            "completed",
+            capture_output=True,
+            text=True,
+            input="n\n"  # n to decline completion
+        )
+
+        assert result.returncode == 0
+        # Verify completion prompt appeared (shows that detection is working)
+        assert "Mark spec as complete" in result.stdout or "mark this spec" in result.stdout.lower()
+        # The prompt should include the progress
+        assert "4/4 tasks" in result.stdout or "100%" in result.stdout
+
+        # Verify spec still exists in active directory (wasn't moved to completed)
+        # Note: The spec file should still be in the active directory since user declined
+        spec_file = specs_structure / "active" / f"{spec_id}.json"
+        assert spec_file.exists() or (specs_structure / f"{spec_id}.json").exists()

@@ -12,6 +12,7 @@ from claude_skills.common import (
     get_task_context_from_docs,
     check_doc_query_available,
 )
+from claude_skills.common.completion import check_spec_completion, should_prompt_completion
 
 
 def is_unblocked(spec_data: Dict, task_id: str, task_data: Dict) -> bool:
@@ -239,7 +240,12 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
     Prepare complete context for task implementation.
 
     Combines task discovery, dependency checking, and detail extraction.
-    Now includes automatic spec validation and doc-query context gathering.
+    Includes automatic spec validation, doc-query context gathering, and
+    completion detection when no actionable tasks are found.
+
+    When no actionable tasks are found, checks if the spec is complete
+    (all tasks completed) vs. blocked (tasks waiting on dependencies).
+    Returns completion information for caller to handle.
 
     Args:
         spec_id: Specification ID
@@ -247,7 +253,19 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
         task_id: Optional task ID (auto-discovers if not provided)
 
     Returns:
-        Complete task preparation data with validation and context
+        Complete task preparation data with validation and context.
+
+        When no tasks found:
+        - If spec complete: success=True, spec_complete=True, completion_info set
+        - If tasks blocked: success=False, spec_complete=False, completion_info set
+
+        Fields:
+            success (bool): True if task found or spec complete
+            task_id (str|None): Next task ID if found
+            task_data (dict|None): Task details if found
+            spec_complete (bool): True if all tasks completed
+            completion_info (dict|None): Completion check details
+            error (str|None): Error message if applicable
     """
     result = {
         "success": False,
@@ -258,6 +276,8 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
         "spec_file": None,
         "doc_context": None,
         "validation_warnings": [],
+        "spec_complete": False,
+        "completion_info": None,
         "error": None
     }
 
@@ -291,8 +311,22 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
     if not task_id:
         next_task = get_next_task(spec_data)
         if not next_task:
-            result["error"] = "No actionable tasks found"
-            return result
+            # Check if spec is complete before returning error
+            completion_check = should_prompt_completion(spec_data)
+
+            if completion_check["should_prompt"]:
+                # Spec is complete - return success with completion flag
+                result["success"] = True
+                result["spec_complete"] = True
+                result["completion_info"] = completion_check
+                result["error"] = None
+                return result
+            else:
+                # Not complete - return error with completion context
+                result["error"] = "No actionable tasks found"
+                result["spec_complete"] = False
+                result["completion_info"] = completion_check
+                return result
         task_id, _ = next_task
         result["task_id"] = task_id
 

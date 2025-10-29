@@ -1,0 +1,1423 @@
+{
+  "spec_id": "subagent-refactoring-2025-10-28-001",
+  "generated": "2025-10-28T00:00:00Z",
+  "last_updated": "2025-10-28T22:13:57.833361Z",
+  "metadata": {
+    "status": "draft",
+    "priority": "high",
+    "category": "refactoring",
+    "description": "Refactor SDD skills to use Claude Code Task tool subagents for action-oriented operations with result reporting",
+    "objectives": [
+      "Create subagent definitions for sdd-update, sdd-plan-review, sdd-validate, run-tests, and code-doc",
+      "Update sdd-plan and sdd-next to invoke these skills as subagents by default",
+      "Ensure subagents perform work/research and report results back",
+      "Maintain natural language output format",
+      "Keep doc-query as direct import for frequent usage"
+    ],
+    "estimated_hours": 24,
+    "complexity": "high"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Refactor SDD Skills to Use Claude Code Subagents",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ],
+      "total_tasks": 45,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Create Subagent Definitions",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 16,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create minimal SKILL.md subagent definitions that invoke actual skills and report results",
+        "risk_level": "low",
+        "estimated_hours": 6
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create subagent definition for sdd-update",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/subagents/sdd-update/SKILL.md",
+        "description": "Create subagent that invokes sdd-update CLI and reports status changes, journal entries, or time tracking results"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Write SKILL.md with subagent instructions",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Include: when to use, how to invoke sdd CLI, what to report back (task status updates, journal entries added, time tracked)"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Add reporting format instructions",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Specify natural language report format: what was done, what changed, any errors/warnings"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Create subagent definition for sdd-plan-review",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/subagents/sdd-plan-review/SKILL.md",
+        "description": "Create subagent that runs multi-model spec review and reports findings, recommendations, and issues by severity"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Write SKILL.md with review invocation",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Include: when to trigger review, how to invoke sdd review CLI, review types available"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Define review result reporting format",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Report: critical/high/medium/low issues found, overall recommendation, review score, tools consulted"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Create subagent definition for sdd-validate",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/subagents/sdd-validate/SKILL.md",
+        "description": "Create subagent that validates specs and reports errors, warnings, and auto-fix results"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Write SKILL.md for validation workflow",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Include: validate command usage, fix command with --preview, stats for metrics"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Define validation result reporting",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Report: validation status (pass/warnings/errors), issues found, fixes applied, hierarchy integrity status"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Create subagent definition for run-tests",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1",
+        "task-1-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/subagents/run-tests/SKILL.md",
+        "description": "Create subagent that runs tests with AI consultation and reports results, failures, and AI recommendations"
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Write SKILL.md for test execution",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Include: test invocation patterns, consultation triggers, investigation workflow"
+      }
+    },
+    "task-1-4-2": {
+      "type": "subtask",
+      "title": "Define test result reporting format",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Report: pass/fail status, failed test details, AI consultation results (if triggered), recommended fixes"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "Create subagent definition for code-doc",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1",
+        "task-1-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/subagents/code-doc/SKILL.md",
+        "description": "Create subagent that generates codebase documentation and reports generation results, stats, and file locations"
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Write SKILL.md for documentation generation",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Include: when to generate docs, sdd doc generate command, output formats (JSON/markdown)"
+      }
+    },
+    "task-1-5-2": {
+      "type": "subtask",
+      "title": "Define documentation result reporting",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Report: files analyzed, documentation output location, stats (modules/classes/functions), generation time"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3",
+        "verify-1-4",
+        "verify-1-5",
+        "verify-1-6"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Subagent SKILL.md files are readable and well-formatted",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All 5 SKILL.md files exist and follow consistent format with clear instructions",
+        "command": ""
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Each subagent includes when-to-use guidance",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each SKILL.md clearly states when the subagent should be invoked",
+        "command": ""
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Each subagent includes CLI invocation examples",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "SKILL.md files show concrete examples of invoking sdd CLI commands",
+        "command": ""
+      }
+    },
+    "verify-1-4": {
+      "type": "verify",
+      "title": "Each subagent includes result reporting format",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each SKILL.md specifies what to report back in natural language",
+        "command": ""
+      }
+    },
+    "verify-1-5": {
+      "type": "verify",
+      "title": "Subagent instructions emphasize action and reporting",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Instructions clearly state: perform work/research, then report results",
+        "command": ""
+      }
+    },
+    "verify-1-6": {
+      "type": "verify",
+      "title": "No JSON output flags required in subagent definitions",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Subagents use natural language output, no --json flags in examples",
+        "command": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Update sdd-plan Workflow",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Modify sdd-plan to invoke sdd-plan-review, code-doc, and sdd-validate as subagents by default",
+        "risk_level": "medium",
+        "estimated_hours": 6
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Update sdd-plan SKILL.md to reference subagents",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "description": "Update instructions to invoke subagents instead of direct CLI calls"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Add section on invoking sdd-validate subagent after spec creation",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Replace direct sdd validate commands with Task tool invocation of sdd-validate subagent"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add section on invoking sdd-plan-review subagent for spec review",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update review workflow section to use Task tool with sdd-plan-review subagent"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Add section on invoking code-doc subagent for codebase analysis",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update codebase analysis section (1.2.1) to recommend code-doc subagent when docs missing"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Update sdd-plan workflow examples",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "description": "Update code examples showing Task tool invocations"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Replace validation command examples with subagent calls",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show Task tool usage: Task(subagent_type='sdd-validate', prompt='Validate spec...')"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Add example workflow showing subagent orchestration",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show complete workflow: create spec \u2192 validate subagent \u2192 review subagent \u2192 implementation"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Remove direct CLI command references from sdd-plan",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1",
+          "task-2-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "description": "Remove bash command examples for sdd validate, sdd review, etc. - keep only subagent references"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "sdd-plan SKILL.md references all three subagents",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "SKILL.md mentions sdd-validate, sdd-plan-review, and code-doc subagents",
+        "command": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "No direct CLI validation/review commands remain",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -n 'sdd validate\\|sdd review\\|sdd doc' skills/sdd-plan/SKILL.md | grep -v 'subagent\\|Task'",
+        "expected": "No matches found (all references should be via subagent)"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Workflow examples show Task tool usage",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Examples demonstrate Task(subagent_type=...) pattern",
+        "command": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Update sdd-next Workflow",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Modify sdd-next to invoke sdd-validate, run-tests, and code-doc as subagents by default",
+        "risk_level": "medium",
+        "estimated_hours": 6
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Update sdd-next SKILL.md to reference subagents",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/sdd-next/SKILL.md",
+        "description": "Update instructions to invoke subagents instead of direct CLI calls"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Add section on invoking sdd-validate subagent before task preparation",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update pre-task validation section to use Task tool with sdd-validate subagent"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Add section on invoking run-tests subagent for verification tasks",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update verification task handling to invoke run-tests subagent when task type is verify"
+      }
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Add section on invoking code-doc subagent for context gathering",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Update context gathering workflow to recommend code-doc subagent when docs needed"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Update sdd-next workflow examples",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-3-1"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/sdd-next/SKILL.md",
+        "description": "Update code examples showing Task tool invocations"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Replace test execution examples with subagent calls",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show Task tool usage: Task(subagent_type='run-tests', prompt='Run tests for...')"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Add example of validation subagent in prepare-task workflow",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Show validation before task prep: validate subagent \u2192 prepare task \u2192 format plan"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Remove direct CLI command references from sdd-next",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-3-1",
+          "task-3-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "file_path": "skills/sdd-next/SKILL.md",
+        "description": "Remove bash command examples for sdd validate, run-tests CLI, etc. - keep only subagent references"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "sdd-next SKILL.md references all three subagents",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "SKILL.md mentions sdd-validate, run-tests, and code-doc subagents",
+        "command": ""
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "No direct CLI test/validation commands remain",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -n 'sdd validate\\|run-tests:\\|pytest' skills/sdd-next/SKILL.md | grep -v 'subagent\\|Task'",
+        "expected": "No matches found (all references should be via subagent)"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Workflow examples show Task tool usage",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Examples demonstrate Task(subagent_type=...) pattern for validation, testing, doc generation",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Update Cross-References and Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update other skill references and main documentation to reflect subagent architecture",
+        "risk_level": "low",
+        "estimated_hours": 6
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4",
+        "task-4-5"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Update sdd-update SKILL.md cross-references",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "skills/sdd-update/SKILL.md",
+        "description": "Update any references to validation or testing to point to subagents"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Replace validation CLI references with subagent",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "If sdd-update mentions validation, update to reference sdd-validate subagent"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Update main README or toolkit docs",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "README.md",
+        "description": "Document subagent architecture in main toolkit documentation"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Add section explaining subagent architecture",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Explain that some skills are invoked as Claude Code subagents for orchestration"
+      }
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "List which skills are subagents vs direct",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Subagents: sdd-update, sdd-plan-review, sdd-validate, run-tests, code-doc. Direct: doc-query, sdd-plan, sdd-next"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Create subagent architecture diagram",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "docs/architecture/subagents.md",
+        "description": "Create visual diagram showing skill orchestration via subagents"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Draw workflow showing sdd-plan/sdd-next invoking subagents",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "ASCII or mermaid diagram: Claude Code \u2192 Task tool \u2192 Subagent \u2192 SDD CLI \u2192 Result \u2192 Report back"
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "Update plugin.json subagent definitions",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-4-1",
+        "task-4-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "plugin.json",
+        "description": "Register new subagent skills in plugin manifest"
+      }
+    },
+    "task-4-4-1": {
+      "type": "subtask",
+      "title": "Add 5 new subagent skill entries",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Register: subagent-sdd-update, subagent-sdd-plan-review, subagent-sdd-validate, subagent-run-tests, subagent-code-doc"
+      }
+    },
+    "task-4-4-2": {
+      "type": "subtask",
+      "title": "Mark subagent skills as type 'subagent'",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add metadata indicating these are Claude Code subagent skills, not direct invocations"
+      }
+    },
+    "task-4-5": {
+      "type": "task",
+      "title": "Update other skill cross-references",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-5-1",
+        "task-4-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "refactoring",
+        "file_path": "multiple",
+        "description": "Search and update any other skills that reference validation, review, or testing"
+      }
+    },
+    "task-4-5-1": {
+      "type": "subtask",
+      "title": "Search for validation/review/test references",
+      "status": "pending",
+      "parent": "task-4-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "grep -r 'sdd validate\\|sdd review\\|run-tests' skills/*/SKILL.md to find references"
+      }
+    },
+    "task-4-5-2": {
+      "type": "subtask",
+      "title": "Update found references to use subagents",
+      "status": "pending",
+      "parent": "task-4-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Replace direct CLI calls with Task tool subagent invocations"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "All cross-references updated to subagents",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -r 'sdd validate\\|sdd review\\|sdd-review\\|run-tests:' skills/*/SKILL.md | grep -v subagent | grep -v '# Examples' | wc -l",
+        "expected": "0 (no direct CLI references outside of examples/comments)"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Documentation clearly explains subagent architecture",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "README or docs explain which skills are subagents and why",
+        "command": ""
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "plugin.json includes all subagent skills",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -c 'subagent-' plugin.json",
+        "expected": "5 (one entry for each subagent skill)"
+      }
+    }
+  }
+}

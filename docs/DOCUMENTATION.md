@@ -1,23 +1,23 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-10-27 21:17:30
+**Generated:** 2025-10-28 20:08:23
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 154
-- **Total Lines:** 47764
-- **Total Classes:** 181
-- **Total Functions:** 677
-- **Avg Complexity:** 5.37
-- **Max Complexity:** 40
+- **Total Files:** 157
+- **Total Lines:** 49985
+- **Total Classes:** 190
+- **Total Functions:** 684
+- **Avg Complexity:** 5.4
+- **Max Complexity:** 47
 - **High Complexity Functions:**
+  - update_task_status (47)
   - generate_report (40)
   - format_execution_plan (39)
   - execute_verify_task (38)
-  - update_task_status (37)
   - print_discovery_report (35)
 
 
@@ -1079,6 +1079,29 @@ parsing across multiple languages.
 
 ---
 
+### `TestCheckSpecCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:124`
+
+**Description:**
+> Tests for check_spec_completion() function.
+
+**Methods:**
+- `test_all_tasks_complete()`
+- `test_partial_completion()`
+- `test_empty_spec()`
+- `test_specific_phase_completion()`
+- `test_nested_task_hierarchy()`
+- `test_blocked_tasks_not_complete()`
+- `test_in_progress_tasks_not_complete()`
+- `test_no_spec_data()`
+- `test_no_hierarchy()`
+- `test_invalid_phase_id()`
+- `test_percentage_calculation()`
+
+---
+
 ### `TestClassSchemaEnhancements`
 
 **Language:** python
@@ -1155,6 +1178,37 @@ parsing across multiple languages.
 
 ---
 
+### `TestCompletionDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:346`
+
+**Description:**
+> Tests for automatic spec completion detection in sdd-next workflow.
+
+**Methods:**
+- `test_completion_detection_prepare_task()`
+- `test_all_blocked_messaging()`
+- `test_prepare_task_with_completion_and_blockers()`
+
+---
+
+### `TestCompletionDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:649`
+
+**Description:**
+> Tests for automatic spec completion detection after update-status.
+
+**Methods:**
+- `test_completion_detection_after_update()`
+- `test_completion_prompt_skipped_when_blocked()`
+- `test_user_confirmation_flow()`
+- `test_user_decline_flow()`
+
+---
+
 ### `TestConsultation`
 
 **Language:** python
@@ -1183,6 +1237,23 @@ parsing across multiple languages.
 - `test_create_basic_summary()`
 - `test_summary_with_readme()`
 - `test_summary_structure()`
+
+---
+
+### `TestCountBlockedTasks`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:408`
+
+**Description:**
+> Tests for count_blocked_tasks() function.
+
+**Methods:**
+- `test_no_blocked_tasks()`
+- `test_single_blocked_task()`
+- `test_multiple_blocked_tasks()`
+- `test_nested_blocked_tasks()`
+- `test_invalid_node_id()`
 
 ---
 
@@ -1443,6 +1514,32 @@ parsing across multiple languages.
 
 ---
 
+### `TestFormatCompletionPrompt`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:708`
+
+**Description:**
+> Tests for format_completion_prompt() function.
+
+**Methods:**
+- `test_spec_level_prompt_with_hours()`
+- `test_spec_level_prompt_without_hours_estimate()`
+- `test_phase_level_prompt_with_hours()`
+- `test_phase_level_prompt_without_hours()`
+- `test_show_hours_input_disabled()`
+- `test_empty_spec_prompt()`
+- `test_nested_task_hierarchy()`
+- `test_no_spec_data()`
+- `test_invalid_phase_id()`
+- `test_no_hierarchy()`
+- `test_node_without_title()`
+- `test_estimated_hours_zero()`
+- `test_prompt_text_structure()`
+- `test_completion_context_completeness()`
+
+---
+
 ### `TestFormatOutputEnhanced`
 
 **Language:** python
@@ -1507,6 +1604,23 @@ parsing across multiple languages.
 - `test_generate_spec_without_category()`
 - `test_generate_spec_all_categories()`
 - `test_generate_spec_category_none()`
+
+---
+
+### `TestGetAllTasksInSubtree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:49`
+
+**Description:**
+> Tests for get_all_tasks_in_subtree() function.
+
+**Methods:**
+- `test_single_task()`
+- `test_nested_tasks()`
+- `test_only_tasks_included()`
+- `test_empty_hierarchy()`
+- `test_node_with_no_children()`
 
 ---
 
@@ -1840,6 +1954,24 @@ parsing across multiple languages.
 **Methods:**
 - `test_get_session_state_called_with_correct_path()`
 - `test_multiple_in_progress_tasks_display()`
+
+---
+
+### `TestIsTaskComplete`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:16`
+
+**Description:**
+> Tests for is_task_complete() function.
+
+**Methods:**
+- `test_completed_task()`
+- `test_pending_task()`
+- `test_in_progress_task()`
+- `test_blocked_task()`
+- `test_no_status()`
+- `test_none_task()`
 
 ---
 
@@ -2672,6 +2804,28 @@ parsing across multiple languages.
 
 ---
 
+### `TestShouldPromptCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:502`
+
+**Description:**
+> Tests for should_prompt_completion() function.
+
+**Methods:**
+- `test_should_prompt_when_complete_and_no_blocks()`
+- `test_should_not_prompt_when_incomplete()`
+- `test_should_not_prompt_when_blocked_tasks_exist()`
+- `test_should_not_prompt_when_in_progress()`
+- `test_phase_level_prompt_check()`
+- `test_all_complete_but_has_blocked_tasks()`
+- `test_empty_spec_should_prompt()`
+- `test_error_handling_no_spec_data()`
+- `test_error_handling_no_hierarchy()`
+- `test_error_handling_invalid_phase_id()`
+
+---
+
 ### `TestSpecStats`
 
 **Language:** python
@@ -2701,6 +2855,22 @@ parsing across multiple languages.
 - `test_stats_json()`
 - `test_stats_deep_hierarchy()`
 - `test_stats_verification_coverage()`
+
+---
+
+### `TestStatusReportCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_status_report.py:78`
+
+**Description:**
+> Tests for status-report completion detection.
+
+**Methods:**
+- `test_completion_message_in_status_report()`
+- `test_non_interactive_behavior()`
+- `test_command_hint_displayed()`
+- `test_incomplete_spec_no_completion_message()`
 
 ---
 
@@ -3425,7 +3595,7 @@ Returns:
 ### `_check_all_task_deps(spec_data, args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:436`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:437`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -4765,7 +4935,7 @@ Returns:
 ### `audit_spec(spec_id, specs_dir, printer) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:146`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:166`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -5238,7 +5408,7 @@ Returns:
 ### `check_dependencies(spec_data, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:171`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:172`
 **Complexity:** 8
 
 **Description:**
@@ -5397,6 +5567,55 @@ Returns:
 Example:
     >>> if check_sdd_integration_available():
     ...     context = get_task_context_from_docs("implement auth")
+
+---
+
+### `check_spec_completion(spec_data, phase_id) -> Dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:9`
+**Complexity:** 10
+
+**Description:**
+> Check if a spec (or specific phase) is complete.
+
+Analyzes the task hierarchy to determine if all tasks in the spec (or a
+specific phase) have been completed. Returns comprehensive metadata about
+completion status, progress, and any incomplete tasks.
+
+Args:
+    spec_data: JSON spec file data containing hierarchy and task information
+    phase_id: Optional phase ID to check specific phase completion.
+             If None, checks entire spec completion.
+
+Returns:
+    Dictionary with completion status and metadata:
+    {
+        "is_complete": bool,           # True if all tasks completed
+        "total_tasks": int,            # Total task count in scope
+        "completed_tasks": int,        # Number of completed tasks
+        "percentage": int,             # Completion percentage (0-100)
+        "incomplete_tasks": List[str], # IDs of incomplete tasks
+        "node_id": str,                # The node checked (spec-root or phase-id)
+        "can_finalize": bool,          # True if ready to mark as complete
+        "error": Optional[str]         # Error message if check failed
+    }
+
+Example:
+    >>> from claude_skills.common.spec import load_spec
+    >>> from claude_skills.common.completion import check_spec_completion
+    >>>
+    >>> spec_data = load_spec("specs/active/my-spec.json")
+    >>> result = check_spec_completion(spec_data)
+    >>>
+    >>> if result["is_complete"]:
+    ...     print(f"Spec is complete! {result['completed_tasks']}/{result['total_tasks']} tasks done")
+    ... else:
+    ...     print(f"Incomplete tasks: {result['incomplete_tasks']}")
+
+**Parameters:**
+- `spec_data`: Dict
+- `phase_id`: Optional[str]
 
 ---
 
@@ -5628,7 +5847,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:384`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:385`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -5658,7 +5877,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:741`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:871`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -5820,7 +6039,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:670`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:800`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -5877,7 +6096,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:784`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:914`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -5928,7 +6147,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:649`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:779`
 **Complexity:** 5
 
 **Description:**
@@ -5943,7 +6162,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:824`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:954`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -5958,7 +6177,7 @@ Returns:
 ### `cmd_find_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:274`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:275`
 **Complexity:** 8
 
 **Description:**
@@ -5973,7 +6192,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:709`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:839`
 **Complexity:** 9
 
 **Description:**
@@ -6018,7 +6237,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:593`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:723`
 **Complexity:** 4
 
 **Description:**
@@ -6135,7 +6354,7 @@ Returns:
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:518`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:519`
 **Complexity:** 6
 
 **Description:**
@@ -6276,7 +6495,7 @@ Returns:
 ### `cmd_next_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:302`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:303`
 **Complexity:** 8
 
 **Description:**
@@ -6306,11 +6525,48 @@ Returns:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:543`
-⚠️ **Complexity:** 13 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:544`
+⚠️ **Complexity:** 21 (High)
 
 **Description:**
 > Prepare task for implementation.
+
+This command integrates with the automatic completion detection system.
+It calls prepare_task() from discovery.py which returns completion signals
+when all tasks in a spec are finished.
+
+Completion Signal Handling (from prepare_task() in discovery.py):
+----------------------------------------------------------------
+prepare_task() performs completion detection and returns different signals
+based on the spec's state:
+
+Scenario 1: No Actionable Tasks Available
+    - Returned when: No pending/unblocked tasks found
+    - Signal: success=False, spec_complete=False
+    - completion_info present if tasks are blocked
+    - Indicates: Tasks exist but are blocked by dependencies
+
+Scenario 2: Spec/Phase Complete
+    - Returned when: All tasks completed, no blocked tasks
+    - Signal: success=True, spec_complete=True
+    - completion_info contains should_prompt=True
+    - Indicates: Ready to finalize and move to completed/
+
+Scenario 3: Normal Task Found
+    - Returned when: Found actionable task to work on
+    - Signal: success=True, task_id set, spec_complete=False
+    - Indicates: Continue normal workflow with returned task
+
+The completion_info dict structure (from should_prompt_completion):
+    {
+        "should_prompt": bool,      # True if ready to complete
+        "reason": str,               # Human-readable explanation
+        "is_complete": bool,         # All tasks done
+        "blocked_count": int,        # Number of blocked tasks
+        "blocked_tasks": List[str],  # IDs of blocked tasks
+        "node_id": str,              # Node that was checked
+        "error": Optional[str]       # Error if check failed
+    }
 
 **Parameters:**
 - `args`: None
@@ -6321,7 +6577,7 @@ Returns:
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:485`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:486`
 **Complexity:** 7
 
 **Description:**
@@ -6457,7 +6713,7 @@ Returns:
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:887`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1017`
 **Complexity:** 10
 
 **Description:**
@@ -6529,7 +6785,7 @@ Returns:
 ### `cmd_task_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:343`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:344`
 **Complexity:** 9
 
 **Description:**
@@ -6706,7 +6962,7 @@ Returns:
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:860`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:990`
 **Complexity:** 7
 
 **Description:**
@@ -6721,7 +6977,7 @@ Returns:
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:612`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:742`
 **Complexity:** 10
 
 **Description:**
@@ -6736,7 +6992,7 @@ Returns:
 ### `cmd_verify_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:255`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:256`
 **Complexity:** 3
 
 **Description:**
@@ -7056,6 +7312,34 @@ Returns:
 - `tool`: str
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `count_blocked_tasks(hierarchy, node_id) -> tuple`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:289`
+**Complexity:** 5
+
+**Description:**
+> Count blocked tasks under a node.
+
+Traverses the hierarchy tree starting from the given node and counts
+all descendant tasks that have status="blocked". This is used to
+prevent completion when there are unresolved blocking issues.
+
+Args:
+    hierarchy: The hierarchy dictionary from spec data
+    node_id: Starting node ID to search from
+
+Returns:
+    Tuple of (count: int, blocked_task_ids: List[str])
+    - count: Number of blocked tasks found
+    - blocked_task_ids: List of task IDs with status="blocked"
+
+**Parameters:**
+- `hierarchy`: Dict
+- `node_id`: str
 
 ---
 
@@ -7408,7 +7692,7 @@ Returns:
 ### `detect_unjournaled_tasks(spec_id, specs_dir, printer) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:323`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:343`
 **Complexity:** 7
 
 **Description:**
@@ -8257,7 +8541,7 @@ Returns:
 ### `find_verify_tasks_for_task(spec_data, task_id) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:17`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:18`
 **Complexity:** 5
 
 **Description:**
@@ -8412,6 +8696,89 @@ Returns:
 
 ---
 
+### `format_completion_prompt(spec_data, phase_id, show_hours_input) -> Dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:325`
+**Complexity:** 8
+
+**Description:**
+> Generate user-friendly completion prompt with optional hours input.
+
+Creates a formatted prompt message to present to users when a spec or
+phase is complete and ready to be marked as finalized. The prompt
+includes progress summary and optionally asks for actual hours spent
+if estimated hours were provided in the task metadata.
+
+This function is designed to be called by sdd-update, sdd-next, and
+status-report workflows when completion conditions are met (all tasks
+completed, no blocked tasks).
+
+Args:
+    spec_data: JSON spec file data containing hierarchy and task information
+    phase_id: Optional phase ID to format prompt for specific phase.
+             If None, formats prompt for entire spec.
+    show_hours_input: Whether to include actual hours input prompt.
+                     Default True. Set False to skip hours input.
+
+Returns:
+    Dictionary with prompt information:
+    {
+        "prompt_text": str,           # Formatted completion message
+        "requires_input": bool,        # True if hours input requested
+        "completion_context": {        # Metadata about completion
+            "node_id": str,            # Node that is complete
+            "node_type": str,          # "spec" or "phase"
+            "total_tasks": int,        # Total tasks in scope
+            "completed_tasks": int,    # Number completed
+            "estimated_hours": float,  # Estimated hours (if available)
+            "has_hours_estimate": bool # Whether estimate exists
+        },
+        "error": Optional[str]         # Error message if prompt failed
+    }
+
+Example:
+    >>> from claude_skills.common.spec import load_spec
+    >>> from claude_skills.common.completion import format_completion_prompt
+    >>>
+    >>> spec_data = load_spec("specs/active/my-spec.json")
+    >>> result = format_completion_prompt(spec_data)
+    >>>
+    >>> if result["error"]:
+    ...     print(f"Error: {result['error']}")
+    ... else:
+    ...     print(result["prompt_text"])
+    ...     if result["requires_input"]:
+    ...         actual_hours = input("Enter actual hours: ")
+
+    Example prompt output (spec-level with hours):
+    '''
+    All tasks complete!
+
+    Spec: User Authentication System
+    Progress: 23/23 tasks (100%)
+    Estimated: 15.5 hours
+
+    How many actual hours did this take? (Enter a number or press Enter to skip)
+    '''
+
+    Example prompt output (phase-level without hours):
+    '''
+    Phase complete!
+
+    Phase: Database Schema Setup
+    Progress: 7/7 tasks (100%)
+
+    Mark this phase as complete?
+    '''
+
+**Parameters:**
+- `spec_data`: Dict
+- `phase_id`: Optional[str]
+- `show_hours_input`: bool
+
+---
+
 ### `format_dependency_tree(impact_result) -> str`
 
 **Language:** python
@@ -8464,7 +8831,7 @@ Returns:
 ### `format_execution_plan(spec_id, task_id, specs_dir) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:57`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:58`
 ⚠️ **Complexity:** 39 (High)
 
 **Description:**
@@ -9533,6 +9900,32 @@ Returns:
 
 ---
 
+### `get_all_tasks_in_subtree(hierarchy, node_id) -> List[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:133`
+**Complexity:** 4
+
+**Description:**
+> Recursively collect all task IDs under a node.
+
+Traverses the hierarchy tree starting from the given node and collects
+all descendant nodes that are of type "task". This includes tasks at
+any depth in the tree.
+
+Args:
+    hierarchy: The hierarchy dictionary from spec data
+    node_id: Starting node ID to search from
+
+Returns:
+    List of task IDs found in the subtree (only nodes with type="task")
+
+**Parameters:**
+- `hierarchy`: Dict
+- `node_id`: str
+
+---
+
 ### `get_auto_trigger_failures() -> List[str]`
 
 **Language:** python
@@ -9934,7 +10327,7 @@ Returns:
 ### `get_next_task(spec_data) -> Optional[Tuple[str, Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:101`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:102`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -10231,8 +10624,8 @@ Returns:
 ### `get_status_report(spec_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:73`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:74`
+**Complexity:** 9
 
 **Description:**
 > Generate comprehensive status report.
@@ -10379,7 +10772,7 @@ Returns:
 ### `get_task_info(spec_data, task_id) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:157`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:158`
 **Complexity:** 1
 
 **Description:**
@@ -10765,7 +11158,7 @@ Returns:
 ### `is_in_current_phase(spec_data, task_id, phase_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:72`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:73`
 **Complexity:** 5
 
 **Description:**
@@ -10797,10 +11190,34 @@ Returns:
 
 ---
 
+### `is_task_complete(task_node) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:166`
+**Complexity:** 2
+
+**Description:**
+> Check if a single task is marked complete.
+
+A task is considered complete if its status is explicitly set to "completed".
+Tasks with status "in_progress", "pending", "blocked", or any other value
+are not considered complete.
+
+Args:
+    task_node: Task node dictionary from hierarchy
+
+Returns:
+    True if task status is "completed", False otherwise
+
+**Parameters:**
+- `task_node`: Dict
+
+---
+
 ### `is_unblocked(spec_data, task_id, task_data) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:17`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:18`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -11081,7 +11498,7 @@ Returns:
 ### `mark_task_blocked(spec_id, task_id, reason, specs_dir, blocker_type, ticket, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:259`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:321`
 **Complexity:** 10
 
 **Description:**
@@ -11373,14 +11790,19 @@ Returns:
 ### `prepare_task(spec_id, specs_dir, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:237`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:238`
+⚠️ **Complexity:** 12 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
 
 Combines task discovery, dependency checking, and detail extraction.
-Now includes automatic spec validation and doc-query context gathering.
+Includes automatic spec validation, doc-query context gathering, and
+completion detection when no actionable tasks are found.
+
+When no actionable tasks are found, checks if the spec is complete
+(all tasks completed) vs. blocked (tasks waiting on dependencies).
+Returns completion information for caller to handle.
 
 Args:
     spec_id: Specification ID
@@ -11388,7 +11810,19 @@ Args:
     task_id: Optional task ID (auto-discovers if not provided)
 
 Returns:
-    Complete task preparation data with validation and context
+    Complete task preparation data with validation and context.
+
+    When no tasks found:
+    - If spec complete: success=True, spec_complete=True, completion_info set
+    - If tasks blocked: success=False, spec_complete=False, completion_info set
+
+    Fields:
+        success (bool): True if task found or spec complete
+        task_id (str|None): Next task ID if found
+        task_data (dict|None): Task details if found
+        spec_complete (bool): True if all tasks completed
+        completion_info (dict|None): Completion check details
+        error (str|None): Error message if applicable
 
 **Parameters:**
 - `spec_id`: str
@@ -11593,7 +12027,7 @@ Returns:
 ### `reconcile_state(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:227`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:247`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -11753,7 +12187,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:934`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1064`
 **Complexity:** 1
 
 **Description:**
@@ -12000,6 +12434,20 @@ Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-col
 
 **Description:**
 > Helper to run sdd CLI with unified command (sdd-validate commands).
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_status_report.py:19`
+**Complexity:** 7
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
 
 ---
 
@@ -12565,6 +13013,61 @@ Example:
 **Parameters:**
 - `project_root`: str
 - `interactive`: bool
+
+---
+
+### `should_prompt_completion(spec_data, phase_id) -> Dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/completion.py:186`
+**Complexity:** 4
+
+**Description:**
+> Determine if completion prompt should be shown to user.
+
+A completion prompt should only be shown if the spec/phase is fully
+complete AND there are no blocked tasks. Blocked tasks indicate
+unresolved dependencies or issues that prevent true completion.
+
+This function prevents premature completion by checking both:
+1. All tasks are completed (via check_spec_completion)
+2. No tasks are currently blocked (blocked = incomplete dependencies)
+
+Args:
+    spec_data: JSON spec file data containing hierarchy and task information
+    phase_id: Optional phase ID to check specific phase completion.
+             If None, checks entire spec.
+
+Returns:
+    Dictionary with prompt decision and reasoning:
+    {
+        "should_prompt": bool,        # True if should show completion prompt
+        "reason": str,                 # Explanation for the decision
+        "is_complete": bool,           # Whether all tasks are complete
+        "blocked_count": int,          # Number of blocked tasks
+        "blocked_tasks": List[str],    # IDs of blocked tasks
+        "node_id": str,                # Node that was checked
+        "error": Optional[str]         # Error if check failed
+    }
+
+Example:
+    >>> from claude_skills.common.spec import load_spec
+    >>> from claude_skills.common.completion import should_prompt_completion
+    >>>
+    >>> spec_data = load_spec("specs/active/my-spec.json")
+    >>> result = should_prompt_completion(spec_data)
+    >>>
+    >>> if result["should_prompt"]:
+    ...     print("Ready to mark spec as complete!")
+    ...     print(result["reason"])
+    ... else:
+    ...     print(f"Not ready: {result['reason']}")
+    ...     if result["blocked_tasks"]:
+    ...         print(f"Blocked tasks: {result['blocked_tasks']}")
+
+**Parameters:**
+- `spec_data`: Dict
+- `phase_id`: Optional[str]
 
 ---
 
@@ -14488,7 +14991,7 @@ Returns:
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:353`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:415`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -14635,8 +15138,8 @@ Returns:
 ### `update_task_status(spec_id, task_id, new_status, specs_dir, note, dry_run, verify, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:52`
-⚠️ **Complexity:** 37 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:53`
+⚠️ **Complexity:** 47 (High)
 
 **Description:**
 > Update a task's status with automatic progress recalculation.
@@ -14927,7 +15430,7 @@ Returns:
 ### `validate_spec(spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:16`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:17`
 **Complexity:** 6
 
 **Description:**
@@ -15392,6 +15895,9 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/__init__.py`
 
+- `completion.check_spec_completion`
+- `completion.format_completion_prompt`
+- `completion.should_prompt_completion`
 - `dependency_analysis.DEFAULT_BOTTLENECK_THRESHOLD`
 - `dependency_analysis.analyze_dependencies`
 - `dependency_analysis.find_blocking_tasks`
@@ -15461,6 +15967,12 @@ Returns:
 - `validation.validate_node_type`
 - `validation.validate_spec_id_format`
 - `validation.validate_status`
+
+### `src/claude_skills/claude_skills/common/completion.py`
+
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/dependency_analysis.py`
 
@@ -15826,6 +16338,7 @@ Returns:
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.check_complete`
+- `claude_skills.common.completion.format_completion_prompt`
 - `claude_skills.common.ensure_reports_directory`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.get_progress_summary`
@@ -15856,6 +16369,8 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_next/discovery.py`
 
 - `claude_skills.common.check_doc_query_available`
+- `claude_skills.common.completion.check_spec_completion`
+- `claude_skills.common.completion.should_prompt_completion`
 - `claude_skills.common.get_node`
 - `claude_skills.common.get_task_context_from_docs`
 - `claude_skills.common.load_json_spec`
@@ -16139,6 +16654,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/status.py`
 
+- `claude_skills.common.completion.check_spec_completion`
 - `claude_skills.common.execute_verify_task`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.progress.recalculate_progress`
@@ -16163,6 +16679,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/validation.py`
 
+- `claude_skills.common.completion.check_spec_completion`
 - `claude_skills.common.dependency_analysis.find_circular_dependencies`
 - `claude_skills.common.hierarchy_validation.validate_spec_hierarchy`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -16383,6 +16900,14 @@ Returns:
 - `subprocess`
 - `sys`
 
+### `src/claude_skills/claude_skills/tests/integration/test_status_report.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `subprocess`
+- `sys`
+
 ### `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py`
 
 - `claude_skills.common.hierarchy_validation.validate_spec_hierarchy`
@@ -16512,6 +17037,16 @@ Returns:
 ### `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py`
 
 - `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`
+
+- `claude_skills.common.completion.check_spec_completion`
+- `claude_skills.common.completion.count_blocked_tasks`
+- `claude_skills.common.completion.format_completion_prompt`
+- `claude_skills.common.completion.get_all_tasks_in_subtree`
+- `claude_skills.common.completion.is_task_complete`
+- `claude_skills.common.completion.should_prompt_completion`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py`

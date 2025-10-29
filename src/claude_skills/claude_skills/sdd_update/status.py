@@ -12,6 +12,7 @@ from claude_skills.common.spec import load_json_spec, save_json_spec, update_nod
 from claude_skills.common.progress import recalculate_progress
 from claude_skills.common.printer import PrettyPrinter
 from claude_skills.common import execute_verify_task
+from claude_skills.common.completion import check_spec_completion
 
 
 def find_verify_tasks_for_task(spec_data: dict, task_id: str) -> List[str]:
@@ -143,6 +144,67 @@ def update_task_status(
         return False
 
     printer.success(f"Task {task_id} status updated to '{new_status}'")
+
+    # Check if spec is complete after marking task as completed
+    completion_result = None
+    if new_status == "completed" and not dry_run:
+        completion_result = check_spec_completion(spec_data)
+
+        # Display completion prompt if appropriate
+        from claude_skills.common.completion import should_prompt_completion, format_completion_prompt
+
+        # Check if we should prompt
+        prompt_decision = should_prompt_completion(spec_data)
+
+        if prompt_decision.get("should_prompt"):
+            # Format the prompt
+            prompt_data = format_completion_prompt(spec_data, show_hours_input=True)
+
+            if not prompt_data.get("error"):
+                # Display the prompt
+                printer.info("\n" + "=" * 60)
+                printer.success(prompt_data["prompt_text"])
+                printer.info("=" * 60)
+
+                # Get user confirmation
+                from claude_skills.sdd_update.lifecycle import complete_spec
+
+                user_input = input("\nMark spec as complete? (y/n): ").strip().lower()
+
+                if user_input in ['y', 'yes']:
+                    # Get actual hours if estimated hours exist
+                    actual_hours = None
+                    if prompt_data["requires_input"]:
+                        try:
+                            hours_input = input("Enter actual hours spent (or press Enter to skip): ").strip()
+                            if hours_input:
+                                actual_hours = float(hours_input)
+                        except ValueError:
+                            printer.warning("Invalid hours input, skipping")
+
+                    # Call complete_spec
+                    printer.info("\nMarking spec as complete...")
+                    success = complete_spec(
+                        spec_id=spec_id,
+                        spec_file=None,  # Will be auto-detected
+                        specs_dir=specs_dir,
+                        actual_hours=actual_hours,
+                        skip_doc_regen=False,
+                        dry_run=False,
+                        printer=printer
+                    )
+
+                    if success:
+                        printer.success("Spec marked as complete!")
+                    else:
+                        printer.error("Failed to complete spec")
+                else:
+                    printer.info("Spec completion skipped")
+        else:
+            # Inform user why completion prompt was not shown
+            reason = prompt_decision.get("reason", "Unknown reason")
+            if "blocked" in reason.lower():
+                printer.warning(f"\n⚠️  Spec completion not available: {reason}")
 
     # Run verification if requested and task is completed
     if verify and new_status == "completed" and not dry_run:

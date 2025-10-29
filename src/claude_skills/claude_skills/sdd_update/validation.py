@@ -11,6 +11,7 @@ from claude_skills.common.progress import get_progress_summary, list_phases, get
 from claude_skills.common.printer import PrettyPrinter
 from claude_skills.common.dependency_analysis import find_circular_dependencies
 from claude_skills.common.hierarchy_validation import validate_spec_hierarchy
+from claude_skills.common.completion import check_spec_completion
 
 
 def validate_spec(
@@ -119,6 +120,17 @@ def get_status_report(
     if unjournaled:
         report["unjournaled_task_list"] = unjournaled
 
+    # Check if spec is complete
+    completion_result = check_spec_completion(spec_data)
+
+    # Add completion status to report
+    report["completion_status"] = {
+        "is_complete": completion_result["is_complete"],
+        "percentage": completion_result["percentage"],
+        "incomplete_tasks": completion_result["incomplete_tasks"],
+        "can_finalize": completion_result["can_finalize"]
+    }
+
     # Display report
     printer.header(f"Status Report: {progress['title']}")
 
@@ -139,6 +151,14 @@ def get_status_report(
     for phase in phases:
         status_symbol = {"completed": "✓", "in_progress": "→", "pending": "○", "blocked": "✗"}.get(phase["status"], "?")
         printer.detail(f"{status_symbol} {phase['title']}: {phase['completed_tasks']}/{phase['total_tasks']} ({phase['percentage']}%)")
+
+    # Display completion status if relevant
+    if completion_result["is_complete"]:
+        printer.success("\n✅ Spec is complete! All tasks finished.")
+        printer.detail("  Run 'sdd complete-spec' command to finalize and move to completed folder")
+    elif completion_result["percentage"] >= 90:
+        remaining = len(completion_result["incomplete_tasks"])
+        printer.info(f"\n⏳ Almost there! {remaining} task(s) remaining")
 
     return report
 
