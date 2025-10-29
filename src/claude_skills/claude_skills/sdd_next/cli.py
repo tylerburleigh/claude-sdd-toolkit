@@ -28,6 +28,7 @@ from claude_skills.common import (
     check_complete,
     list_blockers as list_blocked_tasks
 )
+from claude_skills.common.completion import format_completion_prompt
 
 # Import from sdd_next module
 from claude_skills.sdd_next.discovery import (
@@ -541,7 +542,46 @@ def cmd_init_env(args, printer):
 
 
 def cmd_prepare_task(args, printer):
-    """Prepare task for implementation."""
+    """
+    Prepare task for implementation.
+
+    This command integrates with the automatic completion detection system.
+    It calls prepare_task() from discovery.py which returns completion signals
+    when all tasks in a spec are finished.
+
+    Completion Signal Handling (from prepare_task() in discovery.py):
+    ----------------------------------------------------------------
+    prepare_task() performs completion detection and returns different signals
+    based on the spec's state:
+
+    Scenario 1: No Actionable Tasks Available
+        - Returned when: No pending/unblocked tasks found
+        - Signal: success=False, spec_complete=False
+        - completion_info present if tasks are blocked
+        - Indicates: Tasks exist but are blocked by dependencies
+
+    Scenario 2: Spec/Phase Complete
+        - Returned when: All tasks completed, no blocked tasks
+        - Signal: success=True, spec_complete=True
+        - completion_info contains should_prompt=True
+        - Indicates: Ready to finalize and move to completed/
+
+    Scenario 3: Normal Task Found
+        - Returned when: Found actionable task to work on
+        - Signal: success=True, task_id set, spec_complete=False
+        - Indicates: Continue normal workflow with returned task
+
+    The completion_info dict structure (from should_prompt_completion):
+        {
+            "should_prompt": bool,      # True if ready to complete
+            "reason": str,               # Human-readable explanation
+            "is_complete": bool,         # All tasks done
+            "blocked_count": int,        # Number of blocked tasks
+            "blocked_tasks": List[str],  # IDs of blocked tasks
+            "node_id": str,              # Node that was checked
+            "error": Optional[str]       # Error if check failed
+        }
+    """
     if not args.json:
         printer.action("Preparing task for implementation...")
 
@@ -553,12 +593,102 @@ def cmd_prepare_task(args, printer):
     # Ensure .reports/ directory exists (defensive)
     ensure_reports_directory(specs_dir)
 
+    # Call prepare_task() - this is where completion detection happens
+    # Returns completion signals when spec is finished or blocked
     task_prep = prepare_task(args.spec_id, specs_dir, args.task_id)
 
     if not task_prep["success"]:
-        printer.error(task_prep['error'])
+        # ==========================================
+        # SCENARIO 1: No Actionable Tasks Available
+        # ==========================================
+        # This occurs when:
+        #   - No pending tasks exist, OR
+        #   - All pending tasks are blocked by dependencies
+        #
+        # The completion_info will be present if tasks are blocked,
+        # helping distinguish between "truly done" vs "stuck on blockers"
+        completion_info = task_prep.get('completion_info')
+        if completion_info:
+            # Enhanced error messaging with completion context
+            printer.error(task_prep['error'])
+            reason = completion_info.get('reason', '')
+            if reason:
+                printer.detail(f"Reason: {reason}")
+
+            # Show blocked task count if available
+            blocked_count = completion_info.get('blocked_count', 0)
+            if blocked_count > 0:
+                printer.detail(f"Blocked tasks: {blocked_count}")
+                print(f"\n💡 Run 'sdd list-blockers {args.spec_id}' for details")
+        else:
+            # Original error handling (no completion info available)
+            # This path is rare - usually for validation errors
+            printer.error(task_prep['error'])
         return 1
 
+    # ==========================================
+    # SCENARIO 2: Spec/Phase Complete
+    # ==========================================
+    # This is the COMPLETION SIGNAL from automatic detection!
+    #
+    # This occurs when:
+    #   - All tasks in the spec are marked "completed"
+    #   - No tasks are in "blocked" state
+    #   - should_prompt_completion() returned should_prompt=True
+    #
+    # At this point, the spec is ready to be finalized and moved
+    # to the completed/ directory. This displays a user-friendly
+    # completion prompt (task-3-2-2).
+    if task_prep.get('spec_complete'):
+        completion_info = task_prep.get('completion_info', {})
+
+        if args.json:
+            print(json.dumps(task_prep, indent=2))
+        else:
+            # Show completion message
+            printer.success("All tasks completed!")
+            printer.result("Status", "Spec is complete and ready to finalize")
+
+            reason = completion_info.get('reason', '')
+            if reason:
+                printer.detail(reason)
+
+            # Display formatted completion prompt (task-3-2-2)
+            # Load spec data for prompt formatting
+            spec_data = load_json_spec(args.spec_id, specs_dir)
+            if spec_data:
+                # Generate formatted completion prompt
+                prompt_result = format_completion_prompt(spec_data, phase_id=None, show_hours_input=False)
+
+                if prompt_result.get('error'):
+                    # Fallback to simple message if prompt generation fails
+                    printer.warning(f"Could not generate completion prompt: {prompt_result['error']}")
+                    print(f"\n💡 Run 'sdd complete-spec {args.spec_id}' to mark as complete and move to completed/ folder")
+                else:
+                    # Display the formatted prompt
+                    print(f"\n{prompt_result['prompt_text']}")
+                    print(f"\n💡 To complete this spec, run: sdd complete-spec {args.spec_id}")
+            else:
+                # Fallback if spec data cannot be loaded
+                print(f"\n💡 Run 'sdd complete-spec {args.spec_id}' to mark as complete and move to completed/ folder")
+
+        return 0
+
+    # ==========================================
+    # SCENARIO 3: Normal Task Found
+    # ==========================================
+    # This is the standard workflow path.
+    #
+    # This occurs when:
+    #   - Found a pending task that is unblocked
+    #   - Task is ready to be worked on
+    #   - Spec still has work remaining
+    #
+    # The returned task_prep includes:
+    #   - task_id: The next task to work on
+    #   - task_data: Full task metadata from JSON spec
+    #   - dependencies: Dependency analysis (blocked_by, soft_depends, blocks)
+    #   - doc_context: Optional codebase context from doc-query
     if args.json:
         print(json.dumps(task_prep, indent=2))
     else:

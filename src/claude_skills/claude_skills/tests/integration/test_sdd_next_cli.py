@@ -340,3 +340,90 @@ class TestCLIWorkflows:
             text=True
         )
         assert result.returncode == 0
+
+
+@pytest.mark.integration
+class TestCompletionDetection:
+    """Tests for automatic spec completion detection in sdd-next workflow."""
+
+    def test_completion_detection_prepare_task(self, sample_json_spec_completed, specs_structure):
+        """Test completion prompt appears when prepare_task finds all tasks complete."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+
+        spec_id = "completed-spec-2025-01-01-007"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Ensure all tasks are completed
+        for node_id, node in spec_data["hierarchy"].items():
+            if node.get("type") == "task":
+                node["status"] = "completed"
+
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Run prepare-task which should detect completion
+        result = run_cli(
+            "prepare-task",
+            spec_id,
+            "--path", str(specs_structure),
+            capture_output=True,
+            text=True
+        )
+
+        # Should show completion message
+        assert "complete" in result.stdout.lower() or "all tasks" in result.stdout.lower()
+
+    def test_all_blocked_messaging(self, sample_json_spec_with_blockers, specs_structure):
+        """Test that 'all blocked' shows different message than 'all completed'."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+
+        spec_id = "blocked-spec-2025-01-01-005"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Mark all tasks as either completed or blocked (no pending)
+        for node_id, node in spec_data["hierarchy"].items():
+            if node.get("type") == "task":
+                if node.get("status") != "blocked":
+                    node["status"] = "completed"
+
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Run prepare-task
+        result = run_cli(
+            "prepare-task",
+            spec_id,
+            "--path", str(specs_structure),
+            capture_output=True,
+            text=True
+        )
+
+        # When there are blocked tasks, should show "remaining" or "no actionable tasks"
+        # (blocked tasks count as incomplete/remaining)
+        assert "remaining" in result.stdout.lower() or "no actionable" in result.stdout.lower()
+
+    def test_prepare_task_with_completion_and_blockers(self, sample_json_spec_with_blockers, specs_structure):
+        """Test prepare-task when spec is complete but has blocked tasks."""
+        from claude_skills.common.spec import load_json_spec, save_json_spec
+
+        spec_id = "blocked-spec-2025-01-01-005"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Mark all non-blocked tasks as completed
+        for node_id, node in spec_data["hierarchy"].items():
+            if node.get("type") == "task" and node.get("status") != "blocked":
+                node["status"] = "completed"
+
+        save_json_spec(spec_id, specs_structure, spec_data)
+
+        # Run prepare-task
+        result = run_cli(
+            "prepare-task",
+            spec_id,
+            "--path", str(specs_structure),
+            capture_output=True,
+            text=True
+        )
+
+        # Should show that there are remaining tasks (the blocked ones)
+        assert "remaining" in result.stdout.lower() or "no actionable" in result.stdout.lower()
+        # Should NOT show completion prompt since blocked tasks exist
+        assert not ("mark spec as complete" in result.stdout.lower())

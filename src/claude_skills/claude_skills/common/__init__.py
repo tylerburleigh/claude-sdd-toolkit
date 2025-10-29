@@ -14,6 +14,7 @@ from .spec import (
     extract_frontmatter,
 )
 from .progress import recalculate_progress, update_parent_status, get_progress_summary, list_phases
+from .completion import check_spec_completion, should_prompt_completion, format_completion_prompt
 from .paths import (
     find_specs_directory,
     validate_path,
@@ -121,6 +122,11 @@ __all__ = [
     "update_parent_status",
     "get_progress_summary",
     "list_phases",
+
+    # Completion detection
+    "check_spec_completion",
+    "should_prompt_completion",
+    "format_completion_prompt",
 
     # Path utilities
     "find_specs_directory",
