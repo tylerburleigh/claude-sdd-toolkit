@@ -1,0 +1,1606 @@
+{
+  "spec_id": "ai-enhanced-rendering-2025-10-28-001",
+  "title": "AI-Enhanced Spec Rendering Skill",
+  "generated": "2025-10-28T00:00:00Z",
+  "last_updated": "2025-10-28T22:34:29.393376Z",
+  "metadata": {
+    "status": "draft",
+    "estimated_hours": 24,
+    "complexity": "high",
+    "description": "Create an AI-enhanced rendering skill that transforms JSON specs into intelligent, hierarchical markdown with executive summaries, progressive disclosure, dependency visualization, and narrative flow. Replaces the current simple template-based renderer with context-aware formatting.",
+    "objectives": [
+      "Generate AI-powered executive summaries with key insights and critical path analysis",
+      "Implement progressive disclosure with collapsible sections and smart detail levels",
+      "Create Mermaid dependency graphs for visualization of task relationships",
+      "Add intelligent task grouping and ordering by priority, risk, and complexity",
+      "Enhance narrative flow to make specs more readable and actionable",
+      "Maintain compatibility with existing sdd render CLI interface",
+      "Use main agent for AI analysis (skill-based approach)"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "title": "AI-Enhanced Spec Rendering Skill",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 49,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Foundation & Skill Setup",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Set up the new sdd-render skill structure and integrate with existing CLI",
+        "risk_level": "low",
+        "estimated_hours": 4
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "id": "phase-1-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Create sdd_render_skill directory structure",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/",
+        "estimated_hours": 0.5,
+        "changes": "Create new skill directory with __init__.py, SKILL.md, and skill_main.py following existing skill patterns",
+        "reasoning": "Establish the foundational structure for the new skill following toolkit conventions"
+      }
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Create SKILL.md for sdd-render",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/SKILL.md",
+        "estimated_hours": 1,
+        "changes": "Write comprehensive skill documentation explaining purpose, usage, AI enhancement features, and integration with sdd render CLI",
+        "reasoning": "Document the skill's capabilities and usage patterns for Claude agents"
+      }
+    },
+    "task-1-3": {
+      "id": "task-1-3",
+      "type": "task",
+      "title": "Implement skill_main.py entry point",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-1"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/skill_main.py",
+        "estimated_hours": 1.5,
+        "changes": "Create skill entry point that: 1) Validates spec path, 2) Calls existing sdd render CLI for base markdown, 3) Orchestrates AI enhancement pipeline, 4) Outputs enhanced markdown",
+        "reasoning": "Establish the main skill workflow that integrates with existing renderer"
+      }
+    },
+    "task-1-4": {
+      "id": "task-1-4",
+      "type": "task",
+      "title": "Register skill in toolkit",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/__init__.py",
+        "estimated_hours": 0.5,
+        "changes": "Add sdd_render_skill to skill registry and exports",
+        "reasoning": "Make the new skill discoverable and invokable via Skill() tool"
+      }
+    },
+    "phase-1-verify": {
+      "id": "phase-1-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "id": "verify-1-1",
+      "type": "verify",
+      "title": "Skill structure validates",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -c \"from claude_skills.sdd_render_skill import skill_main\"",
+        "expected": "Module imports without errors"
+      }
+    },
+    "verify-1-2": {
+      "id": "verify-1-2",
+      "type": "verify",
+      "title": "Skill appears in toolkit",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Check that Skill(sdd-toolkit:sdd-render) is available",
+        "expected": "Skill is registered and invokable"
+      }
+    },
+    "phase-2": {
+      "id": "phase-2",
+      "type": "phase",
+      "title": "AI Analysis Engine",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Build the core AI analysis components that extract insights from specs",
+        "risk_level": "medium",
+        "estimated_hours": 8
+      }
+    },
+    "phase-2-files": {
+      "id": "phase-2-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5",
+        "task-2-6"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "id": "task-2-1",
+      "type": "task",
+      "title": "Create spec_analyzer.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-3"
+        ],
+        "blocked_by": [
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/spec_analyzer.py",
+        "estimated_hours": 2
+      }
+    },
+    "task-2-1-1": {
+      "id": "task-2-1-1",
+      "type": "subtask",
+      "title": "Implement SpecAnalyzer class",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-1-2",
+          "task-2-1-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Create class that parses JSON spec and builds internal analysis model",
+        "reasoning": "Core analyzer that processes spec structure"
+      }
+    },
+    "task-2-1-2": {
+      "id": "task-2-1-2",
+      "type": "subtask",
+      "title": "Add critical path detection",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Implement graph algorithm to identify critical path through dependency tree",
+        "reasoning": "Essential for highlighting blocking tasks"
+      }
+    },
+    "task-2-1-3": {
+      "id": "task-2-1-3",
+      "type": "subtask",
+      "title": "Add bottleneck detection",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Identify tasks with many dependents (high fan-out)",
+        "reasoning": "Highlight tasks that block many others"
+      }
+    },
+    "task-2-2": {
+      "id": "task-2-2",
+      "type": "task",
+      "title": "Create priority_ranker.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/priority_ranker.py",
+        "estimated_hours": 1.5,
+        "changes": "Implement multi-factor priority scoring: risk_level weight, dependency count, estimated_hours, task_category, blocking status. Returns ranked task list.",
+        "reasoning": "Enable intelligent task ordering in rendered output"
+      }
+    },
+    "task-2-3": {
+      "id": "task-2-3",
+      "type": "task",
+      "title": "Create complexity_scorer.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/complexity_scorer.py",
+        "estimated_hours": 1,
+        "changes": "Calculate complexity score based on: subtask depth, dependency count, estimated hours, file path patterns",
+        "reasoning": "Support adaptive formatting based on task complexity"
+      }
+    },
+    "task-2-4": {
+      "id": "task-2-4",
+      "type": "task",
+      "title": "Create insight_generator.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-1"
+        ],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1",
+          "task-2-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/insight_generator.py",
+        "estimated_hours": 2,
+        "changes": "Extract actionable insights: risk warnings, time estimates, suggested next steps, dependency conflicts, phase completion predictions",
+        "reasoning": "Provide AI-generated recommendations and warnings"
+      }
+    },
+    "task-2-5": {
+      "id": "task-2-5",
+      "type": "task",
+      "title": "Create dependency_graph.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-3"
+        ],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/dependency_graph.py",
+        "estimated_hours": 1.5,
+        "changes": "Generate Mermaid flowchart/graph syntax from dependency relationships. Support filtering by phase, critical path highlighting, collapsible subgraphs.",
+        "reasoning": "Enable visual dependency understanding"
+      }
+    },
+    "task-2-6": {
+      "id": "task-2-6",
+      "type": "task",
+      "title": "Create task_grouper.py module",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/task_grouper.py",
+        "estimated_hours": 1,
+        "changes": "Implement smart grouping strategies: by file/directory, by task_category, by risk level, by dependencies. Return grouped task structure.",
+        "reasoning": "Support multiple viewing perspectives beyond phase hierarchy"
+      }
+    },
+    "phase-2-verify": {
+      "id": "phase-2-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "id": "verify-2-1",
+      "type": "verify",
+      "title": "Critical path detection works",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_render_skill/test_spec_analyzer.py::test_critical_path",
+        "expected": "Correctly identifies longest dependency chain"
+      }
+    },
+    "verify-2-2": {
+      "id": "verify-2-2",
+      "type": "verify",
+      "title": "Priority ranking is deterministic",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_render_skill/test_priority_ranker.py",
+        "expected": "Same spec produces same ranking consistently"
+      }
+    },
+    "verify-2-3": {
+      "id": "verify-2-3",
+      "type": "verify",
+      "title": "Mermaid syntax is valid",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Generate graph for test spec and validate at mermaid.live",
+        "expected": "Graph renders without syntax errors"
+      }
+    },
+    "verify-2-4": {
+      "id": "verify-2-4",
+      "type": "verify",
+      "title": "Task grouping covers all tasks",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_render_skill/test_task_grouper.py::test_complete_coverage",
+        "expected": "Every task appears in exactly one group"
+      }
+    },
+    "phase-3": {
+      "id": "phase-3",
+      "type": "phase",
+      "title": "AI Enhancement Layer",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 14,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement AI-powered content generation for summaries and narrative",
+        "risk_level": "medium",
+        "estimated_hours": 6
+      }
+    },
+    "phase-3-files": {
+      "id": "phase-3-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4",
+        "task-3-5"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "id": "task-3-1",
+      "type": "task",
+      "title": "Create executive_summary.py module",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-1"
+        ],
+        "blocked_by": [
+          "task-2-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/executive_summary.py",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-1-1": {
+      "id": "task-3-1-1",
+      "type": "subtask",
+      "title": "Build summary prompt template",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Create prompt that asks agent to summarize: objectives, scope, key phases, critical path, estimated effort, major risks",
+        "reasoning": "Generate concise overview for quick understanding"
+      }
+    },
+    "task-3-1-2": {
+      "id": "task-3-1-2",
+      "type": "subtask",
+      "title": "Integrate with main agent",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-1-3"
+        ],
+        "blocked_by": [
+          "task-3-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Call agent with prompt + spec data, parse markdown response",
+        "reasoning": "Leverage main agent for intelligent summarization"
+      }
+    },
+    "task-3-1-3": {
+      "id": "task-3-1-3",
+      "type": "subtask",
+      "title": "Add key metrics extraction",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Extract and format: total/completed tasks, phases, estimated hours, complexity, risk areas",
+        "reasoning": "Provide at-a-glance metrics"
+      }
+    },
+    "task-3-2": {
+      "id": "task-3-2",
+      "type": "task",
+      "title": "Create progressive_disclosure.py module",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-1"
+        ],
+        "blocked_by": [
+          "task-2-2",
+          "task-2-6"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/progressive_disclosure.py",
+        "estimated_hours": 2
+      }
+    },
+    "task-3-2-1": {
+      "id": "task-3-2-1",
+      "type": "subtask",
+      "title": "Implement detail level calculator",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Calculate detail level (summary/medium/full) based on: task status, priority, risk, user context",
+        "reasoning": "Determine how much detail to show per section"
+      }
+    },
+    "task-3-2-2": {
+      "id": "task-3-2-2",
+      "type": "subtask",
+      "title": "Generate collapsible markdown",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Use HTML <details><summary> tags for collapsible sections in markdown",
+        "reasoning": "Enable progressive disclosure in rendered output"
+      }
+    },
+    "task-3-3": {
+      "id": "task-3-3",
+      "type": "task",
+      "title": "Create visualization_builder.py module",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1"
+        ],
+        "blocked_by": [
+          "task-2-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/visualization_builder.py",
+        "estimated_hours": 1.5,
+        "changes": "Build visualizations: dependency graph (Mermaid), progress charts (ASCII/Mermaid), timeline (Mermaid gantt), category distribution",
+        "reasoning": "Generate visual representations of spec structure"
+      }
+    },
+    "task-3-4": {
+      "id": "task-3-4",
+      "type": "task",
+      "title": "Create narrative_enhancer.py module",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1"
+        ],
+        "blocked_by": [],
+        "depends": [
+          "task-2-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/narrative_enhancer.py",
+        "estimated_hours": 2,
+        "changes": "Use AI to: add transitional text between phases, explain dependency rationale, suggest implementation order, provide context for decisions",
+        "reasoning": "Make specs read more like a story than a list"
+      }
+    },
+    "task-3-5": {
+      "id": "task-3-5",
+      "type": "task",
+      "title": "Create ai_prompts.py module",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/ai_prompts.py",
+        "estimated_hours": 1,
+        "changes": "Centralize all AI prompt templates: summary generation, narrative enhancement, insight extraction, risk analysis",
+        "reasoning": "Maintain consistent prompt engineering in one place"
+      }
+    },
+    "phase-3-verify": {
+      "id": "phase-3-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4",
+        "verify-3-5",
+        "verify-3-6"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "id": "verify-3-1",
+      "type": "verify",
+      "title": "Executive summary is concise",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Generate summary for large spec, verify < 500 words",
+        "expected": "Summary captures essence without overwhelming detail"
+      }
+    },
+    "verify-3-2": {
+      "id": "verify-3-2",
+      "type": "verify",
+      "title": "Collapsible sections render correctly",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "View rendered markdown in GitHub or markdown previewer",
+        "expected": "Details tags work, content is expandable/collapsible"
+      }
+    },
+    "verify-3-3": {
+      "id": "verify-3-3",
+      "type": "verify",
+      "title": "Visualizations render in markdown",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Check Mermaid graphs render on GitHub/mermaid.live",
+        "expected": "All diagrams display correctly"
+      }
+    },
+    "verify-3-4": {
+      "id": "verify-3-4",
+      "type": "verify",
+      "title": "Narrative flows naturally",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Read enhanced spec, check for smooth transitions",
+        "expected": "Spec reads like coherent document, not fragmented list"
+      }
+    },
+    "verify-3-5": {
+      "id": "verify-3-5",
+      "type": "verify",
+      "title": "AI responses are relevant",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test with various spec types, verify AI output accuracy",
+        "expected": "Summaries and narratives accurately reflect spec content"
+      }
+    },
+    "verify-3-6": {
+      "id": "verify-3-6",
+      "type": "verify",
+      "title": "Progressive disclosure adapts to context",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Compare output for small vs large specs, verify detail levels differ",
+        "expected": "Large specs show more collapsed sections, small specs more detail"
+      }
+    },
+    "phase-4": {
+      "id": "phase-4",
+      "type": "phase",
+      "title": "Enhanced Markdown Generator",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Assemble all components into final enhanced markdown output",
+        "risk_level": "low",
+        "estimated_hours": 4
+      }
+    },
+    "phase-4-files": {
+      "id": "phase-4-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "id": "task-4-1",
+      "type": "task",
+      "title": "Create markdown_composer.py module",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2"
+        ],
+        "blocked_by": [
+          "task-3-1",
+          "task-3-2",
+          "task-3-3",
+          "task-3-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/markdown_composer.py",
+        "estimated_hours": 2
+      }
+    },
+    "task-4-1-1": {
+      "id": "task-4-1-1",
+      "type": "subtask",
+      "title": "Parse base markdown from sdd render",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Read markdown output from sdd render CLI, parse into sections",
+        "reasoning": "Use existing renderer as foundation"
+      }
+    },
+    "task-4-1-2": {
+      "id": "task-4-1-2",
+      "type": "subtask",
+      "title": "Inject AI enhancements",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-1-3"
+        ],
+        "blocked_by": [
+          "task-4-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Insert: executive summary at top, visualizations after objectives, narrative transitions between phases, insights in sidebars",
+        "reasoning": "Layer AI enhancements onto base markdown"
+      }
+    },
+    "task-4-1-3": {
+      "id": "task-4-1-3",
+      "type": "subtask",
+      "title": "Apply progressive disclosure",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "changes": "Wrap appropriate sections in details/summary tags based on detail level calculation",
+        "reasoning": "Make large specs more navigable"
+      }
+    },
+    "task-4-2": {
+      "id": "task-4-2",
+      "type": "task",
+      "title": "Update skill_main.py orchestration",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-3",
+          "task-4-4"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/skill_main.py",
+        "estimated_hours": 1,
+        "changes": "Wire up full pipeline: load spec \u2192 call sdd render \u2192 analyze \u2192 enhance \u2192 compose \u2192 output",
+        "reasoning": "Complete end-to-end skill workflow"
+      }
+    },
+    "task-4-3": {
+      "id": "task-4-3",
+      "type": "task",
+      "title": "Add output formatting options",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/skill_main.py",
+        "estimated_hours": 0.5,
+        "changes": "Support output modes: full (all enhancements), summary (executive only), standard (base + narrative)",
+        "reasoning": "Give users control over enhancement level"
+      }
+    },
+    "task-4-4": {
+      "id": "task-4-4",
+      "type": "task",
+      "title": "Add error handling and fallbacks",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/skill_main.py",
+        "estimated_hours": 0.5,
+        "changes": "Handle: AI failures (fall back to base markdown), invalid specs (use validation), missing dependencies (graceful degradation)",
+        "reasoning": "Ensure skill always produces usable output"
+      }
+    },
+    "phase-4-verify": {
+      "id": "phase-4-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3",
+        "verify-4-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "id": "verify-4-1",
+      "type": "verify",
+      "title": "End-to-end skill invocation works",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Skill(sdd-toolkit:sdd-render) on test spec",
+        "expected": "Enhanced markdown generated successfully"
+      }
+    },
+    "verify-4-2": {
+      "id": "verify-4-2",
+      "type": "verify",
+      "title": "Output replaces base markdown",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Check specs/.human-readable/ contains enhanced version",
+        "expected": "Enhanced markdown saved to standard location"
+      }
+    },
+    "verify-4-3": {
+      "id": "verify-4-3",
+      "type": "verify",
+      "title": "Fallback to base markdown works",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Simulate AI failure, verify base markdown returned",
+        "expected": "Skill gracefully degrades to standard rendering"
+      }
+    },
+    "verify-4-4": {
+      "id": "verify-4-4",
+      "type": "verify",
+      "title": "All output modes function",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Test full, summary, and standard modes",
+        "expected": "Each mode produces appropriate level of enhancement"
+      }
+    },
+    "phase-5": {
+      "id": "phase-5",
+      "type": "phase",
+      "title": "Testing & Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Comprehensive testing and documentation for production readiness",
+        "risk_level": "low",
+        "estimated_hours": 6
+      }
+    },
+    "phase-5-files": {
+      "id": "phase-5-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "id": "task-5-1",
+      "type": "task",
+      "title": "Create unit tests",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_sdd_render_skill/",
+        "estimated_hours": 3,
+        "changes": "Write tests for: spec_analyzer, priority_ranker, complexity_scorer, dependency_graph, task_grouper, progressive_disclosure",
+        "reasoning": "Ensure all analysis components work correctly"
+      }
+    },
+    "task-5-2": {
+      "id": "task-5-2",
+      "type": "task",
+      "title": "Create integration tests",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_sdd_render_skill/",
+        "estimated_hours": 2,
+        "changes": "Test end-to-end: small spec, large spec, spec with complex dependencies, spec with all features",
+        "reasoning": "Verify full pipeline produces correct enhanced markdown"
+      }
+    },
+    "task-5-3": {
+      "id": "task-5-3",
+      "type": "task",
+      "title": "Update SKILL.md with examples",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "src/claude_skills/claude_skills/sdd_render_skill/SKILL.md",
+        "estimated_hours": 1,
+        "changes": "Add: usage examples, output samples, before/after comparisons, configuration options, troubleshooting",
+        "reasoning": "Make skill easy to understand and use"
+      }
+    },
+    "phase-5-verify": {
+      "id": "phase-5-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3",
+        "verify-5-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "id": "verify-5-1",
+      "type": "verify",
+      "title": "All unit tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_render_skill/ -v",
+        "expected": "All tests pass with >80% coverage"
+      }
+    },
+    "verify-5-2": {
+      "id": "verify-5-2",
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_render_skill/ -v",
+        "expected": "End-to-end workflows complete successfully"
+      }
+    },
+    "verify-5-3": {
+      "id": "verify-5-3",
+      "type": "verify",
+      "title": "Test with real specs",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Run skill on existing specs in specs/completed/",
+        "expected": "Enhanced markdown is improvement over original"
+      }
+    },
+    "verify-5-4": {
+      "id": "verify-5-4",
+      "type": "verify",
+      "title": "Documentation is complete",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Review SKILL.md completeness",
+        "expected": "All features documented with examples"
+      }
+    }
+  }
+}
