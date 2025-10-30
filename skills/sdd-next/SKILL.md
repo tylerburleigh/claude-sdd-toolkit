@@ -104,6 +104,111 @@ Example of INCORRECT context output (NEVER do this):
 echo "Context usage: approximately $(echo "scale=1; 90267/200000*100" | bc)% of available context"
 ```
 
+## General Output Formatting Guidelines
+
+**IMPORTANT - How to Present Execution Plans and Task Information:**
+
+When presenting execution plans, task summaries, verification details, or any output to the user, follow these formatting rules for maximum readability.
+
+**DO:**
+- ✅ Use clear section headers with proper markdown (## or **Header:**)
+- ✅ Put each item on its own line - **never cram multiple items together**
+- ✅ Add a space after emojis, colons, and labels
+- ✅ Use blank lines to separate sections
+- ✅ Use proper markdown lists (- or 1. with newlines)
+- ✅ Keep paragraphs concise and well-spaced
+
+**DO NOT:**
+- ❌ Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
+- ❌ Use bullet points (●) without proper list formatting
+- ❌ Create dense text blocks with odd line breaks
+- ❌ Let emojis run together or miss spaces after them
+
+**Example of CORRECT format:**
+```
+## Execution Plan Ready: verify-2-1
+
+**Type:** Manual Verification Task
+**Purpose:** Test task status transition resets
+**Phase:** Phase 2-verify - Verification (0/0 tasks, 0%)
+
+### Readiness Check
+
+✅ Ready to begin: no blocking dependencies
+
+### Verification Details
+
+**What we're testing:**
+When a task status is set to in_progress multiple times, the started_at timestamp should be updated each time.
+
+**Expected behavior:**
+- First transition to in_progress: started_at is set
+- Transition to pending: started_at remains
+- Second transition to in_progress: started_at updates to new timestamp
+
+### Implementation Steps
+
+**Step 1: Create test spec**
+- Action: Create minimal test spec file
+- Location: specs/active/test-verify.json
+- Duration: 2 minutes
+
+**Step 2: Test initial status**
+- Command: `sdd update-status test-verify task-1 in_progress`
+- Expected: started_at timestamp is set
+- Duration: 1 minute
+
+### Success Criteria
+
+✅ started_at is set on first in_progress transition
+✅ started_at updates on subsequent in_progress transitions
+✅ Timestamps use ISO 8601 format
+✅ No errors during transitions
+
+**Total Estimated Time:** 8 minutes
+```
+
+**Example of INCORRECT format (NEVER do this):**
+```
+● Execution Plan Ready: verify-2-1
+
+  📋 Task Summary
+
+  Type: Manual Verification TaskPurpose: Test task status transition resets
+  Phase: Phase 2-verify - Verification (0/0 tasks, 0%)
+
+  ✅ Readiness Check
+
+  - Ready to begin: no blocking dependencies
+
+  🎯 Verification Details
+
+  What we're testing: When a task status is set to in_progress multiple times...
+
+  Implementation Steps
+
+  Step 1: Create Test Spec
+
+  Action: Create a minimal test spec file for verificationLocation:
+  specs/active/test-verify-timestamps.jsonDuration: 2 minutes
+```
+
+**Issues with incorrect format:**
+- Multiple items on one line: "Type: Manual Verification TaskPurpose:"
+- Bullet points (●) used inconsistently
+- No clear section structure
+- Information crammed together without breathing room
+- Odd line breaks in the middle of information
+- Hard to scan quickly
+
+**This applies to all sdd-next output:**
+- Execution plan presentations
+- Task summaries and preparation
+- Verification findings
+- Progress reports
+- Context information
+- Any user-facing output
+
 ## Tool Verification
 
 **Before using this skill**, verify the required tools are available:
