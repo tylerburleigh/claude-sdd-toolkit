@@ -108,7 +108,7 @@ def update_task_status(
     if "metadata" not in task:
         task["metadata"] = {}
 
-    if new_status == "in_progress" and old_status == "pending":
+    if new_status == "in_progress":
         updates.setdefault("metadata", {})["started_at"] = timestamp
     elif new_status == "completed":
         updates.setdefault("metadata", {})["completed_at"] = timestamp
