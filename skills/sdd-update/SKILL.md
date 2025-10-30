@@ -101,6 +101,45 @@ The CLI provides proper error handling, validation, argument parsing, and interf
 
 If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
 
+## Output Formatting Guidelines
+
+**IMPORTANT - How to Present Information to Users:**
+
+When presenting task completion summaries, status updates, or progress information, follow these formatting rules:
+
+**DO:**
+- ✅ Output completion summaries and status updates directly as formatted text
+- ✅ Use proper spacing - **always add a space after emojis**
+- ✅ Put each major item on its own line for readability
+- ✅ Use blank lines to separate sections
+- ✅ Use clear section headers (e.g., "## Task Completed", "**Status:**")
+- ✅ Keep related information grouped together
+
+**DO NOT:**
+- ❌ Cram multiple items onto single lines
+- ❌ Let emojis run together without spaces
+- ❌ Use bash commands (like `echo`) for simple text output
+- ❌ Create dense, hard-to-read blocks of text
+
+**Example of CORRECT formatting:**
+```
+✅ Task Completed: task-2-3-1
+
+**Status:** Updated to completed
+**Journal:** Implementation details documented
+**Progress:** 31% complete (11/35 tasks)
+**Metadata:** Synced with spec file
+
+Next: Continuing with task-2-3-2...
+```
+
+**Example of INCORRECT formatting (NEVER do this):**
+```
+✅ Task Status: Updated to completed📝 Journal Entry: Added with full implementation details📊 Progress Updated: 31% complete (11/35 tasks)🔄 Metadata Synced:
+```
+
+The correct format makes information easy to scan and understand. The incorrect format is dense and hard to read.
+
 ## Quick Reference: Common Operations
 
 This table shows the most frequently used commands:
