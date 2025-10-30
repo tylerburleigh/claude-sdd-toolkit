@@ -31,7 +31,7 @@ Display this message and exit:
 ```
 ✅ SDD permissions are already configured for this project!
 
-You're all set. Run /sdd-start to begin working with specifications.
+You're all set. Run /sdd-begin to begin working with specifications.
 ```
 
 **If `configured: false`:**
@@ -58,7 +58,7 @@ After successful configuration, display:
 ✅ SDD permissions configured successfully!
 
 Next steps:
-• Run /sdd-start to resume existing work or start a new specification
+• Run /sdd-begin to resume existing work or start a new specification
 • Run sdd-plan skill to create a new detailed specification
 • See the SDD toolkit documentation for more information
 ```
@@ -78,7 +78,7 @@ The setup adds these permissions to `.claude/settings.json`:
 - Skill(sdd-toolkit:doc-query) + Skill(doc-query)
 
 **Commands:**
-- SlashCommand(/sdd-start)
+- SlashCommand(/sdd-begin)
 
 **CLI Tools:**
 - Bash(sdd:*) - Unified CLI for all sdd commands (doc, test, skills-dev, etc.)
@@ -108,7 +108,7 @@ If the setup fails:
 ## Integration
 
 After running this setup:
-- Use `/sdd-start` to begin your SDD workflow
+- Use `/sdd-begin` to begin your SDD workflow
 - Use `sdd-plan` skill to create specifications
 - Use `sdd-next` skill to work on tasks
 - Use `sdd-update` skill to track progress

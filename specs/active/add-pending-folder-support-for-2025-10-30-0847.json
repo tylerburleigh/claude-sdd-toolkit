@@ -14,7 +14,7 @@
     "objectives": [
       "Add specs/pending/ folder for spec backlog management",
       "Implement activate_spec() function to move specs pending \u2192 active",
-      "Integrate activation workflow into sdd-start and sdd-next",
+      "Integrate activation workflow into sdd-begin and sdd-next",
       "Update all discovery logic to include pending folder",
       "Allow multiple active specs (parallel work streams)",
       "Maintain backward compatibility with existing active/ specs",
@@ -22,7 +22,7 @@
     ],
     "success_criteria": [
       "New specs created via sdd-plan land in specs/pending/",
-      "sdd-start shows pending specs backlog and offers to activate selected ones",
+      "sdd-begin shows pending specs backlog and offers to activate selected ones",
       "sdd-next detects pending specs and prompts to activate first",
       "Multiple specs can exist in active/ simultaneously",
       "All existing active/ specs continue to work without changes",
@@ -763,7 +763,7 @@
       "total_tasks": 9,
       "completed_tasks": 0,
       "metadata": {
-        "purpose": "Update sdd-next and sdd-start to handle pending specs with activation workflow",
+        "purpose": "Update sdd-next and sdd-begin to handle pending specs with activation workflow",
         "risk_level": "medium",
         "estimated_hours": 12
       }
@@ -866,7 +866,7 @@
         "task_category": "implementation",
         "estimated_hours": 4,
         "changes": "Update discovery to include pending specs and categorize them separately",
-        "reasoning": "sdd-start helper must discover pending specs and provide counts for backlog management"
+        "reasoning": "sdd-begin helper must discover pending specs and provide counts for backlog management"
       }
     },
     "task-4-2-1": {
@@ -900,12 +900,12 @@
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
-        "details": "Add pending_specs field to helper output containing list of {spec_id, title} from pending/ folder, so sdd-start can show backlog"
+        "details": "Add pending_specs field to helper output containing list of {spec_id, title} from pending/ folder, so sdd-begin can show backlog"
       }
     },
     "task-4-3": {
       "type": "task",
-      "title": "commands/sdd-start.md",
+      "title": "commands/sdd-begin.md",
       "status": "pending",
       "parent": "phase-4-files",
       "children": [
@@ -920,11 +920,11 @@
       "total_tasks": 2,
       "completed_tasks": 0,
       "metadata": {
-        "file_path": "commands/sdd-start.md",
+        "file_path": "commands/sdd-begin.md",
         "task_category": "implementation",
         "estimated_hours": 2,
         "changes": "Add pending backlog management to workflow",
-        "reasoning": "sdd-start command must show backlog and offer to activate specs"
+        "reasoning": "sdd-begin command must show backlog and offer to activate specs"
       }
     },
     "task-4-3-1": {
@@ -1003,7 +1003,7 @@
     },
     "verify-4-2": {
       "type": "verify",
-      "title": "Test sdd-start shows pending backlog",
+      "title": "Test sdd-begin shows pending backlog",
       "status": "pending",
       "parent": "phase-4-verify",
       "children": [],
@@ -1016,13 +1016,13 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "command": "Create 2 test specs in pending/, run /sdd-start",
-        "expected": "sdd-start shows 'Found 2 pending specs in backlog' and offers to view/activate them"
+        "command": "Create 2 test specs in pending/, run /sdd-begin",
+        "expected": "sdd-begin shows 'Found 2 pending specs in backlog' and offers to view/activate them"
       }
     },
     "verify-4-3": {
       "type": "verify",
-      "title": "Test activation workflow from sdd-start",
+      "title": "Test activation workflow from sdd-begin",
       "status": "pending",
       "parent": "phase-4-verify",
       "children": [],
@@ -1035,7 +1035,7 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "command": "Create pending spec, run /sdd-start, select 'View pending backlog', choose a spec to activate",
+        "command": "Create pending spec, run /sdd-begin, select 'View pending backlog', choose a spec to activate",
         "expected": "Spec moves from pending/ to active/ and user can then run sdd next-task on it"
       }
     },
@@ -1602,7 +1602,7 @@
     },
     "verify-6-4": {
       "type": "verify",
-      "title": "Test sdd-start backlog workflow",
+      "title": "Test sdd-begin backlog workflow",
       "status": "pending",
       "parent": "phase-6-verify",
       "children": [],
@@ -1615,8 +1615,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "command": "Create multiple pending specs, run /sdd-start, select 'View pending backlog'",
-        "expected": "sdd-start shows pending spec list, allows activation of selected specs"
+        "command": "Create multiple pending specs, run /sdd-begin, select 'View pending backlog'",
+        "expected": "sdd-begin shows pending spec list, allows activation of selected specs"
       }
     },
     "verify-6-5": {

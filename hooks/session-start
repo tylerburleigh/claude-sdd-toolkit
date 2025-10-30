@@ -26,7 +26,7 @@ SETTINGS_FILE="${HOME}/.claude/settings.json"
 SPECS_ACTIVE_DIR="${PROJECT_ROOT}/specs/active"
 DEBUG_LOG="/tmp/session-start.log"
 MARKER_DIR="/tmp"
-MARKER_PREFIX=".claude-sdd-start"
+MARKER_PREFIX=".claude-sdd-begin"
 
 # =============================================================================
 # DEBUG LOGGING
@@ -230,7 +230,7 @@ main() {
     local system_msg=""
 
     if [ "$needs_perms" = "true" ]; then
-        system_msg="📋 This project needs SDD permission setup. Run /sdd-start to configure."
+        system_msg="📋 This project needs SDD permission setup. Run /sdd-begin to configure."
     fi
 
     if [ "$has_specs" = "true" ]; then
@@ -247,7 +247,7 @@ if specs:
             if [ -n "$system_msg" ]; then
                 system_msg="$system_msg | $spec_list"
             else
-                system_msg="$spec_list. Run /sdd-start to resume work."
+                system_msg="$spec_list. Run /sdd-begin to resume work."
             fi
         fi
     fi

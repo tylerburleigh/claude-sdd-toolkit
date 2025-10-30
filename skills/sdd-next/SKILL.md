@@ -82,9 +82,9 @@ This skill is part of the **Spec-Driven Development** family:
 - Monitor Claude's context window usage throughout task execution
 - Use `/context` command to check current usage percentage
 - **50% threshold**: At 50% or higher context usage, recommend pausing to preserve context for complex tasks
-- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-start`
+- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-begin`
   - Always save progress with sdd-update BEFORE clearing context
-  - Use /sdd-start to resume from the saved state
+  - Use /sdd-begin to resume from the saved state
 - **Why 50%?**: Complex tasks can consume 30-50% of context during preparation and implementation. Starting fresh ensures you won't hit limits mid-task
 - **Context preservation**: The /clear command wipes conversation history, so ensure all progress is saved to the spec file first
 
@@ -1649,7 +1649,7 @@ Before moving to the next task, check Claude's context window usage to avoid run
         options: [
           {
             label: "Save & Clear (Recommended)",
-            description: "Save progress with sdd-update, /clear, then /sdd-start to resume fresh"
+            description: "Save progress with sdd-update, /clear, then /sdd-begin to resume fresh"
           },
           {
             label: "Continue Anyway",
@@ -1681,7 +1681,7 @@ Before moving to the next task, check Claude's context window usage to avoid run
 **Important**: Always invoke `Skill(sdd-toolkit:sdd-update)` to save progress BEFORE running `/clear`, as clearing the conversation will lose any unsaved state.
 
 **Response Handling for >=50% context:**
-- **"Save & Clear"**: Confirm sdd-update was called, then instruct user to run `/clear` then `/sdd-start`
+- **"Save & Clear"**: Confirm sdd-update was called, then instruct user to run `/clear` then `/sdd-begin`
 - **"Continue Anyway"**: Proceed to find next task (step 5 below)
 - **"Finish for Now"**: Confirm work saved, provide summary of what was completed
 
@@ -1776,7 +1776,7 @@ This skill enables coordination across different implementation tools:
 3. Developer: Implements following the plan
 4. Developer: Uses sdd-update to update status
 5. Claude: Checks context usage with /context
-6. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise finds next task
+6. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise finds next task
 
 **Scenario: Claude creates plan, Cursor implements**
 1. Claude: Uses sdd-next to create plan
@@ -1786,7 +1786,7 @@ This skill enables coordination across different implementation tools:
 5. Cursor: Implements following Claude's plan
 6. Cursor: Updates JSON spec file when complete
 7. Claude: Checks context usage with /context
-8. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise reads updated JSON spec file and finds next task
+8. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise reads updated JSON spec file and finds next task
 
 ## Common Workflows
 
@@ -1839,7 +1839,7 @@ or "review progress" for detailed status.
    - User can say "stop" or "pause" to defer
 9. Continue implementation
 10. After completion, check context usage with /context
-11. If >= 50%, recommend sdd-update → /clear → /sdd-start workflow
+11. If >= 50%, recommend sdd-update → /clear → /sdd-begin workflow
 
 ### Workflow 3: Handling Blockers
 **Situation:** Next task is blocked by external issue

@@ -13,7 +13,7 @@ This directory contains Claude Code hooks that automate SDD (Spec-Driven Develop
 - Checks for `specs/active/` directory (SDD project marker)
 - Detects if permission setup is needed
 - Finds active specification files
-- Creates marker files in `/tmp/.claude-sdd-start-*.json` for Claude to read
+- Creates marker files in `/tmp/.claude-sdd-begin-*.json` for Claude to read
 - Outputs JSON with project context
 
 **Dependencies**:
@@ -151,7 +151,7 @@ Hook behavior is controlled via settings:
 
 ### Session detection not working
 1. Ensure `specs/active/` directory exists
-2. Check marker files: `ls /tmp/.claude-sdd-start-*.json`
+2. Check marker files: `ls /tmp/.claude-sdd-begin-*.json`
 3. Review hook logs: `/tmp/session-start.log`
 
 ## Maintenance
@@ -165,7 +165,7 @@ rm ~/.claude/.sdd-permissions-declined
 ### Clearing marker files
 Old marker files are auto-cleaned (>1 hour), but can be manually removed:
 ```bash
-rm /tmp/.claude-sdd-start-*.json
+rm /tmp/.claude-sdd-begin-*.json
 ```
 
 ### Viewing hook logs

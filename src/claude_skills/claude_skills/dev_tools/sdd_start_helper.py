@@ -2,7 +2,7 @@
 """
 SDD Start Helper Script
 
-Provides commands for /sdd-start slash command and session management:
+Provides commands for /sdd-begin slash command and session management:
 - check-permissions: Check if SDD permissions are configured
 - format-output: Human-readable formatted text for active specs with last-accessed task
 - find-active-work: JSON with all resumable specs
