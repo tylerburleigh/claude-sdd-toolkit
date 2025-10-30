@@ -239,16 +239,8 @@ def format_execution_plan(spec_id: str, task_id: str, specs_dir: Path) -> str:
             lines.append(f"- {warning}")
         lines.append("")
 
-    # Ready to Proceed
-    lines.append("---")
-    lines.append("")
-    lines.append("## Ready to Proceed?")
-    lines.append("")
-    lines.append("Options:")
-    lines.append("1. ✅ Approve plan and begin implementation")
-    lines.append("2. 📝 Request changes to plan")
-    lines.append("3. 🔍 See more details about specific steps")
-    lines.append("4. ⏸️  Defer to later")
+    # Note: Interactive prompt handled by Claude using AskUserQuestion tool
+    # The CLI just returns the execution plan details
 
     return '\n'.join(lines)
 

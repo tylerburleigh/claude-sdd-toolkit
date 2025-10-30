@@ -88,6 +88,22 @@ This skill is part of the **Spec-Driven Development** family:
 - **Why 50%?**: Complex tasks can consume 30-50% of context during preparation and implementation. Starting fresh ensures you won't hit limits mid-task
 - **Context preservation**: The /clear command wipes conversation history, so ensure all progress is saved to the spec file first
 
+**IMPORTANT - Context Output Rules:**
+- **DO**: Output context information directly as text to the user
+- **DO**: Use the `/context` command to check current usage
+- **DO NOT**: Use Bash commands like `echo` or `bc` to calculate or display context percentages
+- **DO NOT**: Use Bash for any simple text output or calculations - output text directly instead
+
+Example of CORRECT context output:
+```
+Context usage is at 67% (134k/200k tokens).
+```
+
+Example of INCORRECT context output (NEVER do this):
+```bash
+echo "Context usage: approximately $(echo "scale=1; 90267/200000*100" | bc)% of available context"
+```
+
 ## Tool Verification
 
 **Before using this skill**, verify the required tools are available:
@@ -336,16 +352,25 @@ If available, invoke `Skill(sdd-toolkit:doc-query)` which provides commands like
 
 **Purpose**: Present structured, interactive questions to users at key decision points instead of text-based prompting.
 
+**CRITICAL: ALWAYS USE THIS TOOL FOR USER DECISIONS**
+
+When presenting options to the user, you MUST use `AskUserQuestion`. NEVER use text-based numbered lists.
+
 **When to use in this skill:**
 - **Phase 2.3**: Presenting task options for user selection
-- **Phase 5.2**: Getting approval/feedback on execution plans
+- **Phase 5.2**: Getting approval/feedback on execution plans (REQUIRED after format-plan)
+- **Verification tasks**: When verification is complete and seeking approval to mark task complete
 - **Any decision point**: When offering multiple clear choices to the user
+- **Blocker handling**: When presenting alternatives for blocked tasks
+- **Context management**: When asking about context usage and next steps
 
 **Benefits:**
 - ✅ Structured responses - No need to parse free-form text
 - ✅ Clear options - Users see exactly what choices are available
 - ✅ Better UX - More interactive and guided experience
 - ✅ Consistent - Same interaction pattern across workflows
+
+**This is NOT optional** - it's a core part of the skill's UX design.
 
 **Example Usage:**
 ```javascript
@@ -1385,15 +1410,28 @@ Display this output EXACTLY as returned - do not reformat or modify it.
 - [Tasks that are blocked by this one]
 ```
 
-**Note on Presentation**: After displaying the plan output, use `AskUserQuestion` tool (see Phase 5.2) instead of text-based "Ready to Proceed?" prompts. This provides better UX with structured options.
+**CRITICAL - After Displaying the Plan:**
 
-**Note**: The above is just a reference template. The actual output from `format-plan` includes:
+**YOU MUST immediately use the `AskUserQuestion` tool** (see Phase 5.2) to get user approval. The CLI output does NOT include interactive prompts - you must add them using AskUserQuestion.
+
+**Do NOT:**
+- ❌ Present text-based "Ready to Proceed?" prompts
+- ❌ List numbered options in text (1, 2, 3, 4)
+- ❌ Wait for free-form user response
+
+**Do:**
+- ✅ Display the plan output from `format-plan`
+- ✅ Immediately call `AskUserQuestion` with structured options
+- ✅ Follow the exact pattern shown in Phase 5.2
+
+**Note**: The output from `format-plan` includes:
 - Complete task summary with file path, purpose, phase, and estimated time
 - Prerequisites verification (dependencies checked dynamically)
 - Implementation details from the spec JSON
 - Success criteria tailored to the task type
 - Next tasks that depend on this one
-- Ready to proceed options
+
+The CLI intentionally does NOT include "Ready to proceed" options - that's Claude's job via AskUserQuestion.
 
 **Always use the `format-plan` command** rather than manually creating this output.
 
@@ -1886,6 +1924,75 @@ AskUserQuestion(
 8. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
 9. Update spec if structural changes needed
 10. Continue with revised plan
+
+### Workflow 6: Verification Task Completion
+**Situation:** Working on a verification task (type: verify), verification steps complete, need user approval
+
+**CRITICAL: Use AskUserQuestion, NOT text-based options**
+
+Steps:
+1. Perform verification steps as specified in task metadata
+2. Document findings (what was verified, what passed/failed)
+3. Analyze results
+4. Present findings to user in text format:
+
+**Example Presentation:**
+```
+✅ Verification Complete: verify-2-1
+
+**Task:** Ensure timestamp format consistency
+**Verification Type:** Code inspection
+**Scope:** Checked started_at and completed_at timestamp formats
+
+**Findings:**
+- Both timestamp fields use datetime.datetime.now(timezone.utc).isoformat() format
+- Format: ISO 8601 with 'Z' suffix (e.g., "2025-10-30T12:15:05.279477Z")
+- Compatible with calculate_time_from_timestamps() function (supports both Z and +00:00)
+- All timestamp writes follow consistent pattern
+
+**Conclusion:** Timestamp formats are consistent and compatible. No issues found.
+```
+
+5. **IMMEDIATELY use AskUserQuestion** to get user decision:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Verification complete. How would you like to proceed?",
+    header: "Verify Done",
+    multiSelect: false,
+    options: [
+      {
+        label: "Approve & Complete",
+        description: "Mark verification task as complete (recommended)"
+      },
+      {
+        label: "Request Changes",
+        description: "Additional verification steps needed"
+      },
+      {
+        label: "Review Details",
+        description: "Show specific code sections or verification evidence"
+      },
+      {
+        label: "Defer",
+        description: "Save findings for later"
+      }
+    ]
+  }]
+)
+```
+
+6. Based on user selection:
+   - If "Approve & Complete": Use `Skill(sdd-toolkit:sdd-update)` to mark task completed
+   - If "Request Changes": Ask for specifics, perform additional verification
+   - If "Review Details": Show requested details, then re-ask with AskUserQuestion
+   - If "Defer": Document findings and exit gracefully
+
+**Important:**
+- NEVER present text-based options like "1. Approve, 2. Request changes"
+- ALWAYS use AskUserQuestion for the decision
+- Document findings in the task's status_note when marking complete
 
 ## Advanced Query Techniques
 
