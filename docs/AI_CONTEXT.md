@@ -46,7 +46,7 @@ Extends Claude's capabilities via `SKILL.md` instruction files. Skills are autom
 - `run-tests` - Run tests with AI debugging
 
 ### Command
-User-invoked workflow triggered with `/` prefix (e.g., `/sdd-start`).
+User-invoked workflow triggered with `/` prefix (e.g., `/sdd-begin`).
 
 **Location:** `~/.claude/commands/*.md`
 
@@ -227,7 +227,7 @@ specs/active/<spec-id>.json
 
 ```bash
 # 1. Start workflow
-/sdd-start
+/sdd-begin
 
 # 2. Detect active specs
 sdd skills-dev start-helper -- detect-active

@@ -82,11 +82,132 @@ This skill is part of the **Spec-Driven Development** family:
 - Monitor Claude's context window usage throughout task execution
 - Use `/context` command to check current usage percentage
 - **50% threshold**: At 50% or higher context usage, recommend pausing to preserve context for complex tasks
-- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-start`
+- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-begin`
   - Always save progress with sdd-update BEFORE clearing context
-  - Use /sdd-start to resume from the saved state
+  - Use /sdd-begin to resume from the saved state
 - **Why 50%?**: Complex tasks can consume 30-50% of context during preparation and implementation. Starting fresh ensures you won't hit limits mid-task
 - **Context preservation**: The /clear command wipes conversation history, so ensure all progress is saved to the spec file first
+
+**IMPORTANT - Context Output Rules:**
+- **DO**: Output context information directly as text to the user
+- **DO**: Use the `/context` command to check current usage
+- **DO NOT**: Use Bash commands like `echo` or `bc` to calculate or display context percentages
+- **DO NOT**: Use Bash for any simple text output or calculations - output text directly instead
+
+Example of CORRECT context output:
+```
+Context usage is at 67% (134k/200k tokens).
+```
+
+Example of INCORRECT context output (NEVER do this):
+```bash
+echo "Context usage: approximately $(echo "scale=1; 90267/200000*100" | bc)% of available context"
+```
+
+## General Output Formatting Guidelines
+
+**IMPORTANT - How to Present Execution Plans and Task Information:**
+
+When presenting execution plans, task summaries, verification details, or any output to the user, follow these formatting rules for maximum readability.
+
+**DO:**
+- ✅ Use clear section headers with proper markdown (## or **Header:**)
+- ✅ Put each item on its own line - **never cram multiple items together**
+- ✅ Add a space after emojis, colons, and labels
+- ✅ Use blank lines to separate sections
+- ✅ Use proper markdown lists (- or 1. with newlines)
+- ✅ Keep paragraphs concise and well-spaced
+
+**DO NOT:**
+- ❌ Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
+- ❌ Use bullet points (●) without proper list formatting
+- ❌ Create dense text blocks with odd line breaks
+- ❌ Let emojis run together or miss spaces after them
+
+**Example of CORRECT format:**
+```
+## Execution Plan Ready: verify-2-1
+
+**Type:** Manual Verification Task
+**Purpose:** Test task status transition resets
+**Phase:** Phase 2-verify - Verification (0/0 tasks, 0%)
+
+### Readiness Check
+
+✅ Ready to begin: no blocking dependencies
+
+### Verification Details
+
+**What we're testing:**
+When a task status is set to in_progress multiple times, the started_at timestamp should be updated each time.
+
+**Expected behavior:**
+- First transition to in_progress: started_at is set
+- Transition to pending: started_at remains
+- Second transition to in_progress: started_at updates to new timestamp
+
+### Implementation Steps
+
+**Step 1: Create test spec**
+- Action: Create minimal test spec file
+- Location: specs/active/test-verify.json
+- Duration: 2 minutes
+
+**Step 2: Test initial status**
+- Command: `sdd update-status test-verify task-1 in_progress`
+- Expected: started_at timestamp is set
+- Duration: 1 minute
+
+### Success Criteria
+
+✅ started_at is set on first in_progress transition
+✅ started_at updates on subsequent in_progress transitions
+✅ Timestamps use ISO 8601 format
+✅ No errors during transitions
+
+**Total Estimated Time:** 8 minutes
+```
+
+**Example of INCORRECT format (NEVER do this):**
+```
+● Execution Plan Ready: verify-2-1
+
+  📋 Task Summary
+
+  Type: Manual Verification TaskPurpose: Test task status transition resets
+  Phase: Phase 2-verify - Verification (0/0 tasks, 0%)
+
+  ✅ Readiness Check
+
+  - Ready to begin: no blocking dependencies
+
+  🎯 Verification Details
+
+  What we're testing: When a task status is set to in_progress multiple times...
+
+  Implementation Steps
+
+  Step 1: Create Test Spec
+
+  Action: Create a minimal test spec file for verificationLocation:
+  specs/active/test-verify-timestamps.jsonDuration: 2 minutes
+```
+
+**Issues with incorrect format:**
+- Multiple items on one line: "Type: Manual Verification TaskPurpose:"
+- Bullet points (●) used inconsistently
+- No clear section structure
+- Information crammed together without breathing room
+- Odd line breaks in the middle of information
+- Hard to scan quickly
+
+**This applies to all sdd-next output:**
+- Execution plan presentations
+- Task summaries and preparation
+- Verification findings
+- Progress reports
+- Context information
+- Any user-facing output
 
 ## Tool Verification
 
@@ -134,7 +255,27 @@ The `prepare-task` command handles spec discovery, finds the next actionable tas
 
 The `prepare-task` command includes two automatic enhancements:
 
-1. **Spec Validation**: Validates the JSON spec file before proceeding. If critical errors are found, shows clear error messages with suggested fixes (e.g., `sdd fix spec-id.json`). Non-critical warnings are displayed but don't block task preparation.
+1. **Spec Validation**: Validates the JSON spec file before proceeding.
+
+   **Critical errors:** If critical errors are found, stops and shows clear error messages with suggested fixes (e.g., `sdd fix spec-id.json`). You must address critical errors before proceeding.
+
+   **Non-critical warnings:** Displayed as informational text and automatically continues. The workflow is not blocked by non-critical warnings.
+
+   **Example output:**
+   ```
+   ⚠️  Spec Validation Warnings (3 non-critical)
+
+   1. Task task-2-3 missing estimated_hours metadata
+   2. Phase phase-2 has no verification steps
+   3. Circular dependency detected in task-4-5 (low impact)
+
+   These warnings don't prevent task preparation but may affect tracking accuracy.
+   You can fix them later with: sdd validate --fix SPEC_ID
+
+   Continuing with task preparation...
+   ```
+
+   User can interrupt and ask to fix warnings if desired, or address them later.
 
 2. **Codebase Context Gathering**: If codebase documentation has been generated, automatically gathers task-relevant context (via `Skill(sdd-toolkit:doc-query)`) including:
    - Relevant files from the codebase
@@ -310,6 +451,114 @@ If available, invoke `Skill(sdd-toolkit:doc-query)` which provides commands like
 
 **Important**: All workflows in this guide that reference `Skill(sdd-toolkit:doc-query)` are **recommendations for enhanced context**, not requirements. The core sdd-next workflow functions without them.
 
+## Interactive Question Tool
+
+**Tool:** `AskUserQuestion` (Claude Code built-in)
+
+**Purpose**: Present structured, interactive questions to users at key decision points instead of text-based prompting.
+
+**CRITICAL: ALWAYS USE THIS TOOL FOR USER DECISIONS**
+
+When presenting options to the user, you MUST use `AskUserQuestion`. NEVER use text-based numbered lists.
+
+**When to use in this skill:**
+- **Phase 2.3**: Presenting task options for user selection
+- **Phase 5.2**: Getting approval/feedback on execution plans (REQUIRED after format-plan)
+- **Verification tasks**: When verification is complete and seeking approval to mark task complete
+- **Any decision point**: When offering multiple clear choices to the user
+- **Blocker handling**: When presenting alternatives for blocked tasks
+- **Context management**: When asking about context usage and next steps
+
+**Benefits:**
+- ✅ Structured responses - No need to parse free-form text
+- ✅ Clear options - Users see exactly what choices are available
+- ✅ Better UX - More interactive and guided experience
+- ✅ Consistent - Same interaction pattern across workflows
+
+**This is NOT optional** - it's a core part of the skill's UX design.
+
+**Example Usage:**
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Which task would you like to work on?",
+    header: "Task Selection",
+    multiSelect: false,
+    options: [
+      {
+        label: "task-2-1 (Recommended)",
+        description: "src/services/authService.ts - Implement core authentication (3 hours)"
+      },
+      {
+        label: "task-1-7",
+        description: "tests/user.spec.ts - Write user model tests (1.5 hours)"
+      }
+    ]
+  }]
+)
+```
+
+**Tool Parameters:**
+- `questions`: Array of 1-4 questions to ask
+  - `question`: The complete question text
+  - `header`: Short label (max 12 chars) displayed as a chip/tag
+  - `multiSelect`: Set to true to allow multiple selections (default: false)
+  - `options`: 2-4 available choices
+    - `label`: Display text for the option (1-5 words)
+    - `description`: Explanation of what this option means
+
+**Note:** Users can always select "Other" to provide custom text input if the provided options don't match their needs.
+
+### Decision Point Rules
+
+**When to Use AskUserQuestion:**
+- ✅ User needs to make a choice between 2-4 clear options
+- ✅ The decision affects workflow direction (which task, how to proceed, etc.)
+- ✅ Options are mutually exclusive or can be presented as distinct choices
+- ✅ You want structured, unambiguous user input
+
+**When to Use Text Communication:**
+- ✅ Presenting data, progress reports, or context information
+- ✅ Explaining concepts, showing details, or providing documentation
+- ✅ Asking open-ended questions that need free-form responses
+- ✅ Showing command outputs or technical information
+
+**The Recommended Pattern:**
+
+```
+1. Present Context (Text)
+   - Show relevant information
+   - Explain the situation
+   - Provide recommendations
+
+2. Ask Structured Question (AskUserQuestion)
+   - Present 2-4 clear options
+   - Each option has label + description
+   - User selects their choice
+
+3. Handle Response (Code Logic)
+   - Process user selection
+   - Execute appropriate workflow branch
+   - Continue with next phase
+```
+
+**Example Decision Points in This Workflow:**
+- Task selection from multiple available tasks
+- Plan approval or requesting changes
+- Handling blockers (work on alternative or resolve blocker)
+- Context management (continue or save & clear)
+- Multiple specs selection
+- Resuming work after completion
+
+**Anti-Pattern - Don't Do This:**
+```
+Would you like to:
+1. Option A
+2. Option B
+3. Option C
+```
+Instead, use AskUserQuestion with structured options.
+
 ## When to Use This Skill
 
 Use `Skill(sdd-toolkit:sdd-next)` when:
@@ -418,10 +667,55 @@ sdd find-specs --verbose
 - **Empty directory**: No active specs found - use `sdd-plan` to create one
 
 **Multiple Specs Handling:**
+
 `prepare-task` and other commands accept a single `SPEC_ID`. When several specs are active:
-- Run `sdd find-specs --verbose` to list the available IDs with progress summaries
-- Pick the target `SPEC_ID` manually (or confirm with your user) before continuing
-- If the chosen spec is blocked, use `sdd list-blockers SPEC_ID` to show why before proceeding
+
+1. Run `sdd find-specs --verbose` to get all available specs with progress summaries
+2. Present the specs to the user in text format with key information
+3. Use `AskUserQuestion` to let user select which spec to work on
+
+**Example:**
+
+After running `sdd find-specs --verbose`, present context:
+```
+Found 3 active specifications:
+
+1. user-auth-2025-10-18-001: User Authentication System
+   Phase 2/4 (35% complete, 7/23 tasks)
+
+2. payment-api-2025-10-20-003: Payment API Integration
+   Phase 1/3 (10% complete, 2/15 tasks)
+
+3. data-migration-2025-10-21-001: Database Migration to PostgreSQL
+   Phase 3/5 (60% complete, 12/18 tasks)
+```
+
+Then ask with `AskUserQuestion`:
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Which specification would you like to work on?",
+    header: "Spec Select",
+    multiSelect: false,
+    options: [
+      {
+        label: "user-auth (35%)",
+        description: "User Authentication System - Phase 2/4, 7 of 23 tasks done"
+      },
+      {
+        label: "payment-api (10%)",
+        description: "Payment API Integration - Phase 1/3, 2 of 15 tasks done"
+      },
+      {
+        label: "data-migration (60%)",
+        description: "Database Migration - Phase 3/5, 12 of 18 tasks done"
+      }
+    ]
+  }]
+)
+```
+
+**After user selects:** Use the full `SPEC_ID` (e.g., `user-auth-2025-10-18-001`) for subsequent commands. If the chosen spec is blocked, use `sdd list-blockers SPEC_ID` to diagnose before proceeding.
 
 Most spec operations auto-discover the `specs/active` directory. Only use `--path` when the specs live in a custom location.
 
@@ -654,14 +948,65 @@ sdd query-tasks "$SPEC_ID" --status pending --parent phase-2 --json
 - `list-blockers` - Analysis: "What tasks are currently blocked and why?" (diagnostic)
 
 **If next-task fails or returns no results:**
-- **No actionable tasks found**:
-  - All tasks may be completed - check progress: `sdd progress SPEC_ID`
-  - All tasks may be blocked - check blockers: `sdd list-blockers SPEC_ID`
-  - Spec may be finished - verify with `check-complete SPEC_ID`
-- **All tasks blocked**:
-  - Review blockers to identify what needs resolution
-  - Look for external dependencies that need attention
-  - Consider if circular dependencies exist: `find-circular-deps SPEC_ID`
+
+**Scenario: No actionable tasks found**
+
+When `sdd next-task` returns no available tasks, investigate and present options using `AskUserQuestion`:
+
+1. Run diagnostic commands:
+   ```bash
+   sdd progress SPEC_ID
+   sdd list-blockers SPEC_ID
+   sdd check-complete SPEC_ID
+   ```
+
+2. **Present context based on findings:**
+   ```
+   ⚠️  No Actionable Tasks Found
+
+   Status: 18/23 tasks completed (78%)
+
+   Findings:
+   - 5 tasks remaining
+   - 3 tasks blocked (task-3-1, task-3-2, task-4-3)
+   - 2 tasks completed but not marked (task-2-5, task-2-7)
+
+   Blockers:
+   - Redis server not configured (blocks 2 tasks)
+   - API keys missing (blocks 1 task)
+   ```
+
+3. **Then ask with AskUserQuestion:**
+   ```javascript
+   AskUserQuestion(
+     questions: [{
+       question: "No tasks are currently actionable. How would you like to proceed?",
+       header: "No Tasks",
+       multiSelect: false,
+       options: [
+         {
+           label: "Review Blockers",
+           description: "Show detailed blocker information and resolution steps"
+         },
+         {
+           label: "Check if Complete",
+           description: "Verify if this spec is finished"
+         },
+         {
+           label: "Add More Tasks",
+           description: "Use sdd-plan to extend the specification"
+         },
+         {
+           label: "Different Spec",
+           description: "Work on a different specification instead"
+         }
+       ]
+     }]
+   )
+   ```
+
+**Other failure scenarios:**
+- **All tasks blocked**: Use the blocker handling flow (see Workflow 3)
 - **Multiple specs returned**: Verify you're using correct SPEC_ID, check spelling
 - **Spec file corrupt/invalid**: Validate spec with `validate-spec` command or regenerate with Skill(sdd-toolkit:sdd-plan)
 
@@ -709,7 +1054,39 @@ sdd next-task "$SPEC_ID"
 sdd list-blockers "$SPEC_ID"
 ```
 
-**Example Presentation Format (you create this based on command outputs):**
+**Presentation Approach - Use Interactive Questions:**
+
+Instead of text-based prompting, use the `AskUserQuestion` tool for structured user interaction:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Which task would you like to work on?",
+    header: "Task Select",
+    multiSelect: false,
+    options: [
+      {
+        label: "task-2-1 (Recommended)",
+        description: "src/services/authService.ts - Core authentication service (3 hours)"
+      },
+      {
+        label: "task-1-7 (Parallel-safe)",
+        description: "tests/user.spec.ts - User model tests (1.5 hours)"
+      },
+      {
+        label: "More details",
+        description: "Show detailed information about tasks and blockers"
+      },
+      {
+        label: "Defer",
+        description: "Save this for later"
+      }
+    ]
+  }]
+)
+```
+
+**Before asking, present context to user in text:**
 ```
 📋 Next Actionable Tasks for: User Authentication
 
@@ -735,12 +1112,13 @@ Current Phase: Phase 2 - Authentication Service (2/8 tasks, 25%)
    Estimated: 1.5 hours
    Dependencies: None (can start anytime)
    Note: From completed Phase 1
-
-Would you like to:
-1. Proceed with recommended task (task-2-1)
-2. Select a different task
-3. See more details about any task
 ```
+
+**Benefits of this approach:**
+- ✅ User sees full context before choosing
+- ✅ Structured response - no need to parse free text
+- ✅ Clear, actionable options
+- ✅ "Other" option always available for custom input
 
 **Benefits of showing blocked tasks:**
 - Helps user understand the impact of completing recommended task
@@ -748,10 +1126,10 @@ Would you like to:
 - Identifies external dependencies that need resolution
 
 **User Response Handling:**
-- If user agrees → Proceed to Phase 3 with selected task
-- If user picks different task → Proceed with their choice
-- If user wants details → Provide deep dive on specific task
-- If user wants to defer → Exit gracefully
+- If user selects recommended task → Proceed to Phase 3 with selected task
+- If user selects alternative task → Proceed with their choice
+- If user selects "More details" → Provide deep dive on specific task
+- If user selects "Defer" or enters custom "Other" response → Handle gracefully
 
 ### Phase 3: Task Context Assembly
 
@@ -1135,24 +1513,30 @@ Display this output EXACTLY as returned - do not reformat or modify it.
 
 ## 📦 Next Tasks After This
 - [Tasks that are blocked by this one]
-
----
-
-## Ready to Proceed?
-Options:
-1. ✅ Approve plan and begin implementation
-2. 📝 Request changes to plan
-3. 🔍 See more details about specific steps
-4. ⏸️  Defer to later
 ```
 
-**Note**: The above is just a reference template. The actual output from `format-plan` includes:
+**CRITICAL - After Displaying the Plan:**
+
+**YOU MUST immediately use the `AskUserQuestion` tool** (see Phase 5.2) to get user approval. The CLI output does NOT include interactive prompts - you must add them using AskUserQuestion.
+
+**Do NOT:**
+- ❌ Present text-based "Ready to Proceed?" prompts
+- ❌ List numbered options in text (1, 2, 3, 4)
+- ❌ Wait for free-form user response
+
+**Do:**
+- ✅ Display the plan output from `format-plan`
+- ✅ Immediately call `AskUserQuestion` with structured options
+- ✅ Follow the exact pattern shown in Phase 5.2
+
+**Note**: The output from `format-plan` includes:
 - Complete task summary with file path, purpose, phase, and estimated time
 - Prerequisites verification (dependencies checked dynamically)
 - Implementation details from the spec JSON
 - Success criteria tailored to the task type
 - Next tasks that depend on this one
-- Ready to proceed options
+
+The CLI intentionally does NOT include "Ready to proceed" options - that's Claude's job via AskUserQuestion.
 
 **Always use the `format-plan` command** rather than manually creating this output.
 
@@ -1246,27 +1630,60 @@ Before moving to the next task, check Claude's context window usage to avoid run
 
 **Decision Logic:**
 
-- **If context usage >= 50%**: Strongly recommend starting fresh to ensure smooth execution of the next task
+- **If context usage >= 50%**: Use AskUserQuestion to get user decision on context management
   - First ensure task status is updated (step 2 above should already be complete)
-  - Message to user:
+  - Present context to user:
     ```
-    ⚠️  Context usage is at X% (Y/200k tokens). To ensure smooth execution of the next task, I recommend:
+    ⚠️  Context usage is at 67% (134k/200k tokens). To ensure smooth execution of the next task,
+    I recommend saving progress and starting fresh.
 
-    1. First, if you haven't already, complete the task with full context: Skill(sdd-toolkit:sdd-update)
-       (Include: status, actual hours, completion notes, any deviations)
-    2. Then /clear to start a fresh conversation
-    3. Then /sdd-start to resume work on this specification
-
-    This will preserve your progress while giving us a clean context window for the next task.
+    This preserves your progress while giving us a clean context window for complex tasks.
+    ```
+  - Then ask structured question:
+    ```javascript
+    AskUserQuestion(
+      questions: [{
+        question: "How would you like to manage the context before continuing?",
+        header: "Context High",
+        multiSelect: false,
+        options: [
+          {
+            label: "Save & Clear (Recommended)",
+            description: "Save progress with sdd-update, /clear, then /sdd-begin to resume fresh"
+          },
+          {
+            label: "Continue Anyway",
+            description: "Continue to next task with current context (may hit limits)"
+          },
+          {
+            label: "Finish for Now",
+            description: "Save progress and stop work on this spec"
+          }
+        ]
+      }]
+    )
     ```
 
-- **If context usage < 50%**: Ask user if they want to continue
-  - Message to user:
+- **If context usage < 50%**: Present status and prepare next task automatically
+  - Present context to user:
     ```
-    ✅ Task completed! Context usage is at X% (Y/200k tokens). Would you like me to prepare the next task now?
+    ✅ Task completed! Context usage is at 42% (84k/200k tokens).
+    Plenty of room for the next task.
+
+    Next task ready: task-2-2 (src/middleware/auth.ts - JWT verification, 2 hours)
+
+    I'll prepare the execution plan. Reply "stop" if you want to pause, or
+    "review progress" to see overall spec status first.
     ```
+  - Then proceed to find next task automatically
+  - User can interrupt at any time with "stop", "pause", "review progress", or "different task"
 
 **Important**: Always invoke `Skill(sdd-toolkit:sdd-update)` to save progress BEFORE running `/clear`, as clearing the conversation will lose any unsaved state.
+
+**Response Handling for >=50% context:**
+- **"Save & Clear"**: Confirm sdd-update was called, then instruct user to run `/clear` then `/sdd-begin`
+- **"Continue Anyway"**: Proceed to find next task (step 5 below)
+- **"Finish for Now"**: Confirm work saved, provide summary of what was completed
 
 5. **Find Next Task** (only if user wants to continue AND context usage < 50%)
 
@@ -1280,24 +1697,74 @@ Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
 
 #### 5.2 Handle User Feedback
 
-Respond to user's decision on the plan.
+Get structured user decision on the execution plan using `AskUserQuestion`.
 
-**User Approves:**
+**Presentation Approach - Use Interactive Questions:**
+
+After presenting the execution plan (from `format-plan` or manually created), use the `AskUserQuestion` tool:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "How would you like to proceed with this execution plan?",
+    header: "Plan Review",
+    multiSelect: false,
+    options: [
+      {
+        label: "Approve",
+        description: "Begin implementation following this plan"
+      },
+      {
+        label: "Request Changes",
+        description: "I'd like to modify the approach or scope"
+      },
+      {
+        label: "More Details",
+        description: "Show more information about specific steps"
+      },
+      {
+        label: "Defer",
+        description: "Save this for later"
+      }
+    ]
+  }]
+)
+```
+
+**Benefits of Interactive Questions:**
+- ✅ Clear, structured choices for the user
+- ✅ Eliminates ambiguity in user response
+- ✅ Consistent UX across all decision points
+- ✅ Easy to process user selection
+
+**User Response Handling:**
+
+Based on the user's selection:
+
+**If user selects "Approve":**
 - Mark task as in_progress (handoff to `Skill(sdd-toolkit:sdd-update)`)
 - Begin implementation or hand off to implementation tools
 - Follow the execution plan
 
-**User Requests Changes:**
+**If user selects "Request Changes":**
+- Ask user to specify what changes they want (via "Other" or follow-up question)
 - Analyze the requested changes
 - Assess impact on scope and timeline
 - Check if changes align with spec
 - Update plan or recommend spec revision
 
-**User Wants More Details:**
+**If user selects "More Details":**
+- Ask which aspect they want to know more about
 - Provide deep dive into specific steps
 - Show code examples
 - Explain technical decisions
 - Answer questions about approach
+- Then present the question again after providing details
+
+**If user selects "Defer" or provides custom "Other" response:**
+- Acknowledge their decision
+- Document the plan for future reference
+- Exit gracefully
 
 ## Working with Multiple Agents/Tools
 
@@ -1309,7 +1776,7 @@ This skill enables coordination across different implementation tools:
 3. Developer: Implements following the plan
 4. Developer: Uses sdd-update to update status
 5. Claude: Checks context usage with /context
-6. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise finds next task
+6. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise finds next task
 
 **Scenario: Claude creates plan, Cursor implements**
 1. Claude: Uses sdd-next to create plan
@@ -1319,7 +1786,7 @@ This skill enables coordination across different implementation tools:
 5. Cursor: Implements following Claude's plan
 6. Cursor: Updates JSON spec file when complete
 7. Claude: Checks context usage with /context
-8. Claude: If >= 50%, recommends /clear then /sdd-start; otherwise reads updated JSON spec file and finds next task
+8. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise reads updated JSON spec file and finds next task
 
 ## Common Workflows
 
@@ -1346,10 +1813,33 @@ Steps:
 4. Find next available task in that phase
 5. Verify dependencies are met
 6. Create execution plan
-7. Present plan with context of progress
-8. Continue implementation
-9. After completion, check context usage with /context
-10. If >= 50%, recommend sdd-update → /clear → /sdd-start workflow
+7. Present plan with context of progress:
+
+**Present context and proceed:**
+```
+📊 Spec Progress: User Authentication System (35% complete, 7/23 tasks)
+
+Current Phase: Phase 2 - Authentication Service (2/8 tasks, 25%)
+
+🎯 Resuming with task-2-2:
+   File: src/middleware/auth.ts
+   Purpose: JWT verification middleware
+   Estimated: 2 hours
+   Dependencies: ✅ task-2-1 (AuthService) completed
+
+[Execution plan details...]
+
+Ready to proceed with this task. Reply "different task" to see alternatives,
+or "review progress" for detailed status.
+```
+
+8. Proceed with execution plan automatically
+   - User can interrupt with "different task" to use Phase 2.3 (Present Task Options)
+   - User can ask "review progress" to run `sdd progress SPEC_ID`
+   - User can say "stop" or "pause" to defer
+9. Continue implementation
+10. After completion, check context usage with /context
+11. If >= 50%, recommend sdd-update → /clear → /sdd-begin workflow
 
 ### Workflow 3: Handling Blockers
 **Situation:** Next task is blocked by external issue
@@ -1359,12 +1849,56 @@ Steps:
 2. Check dependencies
 3. Discover blocker (e.g., Redis not configured)
 4. Document blocker with `Skill(sdd-toolkit:sdd-update)`
-5. Find alternative task:
+5. Find alternative tasks and present to user:
    - Parallel-safe task from same phase
    - Task from different phase
    - Test task that's not blocked
-6. Create plan for alternative task
-7. Note that original task should resume after blocker cleared
+6. Use `AskUserQuestion` to let user choose how to proceed:
+
+**Present context:**
+```
+⚠️  Task task-3-1 (src/cache/redis.ts) is blocked:
+   Dependency: Redis server must be configured
+
+Available alternative tasks:
+- task-2-5: src/utils/validators.ts (2 hours, parallel-safe)
+- task-4-1: tests/auth.spec.ts (1.5 hours, from Phase 4)
+```
+
+**Then ask with AskUserQuestion:**
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "The next task is blocked by Redis configuration. How would you like to proceed?",
+    header: "Task Blocked",
+    multiSelect: false,
+    options: [
+      {
+        label: "task-2-5 (Validators)",
+        description: "src/utils/validators.ts - Input validation (2 hours, parallel-safe)"
+      },
+      {
+        label: "task-4-1 (Tests)",
+        description: "tests/auth.spec.ts - Auth tests (1.5 hours, from Phase 4)"
+      },
+      {
+        label: "Resolve Blocker",
+        description: "Help me configure Redis first, then continue with task-3-1"
+      },
+      {
+        label: "Stop for Now",
+        description: "Document blocker and finish work session"
+      }
+    ]
+  }]
+)
+```
+
+7. Based on user selection:
+   - If alternative task selected: Create plan for that task
+   - If "Resolve Blocker": Provide guidance on resolving the blocker
+   - If "Stop for Now": Summarize what was blocked and exit
+8. Note that original task should resume after blocker cleared
 
 ### Workflow 4: Multi-Developer Coordination
 **Situation:** Multiple people working on same spec
@@ -1374,10 +1908,58 @@ Steps:
 2. Developer A: Marks task-2-1 in_progress
 3. Developer B: Uses sdd-next
 4. Developer B: Sees task-2-1 in_progress
-5. Developer B: Gets next available task (task-2-3)
-6. Both work in parallel
-7. Both update state when complete
-8. Spec file coordinates progress
+5. System presents situation and uses `AskUserQuestion`:
+
+**Present context:**
+```
+⚠️  Task Coordination Notice
+
+The recommended task (task-2-1: src/services/authService.ts) is currently in progress
+by another developer.
+
+Next available tasks:
+- task-2-3: src/middleware/auth.ts (depends on task-2-1, will be blocked)
+- task-2-4: src/routes/auth.ts (depends on task-2-1, will be blocked)
+- task-1-7: tests/user.spec.ts (parallel-safe, from completed Phase 1)
+```
+
+**Then ask with AskUserQuestion:**
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "The next task is currently being worked on. How would you like to proceed?",
+    header: "Task In Use",
+    multiSelect: false,
+    options: [
+      {
+        label: "task-1-7 (Tests)",
+        description: "tests/user.spec.ts - User model tests (parallel-safe, 1.5 hours)"
+      },
+      {
+        label: "View All Available",
+        description: "Show me all pending tasks to choose from"
+      },
+      {
+        label: "Wait for task-2-1",
+        description: "Check back later when task-2-1 is complete"
+      },
+      {
+        label: "Different Spec",
+        description: "Work on a different specification instead"
+      }
+    ]
+  }]
+)
+```
+
+6. Based on selection:
+   - If alternative task: Create plan for selected task
+   - If "View All": Use Phase 2.3 (Present Task Options) with all pending tasks
+   - If "Wait": Exit gracefully with status update
+   - If "Different Spec": Return to Phase 1.0 (Multiple Specs Handling)
+7. Both developers work in parallel
+8. Both update state when complete
+9. Spec file coordinates progress
 
 ### Workflow 5: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
@@ -1387,11 +1969,135 @@ Steps:
 2. Discover issue (e.g., API different than expected)
 3. Pause implementation
 4. Document deviation with `Skill(sdd-toolkit:sdd-update)`
-5. Revise plan with `Skill(sdd-toolkit:sdd-next)`
-6. Present revised plan to user
-7. Get approval for deviation
-8. Update spec if needed
-9. Continue with revised plan
+5. Analyze the deviation and use `AskUserQuestion` to get user decision:
+
+**Present context:**
+```
+⚠️  Implementation Deviation Discovered
+
+Task: task-2-1 (src/services/authService.ts)
+
+Issue: The User API uses async/await pattern, but the original plan assumed
+callback-based methods.
+
+Impact:
+- AuthService methods need to be async
+- Error handling approach needs adjustment
+- Tests need to use async patterns
+
+Options:
+1. Update plan to use async/await (recommended)
+2. Add wrapper to convert async to callbacks (adds complexity)
+3. Update User model to use callbacks instead (breaks existing code)
+```
+
+**Then ask with AskUserQuestion:**
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Implementation deviation found. How should we proceed?",
+    header: "Plan Change",
+    multiSelect: false,
+    options: [
+      {
+        label: "Revise Plan (Recommended)",
+        description: "Update execution plan to use async/await pattern throughout"
+      },
+      {
+        label: "Update Spec",
+        description: "This requires changing the specification itself"
+      },
+      {
+        label: "Explain More",
+        description: "Show me the specific differences and implications"
+      },
+      {
+        label: "Rollback",
+        description: "Revert changes and stick to original plan"
+      }
+    ]
+  }]
+)
+```
+
+6. Based on user selection:
+   - If "Revise Plan": Use `Skill(sdd-toolkit:sdd-next)` to create revised execution plan
+   - If "Update Spec": Use `Skill(sdd-toolkit:sdd-plan)` to update specification
+   - If "Explain More": Provide detailed analysis, then re-ask
+   - If "Rollback": Revert implementation changes
+7. If plan revised, present revised plan to user (use Phase 5.2)
+8. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
+9. Update spec if structural changes needed
+10. Continue with revised plan
+
+### Workflow 6: Verification Task Completion
+**Situation:** Working on a verification task (type: verify), verification steps complete, need user approval
+
+**CRITICAL: Use AskUserQuestion, NOT text-based options**
+
+Steps:
+1. Perform verification steps as specified in task metadata
+2. Document findings (what was verified, what passed/failed)
+3. Analyze results
+4. Present findings to user in text format:
+
+**Example Presentation:**
+```
+✅ Verification Complete: verify-2-1
+
+**Task:** Ensure timestamp format consistency
+**Verification Type:** Code inspection
+**Scope:** Checked started_at and completed_at timestamp formats
+
+**Findings:**
+- Both timestamp fields use datetime.datetime.now(timezone.utc).isoformat() format
+- Format: ISO 8601 with 'Z' suffix (e.g., "2025-10-30T12:15:05.279477Z")
+- Compatible with calculate_time_from_timestamps() function (supports both Z and +00:00)
+- All timestamp writes follow consistent pattern
+
+**Conclusion:** Timestamp formats are consistent and compatible. No issues found.
+```
+
+5. **IMMEDIATELY use AskUserQuestion** to get user decision:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Verification complete. How would you like to proceed?",
+    header: "Verify Done",
+    multiSelect: false,
+    options: [
+      {
+        label: "Approve & Complete",
+        description: "Mark verification task as complete (recommended)"
+      },
+      {
+        label: "Request Changes",
+        description: "Additional verification steps needed"
+      },
+      {
+        label: "Review Details",
+        description: "Show specific code sections or verification evidence"
+      },
+      {
+        label: "Defer",
+        description: "Save findings for later"
+      }
+    ]
+  }]
+)
+```
+
+6. Based on user selection:
+   - If "Approve & Complete": Use `Skill(sdd-toolkit:sdd-update)` to mark task completed
+   - If "Request Changes": Ask for specifics, perform additional verification
+   - If "Review Details": Show requested details, then re-ask with AskUserQuestion
+   - If "Defer": Document findings and exit gracefully
+
+**Important:**
+- NEVER present text-based options like "1. Approve, 2. Request changes"
+- ALWAYS use AskUserQuestion for the decision
+- Document findings in the task's status_note when marking complete
 
 ## Advanced Query Techniques
 
@@ -1505,7 +2211,38 @@ Detects circular chains, orphaned tasks, and impossible dependency chains.
 
 ### Issue: Dependencies Not Clear
 **Symptom:** Unsure if task dependencies are met
-**Solution:** Use `sdd check-deps SPEC_ID TASK_ID` to verify status; ask user if still unclear
+
+**Solution:**
+
+1. Use `sdd check-deps SPEC_ID TASK_ID` to verify dependency status
+2. If dependency status is still unclear after checking, explain the concern and ask user:
+
+**Present context and ask:**
+```
+⚠️  Unclear Dependency Status
+
+Task: task-2-3 (src/middleware/auth.ts)
+
+Dependency Analysis:
+- task-2-1 (AuthService) status: completed
+- However: No test verification for task-2-1 found
+- Risk: AuthService may have issues that could affect this task
+
+Recommendation: Verify task-2-1 is truly complete before proceeding.
+
+Should I proceed with this task anyway, or would you like to:
+- Verify task-2-1 completion first
+- Work on a different task instead
+- See more details about the risk
+
+Let me know how you'd like to proceed.
+```
+
+**Handle user response:**
+- If user says proceed/yes: Continue with task
+- If user asks for verification: Guide through verification steps
+- If user wants different task: Use Phase 2.3 (Present Task Options)
+- If user asks for details: Explain the specific dependency concern
 
 ### Issue: Plan Too Complex
 **Symptom:** Plan is too large or exceeds estimates

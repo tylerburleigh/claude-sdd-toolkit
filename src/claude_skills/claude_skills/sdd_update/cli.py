@@ -379,29 +379,7 @@ def cmd_complete_spec(args, printer):
         spec_id=args.spec_id,
         spec_file=spec_file,
         specs_dir=specs_dir,
-        actual_hours=args.actual_hours,
         skip_doc_regen=getattr(args, 'skip_doc_regen', False),
-        dry_run=args.dry_run,
-        printer=printer
-    )
-
-    return 0 if success else 1
-
-
-def cmd_track_time(args, printer):
-    """Track time spent on task."""
-    printer.action(f"Recording time for task {args.task_id}...")
-
-    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
-    if not specs_dir:
-        printer.error("Specs directory not found")
-        return 1
-
-    success = track_time(
-        spec_id=args.spec_id,
-        task_id=args.task_id,
-        actual_hours=args.actual,
-        specs_dir=specs_dir,
         dry_run=args.dry_run,
         printer=printer
     )
@@ -754,7 +732,6 @@ def cmd_complete_task(args, printer):
         spec_id=args.spec_id,
         task_id=args.task_id,
         specs_dir=specs_dir,
-        actual_hours=args.actual_hours,
         note=args.note,
         journal_title=args.journal_title,
         journal_content=args.journal_content,
@@ -886,18 +863,9 @@ def register_update(subparsers, parent_parser):
     p_complete = subparsers.add_parser("complete-spec", help="Mark spec as completed", parents=[parent_parser])
     p_complete.add_argument("spec_id", help="Specification ID")
     p_complete.add_argument("spec_file", nargs='?', help="Path to spec file (optional - will be auto-detected if not provided)")
-    p_complete.add_argument("--actual-hours", type=float, help="Actual hours spent")
     p_complete.add_argument("--skip-doc-regen", action="store_true", help="Skip documentation regeneration for faster completion")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
-
-    # track-time command
-    p_time = subparsers.add_parser("track-time", help="Track time spent on task", parents=[parent_parser])
-    p_time.add_argument("spec_id", help="Specification ID")
-    p_time.add_argument("task_id", help="Task ID")
-    p_time.add_argument("--actual", type=float, required=True, help="Actual hours spent")
-    p_time.add_argument("--dry-run", action="store_true", help="Preview change")
-    p_time.set_defaults(func=cmd_track_time)
 
     # time-report command
     p_report = subparsers.add_parser("time-report", help="Generate time tracking report", parents=[parent_parser])
@@ -994,12 +962,11 @@ def register_update(subparsers, parent_parser):
     # complete-task command
     p_complete_task = subparsers.add_parser(
         "complete-task",
-        help="Complete task with optional journaling and metadata updates",
+        help="Complete task with optional journaling and metadata updates. Time is automatically calculated from started_at and completed_at timestamps.",
         parents=[parent_parser],
     )
     p_complete_task.add_argument("spec_id", help="Specification ID")
     p_complete_task.add_argument("task_id", help="Task ID to complete")
-    p_complete_task.add_argument("--actual-hours", type=float, help="Actual hours spent")
     p_complete_task.add_argument("--note", help="Status note")
     p_complete_task.add_argument("--author", default="claude-code", help="Journal author")
     p_complete_task.add_argument("--journal-title", help="Journal entry title")

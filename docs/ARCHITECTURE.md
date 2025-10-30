@@ -45,7 +45,7 @@ The system follows a layered architecture where each layer has distinct responsi
 
 **Key Commands:**
 - **`/sdd-setup`**: First-time configuration and project permissions setup
-- **`/sdd-start`**: Interactive workflow to resume work on active specs
+- **`/sdd-begin`**: Interactive workflow to resume work on active specs
 
 ### C. Hooks Layer (`~/.claude/hooks/`)
 
@@ -125,8 +125,8 @@ spec-root (type: "spec")
 7. Claude reports success to user
 
 **Resuming Work:**
-1. User: `/sdd-start`
-2. Command loads workflow from `commands/sdd-start.md`
+1. User: `/sdd-begin`
+2. Command loads workflow from `commands/sdd-begin.md`
 3. CLI: `sdd skills-dev start-helper -- detect-active`
 4. CLI scans `specs/active/` directory
 5. Returns JSON with active spec list

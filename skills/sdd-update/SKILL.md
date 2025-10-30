@@ -101,6 +101,45 @@ The CLI provides proper error handling, validation, argument parsing, and interf
 
 If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
 
+## Output Formatting Guidelines
+
+**IMPORTANT - How to Present Information to Users:**
+
+When presenting task completion summaries, status updates, or progress information, follow these formatting rules:
+
+**DO:**
+- ✅ Output completion summaries and status updates directly as formatted text
+- ✅ Use proper spacing - **always add a space after emojis**
+- ✅ Put each major item on its own line for readability
+- ✅ Use blank lines to separate sections
+- ✅ Use clear section headers (e.g., "## Task Completed", "**Status:**")
+- ✅ Keep related information grouped together
+
+**DO NOT:**
+- ❌ Cram multiple items onto single lines
+- ❌ Let emojis run together without spaces
+- ❌ Use bash commands (like `echo`) for simple text output
+- ❌ Create dense, hard-to-read blocks of text
+
+**Example of CORRECT formatting:**
+```
+✅ Task Completed: task-2-3-1
+
+**Status:** Updated to completed
+**Journal:** Implementation details documented
+**Progress:** 31% complete (11/35 tasks)
+**Metadata:** Synced with spec file
+
+Next: Continuing with task-2-3-2...
+```
+
+**Example of INCORRECT formatting (NEVER do this):**
+```
+✅ Task Status: Updated to completed📝 Journal Entry: Added with full implementation details📊 Progress Updated: 31% complete (11/35 tasks)🔄 Metadata Synced:
+```
+
+The correct format makes information easy to scan and understand. The incorrect format is dense and hard to read.
+
 ## Quick Reference: Common Operations
 
 This table shows the most frequently used commands:
@@ -113,7 +152,7 @@ This table shows the most frequently used commands:
 | Unblock task | `sdd unblock-task {spec-id} {task-id} --resolution "..."` | Documents resolution and updates status |
 | Execute verification | `sdd execute-verify {spec-id} {verify-id}` | Automatically runs verification task based on metadata |
 | Add verification | `sdd add-verification {spec-id} {verify-id} {status}` | Status: PASSED, FAILED, PARTIAL |
-| Track time | `sdd track-time {spec-id} {task-id} --actual {hours}` | Records actual hours spent |
+| Track time | Automatic (calculated from timestamps) | Time automatically calculated from started_at/completed_at timestamps |
 | Update metadata | `sdd update-frontmatter {spec-id} {key} "{value}"` | Updates spec-level metadata fields |
 | Get status report | `sdd status-report {spec-id}` | Shows overall progress and status |
 | Complete spec | `sdd complete-spec {spec-id} --actual-hours {hours}` | Marks complete, regenerates docs, and moves to completed/ (use `--skip-doc-regen` to skip doc regeneration) |
@@ -123,10 +162,10 @@ This table shows the most frequently used commands:
 All operations use the `sdd` command. Here's a typical workflow:
 
 ```bash
-# 1. Start working on a task
+# 1. Start working on a task (started_at timestamp automatically recorded)
 sdd update-status user-auth-001 task-1-2 in_progress
 
-# 2. Complete the task
+# 2. Complete the task (completed_at timestamp automatically recorded, actual_hours calculated)
 sdd update-status user-auth-001 task-1-2 completed --note "Implemented User model"
 
 # 3. Add a journal entry (if deviations occurred)
@@ -138,6 +177,8 @@ sdd status-report user-auth-001
 # 5. When all tasks done, complete the spec
 sdd complete-spec user-auth-001 --actual-hours 18.5
 ```
+
+**Automatic Time Tracking:** Time tracking happens automatically! When you mark a task as `in_progress`, the system records `started_at`. When you mark it `completed`, it records `completed_at` and calculates `actual_hours`. No manual time entry needed - just work on your tasks normally!
 
 **Tip**: Use `--dry-run` flag to preview changes before applying them.
 
@@ -163,8 +204,7 @@ For comprehensive command list, see Command Reference below.
 - `complete-spec` - Mark spec complete, regenerate documentation (by default), and move to completed/ (use `--skip-doc-regen` to skip doc regeneration)
 
 **Time Tracking:**
-- `track-time` - Record actual time spent on task
-- `time-report` - Generate time analysis report
+- `time-report` - Generate time analysis report (automatic calculation from timestamps)
 - `phase-time` - Calculate time breakdown for a specific phase
 
 **Validation & Reporting:**
@@ -1421,9 +1461,9 @@ sdd mark-blocked user-auth-001 task-3-1 --reason "Missing API key" --dry-run
 
 Track estimated vs actual time for better planning.
 
-#### 9.1 Record Time Spent
+#### 9.1 Automatic Time Calculation
 
-Add time tracking to task metadata:
+Time tracking is **automatically calculated** from task timestamps when you update task status:
 
 ```json
 {
@@ -1431,14 +1471,28 @@ Add time tracking to task metadata:
     "status": "completed",
     "metadata": {
       "estimated_hours": 2,
-      "actual_hours": 2.5,
-      "started_at": "2025-10-18T14:00:00Z",
-      "completed_at": "2025-10-18T16:30:00Z",
+      "started_at": "2025-10-18T14:00:00Z",      // Set when marked in_progress
+      "completed_at": "2025-10-18T16:30:00Z",    // Set when marked completed
+      "actual_hours": 2.5,                        // Automatically calculated: (completed_at - started_at) in hours
       "time_notes": "Additional time needed for edge case testing"
     }
   }
 }
 ```
+
+**How it works:**
+1. When you mark a task as `in_progress`, `started_at` timestamp is recorded
+2. When you mark a task as `completed`, `completed_at` timestamp is recorded
+3. `actual_hours` is automatically calculated from the time difference
+4. Calculation: `actual_hours = (completed_at - started_at) / 3600` seconds
+
+**Manual override (optional):**
+If you need to manually specify actual hours (e.g., task done across multiple sessions), you can provide it when completing the task:
+```bash
+sdd update-status user-auth-001 task-1-2 completed --actual-hours 3.5
+```
+
+This overrides the automatic calculation.
 
 #### 9.2 Calculate Phase Time
 
@@ -1475,12 +1529,7 @@ When phase/spec completes, update metadata:
 }
 ```
 
-#### 9.4 Track and Report Time
-
-**Track time for a task:**
-```bash
-sdd track-time user-auth-001 task-1-2 --actual 2.5
-```
+#### 9.4 Time Reporting
 
 **Generate time tracking report:**
 ```bash
@@ -1491,6 +1540,8 @@ sdd time-report user-auth-001
 ```bash
 sdd time-report user-auth-001 --json
 ```
+
+Time tracking is automatic - no manual entry needed! The `time-report` command analyzes the timestamps and calculates actual hours spent on each task.
 
 **Example time report output:**
 ```
@@ -1553,21 +1604,57 @@ Tasks over estimate:
 
 1. Load spec and spec files
 2. Find next available task (or use Skill(sdd-toolkit:sdd-next))
-3. Mark task as `in_progress` in state
-4. Update `started_at` timestamp in metadata
-5. Recalculate parent progress
-6. Save spec file
-7. Add journal entry noting start
+3. Mark task as `in_progress` (automatically records `started_at` timestamp)
+   ```bash
+   sdd update-status user-auth-001 task-1-2 in_progress
+   ```
+4. System automatically:
+   - Records `started_at` timestamp in metadata
+   - Recalculates parent progress
+   - Saves spec file
+5. (Optional) Add journal entry noting start
+
+**Example result in JSON:**
+```json
+{
+  "task-1-2": {
+    "status": "in_progress",
+    "metadata": {
+      "started_at": "2025-10-30T14:30:00Z"  // Automatically recorded
+    }
+  }
+}
+```
 
 ### Workflow 2: Completing a Task
 
 1. Finish the implementation work (outside this skill)
-2. Mark task as `completed` in state
-3. Update `completed_at` timestamp
-4. Add actual_hours if tracking time
-5. Recalculate parent progress
-6. Save spec file
-7. Add journal entry with notes
+2. Mark task as `completed` (automatically records `completed_at` and calculates `actual_hours`)
+   ```bash
+   sdd update-status user-auth-001 task-1-2 completed --note "User model implemented and tested"
+   ```
+3. System automatically:
+   - Records `completed_at` timestamp
+   - Calculates `actual_hours` from time difference
+   - Recalculates parent progress
+   - Saves spec file
+4. (Optional) Add journal entry with implementation notes
+
+**Example result in JSON:**
+```json
+{
+  "task-1-2": {
+    "status": "completed",
+    "metadata": {
+      "started_at": "2025-10-30T14:30:00Z",
+      "completed_at": "2025-10-30T17:00:00Z",
+      "actual_hours": 2.5  // Automatically calculated!
+    }
+  }
+}
+```
+
+**Time calculation:** (17:00 - 14:30) = 2.5 hours
 
 ### Workflow 3: Completing a Phase
 
@@ -1696,7 +1783,7 @@ This skill provides document management operations for spec-driven development:
 - ✅ Move specs between lifecycle folders
 - ✅ Update JSON metadata fields
 - ✅ Handle blockers and dependencies
-- ✅ Track time spent vs estimated
+- ✅ Review time variance reports (automatically calculated from timestamps)
 - ✅ Query spec status and progress
 - ✅ Maintain JSON spec file consistency
 

@@ -2,7 +2,7 @@
 Setup Project Permissions Commands
 
 Configures .claude/settings.json with required SDD tool permissions.
-Used by /sdd-start command and sdd-plan skill to ensure proper permissions.
+Used by /sdd-begin command and sdd-plan skill to ensure proper permissions.
 """
 
 import json
@@ -35,7 +35,7 @@ SDD_PERMISSIONS = [
     "Skill(doc-query)",
 
     # Slash commands
-    "SlashCommand(/sdd-start)",
+    "SlashCommand(/sdd-begin)",
 
     # CLI command permissions (unified sdd CLI + legacy standalone commands)
     "Bash(sdd:*)",      # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>

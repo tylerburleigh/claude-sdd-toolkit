@@ -174,7 +174,7 @@
       "name": "setup_permissions",
       "file": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
       "language": "python",
-      "docstring": "Setup Project Permissions Commands\n\nConfigures .claude/settings.json with required SDD tool permissions.\nUsed by /sdd-start command and sdd-plan skill to ensure proper permissions.",
+      "docstring": "Setup Project Permissions Commands\n\nConfigures .claude/settings.json with required SDD tool permissions.\nUsed by /sdd-begin command and sdd-plan skill to ensure proper permissions.",
       "classes": [],
       "functions": [
         "cmd_update",
@@ -194,7 +194,7 @@
       "name": "start_helper",
       "file": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
       "language": "python",
-      "docstring": "SDD Start Helper Commands\n\nProvides commands for /sdd-start slash command and session management.",
+      "docstring": "SDD Start Helper Commands\n\nProvides commands for /sdd-begin slash command and session management.",
       "classes": [],
       "functions": [
         "cmd_check_permissions",
@@ -1202,7 +1202,7 @@
       "name": "sdd_start_helper",
       "file": "src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py",
       "language": "python",
-      "docstring": "SDD Start Helper Script\n\nProvides commands for /sdd-start slash command and session management:\n- check-permissions: Check if SDD permissions are configured\n- format-output: Human-readable formatted text for active specs with last-accessed task\n- find-active-work: JSON with all resumable specs\n- get-session-info: Session state with last-accessed task (JSON)",
+      "docstring": "SDD Start Helper Script\n\nProvides commands for /sdd-begin slash command and session management:\n- check-permissions: Check if SDD permissions are configured\n- format-output: Human-readable formatted text for active specs with last-accessed task\n- find-active-work: JSON with all resumable specs\n- get-session-info: Session state with last-accessed task (JSON)",
       "classes": [],
       "functions": [
         "check_permissions",
@@ -1227,7 +1227,7 @@
       "name": "setup_project_permissions",
       "file": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
       "language": "python",
-      "docstring": "Setup Project Permissions Script\n\nConfigures .claude/settings.json with required SDD tool permissions.\nUsed by /sdd-start command and sdd-plan skill to ensure proper permissions.",
+      "docstring": "Setup Project Permissions Script\n\nConfigures .claude/settings.json with required SDD tool permissions.\nUsed by /sdd-begin command and sdd-plan skill to ensure proper permissions.",
       "classes": [],
       "functions": [
         "update_permissions",

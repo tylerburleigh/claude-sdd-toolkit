@@ -20,7 +20,7 @@ from .journal import (
     _ensure_journal_container,
 )
 from .status import update_task_status
-from .time_tracking import track_time
+from .time_tracking import track_time, calculate_time_from_timestamps
 
 
 def _get_timestamp() -> str:
@@ -91,10 +91,24 @@ def _simulate_workflow(
 
     metadata = task.setdefault("metadata", {})
 
+    timestamp = _get_timestamp()
+
+    # Handle actual_hours (manual or calculated)
     if actual_hours and actual_hours > 0:
         metadata["actual_hours"] = actual_hours
+    else:
+        # Simulate automatic calculation
+        started_at = metadata.get("started_at")
+        completed_at = timestamp  # Using simulated completion timestamp
 
-    timestamp = _get_timestamp()
+        if started_at:
+            calculated = calculate_time_from_timestamps(
+                started_at,
+                completed_at,
+                printer=None  # Suppress output in simulation
+            )
+            if calculated is not None and calculated >= 0:
+                metadata["actual_hours"] = calculated
     metadata["completed_at"] = timestamp
     metadata["needs_journaling"] = False
     if note:
@@ -352,6 +366,45 @@ def complete_task_workflow(
         printer=printer,
     ):
         return None
+
+    # Automatic time calculation if actual_hours not manually provided
+    if not actual_hours:
+        # Reload spec to get updated timestamps from update_task_status()
+        updated_state = load_json_spec(spec_id, specs_dir)
+        if updated_state:
+            updated_task = updated_state.get("hierarchy", {}).get(task_id, {})
+            task_metadata = updated_task.get("metadata", {})
+
+            started_at = task_metadata.get("started_at")
+            completed_at = task_metadata.get("completed_at")
+
+            if started_at and completed_at:
+                # Calculate time from timestamps
+                calculated_hours = calculate_time_from_timestamps(
+                    started_at,
+                    completed_at,
+                    printer=printer
+                )
+
+                if calculated_hours is not None and calculated_hours >= 0:
+                    # Store calculated time
+                    if not track_time(
+                        spec_id=spec_id,
+                        task_id=task_id,
+                        actual_hours=calculated_hours,
+                        specs_dir=specs_dir,
+                        dry_run=False,
+                        printer=printer,
+                    ):
+                        printer.warning(f"Failed to store calculated time ({calculated_hours:.3f}h)")
+                    else:
+                        printer.info(f"Automatically calculated time: {calculated_hours:.3f}h")
+                else:
+                    printer.warning("Time calculation returned invalid result")
+            else:
+                # Missing timestamps - this is expected if task was never marked in_progress
+                if not started_at:
+                    printer.info("No started_at timestamp found; task may not have been marked in_progress")
 
     if not add_journal_entry(
         spec_id=spec_id,

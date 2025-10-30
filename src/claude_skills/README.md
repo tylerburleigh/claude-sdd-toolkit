@@ -145,7 +145,7 @@ This package is part of the larger Claude Skills ecosystem located at `~/.claude
 ```
 ~/.claude/
 ├── skills/           # Claude Code skills (auto-detected)
-├── commands/         # Slash commands (/sdd-start)
+├── commands/         # Slash commands (/sdd-begin)
 ├── hooks/            # Event hooks (session-start, pre-tool-use)
 └── src/
     └── claude_skills/  ← This package

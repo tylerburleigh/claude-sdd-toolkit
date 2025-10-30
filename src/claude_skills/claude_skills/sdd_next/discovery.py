@@ -139,7 +139,7 @@ def get_next_task(spec_data: Dict) -> Optional[Tuple[str, Dict]]:
         # Prefer leaf tasks (no children) over parent tasks
         candidates = []
         for key, value in hierarchy.items():
-            if (value.get("type") in ["task", "subtask"] and
+            if (value.get("type") in ["task", "subtask", "verify"] and
                 value.get("status") == "pending" and
                 is_unblocked(spec_data, key, value) and
                 is_in_current_phase(spec_data, key, current_phase)):

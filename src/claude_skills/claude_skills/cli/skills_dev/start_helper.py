@@ -1,7 +1,7 @@
 """
 SDD Start Helper Commands
 
-Provides commands for /sdd-start slash command and session management.
+Provides commands for /sdd-begin slash command and session management.
 """
 
 import json
@@ -265,7 +265,7 @@ def register_start_helper(subparsers, parent_parser):
         'start-helper',
         parents=[parent_parser],
         help='Session start helper commands',
-        description='Commands for /sdd-start slash command and session management'
+        description='Commands for /sdd-begin slash command and session management'
     )
 
     # Create subparsers for start-helper commands

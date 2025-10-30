@@ -86,12 +86,12 @@ Claude will:
 Resume anytime with:
 
 ```
-/sdd-start
+/sdd-begin
 ```
 
 ### See It In Action
 
-Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-start` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
+Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-begin` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
 
 ## Core Concepts
 
@@ -142,7 +142,7 @@ Claude uses skills automatically based on your requests.
 
 **Commands** are interactive workflows you invoke with `/`:
 
-- `/sdd-start` - Resume work on active specs
+- `/sdd-begin` - Resume work on active specs
 
 Type `/` in Claude Code to see all available commands.
 
@@ -156,13 +156,13 @@ Type `/` in Claude Code to see all available commands.
    Claude generates detailed spec
    ↓
 3. Implement Tasks
-   /sdd-start → pick next task
+   /sdd-begin → pick next task
    ↓
 4. Track Progress
    Tasks auto-marked as complete
    ↓
 5. Resume Anytime
-   /sdd-start shows progress
+   /sdd-begin shows progress
 ```
 
 ## Common Workflows
@@ -174,7 +174,7 @@ You: Create a spec for adding rate limiting to the API
 
 Claude: [Creates detailed spec at specs/active/rate-limiting-001.json]
 
-You: /sdd-start
+You: /sdd-begin
 
 Claude: Found active spec "rate-limiting-001". Continue with next task?
 
@@ -183,7 +183,7 @@ You: Yes
 Claude: Task 1: Create RateLimiter middleware class
         [Implements the task]
 
-You: /sdd-start
+You: /sdd-begin
 
 Claude: Task 2: Add rate limit configuration...
         [Continues through all tasks]
@@ -192,7 +192,7 @@ Claude: Task 2: Add rate limit configuration...
 ### Resume Work After a Break
 
 ```
-You: /sdd-start
+You: /sdd-begin
 
 Claude: Found 2 active specs:
         1. rate-limiting-001 (3/7 tasks complete)
@@ -439,7 +439,7 @@ The plugin installs these components:
 
 **In `~/.claude/`:**
 - `skills/` - 8 specialized skills for Claude
-- `commands/` - Slash commands like `/sdd-start`
+- `commands/` - Slash commands like `/sdd-begin`
 - `hooks/` - Automatic session detection
 - `src/claude_skills/` - Python CLI tools
 
@@ -450,7 +450,7 @@ The plugin installs these components:
 ## Tips for Success
 
 1. **Start with a spec** - Always create a spec before major work
-2. **Use /sdd-start often** - It keeps you on track
+2. **Use /sdd-begin often** - It keeps you on track
 3. **Review specs** - Use multi-model review for important features
 4. **Keep specs active** - Move completed specs to `completed/`
 5. **Document as you go** - Run `code-doc` periodically
@@ -463,7 +463,7 @@ Ready to get started?
 1. ✅ Install the plugin (see above)
 2. ✅ Verify installation works
 3. 📝 Create your first spec: "Plan a feature for X"
-4. 🚀 Implement with `/sdd-start`
+4. 🚀 Implement with `/sdd-begin`
 5. 🎉 Track progress and stay organized
 
 **Questions?** Check [INSTALLATION.md](INSTALLATION.md) for detailed setup or [DEVELOPER.md](DEVELOPER.md) for customization.

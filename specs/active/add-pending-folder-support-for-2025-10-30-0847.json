@@ -1,0 +1,1642 @@
+{
+  "spec_id": "add-pending-folder-support-for-2025-10-30-0847",
+  "title": "Add Pending Folder Support for Spec Workflow Management",
+  "generated": "2025-10-30T12:47:11.369811Z",
+  "last_updated": "2025-10-30T12:50:28.698846Z",
+  "metadata": {
+    "template": "complex",
+    "complexity": "high",
+    "risk_level": "medium",
+    "estimated_hours": 60,
+    "security_sensitive": false,
+    "default_category": "implementation",
+    "description": "Implement a pending folder workflow where new specs are created in specs/pending/ as a backlog, and can be activated to specs/active/ when ready to work on them. This provides backlog organization and work-in-progress management.",
+    "objectives": [
+      "Add specs/pending/ folder for spec backlog management",
+      "Implement activate_spec() function to move specs pending \u2192 active",
+      "Integrate activation workflow into sdd-begin and sdd-next",
+      "Update all discovery logic to include pending folder",
+      "Allow multiple active specs (parallel work streams)",
+      "Maintain backward compatibility with existing active/ specs",
+      "Update documentation and permissions across all skills"
+    ],
+    "success_criteria": [
+      "New specs created via sdd-plan land in specs/pending/",
+      "sdd-begin shows pending specs backlog and offers to activate selected ones",
+      "sdd-next detects pending specs and prompts to activate first",
+      "Multiple specs can exist in active/ simultaneously",
+      "All existing active/ specs continue to work without changes",
+      "Permissions updated to allow write access to specs/pending/",
+      "All documentation reflects backlog management workflow"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Add Pending Folder Support for Spec Workflow Management",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6"
+      ],
+      "total_tasks": 44,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Foundation & Permissions",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update permission configurations and path discovery to support pending/ folder",
+        "risk_level": "low",
+        "estimated_hours": 4
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add pending folder permissions to SDD_PERMISSIONS list",
+        "reasoning": "Claude Code needs write/edit permissions for specs/pending/ folder"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Add Write and Edit permissions for specs/pending/**",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add 'Write(//**/specs/pending/**)' and 'Edit(//**/specs/pending/**)' to the SDD_PERMISSIONS list around lines 46-52"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Mirror the permission changes from task-1-1",
+        "reasoning": "Duplicate permission list exists in this file and must be kept in sync"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Add Write and Edit permissions for specs/pending/**",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add the same pending folder permissions as task-1-1-1"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/paths.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/paths.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Add 'pending' to search_dirs in find_spec_file() function",
+        "reasoning": "All spec discovery must include pending/ folder to find specs in backlog"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Update search_dirs in find_spec_file()",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Change line 97 from search_dirs = ['active', 'completed', 'archived'] to search_dirs = ['pending', 'active', 'completed', 'archived']. Put pending first so it's checked first in priority order."
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Verify permissions include pending folder",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "grep -n 'specs/pending' src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
+        "expected": "Both files contain Write(//**/specs/pending/**) and Edit(//**/specs/pending/**)"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Verify find_spec_file() searches pending folder",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "grep -A 2 'search_dirs = ' src/claude_skills/claude_skills/common/paths.py",
+        "expected": "search_dirs includes 'pending' as first element"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Core Lifecycle Management",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement activate_spec() function and CLI command to move specs from pending/ backlog to active/ work-in-progress",
+        "risk_level": "medium",
+        "estimated_hours": 8
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add new activate_spec() function to handle pending \u2192 active transition",
+        "reasoning": "Core functionality for activating specs from backlog to work-in-progress"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Create activate_spec() function",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add function signature: activate_spec(spec_id: str, specs_dir: Path, dry_run: bool = False, printer: Optional[PrettyPrinter] = None) -> bool. Function should: 1) Find spec in pending/, 2) Update metadata status to 'active', 3) Add activated_date timestamp, 4) Use move_spec() to move to active/, 5) Return success/failure"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add error handling for non-pending specs",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Validate that spec is actually in pending/ folder before activating. Show error if spec not found or already in active/completed/archived folders. Friendly message if already active: 'Spec is already active - no need to activate again.'"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Add metadata updates for activation tracking",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update spec metadata with: status='active', activated_date=timestamp. No need for 'activated_by' field since this is just backlog management, not approval tracking."
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add activate-spec CLI subcommand",
+        "reasoning": "Provide command-line interface for activating specs from backlog"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Create cmd_activate_spec() function",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add function that calls lifecycle.activate_spec() and handles success/failure return codes. Success message: 'Spec activated and moved to active/. You can now start working on it with sdd next-task.'"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Register activate-spec subparser",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "In register_update() function, add subparser for 'activate-spec' command with spec_id argument and standard flags (--dry-run, etc.)"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test activate_spec() function exists and has correct signature",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python3 -c \"from claude_skills.sdd_update.lifecycle import activate_spec; import inspect; print(inspect.signature(activate_spec))\"",
+        "expected": "Function signature shows spec_id, specs_dir, dry_run, and printer parameters"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Test CLI command is registered",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd activate-spec --help",
+        "expected": "Help text shows activate-spec command with spec_id argument"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "End-to-end test: Create spec in pending, activate, verify in active",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "1. Create test spec in specs/pending/, 2. Run sdd activate-spec <spec-id>, 3. Verify spec moved to specs/active/, 4. Check metadata has activated_date",
+        "expected": "Spec successfully moves from pending/ to active/ with metadata updated"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Spec Creation Changes",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update sdd-plan to create new specs in pending/ instead of active/",
+        "risk_level": "medium",
+        "estimated_hours": 6
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan/planner.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan/planner.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Change default specs_dir from 'specs/active' to 'specs/pending'",
+        "reasoning": "New specs should land in pending/ backlog, not immediately in active/ work-in-progress"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Update default folder in create_spec_interactive()",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Change line 128 from specs_dir = Path('specs/active') to specs_dir = Path('specs/pending')"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Update cmd_create() to use pending subfolder",
+        "reasoning": "CLI command must pass pending folder to planner function"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Change target folder in cmd_create()",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Change line 43 from specs_dir / 'active' to specs_dir / 'pending'"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Update success message to mention pending folder",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update line 51 success message to indicate spec created in pending/ backlog. Message: 'Spec created in pending/. Run sdd activate-spec <spec-id> when ready to start working on it.'"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Test sdd create places specs in pending/",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd create 'Test Pending Spec' --template simple && ls specs/pending/ | grep test-pending-spec",
+        "expected": "New spec appears in specs/pending/ folder"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Verify spec metadata shows pending status",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create test spec, read JSON, verify status field is 'pending'",
+        "expected": "Spec metadata.status or spec-root.status is 'pending'"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Discovery & Workflow Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3",
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update sdd-next and sdd-begin to handle pending specs with activation workflow",
+        "risk_level": "medium",
+        "estimated_hours": 12
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add logic to detect pending specs and prompt to activate first",
+        "reasoning": "sdd-next should detect when spec is in pending/ and instruct user to activate it before work begins"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add pending spec detection",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "After loading spec, check if spec file path contains '/pending/'. If so, show message: 'This spec is in your pending backlog. Run sdd activate-spec <spec-id> to move it to active/ before starting work.'"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Add helpful CLI suggestion",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "When pending spec detected, provide the exact command to run: 'sdd activate-spec <spec-id>'. Then exit gracefully - don't proceed with task discovery."
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Update discovery to include pending specs and categorize them separately",
+        "reasoning": "sdd-begin helper must discover pending specs and provide counts for backlog management"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Include pending/ in spec search",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update discovery functions to search specs/pending/ folder"
+      }
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Add pending_specs list to output",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add pending_specs field to helper output containing list of {spec_id, title} from pending/ folder, so sdd-begin can show backlog"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "commands/sdd-begin.md",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "commands/sdd-begin.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add pending backlog management to workflow",
+        "reasoning": "sdd-begin command must show backlog and offer to activate specs"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Add pending spec discovery to Phase 1",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "In Phase 1 (Discover), show: 'Found N active specs and M pending specs in backlog'"
+      }
+    },
+    "task-4-3-2": {
+      "type": "subtask",
+      "title": "Add backlog activation option to Phase 2",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "In Phase 2 (Present Options), add option: 'View pending backlog (M specs)' that shows pending spec list with titles, then uses AskUserQuestion to let user select which one to activate. After selection, run activate_spec() from lifecycle module."
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Test sdd-next detects pending specs",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create test spec in pending/, run sdd next-task with that spec",
+        "expected": "sdd-next detects pending status and shows message to activate first"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Test sdd-begin shows pending backlog",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create 2 test specs in pending/, run /sdd-begin",
+        "expected": "sdd-begin shows 'Found 2 pending specs in backlog' and offers to view/activate them"
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Test activation workflow from sdd-begin",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create pending spec, run /sdd-begin, select 'View pending backlog', choose a spec to activate",
+        "expected": "Spec moves from pending/ to active/ and user can then run sdd next-task on it"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Documentation Updates",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update all documentation to reflect pending backlog workflow",
+        "risk_level": "low",
+        "estimated_hours": 8
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3",
+        "task-5-4",
+        "task-5-5"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "skills/sdd-plan/SKILL.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-plan/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Update folder structure documentation and workflow description",
+        "reasoning": "sdd-plan documentation must reflect pending/ as backlog destination"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Update folder structure examples",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update lines 106-110 and 776-786 to show: pending/ (Backlog of specs to work on), active/ (Currently being implemented), completed/ (Done), archived/ (Old/cancelled). Explain specs land in pending/ and must be activated before work begins."
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "skills/sdd-next/SKILL.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-next/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Document pending spec detection and activation requirement",
+        "reasoning": "sdd-next documentation must explain how it handles specs in backlog"
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Add pending spec handling section",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add new section explaining: 1) How sdd-next detects pending/ specs, 2) Message shown to user to activate first, 3) Why specs must be activated (backlog organization). Update folder structure references at lines 59-64, 533-538, 623-631."
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "skills/sdd-update/SKILL.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-3-1",
+        "task-5-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-update/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add activate-spec operation documentation and update folder references",
+        "reasoning": "sdd-update documentation must explain new activate-spec command"
+      }
+    },
+    "task-5-3-1": {
+      "type": "subtask",
+      "title": "Add 'Activate Specs from Backlog' operation section",
+      "status": "pending",
+      "parent": "task-5-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add new operation section documenting sdd activate-spec command. Explain: moves spec from pending/ backlog to active/ WIP, updates metadata with activated_date, allows multiple active specs. Example usage: 'sdd activate-spec my-feature-2025-10-30-001'"
+      }
+    },
+    "task-5-3-2": {
+      "type": "subtask",
+      "title": "Update folder structure documentation",
+      "status": "pending",
+      "parent": "task-5-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update lines 76-84 and 936-944 to include pending/ folder with description: 'Backlog of planned work'"
+      }
+    },
+    "task-5-4": {
+      "type": "task",
+      "title": "README.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Update workflow diagrams and folder structure examples",
+        "reasoning": "Main README must reflect pending/ backlog in quick start and examples"
+      }
+    },
+    "task-5-4-1": {
+      "type": "subtask",
+      "title": "Update folder structure and workflow sections",
+      "status": "pending",
+      "parent": "task-5-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update lines 106-110 and 247-259 to include pending/ folder and explain activation step in workflow. Add note: 'You can have multiple specs in active/ representing parallel work streams.'"
+      }
+    },
+    "task-5-5": {
+      "type": "task",
+      "title": "commands/sdd-setup.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-5-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "commands/sdd-setup.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Update permission examples to include pending folder",
+        "reasoning": "Setup documentation must show updated permission strings"
+      }
+    },
+    "task-5-5-1": {
+      "type": "subtask",
+      "title": "Add pending permissions to examples",
+      "status": "pending",
+      "parent": "task-5-5",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update permission configuration examples to show Write(//**/specs/pending/**) and Edit(//**/specs/pending/**)"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Verify all SKILL.md files mention pending folder",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -r 'pending' skills/sdd-*/SKILL.md | wc -l",
+        "expected": "All three skill files contain references to pending folder"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Documentation consistency check",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Review all updated docs to ensure consistent explanation of pending workflow",
+        "expected": "All documentation consistently describes: 1) pending/ as backlog, 2) active/ as WIP, 3) activate-spec to move between them, 4) Multiple active specs allowed"
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Testing & Final Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add/update unit tests and perform end-to-end verification",
+        "risk_level": "low",
+        "estimated_hours": 10
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ]
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-1-1",
+        "task-6-1-2",
+        "task-6-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add unit tests for activate_spec() function",
+        "reasoning": "Ensure activate_spec() works correctly with comprehensive test coverage"
+      }
+    },
+    "task-6-1-1": {
+      "type": "subtask",
+      "title": "Add test_activate_spec_success()",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test that activate_spec() successfully moves spec from pending/ to active/ and updates metadata with activated_date"
+      }
+    },
+    "task-6-1-2": {
+      "type": "subtask",
+      "title": "Add test_activate_spec_not_found()",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test error handling when spec_id not found in pending/"
+      }
+    },
+    "task-6-1-3": {
+      "type": "subtask",
+      "title": "Add test_activate_spec_already_active()",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test friendly message when trying to activate spec already in active/ folder"
+      }
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/unit/test_common/test_paths.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_common/test_paths.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add/update tests for find_spec_file() with pending folder",
+        "reasoning": "Ensure spec discovery includes pending folder correctly"
+      }
+    },
+    "task-6-2-1": {
+      "type": "subtask",
+      "title": "Add test for pending folder search priority",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test that find_spec_file() searches pending/ first and finds specs there correctly"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2",
+        "verify-6-3",
+        "verify-6-4",
+        "verify-6-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Run all unit tests",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "cd src/claude_skills && python -m pytest tests/unit/ -v",
+        "expected": "All unit tests pass including new activate_spec and paths tests"
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "End-to-end workflow test: Create \u2192 Activate \u2192 Work",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "1. sdd create 'Test Feature' --template simple, 2. Verify in pending/, 3. sdd activate-spec <id>, 4. Verify in active/, 5. sdd next-task to start work",
+        "expected": "Complete workflow succeeds: create in pending/ \u2192 activate \u2192 move to active/ \u2192 begin work"
+      }
+    },
+    "verify-6-3": {
+      "type": "verify",
+      "title": "Backward compatibility: Existing active/ specs still work",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Run sdd next-task on existing specs in specs/active/ folder",
+        "expected": "All existing active specs work without requiring activation or migration"
+      }
+    },
+    "verify-6-4": {
+      "type": "verify",
+      "title": "Test sdd-begin backlog workflow",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Create multiple pending specs, run /sdd-begin, select 'View pending backlog'",
+        "expected": "sdd-begin shows pending spec list, allows activation of selected specs"
+      }
+    },
+    "verify-6-5": {
+      "type": "verify",
+      "title": "Test multiple active specs simultaneously",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Activate 3 different specs, verify all can coexist in active/, run sdd next-task on each",
+        "expected": "Multiple specs work in parallel in active/ folder without conflicts"
+      }
+    }
+  }
+}
