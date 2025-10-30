@@ -161,45 +161,24 @@ def update_task_status(
             prompt_data = format_completion_prompt(spec_data, show_hours_input=True)
 
             if not prompt_data.get("error"):
-                # Display the prompt
-                printer.info("\n" + "=" * 60)
+                # Display informational message (non-blocking)
+                printer.blank()
+                printer.info("=" * 60)
                 printer.success(prompt_data["prompt_text"])
                 printer.info("=" * 60)
+                printer.blank()
 
-                # Get user confirmation
-                from claude_skills.sdd_update.lifecycle import complete_spec
+                # Provide actionable next step for Claude/user
+                printer.info("To mark this spec as complete, run:")
+                printer.info(f"  sdd complete-spec {spec_id}")
 
-                user_input = input("\nMark spec as complete? (y/n): ").strip().lower()
+                # Show estimated hours hint if available
+                metadata = spec_data.get("metadata", {})
+                estimated_hours = metadata.get("estimated_hours")
+                if estimated_hours:
+                    printer.info(f"  --actual-hours <hours>  (estimated: {estimated_hours}h)")
 
-                if user_input in ['y', 'yes']:
-                    # Get actual hours if estimated hours exist
-                    actual_hours = None
-                    if prompt_data["requires_input"]:
-                        try:
-                            hours_input = input("Enter actual hours spent (or press Enter to skip): ").strip()
-                            if hours_input:
-                                actual_hours = float(hours_input)
-                        except ValueError:
-                            printer.warning("Invalid hours input, skipping")
-
-                    # Call complete_spec
-                    printer.info("\nMarking spec as complete...")
-                    success = complete_spec(
-                        spec_id=spec_id,
-                        spec_file=None,  # Will be auto-detected
-                        specs_dir=specs_dir,
-                        actual_hours=actual_hours,
-                        skip_doc_regen=False,
-                        dry_run=False,
-                        printer=printer
-                    )
-
-                    if success:
-                        printer.success("Spec marked as complete!")
-                    else:
-                        printer.error("Failed to complete spec")
-                else:
-                    printer.info("Spec completion skipped")
+                printer.blank()
         else:
             # Inform user why completion prompt was not shown
             reason = prompt_decision.get("reason", "Unknown reason")

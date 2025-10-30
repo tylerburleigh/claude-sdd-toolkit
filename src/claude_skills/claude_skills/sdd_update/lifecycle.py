@@ -15,6 +15,9 @@ from claude_skills.common.spec import load_json_spec, save_json_spec
 from claude_skills.common.paths import ensure_directory, find_spec_file
 from claude_skills.common.printer import PrettyPrinter
 
+# Import from sdd_update
+from claude_skills.sdd_update.time_tracking import aggregate_task_times
+
 
 def move_spec(
     spec_file: Path,
@@ -130,7 +133,6 @@ def complete_spec(
     spec_id: str,
     spec_file: Optional[Path],
     specs_dir: Path,
-    actual_hours: Optional[float] = None,
     skip_doc_regen: bool = False,
     dry_run: bool = False,
     printer: Optional[PrettyPrinter] = None
@@ -140,7 +142,7 @@ def complete_spec(
 
     Performs the following:
     1. Verifies all tasks are completed
-    2. Updates JSON metadata (status, completed_date, actual_hours)
+    2. Updates JSON metadata (status, completed_date, actual_hours auto-calculated from tasks)
     3. Moves JSON spec file to completed/ folder
     4. Regenerates codebase documentation (unless skip_doc_regen is True)
 
@@ -148,7 +150,6 @@ def complete_spec(
         spec_id: Specification ID
         spec_file: Path to JSON spec file (optional - will be auto-detected if not provided)
         specs_dir: Path to specs directory
-        actual_hours: Optional actual hours spent
         skip_doc_regen: If True, skip documentation regeneration
         dry_run: If True, show changes without executing
         printer: Optional printer for output
@@ -205,8 +206,10 @@ def complete_spec(
     spec_data["metadata"]["status"] = "completed"
     spec_data["metadata"]["completed_date"] = timestamp
 
-    if actual_hours:
-        spec_data["metadata"]["actual_hours"] = actual_hours
+    # Auto-calculate from task-level actual_hours
+    calculated_hours = aggregate_task_times(spec_id, specs_dir, printer)
+    if calculated_hours:
+        spec_data["metadata"]["actual_hours"] = calculated_hours
 
     # Update last_updated timestamp
     spec_data["last_updated"] = timestamp
@@ -214,8 +217,8 @@ def complete_spec(
     printer.info("Updating metadata:")
     printer.detail(f"status: completed")
     printer.detail(f"completed_date: {timestamp}")
-    if actual_hours:
-        printer.detail(f"actual_hours: {actual_hours}")
+    if "actual_hours" in spec_data["metadata"]:
+        printer.detail(f"actual_hours: {spec_data['metadata']['actual_hours']} (auto-calculated)")
 
     if dry_run:
         printer.warning("DRY RUN - No changes made")

@@ -379,7 +379,6 @@ def cmd_complete_spec(args, printer):
         spec_id=args.spec_id,
         spec_file=spec_file,
         specs_dir=specs_dir,
-        actual_hours=args.actual_hours,
         skip_doc_regen=getattr(args, 'skip_doc_regen', False),
         dry_run=args.dry_run,
         printer=printer
@@ -864,7 +863,6 @@ def register_update(subparsers, parent_parser):
     p_complete = subparsers.add_parser("complete-spec", help="Mark spec as completed", parents=[parent_parser])
     p_complete.add_argument("spec_id", help="Specification ID")
     p_complete.add_argument("spec_file", nargs='?', help="Path to spec file (optional - will be auto-detected if not provided)")
-    p_complete.add_argument("--actual-hours", type=float, help="Actual hours spent")
     p_complete.add_argument("--skip-doc-regen", action="store_true", help="Skip documentation regeneration for faster completion")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
@@ -964,7 +962,7 @@ def register_update(subparsers, parent_parser):
     # complete-task command
     p_complete_task = subparsers.add_parser(
         "complete-task",
-        help="Complete task with optional journaling and metadata updates",
+        help="Complete task with optional journaling and metadata updates. Time is automatically calculated from started_at and completed_at timestamps.",
         parents=[parent_parser],
     )
     p_complete_task.add_argument("spec_id", help="Specification ID")

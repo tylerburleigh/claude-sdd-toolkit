@@ -260,3 +260,62 @@ def generate_time_report(
         printer.detail(f"{task['task_id']}: {task['actual']:.1f}h ({variance_str})")
 
     return report
+
+
+def aggregate_task_times(
+    spec_id: str,
+    specs_dir: Path,
+    printer: Optional[PrettyPrinter] = None
+) -> Optional[float]:
+    """
+    Aggregate actual_hours from all tasks in the spec hierarchy.
+
+    Traverses the hierarchy recursively and sums all actual_hours values
+    from task-level nodes that have time tracking data.
+
+    Args:
+        spec_id: Specification ID
+        specs_dir: Path to specs/active directory
+        printer: Optional printer for error messages
+
+    Returns:
+        Total actual hours across all tasks, or None if no time data found
+
+    Examples:
+        >>> aggregate_task_times("user-auth-2025-10-18-001", Path("specs/active"))
+        18.5
+    """
+    if not printer:
+        printer = PrettyPrinter()
+
+    # Load state
+    spec_data = load_json_spec(spec_id, specs_dir)
+    if not spec_data:
+        return None
+
+    hierarchy = spec_data.get("hierarchy", {})
+
+    total_actual = 0.0
+    tasks_found = 0
+
+    # Collect time data from all tasks
+    for node_id, node_data in hierarchy.items():
+        if node_data.get("type") != "task":
+            continue
+
+        metadata = node_data.get("metadata", {})
+        actual = metadata.get("actual_hours")
+
+        if actual:
+            try:
+                actual_val = float(actual)
+                total_actual += actual_val
+                tasks_found += 1
+            except (ValueError, TypeError) as e:
+                printer.warning(f"Invalid actual_hours value for {node_id}: {actual} ({e})")
+                continue
+
+    if tasks_found == 0:
+        return None
+
+    return round(total_actual, 3)

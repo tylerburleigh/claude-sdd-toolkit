@@ -12,7 +12,7 @@ The Spec-Driven Development process works by defining all planned work upfront i
 
 Here's what happens:
 
-1. **User runs** `/sdd-start` to begin a session
+1. **User runs** `/sdd-begin` to begin a session
 2. **Claude checks** the environment setup and finds active specs with pending tasks
 3. **User selects** "Continue with next task"
 4. **Claude prepares** a detailed plan using the `sdd-next` skill - identifies the task, gathers context, shows what needs to be done
@@ -25,7 +25,7 @@ Here's what happens:
 
 ## The Workflow
 
-I begin a session by running the `/sdd-start` slash command.
+I begin a session by running the `/sdd-begin` slash command.
 
 This initiates the start procedure, which leads Claude to:
 
@@ -34,7 +34,7 @@ This initiates the start procedure, which leads Claude to:
 3. Asks me if I want to continue with the next task
 
 ```
-> /sdd-start is running… 
+> /sdd-begin is running… 
 
 ⏺ I'll help you check for active SDD work and get you started. Let me first verify the
    project permissions.
@@ -483,3 +483,94 @@ After this procedure is run, it adds an entry to the "journal" key in the spec J
     }
   ]
 ```
+
+---
+
+## Time Tracking
+
+One of the key features of the SDD toolkit is **automatic time tracking**. You don't need to manually record how long you spent on tasks - the system tracks this automatically using timestamps.
+
+### How It Works
+
+When you mark a task as `in_progress`, the system automatically records a `started_at` timestamp:
+
+```bash
+sdd update-status semantic-search-2025-10-24-001 task-1-1 in_progress
+```
+
+This updates the task metadata in the JSON spec:
+
+```json
+{
+  "task-1-1": {
+    "status": "in_progress",
+    "metadata": {
+      "started_at": "2025-10-24T16:30:00Z"  // Automatically recorded
+    }
+  }
+}
+```
+
+When you mark the task as `completed`, the system:
+1. Records a `completed_at` timestamp
+2. Automatically calculates `actual_hours` from the time difference
+
+```bash
+sdd update-status semantic-search-2025-10-24-001 task-1-1 completed --note "Task finished"
+```
+
+Result in JSON spec:
+
+```json
+{
+  "task-1-1": {
+    "status": "completed",
+    "metadata": {
+      "started_at": "2025-10-24T16:30:00Z",
+      "completed_at": "2025-10-24T19:00:00Z",
+      "actual_hours": 2.5  // Automatically calculated!
+    }
+  }
+}
+```
+
+**Time calculation:** (19:00 - 16:30) = 2.5 hours
+
+### Viewing Time Reports
+
+After completing tasks, you can generate time tracking reports to see variance from estimates:
+
+```bash
+sdd time-report semantic-search-2025-10-24-001
+```
+
+Example output:
+
+```
+Time Tracking Report: semantic-search-2025-10-24-001
+==============================================
+Overall:
+  Estimated: 16.0 hours
+  Actual:    14.5 hours
+  Variance:  -1.5 hours (-9.4%)
+
+By Phase:
+  phase-1: 4.0h / 4.5h (-0.5h)
+  phase-2: 6.5h / 6.0h (+0.5h)
+  phase-3: 4.0h / 4.0h (on target)
+
+Tasks over estimate:
+  - task-2-3: +0.5h (additional testing needed)
+```
+
+### No Manual Entry Needed
+
+The key benefit: **you don't need to remember to track your time manually**. Just start tasks when you begin work and complete them when done. The system handles the rest automatically!
+
+**Manual override (if needed):** If you worked on a task across multiple sessions or need to manually specify time, you can override the automatic calculation:
+
+```bash
+sdd update-status semantic-search-2025-10-24-001 task-1-1 completed --actual-hours 3.5
+```
+
+This is useful for tasks that span multiple work sessions or when you need to adjust the calculated time.

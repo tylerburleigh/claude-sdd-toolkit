@@ -130,20 +130,29 @@ class TestCompleteSpec:
     """Test complete_spec() function."""
 
     def test_complete_spec_all_tasks_done(self, specs_structure, sample_json_spec_completed):
-        """Test completing spec when all tasks are done."""
+        """Test completing spec when all tasks are done with auto-calculated hours."""
         spec_id = "completed-spec-2025-01-01-007"
 
         # Create spec file in active folder
         spec_file = specs_structure / "active" / f"{spec_id}.json"
         spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Add actual_hours to tasks for auto-calculation
+        expected_total = 0.0
+        for node_id, node_data in spec_data["hierarchy"].items():
+            if node_data.get("type") == "task":
+                hours = 2.5
+                node_data["metadata"]["actual_hours"] = hours
+                expected_total += hours
+
         spec_file.write_text(json.dumps(spec_data))
 
         result = complete_spec(
             spec_id=spec_id,
             spec_file=spec_file,
             specs_dir=specs_structure,
-            actual_hours=12.5,
-            printer=None
+            printer=None,
+            skip_doc_regen=True
         )
 
         assert result is True
@@ -152,31 +161,76 @@ class TestCompleteSpec:
         spec_data = load_json_spec(spec_id, specs_structure)
         assert spec_data["metadata"]["status"] == "completed"
         assert "completed_date" in spec_data["metadata"]
-        assert spec_data["metadata"]["actual_hours"] == 12.5
+        assert spec_data["metadata"]["actual_hours"] == expected_total
 
         # Verify file was moved
         assert not spec_file.exists()
         assert (specs_structure / "completed" / f"{spec_id}.json").exists()
 
     def test_complete_spec_without_actual_hours(self, specs_structure, sample_json_spec_completed):
-        """Test completing spec without providing actual hours."""
+        """Test completing spec without providing actual hours auto-calculates from tasks."""
         spec_id = "completed-spec-2025-01-01-007"
 
         spec_file = specs_structure / "active" / f"{spec_id}.json"
         spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Add actual_hours to some tasks
+        task_count = 0
+        expected_total = 0.0
+        for node_id, node_data in spec_data["hierarchy"].items():
+            if node_data.get("type") == "task":
+                hours = 2.5 + task_count
+                node_data["metadata"]["actual_hours"] = hours
+                expected_total += hours
+                task_count += 1
+
+        save_json_spec(spec_id, specs_structure, spec_data)
         spec_file.write_text(json.dumps(spec_data))
 
         result = complete_spec(
             spec_id=spec_id,
             spec_file=spec_file,
             specs_dir=specs_structure,
-            printer=None
+            printer=None,
+            skip_doc_regen=True
         )
 
         assert result is True
 
         spec_data = load_json_spec(spec_id, specs_structure)
         assert spec_data["metadata"]["status"] == "completed"
+        assert "actual_hours" in spec_data["metadata"]
+        assert spec_data["metadata"]["actual_hours"] == expected_total
+
+    def test_complete_spec_without_time_data(self, specs_structure, sample_json_spec_completed):
+        """Test completing spec without time data doesn't set actual_hours."""
+        spec_id = "completed-spec-2025-01-01-007"
+
+        spec_file = specs_structure / "active" / f"{spec_id}.json"
+        spec_data = load_json_spec(spec_id, specs_structure)
+
+        # Ensure no tasks have actual_hours
+        for node_id, node_data in spec_data["hierarchy"].items():
+            if node_data.get("type") == "task":
+                if "actual_hours" in node_data.get("metadata", {}):
+                    del node_data["metadata"]["actual_hours"]
+
+        save_json_spec(spec_id, specs_structure, spec_data)
+        spec_file.write_text(json.dumps(spec_data))
+
+        result = complete_spec(
+            spec_id=spec_id,
+            spec_file=spec_file,
+            specs_dir=specs_structure,
+            printer=None,
+            skip_doc_regen=True
+        )
+
+        assert result is True
+
+        spec_data = load_json_spec(spec_id, specs_structure)
+        assert spec_data["metadata"]["status"] == "completed"
+        # When no time data exists, actual_hours should not be set
         assert "actual_hours" not in spec_data["metadata"]
 
     def test_complete_spec_incomplete_tasks(self, specs_structure, sample_json_spec_simple):
@@ -216,9 +270,9 @@ class TestCompleteSpec:
             spec_id=spec_id,
             spec_file=spec_file,
             specs_dir=specs_structure,
-            actual_hours=15.0,
             dry_run=True,
-            printer=None
+            printer=None,
+            skip_doc_regen=True
         )
 
         assert result is True

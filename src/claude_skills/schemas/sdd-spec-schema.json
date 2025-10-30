@@ -125,6 +125,21 @@
             "on_failure": {
               "$ref": "#/definitions/on_failure_actions",
               "description": "Actions to take when verification fails"
+            },
+            "started_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when task was started (automatically populated by sdd-update)"
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when task was completed (automatically populated by sdd-update)"
+            },
+            "actual_hours": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual time spent on task in hours (enables variance analysis against estimated_hours)"
             }
           }
         }
