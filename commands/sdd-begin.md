@@ -1,5 +1,5 @@
 ---
-name: sdd-start
+name: sdd-begin
 description: Resume or start spec-driven development work by detecting active tasks and providing interactive options
 ---
 
