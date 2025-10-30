@@ -82,6 +82,38 @@ class TestGetNextTask:
 
         assert next_task is None
 
+    def test_get_next_task_finds_verify_tasks(self, sample_json_spec_simple, specs_structure):
+        """Test that verification tasks are discoverable as actionable tasks."""
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+
+        # Complete all regular tasks so verify tasks become next
+        for key, value in spec_data["hierarchy"].items():
+            if value.get("type") in ["task", "subtask"]:
+                value["status"] = "completed"
+
+        # Add a verify task to the hierarchy
+        spec_data["hierarchy"]["verify-1-1"] = {
+            "type": "verify",
+            "title": "Test verification",
+            "status": "pending",
+            "parent": "phase-1",
+            "children": [],
+            "dependencies": {"blocked_by": [], "depends": [], "blocks": []},
+            "metadata": {"verification_type": "manual"}
+        }
+
+        # Ensure phase-1 includes the verify task
+        if "children" not in spec_data["hierarchy"]["phase-1"]:
+            spec_data["hierarchy"]["phase-1"]["children"] = []
+        spec_data["hierarchy"]["phase-1"]["children"].append("verify-1-1")
+
+        next_task = get_next_task(spec_data)
+
+        assert next_task is not None
+        task_id, task_data = next_task
+        assert task_id == "verify-1-1"
+        assert task_data["type"] == "verify"
+
 
 class TestGetTaskInfo:
     """Tests for get_task_info function."""
