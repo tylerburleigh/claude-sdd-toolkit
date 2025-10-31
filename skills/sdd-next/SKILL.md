@@ -599,6 +599,101 @@ Ready to implement?
 
 ## The Developer Workflow
 
+### Phase 0: Context Window Check (Before Starting)
+
+Before identifying and preparing the next task, check the Claude Code context window usage to ensure efficient session management and prevent context overflow.
+
+**When to Check:**
+- At the beginning of the sdd-next workflow
+- Before finding and preparing the next task
+- Each time sdd-next is invoked to identify work
+
+**How to Check:**
+```bash
+# Get context usage as JSON
+sdd context --json
+```
+
+**Example Output:**
+```json
+{
+  "context_length": 157000,
+  "context_percentage": 78.5,
+  "max_context": 200000,
+  "input_tokens": 45000,
+  "output_tokens": 32000,
+  "cached_tokens": 80000,
+  "total_tokens": 157000
+}
+```
+
+**Decision Logic:**
+
+**If context_percentage >= 75%:**
+
+The context window is approaching capacity. Present a recommendation to the user before continuing:
+
+```
+⚠️  Context Window Usage High
+
+Current Usage: 78.5% (157,000 / 200,000 tokens)
+
+Before continuing with the next task, it's recommended to reset your session:
+
+1. Stop work here
+2. Run /clear to reset the context window
+3. Run /sdd-begin to resume from where you left off
+
+When you resume:
+✅ All completed tasks are preserved in the spec file
+✅ The next actionable task will be automatically identified
+✅ You'll continue with a fresh context window
+
+Continuing with high context usage may lead to:
+❌ Degraded performance
+❌ Context overflow errors
+❌ Loss of important context information
+```
+
+Then use `AskUserQuestion` to get the user's decision:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Context window is 78.5% full. How would you like to proceed?",
+    header: "Context Full",
+    multiSelect: false,
+    options: [
+      {
+        label: "Stop and Reset (Recommended)",
+        description: "Reset context with /clear, then /sdd-begin to resume work"
+      },
+      {
+        label: "Continue Anyway",
+        description: "Proceed with task preparation despite high context usage"
+      }
+    ]
+  }]
+)
+```
+
+**User Response Handling:**
+- **Stop and Reset**: Acknowledge the user's decision, remind them to run `/clear` followed by `/sdd-begin`, then exit gracefully
+- **Continue Anyway**: Proceed with the workflow (Phase 1: Spec Discovery), but the user has been warned about potential issues
+
+**If context_percentage < 75%:**
+- Continue normally with Phase 1
+- No user interaction needed
+- Context usage is healthy for continued work
+
+**Best Practices:**
+- Always check context at the start of sdd-next
+- The 75% threshold provides a safety buffer before issues occur
+- Resetting is quick and preserves all progress in the spec file
+- Better to reset proactively than encounter context overflow mid-task
+
+**Note:** Context window management is also performed by sdd-update after task completion. This check serves as a complementary safety measure to catch high context usage before starting new work, especially when sdd-next is invoked directly.
+
 ### Phase 1: Spec Discovery and Context Gathering
 
 Understand the overall specification before diving into specific tasks.

@@ -1716,6 +1716,119 @@ Tasks over estimate:
 
 **Time calculation:** (17:00 - 14:30) = 2.5 hours
 
+### Workflow 2.5: Context Window Management After Task Completion
+
+After marking a task as completed, check the Claude Code context window usage to prevent context overflow and maintain optimal performance.
+
+**When to Check:**
+- Immediately after marking any task as completed
+- Before transitioning to the next task
+- Each time a task status changes to `completed`
+
+**How to Check:**
+```bash
+# Get context usage as JSON
+sdd context --json
+```
+
+**Example Output:**
+```json
+{
+  "context_length": 157000,
+  "context_percentage": 78.5,
+  "max_context": 200000,
+  "input_tokens": 45000,
+  "output_tokens": 32000,
+  "cached_tokens": 80000,
+  "total_tokens": 157000
+}
+```
+
+**Decision Logic:**
+
+**If context_percentage >= 75%:**
+
+The context window is approaching capacity. Present a recommendation to the user:
+
+```
+⚠️  Context Window Usage High
+
+Current Usage: 78.5% (157,000 / 200,000 tokens)
+
+Your progress has been saved to the spec file. To maintain optimal performance
+and prevent context overflow, it's recommended to reset your session:
+
+1. Stop work here
+2. Run /clear to reset the context window
+3. Run /sdd-begin to resume from where you left off
+
+When you resume:
+✅ All completed tasks are preserved
+✅ The next actionable task will be automatically identified
+✅ You'll continue with a fresh context window
+```
+
+Then use `AskUserQuestion` to get the user's decision:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Context window is 78.5% full. How would you like to proceed?",
+    header: "Context Full",
+    multiSelect: false,
+    options: [
+      {
+        label: "Stop and Reset (Recommended)",
+        description: "Save progress and reset context with /clear, then /sdd-begin to resume"
+      },
+      {
+        label: "Continue Anyway",
+        description: "Proceed to next task despite high context usage (may cause issues)"
+      },
+      {
+        label: "Complete One More Task",
+        description: "Work on one more task, then stop and reset"
+      }
+    ]
+  }]
+)
+```
+
+**User Response Handling:**
+- **Stop and Reset**: Acknowledge the user's decision, remind them to run `/clear` followed by `/sdd-begin`, then exit gracefully with a summary of progress
+- **Continue Anyway**: Proceed with finding the next task, but warn that context overflow may occur and performance may degrade
+- **Complete One More Task**: Proceed with one more task, but flag to check context again after that task completes
+
+**If context_percentage < 75%:**
+- Continue normally with the workflow
+- No user interaction needed
+- Proceed to next task selection or handoff to sdd-next
+
+**Best Practices:**
+- Check context after every task completion
+- Don't wait until context is completely full (75% threshold provides safety buffer)
+- Resetting context is quick and maintains all your progress in the spec file
+- The spec file serves as your checkpoint - you can always resume exactly where you left off
+
+**Integration with Workflow:**
+
+This context check should happen in Workflow 2 right after step 4 (marking task complete):
+
+```bash
+# 1-3. [Previous workflow steps...]
+
+# 4. Mark task as completed
+sdd update-status user-auth-001 task-1-2 completed --note "User model finished"
+
+# 4.5. Check context window (NEW)
+sdd context --json
+
+# If context >= 75%: Present recommendation and get user decision
+# If context < 75%: Continue to next step
+
+# 5. Continue with next task or stop based on context check
+```
+
 ### Workflow 3: Completing a Phase
 
 1. Verify all tasks in phase are completed

@@ -161,7 +161,7 @@ def format_metrics_human(metrics, max_context: int = 160000):
     output.append("Claude Code Context Usage")
     output.append("=" * 60)
     output.append("")
-    output.append(f"Usable Context:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
+    output.append(f"Context Used:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
     output.append("")
     output.append("Session Totals:")
     output.append(f"  Input Tokens:    {format_number(metrics.input_tokens)}")

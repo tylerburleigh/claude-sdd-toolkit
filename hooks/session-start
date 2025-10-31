@@ -24,19 +24,10 @@ export PATH="${HOME}/.claude/bin:$PATH"
 PROJECT_ROOT=$(pwd)
 SETTINGS_FILE="${HOME}/.claude/settings.json"
 SPECS_ACTIVE_DIR="${PROJECT_ROOT}/specs/active"
-DEBUG_LOG="/tmp/session-start.log"
 MARKER_DIR="/tmp"
 MARKER_PREFIX=".claude-sdd-begin"
 TRANSCRIPT_CACHE_DIR="${HOME}/.config/claude-sdd-toolkit"
 TRANSCRIPT_CACHE_FILE="${TRANSCRIPT_CACHE_DIR}/transcript-cache.json"
-
-# =============================================================================
-# DEBUG LOGGING
-# =============================================================================
-
-log_debug() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$DEBUG_LOG"
-}
 
 # =============================================================================
 # TRANSCRIPT PATH CACHING
@@ -45,7 +36,6 @@ log_debug() {
 # Handles multiple parallel Claude sessions by tracking per-directory
 
 cache_transcript_path() {
-    log_debug "Checking for stdin data..."
     # Read hook data from stdin if available
     if [ ! -t 0 ]; then
         local hook_data=$(cat)
@@ -91,13 +81,11 @@ try:
 
         # Also set environment variable for this session
         print(f'CLAUDE_SESSION_ID={session_id}')
-        print(f'Cached: {cwd} -> session {session_id} -> {transcript_path}', file=sys.stderr)
 except Exception as e:
-    print(f'Error: {e}', file=sys.stderr)
-" 2>/dev/null || echo "")
+    pass
+" 2>/dev/null)
 
         if [ -n "$cache_data" ]; then
-            log_debug "Transcript cache: $cache_data"
             # Try to export the session ID (may not work across processes, but worth trying)
             eval "$cache_data" 2>/dev/null || true
         fi
@@ -106,17 +94,6 @@ except Exception as e:
         echo "$hook_data"
     fi
 }
-
-# =============================================================================
-# DEBUG LOGGING
-# =============================================================================
-
-log_debug() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$DEBUG_LOG"
-}
-
-# Log hook start
-log_debug "SessionStart hook triggered from: $PROJECT_ROOT"
 
 # =============================================================================
 # CONFIGURATION LOADING
@@ -223,7 +200,6 @@ EOF
 
 cleanup_old_markers() {
     # Remove marker files older than 1 hour
-    log_debug "Cleaning up old marker files..."
     find "$MARKER_DIR" -name "${MARKER_PREFIX}-*.json" -type f -mmin +60 -delete 2>/dev/null || true
 }
 
@@ -235,8 +211,6 @@ create_marker_file() {
     # Generate timestamp for unique filename
     local timestamp=$(date +%s)
     local marker_file="${MARKER_DIR}/${MARKER_PREFIX}-${timestamp}.json"
-
-    log_debug "Creating marker file: $marker_file"
 
     # Convert bash true/false to Python True/False
     local py_bool="False"
@@ -259,8 +233,6 @@ marker = {
 
 print(json.dumps(marker, indent=2))
 " > "$marker_file"
-
-    log_debug "Marker file created successfully"
 }
 
 # =============================================================================
@@ -269,44 +241,31 @@ print(json.dumps(marker, indent=2))
 
 main() {
     # Cache transcript path first (consumes stdin if available)
-    cache_transcript_path >/dev/null 2>&1
+    cache_transcript_path >/dev/null
 
     # Clean up old marker files first
     cleanup_old_markers
 
-    log_debug "Checking if auto-offer is enabled..."
     # Check if auto-offer is enabled
     if [ "$(is_auto_offer_enabled)" != "true" ]; then
-        log_debug "Auto-offer disabled, exiting"
         exit 0
     fi
-    log_debug "Auto-offer enabled, proceeding..."
 
     # FIRST: Check if this is an SDD project (has specs/active folder)
-    log_debug "Checking if SDD project exists..."
     if [ ! -d "$SPECS_ACTIVE_DIR" ]; then
-        log_debug "No specs/active directory found, not an SDD project - exiting silently"
         exit 0
     fi
-    log_debug "SDD project detected (specs/active exists)"
 
     # Detect what's needed
-    log_debug "Checking permission setup..."
     local needs_perms=$(needs_permission_setup)
-    log_debug "Needs permissions: $needs_perms"
 
-    log_debug "Getting active specs..."
     local active_specs_json=$(get_active_specs_json)
     local has_specs=$(echo "$active_specs_json" | python3 -c "import json, sys; print('true' if len(json.load(sys.stdin)) > 0 else 'false')")
-    log_debug "Has active specs: $has_specs"
 
     # If nothing to do, exit silently
     if [ "$needs_perms" != "true" ] && [ "$has_specs" != "true" ]; then
-        log_debug "Nothing to do, exiting silently"
         exit 0
     fi
-
-    log_debug "Generating JSON output..."
 
     # Build system message for user (visible in CLI)
     local system_msg=""
@@ -363,7 +322,6 @@ if specs:
     fi
 
     # Create marker file for Claude to read proactively
-    log_debug "Creating marker file..."
     create_marker_file "$py_needs_perms" "$active_specs_json" "$system_msg"
 
     # Also output JSON in the format Claude Code expects (for system message display)
@@ -384,7 +342,6 @@ if "$system_msg":
 print(json.dumps(output, indent=2))
 EOF
 
-    log_debug "Marker file and JSON output complete, hook finished successfully"
     exit 0
 }
 
