@@ -306,6 +306,16 @@ def cmd_next_task(args, printer):
     if not spec_data:
         return 1
 
+    # Check if spec is in pending folder
+    from ..common.paths import find_spec_file
+    spec_path = find_spec_file(args.spec_id, specs_dir)
+    if spec_path and '/pending/' in str(spec_path):
+        printer.error(
+            f"This spec is in your pending backlog. "
+            f"Run 'sdd activate-spec {args.spec_id}' to move it to active/ before starting work."
+        )
+        return 1
+
     next_task = get_next_task(spec_data)
 
     if not next_task:

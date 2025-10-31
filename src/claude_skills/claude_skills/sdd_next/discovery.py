@@ -12,6 +12,7 @@ from claude_skills.common import (
     get_task_context_from_docs,
     check_doc_query_available,
 )
+from claude_skills.common.paths import find_spec_file
 from claude_skills.common.completion import check_spec_completion, should_prompt_completion
 
 
@@ -281,8 +282,13 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
         "error": None
     }
 
-    # Phase 1: Validate spec before proceeding (Priority 1 Integration)
-    spec_path = specs_dir / "active" / f"{spec_id}.json"
+    # Phase 1: Find spec file and validate before proceeding
+    # Search in pending/, active/, completed/, archived/
+    spec_path = find_spec_file(spec_id, specs_dir)
+    if not spec_path:
+        result["error"] = f"Spec file not found for {spec_id}"
+        return result
+
     validation_result = validate_spec_before_proceed(str(spec_path), quiet=True)
 
     if not validation_result["valid"]:
@@ -305,6 +311,14 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
     spec_data = load_json_spec(spec_id, specs_dir)
     if not spec_data:
         result["error"] = "Failed to load JSON spec"
+        return result
+
+    # Check if spec is in pending folder
+    if '/pending/' in str(spec_path):
+        result["error"] = (
+            f"This spec is in your pending backlog. "
+            f"Run 'sdd activate-spec {spec_id}' to move it to active/ before starting work."
+        )
         return result
 
     # Get task ID if not provided

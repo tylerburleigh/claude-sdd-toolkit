@@ -5,8 +5,9 @@ Tests path utilities: find_specs_directory, validate_path.
 """
 
 import pytest
+import json
 from pathlib import Path
-from claude_skills.common import find_specs_directory, validate_path
+from claude_skills.common import find_specs_directory, validate_path, find_spec_file
 
 class TestFindSpecsDirectory:
     """Tests for find_specs_directory function."""
@@ -115,6 +116,78 @@ class TestValidatePath:
         for path in paths_to_test:
             result = validate_path(path)
             assert result is not None, f"Failed to validate {path}"
+
+class TestFindSpecFile:
+    """Tests for find_spec_file function."""
+
+    def test_find_spec_file_in_pending(self, specs_structure):
+        """Test that find_spec_file finds specs in pending/ folder first."""
+        # Create a test spec in pending/ folder
+        pending_dir = specs_structure / "pending"
+        pending_dir.mkdir(exist_ok=True)
+
+        spec_id = "test-pending-spec-2025-01-01-001"
+        spec_file = pending_dir / f"{spec_id}.json"
+        spec_data = {
+            "spec_id": spec_id,
+            "title": "Test Pending Spec"
+        }
+        spec_file.write_text(json.dumps(spec_data))
+
+        # Find the spec
+        found = find_spec_file(spec_id, specs_structure)
+
+        assert found is not None
+        assert found.exists()
+        assert found == spec_file
+        assert "pending" in str(found)
+
+    def test_find_spec_file_pending_priority_over_active(self, specs_structure):
+        """Test that pending/ folder has priority over active/ when spec exists in both."""
+        # Create spec in both pending/ and active/
+        pending_dir = specs_structure / "pending"
+        pending_dir.mkdir(exist_ok=True)
+        active_dir = specs_structure / "active"
+
+        spec_id = "test-priority-spec-2025-01-01-002"
+
+        # Create in both locations
+        pending_file = pending_dir / f"{spec_id}.json"
+        active_file = active_dir / f"{spec_id}.json"
+
+        spec_data = {"spec_id": spec_id, "title": "Test"}
+        pending_file.write_text(json.dumps(spec_data))
+        active_file.write_text(json.dumps(spec_data))
+
+        # Find the spec - should return pending/ path
+        found = find_spec_file(spec_id, specs_structure)
+
+        assert found is not None
+        assert found == pending_file
+        assert "pending" in str(found)
+
+    def test_find_spec_file_in_active(self, specs_structure):
+        """Test finding spec in active/ folder when not in pending/."""
+        spec_id = "test-active-spec-2025-01-01-003"
+        active_file = specs_structure / "active" / f"{spec_id}.json"
+
+        spec_data = {"spec_id": spec_id, "title": "Test Active"}
+        active_file.write_text(json.dumps(spec_data))
+
+        # Find the spec
+        found = find_spec_file(spec_id, specs_structure)
+
+        assert found is not None
+        assert found == active_file
+        assert "active" in str(found)
+
+    def test_find_spec_file_not_found(self, specs_structure):
+        """Test that find_spec_file returns None when spec doesn't exist."""
+        spec_id = "nonexistent-spec-999"
+
+        found = find_spec_file(spec_id, specs_structure)
+
+        assert found is None
 
 @pytest.mark.integration
 class TestPathIntegration:

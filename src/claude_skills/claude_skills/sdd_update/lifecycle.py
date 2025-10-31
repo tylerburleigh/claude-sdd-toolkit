@@ -81,6 +81,106 @@ def move_spec(
         return False
 
 
+def activate_spec(
+    spec_id: str,
+    specs_dir: Path,
+    dry_run: bool = False,
+    printer: Optional[PrettyPrinter] = None
+) -> bool:
+    """
+    Activate a pending spec by moving it to the active folder.
+
+    Performs the following:
+    1. Finds spec file in pending/ folder
+    2. Updates metadata status to 'active'
+    3. Adds activated_date timestamp
+    4. Moves spec file to active/ folder
+
+    Args:
+        spec_id: Specification ID
+        specs_dir: Path to specs directory
+        dry_run: If True, show changes without executing
+        printer: Optional printer for output
+
+    Returns:
+        True if successful, False otherwise
+    """
+    if not printer:
+        printer = PrettyPrinter()
+
+    # Check if spec exists and determine its current location
+    current_spec_file = find_spec_file(spec_id, specs_dir)
+
+    if not current_spec_file:
+        printer.error(f"Spec file not found: {spec_id}")
+        printer.detail(f"Searched in: pending/, active/, completed/, archived/")
+        return False
+
+    # Determine which folder the spec is currently in
+    current_folder = current_spec_file.parent.name
+
+    # Validate spec is in pending folder
+    if current_folder == "active":
+        printer.info(f"Spec is already active - no need to activate again.")
+        return True
+    elif current_folder == "completed":
+        printer.error(f"Spec is already completed and cannot be activated.")
+        printer.detail(f"Location: {current_spec_file}")
+        return False
+    elif current_folder == "archived":
+        printer.error(f"Spec is archived and cannot be activated.")
+        printer.detail(f"Location: {current_spec_file}")
+        return False
+    elif current_folder != "pending":
+        printer.error(f"Spec is in unexpected location: {current_folder}/")
+        printer.detail(f"Location: {current_spec_file}")
+        return False
+
+    # Spec is in pending folder - proceed with activation
+    spec_file = current_spec_file
+
+    # Load spec
+    printer.action(f"Loading spec for {spec_id}...")
+    spec_data = load_json_spec(spec_id, specs_dir)
+    if not spec_data:
+        return False
+
+    # Update metadata
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+    if "metadata" not in spec_data:
+        spec_data["metadata"] = {}
+
+    spec_data["metadata"]["status"] = "active"
+    spec_data["metadata"]["activated_date"] = timestamp
+
+    # Update last_updated timestamp
+    spec_data["last_updated"] = timestamp
+
+    printer.info("Updating metadata:")
+    printer.detail(f"status: active")
+    printer.detail(f"activated_date: {timestamp}")
+
+    if dry_run:
+        printer.warning("DRY RUN - No changes made")
+        return True
+
+    # Save JSON spec file
+    if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
+        printer.error("Failed to save spec file with activation metadata")
+        return False
+
+    # Move to active folder
+    printer.action("Moving spec to active/...")
+    if not move_spec(spec_file, "active", dry_run=False, printer=printer):
+        printer.error("Failed to move spec file")
+        printer.warning("Metadata was updated but file was not moved")
+        return False
+
+    printer.success(f"Spec {spec_id} activated and moved to active/")
+    return True
+
+
 def _regenerate_documentation(specs_dir: Path, printer: PrettyPrinter) -> bool:
     """
     Regenerate codebase documentation.

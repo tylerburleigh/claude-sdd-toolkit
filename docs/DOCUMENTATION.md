@@ -1,20 +1,20 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-10-28 20:08:23
+**Generated:** 2025-10-31 08:36:56
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 157
-- **Total Lines:** 49985
-- **Total Classes:** 190
-- **Total Functions:** 684
-- **Avg Complexity:** 5.4
-- **Max Complexity:** 47
+- **Total Files:** 163
+- **Total Lines:** 52269
+- **Total Classes:** 198
+- **Total Functions:** 697
+- **Avg Complexity:** 5.46
+- **Max Complexity:** 42
 - **High Complexity Functions:**
-  - update_task_status (47)
+  - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
   - execute_verify_task (38)
@@ -774,6 +774,21 @@ parsing across multiple languages.
 
 ---
 
+### `TestActivateSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py:339`
+
+**Description:**
+> Test activate_spec() function.
+
+**Methods:**
+- `test_activate_spec_success()`
+- `test_activate_spec_not_found()`
+- `test_activate_spec_already_active()`
+
+---
+
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -825,6 +840,31 @@ parsing across multiple languages.
 - `test_add_verification_result_nonexistent_verify_id()`
 - `test_add_verification_result_dry_run()`
 - `test_add_verification_result_minimal()`
+
+---
+
+### `TestAggregateTaskTimes`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:293`
+
+**Description:**
+> Test aggregate_task_times() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_aggregate_task_times_basic()`
+- `test_aggregate_task_times_no_data()`
+- `test_aggregate_task_times_partial_data()`
+- `test_aggregate_task_times_nonexistent_spec()`
+- `test_aggregate_task_times_empty_hierarchy()`
+- `test_aggregate_task_times_mixed_node_types()`
+- `test_aggregate_task_times_invalid_values()`
+- `test_aggregate_task_times_precision()`
+- `test_aggregate_task_times_with_printer()`
+- `test_aggregate_task_times_single_task()`
+- `test_aggregate_task_times_zero_hours()`
+- `test_aggregate_task_times_negative_hours()`
 
 ---
 
@@ -949,6 +989,41 @@ parsing across multiple languages.
 
 ---
 
+### `TestCalculateTimeFromTimestamps`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:16`
+
+**Description:**
+> Test calculate_time_from_timestamps() function.
+
+**Methods:**
+- `test_calculate_time_basic()`
+- `test_calculate_time_whole_hours()`
+- `test_calculate_time_fractional()`
+- `test_calculate_time_across_days()`
+- `test_calculate_time_with_timezone_offset()`
+- `test_calculate_time_invalid_format()`
+- `test_calculate_time_negative_duration()`
+- `test_calculate_time_same_timestamp()`
+- `test_calculate_time_with_seconds()`
+- `test_calculate_time_missing_z_suffix()`
+- `test_calculate_time_one_hour()`
+- `test_calculate_time_two_and_half_hours()`
+- `test_calculate_time_six_minutes()`
+- `test_calculate_time_over_24_hours()`
+- `test_calculate_time_none_input()`
+- `test_calculate_time_empty_string()`
+- `test_calculate_time_both_none()`
+- `test_calculate_time_end_none()`
+- `test_calculate_time_whitespace_strings()`
+- `test_calculate_time_very_large_difference()`
+- `test_calculate_time_with_printer_none_input()`
+- `test_calculate_time_with_printer_invalid_format()`
+- `test_calculate_time_with_printer_negative_duration()`
+
+---
+
 ### `TestCheckComplete`
 
 **Language:** python
@@ -986,7 +1061,7 @@ parsing across multiple languages.
 ### `TestCheckDependencies`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:127`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:159`
 
 **Description:**
 > Tests for check_dependencies function.
@@ -1171,10 +1246,27 @@ parsing across multiple languages.
 **Methods:**
 - `test_complete_spec_all_tasks_done()`
 - `test_complete_spec_without_actual_hours()`
+- `test_complete_spec_without_time_data()`
 - `test_complete_spec_incomplete_tasks()`
 - `test_complete_spec_dry_run()`
 - `test_complete_spec_creates_metadata()`
 - `test_complete_spec_updates_last_updated()`
+
+---
+
+### `TestCompleteTaskWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py:14`
+
+**Description:**
+> Test complete_task_workflow() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_complete_task_workflow_auto_calculates_time()`
+- `test_complete_task_workflow_manual_hours_not_overridden()`
+- `test_complete_task_workflow_no_started_at_no_calculation()`
 
 ---
 
@@ -1292,7 +1384,7 @@ parsing across multiple languages.
 ### `TestDiscoveryIntegration`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:227`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:259`
 
 **Description:**
 > Integration tests for discovery operations.
@@ -1447,6 +1539,22 @@ parsing across multiple languages.
 
 ---
 
+### `TestFindSpecFile`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:120`
+
+**Description:**
+> Tests for find_spec_file function.
+
+**Methods:**
+- `test_find_spec_file_in_pending()`
+- `test_find_spec_file_pending_priority_over_active()`
+- `test_find_spec_file_in_active()`
+- `test_find_spec_file_not_found()`
+
+---
+
 ### `TestFindSpecsCommand`
 
 **Language:** python
@@ -1464,7 +1572,7 @@ parsing across multiple languages.
 ### `TestFindSpecsDirectory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:11`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:12`
 
 **Description:**
 > Tests for find_specs_directory function.
@@ -1656,6 +1764,7 @@ parsing across multiple languages.
 - `test_get_next_task_from_current_phase()`
 - `test_get_next_task_none_when_all_complete()`
 - `test_get_next_task_empty_hierarchy()`
+- `test_get_next_task_finds_verify_tasks()`
 
 ---
 
@@ -1776,7 +1885,7 @@ parsing across multiple languages.
 ### `TestGetTaskInfo`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:86`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:118`
 
 **Description:**
 > Tests for get_task_info function.
@@ -2310,7 +2419,7 @@ parsing across multiple languages.
 ### `TestPathIntegration`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:120`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:193`
 
 **Description:**
 > Integration tests for path utilities.
@@ -2357,7 +2466,7 @@ parsing across multiple languages.
 ### `TestPrepareTask`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:181`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:213`
 
 **Description:**
 > Tests for prepare_task function.
@@ -3012,6 +3121,22 @@ parsing across multiple languages.
 
 ---
 
+### `TestUpdateTaskStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py:16`
+
+**Description:**
+> Test update_task_status() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_started_at_resets_on_each_in_progress_transition()`
+- `test_started_at_set_on_first_in_progress()`
+- `test_completed_at_set_on_completion()`
+
+---
+
 ### `TestUpdatedCLICommands`
 
 **Language:** python
@@ -3156,7 +3281,7 @@ parsing across multiple languages.
 ### `TestValidatePath`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:63`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:64`
 
 **Description:**
 > Tests for validate_path function.
@@ -3251,6 +3376,26 @@ parsing across multiple languages.
 
 ---
 
+### `TestValidateTimestampPair`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:213`
+
+**Description:**
+> Test validate_timestamp_pair() function.
+
+**Methods:**
+- `test_validate_timestamp_pair_valid()`
+- `test_validate_timestamp_pair_none_start()`
+- `test_validate_timestamp_pair_none_end()`
+- `test_validate_timestamp_pair_empty_start()`
+- `test_validate_timestamp_pair_invalid_format()`
+- `test_validate_timestamp_pair_negative_disallowed()`
+- `test_validate_timestamp_pair_negative_allowed()`
+- `test_validate_timestamp_pair_with_printer()`
+
+---
+
 ### `TestVerifyToolsCommand`
 
 **Language:** python
@@ -3261,6 +3406,19 @@ parsing across multiple languages.
 
 **Methods:**
 - `test_verify_tools_success()`
+
+---
+
+### `TokenMetrics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/parser.py:10`
+
+**Description:**
+> Token usage metrics extracted from a transcript.
+
+**Properties:**
+- `context_percentage`
 
 ---
 
@@ -3571,7 +3729,7 @@ Returns:
 ### `_calculate_diff(before, after, task_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:167`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:181`
 **Complexity:** 8
 
 **Parameters:**
@@ -3595,7 +3753,7 @@ Returns:
 ### `_check_all_task_deps(spec_data, args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:437`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:439`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -4238,7 +4396,7 @@ Returns True if any of the following conditions are met:
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:215`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:229`
 **Complexity:** 8
 
 **Parameters:**
@@ -4275,7 +4433,7 @@ Returns True if any of the following conditions are met:
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:81`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:184`
 **Complexity:** 5
 
 **Description:**
@@ -4297,7 +4455,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:54`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:56`
 **Complexity:** 1
 
 **Description:**
@@ -4312,7 +4470,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:92`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:94`
 **Complexity:** 1
 
 **Description:**
@@ -4327,7 +4485,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:74`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:76`
 **Complexity:** 1
 
 **Description:**
@@ -4447,7 +4605,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:73`
-⚠️ **Complexity:** 13 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Parameters:**
 - `state`: Dict[str, Any]
@@ -4514,6 +4672,38 @@ Returns:
 
 **Parameters:**
 - `spec_data`: Dict
+
+---
+
+### `activate_spec(spec_id, specs_dir, dry_run, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:84`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Activate a pending spec by moving it to the active folder.
+
+Performs the following:
+1. Finds spec file in pending/ folder
+2. Updates metadata status to 'active'
+3. Adds activated_date timestamp
+4. Moves spec file to active/ folder
+
+Args:
+    spec_id: Specification ID
+    specs_dir: Path to specs directory
+    dry_run: If True, show changes without executing
+    printer: Optional printer for output
+
+Returns:
+    True if successful, False otherwise
+
+**Parameters:**
+- `spec_id`: str
+- `specs_dir`: Path
+- `dry_run`: bool
+- `printer`: Optional[PrettyPrinter]
 
 ---
 
@@ -4661,6 +4851,37 @@ Returns:
 - `notes`: Optional[str]
 - `specs_dir`: Optional[Path]
 - `dry_run`: bool
+- `printer`: Optional[PrettyPrinter]
+
+---
+
+### `aggregate_task_times(spec_id, specs_dir, printer) -> Optional[float]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:265`
+**Complexity:** 8
+
+**Description:**
+> Aggregate actual_hours from all tasks in the spec hierarchy.
+
+Traverses the hierarchy recursively and sums all actual_hours values
+from task-level nodes that have time tracking data.
+
+Args:
+    spec_id: Specification ID
+    specs_dir: Path to specs/active directory
+    printer: Optional printer for error messages
+
+Returns:
+    Total actual hours across all tasks, or None if no time data found
+
+Examples:
+    >>> aggregate_task_times("user-auth-2025-10-18-001", Path("specs/active"))
+    18.5
+
+**Parameters:**
+- `spec_id`: str
+- `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
 
 ---
@@ -5298,6 +5519,34 @@ Returns:
 
 ---
 
+### `calculate_time_from_timestamps(start_timestamp, end_timestamp, printer) -> Optional[float]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:57`
+**Complexity:** 7
+
+**Description:**
+> Calculate decimal hours between two ISO 8601 timestamps.
+
+Args:
+    start_timestamp: ISO 8601 timestamp string (e.g., "2025-10-27T10:00:00Z")
+    end_timestamp: ISO 8601 timestamp string (e.g., "2025-10-27T13:30:00Z")
+    printer: Optional printer for error messages
+
+Returns:
+    Decimal hours between timestamps, or None if parsing fails
+
+Examples:
+    >>> calculate_time_from_timestamps("2025-10-27T10:00:00Z", "2025-10-27T13:30:00Z")
+    3.5
+
+**Parameters:**
+- `start_timestamp`: str
+- `end_timestamp`: str
+- `printer`: Optional[PrettyPrinter]
+
+---
+
 ### `call_tool(tool_name, prompt, timeout) -> Dict[str, Any]`
 
 **Language:** python
@@ -5408,7 +5657,7 @@ Returns:
 ### `check_dependencies(spec_data, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:172`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:173`
 **Complexity:** 8
 
 **Description:**
@@ -5541,7 +5790,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:116`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:118`
 **Complexity:** 2
 
 **Description:**
@@ -5655,6 +5904,21 @@ Returns:
 
 ---
 
+### `cmd_activate_spec(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:366`
+**Complexity:** 4
+
+**Description:**
+> Activate a pending spec by moving it to active folder.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_add_journal(args, printer) -> None`
 
 **Language:** python
@@ -5715,7 +5979,7 @@ Returns:
 ### `cmd_analyze(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:68`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:69`
 **Complexity:** 6
 
 **Description:**
@@ -5817,7 +6081,7 @@ Returns:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:119`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:121`
 **Complexity:** 5
 
 **Description:**
@@ -5847,7 +6111,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:385`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:387`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -5877,7 +6141,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:871`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:873`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -5934,7 +6198,7 @@ Returns:
 ### `cmd_complete_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:366`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:388`
 **Complexity:** 3
 
 **Description:**
@@ -5982,6 +6246,25 @@ Returns:
 **Parameters:**
 - `args`: argparse.Namespace
 - `printer`: PrettyPrinter
+
+---
+
+### `cmd_context(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:194`
+**Complexity:** 5
+
+**Description:**
+> Handler for 'sdd context' command.
+
+Args:
+    args: Parsed arguments from ArgumentParser
+    printer: PrettyPrinter instance for output
+
+**Parameters:**
+- `args`: None
+- `printer`: None
 
 ---
 
@@ -6039,7 +6322,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:800`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:802`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -6082,7 +6365,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:80`
-**Complexity:** 4
+**Complexity:** 8
 
 **Description:**
 > Find all active SDD specifications with resumable work.
@@ -6096,7 +6379,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:914`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:916`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -6147,7 +6430,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:779`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:781`
 **Complexity:** 5
 
 **Description:**
@@ -6162,7 +6445,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:954`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:956`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -6177,7 +6460,7 @@ Returns:
 ### `cmd_find_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:275`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:267`
 **Complexity:** 8
 
 **Description:**
@@ -6192,7 +6475,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:839`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:841`
 **Complexity:** 9
 
 **Description:**
@@ -6222,8 +6505,8 @@ Returns:
 ### `cmd_format_output(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:134`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:162`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Format active work as human-readable text with last-accessed task info.
@@ -6237,7 +6520,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:723`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:725`
 **Complexity:** 4
 
 **Description:**
@@ -6309,8 +6592,8 @@ Returns:
 ### `cmd_get_session_info(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:230`
-**Complexity:** 2
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:280`
+**Complexity:** 5
 
 **Description:**
 > Get session state information as JSON.
@@ -6354,7 +6637,7 @@ Returns:
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:519`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:521`
 **Complexity:** 6
 
 **Description:**
@@ -6495,8 +6778,8 @@ Returns:
 ### `cmd_next_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:303`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:295`
+**Complexity:** 10
 
 **Description:**
 > Find next actionable task.
@@ -6525,7 +6808,7 @@ Returns:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:544`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:546`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -6577,7 +6860,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:486`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:488`
 **Complexity:** 7
 
 **Description:**
@@ -6713,7 +6996,7 @@ Returns:
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1017`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1019`
 **Complexity:** 10
 
 **Description:**
@@ -6770,7 +7053,7 @@ Returns:
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:778`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:777`
 **Complexity:** 3
 
 **Description:**
@@ -6785,7 +7068,7 @@ Returns:
 ### `cmd_task_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:344`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:346`
 **Complexity:** 9
 
 **Description:**
@@ -6800,7 +7083,7 @@ Returns:
 ### `cmd_template(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:125`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:126`
 **Complexity:** 7
 
 **Description:**
@@ -6857,21 +7140,6 @@ Returns:
 
 ---
 
-### `cmd_track_time(args, printer) -> None`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:391`
-**Complexity:** 3
-
-**Description:**
-> Track time spent on task.
-
-**Parameters:**
-- `args`: None
-- `printer`: None
-
----
-
 ### `cmd_unblock_task(args, printer) -> None`
 
 **Language:** python
@@ -6890,7 +7158,7 @@ Returns:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:58`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:60`
 **Complexity:** 8
 
 **Description:**
@@ -6962,7 +7230,7 @@ Returns:
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:990`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:992`
 **Complexity:** 7
 
 **Description:**
@@ -6977,7 +7245,7 @@ Returns:
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:742`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:744`
 **Complexity:** 10
 
 **Description:**
@@ -6992,7 +7260,7 @@ Returns:
 ### `cmd_verify_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:256`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:248`
 **Complexity:** 3
 
 **Description:**
@@ -7090,10 +7358,10 @@ Example:
 
 ---
 
-### `complete_spec(spec_id, spec_file, specs_dir, actual_hours, skip_doc_regen, dry_run, printer) -> bool`
+### `complete_spec(spec_id, spec_file, specs_dir, skip_doc_regen, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:129`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:232`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -7101,7 +7369,7 @@ Example:
 
 Performs the following:
 1. Verifies all tasks are completed
-2. Updates JSON metadata (status, completed_date, actual_hours)
+2. Updates JSON metadata (status, completed_date, actual_hours auto-calculated from tasks)
 3. Moves JSON spec file to completed/ folder
 4. Regenerates codebase documentation (unless skip_doc_regen is True)
 
@@ -7109,7 +7377,6 @@ Args:
     spec_id: Specification ID
     spec_file: Path to JSON spec file (optional - will be auto-detected if not provided)
     specs_dir: Path to specs directory
-    actual_hours: Optional actual hours spent
     skip_doc_regen: If True, skip documentation regeneration
     dry_run: If True, show changes without executing
     printer: Optional printer for output
@@ -7121,7 +7388,6 @@ Returns:
 - `spec_id`: str
 - `spec_file`: Optional[Path]
 - `specs_dir`: Path
-- `actual_hours`: Optional[float]
 - `skip_doc_regen`: bool
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
@@ -7131,8 +7397,8 @@ Returns:
 ### `complete_task_workflow() -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:239`
-⚠️ **Complexity:** 27 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:253`
+⚠️ **Complexity:** 35 (High)
 
 **Description:**
 > Complete a task with optional journaling, time tracking, and revision updates.
@@ -8177,7 +8443,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:70`
-**Complexity:** 5
+**Complexity:** 9
 
 **Description:**
 > Find all active SDD specifications with resumable work.
@@ -8417,11 +8683,11 @@ Returns:
 **Description:**
 > Find the spec file for a given spec ID.
 
-Searches in active/, completed/, and archived/ subdirectories.
+Searches in pending/, active/, completed/, and archived/ subdirectories.
 
 Args:
     spec_id: Specification ID
-    specs_dir: Path to specs directory (containing active/completed/archived)
+    specs_dir: Path to specs directory (containing pending/active/completed/archived)
 
 Returns:
     Absolute path to the spec file, or None if not found
@@ -9012,11 +9278,55 @@ Returns:
 
 ---
 
+### `format_metrics_human(metrics, max_context) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:155`
+**Complexity:** 1
+
+**Description:**
+> Format token metrics for human-readable output.
+
+**Parameters:**
+- `metrics`: None
+- `max_context`: int
+
+---
+
+### `format_metrics_json(metrics, max_context) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:176`
+**Complexity:** 1
+
+**Description:**
+> Format token metrics as JSON.
+
+**Parameters:**
+- `metrics`: None
+- `max_context`: int
+
+---
+
+### `format_number(n) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:150`
+**Complexity:** 1
+
+**Description:**
+> Format a number with thousands separators.
+
+**Parameters:**
+- `n`: int
+
+---
+
 ### `format_output(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:126`
-⚠️ **Complexity:** 13 (High)
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:154`
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Format active work as human-readable text with last-accessed task info.
@@ -9879,7 +10189,7 @@ Returns:
 ### `generate_time_report(spec_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:180`
 **Complexity:** 9
 
 **Description:**
@@ -10009,6 +10319,30 @@ Returns:
 **Parameters:**
 - `failure_type`: str
 - `available_tools`: Optional[List[str]]
+
+---
+
+### `get_cached_transcript_path() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:77`
+**Complexity:** 10
+
+**Description:**
+> Load transcript path from cache for current working directory.
+
+Uses open file detection to identify which transcript is actively being
+written to, enabling correct session detection even with multiple concurrent
+Claude Code sessions in the same directory.
+
+Strategy:
+1. Load all cached transcript paths for this directory
+2. Check which one is currently open for writing (using lsof)
+3. Return the actively-written transcript
+4. Fallback to most recently modified if detection fails
+
+Returns:
+    Cached transcript path or None if not found
 
 ---
 
@@ -10327,7 +10661,7 @@ Returns:
 ### `get_next_task(spec_data) -> Optional[Tuple[str, Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:102`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:103`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -10526,8 +10860,8 @@ Returns:
 ### `get_session_info(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:224`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:274`
+**Complexity:** 6
 
 **Description:**
 > Get session state information as JSON.
@@ -10772,7 +11106,7 @@ Returns:
 ### `get_task_info(spec_data, task_id) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:158`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:159`
 **Complexity:** 1
 
 **Description:**
@@ -11155,10 +11489,31 @@ Returns:
 
 ---
 
+### `is_file_open_for_writing(filepath) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:18`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Check if a file is currently open for writing by any process.
+
+Uses platform-specific tools:
+- Linux/macOS: lsof
+- Windows: fallback to modification time check
+
+Returns:
+    True if file is open for writing, False otherwise
+
+**Parameters:**
+- `filepath`: None
+
+---
+
 ### `is_in_current_phase(spec_data, task_id, phase_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:73`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:74`
 **Complexity:** 5
 
 **Description:**
@@ -11217,7 +11572,7 @@ Returns:
 ### `is_unblocked(spec_data, task_id, task_data) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:18`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:19`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -11460,6 +11815,17 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:266`
+**Complexity:** 7
+
+**Description:**
+> Main CLI entry point.
+
+---
+
+### `main() -> None`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/dev_tools/generate_docs.py:316`
 **Complexity:** 3
 
@@ -11471,7 +11837,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:259`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:327`
 **Complexity:** 5
 
 ---
@@ -11479,7 +11845,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:157`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:159`
 **Complexity:** 3
 
 ---
@@ -11498,7 +11864,7 @@ Returns:
 ### `mark_task_blocked(spec_id, task_id, reason, specs_dir, blocker_type, ticket, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:321`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:300`
 **Complexity:** 10
 
 **Description:**
@@ -11624,7 +11990,7 @@ Returns:
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:19`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:22`
 **Complexity:** 8
 
 **Description:**
@@ -11746,6 +12112,26 @@ Returns:
 
 ---
 
+### `parse_transcript(transcript_path) -> Optional[TokenMetrics]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/parser.py:25`
+**Complexity:** 9
+
+**Description:**
+> Parse a Claude Code transcript JSONL file and extract token metrics.
+
+Args:
+    transcript_path: Path to the transcript JSONL file
+
+Returns:
+    TokenMetrics object with aggregated token data, or None if parsing fails
+
+**Parameters:**
+- `transcript_path`: str | Path
+
+---
+
 ### `phase_time(spec_id, phase_id, specs_dir, printer) -> Optional[Dict]`
 
 **Language:** python
@@ -11790,8 +12176,8 @@ Returns:
 ### `prepare_task(spec_id, specs_dir, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:238`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:239`
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
@@ -12139,6 +12525,25 @@ Provides development utilities for maintaining the claude_skills package.
 
 ---
 
+### `register_context(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:233`
+**Complexity:** 1
+
+**Description:**
+> Register 'context' subcommand for unified SDD CLI.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -12187,7 +12592,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1064`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1066`
 **Complexity:** 1
 
 **Description:**
@@ -12202,7 +12607,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_plan(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:160`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan/cli.py:161`
 **Complexity:** 1
 
 **Description:**
@@ -12263,7 +12668,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:170`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:172`
 **Complexity:** 1
 
 **Description:**
@@ -12278,7 +12683,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:261`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:329`
 **Complexity:** 1
 
 **Description:**
@@ -12293,7 +12698,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:797`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:796`
 **Complexity:** 1
 
 **Description:**
@@ -14961,7 +15366,7 @@ Args:
 ### `track_time(spec_id, task_id, actual_hours, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:15`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:111`
 **Complexity:** 9
 
 **Description:**
@@ -14991,7 +15396,7 @@ Returns:
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:415`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:394`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -15124,7 +15529,7 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:55`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:57`
 **Complexity:** 7
 
 **Description:**
@@ -15139,7 +15544,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/status.py:53`
-⚠️ **Complexity:** 47 (High)
+⚠️ **Complexity:** 42 (High)
 
 **Description:**
 > Update a task's status with automatic progress recalculation.
@@ -15583,6 +15988,32 @@ Returns:
 
 ---
 
+### `validate_timestamp_pair(start_timestamp, end_timestamp, allow_negative, printer) -> tuple[bool, Optional[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/time_tracking.py:16`
+**Complexity:** 7
+
+**Description:**
+> Validate a pair of timestamps for time calculation.
+
+Args:
+    start_timestamp: Start timestamp string
+    end_timestamp: End timestamp string
+    allow_negative: If False, returns invalid for negative durations
+    printer: Optional printer for error messages
+
+Returns:
+    Tuple of (is_valid, error_message)
+
+**Parameters:**
+- `start_timestamp`: Optional[str]
+- `end_timestamp`: Optional[str]
+- `allow_negative`: bool
+- `printer`: Optional[PrettyPrinter]
+
+---
+
 ### `write_spec_data(specs_structure, data) -> Path`
 
 **Language:** python
@@ -15932,6 +16363,7 @@ Returns:
 - `paths.ensure_reports_directory`
 - `paths.ensure_reviews_directory`
 - `paths.find_files_by_pattern`
+- `paths.find_spec_file`
 - `paths.find_specs_directory`
 - `paths.generate_backups_readme_content`
 - `paths.generate_human_readable_readme_content`
@@ -16105,6 +16537,27 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/context_tracker/__init__.py`
+
+- `parser.TokenMetrics`
+- `parser.parse_transcript`
+
+### `src/claude_skills/claude_skills/context_tracker/cli.py`
+
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.context_tracker.parser.parse_transcript`
+- `json`
+- `pathlib.Path`
+- `sys`
+
+### `src/claude_skills/claude_skills/context_tracker/parser.py`
+
+- `dataclasses.dataclass`
+- `json`
+- `pathlib.Path`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/dev_tools/generate_docs.py`
 
@@ -16374,6 +16827,7 @@ Returns:
 - `claude_skills.common.get_node`
 - `claude_skills.common.get_task_context_from_docs`
 - `claude_skills.common.load_json_spec`
+- `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.validate_spec_before_proceed`
 - `pathlib.Path`
 - `typing.Dict`
@@ -16582,6 +17036,7 @@ Returns:
 - `claude_skills.sdd_update.journal.bulk_journal_tasks`
 - `claude_skills.sdd_update.journal.sync_metadata_from_state`
 - `claude_skills.sdd_update.journal.update_metadata`
+- `claude_skills.sdd_update.lifecycle.activate_spec`
 - `claude_skills.sdd_update.lifecycle.complete_spec`
 - `claude_skills.sdd_update.lifecycle.move_spec`
 - `claude_skills.sdd_update.query.check_complete`
@@ -16631,6 +17086,7 @@ Returns:
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
+- `claude_skills.sdd_update.time_tracking.aggregate_task_times`
 - `datetime.datetime`
 - `datetime.timezone`
 - `pathlib.Path`
@@ -16673,6 +17129,7 @@ Returns:
 - `claude_skills.common.spec.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
 - `claude_skills.common.spec.update_node`
+- `datetime.datetime`
 - `pathlib.Path`
 - `typing.Dict`
 - `typing.Optional`
@@ -16721,6 +17178,7 @@ Returns:
 - `json`
 - `pathlib.Path`
 - `status.update_task_status`
+- `time_tracking.calculate_time_from_timestamps`
 - `time_tracking.track_time`
 - `typing.Any`
 - `typing.Dict`
@@ -17080,8 +17538,10 @@ Returns:
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py`
 
+- `claude_skills.common.find_spec_file`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.validate_path`
+- `json`
 - `pathlib.Path`
 - `pytest`
 
@@ -17196,6 +17656,7 @@ Returns:
 
 - `claude_skills.common.spec.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
+- `claude_skills.sdd_update.lifecycle.activate_spec`
 - `claude_skills.sdd_update.lifecycle.complete_spec`
 - `claude_skills.sdd_update.lifecycle.move_spec`
 - `json`
@@ -17215,6 +17676,29 @@ Returns:
 - `pathlib.Path`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.status.update_task_status`
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+- `time`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.sdd_update.time_tracking.aggregate_task_times`
+- `claude_skills.sdd_update.time_tracking.calculate_time_from_timestamps`
+- `claude_skills.sdd_update.time_tracking.validate_timestamp_pair`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_verification.py`
 
 - `claude_skills.common.spec.load_json_spec`
@@ -17222,6 +17706,19 @@ Returns:
 - `claude_skills.sdd_update.verification.format_verification_summary`
 - `pathlib.Path`
 - `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.workflow.complete_task_workflow`
+- `datetime.datetime`
+- `datetime.timedelta`
+- `datetime.timezone`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py`
 

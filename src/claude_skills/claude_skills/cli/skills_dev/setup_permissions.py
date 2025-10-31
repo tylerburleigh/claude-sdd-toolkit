@@ -49,9 +49,11 @@ SDD_PERMISSIONS = [
     "Read(//Users/tylerburleigh/.claude/skills/**)",
     "Read(//**/specs/**)",
     "Write(//**/specs/active/**)",
+    "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
     "Write(//**/specs/archived/**)",
     "Edit(//**/specs/active/**)",
+    "Edit(//**/specs/pending/**)",
 ]
 
 

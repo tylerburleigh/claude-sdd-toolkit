@@ -27,6 +27,85 @@ SPECS_ACTIVE_DIR="${PROJECT_ROOT}/specs/active"
 DEBUG_LOG="/tmp/session-start.log"
 MARKER_DIR="/tmp"
 MARKER_PREFIX=".claude-sdd-begin"
+TRANSCRIPT_CACHE_DIR="${HOME}/.config/claude-sdd-toolkit"
+TRANSCRIPT_CACHE_FILE="${TRANSCRIPT_CACHE_DIR}/transcript-cache.json"
+
+# =============================================================================
+# DEBUG LOGGING
+# =============================================================================
+
+log_debug() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$DEBUG_LOG"
+}
+
+# =============================================================================
+# TRANSCRIPT PATH CACHING
+# =============================================================================
+# Cache transcript paths per working directory so 'sdd context' can auto-discover them
+# Handles multiple parallel Claude sessions by tracking per-directory
+
+cache_transcript_path() {
+    log_debug "Checking for stdin data..."
+    # Read hook data from stdin if available
+    if [ ! -t 0 ]; then
+        local hook_data=$(cat)
+
+        # Extract transcript_path and session_id using Python, update multi-session cache
+        local cache_data=$(echo "$hook_data" | python3 -c "
+import json, sys, os, time
+
+try:
+    data = json.load(sys.stdin)
+    transcript_path = data.get('transcript_path', '')
+    session_id = data.get('session_id', '')
+    cwd = os.getcwd()
+
+    if transcript_path and session_id:
+        # Load existing cache
+        cache_file = '$TRANSCRIPT_CACHE_FILE'
+        cache = {}
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r') as f:
+                    cache = json.load(f)
+            except:
+                pass
+
+        # Initialize directory entry if needed
+        if cwd not in cache:
+            cache[cwd] = {'sessions': {}}
+
+        # Add/update this session
+        cache[cwd]['sessions'][session_id] = {
+            'transcript_path': transcript_path,
+            'timestamp': int(time.time())
+        }
+
+        # Mark as most recent
+        cache[cwd]['most_recent'] = session_id
+
+        # Write cache
+        os.makedirs('$TRANSCRIPT_CACHE_DIR', exist_ok=True)
+        with open(cache_file, 'w') as f:
+            json.dump(cache, f, indent=2)
+
+        # Also set environment variable for this session
+        print(f'CLAUDE_SESSION_ID={session_id}')
+        print(f'Cached: {cwd} -> session {session_id} -> {transcript_path}', file=sys.stderr)
+except Exception as e:
+    print(f'Error: {e}', file=sys.stderr)
+" 2>/dev/null || echo "")
+
+        if [ -n "$cache_data" ]; then
+            log_debug "Transcript cache: $cache_data"
+            # Try to export the session ID (may not work across processes, but worth trying)
+            eval "$cache_data" 2>/dev/null || true
+        fi
+
+        # Re-populate stdin for rest of script (pass through hook_data)
+        echo "$hook_data"
+    fi
+}
 
 # =============================================================================
 # DEBUG LOGGING
@@ -189,6 +268,9 @@ print(json.dumps(marker, indent=2))
 # =============================================================================
 
 main() {
+    # Cache transcript path first (consumes stdin if available)
+    cache_transcript_path >/dev/null 2>&1
+
     # Clean up old marker files first
     cleanup_old_markers
 

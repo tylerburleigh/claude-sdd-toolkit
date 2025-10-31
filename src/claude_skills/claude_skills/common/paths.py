@@ -84,17 +84,17 @@ def find_spec_file(spec_id: str, specs_dir: Path) -> Optional[Path]:
     """
     Find the spec file for a given spec ID.
 
-    Searches in active/, completed/, and archived/ subdirectories.
+    Searches in pending/, active/, completed/, and archived/ subdirectories.
 
     Args:
         spec_id: Specification ID
-        specs_dir: Path to specs directory (containing active/completed/archived)
+        specs_dir: Path to specs directory (containing pending/active/completed/archived)
 
     Returns:
         Absolute path to the spec file, or None if not found
     """
-    # Search in order: active, completed, archived
-    search_dirs = ["active", "completed", "archived"]
+    # Search in order: pending, active, completed, archived
+    search_dirs = ["pending", "active", "completed", "archived"]
 
     for subdir in search_dirs:
         spec_file = specs_dir / subdir / f"{spec_id}.json"

@@ -86,9 +86,11 @@ The setup adds these permissions to `.claude/settings.json`:
 **File Access:**
 - Read(//Users/tylerburleigh/.claude/skills/**)
 - Read(//**/specs/**)
+- Write(//**/specs/pending/**)
 - Write(//**/specs/active/**)
 - Write(//**/specs/completed/**)
 - Write(//**/specs/archived/**)
+- Edit(//**/specs/pending/**)
 - Edit(//**/specs/active/**)
 
 ## Important Notes

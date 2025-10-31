@@ -75,12 +75,14 @@ This skill is part of the **Spec-Driven Development** family:
 
 ## File Structure
 
-- **JSON spec file** (`specs/active/{spec-id}.json`) - Single source of truth containing:
+- **JSON spec file** (`specs/active/{spec-id}.json` or `specs/pending/{spec-id}.json`) - Single source of truth containing:
   - Task hierarchy and status
   - Progress tracking
   - Journal entries
   - Verification results
   - All metadata
+- **Pending folder** (`specs/pending/`) - Backlog of planned work awaiting activation
+- **Active folder** (`specs/active/`) - Specifications currently being implemented
 
 ## Tool Verification
 
@@ -146,6 +148,7 @@ This table shows the most frequently used commands:
 
 | Operation | CLI Command | Notes |
 |-----------|-------------|-------|
+| Activate spec | `sdd activate-spec {spec-id}` | Move spec from pending/ backlog to active/ (starts work on a planned spec) |
 | Update task status | `sdd update-status {spec-id} {task-id} {status}` | Status: pending, in_progress, completed, blocked. Use `--verify` to auto-run verify tasks on completion |
 | Add journal entry | `sdd add-journal {spec-id} --title "..." --content "..."` | Use `--task-id` to link to specific task |
 | Mark task blocked | `sdd mark-blocked {spec-id} {task-id} --reason "..." --type {type}` | Types: dependency, technical, resource, decision |
@@ -200,7 +203,8 @@ For comprehensive command list, see Command Reference below.
 - `add-verification` - Document verification results
 
 **Lifecycle:**
-- `move-spec` - Move spec between folders (active/completed/archived)
+- `activate-spec` - Activate spec from backlog (move from pending/ to active/)
+- `move-spec` - Move spec between folders (pending/active/completed/archived)
 - `complete-spec` - Mark spec complete, regenerate documentation (by default), and move to completed/ (use `--skip-doc-regen` to skip doc regeneration)
 
 **Time Tracking:**
@@ -274,6 +278,7 @@ $ sdd complete-spec user-auth-001 --actual-hours 18.5 --skip-doc-regen
 ## When to Use This Skill
 
 Use `Skill(sdd-toolkit:sdd-update)` to:
+- Activate specs from the backlog (pending/ to active/)
 - Mark tasks as in_progress, completed, or blocked
 - Update progress percentages across the hierarchy
 - Document why a task is blocked or delayed
@@ -348,7 +353,7 @@ Update the status of tasks in the spec file as work progresses.
 
 **Steps:**
 1. Get the `spec_id` from the JSON spec file name or metadata
-2. Load spec file from `specs/active/{spec-id}.json`
+2. Load spec file from `specs/active/{spec-id}.json` (or `specs/pending/{spec-id}.json` for backlog specs)
 3. Parse JSON and validate structure
 
 **Example:**
@@ -973,6 +978,8 @@ Organize JSON spec files by their lifecycle status.
 
 ```
 specs/
+├── pending/             # Backlog - planned but not yet activated
+│   └── future-feature-001.json
 ├── active/              # Currently being implemented
 │   ├── user-auth-001.json
 │   └── api-refactor-001.json
@@ -1046,6 +1053,59 @@ sdd move-spec legacy-auth-001 archived
   }
 }
 ```
+
+#### 4.4 Activate Specs from Backlog
+
+When you're ready to begin work on a spec from the backlog, activate it by moving it from `pending/` to `active/`.
+
+**Why activate specs?**
+- Keeps backlog separate from current work
+- Prevents accidental work on unreviewed or deprioritized specs
+- Maintains clear workflow: plan → activate → implement → complete
+- Makes it obvious which specs are currently being worked on
+
+**Activate a spec:**
+```bash
+# Move spec from pending/ to active/
+sdd activate-spec my-feature-2025-10-30-001
+
+# Or use the general move-spec command
+sdd move-spec my-feature-2025-10-30-001 active
+```
+
+**What happens during activation:**
+1. Spec file moves from `specs/pending/` to `specs/active/`
+2. Metadata `status` updates to `"active"`
+3. `activated_date` timestamp is recorded
+4. Spec becomes visible to `sdd-next` for task discovery
+
+**Result - JSON Metadata After Activation:**
+```json
+{
+  "spec_id": "my-feature-2025-10-30-001",
+  "metadata": {
+    "status": "active",
+    "activated_date": "2025-10-30T14:30:00Z"
+  }
+}
+```
+
+**Example Workflow:**
+```bash
+# 1. Create spec (automatically goes to pending/)
+# Using sdd-plan skill creates: specs/pending/my-feature-2025-10-30-001.json
+
+# 2. Review spec in backlog
+cat specs/pending/my-feature-2025-10-30-001.json
+
+# 3. When ready to start work, activate it
+sdd activate-spec my-feature-2025-10-30-001
+
+# 4. Now sdd-next can find tasks from this spec
+sdd prepare-task my-feature-2025-10-30-001
+```
+
+**Note:** Multiple specs can be active simultaneously, allowing parallel work across different features or team members.
 
 ### Operation 5: Update Spec Metadata
 

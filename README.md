@@ -105,7 +105,8 @@ A **spec** is a JSON file containing:
 - Edge cases and considerations
 
 Specs live in your project's `specs/` directory:
-- `specs/active/` - Current work
+- `specs/pending/` - Backlog of planned work awaiting activation
+- `specs/active/` - Current work (you can have multiple specs representing parallel work streams)
 - `specs/completed/` - Finished features
 - `specs/archived/` - Old/cancelled work
 
@@ -245,6 +246,8 @@ After using the toolkit, your project will have:
 ```
 your-project/
 ├── specs/                    # Specifications
+│   ├── pending/             # Backlog (planned work)
+│   │   └── future-feature.json
 │   ├── active/              # Current work
 │   │   └── feature-001.json
 │   ├── completed/           # Finished
@@ -414,6 +417,11 @@ sdd doc search "pattern"              # Pattern search
 
 # Testing
 sdd test run tests/                   # Run tests with AI debugging
+
+# Context Monitoring
+sdd context                           # Show current session token usage
+sdd context --transcript-path <path>  # Check specific transcript
+sdd context --json                    # Get JSON output
 
 # Development tools
 sdd skills-dev setup-permissions -- update .   # Set up permissions
