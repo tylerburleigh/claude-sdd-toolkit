@@ -152,7 +152,7 @@ def format_number(n: int) -> str:
     return f"{n:,}"
 
 
-def format_metrics_human(metrics, max_context: int = 200000):
+def format_metrics_human(metrics, max_context: int = 160000):
     """Format token metrics for human-readable output."""
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
 
@@ -161,7 +161,7 @@ def format_metrics_human(metrics, max_context: int = 200000):
     output.append("Claude Code Context Usage")
     output.append("=" * 60)
     output.append("")
-    output.append(f"Context Length:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
+    output.append(f"Usable Context:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
     output.append("")
     output.append("Session Totals:")
     output.append(f"  Input Tokens:    {format_number(metrics.input_tokens)}")
@@ -173,7 +173,7 @@ def format_metrics_human(metrics, max_context: int = 200000):
     return "\n".join(output)
 
 
-def format_metrics_json(metrics, max_context: int = 200000):
+def format_metrics_json(metrics, max_context: int = 160000):
     """Format token metrics as JSON."""
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
 
@@ -181,6 +181,7 @@ def format_metrics_json(metrics, max_context: int = 200000):
         {
             "context_length": metrics.context_length,
             "context_percentage": round(context_pct, 2),
+            "context_percentage_interpretation": "Percentage of available context used",
             "max_context": max_context,
             "input_tokens": metrics.input_tokens,
             "output_tokens": metrics.output_tokens,
@@ -254,8 +255,8 @@ def register_context(subparsers, parent_parser):
     parser.add_argument(
         '--max-context',
         type=int,
-        default=200000,
-        help='Maximum context window size (default: 200000)'
+        default=160000,
+        help='Maximum context window size (default: 160000)'
     )
 
     # Note: --json is inherited from parent_parser global options
@@ -290,8 +291,8 @@ Examples:
     parser.add_argument(
         "--max-context",
         type=int,
-        default=200000,
-        help="Maximum context window size (default: 200000)",
+        default=160000,
+        help="Maximum context window size (default: 160000)",
     )
 
     parser.add_argument(

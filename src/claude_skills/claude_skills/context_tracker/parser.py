@@ -17,7 +17,7 @@ class TokenMetrics:
     context_length: int
 
     @property
-    def context_percentage(self, max_context: int = 200000) -> float:
+    def context_percentage(self, max_context: int = 160000) -> float:
         """Calculate context usage percentage."""
         return (self.context_length / max_context) * 100 if max_context > 0 else 0.0
 
