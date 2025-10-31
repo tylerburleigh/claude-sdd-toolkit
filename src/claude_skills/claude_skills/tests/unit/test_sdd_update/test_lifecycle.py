@@ -5,7 +5,7 @@ import pytest
 import json
 from pathlib import Path
 
-from claude_skills.sdd_update.lifecycle import move_spec, complete_spec
+from claude_skills.sdd_update.lifecycle import move_spec, complete_spec, activate_spec
 from claude_skills.common.spec import load_json_spec, save_json_spec
 
 
@@ -334,3 +334,137 @@ class TestCompleteSpec:
         new_timestamp = spec_data_after.get("last_updated")
 
         assert new_timestamp != original_timestamp
+
+
+class TestActivateSpec:
+    """Test activate_spec() function."""
+
+    def test_activate_spec_success(self, specs_structure):
+        """Test that activate_spec() successfully moves spec from pending/ to active/ and updates metadata with activated_date."""
+        # Ensure pending/ directory exists
+        pending_dir = specs_structure / "pending"
+        pending_dir.mkdir(exist_ok=True)
+
+        # Create a test spec file in pending folder
+        spec_id = "test-spec-2025-01-01-001"
+        spec_file_pending = pending_dir / f"{spec_id}.json"
+        spec_data = {
+            "spec_id": spec_id,
+            "title": "Test Spec",
+            "metadata": {},
+            "hierarchy": {
+                "spec-root": {
+                    "type": "spec",
+                    "title": "Test Spec",
+                    "status": "pending",
+                    "parent": None,
+                    "children": [],
+                    "total_tasks": 0,
+                    "completed_tasks": 0,
+                    "metadata": {}
+                }
+            }
+        }
+        spec_file_pending.write_text(json.dumps(spec_data))
+
+        # Call activate_spec
+        result = activate_spec(
+            spec_id=spec_id,
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        assert result is True
+
+        # Verify spec was moved to active/
+        spec_file_active = specs_structure / "active" / f"{spec_id}.json"
+        assert spec_file_active.exists()
+        assert not spec_file_pending.exists()
+
+        # Verify metadata was updated
+        spec_data = load_json_spec(spec_id, specs_structure)
+        assert spec_data["metadata"]["status"] == "active"
+        assert "activated_date" in spec_data["metadata"]
+
+        # Verify activated_date is a valid timestamp
+        activated_date = spec_data["metadata"]["activated_date"]
+        assert isinstance(activated_date, str)
+        assert "T" in activated_date  # ISO 8601 format check
+
+    def test_activate_spec_not_found(self, specs_structure):
+        """Test that activate_spec() handles spec_id not found in pending/ gracefully."""
+        # Ensure pending/ directory exists
+        pending_dir = specs_structure / "pending"
+        pending_dir.mkdir(exist_ok=True)
+
+        # Try to activate a spec that doesn't exist in pending/
+        spec_id = "nonexistent-spec-2025-01-01-999"
+
+        result = activate_spec(
+            spec_id=spec_id,
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        # Should return False indicating failure
+        assert result is False
+
+        # Verify no file was created in active/
+        spec_file_active = specs_structure / "active" / f"{spec_id}.json"
+        assert not spec_file_active.exists()
+
+        # Verify no file exists in pending/
+        spec_file_pending = pending_dir / f"{spec_id}.json"
+        assert not spec_file_pending.exists()
+
+    def test_activate_spec_already_active(self, specs_structure):
+        """Test that activate_spec() handles gracefully when spec is already in active/ folder."""
+        # Create a test spec file already in active folder
+        active_dir = specs_structure / "active"
+        spec_id = "test-spec-2025-01-01-002"
+        spec_file_active = active_dir / f"{spec_id}.json"
+        spec_data = {
+            "spec_id": spec_id,
+            "title": "Test Spec Already Active",
+            "metadata": {"status": "active"},
+            "hierarchy": {
+                "spec-root": {
+                    "type": "spec",
+                    "title": "Test Spec",
+                    "status": "in_progress",
+                    "parent": None,
+                    "children": [],
+                    "total_tasks": 0,
+                    "completed_tasks": 0,
+                    "metadata": {}
+                }
+            }
+        }
+        spec_file_active.write_text(json.dumps(spec_data))
+
+        # Ensure pending/ directory exists
+        pending_dir = specs_structure / "pending"
+        pending_dir.mkdir(exist_ok=True)
+
+        # Try to activate a spec that's already in active/
+        result = activate_spec(
+            spec_id=spec_id,
+            specs_dir=specs_structure,
+            printer=None
+        )
+
+        # Should handle gracefully (return True or appropriate value)
+        # The function should recognize it's already active
+        assert result is True
+
+        # Verify file still exists in active/ (not moved or duplicated)
+        assert spec_file_active.exists()
+
+        # Verify no duplicate was created in pending/
+        spec_file_pending = pending_dir / f"{spec_id}.json"
+        assert not spec_file_pending.exists()
+
+        # Verify spec data is intact
+        spec_data_after = load_json_spec(spec_id, specs_structure)
+        assert spec_data_after["spec_id"] == spec_id
+        assert spec_data_after["metadata"]["status"] == "active"

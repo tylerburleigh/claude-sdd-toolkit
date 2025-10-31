@@ -78,32 +78,6 @@ This skill is part of the **Spec-Driven Development** family:
 - **Avoid compound commands with &&** when possible - use separate command invocations instead
 - **Never use inline environment variable assignment with &&** - this adds unnecessary complexity
 
-**Context Usage Management:**
-- Monitor Claude's context window usage throughout task execution
-- Use `/context` command to check current usage percentage
-- **50% threshold**: At 50% or higher context usage, recommend pausing to preserve context for complex tasks
-- **Recovery workflow**: `Skill(sdd-toolkit:sdd-update)` → `/clear` → `/sdd-begin`
-  - Always save progress with sdd-update BEFORE clearing context
-  - Use /sdd-begin to resume from the saved state
-- **Why 50%?**: Complex tasks can consume 30-50% of context during preparation and implementation. Starting fresh ensures you won't hit limits mid-task
-- **Context preservation**: The /clear command wipes conversation history, so ensure all progress is saved to the spec file first
-
-**IMPORTANT - Context Output Rules:**
-- **DO**: Output context information directly as text to the user
-- **DO**: Use the `/context` command to check current usage
-- **DO NOT**: Use Bash commands like `echo` or `bc` to calculate or display context percentages
-- **DO NOT**: Use Bash for any simple text output or calculations - output text directly instead
-
-Example of CORRECT context output:
-```
-Context usage is at 67% (134k/200k tokens).
-```
-
-Example of INCORRECT context output (NEVER do this):
-```bash
-echo "Context usage: approximately $(echo "scale=1; 90267/200000*100" | bc)% of available context"
-```
-
 ## General Output Formatting Guidelines
 
 **IMPORTANT - How to Present Execution Plans and Task Information:**
@@ -467,7 +441,6 @@ When presenting options to the user, you MUST use `AskUserQuestion`. NEVER use t
 - **Verification tasks**: When verification is complete and seeking approval to mark task complete
 - **Any decision point**: When offering multiple clear choices to the user
 - **Blocker handling**: When presenting alternatives for blocked tasks
-- **Context management**: When asking about context usage and next steps
 
 **Benefits:**
 - ✅ Structured responses - No need to parse free-form text
@@ -546,7 +519,6 @@ AskUserQuestion(
 - Task selection from multiple available tasks
 - Plan approval or requesting changes
 - Handling blockers (work on alternative or resolve blocker)
-- Context management (continue or save & clear)
 - Multiple specs selection
 - Resuming work after completion
 
@@ -626,6 +598,101 @@ Ready to implement?
 ```
 
 ## The Developer Workflow
+
+### Phase 0: Context Window Check (Before Starting)
+
+Before identifying and preparing the next task, check the Claude Code context window usage to ensure efficient session management and prevent context overflow.
+
+**When to Check:**
+- At the beginning of the sdd-next workflow
+- Before finding and preparing the next task
+- Each time sdd-next is invoked to identify work
+
+**How to Check:**
+```bash
+# Get context usage as JSON
+sdd context --json
+```
+
+**Example Output:**
+```json
+{
+  "context_length": 157000,
+  "context_percentage": 78.5,
+  "max_context": 200000,
+  "input_tokens": 45000,
+  "output_tokens": 32000,
+  "cached_tokens": 80000,
+  "total_tokens": 157000
+}
+```
+
+**Decision Logic:**
+
+**If context_percentage >= 75%:**
+
+The context window is approaching capacity. Present a recommendation to the user before continuing:
+
+```
+⚠️  Context Window Usage High
+
+Current Usage: 78.5% (157,000 / 200,000 tokens)
+
+Before continuing with the next task, it's recommended to reset your session:
+
+1. Stop work here
+2. Run /clear to reset the context window
+3. Run /sdd-begin to resume from where you left off
+
+When you resume:
+✅ All completed tasks are preserved in the spec file
+✅ The next actionable task will be automatically identified
+✅ You'll continue with a fresh context window
+
+Continuing with high context usage may lead to:
+❌ Degraded performance
+❌ Context overflow errors
+❌ Loss of important context information
+```
+
+Then use `AskUserQuestion` to get the user's decision:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Context window is 78.5% full. How would you like to proceed?",
+    header: "Context Full",
+    multiSelect: false,
+    options: [
+      {
+        label: "Stop and Reset (Recommended)",
+        description: "Reset context with /clear, then /sdd-begin to resume work"
+      },
+      {
+        label: "Continue Anyway",
+        description: "Proceed with task preparation despite high context usage"
+      }
+    ]
+  }]
+)
+```
+
+**User Response Handling:**
+- **Stop and Reset**: Acknowledge the user's decision, remind them to run `/clear` followed by `/sdd-begin`, then exit gracefully
+- **Continue Anyway**: Proceed with the workflow (Phase 1: Spec Discovery), but the user has been warned about potential issues
+
+**If context_percentage < 75%:**
+- Continue normally with Phase 1
+- No user interaction needed
+- Context usage is healthy for continued work
+
+**Best Practices:**
+- Always check context at the start of sdd-next
+- The 75% threshold provides a safety buffer before issues occur
+- Resetting is quick and preserves all progress in the spec file
+- Better to reset proactively than encounter context overflow mid-task
+
+**Note:** Context window management is also performed by sdd-update after task completion. This check serves as a complementary safety measure to catch high context usage before starting new work, especially when sdd-next is invoked directly.
 
 ### Phase 1: Spec Discovery and Context Gathering
 
@@ -1620,72 +1687,7 @@ When providing information to sdd-update, consider including:
 - Note: "Implemented with connection pooling (not in original spec) to handle concurrency"
 - Structured journal explaining what/why/testing/impact
 
-4. **Check Context Usage Before Continuing**
-
-Before moving to the next task, check Claude's context window usage to avoid running out of context mid-task:
-
-```bash
-/context
-```
-
-**Decision Logic:**
-
-- **If context usage >= 50%**: Use AskUserQuestion to get user decision on context management
-  - First ensure task status is updated (step 2 above should already be complete)
-  - Present context to user:
-    ```
-    ⚠️  Context usage is at 67% (134k/200k tokens). To ensure smooth execution of the next task,
-    I recommend saving progress and starting fresh.
-
-    This preserves your progress while giving us a clean context window for complex tasks.
-    ```
-  - Then ask structured question:
-    ```javascript
-    AskUserQuestion(
-      questions: [{
-        question: "How would you like to manage the context before continuing?",
-        header: "Context High",
-        multiSelect: false,
-        options: [
-          {
-            label: "Save & Clear (Recommended)",
-            description: "Save progress with sdd-update, /clear, then /sdd-begin to resume fresh"
-          },
-          {
-            label: "Continue Anyway",
-            description: "Continue to next task with current context (may hit limits)"
-          },
-          {
-            label: "Finish for Now",
-            description: "Save progress and stop work on this spec"
-          }
-        ]
-      }]
-    )
-    ```
-
-- **If context usage < 50%**: Present status and prepare next task automatically
-  - Present context to user:
-    ```
-    ✅ Task completed! Context usage is at 42% (84k/200k tokens).
-    Plenty of room for the next task.
-
-    Next task ready: task-2-2 (src/middleware/auth.ts - JWT verification, 2 hours)
-
-    I'll prepare the execution plan. Reply "stop" if you want to pause, or
-    "review progress" to see overall spec status first.
-    ```
-  - Then proceed to find next task automatically
-  - User can interrupt at any time with "stop", "pause", "review progress", or "different task"
-
-**Important**: Always invoke `Skill(sdd-toolkit:sdd-update)` to save progress BEFORE running `/clear`, as clearing the conversation will lose any unsaved state.
-
-**Response Handling for >=50% context:**
-- **"Save & Clear"**: Confirm sdd-update was called, then instruct user to run `/clear` then `/sdd-begin`
-- **"Continue Anyway"**: Proceed to find next task (step 5 below)
-- **"Finish for Now"**: Confirm work saved, provide summary of what was completed
-
-5. **Find Next Task** (only if user wants to continue AND context usage < 50%)
+4. **Find Next Task**
 
 Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
 
@@ -1775,8 +1777,7 @@ This skill enables coordination across different implementation tools:
 2. Claude: Presents plan to developer
 3. Developer: Implements following the plan
 4. Developer: Uses sdd-update to update status
-5. Claude: Checks context usage with /context
-6. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise finds next task
+5. Claude: Finds next task
 
 **Scenario: Claude creates plan, Cursor implements**
 1. Claude: Uses sdd-next to create plan
@@ -1785,8 +1786,7 @@ This skill enables coordination across different implementation tools:
 4. Cursor: Reads JSON spec file
 5. Cursor: Implements following Claude's plan
 6. Cursor: Updates JSON spec file when complete
-7. Claude: Checks context usage with /context
-8. Claude: If >= 50%, recommends /clear then /sdd-begin; otherwise reads updated JSON spec file and finds next task
+7. Claude: Reads updated JSON spec file and finds next task
 
 ## Common Workflows
 
@@ -1838,8 +1838,6 @@ or "review progress" for detailed status.
    - User can ask "review progress" to run `sdd progress SPEC_ID`
    - User can say "stop" or "pause" to defer
 9. Continue implementation
-10. After completion, check context usage with /context
-11. If >= 50%, recommend sdd-update → /clear → /sdd-begin workflow
 
 ### Workflow 3: Handling Blockers
 **Situation:** Next task is blocked by external issue

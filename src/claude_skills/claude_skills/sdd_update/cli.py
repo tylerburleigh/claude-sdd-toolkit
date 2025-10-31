@@ -32,7 +32,7 @@ from claude_skills.sdd_update.journal import (
     add_revision_entry,
 )
 from claude_skills.sdd_update.verification import add_verification_result, format_verification_summary
-from claude_skills.sdd_update.lifecycle import move_spec, complete_spec
+from claude_skills.sdd_update.lifecycle import move_spec, complete_spec, activate_spec
 from claude_skills.sdd_update.time_tracking import track_time, generate_time_report
 from claude_skills.sdd_update.validation import validate_spec, get_status_report, audit_spec, reconcile_state, detect_unjournaled_tasks
 from claude_skills.sdd_update.query import (
@@ -359,6 +359,28 @@ def cmd_move_spec(args, printer):
         dry_run=args.dry_run,
         printer=printer
     )
+
+    return 0 if success else 1
+
+
+def cmd_activate_spec(args, printer):
+    """Activate a pending spec by moving it to active folder."""
+    printer.action(f"Activating spec {args.spec_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    success = activate_spec(
+        spec_id=args.spec_id,
+        specs_dir=specs_dir,
+        dry_run=args.dry_run,
+        printer=printer
+    )
+
+    if success:
+        printer.success("Spec activated and moved to active/. You can now start working on it with sdd next-task.")
 
     return 0 if success else 1
 
@@ -866,6 +888,12 @@ def register_update(subparsers, parent_parser):
     p_complete.add_argument("--skip-doc-regen", action="store_true", help="Skip documentation regeneration for faster completion")
     p_complete.add_argument("--dry-run", action="store_true", help="Preview changes")
     p_complete.set_defaults(func=cmd_complete_spec)
+
+    # activate-spec command
+    p_activate = subparsers.add_parser("activate-spec", help="Activate a pending spec", parents=[parent_parser])
+    p_activate.add_argument("spec_id", help="Specification ID")
+    p_activate.add_argument("--dry-run", action="store_true", help="Preview changes")
+    p_activate.set_defaults(func=cmd_activate_spec)
 
     # time-report command
     p_report = subparsers.add_parser("time-report", help="Generate time tracking report", parents=[parent_parser])

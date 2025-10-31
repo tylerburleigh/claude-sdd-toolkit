@@ -46,9 +46,11 @@ SDD_PERMISSIONS = [
     # File access permissions
     "Read(//**/specs/**)",
     "Write(//**/specs/active/**)",
+    "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
     "Write(//**/specs/archived/**)",
-    "Edit(//**/specs/active/**)"
+    "Edit(//**/specs/active/**)",
+    "Edit(//**/specs/pending/**)"
 ]
 
 

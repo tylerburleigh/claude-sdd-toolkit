@@ -36,11 +36,11 @@ def cmd_create(args, printer):
     # Ensure .reports/ directory exists (defensive)
     ensure_reports_directory(specs_dir)
 
-    # Create spec (in active subfolder)
+    # Create spec (in pending subfolder)
     success, message, spec = create_spec_interactive(
         title=args.name,
         template=template,
-        specs_dir=specs_dir / "active",
+        specs_dir=specs_dir / "pending",
         default_category=default_category
     )
 
@@ -48,7 +48,7 @@ def cmd_create(args, printer):
         printer.error(message)
         return 1
 
-    printer.success(message)
+    printer.success(f"Spec created in pending/. {message}")
 
     # Show spec info
     printer.detail(f"Template: {template}")
@@ -58,9 +58,10 @@ def cmd_create(args, printer):
 
     printer.info("\nNext steps:")
     printer.detail("1. Edit the spec file to add detailed tasks")
-    printer.detail(f"2. Validate: sdd validate {spec['spec_id']}.json")
+    printer.detail(f"2. Validate: sdd validate {spec['spec_id']}")
     printer.detail("3. Review: sdd review (if sdd-plan-review is available)")
-    printer.detail("4. Start work: sdd next-task")
+    printer.detail(f"4. Activate: sdd activate-spec {spec['spec_id']}")
+    printer.detail("5. Start work: sdd next-task")
 
     return 0
 

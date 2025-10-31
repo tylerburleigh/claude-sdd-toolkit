@@ -125,7 +125,7 @@ def create_spec_interactive(
 
     # Determine output path
     if not specs_dir:
-        specs_dir = Path("specs/active")
+        specs_dir = Path("specs/pending")
 
     specs_dir.mkdir(parents=True, exist_ok=True)
     spec_path = specs_dir / f"{spec['spec_id']}.json"

@@ -17,6 +17,7 @@ from .progress import recalculate_progress, update_parent_status, get_progress_s
 from .completion import check_spec_completion, should_prompt_completion, format_completion_prompt
 from .paths import (
     find_specs_directory,
+    find_spec_file,
     validate_path,
     validate_and_normalize_paths,
     normalize_path,
@@ -130,6 +131,7 @@ __all__ = [
 
     # Path utilities
     "find_specs_directory",
+    "find_spec_file",
     "validate_path",
     "validate_and_normalize_paths",
     "normalize_path",

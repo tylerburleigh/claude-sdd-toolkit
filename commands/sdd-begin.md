@@ -67,7 +67,7 @@ Use the helper script to find and format active specifications:
 sdd skills-dev start-helper format-output
 ```
 
-The script will return properly formatted text with active specs, their progress, and status.
+The script will return properly formatted text with active specs, their progress, and status. It also discovers pending specs in the backlog (from `specs/pending/` folder).
 
 **IMPORTANT**:
 - The `format-output` command returns pre-formatted text with proper newlines and indentation
@@ -80,9 +80,10 @@ The script will return properly formatted text with active specs, their progress
 **If active work found:**
 
 The formatted output from `format-output` already includes:
-- Number of active specifications
-- For each spec: ID, title, progress, current phase, next task, and last updated time
-- Priority indicator (⚡ IN PROGRESS for in-progress specs)
+- Number of specifications found (active and pending combined)
+- For each spec: ID, title, progress, and folder status
+  - Active specs: ⚡ (in_progress) or 📝 (pending status)
+  - Pending specs: ⏸️ with [PENDING] label (backlog)
 - 🕐 Last-accessed task information (if available)
 - 💡 Count of in-progress tasks
 
@@ -97,6 +98,8 @@ sdd skills-dev start-helper get-session-info
 
 **If last-accessed task exists:**
 
+First check if there are pending specs using the get-session-info output (check `pending_specs` array).
+
 Present these options with AskUserQuestion tool:
 - **Header**: "Action"
 - **Question**: "What would you like to do?"
@@ -104,9 +107,12 @@ Present these options with AskUserQuestion tool:
   1. Resume last task (auto-runs sdd-next with specific task)
   2. Continue with next task (auto-runs sdd-next)
   3. Write new spec (auto-runs sdd-plan)
-  4. Something else (exit)
+  4. View pending backlog (M specs) - **Only show if pending_specs array has items**
+  5. Something else (exit)
 
 **If NO last-accessed task:**
+
+First check if there are pending specs using the get-session-info output (check `pending_specs` array).
 
 Present these options:
 - **Header**: "Action"
@@ -114,7 +120,8 @@ Present these options:
 - **Options**:
   1. Continue with next task (auto-runs sdd-next)
   2. Write new spec (auto-runs sdd-plan)
-  3. Something else (exit)
+  3. View pending backlog (M specs) - **Only show if pending_specs array has items**
+  4. Something else (exit)
 
 **If NO active work found:**
 
@@ -184,7 +191,72 @@ Use the Skill tool to invoke sdd-plan:
 Skill(sdd-toolkit:sdd-plan)
 ```
 
-**Option 4: "Something else"**
+**Option 4: "View pending backlog"** (if pending_specs array has items)
+
+Show the user the list of pending specs with their titles:
+
+```bash
+# Get the list of pending specs from get-session-info
+# Display formatted list to user
+```
+
+Example display:
+```
+📋 Pending Backlog (3 specs):
+
+1. user-onboarding-2025-10-15-001
+   Title: User Onboarding Flow Redesign
+
+2. api-versioning-2025-10-18-002
+   Title: API Versioning Strategy
+
+3. monitoring-dashboard-2025-10-20-001
+   Title: Monitoring Dashboard Implementation
+```
+
+Then use AskUserQuestion to let user select which spec to activate:
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Which pending spec would you like to activate?",
+    header: "Activate",
+    multiSelect: false,
+    options: [
+      {
+        label: "spec-1-id",
+        description: "Spec 1 title"
+      },
+      {
+        label: "spec-2-id",
+        description: "Spec 2 title"
+      },
+      // ... one option for each pending spec (up to 4 max for AskUserQuestion)
+    ]
+  }]
+)
+```
+
+**After user selects a spec:**
+```bash
+# Activate the selected spec
+sdd activate-spec SELECTED_SPEC_ID
+
+# Inform user of success
+echo "✅ Spec activated! The spec has been moved to specs/active/"
+
+# Then automatically continue with sdd-next to find first task
+I'll now help you find the first task to work on...
+```
+
+Use the Skill tool to invoke sdd-next:
+```
+Skill(sdd-toolkit:sdd-next)
+```
+
+**If user selects "Other" or cancels:**
+Exit gracefully without activating any spec.
+
+**Option 5: "Something else"**
 ```bash
 No problem! Let me know if you need any help with your project.
 ```

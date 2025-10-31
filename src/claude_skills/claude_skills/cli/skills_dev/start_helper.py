@@ -82,48 +82,76 @@ def cmd_find_active_work(args, printer: PrettyPrinter) -> int:
     project_root = Path(args.project_root) if args.project_root else Path.cwd()
     project_root = project_root.resolve()
 
-    specs_active = project_root / "specs" / "active"
+    specs_dir = project_root / "specs"
+    specs_pending = specs_dir / "pending"
+    specs_active = specs_dir / "active"
 
-    if not specs_active.exists():
+    # Check if specs directory exists
+    if not specs_dir.exists():
         result = {
             "active_work_found": False,
             "specs": [],
-            "message": "No specs/active directory found"
+            "message": "No specs directory found"
         }
         print(json.dumps(result, indent=2))
         return 0
 
-    # Find all JSON spec files
+    # Find all JSON spec files from both pending and active
     specs = []
-    for spec_file in specs_active.glob("*.json"):
-        try:
-            with open(spec_file, 'r') as f:
-                spec_data = json.load(f)
+    search_dirs = []
+    if specs_pending.exists():
+        search_dirs.append(("pending", specs_pending))
+    if specs_active.exists():
+        search_dirs.append(("active", specs_active))
 
-            hierarchy = spec_data.get('hierarchy', {})
-            spec_root = hierarchy.get('spec-root', {})
+    if not search_dirs:
+        result = {
+            "active_work_found": False,
+            "specs": [],
+            "message": "No specs/pending or specs/active directory found"
+        }
+        print(json.dumps(result, indent=2))
+        return 0
 
-            spec_info = {
-                "spec_id": spec_data.get('spec_id'),
-                "spec_file": str(spec_file),
-                "title": spec_root.get('title', 'Unknown'),
-                "progress": {
-                    "completed": spec_root.get('completed_tasks', 0),
-                    "total": spec_root.get('total_tasks', 0),
-                    "percentage": int((spec_root.get('completed_tasks', 0) / spec_root.get('total_tasks', 1)) * 100)
-                },
-                "status": spec_root.get('status', 'unknown'),
-                "last_updated": spec_data.get('last_updated', ''),
-            }
+    for folder_status, search_dir in search_dirs:
+        for spec_file in search_dir.glob("*.json"):
+            try:
+                with open(spec_file, 'r') as f:
+                    spec_data = json.load(f)
 
-            specs.append(spec_info)
-        except Exception:
-            # Skip malformed specs
-            continue
+                hierarchy = spec_data.get('hierarchy', {})
+                spec_root = hierarchy.get('spec-root', {})
+
+                spec_info = {
+                    "spec_id": spec_data.get('spec_id'),
+                    "spec_file": str(spec_file),
+                    "title": spec_root.get('title', 'Unknown'),
+                    "progress": {
+                        "completed": spec_root.get('completed_tasks', 0),
+                        "total": spec_root.get('total_tasks', 0),
+                        "percentage": int((spec_root.get('completed_tasks', 0) / spec_root.get('total_tasks', 1)) * 100)
+                    },
+                    "status": spec_root.get('status', 'unknown'),
+                    "folder_status": folder_status,  # Add folder status (pending/active)
+                    "last_updated": spec_data.get('last_updated', ''),
+                }
+
+                specs.append(spec_info)
+            except Exception as e:
+                # Skip malformed specs
+                continue
+
+    # Create simplified pending_specs list for backlog display
+    pending_specs = [
+        {"spec_id": spec["spec_id"], "title": spec["title"]}
+        for spec in specs
+        if spec.get("folder_status") == "pending"
+    ]
 
     result = {
         "active_work_found": len(specs) > 0,
         "specs": specs,
+        "pending_specs": pending_specs,
         "count": len(specs)
     }
 
@@ -136,43 +164,58 @@ def cmd_format_output(args, printer: PrettyPrinter) -> int:
     project_root = Path(args.project_root) if args.project_root else Path.cwd()
     project_root = project_root.resolve()
 
-    specs_active = project_root / "specs" / "active"
+    specs_dir = project_root / "specs"
+    specs_pending = specs_dir / "pending"
+    specs_active = specs_dir / "active"
 
-    if not specs_active.exists():
+    # Check if specs directory exists
+    if not specs_dir.exists():
         print("📋 No active SDD work found.\n")
-        print("No specs/active directory or no pending/in-progress tasks detected.")
+        print("No specs directory found.")
         return 0
 
     # Get session state with last-accessed task info
-    specs_dir = project_root / "specs"
     session_state = get_session_state(str(specs_dir))
 
-    # Find all JSON spec files
+    # Find all JSON spec files from both pending and active
     specs = []
-    for spec_file in specs_active.glob("*.json"):
-        try:
-            with open(spec_file, 'r') as f:
-                spec_data = json.load(f)
+    search_dirs = []
+    if specs_pending.exists():
+        search_dirs.append(("pending", specs_pending))
+    if specs_active.exists():
+        search_dirs.append(("active", specs_active))
 
-            hierarchy = spec_data.get('hierarchy', {})
-            spec_root = hierarchy.get('spec-root', {})
+    if not search_dirs:
+        print("📋 No active SDD work found.\n")
+        print("No specs/pending or specs/active directory found.")
+        return 0
 
-            completed = spec_root.get('completed_tasks', 0)
-            total = spec_root.get('total_tasks', 0)
-            percentage = int((completed / total) * 100) if total > 0 else 0
+    for folder_status, search_dir in search_dirs:
+        for spec_file in search_dir.glob("*.json"):
+            try:
+                with open(spec_file, 'r') as f:
+                    spec_data = json.load(f)
 
-            spec_info = {
-                "spec_id": spec_data.get('spec_id'),
-                "title": spec_root.get('title', 'Unknown'),
-                "completed": completed,
-                "total": total,
-                "percentage": percentage,
-                "status": spec_root.get('status', 'unknown'),
-            }
+                hierarchy = spec_data.get('hierarchy', {})
+                spec_root = hierarchy.get('spec-root', {})
 
-            specs.append(spec_info)
-        except Exception:
-            continue
+                completed = spec_root.get('completed_tasks', 0)
+                total = spec_root.get('total_tasks', 0)
+                percentage = int((completed / total) * 100) if total > 0 else 0
+
+                spec_info = {
+                    "spec_id": spec_data.get('spec_id'),
+                    "title": spec_root.get('title', 'Unknown'),
+                    "completed": completed,
+                    "total": total,
+                    "percentage": percentage,
+                    "status": spec_root.get('status', 'unknown'),
+                    "folder_status": folder_status,  # Add folder status (pending/active)
+                }
+
+                specs.append(spec_info)
+            except Exception:
+                continue
 
     if not specs:
         print("📋 No active SDD work found.\n")
@@ -180,11 +223,18 @@ def cmd_format_output(args, printer: PrettyPrinter) -> int:
         return 0
 
     # Format output
-    print(f"📋 Found {len(specs)} active specification{'s' if len(specs) != 1 else ''}:\n")
+    print(f"📋 Found {len(specs)} specification{'s' if len(specs) != 1 else ''}:\n")
 
     for i, spec in enumerate(specs, 1):
-        status_emoji = "⚡" if spec['status'] == 'in_progress' else "📝"
-        print(f"{i}. {status_emoji} {spec['title']}")
+        # Add folder status indicator
+        if spec['folder_status'] == 'pending':
+            status_emoji = "⏸️"  # Pending/paused emoji
+            folder_label = " [PENDING]"
+        else:
+            status_emoji = "⚡" if spec['status'] == 'in_progress' else "📝"
+            folder_label = ""
+
+        print(f"{i}. {status_emoji} {spec['title']}{folder_label}")
         print(f"   ID: {spec['spec_id']}")
         print(f"   Progress: {spec['completed']}/{spec['total']} tasks ({spec['percentage']}%)")
         print()
@@ -245,11 +295,29 @@ def cmd_get_session_info(args, printer: PrettyPrinter) -> int:
     # Get session state
     session_state = get_session_state(str(specs_dir))
 
+    # Build pending_specs list from specs in pending folder
+    specs_pending = specs_dir / "pending"
+    pending_specs = []
+    if specs_pending.exists():
+        for spec_file in specs_pending.glob("*.json"):
+            try:
+                with open(spec_file, 'r') as f:
+                    spec_data = json.load(f)
+                hierarchy = spec_data.get('hierarchy', {})
+                spec_root = hierarchy.get('spec-root', {})
+                pending_specs.append({
+                    "spec_id": spec_data.get('spec_id'),
+                    "title": spec_root.get('title', 'Unknown')
+                })
+            except Exception:
+                continue
+
     # Combine with active work info
     result = {
         "has_specs": True,
         "last_task": session_state.get("last_task"),
         "active_specs": session_state.get("active_specs", []),
+        "pending_specs": pending_specs,
         "in_progress_count": session_state.get("in_progress_count", 0),
         "timestamp": session_state.get("timestamp")
     }
