@@ -89,9 +89,10 @@ def get_cached_transcript_path():
 
     Detection Strategy (in order of priority):
     1. PID-based: Match current process tree to cached session PPIDs
-    2. Environment variable: Check CLAUDE_SESSION_ID
-    3. File writing detection: Check which transcript is open for writing (lsof)
-    4. Fallback: Most recently modified transcript (last resort)
+    2. TTY-based: Match current terminal to cached session TTY
+    3. Environment variable: Check CLAUDE_SESSION_ID
+    4. File writing detection: Check which transcript is open for writing (lsof)
+    5. Fallback: Most recently modified transcript (last resort)
 
     Returns:
         Cached transcript path or None if not found
@@ -123,8 +124,21 @@ def get_cached_transcript_path():
         if not sessions:
             return None
 
-        # Clean stale sessions (optional, improves accuracy)
-        _clean_stale_sessions(dir_entry)
+        # Fast path: If only one session exists, validate and return it directly
+        # This skips expensive lsof and multi-strategy detection
+        if len(sessions) == 1:
+            session_id, session_data = next(iter(sessions.items()))
+            ppid = session_data.get("ppid")
+            path = session_data.get("transcript_path")
+
+            if path and Path(path).exists():
+                # Validate session is still alive
+                if ppid and is_pid_alive(ppid):
+                    return path
+                # Allow recently modified files without PPID (old cache format)
+                import time
+                if time.time() - Path(path).stat().st_mtime < 60:
+                    return path
 
         # Strategy 1: PID-based detection (most reliable)
         session_id = find_session_by_pid(dir_entry)
@@ -133,14 +147,28 @@ def get_cached_transcript_path():
             if transcript_path and Path(transcript_path).exists():
                 return transcript_path
 
-        # Strategy 2: Environment variable detection
+        # Strategy 2: TTY-based detection (for multiple sessions in same directory)
+        # This helps disambiguate when running from different terminals
+        try:
+            current_tty = os.ttyname(0)  # Get current terminal's TTY
+            for session_id, session_data in sessions.items():
+                cached_tty = session_data.get("tty")
+                if cached_tty and cached_tty == current_tty:
+                    transcript_path = session_data.get("transcript_path")
+                    if transcript_path and Path(transcript_path).exists():
+                        return transcript_path
+        except (OSError, AttributeError):
+            # Not running in a TTY, skip this strategy
+            pass
+
+        # Strategy 3: Environment variable detection
         env_session_id = os.environ.get("CLAUDE_SESSION_ID")
         if env_session_id and env_session_id in sessions:
             transcript_path = sessions[env_session_id].get("transcript_path")
             if transcript_path and Path(transcript_path).exists():
                 return transcript_path
 
-        # Strategy 3: File writing detection (existing lsof method)
+        # Strategy 4: File writing detection (existing lsof method)
         transcript_paths = [
             s.get("transcript_path")
             for s in sessions.values()
@@ -150,7 +178,7 @@ def get_cached_transcript_path():
             if is_file_open_for_writing(path):
                 return path
 
-        # Strategy 4: Fallback to most recently modified transcript
+        # Strategy 5: Fallback to most recently modified transcript
         # Only consider sessions with alive PIDs or recent timestamps
         valid_paths = []
         import time

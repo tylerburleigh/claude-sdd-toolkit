@@ -220,6 +220,83 @@ def get_current_ppid() -> int:
     return os.getppid()
 
 
+def find_stable_claude_process() -> Optional[int]:
+    """
+    Find the stable 'claude' process PID by walking up the process tree.
+
+    This function walks up the process tree from the current process to find
+    the long-lived 'claude' binary, skipping short-lived subprocess wrappers.
+
+    This is critical for session detection when multiple concurrent Claude Code
+    sessions exist in the same directory. By caching the stable PID instead of
+    a short-lived subprocess PID, session detection remains accurate even as
+    subprocesses die.
+
+    Returns:
+        The PID of the stable 'claude' process if found, otherwise None
+    """
+    system = platform.system()
+
+    # Currently only supports Linux
+    if system != "Linux":
+        return None
+
+    stable_ppid = None
+    pid = os.getppid()
+
+    try:
+        for _ in range(10):  # Max depth to prevent infinite loop
+            # Read process cmdline
+            cmdline_path = Path(f'/proc/{pid}/cmdline')
+            if cmdline_path.exists():
+                try:
+                    # Read as binary and decode, replacing null bytes
+                    cmdline_bytes = cmdline_path.read_bytes()
+                    cmdline = cmdline_bytes.decode('utf-8', errors='replace').replace(chr(0), ' ')
+
+                    # Look for actual 'claude' binary (not paths containing .claude)
+                    # Check if first word is 'claude' or executable ends with '/claude'
+                    first_word = cmdline.strip().split()[0] if cmdline.strip() else ''
+                    is_claude = (
+                        first_word == 'claude' or
+                        first_word.endswith('/claude') or
+                        first_word == './claude'
+                    )
+
+                    if is_claude:
+                        stable_ppid = pid
+                        break
+                except (IOError, UnicodeDecodeError):
+                    pass
+
+            # Get parent of this process
+            status_path = Path(f'/proc/{pid}/status')
+            if not status_path.exists():
+                break
+
+            try:
+                with open(status_path, 'r') as f:
+                    found_ppid = False
+                    for line in f:
+                        if line.startswith('PPid:'):
+                            next_pid = int(line.split()[1])
+                            if next_pid <= 1:
+                                # Reached init, stop
+                                break
+                            pid = next_pid
+                            found_ppid = True
+                            break
+                    if not found_ppid:
+                        break
+            except (IOError, ValueError):
+                break
+    except Exception:
+        # Any unexpected error, return None
+        pass
+
+    return stable_ppid
+
+
 def get_process_info(pid: int) -> Optional[Dict[str, Any]]:
     """
     Get information about a process.
