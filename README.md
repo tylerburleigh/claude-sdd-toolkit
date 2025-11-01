@@ -139,6 +139,88 @@ When a feature requires changes across multiple files, decompose it into multipl
 
 Claude uses skills automatically based on your requests.
 
+### Subagent Architecture
+
+Some skills use **Claude Code's subagent system** for orchestration. Subagents are specialized instances of Claude that handle complex, multi-step tasks autonomously.
+
+**How it works:**
+
+When you invoke certain skills (like `sdd-validate`, `run-tests`, or `code-doc`), Claude launches a subagent using the `Task` tool:
+
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/my-spec.json",
+  description: "Validate spec file"
+)
+```
+
+**Workflow diagram:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Subagent Workflow                        │
+└─────────────────────────────────────────────────────────────┘
+
+User: "Validate my spec"
+  │
+  ▼
+┌──────────────────┐
+│  Main Claude     │  Recognizes validation needed
+│  (sdd-next)      │
+└────────┬─────────┘
+         │ Invokes Task tool
+         ▼
+┌──────────────────┐
+│  Task Tool       │  Launches specialized subagent
+│  (Claude Code)   │
+└────────┬─────────┘
+         │ Creates subagent
+         ▼
+┌──────────────────┐
+│  Subagent        │  Autonomous Claude instance
+│  (sdd-validate)  │  - Specialized context
+└────────┬─────────┘  - Focused tools
+         │ Executes commands
+         ▼
+┌──────────────────┐
+│  SDD CLI         │  Runs validation commands
+│  (sdd validate)  │  - Checks spec structure
+└────────┬─────────┘  - Validates dependencies
+         │ Returns results
+         ▼
+┌──────────────────┐
+│  Subagent        │  Analyzes results
+│  (sdd-validate)  │  - Summarizes findings
+└────────┬─────────┘  - Formats report
+         │ Reports back
+         ▼
+┌──────────────────┐
+│  Main Claude     │  Receives report
+│  (sdd-next)      │  - Presents to user
+└────────┬─────────┘  - Continues workflow
+         │
+         ▼
+User: Sees validation results
+```
+
+**Benefits of subagents:**
+
+- **Autonomous execution**: Subagents work independently to complete complex tasks
+- **Specialized context**: Each subagent has focused tools and instructions
+- **Parallel work**: Multiple subagents can run concurrently
+- **Clean handoffs**: Main Claude receives results without context pollution
+
+**Which skills use subagents:**
+
+- `sdd-validate` → Launches validation subagent for spec quality checks
+- `sdd-plan-review` → Launches review subagent for multi-model feedback
+- `sdd-update` → Launches update subagent for progress tracking and journaling
+- `run-tests` → Launches testing subagent for test execution and debugging
+- `code-doc` → Launches documentation subagent for codebase analysis
+
+**Other skills** (`sdd-plan`, `sdd-next`, `doc-query`) run directly in the main conversation for tighter integration with your workflow.
+
 ### Commands
 
 **Commands** are interactive workflows you invoke with `/`:

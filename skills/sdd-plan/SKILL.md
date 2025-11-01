@@ -39,6 +39,52 @@ This skill is part of the **Spec-Driven Development** family:
 
 **Your Role (PLAN)**: Create the specification and initial task structure before any implementation begins.
 
+### Subagent Orchestration in the Workflow
+
+After creating a spec with this skill, you'll typically validate and review it using specialized subagents before beginning implementation. Here's the concrete workflow:
+
+**Complete Workflow Example:**
+
+```
+# Step 1: Create Specification
+# (This skill - sdd-plan - generates the JSON spec file)
+
+# Step 2: Validate Specification
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/myspec.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec structure"
+)
+
+# Step 3: Review Specification (Optional but Recommended)
+Task(
+  subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
+  prompt: "Review specs/active/myspec.json with full multi-model review. Evaluate architecture, security, and feasibility.",
+  description: "Multi-model spec review"
+)
+
+# Step 4: Address Review Findings
+# (Make any necessary revisions to the spec based on validation/review feedback)
+
+# Step 5: Final Validation
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/myspec.json one final time before implementation.",
+  description: "Final validation"
+)
+
+# Step 6: Begin Implementation
+# (Use Skill(sdd-toolkit:sdd-next) to find and prepare tasks for implementation)
+```
+
+**Key Points:**
+- **Validation subagent**: Checks JSON structure, hierarchy integrity, and dependency validity
+- **Review subagent**: Multi-model evaluation of architecture, security, and implementation approach
+- **Task tool**: All subagents are invoked via the Task tool with `subagent_type` parameter
+- **Iterative**: You can validate/review/revise multiple times before implementation
+
+For detailed review workflow and metadata tracking, see the [Review Workflow](#review-workflow-using-sdd-plan-review-subagent) section below.
+
 **Planning Modes:**
 - **Staged (Recommended for complex features)**: Generate phase structure → user review → detailed tasks
 - **Direct (For simple features)**: Generate complete specification in one pass
@@ -77,9 +123,11 @@ sdd --help
 
 **Expected output**: Help text showing available commands (validate, fix, report, etc.)
 
-**IMPORTANT - CLI Usage Only**:
-- ✅ **DO**: Use `sdd` CLI wrapper commands (e.g., `sdd validate`, `sdd fix`, `sdd report`)
+**IMPORTANT - Subagent-First Approach**:
+- ✅ **DO**: Use Task tool with subagents for validation and review (e.g., `sdd-validate-subagent`, `sdd-plan-review-subagent`)
+- ✅ **DO**: Use `sdd` CLI for utilities (e.g., `sdd render` for documentation generation)
 - ❌ **DO NOT**: Execute Python scripts directly (e.g., `python sdd_plan.py`, `bash python3 scripts/plan.py`)
+- ❌ **DO NOT**: Use CLI commands for operations that have subagent equivalents
 
 The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail. All spec operations should go through the CLI.
 
@@ -328,9 +376,16 @@ planning tasks.
 Generate documentation now? [Y/n]
 ```
 
-3. **If user agrees**, run the `Skill(sdd-toolkit:code-doc)` skill to generate documentation
+3. **If user agrees**, use Task tool to invoke code-doc subagent for documentation generation:
+```
+Task(
+  subagent_type: "sdd-toolkit:code-doc",
+  prompt: "Generate codebase documentation",
+  description: "Generate docs"
+)
+```
 
-Then invoke `Skill(sdd-toolkit:doc-query)` for codebase analysis.
+Then use Task tool with doc-query subagent for codebase analysis.
 
 4. **If user declines** or generation fails, fall back to manual exploration using `Explore`, or alternatively Glob/Read.
 
@@ -344,11 +399,11 @@ Then invoke `Skill(sdd-toolkit:doc-query)` for codebase analysis.
 
 **Using Existing Documentation:**
 
-If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` to efficiently gather context before planning. This provides structured, comprehensive codebase understanding without manual exploration.
+If codebase documentation has been generated, use Task tool with doc-query subagent to efficiently gather context before planning. This provides structured, comprehensive codebase understanding without manual exploration.
 
 **Recommended Analysis Workflow:**
 
-The `Skill(sdd-toolkit:doc-query)` provides the following capabilities (command examples shown for reference):
+The doc-query subagent provides the following capabilities (command examples shown for reference):
 
 **Step 1: Get Codebase Overview**
 ```bash
@@ -721,14 +776,22 @@ Show progress at every level of hierarchy:
 
 **Automatic Task Count Calculation:**
 
-You don't need to manually calculate task counts - the `sdd fix` command handles this automatically:
+You don't need to manually calculate task counts - the sdd-validate subagent can fix this automatically:
 
-```bash
+```
 # Preview fixes without applying (recommended first step)
-sdd fix specs/active/your-spec.json --preview
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  description: "Preview task count fixes"
+)
 
 # Apply fixes to task counts and hierarchy integrity
-sdd fix specs/active/your-spec.json
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues.",
+  description: "Apply task count fixes"
+)
 ```
 
 **How it works:**
@@ -744,7 +807,7 @@ sdd fix specs/active/your-spec.json
 - Before running sdd-next (ensures accurate counts)
 - Any time counts seem out of sync
 
-**Common pitfall:** Don't manually update `total_tasks` or `completed_tasks` in the JSON - let `sdd fix` or `sdd-update` handle it automatically to avoid arithmetic errors.
+**Common pitfall:** Don't manually update `total_tasks` or `completed_tasks` in the JSON - let the sdd-validate subagent or `sdd-update` handle it automatically to avoid arithmetic errors.
 
 ### Task ID Format
 
@@ -936,7 +999,7 @@ sdd fix specs/active/your-spec.json
 - Read by sdd-next to find next tasks
 - Store in specs/active/, specs/completed/, or specs/archived/
 - Consider adding to .gitignore (user preference)
-- Human-readable views can be generated on-demand using `sdd report`
+- Human-readable views can be generated on-demand using `sdd render`
 
 #### Task Category Metadata
 
@@ -1098,81 +1161,96 @@ The JSON spec file is validated for:
 
 **Validation is JSON-only** - markdown files are optional generated artifacts, not validated.
 
-**Validation tool:**
+**Using the sdd-validate Subagent:**
 
-You have access to a tool for validation called `sdd-validate`.
+To validate specs within Claude Code, invoke the sdd-validate subagent using the Task tool:
 
-**Recommended usage:**
-- Call `sdd validate` while creating or refining specs
-- Use `sdd report` for detailed issue breakdowns and guidance
-- Preview fixes with `sdd fix --preview` before applying
-- Integrate validation into CI/CD or pre-handoff checks before invoking sdd-next
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec file"
+)
+```
 
-#### 2.1 Using sdd-validate
+**When to invoke the subagent:**
+- After creating a new spec (verify initial structure)
+- Before implementation begins (ensure spec is valid)
+- After manual JSON edits (check for errors)
+- When validation errors are suspected (diagnose issues)
 
-The `sdd-validate` CLI is the single interface for spec validation and auto-fixes.
+#### 2.1 Using the sdd-validate Subagent
 
-**Core Commands:**
-- `validate` – Validate JSON spec structure (exit codes: 0 valid, 1 warnings, 2 errors)
-- `report` – Generate Markdown/JSON reports with actionable guidance
-- `fix` – Preview/apply auto-fixes for common hierarchy and metadata issues
-- `stats` – Summarize hierarchy size, verification coverage, and complexity metrics
+The sdd-validate subagent provides validation, reporting, fixing, and statistics operations for spec files.
 
-**Common Options:**
-- `--json` – JSON output (available on most commands)
-- `--quiet` / `-q` – Errors only
-- `--verbose` / `-v` – Include extra context
-- `--preview` / `--dry-run` – Show proposed fixes without writing (for `fix`)
+**Core Operations:**
+- **validate** – Validate JSON spec structure and integrity
+- **report** – Generate detailed analysis with actionable guidance
+- **fix** – Preview/apply auto-fixes for common hierarchy and metadata issues
+- **stats** – Summarize hierarchy size, verification coverage, and complexity metrics
 
-##### validate (Recommended)
+##### Validate Operation (Recommended)
 
 Validates the JSON spec file structure, hierarchy, and integrity.
 
-**Usage:**
-```bash
-# Validate JSON spec file
-sdd validate specs/active/your-spec.json
-
-# JSON output for programmatic use
-sdd validate specs/active/your-spec.json --json
+**Invocation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec file"
+)
 ```
 
-##### report
+##### Report Operation
 
 Produces in-depth analysis, grouped by severity, with suggested remedies.
 
-**Usage:**
-```bash
-# Print Markdown report
-sdd report specs/active/your-spec.json
-
-# Save to file
-sdd report specs/active/your-spec.json --output specs/reports/your-spec.md
+**Invocation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Generate a detailed validation report for specs/active/your-spec.json. Save the report to specs/reports/your-spec.md.",
+  description: "Generate validation report"
+)
 ```
 
-##### fix
+##### Fix Operation
 
-Automatically fixes common JSON spec issues. Always preview first.
+Automatically fixes common JSON spec issues. Preview before applying.
 
-**Usage:**
-```bash
-# Preview fixes without applying
-sdd fix specs/active/your-spec.json --preview
-
-# Apply fixes once reviewed
-sdd fix specs/active/your-spec.json
+**Invocation for preview:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  description: "Preview spec fixes"
+)
 ```
 
-##### stats (Optional)
+**Invocation to apply fixes:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues and validate afterward.",
+  description: "Apply spec fixes"
+)
+```
+
+##### Stats Operation (Optional)
 
 Summarizes hierarchy composition, depth, and verification footprint.
 
-**Usage:**
-```bash
-sdd stats specs/active/your-spec.json
+**Invocation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Generate comprehensive statistics for specs/active/your-spec.json. Include quality score, progress metrics, and completeness analysis.",
+  description: "Generate spec statistics"
+)
 ```
 
-**Note:** JSON remains the source of truth. Markdown reports generated via `sdd-validate` are helpful for review, but edits must be made in the JSON and re-rendered.
+**Note:** JSON remains the source of truth. Markdown reports generated via the subagent are helpful for review, but edits must be made in the JSON and re-rendered.
 
 ### Phase 3: Rendering Specs to Human-Readable Markdown
 
@@ -1279,12 +1357,17 @@ The rendered markdown includes:
 - For archival documentation of completed work
 
 **Integration with Workflow:**
-```bash
+```
 # 1. Create spec (this skill)
-# 2. Validate
-sdd validate specs/active/my-spec.json
 
-# 3. Render for review
+# 2. Validate with subagent
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/my-spec.json",
+  description: "Validate spec"
+)
+
+# 3. Render for review (CLI command)
 sdd render my-spec --path specs
 
 # 4. Share rendered markdown for team feedback
@@ -1298,24 +1381,18 @@ sdd render my-spec --path specs
 
 **Before sdd-next Usage:**
 
-Run validation to ensure the JSON spec file is properly formatted:
+Invoke the sdd-validate subagent to ensure the JSON spec file is properly formatted:
 
-```bash
-# Validate JSON spec file (recommended)
-sdd validate specs/active/your-spec.json
-
-# Check validation status
-echo $?  # 0 = valid, 1 = warnings, 2 = errors
-
-# Generate detailed report for review
-sdd report specs/active/your-spec.json --output specs/reports/your-spec.md
-
-# Quiet mode for CI/CD pipelines
-sdd validate specs/active/your-spec.json --quiet
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec before implementation"
+)
 ```
 
 **Required for sdd-next:**
-- ✅ All errors must be fixed (exit code 0 or 1)
+- ✅ All errors must be fixed
 - ✅ Hierarchy integrity maintained
 - ✅ Task counts are accurate across hierarchy
 - ✅ All required fields present
@@ -1325,26 +1402,36 @@ sdd validate specs/active/your-spec.json --quiet
 
 | Error Type | Solution |
 |------------|----------|
-| Task count mismatch | Run `sdd fix --preview` or regenerate spec file manually |
-| Hierarchy integrity issues | Use `sdd fix` or check parent/child references manually |
-| Missing required fields | Add missing fields, then re-run validation |
+| Task count mismatch | Use auto-fix via subagent or regenerate spec file manually |
+| Hierarchy integrity issues | Use auto-fix via subagent or check parent/child references manually |
+| Missing required fields | Add missing fields, then re-validate with subagent |
 | Invalid dependencies | Check dependency IDs match actual task IDs |
 | Circular dependencies | Remove or adjust blocking relationships |
 
 **Auto-Fix Workflow:**
 
-If validation fails with fixable errors, use the auto-fix command:
+If validation fails with fixable errors, use the sdd-validate subagent to preview and apply fixes:
 
-```bash
-# 1. Preview fixes (dry-run)
-sdd fix specs/active/your-spec.json --preview
-
-# 2. Apply fixes if preview looks good
-sdd fix specs/active/your-spec.json
-
-# 3. Re-validate to confirm all issues resolved
-sdd validate specs/active/your-spec.json
+**Step 1: Preview fixes**
 ```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  description: "Preview fixes"
+)
+```
+
+**Step 2: Apply fixes if preview looks good**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues and validate afterward.",
+  description: "Apply fixes"
+)
+```
+
+**Step 3: Validation confirmation**
+The subagent will automatically re-validate after applying fixes and report the results.
 
 ## Best Practices
 
@@ -1354,7 +1441,7 @@ sdd validate specs/active/your-spec.json
 - **Think ahead**: Consider maintenance, testing, and documentation needs
 - **Stay grounded**: Base plans on actual codebase exploration, not assumptions
 
-### Review Workflow (Integration with `Skill(sdd-toolkit:sdd-plan-review)`)
+### Review Workflow (Using sdd-plan-review Subagent)
 
 After creating and validating a spec, consider having it reviewed before implementation:
 
@@ -1371,30 +1458,43 @@ not_reviewed (default) → in_review → reviewed → approved → implementatio
 - `reviewed`: Review complete, may have issues to address
 - `approved`: Review issues addressed, ready for implementation
 
-**Review Integration:**
-1. **Create & Validate**: Use `Skill(sdd-toolkit:sdd-plan)` to create spec, validate with `validate-all`
-2. **Review**: Use `Skill(sdd-toolkit:sdd-plan-review)` to get multi-perspective feedback
+**Review Integration (Complete Multi-Skill Workflow):**
+1. **Create & Validate**: Create spec (this skill), then validate with sdd-validate-subagent (see example workflow below)
+2. **Review**: Use Task tool with `sdd-plan-review-subagent` to get multi-perspective feedback
 3. **Revise**: Address critical/high issues found in review
 4. **Track**: Review metadata automatically added to spec frontmatter
 5. **Link**: Revisions can reference the review that triggered them
 
+**Note on Subagent Pattern**: The review process uses the Task tool to invoke a specialized subagent (`sdd-plan-review-subagent`), similar to how validation uses `sdd-validate-subagent`. This allows Claude Code to run multi-model reviews in parallel using external AI tools. See the example workflow below for the exact invocation pattern.
+
 **Example Workflow:**
-```bash
-# 1. Create spec
-# (Use Skill(sdd-toolkit:sdd-plan) skill)
+```
+# 1. Create spec (done via sdd-plan skill - you're here after completing that)
 
-# 2. Validate JSON spec file
-sdd validate specs/active/myspec.json
+# 2. Validate JSON spec file with subagent
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/myspec.json",
+  description: "Validate spec"
+)
 
-# 3. Review spec (sdd-plan-review runs validation automatically)
-sdd-review review-spec specs/active/myspec.json --type full --auto-fix
+# 3. Review spec (use sdd-plan-review subagent)
+Task(
+  subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
+  prompt: "Review specs/active/myspec.json with full multi-model review",
+  description: "Review spec"
+)
 
 # 4. Address review findings, update spec metadata
 #    - Update revisions[] with context
 #    - Track review history in metadata.review.history[]
 
 # 5. Re-run validation before handoff
-sdd validate specs/active/myspec.json --json
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/myspec.json",
+  description: "Final validation"
+)
 
 # 6. Begin implementation with Skill(sdd-toolkit:sdd-next)
 ```
@@ -1500,7 +1600,7 @@ Spec already exists and needs modification?
 ├─ Minor updates (status, metadata, journal)
 │   └─ Use `Skill(sdd-toolkit:sdd-update)`
 └─ Major restructuring (new phases, tasks)
-    └─ Use `Skill(sdd-toolkit:sdd-plan)` to generate new plan
+    └─ Re-invoke this skill to generate new plan
 ```
 
 ## Quick Reference
