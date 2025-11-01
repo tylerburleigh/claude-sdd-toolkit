@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 
 from claude_skills.context_tracker.parser import parse_transcript
+from claude_skills.context_tracker.process_utils import (
+    find_session_by_pid,
+    is_pid_alive,
+    get_parent_pids
+)
 from claude_skills.common import PrettyPrinter
 
 
@@ -78,15 +83,15 @@ def get_cached_transcript_path():
     """
     Load transcript path from cache for current working directory.
 
-    Uses open file detection to identify which transcript is actively being
-    written to, enabling correct session detection even with multiple concurrent
-    Claude Code sessions in the same directory.
+    Uses multi-layered detection to identify which transcript belongs to the
+    current Claude Code session, enabling correct session detection even with
+    multiple concurrent sessions in the same directory.
 
-    Strategy:
-    1. Load all cached transcript paths for this directory
-    2. Check which one is currently open for writing (using lsof)
-    3. Return the actively-written transcript
-    4. Fallback to most recently modified if detection fails
+    Detection Strategy (in order of priority):
+    1. PID-based: Match current process tree to cached session PPIDs
+    2. Environment variable: Check CLAUDE_SESSION_ID
+    3. File writing detection: Check which transcript is open for writing (lsof)
+    4. Fallback: Most recently modified transcript (last resort)
 
     Returns:
         Cached transcript path or None if not found
@@ -118,20 +123,59 @@ def get_cached_transcript_path():
         if not sessions:
             return None
 
-        # Collect all transcript paths
+        # Clean stale sessions (optional, improves accuracy)
+        _clean_stale_sessions(dir_entry)
+
+        # Strategy 1: PID-based detection (most reliable)
+        session_id = find_session_by_pid(dir_entry)
+        if session_id and session_id in sessions:
+            transcript_path = sessions[session_id].get("transcript_path")
+            if transcript_path and Path(transcript_path).exists():
+                return transcript_path
+
+        # Strategy 2: Environment variable detection
+        env_session_id = os.environ.get("CLAUDE_SESSION_ID")
+        if env_session_id and env_session_id in sessions:
+            transcript_path = sessions[env_session_id].get("transcript_path")
+            if transcript_path and Path(transcript_path).exists():
+                return transcript_path
+
+        # Strategy 3: File writing detection (existing lsof method)
         transcript_paths = [
             s.get("transcript_path")
             for s in sessions.values()
             if s.get("transcript_path")
         ]
-
-        # Find which transcript is actively being written to
         for path in transcript_paths:
             if is_file_open_for_writing(path):
                 return path
 
-        # Fallback: use most recently modified transcript file
-        valid_paths = [p for p in transcript_paths if Path(p).exists()]
+        # Strategy 4: Fallback to most recently modified transcript
+        # Only consider sessions with alive PIDs or recent timestamps
+        valid_paths = []
+        import time
+        current_time = time.time()
+
+        for session_id, session_data in sessions.items():
+            path = session_data.get("transcript_path")
+            if not path or not Path(path).exists():
+                continue
+
+            # Check if session is likely still active
+            ppid = session_data.get("ppid")
+            started_at = session_data.get("started_at", 0)
+
+            # Consider session valid if:
+            # 1. PID is still alive, OR
+            # 2. Session started less than 24 hours ago (generous window)
+            is_valid = (
+                (ppid and is_pid_alive(ppid)) or
+                (current_time - started_at < 86400)
+            )
+
+            if is_valid:
+                valid_paths.append(path)
+
         if valid_paths:
             most_recent_file = max(
                 valid_paths,
@@ -145,6 +189,50 @@ def get_cached_transcript_path():
         pass
 
     return None
+
+
+def _clean_stale_sessions(dir_entry):
+    """
+    Remove sessions with dead PIDs from the cache entry.
+
+    Modifies dir_entry in place.
+
+    Args:
+        dir_entry: Directory entry from cache with 'sessions' dict
+    """
+    import time
+
+    sessions = dir_entry.get("sessions", {})
+    if not sessions:
+        return
+
+    current_time = time.time()
+    stale_session_ids = []
+
+    for session_id, session_data in sessions.items():
+        ppid = session_data.get("ppid")
+        started_at = session_data.get("started_at", 0)
+
+        # Mark as stale if:
+        # 1. Has PPID but it's dead, AND
+        # 2. Session is older than 1 hour
+        if ppid and not is_pid_alive(ppid):
+            age = current_time - started_at
+            if age > 3600:  # 1 hour
+                stale_session_ids.append(session_id)
+
+    # Remove stale sessions
+    for session_id in stale_session_ids:
+        del sessions[session_id]
+
+    # Update most_recent if it was removed
+    most_recent = dir_entry.get("most_recent")
+    if most_recent in stale_session_ids and sessions:
+        # Set most_recent to the session with highest timestamp
+        dir_entry["most_recent"] = max(
+            sessions.keys(),
+            key=lambda sid: sessions[sid].get("timestamp", 0)
+        )
 
 
 def format_number(n: int) -> str:

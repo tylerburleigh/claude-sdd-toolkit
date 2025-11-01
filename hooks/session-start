@@ -51,6 +51,10 @@ try:
     cwd = os.getcwd()
 
     if transcript_path and session_id:
+        # Get parent PID (PPID) for session identification
+        ppid = os.getppid()
+        current_time = int(time.time())
+
         # Load existing cache
         cache_file = '$TRANSCRIPT_CACHE_FILE'
         cache = {}
@@ -65,10 +69,12 @@ try:
         if cwd not in cache:
             cache[cwd] = {'sessions': {}}
 
-        # Add/update this session
+        # Add/update this session with enhanced data
         cache[cwd]['sessions'][session_id] = {
             'transcript_path': transcript_path,
-            'timestamp': int(time.time())
+            'timestamp': current_time,
+            'started_at': current_time,
+            'ppid': ppid
         }
 
         # Mark as most recent
@@ -81,6 +87,7 @@ try:
 
         # Also set environment variable for this session
         print(f'CLAUDE_SESSION_ID={session_id}')
+        print(f'CLAUDE_SESSION_PPID={ppid}')
 except Exception as e:
     pass
 " 2>/dev/null)
