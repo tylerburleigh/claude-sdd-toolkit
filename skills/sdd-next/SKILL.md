@@ -690,7 +690,7 @@ Use `Skill(sdd-toolkit:sdd-next)` when:
 
 **Do NOT use for:**
 - Creating new specifications (use `Skill(sdd-toolkit:sdd-plan)`)
-- Updating task status or progress (use `Skill(sdd-toolkit:sdd-update)`)
+- Updating task status or progress (use sdd-update subagent)
 - Actual code implementation (use appropriate coding tools)
 - Quick bug fixes or one-off changes
 - Work outside of a spec-driven workflow
@@ -709,14 +709,14 @@ Use `Skill(sdd-toolkit:sdd-next)` when:
   - Hand off to coding tools (Claude, Cursor, human developers)
   - Execution plan guides the actual code writing
 
-→ **To Skill(sdd-toolkit:sdd-update)**:
+→ **To sdd-update subagent**:
   - Before starting implementation (mark task in_progress)
   - After completing implementation (mark task completed)
   - When encountering blockers (document issue)
   - When making deviations from plan (journal decision)
   - After task completion, to unlock dependent tasks
 
-← **From Skill(sdd-toolkit:sdd-update)**:
+← **From sdd-update subagent**:
   - After a task is completed, find the next task
   - After resolving a blocker, resume work
   - After updating progress, continue to next work item
@@ -731,8 +731,8 @@ Have a spec already?
 What do you need to do?
 ├─ Find next task to work on → Use `Skill(sdd-toolkit:sdd-next)` (this skill)
 ├─ Create execution plan → Use `Skill(sdd-toolkit:sdd-next)` (this skill)
-├─ Update task status → Use `Skill(sdd-toolkit:sdd-update)`
-├─ Journal a decision → Use `Skill(sdd-toolkit:sdd-update)`
+├─ Update task status → Use sdd-update subagent
+├─ Journal a decision → Use sdd-update subagent
 ├─ Actually write code → Use implementation tools (after Developer creates plan)
 └─ Create new spec → Use `Skill(sdd-toolkit:sdd-plan)`
 
@@ -740,7 +740,7 @@ Ready to implement?
 ├─ Don't know which task → Use this skill to identify next task
 ├─ Know the task, need plan → Use this skill to create execution plan
 ├─ Have plan, ready to code → Hand off to implementation tools
-└─ Task complete → Use `Skill(sdd-toolkit:sdd-update)` to update status
+└─ Task complete → Use sdd-update subagent to update status
 ```
 
 ## The Developer Workflow
@@ -1766,6 +1766,16 @@ The CLI intentionally does NOT include "Ready to proceed" options - that's Claud
 
 **After completing the implementation and all verification steps:**
 
+⚠️ **CRITICAL - Always Use Subagent, Not CLI Directly**
+
+When updating task status, you MUST use the sdd-update subagent:
+- ✅ **CORRECT**: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", ...)`
+- ❌ **WRONG**: `sdd update-status` via Bash tool
+
+The subagent provides additional workflow management that direct CLI calls bypass.
+
+---
+
 1. **Verify Phase Completion Status (Optional)**
 ```bash
 # Check if current phase can be marked complete after this task
@@ -1776,17 +1786,17 @@ sdd check-complete {SPEC_ID} --phase phase-2
 
 2. **Update Task Status**
 
-Use `Skill(sdd-toolkit:sdd-update)` to mark the task as completed.
+Use the sdd-update subagent to mark the task as completed:
 
-**Information to provide:**
-- Spec ID and Task ID
-- New status: `completed`
-- Completion note: "Implementation finished and verified"
-- **Actual hours**: Time spent implementing (if trackable) - enables variance analysis
-- **Entry type**: `status_change` (or `deviation`, `decision` if applicable)
-- **Author**: Attribution (e.g., "claude-sonnet-4.5" or developer name)
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-update-subagent",
+  prompt: "Mark task {task-id} in spec {spec-id} as completed. Note: Implementation finished and verified. Actual hours: {hours}.",
+  description: "Mark task completed"
+)
+```
 
-**What sdd-update will do:**
+**What the subagent will do:**
 - Update the task status in the spec file
 - Record completion timestamp and actual hours
 - Automatically recalculate progress across the hierarchy
@@ -1796,21 +1806,17 @@ Use `Skill(sdd-toolkit:sdd-update)` to mark the task as completed.
 
 3. **Document Deviations (if any)**
 
-If implementation deviated from plan, use `Skill(sdd-toolkit:sdd-update)` to add a journal entry.
+If implementation deviated from plan, use the sdd-update subagent to add a journal entry:
 
-**Information to provide:**
-- Spec file path
-- Task ID (links journal to task, clears `needs_journaling` flag)
-- Journal title: "Implementation Notes: {TASK_ID}"
-- Entry type: `deviation` (or `decision`, `note` as appropriate)
-- Author: Attribution
-- Journal content with structured information:
-  - **What changed**: Specific deviations from plan
-  - **Why**: Rationale and justification
-  - **Testing**: Verification performed
-  - **Impact**: Effect on dependent tasks or architecture
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-update-subagent",
+  prompt: "Add journal entry to spec {spec-id} for task {task-id}. Title: 'Implementation Notes: {task-id}'. Entry type: deviation. Content: [What changed, Why, Testing performed, Impact on dependent tasks].",
+  description: "Journal deviation"
+)
+```
 
-**What sdd-update will do:**
+**What the subagent will do:**
 - Add timestamped journal entry to spec metadata
 - Link entry to specific task (if task ID provided)
 - Clear `needs_journaling` flag on the task
@@ -1844,7 +1850,7 @@ When providing information to sdd-update, consider including:
 
 Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
 
-**Remember:** Always use `Skill(sdd-toolkit:sdd-update)` after completion to:
+**Remember:** Always use the sdd-update subagent after completion to:
 - Keep the spec file current
 - Unlock dependent tasks waiting on this work
 - Maintain accurate progress tracking
@@ -1897,7 +1903,23 @@ AskUserQuestion(
 Based on the user's selection:
 
 **If user selects "Approve":**
-- Mark task as in_progress (handoff to `Skill(sdd-toolkit:sdd-update)`)
+
+⚠️ **CRITICAL - Always Use Subagent, Not CLI Directly**
+
+When updating task status, you MUST use the sdd-update subagent:
+- ✅ **CORRECT**: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", ...)`
+- ❌ **WRONG**: `sdd update-status` via Bash tool
+
+The subagent provides additional workflow management that direct CLI calls bypass.
+
+- Mark task as in_progress using sdd-update subagent:
+  ```
+  Task(
+    subagent_type: "sdd-toolkit:sdd-update-subagent",
+    prompt: "Mark task {task-id} in spec {spec-id} as in_progress. Note: Starting implementation per approved execution plan.",
+    description: "Mark task in_progress"
+  )
+  ```
 - Begin implementation or hand off to implementation tools
 - Follow the execution plan
 
@@ -1999,7 +2021,14 @@ Steps:
 1. Identify next logical task (task-3-1)
 2. Check dependencies
 3. Discover blocker (e.g., Redis not configured)
-4. Document blocker with `Skill(sdd-toolkit:sdd-update)`
+4. Document blocker using sdd-update subagent:
+   ```
+   Task(
+     subagent_type: "sdd-toolkit:sdd-update-subagent",
+     prompt: "Mark task {task-id} as blocked. Reason: Redis server not configured. Type: dependency.",
+     description: "Document blocker"
+   )
+   ```
 5. Find alternative tasks and present to user:
    - Parallel-safe task from same phase
    - Task from different phase
@@ -2119,7 +2148,14 @@ Steps:
 1. Start implementing task per plan
 2. Discover issue (e.g., API different than expected)
 3. Pause implementation
-4. Document deviation with `Skill(sdd-toolkit:sdd-update)`
+4. Document deviation using sdd-update subagent:
+   ```
+   Task(
+     subagent_type: "sdd-toolkit:sdd-update-subagent",
+     prompt: "Add journal entry for task {task-id}. Type: deviation. Content: [describe what changed and why].",
+     description: "Document deviation"
+   )
+   ```
 5. Analyze the deviation and use `AskUserQuestion` to get user decision:
 
 **Present context:**
@@ -2318,7 +2354,14 @@ AskUserQuestion(
 ```
 
 6. Based on user selection:
-   - If "Approve & Complete": Use `Skill(sdd-toolkit:sdd-update)` to mark task completed
+   - If "Approve & Complete": Use sdd-update subagent to mark task completed:
+     ```
+     Task(
+       subagent_type: "sdd-toolkit:sdd-update-subagent",
+       prompt: "Mark verification task {verify-id} as completed. Note: Verification passed - [brief summary of findings].",
+       description: "Mark verification complete"
+     )
+     ```
    - If "Request Changes": Ask for specifics, perform additional verification
    - If "Review Details": Show requested details, then re-ask with AskUserQuestion
    - If "Defer": Document findings and exit gracefully
@@ -2561,7 +2604,7 @@ Bridge specifications to implementation by identifying next tasks, gathering con
 
 **Integration Points:**
 - Reads specs created by `Skill(sdd-toolkit:sdd-plan)`
-- Updates status using `Skill(sdd-toolkit:sdd-update)`
+- Updates status using sdd-update subagent
 - Enables handoff to coding tools
 - Coordinates multi-developer workflows
 
@@ -2575,13 +2618,15 @@ Bridge specifications to implementation by identifying next tasks, gathering con
 - Generate initial spec files
 - Set up the project structure
 
-**Skill(sdd-toolkit:sdd-update)** - Use alongside this skill to:
+**sdd-update subagent** - Use alongside this skill to:
 - Mark tasks as in_progress before implementing
 - Mark tasks as completed after implementing
 - Document deviations and decisions during implementation
 - Track progress and update metrics
 - Journal verification results
 
+Use via: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", prompt: "...", description: "...")`
+
 ---
 
-*For creating specifications, use `Skill(sdd-toolkit:sdd-plan)`. For tracking progress, use `Skill(sdd-toolkit:sdd-update)`.*
+*For creating specifications, use `Skill(sdd-toolkit:sdd-plan)`. For tracking progress, use the sdd-update subagent.*

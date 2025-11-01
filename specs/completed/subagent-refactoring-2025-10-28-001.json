@@ -1,7 +1,7 @@
 {
   "spec_id": "subagent-refactoring-2025-10-28-001",
   "generated": "2025-10-28T00:00:00Z",
-  "last_updated": "2025-11-01T15:19:00.610870Z",
+  "last_updated": "2025-11-01T16:19:41.193933Z",
   "metadata": {
     "status": "completed",
     "priority": "high",
@@ -101,7 +101,9 @@
       "metadata": {
         "task_category": "implementation",
         "file_path": "skills/subagents/sdd-update/SKILL.md",
-        "description": "Create subagent that invokes sdd-update CLI and reports status changes, journal entries, or time tracking results"
+        "description": "Create subagent that invokes sdd-update CLI and reports status changes, journal entries, or time tracking results",
+        "actual_hours": 5.0,
+        "status_note": "Completed and tested with new CLI command"
       }
     },
     "task-1-1-1": {

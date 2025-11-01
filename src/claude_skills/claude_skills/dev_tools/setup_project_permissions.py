@@ -44,7 +44,6 @@ SDD_PERMISSIONS = [
     "Bash(codex:*)",
 
     # File access permissions
-    "Read(//**/specs/**)",
     "Write(//**/specs/active/**)",
     "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",

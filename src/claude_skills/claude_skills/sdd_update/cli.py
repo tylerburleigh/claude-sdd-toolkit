@@ -16,6 +16,7 @@ from pathlib import Path
 # Import shared utilities
 from claude_skills.common import find_specs_directory, PrettyPrinter
 from claude_skills.common import execute_verify_task, load_json_spec
+from claude_skills.common.spec import update_node, save_json_spec
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -793,6 +794,86 @@ def cmd_sync_metadata(args, printer):
     return 0 if success else 1
 
 
+def cmd_update_task_metadata(args, printer):
+    """Update task metadata fields."""
+    printer.action(f"Updating metadata for task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Collect metadata updates from args (8 fields)
+    metadata_updates = {}
+
+    # Collect each field if provided
+    if hasattr(args, 'file_path') and args.file_path:
+        metadata_updates['file_path'] = args.file_path
+    if hasattr(args, 'description') and args.description:
+        metadata_updates['description'] = args.description
+    if hasattr(args, 'task_category') and args.task_category:
+        metadata_updates['task_category'] = args.task_category
+    if hasattr(args, 'actual_hours') and args.actual_hours is not None:
+        metadata_updates['actual_hours'] = args.actual_hours
+    if hasattr(args, 'status_note') and args.status_note:
+        metadata_updates['status_note'] = args.status_note
+    if hasattr(args, 'verification_type') and args.verification_type:
+        metadata_updates['verification_type'] = args.verification_type
+    if hasattr(args, 'skill') and args.skill:
+        metadata_updates['skill'] = args.skill
+    if hasattr(args, 'command') and args.command:
+        metadata_updates['command'] = args.command
+
+    # Validate that at least one metadata field was provided
+    if not metadata_updates:
+        printer.error("No metadata fields provided. Use --help to see available options.")
+        return 1
+
+    # Load JSON spec file
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load JSON spec file for {args.spec_id}")
+        return 1
+
+    # Verify task exists in hierarchy
+    hierarchy = spec_data.get("hierarchy", {})
+    if args.task_id not in hierarchy:
+        printer.error(f"Task '{args.task_id}' not found in spec {args.spec_id}")
+        return 1
+
+    # Show preview of changes
+    task = hierarchy[args.task_id]
+    current_metadata = task.get("metadata", {})
+
+    if args.dry_run:
+        printer.info(f"Would update task {args.task_id} ({task.get('title', 'Untitled')})")
+        printer.info("Metadata changes:")
+        for key, new_value in metadata_updates.items():
+            old_value = current_metadata.get(key, "(not set)")
+            printer.detail(f"  {key}: {old_value} → {new_value}")
+        printer.info("\nNo changes made (--dry-run mode)")
+        return 0
+
+    # Update the task metadata
+    updates = {"metadata": metadata_updates}
+    if not update_node(spec_data, args.task_id, updates):
+        printer.error(f"Failed to update task {args.task_id}")
+        return 1
+
+    # Save the updated spec file with backup
+    if not save_json_spec(args.spec_id, specs_dir, spec_data, backup=True):
+        printer.error(f"Failed to save spec file for {args.spec_id}")
+        return 1
+
+    # Success message
+    printer.success(f"Task {args.task_id} metadata updated successfully")
+    printer.info("Updated fields:")
+    for key, value in metadata_updates.items():
+        printer.detail(f"  {key}: {value}")
+
+    return 0
+
+
 def register_update(subparsers, parent_parser):
     """
     Register 'update' subcommands for unified CLI.
@@ -1020,3 +1101,27 @@ def register_update(subparsers, parent_parser):
     p_sync_meta.add_argument("spec_id", help="Specification ID")
     p_sync_meta.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
     p_sync_meta.set_defaults(func=cmd_sync_metadata)
+
+    # update-task-metadata command
+    p_update_meta = subparsers.add_parser(
+        "update-task-metadata",
+        help="Update task metadata fields",
+        parents=[parent_parser]
+    )
+    p_update_meta.add_argument("spec_id", help="Specification ID")
+    p_update_meta.add_argument("task_id", help="Task ID to update")
+
+    # The 8 metadata field flags
+    p_update_meta.add_argument("--file-path", dest="file_path", help="File path for this task")
+    p_update_meta.add_argument("--description", help="Task description")
+    p_update_meta.add_argument("--task-category", dest="task_category", help="Task category (implementation, testing, etc.)")
+    p_update_meta.add_argument("--actual-hours", dest="actual_hours", type=float, help="Actual hours spent on task")
+    p_update_meta.add_argument("--status-note", dest="status_note", help="Status note or completion note")
+    p_update_meta.add_argument("--verification-type", dest="verification_type", help="Verification type (auto, manual, none)")
+    p_update_meta.add_argument("--skill", help="Skill or tool used")
+    p_update_meta.add_argument("--command", help="Command executed")
+
+    # Standard flags
+    p_update_meta.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+
+    p_update_meta.set_defaults(func=cmd_update_task_metadata)
