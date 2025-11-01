@@ -1423,8 +1423,15 @@ sdd status-report user-auth-001 --json
 ```
 
 **Validate spec file integrity:**
-```bash
-sdd validate-spec user-auth-001
+
+Use the sdd-validate subagent for comprehensive spec validation:
+
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/user-auth-001.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec file"
+)
 ```
 
 **Deep audit of spec file:**
@@ -1894,12 +1901,20 @@ sdd query-tasks {spec-id} --status pending --format simple
 
 ### Validation
 
-Use the CLI tools for comprehensive validation:
+Use the sdd-validate subagent for comprehensive spec validation:
+
+```
+# Validate spec structure and dependencies
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/{spec-id}.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec file"
+)
+```
+
+For deep audits (circular dependencies, metadata completeness), use the CLI tool:
 
 ```bash
-# Quick validation check
-sdd validate-spec {spec-id}
-
 # Deep audit (checks for circular dependencies, metadata completeness)
 sdd audit-spec {spec-id}
 

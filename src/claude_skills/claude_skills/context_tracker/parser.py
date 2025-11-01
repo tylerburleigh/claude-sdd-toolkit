@@ -22,6 +22,37 @@ class TokenMetrics:
         return (self.context_length / max_context) * 100 if max_context > 0 else 0.0
 
 
+def is_clear_command(entry: dict) -> bool:
+    """
+    Check if a transcript entry is a /clear command.
+
+    The /clear command resets the conversation context, so we should
+    reset token counters when we encounter it.
+
+    Args:
+        entry: A parsed JSONL entry from the transcript
+
+    Returns:
+        True if this entry represents a /clear command
+    """
+    if entry.get('type') != 'user':
+        return False
+
+    message = entry.get('message', {})
+    content = message.get('content', [])
+
+    if not content or not isinstance(content, list):
+        return False
+
+    for item in content:
+        if isinstance(item, dict):
+            text = item.get('text', '')
+            if '<command-name>/clear</command-name>' in text:
+                return True
+
+    return False
+
+
 def parse_transcript(transcript_path: str | Path) -> Optional[TokenMetrics]:
     """
     Parse a Claude Code transcript JSONL file and extract token metrics.
@@ -53,6 +84,14 @@ def parse_transcript(transcript_path: str | Path) -> Optional[TokenMetrics]:
                     entry = json.loads(line)
                 except json.JSONDecodeError:
                     continue
+
+                # Check for /clear command - reset all counters
+                if is_clear_command(entry):
+                    input_tokens = 0
+                    output_tokens = 0
+                    cached_tokens = 0
+                    context_length = 0
+                    continue  # Don't process /clear entry itself
 
                 # Skip sidechain and error messages
                 if entry.get("isSidechain") or entry.get("isApiErrorMessage"):

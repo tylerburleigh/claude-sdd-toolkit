@@ -231,7 +231,7 @@ The `prepare-task` command includes two automatic enhancements:
 
 1. **Spec Validation**: Validates the JSON spec file before proceeding.
 
-   **Critical errors:** If critical errors are found, stops and shows clear error messages with suggested fixes (e.g., `sdd fix spec-id.json`). You must address critical errors before proceeding.
+   **Critical errors:** If critical errors are found, stops and shows clear error messages with suggested fixes. You must address critical errors before proceeding using the sdd-validate subagent.
 
    **Non-critical warnings:** Displayed as informational text and automatically continues. The workflow is not blocked by non-critical warnings.
 
@@ -244,7 +244,7 @@ The `prepare-task` command includes two automatic enhancements:
    3. Circular dependency detected in task-4-5 (low impact)
 
    These warnings don't prevent task preparation but may affect tracking accuracy.
-   You can fix them later with: sdd validate --fix SPEC_ID
+   You can fix them later using the sdd-validate subagent (see Manual Spec Validation section).
 
    Continuing with task preparation...
    ```
@@ -262,6 +262,61 @@ The `prepare-task` command includes two automatic enhancements:
 ```bash
 sdd prepare-task SPEC_ID --path /absolute/path/to/specs
 ```
+
+### Manual Spec Validation (Optional)
+
+While `prepare-task` includes automatic spec validation, you may want to validate a spec independently before task preparation. This is useful for:
+
+- **Pre-validation**: Checking spec quality before beginning implementation
+- **Debugging**: Diagnosing spec issues when `prepare-task` fails
+- **Quality assurance**: Ensuring spec meets standards before team handoff
+- **Iterative refinement**: Validating after manual spec edits
+
+**Invoke the sdd-validate subagent:**
+
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/SPEC_ID.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec structure"
+)
+```
+
+**Common validation scenarios:**
+
+**1. Basic validation check:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/user-auth-001.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec file"
+)
+```
+
+**2. Preview auto-fixes before applying:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Preview auto-fixes for specs/active/user-auth-001.json. Show what would be changed without applying.",
+  description: "Preview spec fixes"
+)
+```
+
+**3. Generate detailed validation report:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Generate a detailed validation report for specs/active/user-auth-001.json. Save the report to specs/reports/user-auth-001.md.",
+  description: "Generate validation report"
+)
+```
+
+**When to use manual validation vs automatic:**
+
+- **Automatic (via prepare-task)**: Default for normal task preparation workflow. Validates on-the-fly and reports issues.
+- **Manual (via subagent)**: When you need validation independent of task preparation, want detailed reports, or are debugging spec issues.
+
+For complete validation workflow details, see the [sdd-plan skill validation documentation](../sdd-plan/SKILL.md#validation-workflow-using-sdd-validate-subagent).
 
 ## Quick Start: Automated vs Manual Workflow
 
@@ -291,6 +346,31 @@ sdd prepare-task SPEC_ID
 # - Returns everything needed for execution plan
 # Tip: add --json to capture structured output you can reuse for planning
 ```
+
+**Optional: Validate spec before task preparation**
+
+For critical projects or when spec quality is uncertain, validate the spec first using the sdd-validate subagent:
+
+```
+# Validate spec before preparing tasks
+Task(
+  subagent_type: "sdd-toolkit:sdd-validate-subagent",
+  prompt: "Validate specs/active/SPEC_ID.json. Check for structural errors, missing fields, and dependency issues.",
+  description: "Validate spec before task prep"
+)
+
+# Then prepare task if validation passes
+sdd prepare-task SPEC_ID
+```
+
+**When to validate first:**
+- Working with newly created or manually edited specs
+- Critical production implementations
+- Specs with complex dependency chains
+- After major spec modifications
+- When prepare-task returns unexpected results
+
+For more validation options, see [Manual Spec Validation](#manual-spec-validation-optional) section.
 
 **Skip to:** Phase 4 (Execution Plan Creation) after `prepare-task` succeeds
 
@@ -381,9 +461,75 @@ You have access to the `sdd` command.
 
 The following tools are **optional** but can significantly enhance context gathering during task preparation. These tools are not required for core sdd-next functionality, but provide automated code analysis and documentation lookup when available.
 
+### Generating Documentation for Context (Optional)
+
+Before you can query codebase documentation for context, the documentation must first be generated. Use the code-doc subagent to create comprehensive codebase documentation.
+
+**When to generate documentation:**
+
+- **Beginning of project**: Create initial documentation baseline
+- **After major changes**: Regenerate to reflect new code structure
+- **Before complex tasks**: Ensure context is available for informed decisions
+- **When doc-query fails**: Documentation may be missing or outdated
+
+**Check if documentation exists:**
+
+```bash
+sdd doc stats
+```
+
+If documentation doesn't exist or is outdated, generate it using the code-doc subagent.
+
+**Invoke the code-doc subagent:**
+
+```
+Task(
+  subagent_type: "sdd-toolkit:code-doc",
+  prompt: "Generate codebase documentation for the project. Analyze all source files and create comprehensive documentation.",
+  description: "Generate codebase docs"
+)
+```
+
+**Common documentation generation scenarios:**
+
+**1. Generate initial documentation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:code-doc",
+  prompt: "Generate codebase documentation for the entire project. Include all source files, classes, functions, and dependencies.",
+  description: "Initial doc generation"
+)
+```
+
+**2. Regenerate after major changes:**
+```
+Task(
+  subagent_type: "sdd-toolkit:code-doc",
+  prompt: "Regenerate codebase documentation to reflect recent changes. Update existing documentation with new code structure.",
+  description: "Regenerate docs"
+)
+```
+
+**3. Generate selective documentation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:code-doc",
+  prompt: "Generate documentation for the src/services/ directory. Focus on service layer implementation and API interfaces.",
+  description: "Generate service docs"
+)
+```
+
+**Documentation generation workflow:**
+
+1. **Check if docs exist**: Run `sdd doc stats` to verify documentation status
+2. **Generate if needed**: Invoke code-doc subagent to create documentation
+3. **Query for context**: Use doc-query to access the generated documentation (see next section)
+
+For detailed documentation generation options and configuration, see the [code-doc skill documentation](../code-doc/SKILL.md).
+
 ### Codebase Documentation Query
 
-**Availability**: Requires codebase documentation generated by the `Skill(sdd-toolkit:code-doc)` skill. Invoke `Skill(sdd-toolkit:doc-query)` to access these capabilities.
+**Availability**: Requires codebase documentation generated by the code-doc subagent (see section above). Invoke `Skill(sdd-toolkit:doc-query)` to access these capabilities.
 
 **Purpose**: Provides rapid structural understanding of the codebase without manual exploration
 
@@ -1371,7 +1517,14 @@ Testing Requirements for task-2-1:
 
 🔍 Verification Step (verify-2-1):
    Type: Automated test
-   Command: npm test -- authService.spec.ts
+   Execution: Use run-tests subagent
+   ```
+   Task(
+     subagent_type: "sdd-toolkit:run-tests-subagent",
+     prompt: "Run tests for authService.spec.ts. Execute all auth service tests and report results.",
+     description: "Test authService"
+   )
+   ```
    Expected: All auth service tests passing
    Status: pending
 
@@ -1487,7 +1640,7 @@ Specify exactly what "done" means for this task.
 #### Testing Complete
 - [ ] Test file created: tests/services/authService.spec.ts
 - [ ] All test cases implemented
-- [ ] npm test -- authService.spec.ts passes
+- [ ] Tests pass via run-tests subagent (Task(subagent_type="sdd-toolkit:run-tests-subagent", ...))
 - [ ] Test coverage >80% for AuthService
 
 #### Integration Verified
@@ -1502,7 +1655,7 @@ Specify exactly what "done" means for this task.
 - [ ] Comments explain non-obvious logic
 
 #### Verification (from spec verify-2-1)
-- [ ] Command executed: npm test -- authService.spec.ts
+- [ ] Executed via run-tests subagent (see verification step example above)
 - [ ] Result: All tests passing
 ```
 
@@ -2028,13 +2181,91 @@ AskUserQuestion(
 9. Update spec if structural changes needed
 10. Continue with revised plan
 
+### Executing Verification Tasks with run-tests Subagent
+
+When working on verification tasks (type: verify), use the run-tests subagent to execute tests and verification steps automatically.
+
+**When to use run-tests subagent:**
+
+- **Automated verification tasks**: Tasks with `verification_type: "auto"` in metadata
+- **Test execution**: Running unit tests, integration tests, or test suites
+- **Verification debugging**: Investigating failed verifications with AI assistance
+- **Systematic testing**: Executing verification steps defined in spec metadata
+
+**Invoke the run-tests subagent:**
+
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Run verification task verify-1-1 from specs/active/user-auth-001.json",
+  description: "Execute verification"
+)
+```
+
+**Common verification scenarios:**
+
+**1. Execute a verification task from spec:**
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Run verification task verify-2-1 from specs/active/user-auth-001.json. Execute the verification command and report results.",
+  description: "Execute verify-2-1"
+)
+```
+
+**2. Run specific tests for a file:**
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Run tests for src/services/authService.ts. Execute relevant test files and report pass/fail status.",
+  description: "Test authService"
+)
+```
+
+**3. Debug failed verification:**
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Debug failing tests for verify-2-3. Investigate test failures, analyze errors, and recommend fixes.",
+  description: "Debug verify-2-3"
+)
+```
+
+**4. Run verification with coverage:**
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Run verification verify-1-2 with test coverage analysis. Report coverage percentage and identify untested code paths.",
+  description: "Verify with coverage"
+)
+```
+
+**What the run-tests subagent does:**
+
+- Reads verification task metadata from the spec JSON
+- Identifies test command or skill to execute
+- Runs tests and captures output
+- Analyzes test results (pass/fail, errors, warnings)
+- Provides debugging assistance for failures
+- Reports results back to you
+
+**Integration with verification workflow:**
+
+After the run-tests subagent completes:
+1. Review the test results and findings
+2. Document verification outcome
+3. Present findings to user for approval
+4. Mark verification task as completed (see Workflow 6 below)
+
+For detailed testing capabilities, see the [run-tests skill documentation](../run-tests/SKILL.md).
+
 ### Workflow 6: Verification Task Completion
 **Situation:** Working on a verification task (type: verify), verification steps complete, need user approval
 
 **CRITICAL: Use AskUserQuestion, NOT text-based options**
 
 Steps:
-1. Perform verification steps as specified in task metadata
+1. Perform verification steps - Use run-tests subagent (see section above) or execute verification manually as specified in task metadata
 2. Document findings (what was verified, what passed/failed)
 3. Analyze results
 4. Present findings to user in text format:

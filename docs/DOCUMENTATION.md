@@ -1,24 +1,24 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-10-31 08:36:56
+**Generated:** 2025-11-01 11:19:01
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 163
-- **Total Lines:** 52269
+- **Total Files:** 164
+- **Total Lines:** 52852
 - **Total Classes:** 198
-- **Total Functions:** 697
-- **Avg Complexity:** 5.46
+- **Total Functions:** 712
+- **Avg Complexity:** 5.52
 - **Max Complexity:** 42
 - **High Complexity Functions:**
   - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
   - execute_verify_task (38)
-  - print_discovery_report (35)
+  - get_cached_transcript_path (36)
 
 
 
@@ -3766,6 +3766,25 @@ Returns:
 
 ---
 
+### `_clean_stale_sessions(dir_entry) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:222`
+**Complexity:** 9
+
+**Description:**
+> Remove sessions with dead PIDs from the cache entry.
+
+Modifies dir_entry in place.
+
+Args:
+    dir_entry: Directory entry from cache with 'sessions' dict
+
+**Parameters:**
+- `dir_entry`: None
+
+---
+
 ### `_coerce_scalar(value) -> Any`
 
 **Language:** python
@@ -4187,6 +4206,70 @@ Returns:
 
 ---
 
+### `_get_parent_pid(pid, system) -> Optional[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:54`
+**Complexity:** 4
+
+**Description:**
+> Get the parent PID of a given process.
+
+Args:
+    pid: Process ID to get parent of
+    system: Platform system name (Linux, Darwin, Windows)
+
+Returns:
+    Parent PID or None if not found
+
+**Parameters:**
+- `pid`: int
+- `system`: str
+
+---
+
+### `_get_parent_pid_linux(pid) -> Optional[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:75`
+**Complexity:** 5
+
+**Description:**
+> Get parent PID on Linux using /proc filesystem.
+
+**Parameters:**
+- `pid`: int
+
+---
+
+### `_get_parent_pid_macos(pid) -> Optional[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:99`
+**Complexity:** 3
+
+**Description:**
+> Get parent PID on macOS using ps command.
+
+**Parameters:**
+- `pid`: int
+
+---
+
+### `_get_parent_pid_windows(pid) -> Optional[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:115`
+**Complexity:** 5
+
+**Description:**
+> Get parent PID on Windows using wmic or psutil.
+
+**Parameters:**
+- `pid`: int
+
+---
+
 ### `_get_presets() -> Dict[str, Dict]`
 
 **Language:** python
@@ -4200,6 +4283,48 @@ The coverage preset auto-detects the source directory to avoid hard-coding.
 
 Returns:
     Dictionary of preset configurations
+
+---
+
+### `_get_process_info_linux(pid) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:322`
+**Complexity:** 6
+
+**Description:**
+> Get process info on Linux using /proc filesystem.
+
+**Parameters:**
+- `pid`: int
+
+---
+
+### `_get_process_info_macos(pid) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:353`
+**Complexity:** 5
+
+**Description:**
+> Get process info on macOS using ps command.
+
+**Parameters:**
+- `pid`: int
+
+---
+
+### `_get_process_info_windows(pid) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:389`
+**Complexity:** 6
+
+**Description:**
+> Get process info on Windows using wmic or psutil.
+
+**Parameters:**
+- `pid`: int
 
 ---
 
@@ -6252,7 +6377,7 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:194`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:311`
 **Complexity:** 5
 
 **Description:**
@@ -8652,6 +8777,27 @@ Returns:
 
 ---
 
+### `find_session_by_pid(sessions_cache) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:178`
+**Complexity:** 8
+
+**Description:**
+> Find which cached session matches the current process by walking the process tree.
+
+Args:
+    sessions_cache: The sessions cache dictionary for current directory
+                   Format: {"sessions": {"session-id": {"ppid": 12345, ...}}, ...}
+
+Returns:
+    Session ID if found, None otherwise
+
+**Parameters:**
+- `sessions_cache`: Dict[str, Any]
+
+---
+
 ### `find_similar_implementations(feature_name, docs_path) -> List[QueryResult]`
 
 **Language:** python
@@ -8729,6 +8875,28 @@ Returns:
 
 Returns:
     Path to specs directory or None if not found
+
+---
+
+### `find_stable_claude_process() -> Optional[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:223`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Find the stable 'claude' process PID by walking up the process tree.
+
+This function walks up the process tree from the current process to find
+the long-lived 'claude' binary, skipping short-lived subprocess wrappers.
+
+This is critical for session detection when multiple concurrent Claude Code
+sessions exist in the same directory. By caching the stable PID instead of
+a short-lived subprocess PID, session detection remains accurate even as
+subprocesses die.
+
+Returns:
+    The PID of the stable 'claude' process if found, otherwise None
 
 ---
 
@@ -9281,7 +9449,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:155`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:271`
 **Complexity:** 1
 
 **Description:**
@@ -9296,7 +9464,7 @@ Returns:
 ### `format_metrics_json(metrics, max_context) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:176`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:292`
 **Complexity:** 1
 
 **Description:**
@@ -9311,7 +9479,7 @@ Returns:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:150`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:266`
 **Complexity:** 1
 
 **Description:**
@@ -10325,21 +10493,22 @@ Returns:
 ### `get_cached_transcript_path() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:77`
-**Complexity:** 10
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:82`
+⚠️ **Complexity:** 36 (High)
 
 **Description:**
 > Load transcript path from cache for current working directory.
 
-Uses open file detection to identify which transcript is actively being
-written to, enabling correct session detection even with multiple concurrent
-Claude Code sessions in the same directory.
+Uses multi-layered detection to identify which transcript belongs to the
+current Claude Code session, enabling correct session detection even with
+multiple concurrent sessions in the same directory.
 
-Strategy:
-1. Load all cached transcript paths for this directory
-2. Check which one is currently open for writing (using lsof)
-3. Return the actively-written transcript
-4. Fallback to most recently modified if detection fails
+Detection Strategy (in order of priority):
+1. PID-based: Match current process tree to cached session PPIDs
+2. TTY-based: Match current terminal to cached session TTY
+3. Environment variable: Check CLAUDE_SESSION_ID
+4. File writing detection: Check which transcript is open for writing (lsof)
+5. Fallback: Most recently modified transcript (last resort)
 
 Returns:
     Cached transcript path or None if not found
@@ -10427,6 +10596,20 @@ Returns:
 
 Returns:
     Timeout in seconds
+
+---
+
+### `get_current_ppid() -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:213`
+**Complexity:** 1
+
+**Description:**
+> Get the parent process ID of the current process.
+
+Returns:
+    Parent PID
 
 ---
 
@@ -10700,6 +10883,28 @@ Returns:
 
 ---
 
+### `get_parent_pids(pid, max_depth) -> List[int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:17`
+**Complexity:** 8
+
+**Description:**
+> Get the chain of parent process IDs up the process tree.
+
+Args:
+    pid: Starting PID (defaults to current process)
+    max_depth: Maximum depth to traverse (prevents infinite loops)
+
+Returns:
+    List of PIDs from current process up to init, excluding current PID
+
+**Parameters:**
+- `pid`: Optional[int]
+- `max_depth`: int
+
+---
+
 ### `get_parser_from_module(module_name) -> argparse.ArgumentParser`
 
 **Language:** python
@@ -10770,6 +10975,26 @@ Returns:
 
 Returns:
     Dictionary of preset configurations
+
+---
+
+### `get_process_info(pid) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:300`
+**Complexity:** 4
+
+**Description:**
+> Get information about a process.
+
+Args:
+    pid: Process ID
+
+Returns:
+    Dictionary with process info (name, cmdline, etc.) or None if not found
+
+**Parameters:**
+- `pid`: int
 
 ---
 
@@ -11489,10 +11714,33 @@ Returns:
 
 ---
 
+### `is_clear_command(entry) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/parser.py:25`
+**Complexity:** 7
+
+**Description:**
+> Check if a transcript entry is a /clear command.
+
+The /clear command resets the conversation context, so we should
+reset token counters when we encounter it.
+
+Args:
+    entry: A parsed JSONL entry from the transcript
+
+Returns:
+    True if this entry represents a /clear command
+
+**Parameters:**
+- `entry`: dict
+
+---
+
 ### `is_file_open_for_writing(filepath) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:18`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:23`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -11542,6 +11790,26 @@ Returns:
 
 **Description:**
 > Check if metrics collection is enabled (not in test environment).
+
+---
+
+### `is_pid_alive(pid) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/process_utils.py:140`
+**Complexity:** 6
+
+**Description:**
+> Check if a process with the given PID is currently running.
+
+Args:
+    pid: Process ID to check
+
+Returns:
+    True if process exists, False otherwise
+
+**Parameters:**
+- `pid`: int
 
 ---
 
@@ -11815,7 +12083,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:266`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:383`
 **Complexity:** 7
 
 **Description:**
@@ -12115,8 +12383,8 @@ Returns:
 ### `parse_transcript(transcript_path) -> Optional[TokenMetrics]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/parser.py:25`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/parser.py:56`
+**Complexity:** 10
 
 **Description:**
 > Parse a Claude Code transcript JSONL file and extract token metrics.
@@ -12528,7 +12796,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:233`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:350`
 **Complexity:** 1
 
 **Description:**
@@ -16548,6 +16816,9 @@ Returns:
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.context_tracker.parser.parse_transcript`
+- `claude_skills.context_tracker.process_utils.find_session_by_pid`
+- `claude_skills.context_tracker.process_utils.get_parent_pids`
+- `claude_skills.context_tracker.process_utils.is_pid_alive`
 - `json`
 - `pathlib.Path`
 - `sys`
@@ -16557,6 +16828,17 @@ Returns:
 - `dataclasses.dataclass`
 - `json`
 - `pathlib.Path`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/context_tracker/process_utils.py`
+
+- `os`
+- `pathlib.Path`
+- `platform`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/dev_tools/generate_docs.py`
