@@ -20,6 +20,7 @@ Use this agent when you need to:
 - Track time spent on tasks
 - Move specs between lifecycle folders (pending/active/completed/archived)
 - Update spec metadata
+- Update task metadata (file_path, description, task_category, actual_hours, status_note, verification_type, skill, command)
 - Handle blockers and dependencies
 
 **Do NOT use this agent for:**
@@ -66,6 +67,12 @@ Skill(sdd-toolkit:sdd-update) with prompt:
 ```
 Skill(sdd-toolkit:sdd-update) with prompt:
 "Add journal entry for spec user-auth-001, task task-2-1. Title: 'Deviation: Split Auth Logic'. Entry type: deviation. Content: Created authService.ts instead of modifying userService.ts for better separation of concerns."
+```
+
+**Updating task metadata:**
+```
+Skill(sdd-toolkit:sdd-update) with prompt:
+"Update task metadata for task-1-2 in spec user-auth-001. Set file_path to 'src/auth/service.ts', description to 'Auth service with JWT support', task_category to 'implementation', and actual_hours to 2.5."
 ```
 
 ## Error Handling
