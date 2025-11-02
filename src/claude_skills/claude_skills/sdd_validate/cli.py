@@ -22,6 +22,7 @@ try:
         DEFAULT_BOTTLENECK_THRESHOLD,
         PrettyPrinter,
         find_specs_directory,
+        find_spec_file,
         ensure_reports_directory,
     )
     from claude_skills.sdd_validate import (
@@ -40,6 +41,50 @@ try:
 except ImportError as e:
     print(f"ERROR: Could not import dependencies for sdd-validate CLI: {e}", file=sys.stderr)
     sys.exit(2)
+
+
+def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
+    """
+    Resolve spec file from either a spec name or full path.
+
+    Args:
+        spec_name_or_path: Either a spec name (e.g., 'my-spec') or full path (e.g., '/path/to/my-spec.json')
+        printer: PrettyPrinter for error messages
+
+    Returns:
+        Resolved Path object, or exits with error code 2 if not found
+    """
+    path = Path(spec_name_or_path)
+
+    # If it's an absolute path or has a .json extension, treat it as a full path
+    if path.is_absolute() or spec_name_or_path.endswith('.json'):
+        spec_file = path.resolve()
+
+        if not spec_file.exists():
+            printer.error(f"Spec file not found: {spec_file}")
+            sys.exit(2)
+
+        if spec_file.suffix != '.json':
+            printer.error(f"Expected JSON file, got: {spec_file.suffix}")
+            printer.info("JSON specs are now the single source of truth")
+            sys.exit(2)
+
+        return spec_file
+
+    # Otherwise, treat it as a spec name and search for it
+    specs_dir = find_specs_directory()
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        printer.info("Run from a project with a specs/ directory or provide a full path")
+        sys.exit(2)
+
+    spec_file = find_spec_file(spec_name_or_path, specs_dir)
+    if not spec_file:
+        printer.error(f"Spec file not found for spec name: {spec_name_or_path}")
+        printer.info(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
+        sys.exit(2)
+
+    return spec_file
 
 
 def _stats_to_dict(stats) -> Dict[str, Any]:
@@ -146,20 +191,11 @@ def _interactive_select_fixes(actions, printer):
 
 def cmd_validate(args, printer):
     """Validate JSON spec file."""
-    spec_file = Path(args.spec_file).resolve()
+    spec_file = _resolve_spec_file(args.spec_file, printer)
 
     if not args.json and not args.quiet:
         printer.action("Validating JSON spec...")
         printer.info(f"Spec: {spec_file}")
-
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
-        return 2
-
-    if not spec_file.suffix == '.json':
-        printer.error(f"Expected JSON file, got: {spec_file.suffix}")
-        printer.info("JSON specs are now the single source of truth")
-        return 2
 
     # Load and validate spec
     try:
@@ -241,14 +277,10 @@ def cmd_validate(args, printer):
 
 def cmd_fix(args, printer):
     """Auto-fix validation issues in spec file."""
-    spec_file = Path(args.spec_file).resolve()
+    spec_file = _resolve_spec_file(args.spec_file, printer)
 
     if not args.quiet and not args.json:
         printer.action(f"Analyzing spec for auto-fixable issues: {spec_file}")
-
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
-        return 2
 
     # Load and validate spec
     try:
@@ -378,14 +410,10 @@ def cmd_fix(args, printer):
 
 def cmd_report(args, printer):
     """Generate detailed validation report."""
-    spec_file = Path(args.spec_file).resolve()
+    spec_file = _resolve_spec_file(args.spec_file, printer)
 
     if not args.quiet and args.format != "json":
         printer.action(f"Generating validation report: {spec_file}")
-
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
-        return 2
 
     # Load and validate spec
     try:
@@ -443,14 +471,10 @@ def cmd_report(args, printer):
 
 def cmd_stats(args, printer):
     """Show spec statistics and complexity metrics."""
-    spec_file = Path(args.spec_file).resolve()
+    spec_file = _resolve_spec_file(args.spec_file, printer)
 
     if not args.json:
         printer.action(f"Analyzing: {spec_file}")
-
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
-        return 2
 
     try:
         with open(spec_file, "r") as f:
@@ -473,14 +497,10 @@ def cmd_stats(args, printer):
 
 def cmd_check_deps(args, printer):
     """Check for circular dependencies."""
-    spec_file = Path(args.spec_file).resolve()
+    spec_file = _resolve_spec_file(args.spec_file, printer)
 
     if not args.quiet and not args.json:
         printer.action(f"Checking dependencies: {spec_file}")
-
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
-        return 2
 
     # Load spec
     try:
@@ -546,7 +566,7 @@ def register_validate(subparsers, parent_parser):
     parser_validate = subparsers.add_parser('validate',
                                             parents=[parent_parser],
                                             help='Validate JSON spec file')
-    parser_validate.add_argument('spec_file', help='Path to JSON spec file')
+    parser_validate.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_validate.add_argument('--report', action='store_true',
                                  help='Generate validation report')
     parser_validate.add_argument('--report-format', dest='report_format',
@@ -558,7 +578,7 @@ def register_validate(subparsers, parent_parser):
     parser_fix = subparsers.add_parser('fix',
                                        parents=[parent_parser],
                                        help='Auto-fix validation issues')
-    parser_fix.add_argument('spec_file', help='Path to JSON spec file')
+    parser_fix.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_fix.add_argument('--preview', action='store_true',
                            help='Preview fixes without applying (alias for --dry-run)')
     parser_fix.add_argument('--dry-run', action='store_true',
@@ -579,7 +599,7 @@ def register_validate(subparsers, parent_parser):
     parser_report = subparsers.add_parser('report',
                                           parents=[parent_parser],
                                           help='Generate detailed validation report')
-    parser_report.add_argument('spec_file', help='Path to JSON spec file')
+    parser_report.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_report.add_argument('--output', '-o', help='Output file path (use "-" for stdout)')
     parser_report.add_argument('--format', choices=['markdown', 'json'], default='markdown',
                                help='Report format (default: markdown)')
@@ -591,14 +611,14 @@ def register_validate(subparsers, parent_parser):
     parser_stats = subparsers.add_parser('stats',
                                          parents=[parent_parser],
                                          help='Show spec statistics')
-    parser_stats.add_argument('spec_file', help='Path to JSON spec file')
+    parser_stats.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_stats.set_defaults(func=cmd_stats)
 
     # Analyze dependencies command (renamed from check-deps to avoid conflict with sdd-next)
     parser_deps = subparsers.add_parser('analyze-deps',
                                         parents=[parent_parser],
                                         help='Analyze dependencies for circular dependencies and bottlenecks')
-    parser_deps.add_argument('spec_file', help='Path to JSON spec file')
+    parser_deps.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_deps.add_argument('--bottleneck-threshold', type=int, default=DEFAULT_BOTTLENECK_THRESHOLD,
                             help=f'Minimum tasks blocked to flag bottleneck (default: {DEFAULT_BOTTLENECK_THRESHOLD})')
     parser_deps.set_defaults(func=cmd_check_deps)

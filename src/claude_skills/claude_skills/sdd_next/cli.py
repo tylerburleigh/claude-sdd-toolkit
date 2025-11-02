@@ -599,6 +599,26 @@ def cmd_prepare_task(args, printer):
     # Returns completion signals when spec is finished or blocked
     task_prep = prepare_task(args.spec_id, specs_dir, args.task_id)
 
+    # ==========================================
+    # Documentation Generation Prompt (Proactive)
+    # ==========================================
+    # If documentation is missing or stale, prompt user to generate it
+    # This happens before task processing to provide context for implementation
+    if task_prep.get('doc_prompt_needed') and not args.json:
+        from claude_skills.common.doc_integration import prompt_for_generation
+
+        doc_status = task_prep.get('doc_status', 'unknown')
+        context = f"Documentation is {doc_status}. Generating docs enables automated file suggestions and dependency analysis."
+
+        if prompt_for_generation(skill_name="sdd-next", context=context):
+            # User accepted - suggest running code-doc skill
+            print("\n✅ To generate documentation, run:")
+            print("   sdd doc generate")
+            print("\n📝 After generation completes, re-run prepare-task to use the new documentation.\n")
+        else:
+            # User declined - continue with manual exploration
+            print("\n📝 Continuing without documentation. Manual file exploration will be used.\n")
+
     if not task_prep["success"]:
         # ==========================================
         # SCENARIO 1: No Actionable Tasks Available

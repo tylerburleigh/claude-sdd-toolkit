@@ -2,6 +2,16 @@
 name: code-doc-subagent
 description: Generate codebase documentation and report results by invoking the code-doc skill
 model: haiku
+required_information:
+  full_generation:
+    - (none - operates on entire codebase)
+  targeted_generation:
+    - target_path (optional - specific directory, file, or pattern to document)
+  regenerate:
+    - (none - regenerates all existing documentation)
+  stats_only:
+    - (none - reports statistics without generating docs)
+    - include_complexity (optional - whether to include complexity metrics)
 ---
 
 # Code Documentation Subagent
@@ -47,10 +57,69 @@ This agent is a thin wrapper that invokes `Skill(sdd-toolkit:code-doc)`.
 
 **Your task:**
 1. Parse the user's request to understand what needs to be documented
-2. Invoke the skill: `Skill(sdd-toolkit:code-doc)`
-3. Pass a clear prompt describing the documentation request
-4. Wait for the skill to complete its work
-5. Report the documentation results back to the user
+2. **VALIDATE** that the request is clear enough to proceed (see Contract Validation below)
+3. If the request is ambiguous and could benefit from clarification, ask the user
+4. If you have sufficient information (or can use defaults), invoke the skill: `Skill(sdd-toolkit:code-doc)`
+5. Pass a clear prompt describing the documentation request
+6. Wait for the skill to complete its work
+7. Report the documentation results back to the user
+
+## Contract Validation
+
+**Note:** Unlike strict-contract agents (sdd-validate, sdd-update), code-doc has flexible requirements because it can operate on the entire codebase with sensible defaults.
+
+### Validation Rules
+
+**For full codebase documentation:**
+- No required information - the skill will document the entire codebase
+- Proceed with defaults unless the request is unclear
+
+**For targeted documentation:**
+- Optional: target_path (specific directory, file, or pattern)
+- If the user mentions a specific area but doesn't provide a path, ask for clarification
+- If the request is clear about "all" or "entire codebase", proceed without target_path
+
+**For regeneration:**
+- No required information - the skill will regenerate existing docs
+- Proceed with defaults
+
+**For statistics only:**
+- No required information - the skill will report stats
+- Optional: include_complexity flag
+
+### When to Ask for Clarification
+
+Ask the user for clarification when:
+- Target path is mentioned vaguely (e.g., "document the auth stuff") without a clear path
+- Ambiguous scope (e.g., "update some docs" - which docs?)
+- Conflicting instructions (e.g., "generate everything but only for services")
+
+**When clarification is needed:**
+
+```
+Cannot proceed with documentation: Request needs clarification.
+
+Ambiguity:
+- [Describe what's unclear]
+
+Please clarify:
+- [Specific question about target_path, scope, or operation type]
+
+Examples:
+- "Document src/auth/ directory only"
+- "Generate full codebase documentation"
+- "Get statistics without regenerating"
+```
+
+### When to Proceed with Defaults
+
+Proceed without asking when:
+- User explicitly says "all", "entire codebase", "everything", or "full documentation"
+- User provides a clear target_path
+- User asks to "regenerate" or "update" docs (implies all docs)
+- User asks for "stats" or "statistics" without mentioning specific areas
+
+**DO NOT ask for clarification when defaults are reasonable. Only ask when genuinely ambiguous.**
 
 ## What to Report
 

@@ -5,22 +5,29 @@ description: Multi-language codebase documentation generation supporting Python,
 
 # Codebase Documentation Generator Skill
 
-## Table of Contents
+## Overview
 
-- [Quick Start](#quick-start)
-- [When to Use This Skill](#when-to-use-this-skill)
-- [Core Documentation Process](#core-documentation-process)
-  - [Phase 1: Understand Requirements](#phase-1-understand-requirements)
-  - [Phase 2: Analyze Codebase](#phase-2-analyze-codebase)
-  - [Phase 3: Generate Documentation](#phase-3-generate-documentation)
-  - [Phase 4: Validate & Deliver](#phase-4-validate--deliver)
-- [CLI Tools](#cli-tools)
-- [Critical Rules](#critical-rules)
-- [Best Practices](#best-practices)
-- [Common Scenarios](#common-scenarios)
-- [Reference](#reference)
+Multi-language codebase documentation generator that creates both human-readable markdown and machine-readable JSON output. Supports AST parsing, dependency analysis, code metrics, and AI-enhanced contextual documentation.
 
----
+**Use this skill when:**
+- Generate documentation for multi-language codebases (Python, JS/TS, Go, HTML, CSS)
+- Create API documentation automatically
+- Analyze code structure, complexity, and dependencies
+- Generate machine-readable codebase metadata
+- Create developer onboarding materials with architecture docs (AI-enhanced)
+- Generate AI assistant context documentation (AI-enhanced)
+
+**Key features:**
+- **Structural documentation** - Classes, functions, dependencies, metrics
+- **AI-enhanced documentation** - Multi-agent consultation for architecture and context docs
+- **12 query commands** - Explore generated docs (stats, search, complexity, dependencies)
+- **Read-only analysis** - Never modifies source code
+
+**Do NOT use for:**
+- Writing conceptual documentation (tutorials, guides)
+- Generating docstrings (this extracts existing docstrings)
+- Code generation or modification
+- Testing or debugging (use `Skill(sdd-toolkit:run-tests)`)
 
 ## Tool Verification
 
@@ -45,191 +52,76 @@ If the verification command fails, ensure the SDD toolkit is properly installed 
 
 ## Quick Start
 
-### Option 1: AI-Enhanced Documentation with Main Agent Synthesis (Recommended)
+**Basic 4-Step Workflow:**
 
-**Two-Phase Workflow with AI Research + Main Agent Synthesis:**
-
-```bash
-sdd doc analyze-with-ai <directory> --name ProjectName --version X.Y.Z --verbose
-```
-
-**Phase 1: Skill gathers research**
-- Writes `DOCUMENTATION.md` - Structural reference (classes, functions, dependencies)
-- Writes `documentation.json` - Machine-readable structural data
-- Runs multi-agent AI consultation (cursor-agent + gemini in parallel)
-- Returns JSON with separate responses from each AI tool to stdout
-
-**Phase 2: Main agent synthesizes**
-- Parses JSON output containing research from all AI tools
-- Intelligently synthesizes findings from multiple perspectives
-- Writes `ARCHITECTURE.md` - Unified architecture documentation
-- Writes `AI_CONTEXT.md` - Unified AI assistant quick reference
-
-**Requirements:**
-- At least one AI CLI tool installed: cursor-agent (with cheetah), gemini, or codex
-- Uses 2-model consultation by default for comprehensive analysis (falls back to single-model if only 1 tool available)
-- Main agent (Claude Code) performs final synthesis
-
-**After generation, you can query the documentation:**
-```bash
-sdd doc stats --docs-path ./docs/documentation.json
-sdd doc find-class MyClass --docs-path ./docs/documentation.json
-```
-See "Documentation Query Commands" section for all 12 query commands.
-
-### Option 2: Structural Documentation Only
-
-**Essential 4-Step Workflow (no AI required):**
-
-1. **Understand** → Clarify scope and output requirements
-- What needs documentation? (whole project, specific modules, public API only)
-- What format? (markdown, JSON, or both)
-- What to exclude? (tests, migrations, generated code)
-
-2. **Analyze** → Run codebase analysis
+1. **Analyze (Optional)** → Preview codebase structure
 ```bash
 sdd doc analyze <directory> --verbose
 ```
 
-3. **Generate** → Create documentation files
+2. **Generate** → Create documentation
 ```bash
-sdd doc generate <directory> --name ProjectName --version X.Y.Z --format both --verbose
+# AI-enhanced (recommended if AI tools available)
+sdd doc analyze-with-ai <directory> --name ProjectName --version X.Y.Z --verbose
+
+# Structural only (no AI required)
+sdd doc generate <directory> --name ProjectName --version X.Y.Z --verbose
 ```
 
-4. **Validate** → Verify output quality
+3. **Validate** → Verify JSON output
 ```bash
 sdd doc validate-json ./docs/documentation.json
 ```
 
-5. **Query (Optional)** → Explore the generated documentation
+4. **Query** → Explore generated documentation
 ```bash
-# Get statistics
 sdd doc stats --docs-path ./docs/documentation.json
-
-# Find high-complexity functions
-sdd doc complexity --threshold 10 --docs-path ./docs/documentation.json
-
-# Search for specific entities
 sdd doc search "MyClass" --docs-path ./docs/documentation.json
 ```
 
-**Note:** All query commands support flexible argument order - put `--docs-path` before or after the subcommand.
+**AI-enhanced workflow outputs:**
+- `DOCUMENTATION.md`, `documentation.json` (auto-written by skill)
+- JSON research to stdout (main agent synthesizes → `ARCHITECTURE.md`, `AI_CONTEXT.md`)
+
+**See sections below for:** Research-then-Synthesis Architecture, CLI Tools, Documentation Query Commands (all 12)
 
 ---
 
-## When to Use This Skill
+## AI-Enhanced Workflow (Research-then-Synthesis)
 
-**Use this skill when the user asks to:**
-- Generate documentation for a multi-language codebase
-- Create API documentation automatically
-- Analyze code structure and complexity across multiple languages
-- Document classes, functions, and dependencies
-- Generate machine-readable codebase metadata (JSON)
-- Create developer onboarding materials
-- Track code quality metrics
-- **Understand codebase architecture (AI-powered)**
-- **Generate AI assistant context documentation (AI-powered)**
-- **Create architecture diagrams and design docs (AI-powered)**
+**Two-Phase Process:**
 
-**Supported Languages:**
-- **Python** - Full AST parsing, complexity metrics
-- **JavaScript/TypeScript** - Classes, functions, exports, imports, JSX
-- **Go** - Packages, structs, interfaces, methods
-- **HTML** - Elements, HTMX attributes, custom components
-- **CSS** - Selectors, rules, variables, @-rules
+### Phase 1: Research Gathering (Skill)
 
-**AI-Enhanced Features:**
-- **Multi-agent research** - Parallel consultation with multiple AI models for comprehensive analysis
-- **Contextual analysis** - AI CLIs analyze code to understand "what" and "why", not just "how"
-- **Architecture documentation** - Main agent composes docs from AI research findings
-- **AI assistant quick reference** - Optimized context documentation for AI coding assistants
+The `analyze-with-ai` command:
+- Generates structural docs (DOCUMENTATION.md, documentation.json) automatically
+- Calls AI CLIs in parallel (cursor-agent + gemini by default)
+- Collects separate research from each tool
+- Returns JSON with research keyed by tool name to stdout
+- **Does NOT write ARCHITECTURE.md/AI_CONTEXT.md** (main agent does this)
 
-**Do NOT use for:**
-- Writing conceptual documentation (tutorials, guides, explanations)
-- Generating docstrings (this extracts existing docstrings)
-- Code generation or modification
-- Testing or debugging (use `Skill(sdd-toolkit:run-tests)` instead)
-
----
-
-## Research-then-Synthesis Architecture
-
-**IMPORTANT: Understanding What Gets Generated Automatically vs By Main Agent**
-
-This skill uses a **research gathering + main agent synthesis pattern** for AI-enhanced documentation:
-
-### What `analyze-with-ai` Command Does Automatically
-
-When you run the `analyze-with-ai` command, it:
-1. ✅ **Generates structural docs automatically** (DOCUMENTATION.md, documentation.json)
-2. ✅ **Calls external AI CLIs in parallel** (cursor-agent + gemini by default)
-3. ✅ **Collects separate research responses** from each AI tool
-4. ✅ **Returns JSON to stdout** with research keyed by tool name
-5. ⚠️ **Does NOT write ARCHITECTURE.md/AI_CONTEXT.md** (main agent does this)
-
-**JSON Output Format:**
+**JSON output format:**
 ```json
 {
-  "status": "success",
-  "project_name": "MyProject",
-  "version": "1.0.0",
-  "output_dir": "docs",
-  "architecture_research": {
-    "cursor-agent": "raw architecture research from cursor-agent",
-    "gemini": "raw architecture research from gemini"
-  },
-  "ai_context_research": {
-    "cursor-agent": "raw AI context research from cursor-agent",
-    "gemini": "raw AI context research from gemini"
-  },
-  "statistics": {...}
+  "architecture_research": {"cursor-agent": "...", "gemini": "..."},
+  "ai_context_research": {"cursor-agent": "...", "gemini": "..."}
 }
 ```
 
-### What the Main Agent Must Do After Research
+### Phase 2: Synthesis (Main Agent)
 
-**CRITICAL:** The main Claude Code agent must:
-1. **Parse JSON output** from skill's stdout
-   - Extract between `RESEARCH_JSON_START` and `RESEARCH_JSON_END` markers
-   - Parse as JSON object
+**The main agent must:**
+1. Parse JSON output between `RESEARCH_JSON_START` and `RESEARCH_JSON_END` markers
+2. Synthesize ARCHITECTURE.md from multiple AI perspectives
+   - Merge complementary insights, resolve contradictions, remove redundancy
+   - Create unified architecture documentation
+3. Synthesize AI_CONTEXT.md from multiple AI perspectives
+   - Same process, optimized for AI assistant consumption
+4. Write both files to output_dir
 
-2. **Synthesize ARCHITECTURE.md** from multiple AI perspectives
-   - Read responses from cursor-agent and gemini separately
-   - Intelligently merge insights and remove redundancy
-   - Create unified, coherent architecture documentation
-   - Add proper headers, project metadata, and formatting
-   - Write final file to output_dir
+**Why this separation?** AI CLIs provide diverse perspectives without bias. Main agent (Claude Code) has user context and makes intelligent synthesis decisions.
 
-3. **Synthesize AI_CONTEXT.md** from multiple AI perspectives
-   - Same synthesis process
-   - Format optimized for AI assistant consumption
-   - Write final file to output_dir
-
-### The Two-Phase Workflow
-
-**Phase 1: Research Gathering (Skill)**
-- Skill runs multi-agent consultation in parallel
-- Each AI CLI analyzes code files independently
-- Each provides their unique perspective
-- Skill collects all responses without filtering or merging
-- Returns raw responses as JSON to stdout
-- **Does NOT synthesize or write AI docs**
-
-**Phase 2: Synthesis (Main Agent)**
-- Main agent receives separate responses from all AI tools
-- Agent makes intelligent synthesis decisions:
-  - Merges complementary insights
-  - Resolves contradictions
-  - Removes redundancy
-  - Highlights unique perspectives where valuable
-- Agent writes final ARCHITECTURE.md and AI_CONTEXT.md
-- All synthesis and file writing happens in main agent
-
-**Why this separation?**
-- AI CLIs provide diverse perspectives without bias
-- Main agent (Claude Code) has context about the user's needs
-- Main agent can make intelligent synthesis decisions
-- Cleaner separation of concerns: research vs. synthesis
+**Multi-agent mode (default):** Consults 2 AI models in parallel for comprehensive analysis. Falls back to 1 if only 1 tool installed.
 
 ---
 
@@ -960,184 +852,71 @@ You can retry later with: sdd doc analyze-with-ai ..."
 
 ## Common Scenarios
 
-### Scenario 1: Full Project Documentation with AI (RECOMMENDED)
+### Scenario 1: Full Project Documentation with AI
 
-**User Request:** "Document my entire Python project" or "Generate comprehensive documentation"
+**User:** "Document my entire Python project"
 
-**Your Response:**
-1. Ask: "Should I exclude tests and migrations?"
-2. Run `analyze-with-ai` command (gathers research)
-3. Parse JSON output from skill
-4. Synthesize findings from multiple AI perspectives
-5. Write ARCHITECTURE.md and AI_CONTEXT.md
-6. Report what was generated
-
-**Example:**
+**Workflow:**
 ```bash
-# Step 1: Run skill to gather research
 sdd doc analyze-with-ai ./my_project --name "MyProject" --version "1.0.0" --exclude tests --exclude migrations --verbose
-
-# Step 2: Skill writes structural docs and returns JSON
-# Step 3: You (main agent) parse JSON with research from cursor-agent and gemini
-# Step 4: You synthesize both perspectives into unified docs
-# Step 5: You write final ARCHITECTURE.md and AI_CONTEXT.md
+# Skill returns JSON research → Main agent synthesizes → writes ARCHITECTURE.md, AI_CONTEXT.md
 ```
 
-**Final Output:**
-```
-docs/
-├── DOCUMENTATION.md       # Structural (auto-written by skill)
-├── documentation.json     # Machine-readable (auto-written by skill)
-├── ARCHITECTURE.md        # Synthesized by main agent from multi-AI research
-└── AI_CONTEXT.md          # Synthesized by main agent from multi-AI research
-```
+**Output:** DOCUMENTATION.md, documentation.json (skill) + ARCHITECTURE.md, AI_CONTEXT.md (main agent)
 
-### Scenario 1b: Full Project Documentation (Structural Only)
+### Scenario 2: Structural Documentation Only
 
-**User Request:** "Document my Python project" (when no AI tools available)
+**User:** "Document my project" (no AI tools available)
 
-**Your Response:**
-1. Ask: "Should I exclude tests and migrations?"
-2. Run: `analyze` command for preview
-3. Report statistics
-4. Run: `generate` with appropriate exclusions
-5. Validate JSON output
-6. Deliver summary with file paths
-
-**Example:**
+**Workflow:**
 ```bash
-# Analyze
-sdd doc analyze ./my_project --exclude tests --exclude migrations --verbose
-
-# Generate
-sdd doc generate ./my_project --name "MyProject" --version "1.0.0" --format both --exclude tests --exclude migrations --verbose
-
-# Validate
+sdd doc analyze ./my_project --verbose  # Preview
+sdd doc generate ./my_project --name "MyProject" --version "1.0.0" --exclude tests --verbose
 sdd doc validate-json ./docs/documentation.json
 ```
 
----
-
-### Scenario 2: API Documentation Only
-
-**User Request:** "Generate API documentation for the src/ directory"
-
-**Your Response:**
-1. Focus on src/ directory
-2. Use meaningful project name
-3. Generate both formats
-4. Validate
-
-**Example:**
-```bash
-sdd doc generate ./src --name "MyProject API" --version "2.1.0" --format both --verbose
-```
-
----
-
 ### Scenario 3: Quick Complexity Check
 
-**User Request:** "What's the code complexity of my project?"
+**User:** "What's the code complexity?"
 
-**Your Response:**
-1. Use `analyze` subcommand
-2. Report statistics
-3. Highlight any concerns
-
-**Example:**
+**Workflow:**
 ```bash
 sdd doc analyze ./src --verbose
 ```
 
-**Report:**
-```
-"Your codebase analysis:
-- 45 files, 3,421 lines
-- 23 classes, 156 functions
-- Average complexity: 4.2 (Good - below 10 is healthy)
-- Maximum complexity: 15
-- 2 high-complexity functions found:
-  - process_data (complexity: 15)
-  - validate_input (complexity: 12)
+Report: 45 files, 156 functions, avg complexity 4.2 (good), 2 high-complexity functions needing refactoring.
 
-Consider refactoring these functions to improve maintainability."
-```
+### Scenario 4: API Documentation
 
----
+**User:** "Generate API docs for src/"
 
-### Scenario 4: JSON-Only for Tooling
-
-**User Request:** "I need JSON output for my CI/CD pipeline"
-
-**Your Response:**
-1. Generate JSON only
-2. Validate thoroughly
-3. Provide path
-
-**Example:**
+**Workflow:**
 ```bash
-# Generate JSON only
-sdd doc generate ./src --name "MyProject" --format json --output-dir ./ci_artifacts --verbose
-
-# Validate
-sdd doc validate-json ./ci_artifacts/documentation.json
+sdd doc generate ./src --name "MyProject API" --version "2.1.0" --verbose
 ```
 
----
+### Scenario 5: Large Codebase with Exclusions
 
-### Scenario 5: Large Codebase with Many Exclusions
+**User:** "Document Django project, skip tests/migrations/static"
 
-**User Request:** "Document my Django monolith but skip tests, migrations, and static files"
-
-**Your Response:**
-1. Multiple `--exclude` flags
-2. Use verbose to track progress
-3. Expect longer processing time
-
-**Example:**
+**Workflow:**
 ```bash
-sdd doc generate ./django_project --name "DjangoApp" --version "3.2.0" --exclude tests --exclude migrations --exclude static --exclude media --exclude venv --format both --verbose
+sdd doc generate ./django_project --name "DjangoApp" --version "3.2.0" --exclude tests --exclude migrations --exclude static --exclude media --verbose
 ```
-
----
 
 ### Scenario 6: Querying Generated Documentation
 
-**User Request:** "Find all classes related to validation" or "Show me high-complexity functions" or "What modules handle printing?"
+**User:** "Find validation classes" or "Show high-complexity functions"
 
-**Your Response:**
-1. Verify documentation exists
-2. Use appropriate query command
-3. Present results clearly
-4. Offer to dive deeper if needed
-
-**Example:**
+**Workflow:**
 ```bash
-# Find validation-related entities
 sdd doc search "validation" --docs-path ./docs/documentation.json
-
-# Show high-complexity functions needing refactoring
 sdd doc complexity --threshold 15 --docs-path ./docs/documentation.json
-
-# Get context for printer-related code
-sdd doc context "printer" --docs-path ./docs/documentation.json --limit 5
-
-# Find a specific class
+sdd doc context "printer" --docs-path ./docs/documentation.json
 sdd doc find-class PrettyPrinter --docs-path ./docs/documentation.json
-
-# List all classes in a module
-sdd doc list-classes --module src/common --docs-path ./docs/documentation.json
-
-# See module details
-sdd doc describe-module src/common/printer.py --docs-path ./docs/documentation.json
 ```
 
-**When to use query commands:**
-- User wants to explore generated documentation
-- Looking for specific classes, functions, or modules
-- Analyzing code complexity or dependencies
-- Understanding feature areas before making changes
-- Quick lookups without reading full documentation
+**Use query commands for:** Exploring docs, finding classes/functions/modules, analyzing complexity/dependencies, quick lookups.
 
 ---
 
@@ -1237,72 +1016,53 @@ Using `sdd test check-tools`.
 
 ---
 
-## Failure Handling & Troubleshooting
+## Troubleshooting
 
-### Common Issues and Solutions
+### Common Issues
 
-**1. ImportError: No module named 'tree_sitter'**
+**ImportError: tree_sitter**
 ```bash
-# Solution: Install tree-sitter dependencies
-pip install tree-sitter tree-sitter-python tree-sitter-javascript tree-sitter-go tree-sitter-html tree-sitter-css
+pip install tree-sitter tree-sitter-python tree-sitter-javascript tree-sitter-go
 ```
 
-**2. No parser available for language**
-- Some parsers require tree-sitter dependencies
-- Falls back to skipping unsupported files
-- Check output for "⚠️ No parser available" warnings
+**No parser available for language**
+- Tool skips unsupported files automatically
+- Check output for warnings
 
-**3. AI tool not found (cursor-agent, gemini, codex)**
+**AI tool not found**
 ```bash
-# Fallback: Use structural documentation only
-sdd doc generate ./src --name MyProject
-
-# Or install AI tools:
-# cursor-agent: See cursor.com
-# gemini: npm install -g @google/generative-ai-cli
-# codex: npm install -g @anthropic/codex
+# Fallback to structural docs
+sdd doc generate ./src --name MyProject --verbose
 ```
 
-**4. Validation errors in JSON**
-- Re-run generation with `--verbose` to see details
+**Validation errors in JSON**
+- Re-run with `--verbose` to see details
 - Check for syntax errors in source files
-- Use `sdd doc validate-json` to identify issues
 
-**5. Schema validation fails**
-- Ensure jsonschema installed: `pip install jsonschema`
-- Basic validation runs without it
-- Install for full schema validation
+**Schema validation fails**
+```bash
+pip install jsonschema  # For full schema validation
+```
 
-### Retry Strategies
+### AI Model Failures
 
-**If generation fails:**
-1. Run with `--verbose` to see detailed errors
-2. Add problematic files/directories to `--exclude`
-3. Try with narrower scope (single language)
-4. Check disk space and permissions
+**IMPORTANT: Always report model errors transparently to the user.**
 
-**If AI-enhanced docs fail:**
+**When AI-enhanced docs fail:**
+1. Check tool output for ✓ (success) or ✗ (failure) per model
+2. Report which models failed/succeeded and why
+3. Explain impact on generated docs
+4. Suggest fixes:
+   - Verify installation: `cursor-agent --version`, `gemini --version`
+   - Check API limits/authentication
+   - Try `--single-agent` with working model
+   - Fall back to structural docs: `sdd doc generate`
 
-**IMPORTANT: Always report model errors to the user with specifics.**
-
-1. **Check the tool output** - Look for ✓ (success) or ✗ (failure) symbols for each model
-2. **Report which models failed and why** - Include the specific error (e.g., "model not available", "API error")
-3. **Report which models succeeded** - Let user know if partial success occurred
-4. **Explain the impact** - Was fallback successful? Which docs were/weren't generated?
-5. **Provide next steps** - Suggest fixes or alternatives
-
-**Actions to suggest:**
-- Verify AI tool installation (`cursor-agent --version`, `gemini --version`, `codex --version`)
-- Check API rate limits or authentication
-- Try `--single-agent` with a working model instead of multi-agent
-- Update model configuration if model name is invalid
-- Fall back to structural docs only (`sdd doc generate`)
-
-**Always be transparent about:**
+**Always report:**
 - Which models were attempted
-- Which succeeded/failed and why
-- Whether documentation was still generated (with what limitations)
-- How to fix the issue for future runs
+- Which succeeded/failed with reasons
+- What docs were/weren't generated
+- How to fix for future runs
 
 ---
 
@@ -1323,20 +1083,3 @@ sdd doc generate ./src --name MyProject
 7. **Exclude intelligently** - Default exclusions for tests, migrations, venv, node_modules
 
 8. **Project naming matters** - Always use `--name` for better documentation
-
----
-
-## Final Notes
-
-**This skill provides ready-to-use CLI tools for documentation generation. Your job is to:**
-1. Understand user requirements
-2. Execute the appropriate CLI commands
-3. Validate output
-4. Deliver results with helpful context
-
-**You are NOT:**
-- Writing documentation generators from scratch
-- Implementing AST parsing
-- Creating custom formatters
-
-**The tools are already built - use them effectively!**

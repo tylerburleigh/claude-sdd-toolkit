@@ -10,7 +10,7 @@ description: Task preparation skill for spec-driven workflows. Reads specificati
 This skill is part of the **Spec-Driven Development** family:
 - **Skill(sdd-toolkit:sdd-plan)** - Creates specifications and task hierarchies
 - **Skill(sdd-toolkit:sdd-next)** (this skill) - Identifies next tasks and creates execution plans
-- **Skill(sdd-toolkit:sdd-update)** - Tracks progress and maintains documentation
+- **sdd-update-subagent** - Updates task and spec progress
 
 ## Complete Workflow
 
@@ -54,7 +54,7 @@ This skill is part of the **Spec-Driven Development** family:
 ## Important Notes
 
 **Always Use Absolute Paths:**
-- After Phase 1.1/1.2, all paths (`$SPEC_FILE`, `$SPECS_DIR`) should be absolute
+- After Phase 1.1/1.2, all paths should be absolute
 - Never use relative paths like `specs/active/file.json` - they fail when run from different directories
 - Enhanced discovery (Phase 1.1) checks multiple common locations automatically
 
@@ -64,10 +64,10 @@ This skill is part of the **Spec-Driven Development** family:
 - Query specs via `sdd` commands; avoid ad-hoc parsing
 
 **Fast Context Checklist (daily driver):**
-1. `sdd prepare-task SPEC_ID --json` (auto-discovers specs, selects the next task, and includes dependency status)
-2. If you need more detail, run `sdd task-info SPEC_ID TASK_ID --json` and `sdd check-deps SPEC_ID TASK_ID --json`
-3. Review task metadata, then open the mentioned source/test files; helpers like `sdd find-related-files <path>` and `sdd find-tests --source-file <path>` keep this fast
-4. If `prepare-task` or `check-deps` warns about blockers, run `sdd list-blockers SPEC_ID`
+1. `sdd prepare-task {spec-id} --json` (auto-discovers specs, selects the next task, and includes dependency status)
+2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json` and `sdd check-deps {spec-id} {task-id} --json`
+3. Review task metadata, then open the mentioned source/test files; helpers like `sdd find-related-files {path}` and `sdd find-tests --source-file {path}` keep this fast
+4. If `prepare-task` or `check-deps` warns about blockers, run `sdd list-blockers {spec-id}`
 5. Capture verification steps or linked docs noted in the spec before planning changes
 
 **Command Formatting:**
@@ -78,110 +78,20 @@ This skill is part of the **Spec-Driven Development** family:
 - **Avoid compound commands with &&** when possible - use separate command invocations instead
 - **Never use inline environment variable assignment with &&** - this adds unnecessary complexity
 
-## General Output Formatting Guidelines
+## Output Formatting
 
-**IMPORTANT - How to Present Execution Plans and Task Information:**
-
-When presenting execution plans, task summaries, verification details, or any output to the user, follow these formatting rules for maximum readability.
+**When presenting execution plans and task information:**
 
 **DO:**
-- ✅ Use clear section headers with proper markdown (## or **Header:**)
-- ✅ Put each item on its own line - **never cram multiple items together**
-- ✅ Add a space after emojis, colons, and labels
-- ✅ Use blank lines to separate sections
-- ✅ Use proper markdown lists (- or 1. with newlines)
-- ✅ Keep paragraphs concise and well-spaced
+- Use clear markdown headers (## or **Header:**)
+- Put each item on its own line - never cram multiple items together
+- Use blank lines to separate sections
+- Use proper markdown lists
 
 **DO NOT:**
-- ❌ Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
-- ❌ Use bullet points (●) without proper list formatting
-- ❌ Create dense text blocks with odd line breaks
-- ❌ Let emojis run together or miss spaces after them
-
-**Example of CORRECT format:**
-```
-## Execution Plan Ready: verify-2-1
-
-**Type:** Manual Verification Task
-**Purpose:** Test task status transition resets
-**Phase:** Phase 2-verify - Verification (0/0 tasks, 0%)
-
-### Readiness Check
-
-✅ Ready to begin: no blocking dependencies
-
-### Verification Details
-
-**What we're testing:**
-When a task status is set to in_progress multiple times, the started_at timestamp should be updated each time.
-
-**Expected behavior:**
-- First transition to in_progress: started_at is set
-- Transition to pending: started_at remains
-- Second transition to in_progress: started_at updates to new timestamp
-
-### Implementation Steps
-
-**Step 1: Create test spec**
-- Action: Create minimal test spec file
-- Location: specs/active/test-verify.json
-- Duration: 2 minutes
-
-**Step 2: Test initial status**
-- Command: `sdd update-status test-verify task-1 in_progress`
-- Expected: started_at timestamp is set
-- Duration: 1 minute
-
-### Success Criteria
-
-✅ started_at is set on first in_progress transition
-✅ started_at updates on subsequent in_progress transitions
-✅ Timestamps use ISO 8601 format
-✅ No errors during transitions
-
-**Total Estimated Time:** 8 minutes
-```
-
-**Example of INCORRECT format (NEVER do this):**
-```
-● Execution Plan Ready: verify-2-1
-
-  📋 Task Summary
-
-  Type: Manual Verification TaskPurpose: Test task status transition resets
-  Phase: Phase 2-verify - Verification (0/0 tasks, 0%)
-
-  ✅ Readiness Check
-
-  - Ready to begin: no blocking dependencies
-
-  🎯 Verification Details
-
-  What we're testing: When a task status is set to in_progress multiple times...
-
-  Implementation Steps
-
-  Step 1: Create Test Spec
-
-  Action: Create a minimal test spec file for verificationLocation:
-  specs/active/test-verify-timestamps.jsonDuration: 2 minutes
-```
-
-**Issues with incorrect format:**
-- Multiple items on one line: "Type: Manual Verification TaskPurpose:"
-- Bullet points (●) used inconsistently
-- No clear section structure
-- Information crammed together without breathing room
-- Odd line breaks in the middle of information
-- Hard to scan quickly
-
-**This applies to all sdd-next output:**
-- Execution plan presentations
-- Task summaries and preparation
-- Verification findings
-- Progress reports
-- Context information
-- Any user-facing output
+- Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
+- Create dense text blocks with odd line breaks
+- Use inconsistent formatting
 
 ## Tool Verification
 
@@ -213,15 +123,15 @@ sdd verify-tools
 
 **Step 2: Prepare task (discovers specs automatically)**
 ```bash
-sdd prepare-task SPEC_ID
+sdd prepare-task {spec-id}
 ```
 
 **If prepare-task fails:**
 - **Specs directory not found**: Specify path explicitly with `--path /absolute/path/to/specs`
-- **Spec file not found**: Verify SPEC_ID is correct, check `specs/active/` directory
+- **Spec file not found**: Verify {spec-id} is correct, check `specs/active/` directory
 - **No actionable tasks**: All tasks may be completed or blocked (use `list-blockers` to diagnose)
-- **Multiple specs found**: If you don't know the SPEC_ID, use manual workflow (Phase 1.1)
-- **Circular dependencies detected**: Use `find-circular-deps SPEC_ID` to diagnose, may need spec revision
+- **Multiple specs found**: If you don't know the {spec-id}, use manual workflow (Phase 1.1)
+- **Circular dependencies detected**: Use `find-circular-deps {spec-id}` to diagnose, may need spec revision
 
 The `prepare-task` command handles spec discovery, finds the next actionable task, gathers dependencies, and extracts task details - all in one command. This is the recommended approach for automated workflows.
 
@@ -260,7 +170,7 @@ The `prepare-task` command includes two automatic enhancements:
 
 **If you need to specify a custom specs path:**
 ```bash
-sdd prepare-task SPEC_ID --path /absolute/path/to/specs
+sdd prepare-task {spec-id} --path /absolute/path/to/specs
 ```
 
 ### Manual Spec Validation (Optional)
@@ -277,7 +187,7 @@ While `prepare-task` includes automatic spec validation, you may want to validat
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/SPEC_ID.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate specs/active/{spec-id}.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec structure"
 )
 ```
@@ -336,7 +246,7 @@ For complete validation workflow details, see the [sdd-plan skill validation doc
 sdd verify-tools
 
 # 2. Prepare task automatically (handles everything)
-sdd prepare-task SPEC_ID
+sdd prepare-task {spec-id}
 
 # This single command:
 # - Discovers specs directory
@@ -355,12 +265,12 @@ For critical projects or when spec quality is uncertain, validate the spec first
 # Validate spec before preparing tasks
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/SPEC_ID.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate specs/active/{spec-id}.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec before task prep"
 )
 
 # Then prepare task if validation passes
-sdd prepare-task SPEC_ID
+sdd prepare-task {spec-id}
 ```
 
 **When to validate first:**
@@ -387,11 +297,11 @@ For more validation options, see [Manual Spec Validation](#manual-spec-validatio
 
 ```
 ┌─────────────────────────────────────────┐
-│ Do you know the SPEC_ID to work on?    │
+│ Do you know the {spec-id} to work on?  │
 └────────────┬────────────────────────────┘
              │
         ┌────▼────┐
-        │   YES   │──────────> Use Automated: sdd prepare-task SPEC_ID
+        │   YES   │──────────> Use Automated: sdd prepare-task {spec-id}
         └─────────┘            If succeeds: Skip to Phase 4
                                If fails: See troubleshooting or use manual
 
@@ -410,40 +320,41 @@ This skill uses the `sdd` command that handles:
 - Task discovery and dependency analysis
 - Progress tracking and phase management
 
-### The `sdd-next` tool
+### The `sdd` tool
 
-You have access to the `sdd` command.
+You have access to the `sdd` CLI.
 
 **Available Commands:**
 
 **Spec Operations:**
 - `verify-tools` - Check system requirements
 - `find-specs` - Discover specs directory (supports `-v, --verbose` to show spec files)
-- `next-task <spec-id>` - Find next actionable task
-- `task-info <spec-id> <task-id>` - Get task details from state
-- `check-deps <spec-id> <task-id>` - Check task dependencies
-- `progress <spec-id>` - Show overall progress
-- `list-phases <spec-id>` - List all phases with status
-- `list-blockers <spec-id>` - List all currently blocked tasks
-- `query-tasks <spec-id>` - Query tasks by status, type, or parent (supports `--status`, `--type`, `--parent`)
-- `check-complete <spec-id>` - Check if spec or phase is ready to be marked complete (supports `--phase <phase-id>`)
+- `next-task {spec-id}` - Find next actionable task
+- `task-info {spec-id} {task-id}` - Get task details from state
+- `check-deps {spec-id} {task-id}` - Check task dependencies
+- `progress {spec-id}` - Show overall progress
+- `list-phases {spec-id}` - List all phases with status
+- `list-blockers {spec-id}` - List all currently blocked tasks
+- `query-tasks {spec-id}` - Query tasks by status, type, or parent (supports `--status`, `--type`, `--parent`)
+- `check-complete {spec-id}` - Check if spec or phase is ready to be marked complete (supports `--phase {phase-id}`)
+
 **Workflow Commands:**
-- `prepare-task <spec-id> [task-id]` - Prepare task for implementation (finds next task if task-id not provided)
-- `validate-spec <spec-file>` - Validate spec file structure
-- `find-pattern <pattern>` - Find files matching glob pattern
-- `format-plan <spec-id> <task-id>` - Format execution plan for display
+- `prepare-task {spec-id} [task-id]` - Prepare task for implementation (finds next task if task-id not provided)
+- `validate-spec {spec-id}` - Validate spec file structure
+- `find-pattern {pattern}` - Find files matching glob pattern
+- `format-plan {spec-id} {task-id}` - Format execution plan for display
 
 **Project Analysis Commands:**
 - `detect-project` - Detect project type and dependencies
-- `find-tests` - Discover test files and testing framework (supports `--source-file <file>`)
-- `check-environment` - Verify environmental requirements (supports `--required <deps>`)
-- `find-circular-deps <spec-id>` - Detect circular dependencies
-- `find-related-files <file>` - Find files related to a source file
-- `validate-paths <paths...>` - Validate and normalize file paths (supports `--base-directory <dir>`)
-- `spec-stats <spec-file>` - Get comprehensive spec statistics (supports `--spec-file <file>`)
+- `find-tests` - Discover test files and testing framework (supports `--source-file {file}`)
+- `check-environment` - Verify environmental requirements (supports `--required {deps}`)
+- `find-circular-deps {spec-id}` - Detect circular dependencies
+- `find-related-files {file}` - Find files related to a source file
+- `validate-paths {paths...}` - Validate and normalize file paths (supports `--base-directory {dir}`)
+- `spec-stats {spec-id}` - Get comprehensive spec statistics
 
 **Optional Commands (Advanced/Specialized Use):**
-- `init-env` - Initialize development environment (one-time setup, supports `--spec-path <path>`, `--export`)
+- `init-env` - Initialize development environment (one-time setup, supports `--spec-path {path}`, `--export`)
 - `--no-color` - Disable colored output
 - `--verbose, -v` - Show detailed output (info messages)
 - `--quiet, -q` - Minimal output (errors only)
@@ -459,117 +370,11 @@ You have access to the `sdd` command.
 
 ## Optional Context Enhancement Tools
 
-The following tools are **optional** but can significantly enhance context gathering during task preparation. These tools are not required for core sdd-next functionality, but provide automated code analysis and documentation lookup when available.
+**code-doc**: Generate codebase documentation. Use the `code-doc` subagent to create comprehensive docs. Check if docs exist: `sdd doc stats`. See code-doc SKILL.md for details.
 
-### Generating Documentation for Context (Optional)
+**doc-query**: Query generated documentation for rapid codebase understanding. Use `Skill(sdd-toolkit:doc-query)` for smart context gathering (task-specific files, dependencies, test discovery). Falls back to manual exploration (`Explore`, `Glob`, `Grep`) if docs unavailable.
 
-Before you can query codebase documentation for context, the documentation must first be generated. Use the code-doc subagent to create comprehensive codebase documentation.
-
-**When to generate documentation:**
-
-- **Beginning of project**: Create initial documentation baseline
-- **After major changes**: Regenerate to reflect new code structure
-- **Before complex tasks**: Ensure context is available for informed decisions
-- **When doc-query fails**: Documentation may be missing or outdated
-
-**Check if documentation exists:**
-
-```bash
-sdd doc stats
-```
-
-If documentation doesn't exist or is outdated, generate it using the code-doc subagent.
-
-**Invoke the code-doc subagent:**
-
-```
-Task(
-  subagent_type: "sdd-toolkit:code-doc",
-  prompt: "Generate codebase documentation for the project. Analyze all source files and create comprehensive documentation.",
-  description: "Generate codebase docs"
-)
-```
-
-**Common documentation generation scenarios:**
-
-**1. Generate initial documentation:**
-```
-Task(
-  subagent_type: "sdd-toolkit:code-doc",
-  prompt: "Generate codebase documentation for the entire project. Include all source files, classes, functions, and dependencies.",
-  description: "Initial doc generation"
-)
-```
-
-**2. Regenerate after major changes:**
-```
-Task(
-  subagent_type: "sdd-toolkit:code-doc",
-  prompt: "Regenerate codebase documentation to reflect recent changes. Update existing documentation with new code structure.",
-  description: "Regenerate docs"
-)
-```
-
-**3. Generate selective documentation:**
-```
-Task(
-  subagent_type: "sdd-toolkit:code-doc",
-  prompt: "Generate documentation for the src/services/ directory. Focus on service layer implementation and API interfaces.",
-  description: "Generate service docs"
-)
-```
-
-**Documentation generation workflow:**
-
-1. **Check if docs exist**: Run `sdd doc stats` to verify documentation status
-2. **Generate if needed**: Invoke code-doc subagent to create documentation
-3. **Query for context**: Use doc-query to access the generated documentation (see next section)
-
-For detailed documentation generation options and configuration, see the [code-doc skill documentation](../code-doc/SKILL.md).
-
-### Codebase Documentation Query
-
-**Availability**: Requires codebase documentation generated by the code-doc subagent (see section above). Invoke `Skill(sdd-toolkit:doc-query)` to access these capabilities.
-
-**Purpose**: Provides rapid structural understanding of the codebase without manual exploration
-
-**When it's mentioned in this guide**:
-- Phase 1.4 (Understand Project Context) - Optional alternative to manual exploration
-- Phase 3.1 (Extract Task-Specific Details) - Smart context gathering using SDD integration
-- Phase 3.3 (Examine Related Files) - Finding similar implementations and impact analysis
-- Phase 3.4 (Identify Testing Requirements) - Test context discovery
-
-**Usage**:
-First check if documentation exists:
-```bash
-sdd doc stats
-```
-
-If available, invoke `Skill(sdd-toolkit:doc-query)` which provides commands like:
-- `sdd doc list-modules` - List all modules
-- `sdd doc search "keyword"` - Search for functionality
-- And many more targeted queries
-
-**If codebase documentation has not been generated**: Fall back to manual file exploration using the `Explore` tool.
-
-### Skill(sdd-toolkit:doc-query) - Smart Context for SDD Workflows
-
-**Availability**: Invoke `Skill(sdd-toolkit:doc-query)` to access codebase documentation query capabilities (which use `sdd doc` commands under the hood).
-
-**Purpose**: Bridges codebase documentation with SDD workflows to provide task-specific file suggestions and impact analysis
-
-**When it's mentioned in this guide**:
-- Phase 3.1 (Extract Task-Specific Details) - Get suggested files for specific tasks
-- Phase 3.3 (Examine Related Files) - Find similar implementations and dependencies
-- Phase 3.4 (Identify Testing Requirements) - Test file discovery and coverage estimation
-
-**Alternative approaches if codebase documentation has not been generated:**
-- For task context: Review spec file for mentioned files, use `Explore` to search for related code
-- For similar implementations: Use `Glob` to find files with similar names/patterns
-- For impact analysis: Use `Grep` to find imports and references manually
-- For test context: Use `sdd-next` with the `find-tests` command or `Glob` for test file patterns
-
-**Important**: All workflows in this guide that reference `Skill(sdd-toolkit:doc-query)` are **recommendations for enhanced context**, not requirements. The core sdd-next workflow functions without them.
+**When mentioned in workflows**: Optional enhancements, not requirements. Core sdd-next functions without them.
 
 ## Interactive Question Tool
 
@@ -597,7 +402,7 @@ When presenting options to the user, you MUST use `AskUserQuestion`. NEVER use t
 **This is NOT optional** - it's a core part of the skill's UX design.
 
 **Example Usage:**
-```javascript
+```
 AskUserQuestion(
   questions: [{
     question: "Which task would you like to work on?",
@@ -745,1223 +550,224 @@ Ready to implement?
 
 ## The Developer Workflow
 
-### Phase 0: Context Window Check (Before Starting)
+### Quick Start Decision Tree
 
-Before identifying and preparing the next task, check the Claude Code context window usage to ensure efficient session management and prevent context overflow.
+**Step 1: Check Context (Optional)**
 
-**When to Check:**
-- At the beginning of the sdd-next workflow
-- Before finding and preparing the next task
-- Each time sdd-next is invoked to identify work
+If needed: `sdd context --json`. If ≥75%, recommend reset with `AskUserQuestion` (options: "Stop and Reset" or "Continue").
 
-**How to Check:**
+**Step 2: Run Automated Workflow**
+
 ```bash
-# Get context usage as JSON
-sdd context --json
+# If you know the spec-id:
+sdd prepare-task {spec-id} --json
+
+# If you don't know the spec-id:
+# See "Edge Case: Multiple Specs" below
 ```
 
-**Example Output:**
-```json
-{
-  "context_length": 157000,
-  "context_percentage": 78.5,
-  "max_context": 200000,
-  "input_tokens": 45000,
-  "output_tokens": 32000,
-  "cached_tokens": 80000,
-  "total_tokens": 157000
-}
-```
+**Step 3: Handle Result**
 
-**Decision Logic:**
+- ✅ Success → Skip to "Create Execution Plan" below
+- ⚠️  Multiple specs found → See "Edge Case: Multiple Specs"
+- ❌ No actionable tasks → See "Edge Case: No Actionable Tasks"
+- ❌ Other error → See Troubleshooting section
 
-**If context_percentage >= 75%:**
+---
 
-The context window is approaching capacity. Present a recommendation to the user before continuing:
+### Edge Case: Multiple Specs
 
-```
-⚠️  Context Window Usage High
-
-Current Usage: 78.5% (157,000 / 200,000 tokens)
-
-Before continuing with the next task, it's recommended to reset your session:
-
-1. Stop work here
-2. Run /clear to reset the context window
-3. Run /sdd-begin to resume from where you left off
-
-When you resume:
-✅ All completed tasks are preserved in the spec file
-✅ The next actionable task will be automatically identified
-✅ You'll continue with a fresh context window
-
-Continuing with high context usage may lead to:
-❌ Degraded performance
-❌ Context overflow errors
-❌ Loss of important context information
-```
-
-Then use `AskUserQuestion` to get the user's decision:
-
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "Context window is 78.5% full. How would you like to proceed?",
-    header: "Context Full",
-    multiSelect: false,
-    options: [
-      {
-        label: "Stop and Reset (Recommended)",
-        description: "Reset context with /clear, then /sdd-begin to resume work"
-      },
-      {
-        label: "Continue Anyway",
-        description: "Proceed with task preparation despite high context usage"
-      }
-    ]
-  }]
-)
-```
-
-**User Response Handling:**
-- **Stop and Reset**: Acknowledge the user's decision, remind them to run `/clear` followed by `/sdd-begin`, then exit gracefully
-- **Continue Anyway**: Proceed with the workflow (Phase 1: Spec Discovery), but the user has been warned about potential issues
-
-**If context_percentage < 75%:**
-- Continue normally with Phase 1
-- No user interaction needed
-- Context usage is healthy for continued work
-
-**Best Practices:**
-- Always check context at the start of sdd-next
-- The 75% threshold provides a safety buffer before issues occur
-- Resetting is quick and preserves all progress in the spec file
-- Better to reset proactively than encounter context overflow mid-task
-
-**Note:** Context window management is also performed by sdd-update after task completion. This check serves as a complementary safety measure to catch high context usage before starting new work, especially when sdd-next is invoked directly.
-
-### Phase 1: Spec Discovery and Context Gathering
-
-Understand the overall specification before diving into specific tasks.
-
-**Data Source:**
-- **JSON spec files** = Single source of truth for all spec data
-- Contains: task details, metadata, dependencies, status, and implementation details
-- Located in `specs/active/{spec-id}.json`
-- All task information is queried from JSON using the `sdd` command
-
-#### 1.0 Locate Active Specifications
-
-Find specifications that need implementation work.
+**When:** You don't know which spec-id to use, or `prepare-task` returns multiple specs.
 
 **Steps:**
-1. Search multiple common locations for specs directories
-2. Convert found paths to absolute paths immediately
-3. List all specification files
-4. Identify specs with tasks remaining
 
+1. **Find available specs:**
 ```bash
-# Discover and display specs directory
-sdd find-specs
-
-# List active specs with verbose output
 sdd find-specs --verbose
 ```
 
-**Note:** Most commands auto-discover the specs directory, so you typically don't need to run `find-specs` separately. Use the `--path` parameter if you need to specify a custom location.
+2. **Present options to user with AskUserQuestion:**
 
-**If find-specs fails:**
-- **No specs directory found**:
-  - Check current directory for `specs/active/` folder
-  - Check parent directory for `specs/active/` folder
-  - Specify path explicitly: `--path /absolute/path/to/specs`
-  - Verify spec files exist and are `.json` format
-- **Permission denied**: Check read permissions on specs directory
-- **Empty directory**: No active specs found - use `sdd-plan` to create one
-
-**Multiple Specs Handling:**
-
-`prepare-task` and other commands accept a single `SPEC_ID`. When several specs are active:
-
-1. Run `sdd find-specs --verbose` to get all available specs with progress summaries
-2. Present the specs to the user in text format with key information
-3. Use `AskUserQuestion` to let user select which spec to work on
-
-**Example:**
-
-After running `sdd find-specs --verbose`, present context:
 ```
-Found 3 active specifications:
+📋 Multiple Specifications Found
 
-1. user-auth-2025-10-18-001: User Authentication System
-   Phase 2/4 (35% complete, 7/23 tasks)
-
-2. payment-api-2025-10-20-003: Payment API Integration
-   Phase 1/3 (10% complete, 2/15 tasks)
-
-3. data-migration-2025-10-21-001: Database Migration to PostgreSQL
-   Phase 3/5 (60% complete, 12/18 tasks)
+Available specs:
+- user-auth-2025-10-24-001 (Active, 5 pending tasks, 60% complete)
+- api-refactor-2025-10-25-001 (Active, 12 pending tasks, 30% complete)
+- bug-fix-2025-10-26-001 (Active, 2 pending tasks, 75% complete)
 ```
 
-Then ask with `AskUserQuestion`:
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "Which specification would you like to work on?",
-    header: "Spec Select",
-    multiSelect: false,
-    options: [
-      {
-        label: "user-auth (35%)",
-        description: "User Authentication System - Phase 2/4, 7 of 23 tasks done"
-      },
-      {
-        label: "payment-api (10%)",
-        description: "Payment API Integration - Phase 1/3, 2 of 15 tasks done"
-      },
-      {
-        label: "data-migration (60%)",
-        description: "Database Migration - Phase 3/5, 12 of 18 tasks done"
-      }
-    ]
-  }]
-)
-```
-
-**After user selects:** Use the full `SPEC_ID` (e.g., `user-auth-2025-10-18-001`) for subsequent commands. If the chosen spec is blocked, use `sdd list-blockers SPEC_ID` to diagnose before proceeding.
-
-Most spec operations auto-discover the `specs/active` directory. Only use `--path` when the specs live in a custom location.
-
-
-#### 1.1 Load Spec File
-
-Load the JSON spec file to access all specification data.
-
-**Data Source:**
-All spec information is in the JSON file at `specs/active/{spec-id}.json`:
-- Metadata (spec_id, title, overview, objectives, risk level)
-- Complete task hierarchy (phases, tasks, subtasks)
-- Task details (changes, reasoning, integration points)
-- Dependencies and verification steps
-- Current status and progress
-
-**Steps:**
-1. Confirm the `SPEC_ID` you selected (see 1.1) – no manual path lookup is required unless you are using a custom specs directory
-2. Use CLI commands to read structured data from the JSON JSON spec file (skip manual parsing)
-3. Rely on the outputs of `sdd progress SPEC_ID --json`, `sdd list-phases SPEC_ID --json`, or `sdd prepare-task SPEC_ID --json` to obtain titles, hierarchy, and metadata
-
-**Key Metadata Available:**
-- **Spec ID**: Unique identifier (from JSON root)
-- **Title**: What this spec accomplishes
-- **Hierarchy**: Complete task breakdown with status
-- **Metadata**: Risk level, dependencies, timestamps
-
-**Recommended Queries:**
-```bash
-# Quick spec overview (auto-discovers specs directory)
-sdd progress SPEC_ID --json
-
-# Inspect phase breakdown
-sdd list-phases SPEC_ID --json
-
-# Full task + dependency bundle
-sdd prepare-task SPEC_ID --json
-```
-
-#### 1.2 Discover Next Task
-
-Retrieve current progress and task status.
-
-**Steps:**
-1. Use spec_id to locate JSON file: `specs/active/{spec-id}.json`
-2. Query hierarchy structure using `sdd-next`
-3. Identify task statuses
-4. Find next actionable task
-5. Calculate current progress
-
-**JSON Spec File Structure:**
-
-Use `sdd-next` for all JSON spec file queries.
-
-```json
-{
-  "spec_id": "user-auth-2025-10-18-001",
-  "generated": "2025-10-18T10:00:00Z",
-  "last_updated": "2025-10-18T14:30:00Z",
-
-  "hierarchy": {
-    "spec-root": {
-      "type": "spec",
-      "title": "User Authentication",
-      "status": "in_progress",
-      "parent": null,
-      "children": ["phase-1", "phase-2", "phase-3"],
-      "total_tasks": 23,
-      "completed_tasks": 7,
-      "metadata": {}
-    },
-    
-    "phase-1": {
-      "type": "phase",
-      "title": "Database Schema",
-      "status": "completed",
-      "parent": "spec-root",
-      "children": ["phase-1-files", "phase-1-verify"],
-      "total_tasks": 7,
-      "completed_tasks": 7,
-      "metadata": {}
-    },
-    
-    "task-2-1": {
-      "type": "task",
-      "title": "src/services/authService.ts",
-      "status": "pending",
-      "parent": "phase-2-files",
-      "children": ["task-2-1-1", "task-2-1-2"],
-      "dependencies": {
-        "blocks": [],
-        "blocked_by": [],
-        "depends": ["task-1-2"]
-      },
-      "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {
-        "file_path": "src/services/authService.ts",
-        "estimated_hours": 3
-      }
-    }
-  }
-}
-```
-
-**Example Queries:**
-```bash
-# Get overall progress
-sdd progress SPEC_ID
-
-# List all phases
-sdd list-phases SPEC_ID
-```
-
-#### 1.3 Understand Project Context
-
-Gather information about the codebase and project structure.
-
-**Steps:**
-1. Identify project type (from spec frontmatter or file structure)
-2. Locate key directories (src, tests, config, etc.)
-3. Identify existing patterns and conventions
-4. Note related files mentioned in spec
-5. Understand tech stack and dependencies
-
-**Project Type Detection:**
-
-Use the Python tool for automatic project detection:
-
-```bash
-sdd detect-project  # Add --json for JSON output
-```
-
-Automatically detects Node.js, Python, Rust, Go, Java projects and their dependency managers.
-
-**Codebase Documentation Query (Optional - Recommended if available):**
-
-If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` for rapid context gathering:
-
-```bash
-# First check if documentation exists (auto-detects location)
-sdd doc stats
-```
-
-If documentation is available, invoke `Skill(sdd-toolkit:doc-query)` to:
-- Get quick project overview (module count, class count, complexity metrics)
-- List all modules
-- Search for relevant entities
-
-**If codebase documentation has not been generated:**
-- Use `sdd detect-project --json` for a quick inventory of project type, dependency managers, and key config files
-- Use `sdd find-related-files <path>` to surface neighbouring, similar, and test files for the task at hand
-- Use `sdd find-tests --source-file <path>` (or without the flag) to map the existing test layout
-- Fall back to `Explore`, `Glob`, `Read`, or manual exploration only when the CLI helpers do not provide enough detail
-
-**Benefits when available:** Instant structural understanding without manual exploration.
-
-#### 1.4 Understanding JSON Spec Files
-
-**Data Source:** JSON spec files (`specs/active/*.json`) are the single source of truth for all specification data.
-
-**What's in the JSON:**
-- Complete task hierarchy (phases, tasks, subtasks)
-- Current task statuses (`pending`, `in_progress`, `completed`)
-- Task details (changes, reasoning, integration points)
-- Dependencies (`blocks`, `blocked_by`, `depends`)
-- Progress metrics (`completed_tasks`, `total_tasks`)
-- File paths and metadata
-- Verification procedures
-- Architecture decisions
-
-**Use JSON for:**
-- Finding next available task
-- Getting task implementation details
-- Checking task dependencies
-- Calculating progress percentages
-- Verifying task completion status
-- Identifying blockers
-- Creating execution plans
-
-**Query with:** `sdd-next` commands (see `next-task`, `task-info`, `check-deps`, `progress`)
-
-**Efficient pattern:**
-```bash
-# Use prepare-task to get everything in one command
-sdd prepare-task "$SPEC_ID"
-# Returns: next task + details + dependencies from JSON
-```
-
-### Phase 2: Task Identification and Selection
-
-Find the next actionable task that should be implemented.
-
-#### 2.1 Query Available Tasks
-
-Identify tasks that can be started now.
-
-```bash
-# Find the next actionable task
-sdd next-task "$SPEC_ID" --path "$SPECS_DIR"
-
-# Get detailed info about a specific task
-sdd task-info "$SPEC_ID" "$TASK_ID" --path "$SPECS_DIR"
-
-# Check if a task is ready to start
-sdd check-deps "$SPEC_ID" "$TASK_ID" --path "$SPECS_DIR"
-```
-
-**Advanced Task Querying:**
-
-For more complex filtering beyond the next single task:
-
-```bash
-# Find all pending tasks in a specific phase
-sdd query-tasks "$SPEC_ID" --status pending --parent phase-2
-
-# Find all blocked tasks to understand what's holding up progress
-sdd list-blockers "$SPEC_ID"
-
-# Find all verification tasks
-sdd query-tasks "$SPEC_ID" --type verify
-
-# Combine filters: pending tasks in phase-2
-sdd query-tasks "$SPEC_ID" --status pending --parent phase-2 --json
-```
-
-**When to use each:**
-- `next-task` - Simple: "What should I work on next?" (returns single task)
-- `query-tasks` - Complex: "Show me all pending tasks in phase-2" (returns filtered list)
-- `list-blockers` - Analysis: "What tasks are currently blocked and why?" (diagnostic)
-
-**If next-task fails or returns no results:**
-
-**Scenario: No actionable tasks found**
-
-When `sdd next-task` returns no available tasks, investigate and present options using `AskUserQuestion`:
-
-1. Run diagnostic commands:
-   ```bash
-   sdd progress SPEC_ID
-   sdd list-blockers SPEC_ID
-   sdd check-complete SPEC_ID
-   ```
-
-2. **Present context based on findings:**
-   ```
-   ⚠️  No Actionable Tasks Found
-
-   Status: 18/23 tasks completed (78%)
-
-   Findings:
-   - 5 tasks remaining
-   - 3 tasks blocked (task-3-1, task-3-2, task-4-3)
-   - 2 tasks completed but not marked (task-2-5, task-2-7)
-
-   Blockers:
-   - Redis server not configured (blocks 2 tasks)
-   - API keys missing (blocks 1 task)
-   ```
-
-3. **Then ask with AskUserQuestion:**
-   ```javascript
-   AskUserQuestion(
-     questions: [{
-       question: "No tasks are currently actionable. How would you like to proceed?",
-       header: "No Tasks",
-       multiSelect: false,
-       options: [
-         {
-           label: "Review Blockers",
-           description: "Show detailed blocker information and resolution steps"
-         },
-         {
-           label: "Check if Complete",
-           description: "Verify if this spec is finished"
-         },
-         {
-           label: "Add More Tasks",
-           description: "Use sdd-plan to extend the specification"
-         },
-         {
-           label: "Different Spec",
-           description: "Work on a different specification instead"
-         }
-       ]
-     }]
-   )
-   ```
-
-**Other failure scenarios:**
-- **All tasks blocked**: Use the blocker handling flow (see Workflow 3)
-- **Multiple specs returned**: Verify you're using correct SPEC_ID, check spelling
-- **Spec file corrupt/invalid**: Validate spec with `validate-spec` command or regenerate with Skill(sdd-toolkit:sdd-plan)
-
-#### 2.2 Apply Selection Criteria
-
-Choose the best task to work on next based on multiple factors.
-
-**Priority Order:**
-1. **Blocked tasks are unblocked** - If dependency just completed
-2. **Current phase tasks** - Stay in the active phase
-3. **Sequential tasks** - Follow natural order (task-1-1 → task-1-2)
-4. **High-priority tasks** - If marked in metadata
-5. **Parallel-safe tasks** - Can start anytime
-
-**Selection Algorithm:**
-
-The Python tool handles all the logic:
-- Find current in_progress phase (or first pending phase)
-- Find first unblocked task in that phase
-- Return the task with details
-
-```bash
-# Find next actionable task
-sdd next-task SPEC_ID
-
-# Get JSON output for programmatic use
-sdd next-task SPEC_ID --json
-```
-
-**Validation:**
-- Ensure task is truly unblocked
-- Check if dependencies are actually completed
-- Verify no circular dependencies
-- Confirm task hasn't been started by another tool
-
-#### 2.3 Present Task Options to User
-
-Show available tasks and recommend one.
-
-**Enhanced Presentation with Blocker Analysis:**
-
-```bash
-# Get comprehensive task status including blockers
-sdd next-task "$SPEC_ID"
-sdd list-blockers "$SPEC_ID"
-```
-
-**Presentation Approach - Use Interactive Questions:**
-
-Instead of text-based prompting, use the `AskUserQuestion` tool for structured user interaction:
-
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "Which task would you like to work on?",
-    header: "Task Select",
-    multiSelect: false,
-    options: [
-      {
-        label: "task-2-1 (Recommended)",
-        description: "src/services/authService.ts - Core authentication service (3 hours)"
-      },
-      {
-        label: "task-1-7 (Parallel-safe)",
-        description: "tests/user.spec.ts - User model tests (1.5 hours)"
-      },
-      {
-        label: "More details",
-        description: "Show detailed information about tasks and blockers"
-      },
-      {
-        label: "Defer",
-        description: "Save this for later"
-      }
-    ]
-  }]
-)
-```
-
-**Before asking, present context to user in text:**
-```
-📋 Next Actionable Tasks for: User Authentication
-
-Current Phase: Phase 2 - Authentication Service (2/8 tasks, 25%)
-
-🎯 RECOMMENDED: task-2-1
-   File: src/services/authService.ts
-   Purpose: Implement core authentication service
-   Estimated: 3 hours
-   Dependencies: ✅ task-1-2 (User model) completed
-
-🚫 BLOCKED TASKS (2):
-   task-2-3: src/middleware/auth.ts
-   └─ Waiting on: task-2-1 (Implement core authentication service)
-
-   task-3-1: src/cache/redis.ts
-   └─ Waiting on: External dependency (Redis server setup)
-
-📌 OTHER AVAILABLE TASKS:
-
-   task-1-7: tests/user.spec.ts [PARALLEL-SAFE]
-   Purpose: Write user model tests
-   Estimated: 1.5 hours
-   Dependencies: None (can start anytime)
-   Note: From completed Phase 1
-```
-
-**Benefits of this approach:**
-- ✅ User sees full context before choosing
-- ✅ Structured response - no need to parse free text
-- ✅ Clear, actionable options
-- ✅ "Other" option always available for custom input
-
-**Benefits of showing blocked tasks:**
-- Helps user understand the impact of completing recommended task
-- Shows what will be unblocked by completing task-2-1
-- Identifies external dependencies that need resolution
-
-**User Response Handling:**
-- If user selects recommended task → Proceed to Phase 3 with selected task
-- If user selects alternative task → Proceed with their choice
-- If user selects "More details" → Provide deep dive on specific task
-- If user selects "Defer" or enters custom "Other" response → Handle gracefully
-
-### Phase 3: Task Context Assembly
-
-Gather all information needed to implement the selected task.
-
-#### 3.1 Extract Task-Specific Details from JSON
-
-Query the JSON spec file for task-specific implementation details.
-
-**Task Details Location:**
-All task information is in the JSON spec file hierarchy under the task's ID.
-
-**Task Extraction:**
-
-Use `task-info` command to get complete task details from JSON:
-
-```bash
-# Get task details from JSON
-sdd task-info user-auth-2025-10-18-001 task-2-1
-
-# Or with explicit path
-sdd task-info user-auth-2025-10-18-001 task-2-1 --path /absolute/path/to/specs
-```
-
-**What you get from task-info query:**
-- ✅ Complete task details from structured data
-- ✅ Implementation changes list
-- ✅ Reasoning and context
-- ✅ Integration points
-- ✅ File paths and dependencies
-- ✅ Current status
-
-**Enhanced Context with Documentation (Optional - Recommended if available):**
-
-If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` for:
-- Automated file suggestions based on task description
-- Structured data - no parsing needed
-- Complete context in single query
-
-**If codebase documentation has not been generated:**
-- Review the spec file's task details for mentioned files
-- Use the `Explore` tool to explore the codebase for additional context
-- Use `Grep` to search for related code patterns
-- Use `Glob` to find files with similar names
-- Manually examine files mentioned in integration points
-
-#### 3.2 Gather Dependency Context
-
-Understand what this task depends on and what depends on it.
-
-**From Spec File:**
-
-**⚠️ Use `sdd` commands to query dependencies - DO NOT attempt manual JSON parsing.**
-
-```json
-// Example dependency structure in spec file:
-"task-2-1": {
-  "dependencies": {
-    "blocks": ["task-2-2", "task-2-4"],      // What this task blocks
-    "blocked_by": [],                         // What blocks this task (empty = can start)
-    "depends": ["task-1-2"]                   // Soft dependencies
-  }
-}
-```
-
-**Analysis:**
-1. **Blocked By**: Must complete these first (hard dependencies)
-2. **Depends**: Recommended order (soft dependencies)
-3. **Blocks**: What's waiting on this task
-4. **Related**: Other tasks in same file or related files
-
-**Dependency Details:**
-For each dependency, gather:
-```bash
-# Get dependency info using Python tool
-sdd check-deps "$SPEC_ID" "$TASK_ID" --path "$SPECS_DIR" --json
-
-# Or for human-readable output:
-sdd check-deps "$SPEC_ID" "$TASK_ID" --path "$SPECS_DIR"
-```
-
-**Example Output:**
-```
-Dependencies for task-2-1:
-
-✅ Completed Dependencies:
-   - task-1-2: src/models/User.ts (completed 2025-10-18 14:00)
-     Provides: User model interface and database access
-
-📦 Soft Dependencies (recommended):
-   - None
-
-⏳ This Task Blocks:
-   - task-2-2: src/middleware/auth.ts
-   - task-2-4: src/routes/auth.ts
-```
-
-#### 3.3 Examine Related Files
-
-Look at files that will interact with this task.
-
-Examine these file types:
-1. **Primary File** - The file being modified
-2. **Dependency Files** - Files this task relies on (from `check-deps`)
-3. **Integration Files** - Files that will use this task's output
-4. **Pattern Files** - Similar files for convention reference (use `find-related-files`)
-
-**Example Context Assembly (you create this based on file examination):**
-```
-Related Files for task-2-1:
-
-📝 Primary File: src/services/authService.ts
-   Status: Does not exist (will create)
-
-📚 Dependencies:
-   src/models/User.ts
-   └─ User interface, findByEmail(), validatePassword()
-
-   src/config/jwt.ts
-   └─ JWT secret, token expiration settings
-
-🔌 Integration Points:
-   src/middleware/auth.ts (will use AuthService.verifyToken)
-   src/routes/auth.ts (will use AuthService.login/logout)
-
-📋 Pattern Reference:
-   src/services/userService.ts
-   └─ Shows service class structure, error handling patterns
-```
-
-**Enhanced Context with Documentation (Optional - Recommended if available):**
-
-If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` for:
-- Automatic discovery of integration points and affected files
-- Finding similar implementation patterns
-- Understanding module dependencies
-
-**If codebase documentation has not been generated:**
-- Use `Grep` to search for imports: `grep -r "import.*AuthService" .`
-- Use `Glob` to find similar files: `glob "**/*Service.ts"`
-- Manually review files mentioned in task dependencies
-- Use `find-related-files` command for basic file relationships
-
-#### 3.4 Identify Testing Requirements
-
-Determine what tests need to be written or modified.
-
-**Review Verification Requirements:**
-
-Use `sdd query-tasks "$SPEC_ID" --type verify --json` or inspect the `verifications` array in the JSON spec to confirm what needs to be tested and how success is measured.
-
-**Test File Discovery:**
-
-```bash
-sdd find-tests  # Find all test files
-sdd find-tests --source-file src/services/authService.ts  # Find specific test
-```
-
-**Example Testing Context (you create this based on verification steps):**
-```
-Testing Requirements for task-2-1:
-
-✅ Test File: tests/services/authService.spec.ts
-   Status: Does not exist (will create)
-
-📋 Test Cases Needed:
-   1. login() with valid credentials → returns JWT
-   2. login() with invalid password → throws error
-   3. login() with non-existent user → throws error
-   4. logout() → invalidates token
-   5. Password hashing → bcrypt with proper salt
-
-🔍 Verification Step (verify-2-1):
-   Type: Automated test
-   Execution: Use run-tests subagent
-   ```
-   Task(
-     subagent_type: "sdd-toolkit:run-tests-subagent",
-     prompt: "Run tests for authService.spec.ts. Execute all auth service tests and report results.",
-     description: "Test authService"
-   )
-   ```
-   Expected: All auth service tests passing
-   Status: pending
-
-   ⚠️ All tests must pass before marking task complete
-```
-
-**Enhanced Test Context with Documentation (Optional - Recommended if available):**
-
-If codebase documentation has been generated, use `Skill(sdd-toolkit:doc-query)` for:
-- Automatic test file discovery
-- Understanding test coverage patterns
-- Finding similar test implementations
-
-**If codebase documentation has not been generated:**
-- Use `find-tests` command to discover test files
-- Use `Glob` to search for test patterns: `**/*test*.ts`, `**/*.spec.ts`
-- Manually review existing test files for patterns and structure
-- Check spec file for verification steps that indicate test requirements
-
-**Benefits when available:** Automatic discovery of test files and coverage estimation.
-
-#### 3.5 Check for Blockers or Risks
-
-Identify potential issues that could prevent completion.
-
-**From Spec Risk Assessment:**
-```yaml
-risk_level: medium
-risk_areas:
-  - name: "JWT Secret Management"
-    mitigation: "Use environment variables, never commit secrets"
-  - name: "Password Hashing Performance"
-    mitigation: "Use bcrypt with appropriate work factor (10-12)"
-```
-
-**Blocker Analysis:**
-```
-Potential Blockers for task-2-1:
-
-✅ Clear:
-   - Dependencies installed (bcrypt, jsonwebtoken)
-   - User model available
-   - TypeScript configured
-
-⚠️  Warnings:
-   - JWT_SECRET not in .env.example (need to add)
-   - No bcrypt work factor constant defined (use 12)
-
-🚫 Blocking Issues:
-   - None identified
-```
-
-### Phase 4: Execution Plan Creation
-
-Create a detailed, step-by-step plan for implementing the task.
-
-#### 4.1 Define Implementation Steps
-
-Break the task into concrete, ordered steps.
-
-**Example Step Structure (you create this for the execution plan):**
-```markdown
-## Execution Plan: task-2-1 (src/services/authService.ts)
-
-### Prerequisites
-- [x] User model exists (src/models/User.ts)
-- [x] bcrypt and jsonwebtoken installed
-- [ ] JWT config file created (will create if needed)
-- [x] No blocking issues
-
-### Implementation Steps
-
-#### Step 1: Create File Structure
-**Action**: Create src/services/authService.ts
-**Reasoning**: New file, establish basic structure
-**Duration**: 5 minutes
-**Key elements**: Import bcrypt, jwt, User model, jwtConfig; create AuthService class
-
-#### Step 2: Implement Password Hashing
-**Action**: Add login method with password verification
-**Reasoning**: Core authentication logic
-**Duration**: 30 minutes
-**Key points**:
-- Use bcrypt.compare() for password verification
-- Handle timing attacks (always hash even if user not found)
-- Return clear error messages
-- Implement: findByEmail(), validate password, generateToken()
-
-[Continue with remaining steps...]
-
-**Total Estimated Time:** ~2.5 hours (within 3-hour estimate)
-
-#### 4.2 Define Success Criteria
-
-Specify exactly what "done" means for this task.
-
-**Example Success Criteria (you create this based on task requirements):**
-```markdown
-### Task Completion Checklist
-
-#### Implementation Complete
-- [ ] File created: src/services/authService.ts
-- [ ] AuthService class implements all methods:
-  - [ ] login(email, password) → JWT token
-  - [ ] logout(token) → void
-  - [ ] generateToken(user) → JWT (private)
-- [ ] Password hashing uses bcrypt.compare()
-- [ ] JWT generation uses proper config
-- [ ] Error handling with AuthenticationError
-- [ ] TypeScript types are correct (no 'any')
-- [ ] Follows existing service patterns
-
-#### Testing Complete
-- [ ] Test file created: tests/services/authService.spec.ts
-- [ ] All test cases implemented
-- [ ] Tests pass via run-tests subagent (Task(subagent_type="sdd-toolkit:run-tests-subagent", ...))
-- [ ] Test coverage >80% for AuthService
-
-#### Integration Verified
-- [ ] AuthService can be imported by other files
-- [ ] No circular dependency issues
-- [ ] TypeScript compilation succeeds
-- [ ] Linting passes
-
-#### Documentation
-- [ ] JSDoc comments on public methods
-- [ ] README updated if needed
-- [ ] Comments explain non-obvious logic
-
-#### Verification (from spec verify-2-1)
-- [ ] Executed via run-tests subagent (see verification step example above)
-- [ ] Result: All tests passing
-```
-
-**Definition of Done:**
-All checkboxes checked, no failing tests, ready for code review.
-
-#### 4.3 Identify Potential Issues
-
-Note possible problems and solutions.
-
-**Example Potential Issues (you create this based on task analysis):**
-```markdown
-### Potential Issues and Mitigations
-
-#### Issue 1: JWT Secret Not Configured
-**Problem:** JWT_SECRET might not be in environment variables
-**Mitigation:** 
-1. Add JWT_SECRET to .env.example
-2. Check .env file exists and has secret
-3. Update src/config/jwt.ts to throw clear error if missing
-
-#### Issue 2: Bcrypt Performance
-**Problem:** Password hashing might be slow in tests
-**Mitigation:**
-1. Use lower work factor in test environment (6-8 vs 12)
-2. Consider mocking bcrypt in some tests
-3. Run integration tests separately from unit tests
-
-[Additional issues as needed...]
-```
-
-#### 4.4 Plan Testing Strategy
-
-Detail how to verify the implementation.
-
-**Testing Layers:**
-- Unit Tests: Isolated method testing with mocks
-- Integration Tests: Full flow with real dependencies
-- Manual Verification: API testing
-- Security Review: Vulnerability checks
-
-### Phase 5: Plan Presentation and Approval
-
-Present the complete execution plan to the user for review.
-
-#### 5.1 Format Plan for Presentation
-
-**Use the format-plan command to generate properly formatted output:**
-
-```bash
-sdd format-plan {SPEC_ID} {TASK_ID}
-```
-
-**IMPORTANT**: The `format-plan` command returns pre-formatted text with proper newlines and indentation.
-Display this output EXACTLY as returned - do not reformat or modify it.
-
-**Example Output Structure:**
-```markdown
-# Execution Plan Ready: task-2-1
-
-## 📋 Task Summary
-**File:** src/services/authService.ts
-**Purpose:** Implement core authentication service with login/logout
-**Phase:** 2 - Authentication Service (2/8 tasks, 25%)
-**Estimated Time:** 2.5 hours
-
-## ✅ Prerequisites Verified
-- [Dynamically generated based on task dependencies]
-
-## 🎯 Implementation Details
-- [Task details extracted from spec JSON]
-
-## ✓ Success Criteria
-- [Criteria based on task type and content]
-
-## 📦 Next Tasks After This
-- [Tasks that are blocked by this one]
-```
-
-**CRITICAL - After Displaying the Plan:**
-
-**YOU MUST immediately use the `AskUserQuestion` tool** (see Phase 5.2) to get user approval. The CLI output does NOT include interactive prompts - you must add them using AskUserQuestion.
-
-**Do NOT:**
-- ❌ Present text-based "Ready to Proceed?" prompts
-- ❌ List numbered options in text (1, 2, 3, 4)
-- ❌ Wait for free-form user response
-
-**Do:**
-- ✅ Display the plan output from `format-plan`
-- ✅ Immediately call `AskUserQuestion` with structured options
-- ✅ Follow the exact pattern shown in Phase 5.2
-
-**Note**: The output from `format-plan` includes:
-- Complete task summary with file path, purpose, phase, and estimated time
-- Prerequisites verification (dependencies checked dynamically)
-- Implementation details from the spec JSON
-- Success criteria tailored to the task type
-- Next tasks that depend on this one
-
-The CLI intentionally does NOT include "Ready to proceed" options - that's Claude's job via AskUserQuestion.
-
-**Always use the `format-plan` command** rather than manually creating this output.
+Use `AskUserQuestion`:
+- Question: "Which specification would you like to work on?"
+- Header: "Select Spec"
+- Options: One for each spec (label: spec-id, description: status + progress)
+- Include "Other" for custom input
+
+3. **Once user selects, run `prepare-task` with that spec-id**
 
 ---
 
-## Post-Implementation Checklist
+### Edge Case: No Actionable Tasks
 
-**After completing the implementation and all verification steps:**
+**When:** `prepare-task` returns "no actionable tasks" or all tasks are blocked/in_progress.
 
-⚠️ **CRITICAL - Always Use Subagent, Not CLI Directly**
+**Steps:**
 
-When updating task status, you MUST use the sdd-update subagent:
-- ✅ **CORRECT**: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", ...)`
-- ❌ **WRONG**: `sdd update-status` via Bash tool
+1. **Diagnose the situation:**
+```bash
+sdd list-blockers {spec-id}
+sdd check-complete {spec-id}
+```
 
-The subagent provides additional workflow management that direct CLI calls bypass.
+2. **Present situation to user:**
+
+```
+⚠️  No Actionable Tasks Available
+
+Spec: user-auth-2025-10-24-001
+
+Status:
+- 8 tasks completed
+- 3 tasks in_progress
+- 2 tasks blocked
+
+Blockers:
+- task-2-3: Depends on task-2-1 (in_progress)
+- task-2-4: Depends on task-2-1 (in_progress)
+```
+
+3. **Use AskUserQuestion with options:**
+- "Wait for {task-id}" - Exit gracefully
+- "View All Tasks" - Show all tasks with `query-tasks`
+- "Work on Different Spec" - Return to Multiple Specs workflow
+- "Resolve Blocker" - Provide guidance on resolving blocker
 
 ---
 
-1. **Verify Phase Completion Status (Optional)**
+### Create Execution Plan
+
+**After `prepare-task` succeeds, create a detailed execution plan.**
+
+**Key components:**
+
+1. **Task Summary**
+   - Task ID and title
+   - Type (task, verify, group, phase)
+   - Phase information
+   - Estimated effort
+
+2. **Prerequisites Check**
+   - Review dependencies from `prepare-task` output
+   - Verify required files/tools exist
+   - Note any blockers or risks
+
+3. **Implementation Steps**
+   - Break task into 3-7 concrete steps
+   - For each step:
+     - Action (what to do)
+     - Reasoning (why this approach)
+     - Duration (time estimate)
+     - Key details (important considerations)
+
+4. **Success Criteria**
+   - Specific, measurable outcomes
+   - How to verify task completion
+   - Expected test results
+
+5. **Potential Issues**
+   - Known risks or challenges
+   - Mitigation strategies
+   - Alternative approaches
+
+6. **Testing Strategy**
+   - Required test coverage
+   - Test file locations
+   - Verification commands
+
+**Use context from:**
+- Task metadata in `prepare-task` output
+- Related files mentioned in spec
+- Dependencies and blockers
+- Verification steps defined in spec
+
+---
+
+### Present Plan and Get Approval
+
+**After creating the plan, present it to the user for approval.**
+
+**Step 1: Format the plan (optional)**
 ```bash
-# Check if current phase can be marked complete after this task
-sdd check-complete {SPEC_ID} --phase phase-2
+sdd format-plan {spec-id} {task-id}
 ```
 
-   If this task completes all tasks in the phase, the phase can be marked completed. This helps track major milestones in the spec.
+**Step 2: Present plan to user**
 
-2. **Update Task Status**
+Show the formatted execution plan with all sections clearly separated.
 
-Use the sdd-update subagent to mark the task as completed:
+**Step 3: IMMEDIATELY use AskUserQuestion for approval**
 
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-update-subagent",
-  prompt: "Mark task {task-id} in spec {spec-id} as completed. Note: Implementation finished and verified. Actual hours: {hours}.",
-  description: "Mark task completed"
-)
-```
-
-**What the subagent will do:**
-- Update the task status in the spec file
-- Record completion timestamp and actual hours
-- Automatically recalculate progress across the hierarchy
-- Unlock any tasks that were blocked by this task
-- Update phase completion status if applicable
-- Calculate time variance (actual vs. estimated hours)
-
-3. **Document Deviations (if any)**
-
-If implementation deviated from plan, use the sdd-update subagent to add a journal entry:
-
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-update-subagent",
-  prompt: "Add journal entry to spec {spec-id} for task {task-id}. Title: 'Implementation Notes: {task-id}'. Entry type: deviation. Content: [What changed, Why, Testing performed, Impact on dependent tasks].",
-  description: "Journal deviation"
-)
-```
-
-**What the subagent will do:**
-- Add timestamped journal entry to spec metadata
-- Link entry to specific task (if task ID provided)
-- Clear `needs_journaling` flag on the task
-- Document the deviation for future reference
-- Maintain audit trail of implementation decisions
-- Enable traceability for post-implementation reviews
-
-**Best Practices for Complete Handoffs:**
-
-When providing information to sdd-update, consider including:
-
-- **Always provide**: Spec ID, Task ID, status, completion note
-- **Highly recommended**: Actual hours (improves future estimates)
-- **For deviations**: Entry type, structured rationale, impact assessment
-- **For decisions**: Why this approach was chosen over alternatives
-- **For blockers**: What's blocking, what's needed to unblock
-- **For verification**: Test results, command output, issues found
-
-**Example - Standard Completion:**
-- Actual hours: 2.5
-- Entry type: status_change
-- Note: "Implementation complete, all tests passing"
-
-**Example - Complex Completion with Deviation:**
-- Actual hours: 4.2
-- Entry type: deviation
-- Note: "Implemented with connection pooling (not in original spec) to handle concurrency"
-- Structured journal explaining what/why/testing/impact
-
-4. **Find Next Task**
-
-Use `Skill(sdd-toolkit:sdd-next)` skill to identify the next actionable task
-
-**Remember:** Always use the sdd-update subagent after completion to:
-- Keep the spec file current
-- Unlock dependent tasks waiting on this work
-- Maintain accurate progress tracking
-- Enable other developers/tools to see what's completed
-
-#### 5.2 Handle User Feedback
-
-Get structured user decision on the execution plan using `AskUserQuestion`.
-
-**Presentation Approach - Use Interactive Questions:**
-
-After presenting the execution plan (from `format-plan` or manually created), use the `AskUserQuestion` tool:
+**CRITICAL: Never use text-based options like "1. Approve, 2. Request changes". ALWAYS use AskUserQuestion.**
 
 ```javascript
 AskUserQuestion(
   questions: [{
-    question: "How would you like to proceed with this execution plan?",
+    question: "Review the execution plan above. How would you like to proceed?",
     header: "Plan Review",
     multiSelect: false,
     options: [
       {
-        label: "Approve",
-        description: "Begin implementation following this plan"
+        label: "Approve & Start",
+        description: "Begin implementing this plan"
       },
       {
         label: "Request Changes",
-        description: "I'd like to modify the approach or scope"
+        description: "Suggest modifications to the plan"
       },
       {
         label: "More Details",
-        description: "Show more information about specific steps"
+        description: "Request additional information or clarification"
       },
       {
         label: "Defer",
-        description: "Save this for later"
+        description: "Save plan for later"
       }
     ]
   }]
 )
 ```
 
-**Benefits of Interactive Questions:**
-- ✅ Clear, structured choices for the user
-- ✅ Eliminates ambiguity in user response
-- ✅ Consistent UX across all decision points
-- ✅ Easy to process user selection
+**Step 4: Handle user response**
 
-**User Response Handling:**
+- **Approve & Start:** Begin implementation according to plan
+- **Request Changes:** Ask for specifics, revise plan, re-present with AskUserQuestion
+- **More Details:** Provide requested details, then re-ask with AskUserQuestion
+- **Defer:** Save plan details and exit gracefully
 
-Based on the user's selection:
+---
 
-**If user selects "Approve":**
+### Post-Implementation
 
-⚠️ **CRITICAL - Always Use Subagent, Not CLI Directly**
+**After completing implementation:**
 
-When updating task status, you MUST use the sdd-update subagent:
-- ✅ **CORRECT**: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", ...)`
-- ❌ **WRONG**: `sdd update-status` via Bash tool
+1. **Mark task complete using sdd-update:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-update-subagent",
+  prompt: "Mark task {task-id} as completed in spec {spec-id}",
+  description: "Mark task complete"
+)
+```
 
-The subagent provides additional workflow management that direct CLI calls bypass.
+2. **The sdd-update subagent will:**
+   - Update task status to "completed"
+   - Set completion timestamp
+   - Check context usage and recommend reset if needed
+   - Identify next actionable task
 
-- Mark task as in_progress using sdd-update subagent:
-  ```
-  Task(
-    subagent_type: "sdd-toolkit:sdd-update-subagent",
-    prompt: "Mark task {task-id} in spec {spec-id} as in_progress. Note: Starting implementation per approved execution plan.",
-    description: "Mark task in_progress"
-  )
-  ```
-- Begin implementation or hand off to implementation tools
-- Follow the execution plan
+3. **Continue with next task or end session**
 
-**If user selects "Request Changes":**
-- Ask user to specify what changes they want (via "Other" or follow-up question)
-- Analyze the requested changes
-- Assess impact on scope and timeline
-- Check if changes align with spec
-- Update plan or recommend spec revision
-
-**If user selects "More Details":**
-- Ask which aspect they want to know more about
-- Provide deep dive into specific steps
-- Show code examples
-- Explain technical decisions
-- Answer questions about approach
-- Then present the question again after providing details
-
-**If user selects "Defer" or provides custom "Other" response:**
-- Acknowledge their decision
-- Document the plan for future reference
-- Exit gracefully
-
-## Working with Multiple Agents/Tools
-
-This skill enables coordination across different implementation tools:
-
-**Scenario: Claude creates plan, human implements**
-1. Claude: Uses sdd-next to create plan
-2. Claude: Presents plan to developer
-3. Developer: Implements following the plan
-4. Developer: Uses sdd-update to update status
-5. Claude: Finds next task
-
-**Scenario: Claude creates plan, Cursor implements**
-1. Claude: Uses sdd-next to create plan
-2. Claude: Saves plan to file or shows to user
-3. User: Opens Cursor IDE
-4. Cursor: Reads JSON spec file
-5. Cursor: Implements following Claude's plan
-6. Cursor: Updates JSON spec file when complete
-7. Claude: Reads updated JSON spec file and finds next task
+---
 
 ## Common Workflows
 
@@ -1969,26 +775,20 @@ This skill enables coordination across different implementation tools:
 **Situation:** Spec exists, no tasks started yet
 
 Steps:
-1. Locate spec using enhanced discovery (Phase 1.1) - gets absolute path
-2. Read specification frontmatter (Phase 1.2)
-3. Load spec file (all tasks pending)
-4. Identify phase-1, task-1
-5. Create execution plan for first task
-6. Present plan to user
-7. Mark task in_progress (via sdd-update)
-8. Begin implementation
+1. Run `sdd prepare-task {spec-id} --json`
+2. Review task details and dependencies from output
+3. Create execution plan for the task
+4. Present plan to user with AskUserQuestion
+5. Begin implementation
 
 ### Workflow 2: Resuming Work
 **Situation:** Some tasks completed, need to continue
 
 Steps:
-1. Load JSON spec file
-2. Check overall progress
-3. Identify current phase
-4. Find next available task in that phase
-5. Verify dependencies are met
-6. Create execution plan
-7. Present plan with context of progress:
+1. Run `sdd prepare-task {spec-id} --json`
+2. Review progress information from output
+3. Create execution plan for next task
+4. Present plan with context of progress:
 
 **Present context and proceed:**
 ```
@@ -2010,7 +810,7 @@ or "review progress" for detailed status.
 
 8. Proceed with execution plan automatically
    - User can interrupt with "different task" to use Phase 2.3 (Present Task Options)
-   - User can ask "review progress" to run `sdd progress SPEC_ID`
+   - User can ask "review progress" to run `sdd progress {spec-id}`
    - User can say "stop" or "pause" to defer
 9. Continue implementation
 
@@ -2046,7 +846,7 @@ Available alternative tasks:
 ```
 
 **Then ask with AskUserQuestion:**
-```javascript
+```
 AskUserQuestion(
   questions: [{
     question: "The next task is blocked by Redis configuration. How would you like to proceed?",
@@ -2080,68 +880,7 @@ AskUserQuestion(
    - If "Stop for Now": Summarize what was blocked and exit
 8. Note that original task should resume after blocker cleared
 
-### Workflow 4: Multi-Developer Coordination
-**Situation:** Multiple people working on same spec
-
-Steps:
-1. Developer A: Uses sdd-next for task-2-1
-2. Developer A: Marks task-2-1 in_progress
-3. Developer B: Uses sdd-next
-4. Developer B: Sees task-2-1 in_progress
-5. System presents situation and uses `AskUserQuestion`:
-
-**Present context:**
-```
-⚠️  Task Coordination Notice
-
-The recommended task (task-2-1: src/services/authService.ts) is currently in progress
-by another developer.
-
-Next available tasks:
-- task-2-3: src/middleware/auth.ts (depends on task-2-1, will be blocked)
-- task-2-4: src/routes/auth.ts (depends on task-2-1, will be blocked)
-- task-1-7: tests/user.spec.ts (parallel-safe, from completed Phase 1)
-```
-
-**Then ask with AskUserQuestion:**
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "The next task is currently being worked on. How would you like to proceed?",
-    header: "Task In Use",
-    multiSelect: false,
-    options: [
-      {
-        label: "task-1-7 (Tests)",
-        description: "tests/user.spec.ts - User model tests (parallel-safe, 1.5 hours)"
-      },
-      {
-        label: "View All Available",
-        description: "Show me all pending tasks to choose from"
-      },
-      {
-        label: "Wait for task-2-1",
-        description: "Check back later when task-2-1 is complete"
-      },
-      {
-        label: "Different Spec",
-        description: "Work on a different specification instead"
-      }
-    ]
-  }]
-)
-```
-
-6. Based on selection:
-   - If alternative task: Create plan for selected task
-   - If "View All": Use Phase 2.3 (Present Task Options) with all pending tasks
-   - If "Wait": Exit gracefully with status update
-   - If "Different Spec": Return to Phase 1.0 (Multiple Specs Handling)
-7. Both developers work in parallel
-8. Both update state when complete
-9. Spec file coordinates progress
-
-### Workflow 5: Plan Refinement
+### Workflow 4: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
 
 Steps:
@@ -2179,7 +918,7 @@ Options:
 ```
 
 **Then ask with AskUserQuestion:**
-```javascript
+```
 AskUserQuestion(
   questions: [{
     question: "Implementation deviation found. How should we proceed?",
@@ -2217,159 +956,9 @@ AskUserQuestion(
 9. Update spec if structural changes needed
 10. Continue with revised plan
 
-### Executing Verification Tasks with run-tests Subagent
+### Verification Tasks
 
-When working on verification tasks (type: verify), use the run-tests subagent to execute tests and verification steps automatically.
-
-**When to use run-tests subagent:**
-
-- **Automated verification tasks**: Tasks with `verification_type: "auto"` in metadata
-- **Test execution**: Running unit tests, integration tests, or test suites
-- **Verification debugging**: Investigating failed verifications with AI assistance
-- **Systematic testing**: Executing verification steps defined in spec metadata
-
-**Invoke the run-tests subagent:**
-
-```
-Task(
-  subagent_type: "sdd-toolkit:run-tests-subagent",
-  prompt: "Run verification task verify-1-1 from specs/active/user-auth-001.json",
-  description: "Execute verification"
-)
-```
-
-**Common verification scenarios:**
-
-**1. Execute a verification task from spec:**
-```
-Task(
-  subagent_type: "sdd-toolkit:run-tests-subagent",
-  prompt: "Run verification task verify-2-1 from specs/active/user-auth-001.json. Execute the verification command and report results.",
-  description: "Execute verify-2-1"
-)
-```
-
-**2. Run specific tests for a file:**
-```
-Task(
-  subagent_type: "sdd-toolkit:run-tests-subagent",
-  prompt: "Run tests for src/services/authService.ts. Execute relevant test files and report pass/fail status.",
-  description: "Test authService"
-)
-```
-
-**3. Debug failed verification:**
-```
-Task(
-  subagent_type: "sdd-toolkit:run-tests-subagent",
-  prompt: "Debug failing tests for verify-2-3. Investigate test failures, analyze errors, and recommend fixes.",
-  description: "Debug verify-2-3"
-)
-```
-
-**4. Run verification with coverage:**
-```
-Task(
-  subagent_type: "sdd-toolkit:run-tests-subagent",
-  prompt: "Run verification verify-1-2 with test coverage analysis. Report coverage percentage and identify untested code paths.",
-  description: "Verify with coverage"
-)
-```
-
-**What the run-tests subagent does:**
-
-- Reads verification task metadata from the spec JSON
-- Identifies test command or skill to execute
-- Runs tests and captures output
-- Analyzes test results (pass/fail, errors, warnings)
-- Provides debugging assistance for failures
-- Reports results back to you
-
-**Integration with verification workflow:**
-
-After the run-tests subagent completes:
-1. Review the test results and findings
-2. Document verification outcome
-3. Present findings to user for approval
-4. Mark verification task as completed (see Workflow 6 below)
-
-For detailed testing capabilities, see the [run-tests skill documentation](../run-tests/SKILL.md).
-
-### Workflow 6: Verification Task Completion
-**Situation:** Working on a verification task (type: verify), verification steps complete, need user approval
-
-**CRITICAL: Use AskUserQuestion, NOT text-based options**
-
-Steps:
-1. Perform verification steps - Use run-tests subagent (see section above) or execute verification manually as specified in task metadata
-2. Document findings (what was verified, what passed/failed)
-3. Analyze results
-4. Present findings to user in text format:
-
-**Example Presentation:**
-```
-✅ Verification Complete: verify-2-1
-
-**Task:** Ensure timestamp format consistency
-**Verification Type:** Code inspection
-**Scope:** Checked started_at and completed_at timestamp formats
-
-**Findings:**
-- Both timestamp fields use datetime.datetime.now(timezone.utc).isoformat() format
-- Format: ISO 8601 with 'Z' suffix (e.g., "2025-10-30T12:15:05.279477Z")
-- Compatible with calculate_time_from_timestamps() function (supports both Z and +00:00)
-- All timestamp writes follow consistent pattern
-
-**Conclusion:** Timestamp formats are consistent and compatible. No issues found.
-```
-
-5. **IMMEDIATELY use AskUserQuestion** to get user decision:
-
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "Verification complete. How would you like to proceed?",
-    header: "Verify Done",
-    multiSelect: false,
-    options: [
-      {
-        label: "Approve & Complete",
-        description: "Mark verification task as complete (recommended)"
-      },
-      {
-        label: "Request Changes",
-        description: "Additional verification steps needed"
-      },
-      {
-        label: "Review Details",
-        description: "Show specific code sections or verification evidence"
-      },
-      {
-        label: "Defer",
-        description: "Save findings for later"
-      }
-    ]
-  }]
-)
-```
-
-6. Based on user selection:
-   - If "Approve & Complete": Use sdd-update subagent to mark task completed:
-     ```
-     Task(
-       subagent_type: "sdd-toolkit:sdd-update-subagent",
-       prompt: "Mark verification task {verify-id} as completed. Note: Verification passed - [brief summary of findings].",
-       description: "Mark verification complete"
-     )
-     ```
-   - If "Request Changes": Ask for specifics, perform additional verification
-   - If "Review Details": Show requested details, then re-ask with AskUserQuestion
-   - If "Defer": Document findings and exit gracefully
-
-**Important:**
-- NEVER present text-based options like "1. Approve, 2. Request changes"
-- ALWAYS use AskUserQuestion for the decision
-- Document findings in the task's status_note when marking complete
+For verification tasks (type: verify), use `Skill(sdd-toolkit:run-tests)` to execute tests and verification steps. After verification completes, present findings to user and use `AskUserQuestion` to get approval before marking complete with sdd-update. See run-tests SKILL.md for details.
 
 ## Advanced Query Techniques
 
@@ -2381,18 +970,18 @@ The `query-tasks` command provides flexible filtering for complex scenarios:
 
 **Find all pending tasks in a specific phase:**
 ```bash
-sdd query-tasks "$SPEC_ID" --status pending --parent phase-2 --json
+sdd query-tasks {spec-id} --status pending --parent phase-2 --json
 ```
 
 **Find all verification tasks:**
 ```bash
-sdd query-tasks "$SPEC_ID" --type verify
+sdd query-tasks {spec-id} --type verify
 ```
 
 **Combine filters:**
 ```bash
 # Find all completed tasks in phase-1
-sdd query-tasks "$SPEC_ID" --status completed --parent phase-1
+sdd query-tasks {spec-id} --status completed --parent phase-1
 ```
 
 ### When to Use Each Approach
@@ -2408,31 +997,31 @@ sdd query-tasks "$SPEC_ID" --status completed --parent phase-1
 **1. Find all tasks that can be started right now:**
 ```bash
 # Pending tasks with no blockers
-sdd query-tasks "$SPEC_ID" --status pending
+sdd query-tasks {spec-id} --status pending
 ```
 
 **2. Analyze blocked tasks:**
 ```bash
 # See what's blocking progress
-sdd list-blockers "$SPEC_ID" --json
+sdd list-blockers {spec-id} --json
 ```
 
 **3. Check phase completion readiness:**
 ```bash
 # Before moving to next phase, verify current phase is complete
-sdd check-complete "$SPEC_ID" --phase phase-2
+sdd check-complete {spec-id} --phase phase-2
 ```
 
 **4. Get all verification steps:**
 ```bash
 # Find all verifications to understand testing requirements
-sdd query-tasks "$SPEC_ID" --type verify
+sdd query-tasks {spec-id} --type verify
 ```
 
 **5. Find tasks by parent (all tasks in a phase):**
 ```bash
 # Get all tasks under phase-2, regardless of status
-sdd query-tasks "$SPEC_ID" --parent phase-2 --json
+sdd query-tasks {spec-id} --parent phase-2 --json
 ```
 
 ## Troubleshooting
@@ -2471,8 +1060,8 @@ Always run `sdd verify-tools` before starting spec work.
 Use the Python tool for dependency analysis:
 
 ```bash
-sdd find-circular-deps "$SPEC_ID"
-sdd next-task "$SPEC_ID"
+sdd find-circular-deps {spec-id}
+sdd next-task {spec-id}
 ```
 
 Detects circular chains, orphaned tasks, and impossible dependency chains.
@@ -2486,7 +1075,7 @@ Detects circular chains, orphaned tasks, and impossible dependency chains.
 
 **Solution:**
 
-1. Use `sdd check-deps SPEC_ID TASK_ID` to verify dependency status
+1. Use `sdd check-deps {spec-id} {task-id}` to verify dependency status
 2. If dependency status is still unclear after checking, explain the concern and ask user:
 
 **Present context and ask:**
@@ -2518,7 +1107,7 @@ Let me know how you'd like to proceed.
 
 ### Issue: Plan Too Complex
 **Symptom:** Plan is too large or exceeds estimates
-**Solution:** Split into smaller tasks using sdd-update
+**Solution:** Split into smaller tasks using sdd-update subagent
 
 ## Quick Reference
 
@@ -2527,34 +1116,34 @@ Let me know how you'd like to proceed.
 **Automated Workflow (Recommended):**
 ```bash
 # 1. Prepare task (handles discovery automatically)
-sdd prepare-task SPEC_ID
+sdd prepare-task {spec-id}
 ```
 
 **Manual Task Discovery:**
 ```bash
 # Find next task
-sdd next-task SPEC_ID
+sdd next-task {spec-id}
 
 # Get task details
-sdd task-info SPEC_ID TASK_ID
+sdd task-info {spec-id} {task-id}
 
 # Check dependencies
-sdd check-deps SPEC_ID TASK_ID
+sdd check-deps {spec-id} {task-id}
 
 # View progress
-sdd progress SPEC_ID
+sdd progress {spec-id}
 ```
 
 **Advanced Querying:**
 ```bash
 # Query tasks by criteria
-sdd query-tasks SPEC_ID --status pending
+sdd query-tasks {spec-id} --status pending
 
 # List blocked tasks
-sdd list-blockers SPEC_ID
+sdd list-blockers {spec-id}
 
 # Check completion readiness
-sdd check-complete SPEC_ID --phase phase-2
+sdd check-complete {spec-id} --phase phase-2
 
 ```
 
@@ -2569,16 +1158,6 @@ sdd find-tests
 # Validate environment
 sdd check-environment
 ```
-
-### Optional/Advanced Commands
-
-**Environment Setup (one-time):**
-```bash
-# Initialize environment variables
-sdd init-env --export
-```
-
-**Note:** Most commands auto-discover specs directory. Add `--path /absolute/path/to/specs` if needed for custom locations.
 
 ## Summary
 

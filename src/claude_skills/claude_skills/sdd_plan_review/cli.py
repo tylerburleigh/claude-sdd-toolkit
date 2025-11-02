@@ -14,6 +14,7 @@ from claude_skills.common import (
     PrettyPrinter,
     load_json_spec,
     find_specs_directory,
+    find_spec_file,
     ensure_reviews_directory
 )
 from claude_skills.sdd_plan_review import (
@@ -29,10 +30,18 @@ from claude_skills.sdd_plan_review.reporting import (
 
 def cmd_review(args, printer):
     """Review a specification file using multiple AI models."""
-    spec_file = Path(args.spec_file)
+    # Find specs directory
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        printer.detail("Looked for specs/active/, specs/completed/, specs/archived/")
+        return 1
 
-    if not spec_file.exists():
-        printer.error(f"Spec file not found: {spec_file}")
+    # Find spec file from spec ID
+    spec_file = find_spec_file(args.spec_id, specs_dir)
+    if not spec_file:
+        printer.error(f"Spec file not found for: {args.spec_id}")
+        printer.detail(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
         return 1
 
     printer.info(f"Reviewing specification: {spec_file}")
@@ -239,7 +248,7 @@ def register_plan_review(subparsers, parent_parser):
         parents=[parent_parser],
         help='Review specification with multiple AI models'
     )
-    parser_review.add_argument('spec_file', help='Path to specification file')
+    parser_review.add_argument('spec_id', help='Specification ID')
     parser_review.add_argument(
         '--type',
         choices=['quick', 'full', 'security', 'feasibility'],

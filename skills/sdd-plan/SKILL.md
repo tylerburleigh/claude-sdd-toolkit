@@ -352,6 +352,65 @@ Before creating the plan, explore the relevant parts of the codebase:
 - Review similar implementations for consistency
 - Note potential conflicts or breaking changes
 
+**Automatic Documentation Availability Check:**
+
+This skill automatically checks if codebase documentation is available to enhance planning quality and speed.
+
+**How It Works:**
+
+1. **Automatic Check**: Before manual codebase exploration, the skill runs `sdd doc stats` to verify documentation availability
+2. **Smart Prompting**: If documentation is missing or stale, you'll receive a clear prompt explaining the benefits
+3. **User Decision**: You can choose to generate documentation now (2-5 minutes) or proceed with manual analysis
+4. **Graceful Degradation**: If you skip documentation, the skill seamlessly falls back to manual codebase exploration
+
+**Value Proposition:**
+
+With documentation available, codebase analysis becomes **dramatically more effective**:
+- **Comprehensive Understanding**: See the entire codebase structure, patterns, and relationships at a glance
+- **Better Specs**: Create more accurate plans based on complete knowledge of existing implementations
+- **Faster Planning**: Reduce analysis time from hours to minutes
+- **Consistency**: Automatically align new features with existing architectural patterns
+- **Future Benefit**: Documentation accelerates all subsequent planning and development tasks
+
+**When Documentation Is Unavailable:**
+
+You'll see a prompt like:
+```
+ℹ️  Codebase documentation not found
+
+Documentation enables:
+- Comprehensive codebase understanding
+- Faster, more accurate planning
+- Automatic pattern and dependency discovery
+
+Generate documentation now? (2-5 minutes)
+1. Yes, generate for better planning
+2. No, use manual codebase exploration
+```
+
+**Recommendation**: For medium to large codebases or complex features, generating documentation upfront significantly improves spec quality and saves planning time.
+
+**Quick Reference: Useful Documentation Commands for Planning**
+
+When documentation is available, these commands accelerate codebase analysis and planning:
+
+| Command | Purpose | Example Usage |
+|---------|---------|---------------|
+| `sdd doc stats` | Check documentation status and metrics | `sdd doc stats` |
+| `sdd doc search <query>` | Find relevant implementations and patterns | `sdd doc search "authentication flow"` |
+| `sdd doc context <file>` | Get comprehensive file context and relationships | `sdd doc context src/auth/login.ts` |
+| `sdd doc dependencies --reverse <file>` | Find what depends on a file (impact analysis) | `sdd doc dependencies --reverse src/models/User.ts` |
+| `sdd doc complexity <file>` | Assess code complexity and maintainability | `sdd doc complexity src/services/payment.ts` |
+| `sdd doc list-modules` | Get overview of all modules in the codebase | `sdd doc list-modules` |
+
+**Common Planning Workflows with Documentation:**
+
+- **Understanding existing features:** `sdd doc search` → find similar implementations
+- **Impact analysis:** `sdd doc dependencies --reverse` → see what will be affected
+- **Complexity assessment:** `sdd doc complexity` → estimate effort and risks
+- **Pattern discovery:** `sdd doc context` → understand existing architectural patterns
+- **Codebase overview:** `sdd doc list-modules` + `sdd doc stats` → understand project structure
+
 #### 1.2.1 Using `Skill(sdd-toolkit:doc-query)` for Efficient Codebase Analysis (Recommended)
 
 **Proactive Documentation Generation**

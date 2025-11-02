@@ -12,6 +12,12 @@ from claude_skills.common import (
     get_task_context_from_docs,
     check_doc_query_available,
 )
+from claude_skills.common.doc_integration import (
+    check_doc_availability,
+    prompt_for_generation,
+    clear_doc_status_cache,
+    DocStatus
+)
 from claude_skills.common.paths import find_spec_file
 from claude_skills.common.completion import check_spec_completion, should_prompt_completion
 
@@ -357,6 +363,16 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
     result["dependencies"] = deps
 
     # Phase 3: Context gathering from doc-query (Priority 1 Integration)
+    # Check documentation availability first (proactive)
+    doc_status = check_doc_availability()
+
+    # If docs are missing or stale, note this for CLI to handle
+    # (Library functions can't directly invoke skills or prompt, so we flag it)
+    if doc_status in (DocStatus.MISSING, DocStatus.STALE):
+        # Store status in result for CLI layer to handle
+        result["doc_status"] = doc_status.value
+        result["doc_prompt_needed"] = True
+
     # Automatically gather codebase context if documentation is available
     doc_check = check_doc_query_available()
     if doc_check["available"]:
