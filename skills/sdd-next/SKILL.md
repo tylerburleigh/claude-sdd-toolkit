@@ -1208,67 +1208,33 @@ Include the current context percentage in the completion report.
 
 Steps:
 1. Run `sdd prepare-task {spec-id} --json`
-2. Review task details and dependencies from output
-3. **Optional: Use Plan subagent for implementation strategy research**
-   - For complex or architectural tasks, delegate research to Plan subagent
-   - Plan subagent analyzes codebase patterns and recommends approach
-   - Present recommendations to user with AskUserQuestion
-4. Create execution plan for the task (incorporating approved recommendations)
-5. Present plan to user with AskUserQuestion
+2. Review task details and dependencies
+3. **Optional: Use Plan subagent for complex/architectural tasks**
+   - Analyzes codebase patterns, recommends approach
+   - Present recommendations with AskUserQuestion
+4. Create execution plan (incorporating approved recommendations)
+5. Present plan with AskUserQuestion
 6. Begin implementation
 
 **Example with Plan subagent:**
 
-```bash
-# Step 1: Prepare task
-sdd prepare-task user-auth-001 --json
-# Returns: task-1-1 "Create AuthService class" in src/services/authService.ts
+```
+sdd prepare-task user-auth-001 --json  # Returns task-1-1 "Create AuthService"
 
-# Step 2: Review task requirements
-# Task requires new authentication service, unclear which patterns to follow
+Task(subagent_type: "Plan",
+     prompt: "Analyze service classes in src/services/ for patterns. Task creates
+              AuthService in src/services/authService.ts for JWT. Recommend:
+              class structure, DI pattern, error handling, test strategy.
+              Thoroughness: medium",
+     description: "Research service patterns")
 
-# Step 3: Research implementation approach
-Task(
-  subagent_type: "Plan",
-  prompt: "Analyze existing service classes in src/services/ to understand
-          architectural patterns. Task requires creating AuthService in
-          src/services/authService.ts for JWT authentication. Recommend:
-          (1) Class structure (singleton vs factory vs plain class)
-          (2) Dependency injection pattern used
-          (3) Error handling approach
-          (4) Testing strategy based on existing tests
-          Thoroughness: medium",
-  description: "Research service architecture patterns"
-)
-
-# Plan subagent returns analysis + recommendations
-
-# Step 4: Present recommendations to user
-AskUserQuestion(
-  questions: [{
-    question: "Plan subagent recommends singleton pattern with dependency injection. Approve this approach?",
-    header: "Architecture",
-    multiSelect: false,
-    options: [
-      {label: "Approve", description: "Use recommended singleton pattern"},
-      {label: "Factory Pattern", description: "Use factory pattern instead"},
-      {label: "Plain Class", description: "Use simple class without singleton"}
-    ]
-  }]
-)
-
-# Step 5: Create execution plan based on approved approach
-# Step 6: Present execution plan with AskUserQuestion
-# Step 7: Begin implementation
+# Present Plan recommendations to user with AskUserQuestion
+# Create execution plan based on approved approach
 ```
 
-**When to use Plan subagent in Workflow 1:**
-- ✅ First task in a new codebase area
-- ✅ Architectural or design-heavy tasks
-- ✅ Multiple valid implementation approaches exist
-- ✅ Task affects other components significantly
-- ❌ Simple, straightforward tasks with clear implementation
-- ❌ Tasks with explicit implementation instructions in spec
+**Use Plan subagent when:** First task in new area, architectural tasks, multiple approaches exist, affects many components
+
+**Skip for:** Simple tasks, explicit instructions in spec
 
 ### Workflow 2: Resuming Work
 **Situation:** Some tasks completed, need to continue
@@ -1394,135 +1360,44 @@ AskUserQuestion(
 ### Workflow 4: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
 
-**Enhanced Approach: Proactive Verification**
+**Recommended: Proactive Verification**
 
-Before starting implementation on complex tasks, use Plan subagent to verify assumptions:
+Before starting complex tasks, use Plan subagent to verify assumptions:
 
 ```
-Task(
-  subagent_type: "Plan",
-  prompt: "About to implement task-2-1 (src/services/authService.ts) which
-          assumes User API uses callback pattern. Before implementation:
-          (1) Verify User API in src/models/User.ts actually uses callbacks
-          (2) Check error handling patterns in existing services
-          (3) Identify any API mismatches with our execution plan assumptions
-          If assumptions are wrong, recommend adjustments.
-          Thoroughness: quick",
-  description: "Verify execution plan assumptions"
-)
+Task(subagent_type: "Plan",
+     prompt: "About to implement task-2-1 (src/services/authService.ts) assuming
+              User API uses callbacks. Verify: (1) User API pattern in src/models/User.ts,
+              (2) error handling in existing services, (3) any plan mismatches.
+              Recommend adjustments if needed. Thoroughness: quick",
+     description: "Verify plan assumptions")
 ```
 
-This catches deviations **before** implementation starts, saving time and avoiding rework.
+This catches deviations **before** implementation, saving time and avoiding rework.
 
-**Reactive Approach: Handling Mid-Implementation Deviations**
+**Reactive: Handle Mid-Implementation Deviations**
 
-Steps:
-1. Start implementing task per plan
-2. Discover issue (e.g., API different than expected)
-3. Pause implementation
-4. **Use Plan subagent to analyze deviation and recommend solutions:**
+If deviation discovered during implementation:
+
+1. Pause and use Plan subagent to analyze:
    ```
-   Task(
-     subagent_type: "Plan",
-     prompt: "Implementation deviation in task-2-1 (src/services/authService.ts).
-             Plan assumed User API uses callbacks, but it actually uses async/await.
-             Analyze:
-             (1) What changes are needed to execution plan
-             (2) Impact on error handling, tests, and dependent code
-             (3) Alternative approaches (wrapper vs rewrite vs change User API)
-             Recommend best approach with pros/cons for each option.
-             Thoroughness: medium",
-     description: "Analyze deviation and recommend solution"
-   )
+   Task(subagent_type: "Plan",
+        prompt: "Deviation in task-2-1: Plan assumed callbacks, actual uses async/await.
+                 Analyze: (1) plan changes needed, (2) impact on tests/deps,
+                 (3) alternatives (wrapper vs rewrite vs change API).
+                 Recommend approach with pros/cons. Thoroughness: medium",
+        description: "Analyze deviation")
    ```
-5. Plan subagent returns analysis with recommended solutions
-6. Document deviation using sdd-update subagent:
-   ```
-   Task(
-     subagent_type: "sdd-toolkit:sdd-update-subagent",
-     prompt: "Add journal entry for task {task-id}. Type: deviation. Content: [describe what changed and why].",
-     description: "Document deviation"
-   )
-   ```
-7. Use `AskUserQuestion` to present options to user:
 
-**Present context:**
-```
-⚠️  Implementation Deviation Discovered
+2. Document deviation with sdd-update subagent
 
-Task: task-2-1 (src/services/authService.ts)
+3. Present Plan subagent recommendations to user with AskUserQuestion:
+   - Options: Revise Plan / Update Spec / Explain More / Rollback
+   - User selects approach
+   - Execute accordingly
 
-Issue: The User API uses async/await pattern, but the original plan assumed
-callback-based methods.
-
-Impact:
-- AuthService methods need to be async
-- Error handling approach needs adjustment
-- Tests need to use async patterns
-
-Options:
-1. Update plan to use async/await (recommended)
-2. Add wrapper to convert async to callbacks (adds complexity)
-3. Update User model to use callbacks instead (breaks existing code)
-```
-
-**Then ask with AskUserQuestion:**
-```
-AskUserQuestion(
-  questions: [{
-    question: "Implementation deviation found. How should we proceed?",
-    header: "Plan Change",
-    multiSelect: false,
-    options: [
-      {
-        label: "Revise Plan (Recommended)",
-        description: "Update execution plan to use async/await pattern throughout"
-      },
-      {
-        label: "Update Spec",
-        description: "This requires changing the specification itself"
-      },
-      {
-        label: "Explain More",
-        description: "Show me the specific differences and implications"
-      },
-      {
-        label: "Rollback",
-        description: "Revert changes and stick to original plan"
-      }
-    ]
-  }]
-)
-```
-
-8. Based on user selection:
-   - If "Revise Plan": Use `Skill(sdd-toolkit:sdd-next)` to create revised execution plan
-   - If "Update Spec": Use `Skill(sdd-toolkit:sdd-plan)` to update specification
-   - If "Explain More": Provide detailed analysis, then re-ask
-   - If "Rollback": Revert implementation changes
-9. If plan revised, present revised plan to user (use Phase 5.2)
-10. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
-11. Update spec if structural changes needed
-12. Continue with revised plan
-
-**When to use each approach:**
-- **Proactive (Plan subagent before implementation):**
-  - ✅ Complex tasks with many assumptions
-  - ✅ Working in unfamiliar codebase areas
-  - ✅ High-risk changes affecting multiple components
-  - ✅ When execution plan has specific API/pattern assumptions
-
-- **Reactive (Plan subagent after discovering deviation):**
-  - ✅ Simple tasks that hit unexpected issues
-  - ✅ When deviation is discovered mid-implementation
-  - ✅ Rapid prototyping scenarios where speed matters
-
-**Benefits of Plan subagent in Workflow 4:**
-- ✅ Catches assumption mismatches early (proactive)
-- ✅ Provides expert analysis of deviations (reactive)
-- ✅ Recommends solutions with trade-off analysis
-- ✅ Reduces rework and wasted implementation time
-- ✅ Maintains main agent focus on actual coding
+**Use proactive for:** Complex tasks, unfamiliar areas, specific API assumptions
+**Use reactive for:** Simple tasks hitting unexpected issues, rapid prototyping
 
 ### Verification Tasks
 
