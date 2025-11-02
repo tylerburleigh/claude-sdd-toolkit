@@ -462,10 +462,10 @@ sdd prepare-task {spec-id} --json
 
 7. **Mark task complete:**
 ```bash
-# Use sdd-update subagent to mark complete
+# Use sdd-update subagent to mark complete (requires journal content)
 Task(
   subagent_type: "sdd-toolkit:sdd-update-subagent",
-  prompt: "Mark task {task-id} as completed in spec {spec-id}",
+  prompt: "Complete task {task-id} in spec {spec-id}. Completion note: [Brief summary of what was accomplished, tests run, etc.]",
   description: "Mark task complete"
 )
 ```
@@ -681,7 +681,91 @@ You have access to the `sdd` CLI.
 
 **doc-query**: Query generated documentation for rapid codebase understanding. Use `Skill(sdd-toolkit:doc-query)` for smart context gathering (task-specific files, dependencies, test discovery). Falls back to manual exploration (`Explore`, `Glob`, `Grep`) if docs unavailable.
 
+**Plan/Explore subagents**: Built-in Claude Code subagents for codebase exploration. Plan provides research + recommendations (requires approval), Explore provides direct findings. See [Codebase Exploration Subagents](#codebase-exploration-subagents) section for detailed guidance on when to use each.
+
 **When mentioned in workflows**: Optional enhancements, not requirements. Core sdd-next functions without them.
+
+## Codebase Exploration Subagents
+
+**Built-in Claude Code subagents** for codebase exploration. Understanding when to use each maximizes efficiency.
+
+### Plan vs Explore: Key Difference
+
+**Plan Subagent** - Research + recommendations requiring user approval
+- Returns analysis with recommended options
+- Use when: Multiple approaches exist, need expert recommendation
+- Example: "Analyze auth patterns and recommend which to use"
+
+**Explore Subagent** - Direct findings without approval gates
+- Returns factual information immediately
+- Use when: Clear what you need, just need to find it
+- Example: "Find all files related to authentication"
+
+### When to Use Plan Subagent
+
+Use for **decision-making scenarios**:
+
+**Implementation Strategy** - Analyze architecture patterns, evaluate trade-offs, recommend approach
+```
+Task(subagent_type: "Plan",
+     prompt: "Analyze auth implementation in codebase. Task adds JWT middleware
+              in src/middleware/auth.ts. Find patterns, recommend approach with
+              pros/cons. Thoroughness: medium",
+     description: "Research auth patterns")
+```
+
+**Assumption Verification** - Verify plan assumptions before implementation starts
+- Check API patterns match expectations
+- Identify integration issues early
+- Recommend adjustments if needed
+
+**Alternative Analysis** - When blocked, find and recommend alternative tasks
+- Evaluates spec for parallel-safe alternatives
+- Considers value and effort
+- Provides reasoning for recommendations
+
+**Risk Assessment** - Identify issues, analyze impact, recommend mitigations
+
+### When to Use Explore Subagent
+
+Use for **straightforward fact-finding**:
+
+**File Discovery** - Find files by pattern, locate tests, identify related code
+```
+Task(subagent_type: "Explore",
+     prompt: "Find TypeScript files in src/ implementing auth logic.
+              Include imports/references. Thoroughness: quick",
+     description: "Find auth files")
+```
+
+**Implementation Reading** - Understand how features work, check API signatures
+**Quick Lookups** - Find definitions, locate configs, check dependencies
+**Dependency Analysis** - Trace imports, find callers, understand relationships
+
+### Decision Guide
+
+```
+Need a recommendation? → Plan (presents options for approval)
+Just need facts?       → Explore (returns findings directly)
+```
+
+### Thoroughness Levels
+
+- **quick**: Fast answers, straightforward tasks
+- **medium**: Standard coverage (default for most tasks)
+- **very thorough**: Complex/unfamiliar areas, high-risk changes
+
+### Best Practices
+
+✅ Use Plan for recommendations/decisions, Explore for facts
+✅ Specify thoroughness based on complexity
+✅ Present Plan results with AskUserQuestion
+✅ Include specific paths when known
+✅ Combine with doc-query when docs exist
+
+❌ Don't use Plan for file lookups
+❌ Don't use Explore when choosing between options
+❌ Don't ignore Plan recommendations without user consultation
 
 ## Interactive Question Tool
 
@@ -1057,11 +1141,11 @@ AskUserQuestion(
 
 **After completing implementation:**
 
-1. **Mark task complete using sdd-update:**
+1. **Mark task complete using sdd-update (requires journal content):**
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-update-subagent",
-  prompt: "Mark task {task-id} as completed in spec {spec-id}",
+  prompt: "Complete task {task-id} in spec {spec-id}. Completion note: Successfully implemented [feature/fix]. [Brief description of what was done, tests run, verification performed].",
   description: "Mark task complete"
 )
 ```
@@ -1069,6 +1153,8 @@ Task(
 2. **The sdd-update subagent will:**
    - Update task status to "completed"
    - Set completion timestamp
+   - Create journal entry documenting the completion
+   - Clear the needs_journaling flag
    - Identify next actionable task
 
 3. **Check context usage after completion (REQUIRED):**
@@ -1123,9 +1209,66 @@ Include the current context percentage in the completion report.
 Steps:
 1. Run `sdd prepare-task {spec-id} --json`
 2. Review task details and dependencies from output
-3. Create execution plan for the task
-4. Present plan to user with AskUserQuestion
-5. Begin implementation
+3. **Optional: Use Plan subagent for implementation strategy research**
+   - For complex or architectural tasks, delegate research to Plan subagent
+   - Plan subagent analyzes codebase patterns and recommends approach
+   - Present recommendations to user with AskUserQuestion
+4. Create execution plan for the task (incorporating approved recommendations)
+5. Present plan to user with AskUserQuestion
+6. Begin implementation
+
+**Example with Plan subagent:**
+
+```bash
+# Step 1: Prepare task
+sdd prepare-task user-auth-001 --json
+# Returns: task-1-1 "Create AuthService class" in src/services/authService.ts
+
+# Step 2: Review task requirements
+# Task requires new authentication service, unclear which patterns to follow
+
+# Step 3: Research implementation approach
+Task(
+  subagent_type: "Plan",
+  prompt: "Analyze existing service classes in src/services/ to understand
+          architectural patterns. Task requires creating AuthService in
+          src/services/authService.ts for JWT authentication. Recommend:
+          (1) Class structure (singleton vs factory vs plain class)
+          (2) Dependency injection pattern used
+          (3) Error handling approach
+          (4) Testing strategy based on existing tests
+          Thoroughness: medium",
+  description: "Research service architecture patterns"
+)
+
+# Plan subagent returns analysis + recommendations
+
+# Step 4: Present recommendations to user
+AskUserQuestion(
+  questions: [{
+    question: "Plan subagent recommends singleton pattern with dependency injection. Approve this approach?",
+    header: "Architecture",
+    multiSelect: false,
+    options: [
+      {label: "Approve", description: "Use recommended singleton pattern"},
+      {label: "Factory Pattern", description: "Use factory pattern instead"},
+      {label: "Plain Class", description: "Use simple class without singleton"}
+    ]
+  }]
+)
+
+# Step 5: Create execution plan based on approved approach
+# Step 6: Present execution plan with AskUserQuestion
+# Step 7: Begin implementation
+```
+
+**When to use Plan subagent in Workflow 1:**
+- ✅ First task in a new codebase area
+- ✅ Architectural or design-heavy tasks
+- ✅ Multiple valid implementation approaches exist
+- ✅ Task affects other components significantly
+- ❌ Simple, straightforward tasks with clear implementation
+- ❌ Tasks with explicit implementation instructions in spec
 
 ### Workflow 2: Resuming Work
 **Situation:** Some tasks completed, need to continue
@@ -1175,11 +1318,26 @@ Steps:
      description: "Document blocker"
    )
    ```
-5. Find alternative tasks and present to user:
-   - Parallel-safe task from same phase
-   - Task from different phase
-   - Test task that's not blocked
-6. Use `AskUserQuestion` to let user choose how to proceed:
+5. **Use Plan subagent to analyze alternatives and recommend next steps:**
+   ```
+   Task(
+     subagent_type: "Plan",
+     prompt: "Task task-3-1 (src/cache/redis.ts) is blocked by Redis configuration.
+             Analyze the spec at specs/active/user-auth-001.json and identify
+             alternative tasks that: (1) have no blockers, (2) are parallel-safe
+             with task-3-1, (3) provide clear value toward spec completion.
+             For each alternative found (aim for 3-5), explain:
+             - Why it's a good alternative
+             - Estimated effort
+             - Dependencies status
+             - Value/priority
+             Recommend which alternative to work on next with reasoning.
+             Thoroughness: medium",
+     description: "Analyze blocked task alternatives"
+   )
+   ```
+6. Plan subagent returns analysis with recommended alternatives
+7. Use `AskUserQuestion` to present options to user:
 
 **Present context:**
 ```
@@ -1220,20 +1378,65 @@ AskUserQuestion(
 )
 ```
 
-7. Based on user selection:
+8. Based on user selection:
    - If alternative task selected: Create plan for that task
    - If "Resolve Blocker": Provide guidance on resolving the blocker
    - If "Stop for Now": Summarize what was blocked and exit
-8. Note that original task should resume after blocker cleared
+9. Note that original task should resume after blocker cleared
+
+**Benefits of using Plan subagent in Workflow 3:**
+- ✅ Comprehensive alternative analysis (spec-aware)
+- ✅ Expert recommendations with reasoning
+- ✅ Considers parallel-safety and dependencies automatically
+- ✅ Saves main agent context for actual implementation
+- ✅ Provides structured options ready for AskUserQuestion
 
 ### Workflow 4: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
+
+**Enhanced Approach: Proactive Verification**
+
+Before starting implementation on complex tasks, use Plan subagent to verify assumptions:
+
+```
+Task(
+  subagent_type: "Plan",
+  prompt: "About to implement task-2-1 (src/services/authService.ts) which
+          assumes User API uses callback pattern. Before implementation:
+          (1) Verify User API in src/models/User.ts actually uses callbacks
+          (2) Check error handling patterns in existing services
+          (3) Identify any API mismatches with our execution plan assumptions
+          If assumptions are wrong, recommend adjustments.
+          Thoroughness: quick",
+  description: "Verify execution plan assumptions"
+)
+```
+
+This catches deviations **before** implementation starts, saving time and avoiding rework.
+
+**Reactive Approach: Handling Mid-Implementation Deviations**
 
 Steps:
 1. Start implementing task per plan
 2. Discover issue (e.g., API different than expected)
 3. Pause implementation
-4. Document deviation using sdd-update subagent:
+4. **Use Plan subagent to analyze deviation and recommend solutions:**
+   ```
+   Task(
+     subagent_type: "Plan",
+     prompt: "Implementation deviation in task-2-1 (src/services/authService.ts).
+             Plan assumed User API uses callbacks, but it actually uses async/await.
+             Analyze:
+             (1) What changes are needed to execution plan
+             (2) Impact on error handling, tests, and dependent code
+             (3) Alternative approaches (wrapper vs rewrite vs change User API)
+             Recommend best approach with pros/cons for each option.
+             Thoroughness: medium",
+     description: "Analyze deviation and recommend solution"
+   )
+   ```
+5. Plan subagent returns analysis with recommended solutions
+6. Document deviation using sdd-update subagent:
    ```
    Task(
      subagent_type: "sdd-toolkit:sdd-update-subagent",
@@ -1241,7 +1444,7 @@ Steps:
      description: "Document deviation"
    )
    ```
-5. Analyze the deviation and use `AskUserQuestion` to get user decision:
+7. Use `AskUserQuestion` to present options to user:
 
 **Present context:**
 ```
@@ -1292,15 +1495,34 @@ AskUserQuestion(
 )
 ```
 
-6. Based on user selection:
+8. Based on user selection:
    - If "Revise Plan": Use `Skill(sdd-toolkit:sdd-next)` to create revised execution plan
    - If "Update Spec": Use `Skill(sdd-toolkit:sdd-plan)` to update specification
    - If "Explain More": Provide detailed analysis, then re-ask
    - If "Rollback": Revert implementation changes
-7. If plan revised, present revised plan to user (use Phase 5.2)
-8. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
-9. Update spec if structural changes needed
-10. Continue with revised plan
+9. If plan revised, present revised plan to user (use Phase 5.2)
+10. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
+11. Update spec if structural changes needed
+12. Continue with revised plan
+
+**When to use each approach:**
+- **Proactive (Plan subagent before implementation):**
+  - ✅ Complex tasks with many assumptions
+  - ✅ Working in unfamiliar codebase areas
+  - ✅ High-risk changes affecting multiple components
+  - ✅ When execution plan has specific API/pattern assumptions
+
+- **Reactive (Plan subagent after discovering deviation):**
+  - ✅ Simple tasks that hit unexpected issues
+  - ✅ When deviation is discovered mid-implementation
+  - ✅ Rapid prototyping scenarios where speed matters
+
+**Benefits of Plan subagent in Workflow 4:**
+- ✅ Catches assumption mismatches early (proactive)
+- ✅ Provides expert analysis of deviations (reactive)
+- ✅ Recommends solutions with trade-off analysis
+- ✅ Reduces rework and wasted implementation time
+- ✅ Maintains main agent focus on actual coding
 
 ### Verification Tasks
 
@@ -1545,12 +1767,15 @@ Bridge specifications to implementation by identifying next tasks, gathering con
 
 **sdd-update subagent** - Use alongside this skill to:
 - Mark tasks as in_progress before implementing
-- Mark tasks as completed after implementing
+- **Complete tasks** (atomically marks as completed AND creates journal entry - REQUIRES completion note)
+- Mark tasks as blocked when encountering obstacles
 - Document deviations and decisions during implementation
 - Track progress and update metrics
 - Journal verification results
 
-Use via: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", prompt: "...", description: "...")`
+**Important:** When completing tasks, you MUST provide a completion note/journal content describing what was accomplished.
+
+Use via: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", prompt: "Complete task {task-id} in spec {spec-id}. Completion note: [what was done]", description: "...")`
 
 ---
 

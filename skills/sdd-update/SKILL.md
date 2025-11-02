@@ -8,7 +8,8 @@ description: Progress tracking for spec-driven development. Use to update task s
 ## When to Use This Skill
 
 Use `Skill(sdd-toolkit:sdd-update)` to:
-- Mark tasks as in_progress, completed, or blocked
+- **Complete tasks** (atomically marks as completed AND creates journal entry using `complete-task`)
+- Mark tasks as in_progress or blocked
 - Document decisions and deviations in journal entries
 - Add verification results to specs
 - Move specs between lifecycle folders (e.g., pending => active, active => completed)
@@ -191,13 +192,44 @@ Verification tasks can specify custom failure behavior via `on_failure` metadata
 
 ## Workflow 5: Completing Tasks
 
-Mark a task as completed when finished:
+### Complete a Task (Recommended: Atomic Status + Journal)
+
+When finishing a task, use `complete-task` to atomically mark it complete AND create a journal entry:
+
+```bash
+# Complete with automatic journal entry
+sdd complete-task {spec-id} {task-id} --journal-content "Successfully implemented JWT authentication with token refresh. All tests passing including edge cases for expired tokens."
+
+# Customize the journal entry
+sdd complete-task {spec-id} {task-id} \
+  --journal-title "Task Completed: Authentication Implementation" \
+  --journal-content "Detailed description of what was accomplished..." \
+  --entry-type status_change
+
+# Add a brief status note
+sdd complete-task {spec-id} {task-id} \
+  --note "All tests passing" \
+  --journal-content "Implemented authentication successfully."
+```
+
+**What `complete-task` does automatically:**
+1. Updates task status to `completed`
+2. Records completion timestamp
+3. Creates a journal entry documenting the completion
+4. Clears the `needs_journaling` flag
+5. Syncs metadata and recalculates progress
+
+**This is the recommended approach** because it ensures proper documentation of task completion.
+
+### Alternative: Status-Only Update (Not Recommended for Completion)
+
+If you need to mark a task completed without journaling (rare), use:
 
 ```bash
 sdd update-status {spec-id} {task-id} completed --note "Brief completion note"
 ```
 
-The CLI automatically records the completion timestamp.
+⚠️ **Warning:** This sets `needs_journaling=True` and requires a follow-up `add-journal` call. Use `complete-task` instead to avoid forgetting to journal.
 
 ### Complete a Spec
 

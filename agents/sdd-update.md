@@ -3,10 +3,16 @@ name: sdd-update-subagent
 description: Update task status, journal decisions, and track progress by invoking the sdd-update skill
 model: haiku
 required_information:
+  task_completion:
+    - spec_id (spec name or identifier)
+    - task_id (hierarchical task ID like "task-1-2")
+    - completion_note or journal_content (summary of what was accomplished)
+    - journal_title (optional, defaults to "Task Completed")
+    - entry_type (optional: completion, status_change, or other journal types)
   status_updates:
     - spec_id (spec name or identifier)
     - task_id (hierarchical task ID like "task-1-2")
-    - new_status (in_progress, completed, or blocked)
+    - new_status (in_progress or blocked - NOT completed, use task_completion instead)
     - note (optional but recommended for context)
   journal_entries:
     - spec_id
@@ -36,9 +42,10 @@ This agent invokes `Skill(sdd-toolkit:sdd-update)` to handle spec status updates
 ## When to Use This Agent
 
 Use this agent when you need to:
-- Mark tasks as in_progress, completed, or blocked
+- **Complete tasks** (atomically marks as completed AND creates journal entry)
+- Mark tasks as in_progress or blocked
 - Document implementation decisions or deviations from the plan
-- Add journal entries for completed tasks
+- Add standalone journal entries (not tied to task completion)
 - Record verification results
 - Track time spent on tasks
 - Move specs between lifecycle folders (pending/active/completed/archived)
@@ -71,12 +78,22 @@ This agent is a thin wrapper that invokes `Skill(sdd-toolkit:sdd-update)`.
 
 ### Validation Checklist
 
-**For status updates:**
+**For task completion (marks complete + creates journal):**
 - [ ] spec_id is provided (spec name like "user-auth-001" or full identifier)
 - [ ] task_id is provided (hierarchical ID like "task-1-2")
-- [ ] new_status is clear (in_progress, completed, or blocked)
+- [ ] completion_note OR journal_content is provided (what was accomplished)
+- [ ] Optional: journal_title (defaults to "Task Completed" if not provided)
+- [ ] Optional: entry_type (defaults to "completion" if not provided)
 
-**For journal entries:**
+**IMPORTANT:** Task completion is atomic and uses the `complete-task` workflow, NOT `update-status completed`.
+
+**For status updates (in_progress or blocked only):**
+- [ ] spec_id is provided (spec name like "user-auth-001" or full identifier)
+- [ ] task_id is provided (hierarchical ID like "task-1-2")
+- [ ] new_status is clear (in_progress or blocked - NOT completed)
+- [ ] If status is "completed", STOP - use task_completion operation instead
+
+**For journal entries (standalone, not tied to completion):**
 - [ ] spec_id is provided
 - [ ] title is provided (clear, descriptive title)
 - [ ] content is provided (meaningful content describing the decision/deviation/etc.)
@@ -126,19 +143,25 @@ The skill will handle all CLI operations and return structured results. After th
 
 ## Example Invocations
 
+**Completing a task (atomic: status + journal):**
+```
+Skill(sdd-toolkit:sdd-update) with prompt:
+"Complete task-1-2 for spec user-auth-001. Completion note: Successfully implemented JWT authentication with token refresh. All tests passing including edge cases for expired tokens."
+```
+
 **Marking task as in_progress:**
 ```
 Skill(sdd-toolkit:sdd-update) with prompt:
 "Mark task-1-2 as in_progress for spec user-auth-001"
 ```
 
-**Marking task as completed:**
+**Marking task as blocked:**
 ```
 Skill(sdd-toolkit:sdd-update) with prompt:
-"Mark task-1-2 as completed for spec user-auth-001. Implementation finished and all tests passing."
+"Mark task-2-3 as blocked for spec user-auth-001. Note: Waiting for backend API endpoint to be deployed."
 ```
 
-**Adding journal entry:**
+**Adding standalone journal entry (not tied to completion):**
 ```
 Skill(sdd-toolkit:sdd-update) with prompt:
 "Add journal entry for spec user-auth-001, task task-2-1. Title: 'Deviation: Split Auth Logic'. Entry type: deviation. Content: Created authService.ts instead of modifying userService.ts for better separation of concerns."
