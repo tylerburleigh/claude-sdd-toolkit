@@ -413,8 +413,16 @@ If detected, execute the autonomous workflow below. Otherwise, use the standard 
 sdd verify-tools
 
 # Check initial context (optional)
-sdd context --json
+# IMPORTANT: Run these as TWO SEPARATE commands, not combined with && or $()
+
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
+
+**Note:** The marker from step 1 must be logged to the transcript before step 2 can find it. Always run these as separate, sequential Bash tool calls. **Do NOT run them in parallel** - step 2 must wait for step 1 to complete and be logged.
 
 If initial context ≥75%, recommend stopping before starting with AskUserQuestion.
 
@@ -463,9 +471,18 @@ Task(
 ```
 
 8. **Check context usage (REQUIRED):**
+
+Run these as TWO SEPARATE, SEQUENTIAL commands:
+
 ```bash
-sdd context --json
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
+
+**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
 
    - If context ≥75%: **STOP**, exit loop, go to Step 3 (Summary)
    - If context <75%: Continue to next iteration
@@ -1056,11 +1073,19 @@ Task(
 
 3. **Check context usage after completion (REQUIRED):**
 
-After the task is marked complete, you MUST check context usage:
+After the task is marked complete, you MUST check context usage.
+
+Run these as TWO SEPARATE, SEQUENTIAL commands:
 
 ```bash
-sdd context --json
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
+
+**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
 
 If context usage is ≥75%, use `AskUserQuestion` to prompt the user:
 
