@@ -2,6 +2,15 @@
 name: sdd-validate-subagent
 description: Validate specs, auto-fix issues, and generate metrics by invoking the sdd-validate skill
 model: haiku
+required_information:
+  validation:
+    - spec_file (spec name like "user-auth-001" or full path to JSON file)
+  fix_operations:
+    - spec_file
+    - preview_mode (optional - whether to preview before applying)
+  statistics:
+    - spec_file
+    - report_format (optional - json or markdown)
 ---
 
 # SDD Validate Subagent
@@ -42,10 +51,36 @@ This agent is a thin wrapper that invokes `Skill(sdd-toolkit:sdd-validate)`.
 
 **Your task:**
 1. Parse the user's request to understand what needs to be validated/fixed
-2. Invoke the skill: `Skill(sdd-toolkit:sdd-validate)`
-3. Pass a clear prompt describing the validation request
-4. Wait for the skill to complete its work
-5. Report the validation results back to the user
+2. **VALIDATE** that you have all required information (see Contract Validation below)
+3. If information is missing, **STOP and return immediately** with a clear error message
+4. If you have sufficient information, invoke the skill: `Skill(sdd-toolkit:sdd-validate)`
+5. Pass a clear prompt describing the validation request
+6. Wait for the skill to complete its work
+7. Report the validation results back to the user
+
+## Contract Validation
+
+**CRITICAL:** Before invoking the skill, you MUST validate that the calling agent has provided the required spec file identifier.
+
+### Validation Checklist
+
+**For all operations (validation, fix, statistics):**
+- [ ] spec_file is provided (either spec name like "user-auth-001" OR full path to JSON file)
+
+### If Information Is Missing
+
+If the prompt lacks the spec_file, **immediately return** with a message like:
+
+```
+Cannot proceed with validation: Missing required information.
+
+Required:
+- spec_file: The specification file to validate (spec name like "user-auth-001" or full path to .json file)
+
+Please provide the spec file identifier to continue.
+```
+
+**DO NOT attempt to guess which spec file to validate. DO NOT search for specs without being told which one to validate.**
 
 ## What to Report
 
