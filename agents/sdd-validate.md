@@ -119,6 +119,38 @@ Skill(sdd-toolkit:sdd-validate) with prompt:
 "Generate comprehensive statistics for spec user-auth-2025-10-18-001. Include quality score, progress metrics, and completeness analysis."
 ```
 
+## Understanding Exit Codes
+
+The sdd-validate CLI uses exit codes to communicate validation status:
+- **Exit code 0**: Spec is valid (no errors)
+- **Exit code 1**: Spec has warnings only (usable but has issues)
+- **Exit code 2**: Spec has errors (EXPECTED when validating specs with issues)
+
+**IMPORTANT**: Exit code 2 is NOT a command failure. It means the validation successfully detected errors in the spec. This is the normal workflow:
+1. Initial validation (finds errors) → exit code 2
+2. Apply fixes with `sdd fix`
+3. Re-validate (fewer/no errors) → exit code 0
+
+Only treat the command as failed if:
+- The spec file cannot be found
+- The JSON is malformed and cannot be parsed
+- The validation logic itself crashes
+
+## Spec File Identifier Format
+
+**Preferred format**: Spec ID only (e.g., "spec-modification-tools-2025-11-02-001")
+- Automatically searches pending/, active/, completed/, archived/ subdirectories
+- Works from any working directory
+- Handles multiple specs directories gracefully
+
+**Alternative format**: Absolute path to .json file (e.g., "/absolute/path/to/spec.json")
+- Must be an absolute path
+- Ensures exact file is validated
+
+**Avoid**: Relative directory paths (e.g., "specs/active/my-spec.json")
+- May resolve incorrectly depending on working directory
+- Use spec ID or absolute path instead
+
 ## Error Handling
 
 If the skill encounters errors, report:
