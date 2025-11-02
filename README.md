@@ -17,50 +17,6 @@ The SDD Toolkit is a set of Claude skills and Python CLI tools that enable spec-
 
 This was built to keep Claude focused on one task at a time while maintaining a complete record of what's planned, what's done, and what's next.
 
-## Latest Updates
-
-**Version 0.4.0** brings major enhancements including AI-powered spec rendering, automatic time tracking, context monitoring, and code-doc integration that provides richer task context. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
-
-**Important:** After updating the toolkit, you must reinstall the Python package to get the latest CLI commands. See [Updating the Toolkit](#updating-the-toolkit) below.
-
-## Updating the Toolkit
-
-To update to the latest version:
-
-### Step 1: Update the Plugin Marketplace
-
-1. In Claude Code, type `/plugins` and press Enter
-2. Select **"Manage marketplaces"**
-3. Select **`claude-sdd-toolkit`**
-4. Select **"Update marketplace"**
-5. Wait for the update to complete
-
-### Step 2: Update the Installed Plugin
-
-1. Type `/plugins` again
-2. Select **"Manage and uninstall plugins"**
-3. Select **`claude-sdd-toolkit`**
-4. Select **`sdd-toolkit`**
-5. Select **"Update now"**
-6. Wait for the update to complete
-
-### Step 3: Restart Claude Code
-
-Exit Claude Code completely and restart it.
-
-### Step 4: Reinstall Python Package
-
-The plugin files are now updated, but you must reinstall the Python CLI tools:
-
-```bash
-cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
-pip install -e .
-```
-
-**Why all these steps?** The marketplace update gets the latest plugin code, the plugin update installs it to Claude Code, the restart loads the new skills, and the reinstall updates the CLI commands. Skipping any step will leave you with mismatched versions.
-
-**How to verify:** When you start Claude Code, the session-start hook will automatically check for version mismatches and warn you if the update wasn't completed properly.
-
 ## Why Use This?
 
 Working on complex projects with Claude can lead to scope drift, forgotten requirements, and lost context. The toolkit addresses this by:
@@ -72,9 +28,7 @@ Working on complex projects with Claude can lead to scope drift, forgotten requi
 
 Specs live in your project as JSON files, giving you a machine-readable history of what was planned and what was actually done.
 
-## Quick Start
-
-### Installation
+## Installation
 
 1. Launch Claude Code (`claude` command)
 2. Type `/plugin` and press Enter
@@ -96,6 +50,8 @@ Specs live in your project as JSON files, giving you a machine-readable history 
     This configures the necessary permissions for SDD tools to work in your project.
 
 That's it! The plugin is now ready to use.
+
+## Quick Start
 
 ### Your First Workflow
 
@@ -122,6 +78,12 @@ Resume anytime with:
 Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-begin` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
 
 (NOTE: This example was generated using version 0.1.0)
+
+## Latest Updates
+
+**Version 0.4.0** brings major enhancements including AI-powered spec rendering, automatic time tracking, context monitoring, and code-doc integration that provides richer task context. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Important:** After updating the toolkit, you must reinstall the Python package to get the latest CLI commands. See [Updating the Toolkit](#updating-the-toolkit) below.
 
 ## Core Concepts
 
@@ -580,6 +542,44 @@ ls -l ~/.claude/hooks/
 # Make them executable
 chmod +x ~/.claude/hooks/*
 ```
+
+## Updating the Toolkit
+
+To update to the latest version:
+
+### Step 1: Update the Plugin Marketplace
+
+1. In Claude Code, type `/plugins` and press Enter
+2. Select **"Manage marketplaces"**
+3. Select **`claude-sdd-toolkit`**
+4. Select **"Update marketplace"**
+5. Wait for the update to complete
+
+### Step 2: Update the Installed Plugin
+
+1. Type `/plugins` again
+2. Select **"Manage and uninstall plugins"**
+3. Select **`claude-sdd-toolkit`**
+4. Select **`sdd-toolkit`**
+5. Select **"Update now"**
+6. Wait for the update to complete
+
+### Step 3: Restart Claude Code
+
+Exit Claude Code completely and restart it.
+
+### Step 4: Reinstall Python Package
+
+The plugin files are now updated, but you must reinstall the Python CLI tools:
+
+```bash
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+pip install -e .
+```
+
+**Why all these steps?** The marketplace update gets the latest plugin code, the plugin update installs it to Claude Code, the restart loads the new skills, and the reinstall updates the CLI commands. Skipping any step will leave you with mismatched versions.
+
+**How to verify:** When you start Claude Code, the session-start hook will automatically check for version mismatches and warn you if the update wasn't completed properly.
 
 ## Advanced Usage
 
