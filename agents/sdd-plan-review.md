@@ -4,7 +4,7 @@ description: Run multi-model spec reviews and report findings by invoking the sd
 model: haiku
 required_information:
   review_operations:
-    - spec_file (spec name like "user-auth-001" or full path to JSON file)
+    - spec_id (specification ID like "user-auth-001")
     - review_type (optional: quick, full, security, feasibility)
     - tools (optional: specific tools to use like gemini, codex, cursor-agent)
 ---
@@ -59,33 +59,33 @@ This agent is a thin wrapper that invokes `Skill(sdd-toolkit:sdd-plan-review)`.
 
 ## Contract Validation
 
-**CRITICAL:** Before invoking the skill, you MUST validate that the calling agent has provided the required spec file identifier.
+**CRITICAL:** Before invoking the skill, you MUST validate that the calling agent has provided the required spec identifier.
 
 ### Validation Checklist
 
 **For all review operations:**
-- [ ] spec_file is provided (either spec name like "user-auth-001" OR full path to JSON file)
+- [ ] spec_id is provided (specification ID like "user-auth-001")
 
 **Note:** review_type and specific tools are optional. If not specified, the skill will use defaults (full review with all available tools).
 
 ### If Information Is Missing
 
-If the prompt lacks the spec_file, **immediately return** with a message like:
+If the prompt lacks the spec_id, **immediately return** with a message like:
 
 ```
 Cannot proceed with spec review: Missing required information.
 
 Required:
-- spec_file: The specification file to review (spec name like "user-auth-001" or full path to .json file)
+- spec_id: The specification ID to review (e.g., "user-auth-001")
 
 Optional:
 - review_type: quick, full, security, or feasibility (defaults to full)
 - tools: specific AI tools to use (defaults to all available: gemini, codex, cursor-agent)
 
-Please provide the spec file identifier to continue.
+Please provide the spec ID to continue.
 ```
 
-**DO NOT attempt to guess which spec file to review. DO NOT search for specs without being told which one to review.**
+**DO NOT attempt to guess which spec to review. DO NOT search for specs without being told which one to review.**
 
 ## What to Report
 

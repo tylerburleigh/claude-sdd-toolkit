@@ -158,42 +158,42 @@ sdd list-review-tools
 
 ```bash
 # Review a spec with automatic tool detection
-sdd review specs/active/user-auth-001.json
+sdd review user-auth-001
 
 # Review with specific type
-sdd review specs/active/user-auth-001.json --type full
+sdd review user-auth-001 --type full
 
 # Quick review (fast, basic checks only)
-sdd review specs/active/user-auth-001.json --type quick
+sdd review user-auth-001 --type quick
 
 # Security-focused review
-sdd review specs/active/user-auth-001.json --type security
+sdd review user-auth-001 --type security
 
 # Feasibility check (estimates, dependencies)
-sdd review specs/active/user-auth-001.json --type feasibility
+sdd review user-auth-001 --type feasibility
 ```
 
 ### Save Report
 
 ```bash
 # Save as markdown
-sdd review specs/active/user-auth-001.json --output review-report.md
+sdd review user-auth-001 --output review-report.md
 
 # Save as JSON (for automation)
-sdd review specs/active/user-auth-001.json --output review-report.json
+sdd review user-auth-001 --output review-report.json
 ```
 
 ### Advanced Options
 
 ```bash
 # Specify which tools to use
-sdd review specs/active/user-auth-001.json --tools gemini,codex
+sdd review user-auth-001 --tools gemini,codex
 
 # Use caching (skip re-calling models for same spec)
-sdd review specs/active/user-auth-001.json --cache
+sdd review user-auth-001 --cache
 
 # Preview without executing
-sdd review specs/active/user-auth-001.json --dry-run
+sdd review user-auth-001 --dry-run
 ```
 
 ## Quick Reference: Common Commands
@@ -215,13 +215,13 @@ sdd review specs/active/user-auth-001.json --dry-run
 # 1. Create spec (via `Skill(sdd-toolkit:sdd-plan)`)
 
 # 2. Review it
-sdd review specs/active/myspec.json --type full
+sdd review myspec --type full
 
 # 3. If REVISE recommended, address issues
 #    ... edit spec based on critical/high issues ...
 
 # 4. Quick re-review (optional)
-sdd review specs/active/myspec.json --type quick
+sdd review myspec --type quick
 
 # 5. Document review in spec (via `Skill(sdd-toolkit:sdd-update)`)
 sdd add-journal myspec --title "Review completed" --content "7.5/10 score, 2 critical issues addressed"
@@ -402,7 +402,7 @@ Every review evaluates specs across **6 dimensions** (1-10 scale):
 **Multi-model consultation (parallel execution):**
 
 ```bash
-sdd review specs/active/user-auth-001.json --type full
+sdd review user-auth-001 --type full
 ```
 
 **What happens:**
@@ -524,7 +524,7 @@ sdd update-frontmatter user-auth-001 review_score "6.8"
 
 ```bash
 # After fixes, quick re-review
-sdd review specs/active/user-auth-001.json --type quick
+sdd review user-auth-001 --type quick
 
 # Should see improved scores
 # If APPROVE → proceed
@@ -549,11 +549,11 @@ sdd update-frontmatter user-auth-001 review_status "approved"
 Review a specification using multiple AI models.
 
 ```bash
-sdd review <spec-file> [OPTIONS]
+sdd review {spec-id} [OPTIONS]
 ```
 
 **Arguments:**
-- `<spec-file>`: Path to JSON specification file (required)
+- `{spec-id}`: Specification ID (required)
 
 **Options:**
 
@@ -569,28 +569,28 @@ sdd review <spec-file> [OPTIONS]
 
 ```bash
 # Basic review (auto-detects tools, uses full review)
-sdd review specs/active/user-auth-001.json
+sdd review user-auth-001
 
 # Quick review (faster, less comprehensive)
-sdd review specs/active/user-auth-001.json --type quick
+sdd review user-auth-001 --type quick
 
 # Security-focused review
-sdd review specs/active/user-auth-001.json --type security
+sdd review user-auth-001 --type security
 
 # Specify which tools to use
-sdd review specs/active/user-auth-001.json --tools gemini,codex
+sdd review user-auth-001 --tools gemini,codex
 
 # Save report to markdown file
-sdd review specs/active/user-auth-001.json --output review.md
+sdd review user-auth-001 --output review.md
 
 # Save report to JSON (for automation)
-sdd review specs/active/user-auth-001.json --output review.json
+sdd review user-auth-001 --output review.json
 
 # Use caching (skip model calls if spec unchanged)
-sdd review specs/active/user-auth-001.json --cache
+sdd review user-auth-001 --cache
 
 # Preview what would be done
-sdd review specs/active/user-auth-001.json --dry-run
+sdd review user-auth-001 --dry-run
 ```
 
 ### `sdd list-review-tools`
@@ -630,22 +630,22 @@ Multi-model reviews available
 
 ```bash
 # Fast check before approval (10 min)
-sdd review myspec.json --type quick
+sdd review myspec --type quick
 
 # Comprehensive pre-implementation review (20-30 min)
-sdd review myspec.json --type full --output full-review.md
+sdd review myspec --type full --output full-review.md
 
 # Security audit for auth changes (15-20 min)
-sdd review auth-spec.json --type security --output security-audit.md
+sdd review auth-spec --type security --output security-audit.md
 
 # Validate aggressive timeline (10-15 min)
-sdd review big-refactor.json --type feasibility
+sdd review big-refactor --type feasibility
 
 # Re-review after fixes (use cache to skip unchanged parts)
-sdd review myspec.json --type quick --cache
+sdd review myspec --type quick --cache
 
 # Production-ready review with all checks
-sdd review critical-spec.json --type full --tools gemini,codex,cursor-agent
+sdd review critical-spec --type full --tools gemini,codex,cursor-agent
 ```
 
 ## Integration with SDD Workflow
@@ -659,13 +659,13 @@ sdd review critical-spec.json --type full --tools gemini,codex,cursor-agent
 #    → Generates specs/active/myspec.json
 
 # 2. Review it
-sdd review specs/active/myspec.json --type full
+sdd review myspec --type full
 
 # 3. If REVISE recommended, address critical/high issues
 #    ... edit specs/active/myspec.json ...
 
 # 4. Quick re-review after fixes (optional)
-sdd review specs/active/myspec.json --type quick
+sdd review myspec --type quick
 
 # 5. If APPROVE, proceed to implementation
 ```
@@ -674,7 +674,7 @@ sdd review specs/active/myspec.json --type quick
 
 ```bash
 # Review identifies fundamental flaws
-sdd review specs/active/myspec.json --type full
+sdd review myspec --type full
 # → Overall: 2.5/10 (REJECT)
 
 # Back to sdd-plan to redesign
@@ -687,7 +687,7 @@ sdd review specs/active/myspec.json --type full
 
 ```bash
 # After review completes
-sdd review specs/active/user-auth-001.json --output review.md
+sdd review user-auth-001 --output review.md
 
 # Journal the review
 sdd add-journal user-auth-001 --title "Multi-model review completed" --content "Full review: 7.5/10 (APPROVE with minor issues). 2 critical issues fixed. Security review passed."
@@ -732,7 +732,7 @@ sdd update-frontmatter user-auth-001 status "approved"
 
 ```bash
 # Review spec
-sdd review specs/active/user-auth-001.json --type full
+sdd review user-auth-001 --type full
 # → 8.2/10 (APPROVE)
 
 # Document approval (via Skill(sdd-toolkit:sdd-update))
@@ -759,14 +759,14 @@ Review Score → Decision
 # → specs/active/myspec.json created
 
 # 2. Review spec
-sdd review specs/active/myspec.json --type full
+sdd review myspec --type full
 # → 6.5/10 (REVISE): 2 critical, 3 high issues
 
 # 3. Fix critical/high issues
 # ... edit specs/active/myspec.json ...
 
 # 4. Re-review (quick check)
-sdd review specs/active/myspec.json --type quick
+sdd review myspec --type quick
 # → 8.0/10 (APPROVE)
 
 # 5. Document review (via Skill(sdd-toolkit:sdd-update))
@@ -824,10 +824,10 @@ Cache key = SHA-256 hash of:
 
 ```bash
 # Default: No caching (always call tools)
-sdd review myspec.json
+sdd review myspec
 
 # Use cache if available (skip model calls if unchanged)
-sdd review myspec.json --cache
+sdd review myspec --cache
 
 # Clear all cache
 rm -rf ~/.claude/skills/sdd-plan-review/.cache/
