@@ -63,6 +63,14 @@ This skill is part of the **Spec-Driven Development** family:
 - All task metadata, dependencies, verification steps, and risk notes are stored in the JSON hierarchy
 - Query specs via `sdd` commands; avoid ad-hoc parsing
 
+**Reading Specifications (CRITICAL):**
+- ✅ **ALWAYS** use `sdd` commands to read spec files (e.g., `sdd prepare-task`, `sdd task-info`, `sdd context`)
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use command chaining to access specs (e.g., `sdd --version && cat specs/active/spec.json`)
+- The `sdd` CLI provides efficient, structured access with proper parsing and validation
+- Spec files are large and reading them directly wastes valuable context window space
+
 **Fast Context Checklist (daily driver):**
 1. `sdd prepare-task {spec-id} --json` (auto-discovers specs, selects the next task, and includes dependency status)
 2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json` and `sdd check-deps {spec-id} {task-id} --json`
@@ -92,6 +100,64 @@ This skill is part of the **Spec-Driven Development** family:
 - Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
 - Create dense text blocks with odd line breaks
 - Use inconsistent formatting
+
+### Completion Report Format Template
+
+**CRITICAL: When presenting task completion reports, use this exact structure with proper line breaks:**
+
+```markdown
+## Task Completed Successfully! ✓
+
+**Task ID:** task-1-1
+**Title:** Create sdd_render_skill directory structure
+
+### What Was Accomplished
+
+✅ Created skills/sdd-render/ directory with proper naming conventions (hyphens)
+
+✅ Created placeholder SKILL.md (2,807 bytes) with foundational structure
+
+✅ Verified Python module (sdd_render) is properly structured and imports successfully
+
+✅ Confirmed naming conventions match established patterns across the toolkit
+
+✅ Validated structure against existing skills (sdd-next pattern)
+
+### Files Created/Modified
+
+**New Files:**
+- skills/sdd-render/SKILL.md - Claude Code skill definition (placeholder)
+
+**Verified Existing:**
+- src/claude_skills/claude_skills/sdd_render/__init__.py
+- src/claude_skills/claude_skills/sdd_render/cli.py
+- src/claude_skills/claude_skills/sdd_render/renderer.py
+
+### Next Steps
+
+This task unblocks three dependent tasks:
+
+1. **task-1-2:** Create SKILL.md for sdd-render (flesh out the full skill documentation)
+2. **task-1-3:** Implement skill_main.py entry point (clarify requirements)
+3. **task-1-4:** Register skill in toolkit (integration work)
+
+The foundational directory structure is now in place and ready for these subsequent tasks to build upon.
+
+### Progress Update
+
+**Spec:** AI-Enhanced Spec Rendering Skill (ai-enhanced-rendering-2025-10-28-001)
+
+**Phase 1 Progress:** 1/6 tasks completed (17%)
+
+**Overall Progress:** 1/49 tasks completed (2%)
+```
+
+**Key Formatting Rules:**
+1. **Blank line after each section header**
+2. **Blank line between each accomplishment item** (✅ items)
+3. **Blank line before and after subsections** (Files Created/Modified, Next Steps, etc.)
+4. **Each field on its own line** - NEVER combine fields like "Type: X Purpose: Y"
+5. **Use proper markdown headers** (## for main title, ### for subsections, ** for emphasis)
 
 ## Tool Verification
 
@@ -311,6 +377,230 @@ For more validation options, see [Manual Spec Validation](#manual-spec-validatio
 ```
 
 **Most users should start with automated workflow** and only use manual workflow when needed.
+
+---
+
+## Autonomous Workflow (Phase Completion Mode)
+
+**When to use this workflow:**
+- User explicitly requests "autonomous mode" during session setup (via /sdd-begin)
+- The invocation prompt mentions "autonomous mode" or "complete all tasks in current phase"
+- User wants to complete multiple tasks within a phase without stopping for approval on each one
+
+**Key Characteristics:**
+- **Phase-scoped execution**: Completes all tasks within the current phase, does not cross phase boundaries
+- **Context-aware**: Checks context usage after each task, stops if ≥75%
+- **Defensive stops**: Stops for blocked tasks and plan deviations (requires user approval)
+- **No plan approval**: Creates execution plans internally without user approval for each task
+
+### Autonomous Mode Detection
+
+At the beginning of the workflow, check if the invocation prompt mentions autonomous mode:
+
+**Detection keywords:**
+- "autonomous mode"
+- "complete all tasks in current phase"
+- "complete entire phase"
+- "phase completion mode"
+
+If detected, execute the autonomous workflow below. Otherwise, use the standard single-task workflow.
+
+### Autonomous Workflow Loop
+
+**Step 1: Initialize**
+```bash
+# Verify tools (optional, recommended on first task only)
+sdd verify-tools
+
+# Check initial context (optional)
+sdd context --json
+```
+
+If initial context ≥75%, recommend stopping before starting with AskUserQuestion.
+
+**Step 2: Task Execution Loop**
+
+For each task in the current phase:
+
+1. **Prepare next task:**
+```bash
+sdd prepare-task {spec-id} --json
+```
+
+2. **Check if phase complete:**
+   - If no more tasks in current phase: Exit loop, go to Step 3 (Summary)
+   - If all remaining tasks are blocked: Exit loop, go to Step 3 (Summary)
+
+3. **Check for blockers:**
+   - If next task is blocked: **STOP**, present blocker info to user with AskUserQuestion
+   - Options: alternative tasks, resolve blocker, or stop
+   - Exit autonomous mode, handle as normal blocking scenario
+
+4. **Create execution plan (silently):**
+   - Analyze task metadata from prepare-task output
+   - Create detailed execution plan internally (no user approval needed)
+   - Include all standard plan components (prerequisites, steps, success criteria, etc.)
+
+5. **Execute task implementation:**
+   - Implement according to the internal execution plan
+   - Follow all implementation best practices
+   - Perform any required testing or verification
+
+6. **Handle plan deviations:**
+   - If implementation deviates from plan: **STOP**, document deviation
+   - Present deviation to user with AskUserQuestion
+   - Options: revise plan, update spec, explain more, rollback
+   - Exit autonomous mode, handle as normal deviation scenario
+
+7. **Mark task complete:**
+```bash
+# Use sdd-update subagent to mark complete
+Task(
+  subagent_type: "sdd-toolkit:sdd-update-subagent",
+  prompt: "Mark task {task-id} as completed in spec {spec-id}",
+  description: "Mark task complete"
+)
+```
+
+8. **Check context usage (REQUIRED):**
+```bash
+sdd context --json
+```
+
+   - If context ≥75%: **STOP**, exit loop, go to Step 3 (Summary)
+   - If context <75%: Continue to next iteration
+
+9. **Check phase completion:**
+   - If current phase is complete: Exit loop, go to Step 3 (Summary)
+   - Otherwise: Return to step 1 (prepare next task)
+
+**Step 3: Present Summary Report**
+
+When autonomous mode exits (for any reason), present a comprehensive summary:
+
+```markdown
+## Autonomous Execution Summary
+
+**Mode:** Phase Completion (Autonomous)
+
+**Spec:** {spec-title} ({spec-id})
+
+**Phase:** {phase-title} ({phase-id})
+
+### Tasks Completed
+
+✅ **task-1-1:** Create directory structure
+   - File: skills/sdd-render/
+   - Completed: 2025-10-28 14:23:15
+   - Duration: 15 minutes
+
+✅ **task-1-2:** Create SKILL.md documentation
+   - File: skills/sdd-render/SKILL.md
+   - Completed: 2025-10-28 14:45:32
+   - Duration: 22 minutes
+
+✅ **task-1-3:** Implement skill entry point
+   - File: skills/sdd-render/skill_main.py
+   - Completed: 2025-10-28 15:12:08
+   - Duration: 26 minutes
+
+### Phase Progress
+
+**Phase {phase-id}:** {completed_in_phase}/{total_in_phase} tasks completed ({percentage}%)
+
+**Overall Spec:** {total_completed}/{total_tasks} tasks completed ({overall_percentage}%)
+
+### Context Usage
+
+**Current context:** {context_percentage}%
+
+### Exit Reason
+
+{One of the following:}
+- ✅ **Phase Complete:** All tasks in {phase-id} have been completed
+- ⏸️ **Context Limit:** Context usage reached {context_percentage}% (≥75% threshold)
+- 🚧 **Blocked Task:** task-{X} is blocked by {dependency/reason}
+- ⚠️ **Plan Deviation:** Implementation deviated from plan in task-{X}
+- ❌ **No Actionable Tasks:** All remaining tasks in phase are blocked or in progress
+
+### Next Steps
+
+{Contextual recommendations based on exit reason:}
+
+**For Phase Complete:**
+- Phase {phase-id} is complete! Ready to move to {next-phase-id}
+- Run /sdd-begin to start the next phase
+- Consider reviewing phase deliverables before proceeding
+
+**For Context Limit:**
+- Consider resetting the session to free up context
+- You've completed {N} tasks successfully
+- Resume with /sdd-begin after reset
+
+**For Blocked Task:**
+- task-{X} requires: {blocker-description}
+- Alternative tasks available: {list-alternatives}
+- Choose how to proceed using the options provided
+
+**For Plan Deviation:**
+- Review the deviation details above
+- Decide whether to revise plan or update spec
+- Choose how to proceed using the options provided
+```
+
+**Step 4: Handle Exit Scenarios**
+
+Based on exit reason:
+
+1. **Phase Complete:**
+   - Celebrate completion
+   - Summarize phase achievements
+   - Offer to start next phase (via /sdd-begin)
+
+2. **Context Limit Reached:**
+   - Present summary with context percentage
+   - Use AskUserQuestion: "Stop and Reset" vs "Continue Anyway"
+   - Recommend stopping to preserve context for next session
+
+3. **Blocked Task Encountered:**
+   - Present blocker details
+   - Use AskUserQuestion to offer alternatives or resolve blocker
+   - Exit autonomous mode, handle as normal blocking scenario
+
+4. **Plan Deviation:**
+   - Present deviation details
+   - Use AskUserQuestion to get user decision
+   - Exit autonomous mode, handle as normal deviation scenario
+
+### Autonomous Mode Best Practices
+
+**DO:**
+- ✅ Check context after every task completion
+- ✅ Stop immediately when context ≥75%
+- ✅ Stop for blocked tasks (don't auto-pivot without user input)
+- ✅ Stop for plan deviations (don't auto-revise without user approval)
+- ✅ Create detailed internal execution plans for each task
+- ✅ Document all completions with proper metadata
+- ✅ Present comprehensive summary at end
+
+**DON'T:**
+- ❌ Cross phase boundaries (stop at end of current phase)
+- ❌ Skip plan creation (always plan, just don't show to user)
+- ❌ Continue past 75% context usage
+- ❌ Auto-resolve blockers without user input
+- ❌ Auto-revise plans on deviations without user approval
+- ❌ Batch task completions (mark each complete immediately)
+
+### Transitioning Back to Single-Task Mode
+
+If autonomous mode exits due to blockers or deviations, the workflow naturally transitions back to single-task mode:
+
+1. Present the issue with AskUserQuestion
+2. Get user decision on how to proceed
+3. Continue with standard single-task workflow
+4. User can re-enable autonomous mode via /sdd-begin if desired
+
+---
 
 ## Required Tools
 
@@ -762,10 +1052,41 @@ Task(
 2. **The sdd-update subagent will:**
    - Update task status to "completed"
    - Set completion timestamp
-   - Check context usage and recommend reset if needed
    - Identify next actionable task
 
-3. **Continue with next task or end session**
+3. **Check context usage after completion (REQUIRED):**
+
+After the task is marked complete, you MUST check context usage:
+
+```bash
+sdd context --json
+```
+
+If context usage is ≥75%, use `AskUserQuestion` to prompt the user:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Context usage is at X%. Continue or reset?",
+    header: "Context Check",
+    multiSelect: false,
+    options: [
+      {
+        label: "Stop and Reset",
+        description: "End session and recommend resetting context before continuing"
+      },
+      {
+        label: "Continue Anyway",
+        description: "Continue working despite high context usage"
+      }
+    ]
+  }]
+)
+```
+
+Include the current context percentage in the completion report.
+
+4. **Continue with next task or end session**
 
 ---
 

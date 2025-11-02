@@ -23,6 +23,16 @@ Use `Skill(sdd-toolkit:sdd-update)` to:
 
 **Document Reality**: JSON spec files are living documents that evolve during implementation. This skill ensures the spec accurately reflects current progress, decisions, and status. All updates are made through CLI commands that handle validation, backups, and progress recalculation automatically.
 
+## Reading Specifications (CRITICAL)
+
+**When working with spec files, ALWAYS use `sdd` CLI commands:**
+- ✅ **ALWAYS** use `sdd` commands to read/query spec files (e.g., `sdd update-status`, `sdd add-journal`, `sdd list-blockers`)
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use command chaining to access specs (e.g., `sdd --version && cat specs/active/spec.json`)
+- The `sdd` CLI provides efficient, structured access with proper parsing and validation
+- Spec files are large and reading them directly wastes valuable context window space
+
 ## Skill Family
 
 This skill is part of the **Spec-Driven Development** workflow:
