@@ -28,8 +28,22 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     Returns:
         Exit code (0 for success, 1 for error)
     """
-    mode = getattr(args, 'mode', 'basic')
-    enhancement_level = getattr(args, 'enhancement_level', 'full')
+    enhancement_level = getattr(args, 'enhancement_level', None)
+    mode = getattr(args, 'mode', None)
+
+    # If enhancement_level is specified, imply enhanced mode
+    # This makes --mode truly optional when using --enhancement-level
+    if enhancement_level is not None and mode is None:
+        mode = 'enhanced'
+    elif mode is None:
+        # Default to enhanced mode with standard level
+        mode = 'enhanced'
+        if enhancement_level is None:
+            enhancement_level = 'standard'
+
+    # Set default enhancement level if not specified
+    if enhancement_level is None:
+        enhancement_level = 'standard'
 
     if mode == 'enhanced':
         if enhancement_level == 'summary':
@@ -220,15 +234,15 @@ def register_render(subparsers, parent_parser):
     parser.add_argument(
         '--mode',
         choices=['basic', 'enhanced'],
-        default='basic',
-        help='Rendering mode: basic (fast, SpecRenderer) or enhanced (AI features, slower)'
+        default=None,
+        help='Rendering mode: basic (fast, SpecRenderer) or enhanced (AI features). Default: enhanced. Automatically set to enhanced when --enhancement-level is specified.'
     )
 
     parser.add_argument(
         '--enhancement-level',
         choices=['full', 'standard', 'summary'],
-        default='full',
-        help='Enhancement level for enhanced mode: full (all AI features), standard (base + narrative), summary (executive summary only)'
+        default=None,
+        help='AI enhancement level: summary (exec summary only), standard (base + narrative, default), full (all features). Automatically enables enhanced mode.'
     )
 
     parser.set_defaults(func=cmd_render)

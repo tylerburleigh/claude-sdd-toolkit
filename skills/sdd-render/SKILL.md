@@ -377,18 +377,21 @@ Before executing ANY render command, you MUST ask the user for their preferred r
    ```bash
    sdd render {spec-id} --enhancement-level summary
    # ~1-2 minutes
+   # Note: --mode enhanced is implied when --enhancement-level is specified
    ```
 
    **If user chose "Enhanced - Standard" (or didn't specify):**
    ```bash
    sdd render {spec-id}
    # Default: enhanced mode with standard level (~3-5 minutes)
+   # Equivalent to: sdd render {spec-id} --enhancement-level standard
    ```
 
    **If user chose "Enhanced - Full":**
    ```bash
    sdd render {spec-id} --enhancement-level full
    # ~5-8 minutes
+   # Note: --mode enhanced is implied when --enhancement-level is specified
    ```
 
    **If user chose "Generate all versions for comparison":**
@@ -535,17 +538,19 @@ When you run `sdd render {spec-id}` without any flags, it uses **Enhanced Mode w
    - Uses SpecRenderer for deterministic output
    - Typical rendering time: < 2 seconds
    - Use when speed is critical or AI features aren't needed
+   - **Must be explicitly specified** to override the enhanced default
 
-2. **Enhanced Mode** (`--mode enhanced` - default)
+2. **Enhanced Mode** (default, `--mode enhanced` optional)
    - AI-powered analysis and insights
    - Uses external AI CLI tools (gemini, cursor-agent, codex)
-   - Requires `--enhancement-level` parameter (defaults to `standard` if omitted)
+   - Default enhancement level: `standard`
    - Typical rendering time: 1-8 minutes depending on level
    - Automatically falls back to basic mode if AI tools unavailable
+   - **The `--mode enhanced` flag is optional** - specifying `--enhancement-level` automatically enables enhanced mode
 
 ### Enhancement Levels
 
-When using `--mode enhanced`, specify one of three enhancement levels:
+When using enhanced mode (the default), you can optionally specify one of three enhancement levels:
 
 | Level | Features | Performance | Best For |
 |-------|----------|-------------|----------|
@@ -576,7 +581,8 @@ When using `--mode enhanced`, specify one of three enhancement levels:
 # Uses enhanced mode with standard level by default
 sdd render my-spec-001
 
-# Equivalent explicit form
+# Equivalent explicit forms
+sdd render my-spec-001 --enhancement-level standard
 sdd render my-spec-001 --mode enhanced --enhancement-level standard
 
 # With custom output
@@ -585,7 +591,7 @@ sdd render my-spec-001 --output docs/team-status.md
 
 **Basic Mode (fastest, no AI):**
 ```bash
-# Opt into basic mode for speed
+# Must explicitly specify --mode basic to override enhanced default
 sdd render my-spec-001 --mode basic
 
 # For quick status checks
@@ -597,19 +603,19 @@ sdd render my-spec-001 --mode basic
 
 **Enhanced Mode with Summary:**
 ```bash
-# Lighter AI enhancement for quick overview
-sdd render my-spec-001 --mode enhanced --enhancement-level summary
+# Specifying --enhancement-level automatically enables enhanced mode
+sdd render my-spec-001 --enhancement-level summary
 
-# For stakeholder updates
+# For stakeholder updates (--mode enhanced is optional, implied by --enhancement-level)
 sdd render my-spec-001 --enhancement-level summary --output reports/exec-summary.md
 ```
 
 **Enhanced Mode with Full Features:**
 ```bash
-# Maximum AI analysis with all features
-sdd render my-spec-001 --mode enhanced --enhancement-level full
+# Specifying --enhancement-level automatically enables enhanced mode
+sdd render my-spec-001 --enhancement-level full
 
-# Can omit --mode since enhanced is default
+# Maximum AI analysis with all features (--mode enhanced is implied)
 sdd render my-spec-001 --enhancement-level full --output docs/comprehensive-plan.md
 ```
 
@@ -874,19 +880,19 @@ Implement user registration with password hashing
 ```bash
 sdd render {spec-id}
 ```
-Renders a JSON spec with AI-enhanced narrative to markdown in the default location (`specs/.human-readable/`)
+Renders a JSON spec with AI-enhanced narrative to markdown in the default location (`specs/.human-readable/`). Uses enhanced mode with standard level by default.
 
 **Basic Mode (Fast, No AI):**
 ```bash
 sdd render {spec-id} --mode basic
 ```
-Quick rendering without AI features for speed-critical scenarios
+Quick rendering without AI features for speed-critical scenarios. Must explicitly specify `--mode basic` to override the enhanced default.
 
 **Full AI Enhancement:**
 ```bash
 sdd render {spec-id} --enhancement-level full
 ```
-Maximum AI analysis with insights, visualizations, and recommendations
+Maximum AI analysis with insights, visualizations, and recommendations. The `--mode enhanced` flag is optional - it's automatically enabled when you specify `--enhancement-level`.
 
 **Custom Output Path:**
 ```bash
@@ -913,8 +919,8 @@ Directly render a JSON file by providing its full path
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
-| `--mode` | | Rendering mode: `basic` (fast, no AI) or `enhanced` (AI features) | `enhanced` |
-| `--enhancement-level` | | AI enhancement level: `summary`, `standard`, or `full` | `standard` |
+| `--mode` | | Rendering mode: `basic` (fast, no AI) or `enhanced` (AI features). Optional - automatically set to `enhanced` when `--enhancement-level` is specified. | `enhanced` (with `standard` level) |
+| `--enhancement-level` | | AI enhancement level: `summary`, `standard`, or `full`. Automatically enables `enhanced` mode. | `standard` |
 | `--output` | `-o` | Output file path | `specs/.human-readable/{spec-id}.md` |
 | `--path` | | Specs directory path | Auto-discovery |
 | `--format` | | Output format | `markdown` |
@@ -923,36 +929,37 @@ Directly render a JSON file by providing its full path
 
 **Key Options Explained:**
 
-- `--mode basic` - Disables AI features for fast rendering (< 2 seconds)
-- `--mode enhanced` - Enables AI features (default, can be omitted)
-- `--enhancement-level summary` - Executive summary only (~1-2 minutes)
-- `--enhancement-level standard` - Balanced AI features (default, ~3-5 minutes)
-- `--enhancement-level full` - All AI features including visualizations (~5-8 minutes)
+- `--mode basic` - Explicitly disables AI features for fast rendering (< 2 seconds). Must be specified to override enhanced default.
+- `--mode enhanced` - Enables AI features (default, can be omitted). Automatically enabled when `--enhancement-level` is specified.
+- `--enhancement-level summary` - Executive summary only (~1-2 minutes). Automatically enables enhanced mode.
+- `--enhancement-level standard` - Balanced AI features (default, ~3-5 minutes). Automatically enables enhanced mode.
+- `--enhancement-level full` - All AI features including visualizations (~5-8 minutes). Automatically enables enhanced mode.
 
 ### Examples
 
 **Render with default settings (enhanced standard):**
 ```bash
 sdd render user-auth-2025-10-24-001
-# Uses: mode=enhanced, level=standard (~3-5 minutes)
+# Uses: mode=enhanced (default), level=standard (default) (~3-5 minutes)
 ```
 
 **Fast render without AI (basic mode):**
 ```bash
 sdd render user-auth-2025-10-24-001 --mode basic
+# Must explicitly specify --mode basic to override enhanced default
 # Quick status check (< 2 seconds)
 ```
 
 **Executive summary only:**
 ```bash
 sdd render user-auth-2025-10-24-001 --enhancement-level summary
-# Lighter AI enhancement (~1-2 minutes)
+# Automatically enables enhanced mode (~1-2 minutes)
 ```
 
 **Full AI analysis:**
 ```bash
 sdd render user-auth-2025-10-24-001 --enhancement-level full
-# Maximum features (~5-8 minutes)
+# Automatically enables enhanced mode (~5-8 minutes)
 ```
 
 **Render to custom location:**
