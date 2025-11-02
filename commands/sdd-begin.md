@@ -151,33 +151,100 @@ Based on the user's selection:
 **Option 1: "Resume last task"** (if last-accessed task available)
 ```bash
 # Get the last task info from get-session-info output
-# Then automatically invoke the sdd-next skill with context
+# Then ask the user how they want to work
 
 I'll help you resume work on task [task-id] from [spec-name]...
 ```
 
+**Ask the user to configure the work mode:**
+
+Use AskUserQuestion tool:
+- **Header**: "Work Mode"
+- **Question**: "How would you like to work on this task?"
+- **Options**:
+  1. Single Task Mode (Plan and execute one task at a time)
+  2. Autonomous Mode (Complete all tasks in current phase within context limits)
+
+**If user selects Autonomous Mode, check context first:**
+
+Run `sdd context --json` and parse the output to get context percentage.
+
+If context percentage > 50%:
+```
+⚠️  Context usage is already at X%
+
+Autonomous mode works best with lower context usage to ensure you can complete multiple tasks within the 75% limit.
+```
+
+Use AskUserQuestion:
+- **Header**: "High Context"
+- **Question**: "Context is already at X%. How would you like to proceed?"
+- **Options**:
+  1. Continue with Autonomous Mode (May hit 75% limit quickly)
+  2. Switch to Single Task Mode (Safer option)
+
+**Then invoke sdd-next based on the final selected mode:**
+
 Use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
 
-**IMPORTANT**: When invoking sdd-next for resume, provide context about the specific task:
+**IMPORTANT**: When invoking sdd-next:
 - Mention the spec_id from the last_task data
 - Mention the task_id if known
-- This helps sdd-next prepare the specific task
+- **Mention the selected work mode** in the prompt:
+  - For Single Task Mode: "Execute sdd-next for [spec-id] in single-task mode"
+  - For Autonomous Mode: "Execute sdd-next for [spec-id] in autonomous mode - complete all tasks in current phase"
+- This helps sdd-next know which workflow to use
 
 **Option 2: "Continue with next task"**
 ```bash
 # If multiple specs, ask which one (if not obvious)
-# Then automatically invoke the sdd-next skill
+# Then ask the user how they want to work
 
 I'll use the sdd-next skill to find and prepare the next task from [spec-name]...
 ```
+
+**Ask the user to configure the work mode:**
+
+Use AskUserQuestion tool:
+- **Header**: "Work Mode"
+- **Question**: "How would you like to work on this task?"
+- **Options**:
+  1. Single Task Mode (Plan and execute one task at a time)
+  2. Autonomous Mode (Complete all tasks in current phase within context limits)
+
+**If user selects Autonomous Mode, check context first:**
+
+Run `sdd context --json` and parse the output to get context percentage.
+
+If context percentage > 50%:
+```
+⚠️  Context usage is already at X%
+
+Autonomous mode works best with lower context usage to ensure you can complete multiple tasks within the 75% limit.
+```
+
+Use AskUserQuestion:
+- **Header**: "High Context"
+- **Question**: "Context is already at X%. How would you like to proceed?"
+- **Options**:
+  1. Continue with Autonomous Mode (May hit 75% limit quickly)
+  2. Switch to Single Task Mode (Safer option)
+
+**Then invoke sdd-next based on the final selected mode:**
 
 Use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
+
+**IMPORTANT**: When invoking sdd-next:
+- **Mention the selected work mode** in the prompt:
+  - For Single Task Mode: "Execute sdd-next for [spec-id] in single-task mode"
+  - For Autonomous Mode: "Execute sdd-next for [spec-id] in autonomous mode - complete all tasks in current phase"
+- This helps sdd-next know which workflow to use
 
 **Option 3: "Write new spec"**
 ```bash

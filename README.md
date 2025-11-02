@@ -2,7 +2,7 @@
 
 > Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.4.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -16,6 +16,50 @@ The SDD Toolkit is a set of Claude skills and Python CLI tools that enable spec-
 - **Integration** - Skills invoke CLI commands to systematically work through tasks
 
 This was built to keep Claude focused on one task at a time while maintaining a complete record of what's planned, what's done, and what's next.
+
+## Latest Updates
+
+**Version 0.4.0** brings major enhancements including AI-powered spec rendering, automatic time tracking, context monitoring, and code-doc integration that provides richer task context. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Important:** After updating the toolkit, you must reinstall the Python package to get the latest CLI commands. See [Updating the Toolkit](#updating-the-toolkit) below.
+
+## Updating the Toolkit
+
+To update to the latest version:
+
+### Step 1: Update the Plugin Marketplace
+
+1. In Claude Code, type `/plugins` and press Enter
+2. Select **"Manage marketplaces"**
+3. Select **`claude-sdd-toolkit`**
+4. Select **"Update marketplace"**
+5. Wait for the update to complete
+
+### Step 2: Update the Installed Plugin
+
+1. Type `/plugins` again
+2. Select **"Manage and uninstall plugins"**
+3. Select **`claude-sdd-toolkit`**
+4. Select **`sdd-toolkit`**
+5. Select **"Update now"**
+6. Wait for the update to complete
+
+### Step 3: Restart Claude Code
+
+Exit Claude Code completely and restart it.
+
+### Step 4: Reinstall Python Package
+
+The plugin files are now updated, but you must reinstall the Python CLI tools:
+
+```bash
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+pip install -e .
+```
+
+**Why all these steps?** The marketplace update gets the latest plugin code, the plugin update installs it to Claude Code, the restart loads the new skills, and the reinstall updates the CLI commands. Skipping any step will leave you with mismatched versions.
+
+**How to verify:** When you start Claude Code, the session-start hook will automatically check for version mismatches and warn you if the update wasn't completed properly.
 
 ## Why Use This?
 
@@ -53,35 +97,19 @@ Specs live in your project as JSON files, giving you a machine-readable history 
 
 That's it! The plugin is now ready to use.
 
-### Verify Installation
-
-```bash
-# Check that CLI tools are available (examples)
-sdd --help
-sdd doc --help
-sdd test --help
-
-# Check that skills are installed
-ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
-```
-
-You should see: `sdd-plan`, `sdd-next`, `sdd-update`, and other skills.
-
-**Test in Claude Code**: Navigate to a project and run `/sdd-setup`. If it completes successfully, everything is working!
-
 ### Your First Workflow
 
 In Claude Code, try this:
 
 ```
-Create a spec for adding user authentication with email and password
+Create a spec for a command line Pomodoro/task timer.
 ```
 
 Claude will:
-1. Explore your codebase
+1. Explore your codebase (if you have one)
 2. Create a detailed specification
 3. Break it into actionable tasks
-4. Save it as `specs/active/user-auth-YYYY-MM-DD-001.json`
+4. Save it as `specs/pending/{spec-id}.json`
 
 Resume anytime with:
 
@@ -92,6 +120,8 @@ Resume anytime with:
 ### See It In Action
 
 Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-begin` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
+
+(NOTE: This example was generated using version 0.1.0)
 
 ## Core Concepts
 
@@ -105,10 +135,12 @@ A **spec** is a JSON file containing:
 - Edge cases and considerations
 
 Specs live in your project's `specs/` directory:
-- `specs/pending/` - Backlog of planned work awaiting activation
+- `specs/pending/` - Backlog of planned work awaiting activation (specs are created here by default)
 - `specs/active/` - Current work (you can have multiple specs representing parallel work streams)
 - `specs/completed/` - Finished features
 - `specs/archived/` - Old/cancelled work
+
+When you create a spec, it starts in `pending/`. This allows you to plan multiple features without cluttering your active workspace. When you run `/sdd-begin`, Claude will show you pending specs and offer to activate them when you're ready to start working.
 
 ### Design Principles
 
@@ -121,6 +153,32 @@ Specs live in your project's `specs/` directory:
 
 When a feature requires changes across multiple files, decompose it into multiple tasks or use subtasks with proper dependencies. See [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for detailed guidance.
 
+**Task Categories**: Each task can be categorized to improve organization and reporting:
+- `investigation` - Exploring codebase, understanding existing systems
+- `implementation` - Writing new code or features
+- `refactoring` - Improving existing code structure
+- `decision` - Architecture or design decisions
+- `research` - External research, learning new technologies
+
+Categories help with progress tracking and post-project analysis.
+
+**Automatic Time Tracking**: The toolkit automatically tracks time spent on tasks using timestamps:
+- When a task transitions to `in_progress`, `started_at` timestamp is recorded
+- When marked `completed`, `completed_at` timestamp is recorded
+- `actual_hours` is automatically calculated from the duration
+- Spec-level totals are aggregated from all task times
+
+No manual time entry needed - the toolkit handles it automatically based on when you actually work on tasks.
+
+**Documentation Integration**: Several skills leverage generated codebase documentation for better context:
+- **sdd-plan**: Understands existing code patterns when creating specs
+- **sdd-next**: Provides relevant code context when preparing tasks
+- **run-tests**: Uses docs to understand test relationships and dependencies
+
+Best practice: Ask Claude to "Document this codebase" before creating specs to enable enhanced context. Skills gracefully degrade to Explore/Glob/Grep when docs are unavailable.
+
+**Context Tracking**: The toolkit monitors your Claude conversation token usage to prevent hitting the 160k "usable context" limit (80% of 200k total before auto-compaction). `sdd-next` automatically checks context after completing tasks and warns when usage exceeds safe thresholds.
+
 ### Skills
 
 **Skills** extend Claude's capabilities. The toolkit provides:
@@ -131,10 +189,10 @@ When a feature requires changes across multiple files, decompose it into multipl
 | `sdd-next` | Find next task | "What should I work on next?" |
 | `sdd-update` | Track progress | Automatic when tasks complete |
 | `sdd-validate` | Check spec validity | "Is my spec valid?" |
-| `sdd-render` | Render specs to markdown | Generate human-readable documentation |
+| `sdd-render` | Render specs to markdown | Generate human-readable documentation with AI enhancement (3 modes: basic/summary/standard/full) |
 | `sdd-plan-review` | Multi-model review | "Review my spec" |
 | `code-doc` | Generate docs | "Document this codebase" |
-| `doc-query` | Query docs | "What handles authentication?" |
+| `doc-query` | Query docs & analyze relationships | "What calls this function?" "Show call graph" "Find refactor candidates" |
 | `run-tests` | Run & debug tests | "Run tests and fix failures" |
 
 Claude uses skills automatically based on your requests.
@@ -225,7 +283,8 @@ User: Sees validation results
 
 **Commands** are interactive workflows you invoke with `/`:
 
-- `/sdd-begin` - Resume work on active specs
+- `/sdd-begin` - Resume work (shows both pending and active specs with options to activate or continue)
+- `/sdd-setup` - Configure project permissions
 
 Type `/` in Claude Code to see all available commands.
 
@@ -255,21 +314,30 @@ Type `/` in Claude Code to see all available commands.
 ```
 You: Create a spec for adding rate limiting to the API
 
-Claude: [Creates detailed spec at specs/active/rate-limiting-001.json]
+Claude: [Creates detailed spec at specs/pending/rate-limiting-001.json]
 
 You: /sdd-begin
 
-Claude: Found active spec "rate-limiting-001". Continue with next task?
+Claude: Found pending spec "rate-limiting-001"
+        Would you like to activate it and start working?
 
 You: Yes
 
-Claude: Task 1: Create RateLimiter middleware class
+Claude: [Moves spec to specs/active/]
+        Task 1: Create RateLimiter middleware class
         [Implements the task]
 
 You: /sdd-begin
 
 Claude: Task 2: Add rate limit configuration...
         [Continues through all tasks]
+
+        ✅ All tasks completed (7/7 = 100%)
+        This spec is ready to be finalized. Move to completed/?
+
+You: Yes
+
+Claude: [Moves spec to specs/completed/]
 ```
 
 ### Resume Work After a Break
@@ -321,6 +389,71 @@ Claude: [Uses sdd-plan-review skill]
         - Codex warns about performance implications
 ```
 
+### Monitor Context Usage
+
+```
+You: /sdd-begin
+
+Claude: [Completes task-1-1]
+        Context usage: 45% (72k/160k tokens)
+        Continue to next task?
+
+You: Yes
+
+Claude: [Completes task-1-2]
+        Context usage: 62% (99k/160k tokens)
+
+        ⚠️ Context usage above 50% - consider saving progress
+        Options:
+        1. Continue with next task (not recommended above 80%)
+        2. Save progress and clear context (/clear, then /sdd-begin to resume)
+```
+
+### Validate and Fix a Spec
+
+```
+You: Validate my spec
+
+Claude: [Uses sdd-validate skill]
+        Found 12 issues:
+        - 3 circular dependencies
+        - 5 missing dependencies
+        - 4 schema violations
+
+        Auto-fix available. Apply fixes?
+
+You: Yes
+
+Claude: Fixed 8 issues automatically
+        Remaining 4 issues require manual review:
+        [Details of unfixable issues]
+```
+
+### Analyze Code Relationships
+
+```
+You: What calls the authenticateUser function?
+
+Claude: [Uses doc-query skill]
+        Found 5 callers:
+        - LoginController.login() (src/controllers/auth.py:45)
+        - APIMiddleware.verify() (src/middleware/api.py:23)
+        - WebSocketHandler.connect() (src/ws/handler.py:89)
+        - AdminPanel.authorize() (src/admin/panel.py:156)
+        - TestAuthFlow.test_login() (tests/test_auth.py:34)
+
+You: Show me the call graph starting from the login endpoint
+
+Claude: [Generates call graph visualization]
+        LoginController.login()
+        ├── authenticateUser()
+        │   ├── validateCredentials()
+        │   ├── checkUserStatus()
+        │   └── generateToken()
+        └── createSession()
+            └── persistSession()
+```
+
 ## Project Structure
 
 After using the toolkit, your project will have:
@@ -333,7 +466,12 @@ your-project/
 │   ├── active/              # Current work
 │   │   └── feature-001.json
 │   ├── completed/           # Finished
-│   └── archived/            # Old/cancelled
+│   ├── archived/            # Old/cancelled
+│   │
+│   ├── .reports/            # Validation reports (gitignored)
+│   ├── .reviews/            # Multi-model reviews (gitignored)
+│   ├── .backups/            # Spec backups (gitignored)
+│   └── .human-readable/     # Rendered markdown (gitignored)
 │
 ├── .claude/                 # Project settings (optional)
 │   └── settings.json        # Permissions
@@ -374,33 +512,9 @@ The setup creates `.claude/settings.json` with permissions like:
     "allow": [
       "Skill(sdd-toolkit:sdd-plan)",
       "Skill(sdd-toolkit:sdd-next)",
-      "Read(//**/specs/**)",
-      "Write(//**/specs/active/**)"
+      "Write(//**/specs/active/**)",
+      "Write(//**/specs/pending/**)"
     ]
-  }
-}
-```
-
-### Advanced: Manual Setup
-
-If you prefer to configure manually via CLI:
-
-```bash
-# In your project directory
-sdd skills-dev setup-permissions -- update .
-```
-
-This does the same thing as `/sdd-setup` but from the command line.
-
-### Global Settings
-
-Your global settings at `~/.claude/settings.json` control default behavior:
-
-```json
-{
-  "sdd": {
-    "auto_suggest_resume": true,
-    "recent_activity_days": 7
   }
 }
 ```
@@ -415,31 +529,46 @@ ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
 
 # Should show: sdd-plan, sdd-next, sdd-update, etc.
 
-# If missing, reinstall the plugin
-# See "Reinstallation" section
+# If missing, reinstall the plugin from marketplace
 ```
 
 ### CLI Commands Not Found
 
+If `sdd`, `doc`, or `test` commands are not found:
+
 ```bash
 # Reinstall the Python package
-cd ~/.claude/src/claude_skills
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 pip install -e .
 
-# Verify
+# Verify installation (ONLY for troubleshooting - you should never run these directly)
+# Normal workflow: interact with Claude using natural language
 sdd --help
 doc --help
 test --help
 ```
 
+### Updated Plugin But Commands Still Old
+
+If you updated the plugin (via `git pull` or marketplace update) but CLI commands seem outdated or broken:
+
+```bash
+# Reinstall to get latest CLI changes
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+pip install -e .
+
+# Restart Claude Code to reload skills
+```
+
+**Why this happens:** The Python package is installed in editable mode, but updates require reinstallation. See [Updating the Toolkit](#updating-the-toolkit) for details.
+
 ### Permission Errors
 
 ```bash
-# Set up project permissions
-cd /path/to/your/project
-sdd skills-dev setup-permissions -- update .
+# Use the slash command in Claude Code:
+/sdd-setup
 
-# Or tell Claude: "Set up SDD permissions for this project"
+# Or ask Claude to set up permissions for your project
 ```
 
 ### Hooks Not Running
@@ -452,50 +581,48 @@ ls -l ~/.claude/hooks/
 chmod +x ~/.claude/hooks/*
 ```
 
-## Reinstallation
-
-If you need to reinstall the plugin:
-
-1. In Claude Code, type `/plugin`
-2. Select **"Manage and install plugins"**
-3. Find `sdd-toolkit` and click **"Uninstall"**
-4. Exit Claude Code
-5. Delete plugin cache:
-   ```bash
-   rm -rf ~/.claude/plugins/marketplaces/claude-sdd-toolkit
-   rm -rf ~/.claude/plugins/cache/sdd-toolkit
-   ```
-6. Restart Claude Code
-7. Follow the installation steps again
-
 ## Advanced Usage
 
 ### For Developers
 
 - **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System documentation (generated by the `code-doc` skill from this system)
 
-### For Teams
-
-Want to use this with your team?
-- Commit `specs/` directory to git for collaboration
-- Share `.claude/settings.json` for consistent permissions
-- Use spec templates for common patterns
-
 ### CLI Reference
 
-The toolkit provides unified CLI commands:
+**⚠️ For Developers and Advanced Troubleshooting Only**
+
+This CLI reference is for toolkit developers and debugging purposes. **Regular users should NEVER run these commands directly.**
+
+Instead, interact with Claude using:
+- Natural language: "Create a spec for X", "What should I work on next?"
+- Slash commands: `/sdd-begin`, `/sdd-setup`
+
+The commands below are used internally by the skills. They're documented here for developers working on the toolkit itself or for advanced troubleshooting.
 
 ```bash
 # SDD workflows
-sdd next-task <spec-id>           # Find next task
-sdd update-status <spec> <task>   # Update progress
-sdd validate <spec.json>          # Validate spec
-sdd render <spec-id|spec.json>    # Render spec to markdown
+sdd create <name>                     # Create new spec in pending/
+sdd activate-spec <spec-id>           # Move spec from pending to active
+sdd next-task <spec-id>               # Find next task
+sdd prepare-task <spec-id> <task-id>  # Get full context for task
+sdd update-status <spec> <task>       # Update progress
+sdd complete-task <spec-id> <task-id> # Mark task complete with journal entry
+sdd complete-spec <spec-id>           # Move spec to completed/
+sdd validate <spec.json>              # Validate spec
+sdd render <spec-id|spec.json>        # Render spec to markdown
+sdd list-specs [--status STATUS]      # List specs by status
+sdd update-task-metadata <spec> <task> --field value  # Update task metadata
 
 # Documentation
-sdd doc generate .                    # Generate docs
+sdd doc generate .                    # Generate docs with cross-references
 sdd doc query "search term"           # Search docs
-sdd doc search "pattern"              # Pattern search
+sdd doc callers "function_name"       # Who calls this function?
+sdd doc callees "function_name"       # What does this function call?
+sdd doc call-graph "entry_point"      # Visualize call relationships
+sdd doc trace-entry "endpoint"        # Trace request flow from entry point
+sdd doc trace-data "Model.field"      # Trace data flow through system
+sdd doc impact "function_name"        # Analyze refactoring impact
+sdd doc refactor-candidates           # Find complex code needing refactoring
 
 # Testing
 sdd test run tests/                   # Run tests with AI debugging
@@ -512,16 +639,25 @@ sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
 
 ## Prerequisites
 
+### Required
 - **Claude Code** - Latest version
 - **Python 3.9+** - For CLI tools
 - **pip** - Python package manager
-- **Git** (optional) - For version control
+
+### Optional
+- **Git** - For version control and spec collaboration
+- **tree-sitter** libraries - For enhanced code documentation:
+  - `tree-sitter-python`, `tree-sitter-javascript`, `tree-sitter-typescript`
+  - `tree-sitter-go`, `tree-sitter-html`, `tree-sitter-css`
+- **External AI CLIs** - For AI-enhanced features:
+  - `gemini` - Fast structured analysis
+  - `codex` - Code understanding
+  - `cursor-agent` - Large codebase analysis (1M context with cheetah model)
 
 ## Getting Help
 
 - **Issues**: Report bugs at [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
-- **Docs**: Full documentation at [Claude Code Docs](https://docs.claude.com/claude-code)
-- **Examples**: Check `examples/` directory for sample workflows
+- **Docs**: Full Claude Code documentation at [Claude Code Docs](https://docs.claude.com/claude-code)
 
 ## What's Included
 
@@ -535,16 +671,6 @@ The plugin installs these components:
 
 **In your PATH:**
 - `sdd` - Unified CLI for all SDD, documentation, testing, and development commands
-- `sdd-integration` - Integration utilities
-
-## Tips for Success
-
-1. **Start with a spec** - Always create a spec before major work
-2. **Use /sdd-begin often** - It keeps you on track
-3. **Review specs** - Use multi-model review for important features
-4. **Keep specs active** - Move completed specs to `completed/`
-5. **Document as you go** - Run `code-doc` periodically
-6. **Trust the process** - The workflow prevents forgotten requirements
 
 ## Next Steps
 
@@ -556,8 +682,8 @@ Ready to get started?
 4. 🚀 Implement with `/sdd-begin`
 5. 🎉 Track progress and stay organized
 
-**Questions?** Check [INSTALLATION.md](INSTALLATION.md) for detailed setup or [DEVELOPER.md](DEVELOPER.md) for customization.
+**Questions?** Check [INSTALLATION.md](INSTALLATION.md) for detailed setup or [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for development guidance.
 
 ---
 
-**Version**: 0.1.0 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.4.0 | **License**: MIT | **Author**: Tyler Burleigh

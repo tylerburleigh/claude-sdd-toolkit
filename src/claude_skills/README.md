@@ -5,9 +5,8 @@ Professional Python package implementing Spec-Driven Development (SDD) workflows
 ## 📚 Documentation
 
 - **[Complete Installation Guide](../../INSTALLATION.md)** - Setup for both Python package and Claude Code integration
-- **[Getting Started](GETTING_STARTED.md)** - Quick start guide and first workflows
-- **[Workflows](docs/workflows.md)** - Step-by-step guides for common tasks
-- **[CLI Reference](docs/cli-reference.md)** - All CLI commands (if exists)
+- **[Architecture Documentation](../../docs/ARCHITECTURE.md)** - System design and implementation details
+- **[Best Practices](../../docs/BEST_PRACTICES.md)** - Development guidelines and patterns
 
 **New user?** Start with [../../INSTALLATION.md](../../INSTALLATION.md) for complete setup instructions.
 
@@ -20,84 +19,94 @@ pip install -e .
 
 # Verify installation
 sdd --help
-doc --help
-test --help
+sdd doc --help
+sdd test --help
 sdd skills-dev --help
 ```
 
-This installs the unified CLIs:
-- `sdd` – Spec-driven development workflows
-- `doc` – Documentation generation and querying
-- `test` – Test execution, consultation, and discovery
-- `sdd skills-dev` – Internal development utilities (wrapping legacy tools)
+This installs the unified `sdd` CLI with subcommands:
+- `sdd` – Core spec-driven development workflows
+- `sdd doc` – Documentation generation and querying
+- `sdd test` – Test execution, consultation, and discovery
+- `sdd skills-dev` – Internal development utilities
 
 ## Available Commands
 
 ### Unified SDD CLI (`sdd`)
 
-**⭐ All 60 SDD commands now use a single CLI: `sdd`**
-
-The unified SDD CLI consolidates all spec-driven development commands:
+The unified SDD CLI consolidates all spec-driven development commands into a single interface:
 
 ```bash
-# Spec Creation & Planning (sdd-plan: 3 commands)
+# Spec Creation & Planning
 sdd create "Feature Name" --template medium     # Create new specification
 sdd analyze ./src                                # Analyze codebase for planning
 sdd template list                                # List available templates
 
-# Multi-Model Review (sdd-plan-review: 2 commands)
-sdd review specs/active/my-spec.json             # Review spec with AI models
+# Multi-Model Review
+sdd review my-spec-001                           # Review spec with AI models
 sdd list-review-tools                            # Check available AI CLI tools
 
-# Task Discovery (sdd-next: 19 commands)
-sdd next-task SPEC_ID                            # Find next actionable task
-sdd prepare-task SPEC_ID TASK_ID                 # Prepare task for execution
-sdd task-info SPEC_ID TASK_ID                    # Get task details
-sdd check-deps SPEC_ID TASK_ID                   # Check task dependencies
+# Spec Rendering
+sdd render my-spec-001 --mode enhanced           # Render with AI enhancements
+sdd render my-spec-001 --enhancement-level full  # Maximum detail rendering
+
+# Task Discovery & Preparation
+sdd next-task my-spec-001                        # Find next actionable task
+sdd prepare-task my-spec-001 task-1-1            # Get full task context
+sdd task-info my-spec-001 task-1-1               # Get task details
+sdd check-deps my-spec-001 task-1-1              # Check task dependencies
 sdd detect-project                               # Detect project type
 sdd find-tests                                   # Find test files
 
-# Progress Tracking (sdd-update: 31 commands)
-sdd update-status SPEC_ID TASK_ID completed      # Update task status
-sdd add-journal SPEC_FILE --title "Note"         # Add journal entry
-sdd mark-blocked SPEC_ID TASK_ID "Reason"        # Mark task as blocked
-sdd complete-spec SPEC_ID                        # Mark spec as complete
-sdd status-report SPEC_ID                        # Generate status report
-sdd query-tasks SPEC_ID --status pending         # Query tasks
-sdd list-phases SPEC_ID                          # List all phases
+# Progress Tracking
+sdd update-status my-spec-001 task-1-1 completed # Update task status
+sdd complete-task my-spec-001 task-1-1           # Complete with auto-journaling
+sdd add-journal my-spec-001 --title "Decision"   # Add journal entry
+sdd mark-blocked my-spec-001 task-1-2 "Reason"   # Mark task as blocked
+sdd activate-spec my-spec-001                    # Move from pending to active
+sdd complete-spec my-spec-001                    # Move to completed
+sdd status-report my-spec-001                    # Generate status report
+sdd list-specs --status active                   # List specs by status
 
-# Validation & Fixing (sdd-validate: 5 commands)
-sdd validate SPEC_FILE                           # Validate JSON spec
-sdd fix SPEC_FILE                                # Auto-fix validation issues
-sdd report SPEC_FILE --output report.md          # Generate validation report
-sdd stats SPEC_FILE                              # Show spec statistics
-sdd analyze-deps SPEC_FILE                       # Analyze dependencies
+# Validation & Fixing
+sdd validate my-spec-001                         # Validate spec (accepts spec-id or .json path)
+sdd fix my-spec-001                              # Auto-fix validation issues
+sdd report my-spec-001 --output report.md        # Generate validation report
+sdd stats my-spec-001                            # Show spec statistics
+sdd analyze-deps my-spec-001                     # Analyze dependencies
+
+# Context Monitoring
+sdd context                                      # Show current session token usage
+sdd context --json                               # Get JSON output
+sdd session-marker start                         # Mark session start
 
 # View all commands
-sdd --help
+sdd --help                                       # Complete command reference
 ```
 
-**📖 Migration Guide**: See [SDD_MIGRATION.md](./SDD_MIGRATION.md) for detailed migration instructions from old CLIs (`sdd-next`, `sdd-update`, etc.) to the unified `sdd` command.
 
 **Key Benefits**:
-- ✅ Single command to remember (`sdd`)
-- ✅ 60 commands across 5 modules
-- ✅ Consistent interface and flags
-- ✅ Better command discovery
-- ✅ Faster workflow
+- ✅ Single unified command (`sdd`) with comprehensive subcommands
+- ✅ Consistent interface and flags across all operations
+- ✅ Better command discovery via `sdd --help`
+- ✅ Faster workflow with shorter command names
 
-### Documentation CLI (`doc`)
+**Note:** The CLI is actively evolving. Run `sdd --help` for the complete, up-to-date command list. The examples above show the most commonly used commands.
+
+### Documentation CLI (`sdd doc`)
 ```bash
-doc generate ./src --output-dir ./docs
-doc find-class ClassName
-doc stats --json
+sdd doc generate ./src --output-dir ./docs
+sdd doc find-class ClassName
+sdd doc stats --json
+sdd doc callers "function_name"
+sdd doc call-graph "entry_point"
 ```
 
-### Testing CLI (`test`)
+### Testing CLI (`sdd test`)
 ```bash
-test run --preset quick
-test check-tools --json
-test consult assertion --error "Expected 1 == 2" --hypothesis "off-by-one"
+sdd test run --preset quick
+sdd test check-tools --json
+sdd test consult assertion --error "Expected 1 == 2" --hypothesis "off-by-one"
 ```
 
 ### Skills Development CLI (`sdd skills-dev`)
@@ -112,7 +121,8 @@ sdd skills-dev setup-permissions -- update .
 ### Running Tests
 
 ```bash
-cd /Users/tylerburleigh/Documents/private/.claude/src/claude_skills
+# From the package directory
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 pytest tests/ -v
 ```
 

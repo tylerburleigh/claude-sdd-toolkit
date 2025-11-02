@@ -63,6 +63,14 @@ This skill is part of the **Spec-Driven Development** family:
 - All task metadata, dependencies, verification steps, and risk notes are stored in the JSON hierarchy
 - Query specs via `sdd` commands; avoid ad-hoc parsing
 
+**Reading Specifications (CRITICAL):**
+- ✅ **ALWAYS** use `sdd` commands to read spec files (e.g., `sdd prepare-task`, `sdd task-info`, `sdd context`)
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use command chaining to access specs (e.g., `sdd --version && cat specs/active/spec.json`)
+- The `sdd` CLI provides efficient, structured access with proper parsing and validation
+- Spec files are large and reading them directly wastes valuable context window space
+
 **Fast Context Checklist (daily driver):**
 1. `sdd prepare-task {spec-id} --json` (auto-discovers specs, selects the next task, and includes dependency status)
 2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json` and `sdd check-deps {spec-id} {task-id} --json`
@@ -92,6 +100,64 @@ This skill is part of the **Spec-Driven Development** family:
 - Cram multiple fields on one line (e.g., "Type: Verification TaskPurpose: Test...")
 - Create dense text blocks with odd line breaks
 - Use inconsistent formatting
+
+### Completion Report Format Template
+
+**CRITICAL: When presenting task completion reports, use this exact structure with proper line breaks:**
+
+```markdown
+## Task Completed Successfully! ✓
+
+**Task ID:** task-1-1
+**Title:** Create sdd_render_skill directory structure
+
+### What Was Accomplished
+
+✅ Created skills/sdd-render/ directory with proper naming conventions (hyphens)
+
+✅ Created placeholder SKILL.md (2,807 bytes) with foundational structure
+
+✅ Verified Python module (sdd_render) is properly structured and imports successfully
+
+✅ Confirmed naming conventions match established patterns across the toolkit
+
+✅ Validated structure against existing skills (sdd-next pattern)
+
+### Files Created/Modified
+
+**New Files:**
+- skills/sdd-render/SKILL.md - Claude Code skill definition (placeholder)
+
+**Verified Existing:**
+- src/claude_skills/claude_skills/sdd_render/__init__.py
+- src/claude_skills/claude_skills/sdd_render/cli.py
+- src/claude_skills/claude_skills/sdd_render/renderer.py
+
+### Next Steps
+
+This task unblocks three dependent tasks:
+
+1. **task-1-2:** Create SKILL.md for sdd-render (flesh out the full skill documentation)
+2. **task-1-3:** Implement skill_main.py entry point (clarify requirements)
+3. **task-1-4:** Register skill in toolkit (integration work)
+
+The foundational directory structure is now in place and ready for these subsequent tasks to build upon.
+
+### Progress Update
+
+**Spec:** AI-Enhanced Spec Rendering Skill (ai-enhanced-rendering-2025-10-28-001)
+
+**Phase 1 Progress:** 1/6 tasks completed (17%)
+
+**Overall Progress:** 1/49 tasks completed (2%)
+```
+
+**Key Formatting Rules:**
+1. **Blank line after each section header**
+2. **Blank line between each accomplishment item** (✅ items)
+3. **Blank line before and after subsections** (Files Created/Modified, Next Steps, etc.)
+4. **Each field on its own line** - NEVER combine fields like "Type: X Purpose: Y"
+5. **Use proper markdown headers** (## for main title, ### for subsections, ** for emphasis)
 
 ## Tool Verification
 
@@ -312,6 +378,247 @@ For more validation options, see [Manual Spec Validation](#manual-spec-validatio
 
 **Most users should start with automated workflow** and only use manual workflow when needed.
 
+---
+
+## Autonomous Workflow (Phase Completion Mode)
+
+**When to use this workflow:**
+- User explicitly requests "autonomous mode" during session setup (via /sdd-begin)
+- The invocation prompt mentions "autonomous mode" or "complete all tasks in current phase"
+- User wants to complete multiple tasks within a phase without stopping for approval on each one
+
+**Key Characteristics:**
+- **Phase-scoped execution**: Completes all tasks within the current phase, does not cross phase boundaries
+- **Context-aware**: Checks context usage after each task, stops if ≥75%
+- **Defensive stops**: Stops for blocked tasks and plan deviations (requires user approval)
+- **No plan approval**: Creates execution plans internally without user approval for each task
+
+### Autonomous Mode Detection
+
+At the beginning of the workflow, check if the invocation prompt mentions autonomous mode:
+
+**Detection keywords:**
+- "autonomous mode"
+- "complete all tasks in current phase"
+- "complete entire phase"
+- "phase completion mode"
+
+If detected, execute the autonomous workflow below. Otherwise, use the standard single-task workflow.
+
+### Autonomous Workflow Loop
+
+**Step 1: Initialize**
+```bash
+# Verify tools (optional, recommended on first task only)
+sdd verify-tools
+
+# Check initial context (optional)
+# IMPORTANT: Run these as TWO SEPARATE commands, not combined with && or $()
+
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**Note:** The marker from step 1 must be logged to the transcript before step 2 can find it. Always run these as separate, sequential Bash tool calls. **Do NOT run them in parallel** - step 2 must wait for step 1 to complete and be logged.
+
+If initial context ≥75%, recommend stopping before starting with AskUserQuestion.
+
+**Step 2: Task Execution Loop**
+
+For each task in the current phase:
+
+1. **Prepare next task:**
+```bash
+sdd prepare-task {spec-id} --json
+```
+
+2. **Check if phase complete:**
+   - If no more tasks in current phase: Exit loop, go to Step 3 (Summary)
+   - If all remaining tasks are blocked: Exit loop, go to Step 3 (Summary)
+
+3. **Check for blockers:**
+   - If next task is blocked: **STOP**, present blocker info to user with AskUserQuestion
+   - Options: alternative tasks, resolve blocker, or stop
+   - Exit autonomous mode, handle as normal blocking scenario
+
+4. **Create execution plan (silently):**
+   - Analyze task metadata from prepare-task output
+   - Create detailed execution plan internally (no user approval needed)
+   - Include all standard plan components (prerequisites, steps, success criteria, etc.)
+
+5. **Execute task implementation:**
+   - Implement according to the internal execution plan
+   - Follow all implementation best practices
+   - Perform any required testing or verification
+
+6. **Handle plan deviations:**
+   - If implementation deviates from plan: **STOP**, document deviation
+   - Present deviation to user with AskUserQuestion
+   - Options: revise plan, update spec, explain more, rollback
+   - Exit autonomous mode, handle as normal deviation scenario
+
+7. **Mark task complete:**
+```bash
+# Use sdd-update subagent to mark complete (requires journal content)
+Task(
+  subagent_type: "sdd-toolkit:sdd-update-subagent",
+  prompt: "Complete task {task-id} in spec {spec-id}. Completion note: [Brief summary of what was accomplished, tests run, etc.]",
+  description: "Mark task complete"
+)
+```
+
+8. **Check context usage (REQUIRED):**
+
+Run these as TWO SEPARATE, SEQUENTIAL commands:
+
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
+
+   - If context ≥75%: **STOP**, exit loop, go to Step 3 (Summary)
+   - If context <75%: Continue to next iteration
+
+9. **Check phase completion:**
+   - If current phase is complete: Exit loop, go to Step 3 (Summary)
+   - Otherwise: Return to step 1 (prepare next task)
+
+**Step 3: Present Summary Report**
+
+When autonomous mode exits (for any reason), present a comprehensive summary:
+
+```markdown
+## Autonomous Execution Summary
+
+**Mode:** Phase Completion (Autonomous)
+
+**Spec:** {spec-title} ({spec-id})
+
+**Phase:** {phase-title} ({phase-id})
+
+### Tasks Completed
+
+✅ **task-1-1:** Create directory structure
+   - File: skills/sdd-render/
+   - Completed: 2025-10-28 14:23:15
+   - Duration: 15 minutes
+
+✅ **task-1-2:** Create SKILL.md documentation
+   - File: skills/sdd-render/SKILL.md
+   - Completed: 2025-10-28 14:45:32
+   - Duration: 22 minutes
+
+✅ **task-1-3:** Implement skill entry point
+   - File: skills/sdd-render/skill_main.py
+   - Completed: 2025-10-28 15:12:08
+   - Duration: 26 minutes
+
+### Phase Progress
+
+**Phase {phase-id}:** {completed_in_phase}/{total_in_phase} tasks completed ({percentage}%)
+
+**Overall Spec:** {total_completed}/{total_tasks} tasks completed ({overall_percentage}%)
+
+### Context Usage
+
+**Current context:** {context_percentage}%
+
+### Exit Reason
+
+{One of the following:}
+- ✅ **Phase Complete:** All tasks in {phase-id} have been completed
+- ⏸️ **Context Limit:** Context usage reached {context_percentage}% (≥75% threshold)
+- 🚧 **Blocked Task:** task-{X} is blocked by {dependency/reason}
+- ⚠️ **Plan Deviation:** Implementation deviated from plan in task-{X}
+- ❌ **No Actionable Tasks:** All remaining tasks in phase are blocked or in progress
+
+### Next Steps
+
+{Contextual recommendations based on exit reason:}
+
+**For Phase Complete:**
+- Phase {phase-id} is complete! Ready to move to {next-phase-id}
+- Run /sdd-begin to start the next phase
+- Consider reviewing phase deliverables before proceeding
+
+**For Context Limit:**
+- Consider resetting the session to free up context
+- You've completed {N} tasks successfully
+- Resume with /sdd-begin after reset
+
+**For Blocked Task:**
+- task-{X} requires: {blocker-description}
+- Alternative tasks available: {list-alternatives}
+- Choose how to proceed using the options provided
+
+**For Plan Deviation:**
+- Review the deviation details above
+- Decide whether to revise plan or update spec
+- Choose how to proceed using the options provided
+```
+
+**Step 4: Handle Exit Scenarios**
+
+Based on exit reason:
+
+1. **Phase Complete:**
+   - Celebrate completion
+   - Summarize phase achievements
+   - Offer to start next phase (via /sdd-begin)
+
+2. **Context Limit Reached:**
+   - Present summary with context percentage
+   - Use AskUserQuestion: "Stop and Reset" vs "Continue Anyway"
+   - Recommend stopping to preserve context for next session
+
+3. **Blocked Task Encountered:**
+   - Present blocker details
+   - Use AskUserQuestion to offer alternatives or resolve blocker
+   - Exit autonomous mode, handle as normal blocking scenario
+
+4. **Plan Deviation:**
+   - Present deviation details
+   - Use AskUserQuestion to get user decision
+   - Exit autonomous mode, handle as normal deviation scenario
+
+### Autonomous Mode Best Practices
+
+**DO:**
+- ✅ Check context after every task completion
+- ✅ Stop immediately when context ≥75%
+- ✅ Stop for blocked tasks (don't auto-pivot without user input)
+- ✅ Stop for plan deviations (don't auto-revise without user approval)
+- ✅ Create detailed internal execution plans for each task
+- ✅ Document all completions with proper metadata
+- ✅ Present comprehensive summary at end
+
+**DON'T:**
+- ❌ Cross phase boundaries (stop at end of current phase)
+- ❌ Skip plan creation (always plan, just don't show to user)
+- ❌ Continue past 75% context usage
+- ❌ Auto-resolve blockers without user input
+- ❌ Auto-revise plans on deviations without user approval
+- ❌ Batch task completions (mark each complete immediately)
+
+### Transitioning Back to Single-Task Mode
+
+If autonomous mode exits due to blockers or deviations, the workflow naturally transitions back to single-task mode:
+
+1. Present the issue with AskUserQuestion
+2. Get user decision on how to proceed
+3. Continue with standard single-task workflow
+4. User can re-enable autonomous mode via /sdd-begin if desired
+
+---
+
 ## Required Tools
 
 This skill uses the `sdd` command that handles:
@@ -374,7 +681,91 @@ You have access to the `sdd` CLI.
 
 **doc-query**: Query generated documentation for rapid codebase understanding. Use `Skill(sdd-toolkit:doc-query)` for smart context gathering (task-specific files, dependencies, test discovery). Falls back to manual exploration (`Explore`, `Glob`, `Grep`) if docs unavailable.
 
+**Plan/Explore subagents**: Built-in Claude Code subagents for codebase exploration. Plan provides research + recommendations (requires approval), Explore provides direct findings. See [Codebase Exploration Subagents](#codebase-exploration-subagents) section for detailed guidance on when to use each.
+
 **When mentioned in workflows**: Optional enhancements, not requirements. Core sdd-next functions without them.
+
+## Codebase Exploration Subagents
+
+**Built-in Claude Code subagents** for codebase exploration. Understanding when to use each maximizes efficiency.
+
+### Plan vs Explore: Key Difference
+
+**Plan Subagent** - Research + recommendations requiring user approval
+- Returns analysis with recommended options
+- Use when: Multiple approaches exist, need expert recommendation
+- Example: "Analyze auth patterns and recommend which to use"
+
+**Explore Subagent** - Direct findings without approval gates
+- Returns factual information immediately
+- Use when: Clear what you need, just need to find it
+- Example: "Find all files related to authentication"
+
+### When to Use Plan Subagent
+
+Use for **decision-making scenarios**:
+
+**Implementation Strategy** - Analyze architecture patterns, evaluate trade-offs, recommend approach
+```
+Task(subagent_type: "Plan",
+     prompt: "Analyze auth implementation in codebase. Task adds JWT middleware
+              in src/middleware/auth.ts. Find patterns, recommend approach with
+              pros/cons. Thoroughness: medium",
+     description: "Research auth patterns")
+```
+
+**Assumption Verification** - Verify plan assumptions before implementation starts
+- Check API patterns match expectations
+- Identify integration issues early
+- Recommend adjustments if needed
+
+**Alternative Analysis** - When blocked, find and recommend alternative tasks
+- Evaluates spec for parallel-safe alternatives
+- Considers value and effort
+- Provides reasoning for recommendations
+
+**Risk Assessment** - Identify issues, analyze impact, recommend mitigations
+
+### When to Use Explore Subagent
+
+Use for **straightforward fact-finding**:
+
+**File Discovery** - Find files by pattern, locate tests, identify related code
+```
+Task(subagent_type: "Explore",
+     prompt: "Find TypeScript files in src/ implementing auth logic.
+              Include imports/references. Thoroughness: quick",
+     description: "Find auth files")
+```
+
+**Implementation Reading** - Understand how features work, check API signatures
+**Quick Lookups** - Find definitions, locate configs, check dependencies
+**Dependency Analysis** - Trace imports, find callers, understand relationships
+
+### Decision Guide
+
+```
+Need a recommendation? → Plan (presents options for approval)
+Just need facts?       → Explore (returns findings directly)
+```
+
+### Thoroughness Levels
+
+- **quick**: Fast answers, straightforward tasks
+- **medium**: Standard coverage (default for most tasks)
+- **very thorough**: Complex/unfamiliar areas, high-risk changes
+
+### Best Practices
+
+✅ Use Plan for recommendations/decisions, Explore for facts
+✅ Specify thoroughness based on complexity
+✅ Present Plan results with AskUserQuestion
+✅ Include specific paths when known
+✅ Combine with doc-query when docs exist
+
+❌ Don't use Plan for file lookups
+❌ Don't use Explore when choosing between options
+❌ Don't ignore Plan recommendations without user consultation
 
 ## Interactive Question Tool
 
@@ -750,11 +1141,11 @@ AskUserQuestion(
 
 **After completing implementation:**
 
-1. **Mark task complete using sdd-update:**
+1. **Mark task complete using sdd-update (requires journal content):**
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-update-subagent",
-  prompt: "Mark task {task-id} as completed in spec {spec-id}",
+  prompt: "Complete task {task-id} in spec {spec-id}. Completion note: Successfully implemented [feature/fix]. [Brief description of what was done, tests run, verification performed].",
   description: "Mark task complete"
 )
 ```
@@ -762,10 +1153,51 @@ Task(
 2. **The sdd-update subagent will:**
    - Update task status to "completed"
    - Set completion timestamp
-   - Check context usage and recommend reset if needed
+   - Create journal entry documenting the completion
+   - Clear the needs_journaling flag
    - Identify next actionable task
 
-3. **Continue with next task or end session**
+3. **Check context usage after completion (REQUIRED):**
+
+After the task is marked complete, you MUST check context usage.
+
+Run these as TWO SEPARATE, SEQUENTIAL commands:
+
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
+
+If context usage is ≥75%, use `AskUserQuestion` to prompt the user:
+
+```javascript
+AskUserQuestion(
+  questions: [{
+    question: "Context usage is at X%. Continue or reset?",
+    header: "Context Check",
+    multiSelect: false,
+    options: [
+      {
+        label: "Stop and Reset",
+        description: "End session and recommend resetting context before continuing"
+      },
+      {
+        label: "Continue Anyway",
+        description: "Continue working despite high context usage"
+      }
+    ]
+  }]
+)
+```
+
+Include the current context percentage in the completion report.
+
+4. **Continue with next task or end session**
 
 ---
 
@@ -776,10 +1208,33 @@ Task(
 
 Steps:
 1. Run `sdd prepare-task {spec-id} --json`
-2. Review task details and dependencies from output
-3. Create execution plan for the task
-4. Present plan to user with AskUserQuestion
-5. Begin implementation
+2. Review task details and dependencies
+3. **Optional: Use Plan subagent for complex/architectural tasks**
+   - Analyzes codebase patterns, recommends approach
+   - Present recommendations with AskUserQuestion
+4. Create execution plan (incorporating approved recommendations)
+5. Present plan with AskUserQuestion
+6. Begin implementation
+
+**Example with Plan subagent:**
+
+```
+sdd prepare-task user-auth-001 --json  # Returns task-1-1 "Create AuthService"
+
+Task(subagent_type: "Plan",
+     prompt: "Analyze service classes in src/services/ for patterns. Task creates
+              AuthService in src/services/authService.ts for JWT. Recommend:
+              class structure, DI pattern, error handling, test strategy.
+              Thoroughness: medium",
+     description: "Research service patterns")
+
+# Present Plan recommendations to user with AskUserQuestion
+# Create execution plan based on approved approach
+```
+
+**Use Plan subagent when:** First task in new area, architectural tasks, multiple approaches exist, affects many components
+
+**Skip for:** Simple tasks, explicit instructions in spec
 
 ### Workflow 2: Resuming Work
 **Situation:** Some tasks completed, need to continue
@@ -829,11 +1284,26 @@ Steps:
      description: "Document blocker"
    )
    ```
-5. Find alternative tasks and present to user:
-   - Parallel-safe task from same phase
-   - Task from different phase
-   - Test task that's not blocked
-6. Use `AskUserQuestion` to let user choose how to proceed:
+5. **Use Plan subagent to analyze alternatives and recommend next steps:**
+   ```
+   Task(
+     subagent_type: "Plan",
+     prompt: "Task task-3-1 (src/cache/redis.ts) is blocked by Redis configuration.
+             Analyze the spec at specs/active/user-auth-001.json and identify
+             alternative tasks that: (1) have no blockers, (2) are parallel-safe
+             with task-3-1, (3) provide clear value toward spec completion.
+             For each alternative found (aim for 3-5), explain:
+             - Why it's a good alternative
+             - Estimated effort
+             - Dependencies status
+             - Value/priority
+             Recommend which alternative to work on next with reasoning.
+             Thoroughness: medium",
+     description: "Analyze blocked task alternatives"
+   )
+   ```
+6. Plan subagent returns analysis with recommended alternatives
+7. Use `AskUserQuestion` to present options to user:
 
 **Present context:**
 ```
@@ -874,87 +1344,60 @@ AskUserQuestion(
 )
 ```
 
-7. Based on user selection:
+8. Based on user selection:
    - If alternative task selected: Create plan for that task
    - If "Resolve Blocker": Provide guidance on resolving the blocker
    - If "Stop for Now": Summarize what was blocked and exit
-8. Note that original task should resume after blocker cleared
+9. Note that original task should resume after blocker cleared
+
+**Benefits of using Plan subagent in Workflow 3:**
+- ✅ Comprehensive alternative analysis (spec-aware)
+- ✅ Expert recommendations with reasoning
+- ✅ Considers parallel-safety and dependencies automatically
+- ✅ Saves main agent context for actual implementation
+- ✅ Provides structured options ready for AskUserQuestion
 
 ### Workflow 4: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
 
-Steps:
-1. Start implementing task per plan
-2. Discover issue (e.g., API different than expected)
-3. Pause implementation
-4. Document deviation using sdd-update subagent:
+**Recommended: Proactive Verification**
+
+Before starting complex tasks, use Plan subagent to verify assumptions:
+
+```
+Task(subagent_type: "Plan",
+     prompt: "About to implement task-2-1 (src/services/authService.ts) assuming
+              User API uses callbacks. Verify: (1) User API pattern in src/models/User.ts,
+              (2) error handling in existing services, (3) any plan mismatches.
+              Recommend adjustments if needed. Thoroughness: quick",
+     description: "Verify plan assumptions")
+```
+
+This catches deviations **before** implementation, saving time and avoiding rework.
+
+**Reactive: Handle Mid-Implementation Deviations**
+
+If deviation discovered during implementation:
+
+1. Pause and use Plan subagent to analyze:
    ```
-   Task(
-     subagent_type: "sdd-toolkit:sdd-update-subagent",
-     prompt: "Add journal entry for task {task-id}. Type: deviation. Content: [describe what changed and why].",
-     description: "Document deviation"
-   )
+   Task(subagent_type: "Plan",
+        prompt: "Deviation in task-2-1: Plan assumed callbacks, actual uses async/await.
+                 Analyze: (1) plan changes needed, (2) impact on tests/deps,
+                 (3) alternatives (wrapper vs rewrite vs change API).
+                 Recommend approach with pros/cons. Thoroughness: medium",
+        description: "Analyze deviation")
    ```
-5. Analyze the deviation and use `AskUserQuestion` to get user decision:
 
-**Present context:**
-```
-⚠️  Implementation Deviation Discovered
+2. Document deviation with sdd-update subagent
 
-Task: task-2-1 (src/services/authService.ts)
+3. Present Plan subagent recommendations to user with AskUserQuestion:
+   - Options: Revise Plan / Update Spec / Explain More / Rollback
+   - User selects approach
+   - Execute accordingly
 
-Issue: The User API uses async/await pattern, but the original plan assumed
-callback-based methods.
-
-Impact:
-- AuthService methods need to be async
-- Error handling approach needs adjustment
-- Tests need to use async patterns
-
-Options:
-1. Update plan to use async/await (recommended)
-2. Add wrapper to convert async to callbacks (adds complexity)
-3. Update User model to use callbacks instead (breaks existing code)
-```
-
-**Then ask with AskUserQuestion:**
-```
-AskUserQuestion(
-  questions: [{
-    question: "Implementation deviation found. How should we proceed?",
-    header: "Plan Change",
-    multiSelect: false,
-    options: [
-      {
-        label: "Revise Plan (Recommended)",
-        description: "Update execution plan to use async/await pattern throughout"
-      },
-      {
-        label: "Update Spec",
-        description: "This requires changing the specification itself"
-      },
-      {
-        label: "Explain More",
-        description: "Show me the specific differences and implications"
-      },
-      {
-        label: "Rollback",
-        description: "Revert changes and stick to original plan"
-      }
-    ]
-  }]
-)
-```
-
-6. Based on user selection:
-   - If "Revise Plan": Use `Skill(sdd-toolkit:sdd-next)` to create revised execution plan
-   - If "Update Spec": Use `Skill(sdd-toolkit:sdd-plan)` to update specification
-   - If "Explain More": Provide detailed analysis, then re-ask
-   - If "Rollback": Revert implementation changes
-7. If plan revised, present revised plan to user (use Phase 5.2)
-8. Get approval for revised plan (via AskUserQuestion in Phase 5.2)
-9. Update spec if structural changes needed
-10. Continue with revised plan
+**Use proactive for:** Complex tasks, unfamiliar areas, specific API assumptions
+**Use reactive for:** Simple tasks hitting unexpected issues, rapid prototyping
 
 ### Verification Tasks
 
@@ -1199,12 +1642,15 @@ Bridge specifications to implementation by identifying next tasks, gathering con
 
 **sdd-update subagent** - Use alongside this skill to:
 - Mark tasks as in_progress before implementing
-- Mark tasks as completed after implementing
+- **Complete tasks** (atomically marks as completed AND creates journal entry - REQUIRES completion note)
+- Mark tasks as blocked when encountering obstacles
 - Document deviations and decisions during implementation
 - Track progress and update metrics
 - Journal verification results
 
-Use via: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", prompt: "...", description: "...")`
+**Important:** When completing tasks, you MUST provide a completion note/journal content describing what was accomplished.
+
+Use via: `Task(subagent_type: "sdd-toolkit:sdd-update-subagent", prompt: "Complete task {task-id} in spec {spec-id}. Completion note: [what was done]", description: "...")`
 
 ---
 

@@ -1,3 +1,5 @@
+**NOTE: This example was generated using version 0.1.0**
+
 # SDD Toolkit Example: Complete Task Workflow
 
 ## Overview

@@ -107,6 +107,17 @@ from .integrations import (
     get_session_state,
 )
 
+# AI configuration
+from .ai_config import (
+    load_skill_config,
+    get_enabled_tools,
+    get_agent_priority,
+    get_agent_command,
+    get_timeout,
+    get_tool_config,
+    is_tool_enabled,
+)
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -208,4 +219,13 @@ __all__ = [
     "validate_spec_before_proceed",
     "execute_verify_task",
     "get_session_state",
+
+    # AI configuration
+    "load_skill_config",
+    "get_enabled_tools",
+    "get_agent_priority",
+    "get_agent_command",
+    "get_timeout",
+    "get_tool_config",
+    "is_tool_enabled",
 ]

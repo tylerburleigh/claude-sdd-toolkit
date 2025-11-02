@@ -21,6 +21,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-update)",
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
+    "Skill(sdd-toolkit:sdd-render)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
 
@@ -31,6 +32,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-update)",
     "Skill(sdd-plan-review)",
     "Skill(sdd-validate)",
+    "Skill(sdd-render)",
     "Skill(code-doc)",
     "Skill(doc-query)",
 

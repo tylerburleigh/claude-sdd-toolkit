@@ -25,6 +25,7 @@ from claude_skills.sdd_update.status import (
     unblock_task,
 )
 from claude_skills.sdd_update.workflow import complete_task_workflow
+from claude_skills.sdd_update.list_specs import list_specs
 from claude_skills.sdd_update.journal import (
     add_journal_entry,
     update_metadata,
@@ -775,6 +776,24 @@ def cmd_complete_task(args, printer):
     return 0 if success else 1
 
 
+def cmd_list_specs(args, printer):
+    """List specification files with optional filtering."""
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    list_specs(
+        status=args.status,
+        specs_dir=specs_dir,
+        output_format="json" if args.json else "text",
+        verbose=args.detailed,
+        printer=printer,
+    )
+
+    return 0
+
+
 def cmd_sync_metadata(args, printer):
     """Synchronize spec metadata with hierarchy data."""
     printer.action("Synchronizing metadata from hierarchy...")
@@ -1095,6 +1114,24 @@ def register_update(subparsers, parent_parser):
     p_complete_task.add_argument("--show-diff", action="store_true", help="Show diff of metadata changes")
     p_complete_task.add_argument("--dry-run", action="store_true", help="Preview workflow without saving")
     p_complete_task.set_defaults(func=cmd_complete_task)
+
+    # list-specs command
+    p_list_specs = subparsers.add_parser(
+        "list-specs",
+        help="List specification files with optional filtering",
+        parents=[parent_parser],
+    )
+    p_list_specs.add_argument(
+        "--status",
+        choices=["active", "completed", "archived", "pending", "all"],
+        help="Filter by status folder (default: all)",
+    )
+    p_list_specs.add_argument(
+        "--detailed",
+        action="store_true",
+        help="Show detailed information",
+    )
+    p_list_specs.set_defaults(func=cmd_list_specs)
 
     # sync-metadata command
     p_sync_meta = subparsers.add_parser("sync-metadata", help="Synchronize spec metadata with hierarchy data", parents=[parent_parser])

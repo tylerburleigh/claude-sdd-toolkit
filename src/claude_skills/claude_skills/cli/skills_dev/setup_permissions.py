@@ -21,6 +21,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-update)",
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
+    "Skill(sdd-toolkit:sdd-render)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
 
@@ -31,6 +32,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-update)",
     "Skill(sdd-plan-review)",
     "Skill(sdd-validate)",
+    "Skill(sdd-render)",
     "Skill(code-doc)",
     "Skill(doc-query)",
 
@@ -38,6 +40,11 @@ SDD_PERMISSIONS = [
     "SlashCommand(/sdd-begin)",
 
     # CLI command permissions (unified sdd CLI + legacy standalone commands)
+    # NOTE: Bash(sdd:*) allows command chaining that could bypass Read() restrictions
+    # (e.g., "sdd --version && cat specs/active/spec.json"). This is accepted as a
+    # workflow trade-off. Protection against reading spec files is guidance-based
+    # (skills are instructed to use sdd tools exclusively) rather than security-based.
+    # The focus is on efficiency (avoiding context waste) rather than access control.
     "Bash(sdd:*)",      # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
 
     # AI CLI tool permissions

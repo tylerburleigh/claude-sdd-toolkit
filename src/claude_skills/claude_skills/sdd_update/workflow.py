@@ -299,15 +299,22 @@ def complete_task_workflow(
     elif version:
         revision_version = version
 
-    journal_title_final = journal_title
-    journal_content_final = journal_content
-    if not journal_title_final or not journal_content_final:
-        journal_title_final, journal_content_final = _derive_default_journal(
-            task_id,
-            task.get("title", task_id),
-            actual_hours,
-            note,
-        )
+    # Handle journal title and content independently - don't overwrite user-provided values
+    if not journal_title:
+        journal_title_final = f"Task Completed: {task.get('title', task_id)}"
+    else:
+        journal_title_final = journal_title
+
+    if not journal_content:
+        # Derive default content if not provided
+        parts = [f"Task {task_id} marked as completed."]
+        if actual_hours is not None:
+            parts.append(f"Actual hours: {actual_hours:.2f}")
+        if note:
+            parts.append(f"Note: {note}")
+        journal_content_final = " \n".join(parts)
+    else:
+        journal_content_final = journal_content
 
     if revision_version:
         revision_changes = journal_title_final or f"Task {task_id} completed"

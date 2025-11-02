@@ -26,135 +26,6 @@ SETTINGS_FILE="${HOME}/.claude/settings.json"
 SPECS_ACTIVE_DIR="${PROJECT_ROOT}/specs/active"
 MARKER_DIR="/tmp"
 MARKER_PREFIX=".claude-sdd-begin"
-TRANSCRIPT_CACHE_DIR="${HOME}/.config/claude-sdd-toolkit"
-TRANSCRIPT_CACHE_FILE="${TRANSCRIPT_CACHE_DIR}/transcript-cache.json"
-
-# =============================================================================
-# TRANSCRIPT PATH CACHING
-# =============================================================================
-# Cache transcript paths per working directory so 'sdd context' can auto-discover them
-# Handles multiple parallel Claude sessions by tracking per-directory
-
-cache_transcript_path() {
-    # Read hook data from stdin if available
-    if [ ! -t 0 ]; then
-        local hook_data=$(cat)
-
-        # Extract transcript_path and session_id using Python, update multi-session cache
-        local cache_data=$(echo "$hook_data" | python3 -c "
-import json, sys, os, time
-
-try:
-    data = json.load(sys.stdin)
-    transcript_path = data.get('transcript_path', '')
-    session_id = data.get('session_id', '')
-    cwd = os.getcwd()
-
-    if transcript_path and session_id:
-        # Get stable parent PID (PPID) for session identification
-        # Import the utility function for finding the stable Claude process
-        try:
-            from claude_skills.context_tracker.process_utils import find_stable_claude_process
-            stable_ppid = find_stable_claude_process()
-        except ImportError:
-            # Fallback if module not installed
-            stable_ppid = None
-
-        # Use stable PID if found, otherwise fallback to grandparent
-        if stable_ppid:
-            ppid = stable_ppid
-        else:
-            # Fallback: walk up 2 levels instead of immediate parent
-            # This is more stable than immediate parent but not perfect
-            ppid = os.getppid()
-            try:
-                if os.path.exists(f'/proc/{ppid}/status'):
-                    with open(f'/proc/{ppid}/status', 'r') as f:
-                        for line in f:
-                            if line.startswith('PPid:'):
-                                ppid = int(line.split()[1])
-                                break
-            except:
-                pass  # Use immediate parent if this fails
-
-        current_time = int(time.time())
-
-        # Load existing cache
-        cache_file = '$TRANSCRIPT_CACHE_FILE'
-        cache = {}
-        if os.path.exists(cache_file):
-            try:
-                with open(cache_file, 'r') as f:
-                    cache = json.load(f)
-            except:
-                pass
-
-        # Initialize directory entry if needed
-        if cwd not in cache:
-            cache[cwd] = {'sessions': {}}
-
-        # Add/update this session with enhanced data
-        session_data = {
-            'transcript_path': transcript_path,
-            'timestamp': current_time,
-            'started_at': current_time,
-            'ppid': ppid
-        }
-
-        cache[cwd]['sessions'][session_id] = session_data
-
-        # Mark as most recent
-        cache[cwd]['most_recent'] = session_id
-
-        # Clean stale sessions (older than 1 hour with dead PIDs)
-        sessions = cache[cwd].get('sessions', {})
-        stale_session_ids = []
-        for sid, sdata in sessions.items():
-            spid = sdata.get('ppid')
-            started = sdata.get('started_at', 0)
-            age = current_time - started
-
-            # Mark as stale if: has PPID, it's dead, and session > 1 hour old
-            if spid and age > 3600:
-                try:
-                    os.kill(spid, 0)  # Check if process alive
-                except (OSError, ProcessLookupError):
-                    # Process is dead
-                    stale_session_ids.append(sid)
-
-        # Remove stale sessions
-        for sid in stale_session_ids:
-            del sessions[sid]
-
-        # Update most_recent if it was removed
-        if cache[cwd].get('most_recent') in stale_session_ids and sessions:
-            # Set to session with highest timestamp
-            cache[cwd]['most_recent'] = max(
-                sessions.keys(),
-                key=lambda s: sessions[s].get('timestamp', 0)
-            )
-
-        # Write cache
-        os.makedirs('$TRANSCRIPT_CACHE_DIR', exist_ok=True)
-        with open(cache_file, 'w') as f:
-            json.dump(cache, f, indent=2)
-
-        # Also set environment variable for this session
-        print(f'CLAUDE_SESSION_ID={session_id}')
-        print(f'CLAUDE_SESSION_PPID={ppid}')
-except Exception as e:
-    pass
-" 2>/dev/null)
-
-        if [ -n "$cache_data" ]; then
-            # Try to export the session ID (may not work across processes, but worth trying)
-            eval "$cache_data" 2>/dev/null || true
-        fi
-
-        # Re-populate stdin for rest of script (pass through hook_data)
-        echo "$hook_data"
-    fi
-}
 
 # =============================================================================
 # CONFIGURATION LOADING
@@ -176,6 +47,59 @@ try:
 except:
     print('true')
 " 2>/dev/null || echo "true"
+}
+
+# =============================================================================
+# VERSION CHECKING
+# =============================================================================
+
+check_version_mismatch() {
+    python3 <<'EOF'
+import json
+import re
+import sys
+
+try:
+    # Get installed package version
+    try:
+        from importlib.metadata import version
+        installed_version = version('claude-skills')
+    except Exception:
+        # Package not installed - skip check
+        sys.exit(0)
+
+    # Get plugin version from pyproject.toml
+    import os
+    plugin_root = os.environ.get('CLAUDE_PLUGIN_ROOT', '')
+    if not plugin_root:
+        sys.exit(0)
+
+    pyproject_path = f"{plugin_root}/src/claude_skills/pyproject.toml"
+
+    try:
+        with open(pyproject_path, 'r') as f:
+            content = f.read()
+            match = re.search(r'version\s*=\s*"([^"]+)"', content)
+            plugin_version = match.group(1) if match else None
+    except Exception:
+        # Can't read plugin version - skip check
+        sys.exit(0)
+
+    # Compare versions
+    if installed_version != plugin_version:
+        result = {
+            "mismatch": True,
+            "installed": installed_version,
+            "plugin": plugin_version
+        }
+        print(json.dumps(result))
+    else:
+        print(json.dumps({"mismatch": False}))
+
+except Exception as e:
+    # On any error, silently skip check
+    print(json.dumps({"mismatch": False, "error": str(e)}))
+EOF
 }
 
 # =============================================================================
@@ -301,11 +225,36 @@ print(json.dumps(marker, indent=2))
 # =============================================================================
 
 main() {
-    # Cache transcript path first (consumes stdin if available)
-    cache_transcript_path >/dev/null
+    # Output session marker for transcript identification
+    # This helps the context tracker identify the current session's transcript
+    # by searching for this marker pattern in transcript files
+    # Using 4 bytes = 8 hex chars for easier reproduction
+    echo "SESSION_MARKER_$(openssl rand -hex 4 2>/dev/null || echo '0')" 2>/dev/null || true
 
-    # Clean up old marker files first
+    # Clean up old marker files
     cleanup_old_markers
+
+    # Check for version mismatch (always check, regardless of auto-offer setting)
+    local version_check_result=$(check_version_mismatch 2>/dev/null || echo '{"mismatch":false}')
+    local version_mismatch=$(echo "$version_check_result" | python3 -c "import json, sys; data = json.load(sys.stdin); print('true' if data.get('mismatch', False) else 'false')" 2>/dev/null || echo "false")
+
+    # If version mismatch, show warning and exit (this takes priority)
+    if [ "$version_mismatch" = "true" ]; then
+        local installed_ver=$(echo "$version_check_result" | python3 -c "import json, sys; print(json.load(sys.stdin).get('installed', 'unknown'))" 2>/dev/null || echo "unknown")
+        local plugin_ver=$(echo "$version_check_result" | python3 -c "import json, sys; print(json.load(sys.stdin).get('plugin', 'unknown'))" 2>/dev/null || echo "unknown")
+
+        # Output JSON for Claude to read
+        cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "Plugin version $plugin_ver detected, but installed Python package is $installed_ver"
+  },
+  "systemMessage": "⚠️  Plugin updated to v$plugin_ver but Python package is v$installed_ver. Reinstall: cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills && pip install -e ."
+}
+EOF
+        exit 0
+    fi
 
     # Check if auto-offer is enabled
     if [ "$(is_auto_offer_enabled)" != "true" ]; then

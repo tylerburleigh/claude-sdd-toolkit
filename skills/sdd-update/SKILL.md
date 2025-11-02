@@ -8,7 +8,8 @@ description: Progress tracking for spec-driven development. Use to update task s
 ## When to Use This Skill
 
 Use `Skill(sdd-toolkit:sdd-update)` to:
-- Mark tasks as in_progress, completed, or blocked
+- **Complete tasks** (atomically marks as completed AND creates journal entry using `complete-task`)
+- Mark tasks as in_progress or blocked
 - Document decisions and deviations in journal entries
 - Add verification results to specs
 - Move specs between lifecycle folders (e.g., pending => active, active => completed)
@@ -22,6 +23,16 @@ Use `Skill(sdd-toolkit:sdd-update)` to:
 ## Core Philosophy
 
 **Document Reality**: JSON spec files are living documents that evolve during implementation. This skill ensures the spec accurately reflects current progress, decisions, and status. All updates are made through CLI commands that handle validation, backups, and progress recalculation automatically.
+
+## Reading Specifications (CRITICAL)
+
+**When working with spec files, ALWAYS use `sdd` CLI commands:**
+- ✅ **ALWAYS** use `sdd` commands to read/query spec files (e.g., `sdd update-status`, `sdd add-journal`, `sdd list-blockers`)
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use command chaining to access specs (e.g., `sdd --version && cat specs/active/spec.json`)
+- The `sdd` CLI provides efficient, structured access with proper parsing and validation
+- Spec files are large and reading them directly wastes valuable context window space
 
 ## Skill Family
 
@@ -50,9 +61,21 @@ sdd add-journal {spec-id} --title "Decision Title" --content "Explanation of dec
 
 # Document a deviation from the plan
 sdd add-journal {spec-id} --title "Deviation: Changed Approach" --content "Created separate service file instead of modifying existing. Improves separation of concerns." --task-id {task-id} --entry-type deviation
+
+# Document task completion (use status_change, NOT completion)
+sdd add-journal {spec-id} --title "Task Completed: Implement Auth" --content "Successfully implemented authentication with JWT tokens. All tests passing." --task-id {task-id} --entry-type status_change
+
+# Document a note
+sdd add-journal {spec-id} --title "Implementation Note" --content "Using Redis for session storage as discussed." --task-id {task-id} --entry-type note
 ```
 
 **Entry types:** `decision`, `deviation`, `blocker`, `note`, `status_change`
+
+⚠️ **IMPORTANT:** Do NOT use `completion` as an entry-type value. While `completion` exists as a template option for `bulk-journal --template completion`, it is NOT a valid entry type for `add-journal --entry-type`.
+
+**To document task completion:**
+- Use `--entry-type status_change` for individual completion journal entries
+- OR use `sdd bulk-journal {spec-id} --template completion` to journal multiple completed tasks at once
 
 ### Bulk Journal Completed Tasks
 
@@ -169,13 +192,44 @@ Verification tasks can specify custom failure behavior via `on_failure` metadata
 
 ## Workflow 5: Completing Tasks
 
-Mark a task as completed when finished:
+### Complete a Task (Recommended: Atomic Status + Journal)
+
+When finishing a task, use `complete-task` to atomically mark it complete AND create a journal entry:
+
+```bash
+# Complete with automatic journal entry
+sdd complete-task {spec-id} {task-id} --journal-content "Successfully implemented JWT authentication with token refresh. All tests passing including edge cases for expired tokens."
+
+# Customize the journal entry
+sdd complete-task {spec-id} {task-id} \
+  --journal-title "Task Completed: Authentication Implementation" \
+  --journal-content "Detailed description of what was accomplished..." \
+  --entry-type status_change
+
+# Add a brief status note
+sdd complete-task {spec-id} {task-id} \
+  --note "All tests passing" \
+  --journal-content "Implemented authentication successfully."
+```
+
+**What `complete-task` does automatically:**
+1. Updates task status to `completed`
+2. Records completion timestamp
+3. Creates a journal entry documenting the completion
+4. Clears the `needs_journaling` flag
+5. Syncs metadata and recalculates progress
+
+**This is the recommended approach** because it ensures proper documentation of task completion.
+
+### Alternative: Status-Only Update (Not Recommended for Completion)
+
+If you need to mark a task completed without journaling (rare), use:
 
 ```bash
 sdd update-status {spec-id} {task-id} completed --note "Brief completion note"
 ```
 
-The CLI automatically records the completion timestamp.
+⚠️ **Warning:** This sets `needs_journaling=True` and requires a follow-up `add-journal` call. Use `complete-task` instead to avoid forgetting to journal.
 
 ### Complete a Spec
 
@@ -388,6 +442,52 @@ specs/
 3. Choose most recent update (check timestamps)
 4. Recalculate progress from leaf nodes up
 5. Validate merged state
+
+## Common Mistakes
+
+### Using `--entry-type completion`
+
+**Error:**
+```bash
+sdd add-journal: error: argument --entry-type: invalid choice: 'completion'
+Exit code: 2
+```
+
+**Cause:** Confusing the `bulk-journal --template` option with `add-journal --entry-type`
+
+**Fix:** Use `--entry-type status_change` instead:
+
+```bash
+# ❌ WRONG - "completion" is not a valid entry type
+sdd add-journal {spec-id} --task-id {task-id} --entry-type completion --title "..." --content "..."
+
+# ✅ CORRECT - Use "status_change" for task completion entries
+sdd add-journal {spec-id} --task-id {task-id} --entry-type status_change --title "Task Completed" --content "..."
+
+# ✅ ALTERNATIVE - Use bulk-journal with completion template
+sdd bulk-journal {spec-id} --template completion
+```
+
+**Why this happens:** The `bulk-journal` command has a `--template` parameter that accepts `completion` as a value for batch journaling. However, `add-journal` has an `--entry-type` parameter with different valid values. These are two separate parameters for different purposes:
+- `bulk-journal --template completion` - Batch journal multiple completed tasks using a template
+- `add-journal --entry-type status_change` - Add individual journal entry about task status changes
+
+### Reading Spec Files Directly
+
+**Error:** Using Read tool, cat, grep, or jq on spec files
+
+**Fix:** Always use `sdd` CLI commands:
+
+```bash
+# ❌ WRONG - Wastes context tokens and bypasses validation
+Read("specs/active/my-spec.json")
+cat specs/active/my-spec.json
+
+# ✅ CORRECT - Use sdd CLI for structured access
+sdd status-report {spec-id}
+sdd get-task {spec-id} {task-id}
+sdd query-tasks {spec-id} --status pending
+```
 
 ## Command Reference
 

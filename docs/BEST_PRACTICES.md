@@ -4,36 +4,94 @@ This document provides best practices, patterns, and guidelines for effective us
 
 ## Table of Contents
 
-- [Task Granularity and Decomposition](#task-granularity-and-decomposition)
-- [Specification Quality](#specification-quality)
+- [Before You Start](#before-you-start)
+- [Your Role vs. Claude's Role](#your-role-vs-claudes-role)
+- [Understanding Task Structure](#understanding-task-structure)
+- [Guiding Claude to Create Better Specs](#guiding-claude-to-create-better-specs)
 - [Phase Organization](#phase-organization)
-- [Dependency Management](#dependency-management)
+- [How Task Dependencies Work](#how-task-dependencies-work)
 - [Progress Tracking](#progress-tracking)
+- [Working with Long Sessions](#working-with-long-sessions)
 
 ---
 
-## Task Granularity and Decomposition
+## Before You Start
+
+### Generate Code Documentation First
+
+**Recommended**: Before asking Claude to create specs, ask it to document your codebase:
+
+> "Document this codebase"
+
+When documentation is available, Claude can provide better quality specs and task context by understanding your existing code patterns, relationships, and architecture. Without documentation, Claude will still work but uses slower file exploration methods.
+
+### Understanding the Spec Workflow
+
+Specs follow a lifecycle through folders:
+
+1. **Create** → Spec lands in `specs/pending/`
+2. **Activate** → Move to `specs/active/` when ready to start work
+3. **Implement** → Complete tasks one by one
+4. **Complete** → Move to `specs/completed/` when all tasks done
+
+Use `/sdd-begin` to navigate this workflow. Claude will show you pending specs and offer to activate them, or continue with active specs.
+
+**Why pending folder?** Allows you to plan multiple features without cluttering your active workspace. You can have a backlog of planned work while focusing on current implementation.
+
+---
+
+## Your Role vs. Claude's Role
+
+### What You Provide
+
+- **Feature requirements and goals** - Tell Claude what you want to build
+- **Answers to questions** - Claude will ask clarifying questions during spec creation
+- **Implementation** - You write the actual code for each task
+- **Feedback** - Tell Claude when specs don't match your needs or expectations
+
+### What Claude Handles
+
+- **Creating spec structure** - Generates the JSON spec with all metadata
+- **Breaking down features** - Decomposes your feature into atomic tasks
+- **Identifying dependencies** - Determines which tasks depend on others
+- **Managing status** - Updates task status as you work (pending → in_progress → completed)
+- **Time tracking** - Records timestamps automatically
+- **Journaling** - Documents completed work and decisions
+
+### What The Toolkit Enforces
+
+- **One file per task** - Tasks are atomic by design
+- **Dependency validation** - Prevents circular dependencies
+- **Status transitions** - Ensures valid status changes
+- **Automatic timestamps** - Time tracking happens automatically
+- **Spec lifecycle** - Manages the pending → active → completed workflow
+
+You work *with* Claude and the toolkit. You don't write specs manually - you describe what you want and review what Claude creates.
+
+---
+
+## Understanding Task Structure
 
 ### The Atomic Task Principle
 
-**Core Rule**: Each task should modify exactly ONE file.
+**What it means**: The toolkit enforces that each task modifies exactly ONE file.
 
-This is a fundamental design principle of SDD that enables:
+**Why this matters**: Atomic tasks enable:
 - **Precise dependency tracking**: File-level dependencies are explicit and clear
 - **Granular progress monitoring**: Each completed task represents concrete, verifiable progress
 - **Parallel implementation**: Independent tasks can be worked on simultaneously
 - **Straightforward verification**: Each task has a focused scope and clear success criteria
 - **Easy rollback**: Changes can be reverted at the file level without affecting other work
 
-### When a Feature Spans Multiple Files
+### How Claude Handles Multi-File Features
 
-You have two primary approaches:
+When you describe a feature that spans multiple files, Claude uses two approaches:
 
-#### Approach 1: Multiple Independent Tasks (Recommended)
+#### Approach 1: Multiple Independent Tasks (Most Common)
 
-Create separate tasks for each file, with explicit dependencies.
+Claude creates separate tasks for each file, with explicit dependencies between them.
 
-**Example:**
+**Example of what Claude will create:**
 ```json
 {
   "task-1-1": {
@@ -70,13 +128,13 @@ Create separate tasks for each file, with explicit dependencies.
 }
 ```
 
-**When to use**: Most scenarios, especially when files have clear dependency relationships.
+**When Claude uses this**: Most scenarios, especially when files have clear dependency relationships.
 
 #### Approach 2: Subtasks Under a Parent Task
 
-Use a parent task to coordinate, with child subtasks for each file.
+Claude creates a parent task to coordinate, with child subtasks for each file.
 
-**Example:**
+**Example of what Claude will create:**
 ```json
 {
   "task-1": {
@@ -110,11 +168,9 @@ Use a parent task to coordinate, with child subtasks for each file.
 }
 ```
 
-**When to use**: When files are tightly coupled and logically form a single feature unit.
+**When Claude uses this**: When files are tightly coupled and logically form a single feature unit.
 
-### Identifying Atomic Units
-
-#### ✅ Good Task Granularity
+### What Good Task Breakdown Looks Like
 
 **One clear file, one focused change:**
 - "Create authentication middleware in middleware/auth.js"
@@ -122,25 +178,6 @@ Use a parent task to coordinate, with child subtasks for each file.
 - "Update API routes in routes/api.js"
 - "Add error handling to services/payment.js"
 - "Create rate limiter utility in utils/rateLimit.js"
-
-#### ❌ Too Broad - Split These
-
-**Multiple files bundled together:**
-- "Add authentication" → Split into: middleware task, model task, routes task, config task
-- "Refactor user system" → Split into: one task per file being refactored
-- "Update all configuration files" → One task per config file
-- "Implement payment processing" → Split into: validation, API client, webhook handler, database models
-
-**How to fix**: Identify each file that needs changes and create a separate task for each.
-
-#### ❌ Too Narrow - Combine These
-
-**Multiple tasks for the same file:**
-- "Add import statement to file.js" + "Add function to file.js" → Combine into one task
-- "Update line 42" + "Update line 43" + "Update line 44" → All same file, one task
-- "Add type definition" + "Implement function using that type" → If same file, combine
-
-**How to fix**: If all changes are to the same file and are part of the same logical change, combine into a single task.
 
 ### Special Cases
 
@@ -298,63 +335,60 @@ Does this task modify code/config/docs?
 
 ---
 
-## Specification Quality
+## Guiding Claude to Create Better Specs
 
-### Be Specific and Concrete
+### Be Specific in Your Requests
 
-**❌ Vague:**
+When asking Claude to create a spec, provide specific requirements rather than vague goals.
+
+**❌ Vague requests:**
 - "Improve error handling"
 - "Add better logging"
 - "Optimize performance"
 
-**✅ Specific:**
+**✅ Specific requests:**
 - "Add try-catch blocks to all API calls in services/api.js with structured error responses"
 - "Add debug logging to authentication middleware with request ID tracking"
 - "Implement response caching in API routes to reduce database queries by 50%"
 
-### Include Context and Examples
+The more specific you are, the better Claude can create tasks that match your needs.
 
-**Good task descriptions include:**
-- What is being changed
-- Why it's being changed
+### Provide Context and Examples
+
+**Help Claude understand** by including:
+- What needs to change and why
 - What success looks like
 - Example input/output if applicable
+- Any constraints or requirements
 
-**Example:**
-```json
-{
-  "task-1-1": {
-    "title": "Add rate limiting to API endpoints",
-    "description": "Implement rate limiting middleware to prevent API abuse. Use sliding window algorithm with Redis backend. Limit: 100 requests per minute per IP. Return 429 status with Retry-After header when exceeded.",
-    "metadata": {
-      "file_path": "middleware/rateLimit.js"
-    }
-  }
-}
-```
+**Example of a good request:**
 
-### Think Ahead
+> "Create a spec for adding rate limiting to API endpoints. Use a sliding window algorithm with Redis backend. Limit should be 100 requests per minute per IP address. When limit is exceeded, return 429 status with Retry-After header."
 
-Consider during planning:
-- **Testing**: How will this be tested?
-- **Monitoring**: What metrics/logs are needed?
-- **Documentation**: What needs to be documented?
-- **Dependencies**: What must exist first?
-- **Rollback**: How can this be safely reverted?
+Claude will create detailed tasks based on this.
 
-### Stay Grounded in Reality
+### Mention Important Considerations
 
-**Do:**
-- Explore the actual codebase before planning
+**Tell Claude about:**
+- **Testing requirements**: "Make sure to include test tasks"
+- **Monitoring needs**: "We need to log rate limit violations"
+- **Documentation**: "Include a task to document the API changes"
+- **Dependencies**: "This needs the Redis connection to be set up first"
+- **Rollback concerns**: "Make this feature toggleable via config"
+
+Claude will incorporate these into the spec.
+
+### Let Claude Explore First
+
+**Best practice**: Let Claude explore your codebase before creating specs.
+
+When you have documentation generated (see "Before You Start"), Claude can:
 - Verify APIs and libraries exist
 - Check existing patterns and conventions
 - Identify real integration points
+- Understand your architecture
 
-**Don't:**
-- Assume APIs or functions exist
-- Plan around imaginary utilities
-- Ignore existing architecture
-- Guess at implementation details
+If you ask for something that doesn't match your codebase, Claude will ask clarifying questions or suggest alternatives.
 
 ---
 
@@ -419,11 +453,13 @@ Phase 4: Add features D and E (if related)
 
 ---
 
-## Dependency Management
+## How Task Dependencies Work
 
-### Explicit Dependencies
+### Claude Identifies Dependencies
 
-Always declare dependencies explicitly in task metadata:
+When Claude creates a spec, it identifies which tasks depend on others and adds them to the task metadata automatically.
+
+**Example of what you'll see:**
 
 ```json
 {
@@ -437,7 +473,11 @@ Always declare dependencies explicitly in task metadata:
 }
 ```
 
-### Dependency Patterns
+This means task-2-1 can't start until task-1-1 and task-1-2 are completed.
+
+### Common Dependency Patterns
+
+You'll see Claude use these patterns:
 
 #### Linear Dependencies
 ```
@@ -471,56 +511,103 @@ One task depends on multiple prerequisite tasks.
 ```
 Common in complex features.
 
-### Avoiding Circular Dependencies
+### The Toolkit Prevents Circular Dependencies
 
-**Anti-pattern:**
+The toolkit automatically validates dependencies and prevents circular references:
+
+**Example of invalid dependency:**
 ```
 task-1 depends on task-2
 task-2 depends on task-3
 task-3 depends on task-1  ← Circular!
 ```
 
-**How to detect**: Validation will catch these
-**How to fix**: Refactor task breakdown to eliminate the cycle
+If Claude accidentally creates a circular dependency, the validation system will catch it. Claude will then refactor the task breakdown to eliminate the cycle.
 
 ---
 
 ## Progress Tracking
 
-### Task Status Updates
+### Automatic Progress Management
 
-Update task status as you work:
-- `"status": "pending"` - Not started
-- `"status": "in_progress"` - Currently working on it
-- `"status": "completed"` - Done and verified
-- `"status": "blocked"` - Can't proceed (add blocker info)
+The toolkit automatically tracks your progress:
+
+**Automatic Time Tracking**: When Claude marks a task as in_progress or completed, timestamps are recorded automatically:
+- `started_at` - When task moved to in_progress
+- `completed_at` - When task marked completed
+- `actual_hours` - Calculated from the timestamp duration
+
+No manual time entry needed.
+
+**Automatic Completion Detection**: When the last task in a spec is completed, Claude automatically detects this and prompts you to move the spec to `specs/completed/`.
+
+### Working with `/sdd-begin`
+
+Use `/sdd-begin` to manage your workflow:
+
+1. **Shows pending specs** - See your backlog and activate specs when ready
+2. **Shows active specs** - Continue work on current features
+3. **Tracks progress** - See how many tasks are complete
+4. **Detects completion** - Prompts to finalize when all tasks done
+
+### Task Status
+
+Tasks progress through statuses automatically as you work:
+- `pending` - Not started
+- `in_progress` - Currently working (Claude marks this when starting a task)
+- `completed` - Done and verified (Claude marks this when you complete the task)
+- `blocked` - Can't proceed (tell Claude about blockers)
 
 ### Journal Entries
 
-Document important decisions and changes:
+Claude automatically journals completed tasks. Important decisions and changes are recorded in the spec's journal with timestamps.
 
-```json
-{
-  "journal": [
-    {
-      "timestamp": "2024-01-15T10:30:00Z",
-      "author": "Claude",
-      "entry": "Completed task-1-1. Chose JWT over sessions due to stateless requirement. Tests passing."
-    }
-  ]
-}
+**You can also manually add journal entries** by telling Claude:
+
+> "Add a journal entry about [decision/change]"
+
+### Don't Edit JSON Directly
+
+Let Claude manage the spec files. The toolkit maintains consistency in timestamps, status transitions, and metadata. Manual edits can break validation.
+
+---
+
+## Working with Long Sessions
+
+### Context Usage Monitoring
+
+Claude has a 200k token limit, with 160k "usable context" (80%) before auto-compaction kicks in. The toolkit monitors your session usage and warns you when approaching limits.
+
+**After completing tasks**, Claude checks context usage:
+
+```
+✅ Task completed
+Context usage: 45% (72k/160k tokens)
+Continue to next task?
 ```
 
-### When to Update Specs
+### When to Save Progress
 
-Use `Skill(sdd-toolkit:sdd-update)` to:
-- Mark tasks complete
-- Add journal entries
-- Update progress metrics
-- Document blockers
-- Record decisions
+**50% usage** - Consider saving progress soon
+**80% usage** - Strongly recommended to save and clear context
 
-**Don't** manually edit the JSON - use the skill to maintain consistency.
+**How to resume after clearing**:
+1. Use `/clear` to reset the conversation
+2. Use `/sdd-begin` to resume - Claude will show you where you left off
+3. Continue with next task
+
+The spec tracks your progress, so you never lose your place.
+
+### Long Feature Development
+
+For large features spanning many tasks:
+
+1. **Work in phases** - Complete a logical phase, then take a break
+2. **Clear context between sessions** - Start fresh with `/sdd-begin`
+3. **Review journal** - Check what was decided in previous sessions
+4. **Check progress** - `/sdd-begin` shows completion percentage
+
+**Pro tip**: If you know a feature will be large, consider splitting it into multiple specs that can be tackled across different sessions.
 
 ---
 

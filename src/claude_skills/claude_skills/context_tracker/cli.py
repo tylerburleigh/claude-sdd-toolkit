@@ -3,264 +3,161 @@
 Context Tracker - Monitor Claude Code token and context usage.
 
 Parses Claude Code transcript files to display real-time token usage metrics.
-Can be used as a standalone command or configured as a Claude Code hook.
+Adopts a stateless design inspired by ccstatusline - transcript path is provided
+directly via CLI arg, environment variable, or stdin (hook mode).
+
+Usage:
+  # From CLI with explicit path
+  sdd context --transcript-path /path/to/transcript.jsonl
+
+  # From hook (reads stdin JSON)
+  echo '{"transcript_path": "/path/to/transcript.jsonl"}' | sdd context
+
+  # From environment variable
+  export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl
+  sdd context
 """
 
 import argparse
 import json
+import os
+import re
+import secrets
 import sys
+import time
 from pathlib import Path
 
 from claude_skills.context_tracker.parser import parse_transcript
-from claude_skills.context_tracker.process_utils import (
-    find_session_by_pid,
-    is_pid_alive,
-    get_parent_pids
-)
 from claude_skills.common import PrettyPrinter
 
 
-def is_file_open_for_writing(filepath):
+def generate_session_marker() -> str:
     """
-    Check if a file is currently open for writing by any process.
+    Generate a unique random session marker.
 
-    Uses platform-specific tools:
-    - Linux/macOS: lsof
-    - Windows: fallback to modification time check
+    Uses a short 8-character hex string for easier reproduction and lower
+    chance of transcription errors.
 
     Returns:
-        True if file is open for writing, False otherwise
+        The generated marker string (e.g., "SESSION_MARKER_abc12345")
     """
-    import subprocess
-    import platform
-
-    if not Path(filepath).exists():
-        return False
-
-    system = platform.system()
-
-    try:
-        if system in ("Linux", "Darwin"):  # Darwin = macOS
-            # Use lsof to check if file is open
-            # lsof returns 0 if file is open, 1 if not
-            result = subprocess.run(
-                ["lsof", str(filepath)],
-                capture_output=True,
-                timeout=2
-            )
-            # If lsof finds the file open (exit code 0), check if it's for writing
-            if result.returncode == 0:
-                output = result.stdout.decode()
-                # lsof shows file descriptor + mode like "3w", "4u", "5W"
-                # Look for write mode indicators in the FD column
-                # Modes: w=write, u=read+write, W=write with lock
-                for line in output.split('\n'):
-                    # Skip header line
-                    if 'COMMAND' in line or not line.strip():
-                        continue
-                    # FD column is typically the 4th column
-                    parts = line.split()
-                    if len(parts) >= 4:
-                        fd_mode = parts[3]  # File descriptor + mode
-                        # Check if it ends with write indicators
-                        if fd_mode.endswith(('w', 'u', 'W')):
-                            return True
-                return False
-        elif system == "Windows":
-            # Windows: try using handle.exe or fall back to modification time
-            # For now, fall back to modification time check
-            import time
-            mtime = Path(filepath).stat().st_mtime
-            # If modified in last 5 seconds, consider it active
-            return (time.time() - mtime) < 5
-    except (subprocess.TimeoutExpired, FileNotFoundError, PermissionError):
-        pass
-
-    return False
+    marker = f"SESSION_MARKER_{secrets.token_hex(4)}"
+    return marker
 
 
-def get_cached_transcript_path():
+def find_transcript_by_specific_marker(cwd: Path, marker: str) -> str | None:
     """
-    Load transcript path from cache for current working directory.
+    Search transcripts for a specific SESSION_MARKER to identify current session.
 
-    Uses multi-layered detection to identify which transcript belongs to the
-    current Claude Code session, enabling correct session detection even with
-    multiple concurrent sessions in the same directory.
+    This function searches all .jsonl transcript files in the project directory
+    for a specific marker string. The transcript containing that exact marker
+    is the current session's transcript.
 
-    Detection Strategy (in order of priority):
-    1. PID-based: Match current process tree to cached session PPIDs
-    2. TTY-based: Match current terminal to cached session TTY
-    3. Environment variable: Check CLAUDE_SESSION_ID
-    4. File writing detection: Check which transcript is open for writing (lsof)
-    5. Fallback: Most recently modified transcript (last resort)
+    Args:
+        cwd: Current working directory (used to find project-specific transcripts)
+        marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
 
     Returns:
-        Cached transcript path or None if not found
+        Path to transcript containing the marker, or None if not found
     """
-    import os
+    # Claude Code stores transcripts in project-specific directories
+    project_dir_name = str(cwd.resolve()).replace("/", "-")
+    transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
 
-    cache_dir = Path.home() / ".config" / "claude-sdd-toolkit"
-    cache_file = cache_dir / "transcript-cache.json"
-
-    if not cache_file.exists():
+    if not transcript_dir.exists():
         return None
 
+    current_time = time.time()
+
     try:
-        with open(cache_file, "r") as f:
-            cache = json.load(f)
+        for transcript_path in transcript_dir.glob("*.jsonl"):
+            try:
+                # Only check recent transcripts (modified in last 24 hours)
+                mtime = transcript_path.stat().st_mtime
+                if (current_time - mtime) > 86400:
+                    continue
 
-        cwd = os.getcwd()
-        dir_entry = cache.get(cwd)
-
-        if not dir_entry:
-            return None
-
-        # Check if this is old format (direct transcript_path)
-        if "transcript_path" in dir_entry:
-            return dir_entry["transcript_path"]
-
-        # New multi-session format
-        sessions = dir_entry.get("sessions", {})
-        if not sessions:
-            return None
-
-        # Fast path: If only one session exists, validate and return it directly
-        # This skips expensive lsof and multi-strategy detection
-        if len(sessions) == 1:
-            session_id, session_data = next(iter(sessions.items()))
-            ppid = session_data.get("ppid")
-            path = session_data.get("transcript_path")
-
-            if path and Path(path).exists():
-                # Validate session is still alive
-                if ppid and is_pid_alive(ppid):
-                    return path
-                # Allow recently modified files without PPID (old cache format)
-                import time
-                if time.time() - Path(path).stat().st_mtime < 60:
-                    return path
-
-        # Strategy 1: PID-based detection (most reliable)
-        session_id = find_session_by_pid(dir_entry)
-        if session_id and session_id in sessions:
-            transcript_path = sessions[session_id].get("transcript_path")
-            if transcript_path and Path(transcript_path).exists():
-                return transcript_path
-
-        # Strategy 2: TTY-based detection (for multiple sessions in same directory)
-        # This helps disambiguate when running from different terminals
-        try:
-            current_tty = os.ttyname(0)  # Get current terminal's TTY
-            for session_id, session_data in sessions.items():
-                cached_tty = session_data.get("tty")
-                if cached_tty and cached_tty == current_tty:
-                    transcript_path = session_data.get("transcript_path")
-                    if transcript_path and Path(transcript_path).exists():
-                        return transcript_path
-        except (OSError, AttributeError):
-            # Not running in a TTY, skip this strategy
-            pass
-
-        # Strategy 3: Environment variable detection
-        env_session_id = os.environ.get("CLAUDE_SESSION_ID")
-        if env_session_id and env_session_id in sessions:
-            transcript_path = sessions[env_session_id].get("transcript_path")
-            if transcript_path and Path(transcript_path).exists():
-                return transcript_path
-
-        # Strategy 4: File writing detection (existing lsof method)
-        transcript_paths = [
-            s.get("transcript_path")
-            for s in sessions.values()
-            if s.get("transcript_path")
-        ]
-        for path in transcript_paths:
-            if is_file_open_for_writing(path):
-                return path
-
-        # Strategy 5: Fallback to most recently modified transcript
-        # Only consider sessions with alive PIDs or recent timestamps
-        valid_paths = []
-        import time
-        current_time = time.time()
-
-        for session_id, session_data in sessions.items():
-            path = session_data.get("transcript_path")
-            if not path or not Path(path).exists():
+                # Search for the specific marker in the transcript
+                with open(transcript_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if marker in line:
+                            return str(transcript_path)
+            except (OSError, IOError, UnicodeDecodeError):
                 continue
-
-            # Check if session is likely still active
-            ppid = session_data.get("ppid")
-            started_at = session_data.get("started_at", 0)
-
-            # Consider session valid if:
-            # 1. PID is still alive, OR
-            # 2. Session started less than 24 hours ago (generous window)
-            is_valid = (
-                (ppid and is_pid_alive(ppid)) or
-                (current_time - started_at < 86400)
-            )
-
-            if is_valid:
-                valid_paths.append(path)
-
-        if valid_paths:
-            most_recent_file = max(
-                valid_paths,
-                key=lambda p: Path(p).stat().st_mtime,
-                default=None
-            )
-            if most_recent_file:
-                return most_recent_file
-
-    except (json.JSONDecodeError, IOError, ValueError, OSError):
+    except (OSError, IOError):
         pass
 
     return None
 
 
-def _clean_stale_sessions(dir_entry):
+def get_transcript_path_from_stdin() -> str | None:
     """
-    Remove sessions with dead PIDs from the cache entry.
+    Read transcript path from stdin JSON (hook mode).
 
-    Modifies dir_entry in place.
+    Expected JSON format:
+    {
+        "transcript_path": "/path/to/transcript.jsonl",
+        "session_id": "...",
+        "cwd": "...",
+        ...
+    }
+
+    Returns:
+        Transcript path from stdin, or None if stdin is a TTY or parsing fails
+    """
+    if sys.stdin.isatty():
+        return None
+
+    try:
+        stdin_data = sys.stdin.read()
+        if not stdin_data.strip():
+            return None
+
+        hook_data = json.loads(stdin_data)
+        return hook_data.get("transcript_path")
+    except (json.JSONDecodeError, KeyError, ValueError):
+        return None
+
+
+def get_transcript_path(args) -> str | None:
+    """
+    Get transcript path from multiple sources (priority order).
+
+    Priority:
+    1. Explicit CLI argument (--transcript-path)
+    2. Environment variable (CLAUDE_TRANSCRIPT_PATH)
+    3. stdin JSON (hook mode)
+    4. Session marker discovery (if --session-marker provided)
 
     Args:
-        dir_entry: Directory entry from cache with 'sessions' dict
+        args: Parsed CLI arguments
+
+    Returns:
+        Transcript path string, or None if not found
     """
-    import time
+    # Priority 1: Explicit CLI argument
+    if hasattr(args, 'transcript_path') and args.transcript_path:
+        return args.transcript_path
 
-    sessions = dir_entry.get("sessions", {})
-    if not sessions:
-        return
+    # Priority 2: Environment variable
+    env_path = os.environ.get("CLAUDE_TRANSCRIPT_PATH")
+    if env_path:
+        return env_path
 
-    current_time = time.time()
-    stale_session_ids = []
+    # Priority 3: stdin (hook mode)
+    stdin_path = get_transcript_path_from_stdin()
+    if stdin_path:
+        return stdin_path
 
-    for session_id, session_data in sessions.items():
-        ppid = session_data.get("ppid")
-        started_at = session_data.get("started_at", 0)
+    # Priority 4: Session marker discovery
+    # Search for transcripts containing the specific session marker
+    if hasattr(args, 'session_marker') and args.session_marker:
+        cwd = Path.cwd()
+        marker_path = find_transcript_by_specific_marker(cwd, args.session_marker)
+        if marker_path:
+            return marker_path
 
-        # Mark as stale if:
-        # 1. Has PPID but it's dead, AND
-        # 2. Session is older than 1 hour
-        if ppid and not is_pid_alive(ppid):
-            age = current_time - started_at
-            if age > 3600:  # 1 hour
-                stale_session_ids.append(session_id)
-
-    # Remove stale sessions
-    for session_id in stale_session_ids:
-        del sessions[session_id]
-
-    # Update most_recent if it was removed
-    most_recent = dir_entry.get("most_recent")
-    if most_recent in stale_session_ids and sessions:
-        # Set most_recent to the session with highest timestamp
-        dir_entry["most_recent"] = max(
-            sessions.keys(),
-            key=lambda sid: sessions[sid].get("timestamp", 0)
-        )
+    return None
 
 
 def format_number(n: int) -> str:
@@ -268,14 +165,27 @@ def format_number(n: int) -> str:
     return f"{n:,}"
 
 
-def format_metrics_human(metrics, max_context: int = 160000):
-    """Format token metrics for human-readable output."""
+def format_metrics_human(metrics, max_context: int = 160000, transcript_path: str = None):
+    """
+    Format token metrics for human-readable output.
+
+    Args:
+        metrics: TokenMetrics object
+        max_context: Maximum context window size
+        transcript_path: Optional path to transcript file (for display)
+    """
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
 
     output = []
     output.append("=" * 60)
     output.append("Claude Code Context Usage")
     output.append("=" * 60)
+
+    # Show transcript filename if available
+    if transcript_path:
+        transcript_name = Path(transcript_path).name
+        output.append(f"\nTranscript: {transcript_name}")
+
     output.append("")
     output.append(f"Context Used:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
     output.append("")
@@ -289,23 +199,47 @@ def format_metrics_human(metrics, max_context: int = 160000):
     return "\n".join(output)
 
 
-def format_metrics_json(metrics, max_context: int = 160000):
-    """Format token metrics as JSON."""
+def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str = None):
+    """
+    Format token metrics as JSON.
+
+    Args:
+        metrics: TokenMetrics object
+        max_context: Maximum context window size
+        transcript_path: Optional path to transcript file (for metadata)
+    """
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
 
-    return json.dumps(
-        {
-            "context_length": metrics.context_length,
-            "context_percentage": round(context_pct, 2),
-            "context_percentage_interpretation": "Percentage of available context used",
-            "max_context": max_context,
-            "input_tokens": metrics.input_tokens,
-            "output_tokens": metrics.output_tokens,
-            "cached_tokens": metrics.cached_tokens,
-            "total_tokens": metrics.total_tokens,
-        },
-        indent=2,
-    )
+    result = {
+        "context_length": metrics.context_length,
+        "context_percentage": round(context_pct, 2),
+        "max_context": max_context,
+        "input_tokens": metrics.input_tokens,
+        "output_tokens": metrics.output_tokens,
+        "cached_tokens": metrics.cached_tokens,
+        "total_tokens": metrics.total_tokens,
+    }
+
+    if transcript_path:
+        result["transcript_path"] = transcript_path
+
+    return json.dumps(result, indent=2)
+
+
+def cmd_session_marker(args, printer):
+    """
+    Handler for 'sdd session-marker' command.
+
+    Generates and outputs a unique session marker that can be used
+    to identify the current session's transcript.
+
+    Args:
+        args: Parsed arguments from ArgumentParser
+        printer: PrettyPrinter instance for output
+    """
+    marker = generate_session_marker()
+    # Output marker to stdout (not stderr) so it can be captured
+    print(marker)
 
 
 def cmd_context(args, printer):
@@ -316,21 +250,33 @@ def cmd_context(args, printer):
         args: Parsed arguments from ArgumentParser
         printer: PrettyPrinter instance for output
     """
-    transcript_path = args.transcript_path
-
-    # If explicit path provided, use it
-    if not transcript_path:
-        # Otherwise, auto-discover from cache
-        transcript_path = get_cached_transcript_path()
+    transcript_path = get_transcript_path(args)
 
     if not transcript_path:
-        printer.error("No transcript found for this session.")
-        printer.error("")
-        printer.error("The SessionStart hook caches transcript paths automatically.")
-        printer.error("If this is a new session, the hook may not have run yet.")
-        printer.error("")
-        printer.error("To specify a transcript manually, use:")
-        printer.error("  sdd context --transcript-path /path/to/transcript.jsonl")
+        # Provide context-specific error message
+        if hasattr(args, 'session_marker') and args.session_marker:
+            printer.error(f"Could not find transcript containing marker: {args.session_marker}")
+            printer.error("")
+            printer.error("This usually means the marker hasn't been written to the transcript yet.")
+            printer.error("If you're using the two-command approach, make sure to:")
+            printer.error("  1. Call 'sdd session-marker' first (generates and logs marker)")
+            printer.error("  2. Call 'sdd context --session-marker <marker>' in a SEPARATE command")
+            printer.error("")
+            printer.error("The marker must be logged to the transcript before it can be found.")
+            printer.error("Try running 'sdd session-marker' again, then retry this command.")
+        else:
+            printer.error("No transcript path provided.")
+            printer.error("")
+            printer.error("Please provide transcript path via:")
+            printer.error("  1. Session marker: sdd context --session-marker $(sdd session-marker)")
+            printer.error("  2. CLI argument: sdd context --transcript-path /path/to/transcript.jsonl")
+            printer.error("  3. Environment variable: export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl")
+            printer.error("  4. stdin (hook mode): echo '{\"transcript_path\": \"...\"}' | sdd context")
+        sys.exit(1)
+
+    # Verify file exists
+    if not Path(transcript_path).exists():
+        printer.error(f"Transcript file not found: {transcript_path}")
         sys.exit(1)
 
     # Parse the transcript
@@ -342,9 +288,27 @@ def cmd_context(args, printer):
 
     # Output the metrics
     if args.json:
-        print(format_metrics_json(metrics, args.max_context))
+        print(format_metrics_json(metrics, args.max_context, transcript_path))
     else:
-        print(format_metrics_human(metrics, args.max_context))
+        print(format_metrics_human(metrics, args.max_context, transcript_path))
+
+
+def register_session_marker(subparsers, parent_parser):
+    """
+    Register 'session-marker' subcommand for unified SDD CLI.
+
+    Args:
+        subparsers: ArgumentParser subparsers object
+        parent_parser: Parent parser with global options
+    """
+    parser = subparsers.add_parser(
+        'session-marker',
+        parents=[parent_parser],
+        help='Generate a unique session marker for transcript identification',
+        description='Outputs a unique marker that gets logged to the transcript, allowing the context command to identify the current session'
+    )
+
+    parser.set_defaults(func=cmd_session_marker)
 
 
 def register_context(subparsers, parent_parser):
@@ -369,6 +333,12 @@ def register_context(subparsers, parent_parser):
     )
 
     parser.add_argument(
+        '--session-marker',
+        type=str,
+        help='Session marker to search for (generated by session-marker command)'
+    )
+
+    parser.add_argument(
         '--max-context',
         type=int,
         default=160000,
@@ -388,13 +358,17 @@ def main():
         epilog="""
 Examples:
   # Check context usage from transcript path
-  sdd:context --transcript-path /path/to/transcript.jsonl
+  sdd context --transcript-path /path/to/transcript.jsonl
+
+  # Use environment variable
+  export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl
+  sdd context
 
   # Use as a Claude Code hook (reads from stdin)
-  echo '{"transcript_path": "/path/to/transcript.jsonl"}' | sdd:context
+  echo '{"transcript_path": "/path/to/transcript.jsonl"}' | sdd context
 
   # Get JSON output
-  sdd:context --transcript-path /path/to/transcript.jsonl --json
+  sdd context --transcript-path /path/to/transcript.jsonl --json
         """,
     )
 
@@ -419,22 +393,22 @@ Examples:
 
     args = parser.parse_args()
 
-    transcript_path = args.transcript_path
-
-    # If no transcript path provided, try reading from stdin (hook mode)
-    if not transcript_path:
-        if not sys.stdin.isatty():
-            try:
-                stdin_data = sys.stdin.read()
-                hook_data = json.loads(stdin_data)
-                transcript_path = hook_data.get("transcript_path")
-            except (json.JSONDecodeError, KeyError):
-                print("Error: Could not parse hook data from stdin", file=sys.stderr)
-                sys.exit(1)
+    # Get transcript path from args, env var, or stdin
+    transcript_path = get_transcript_path(args)
 
     if not transcript_path:
         parser.print_help()
         print("\nError: No transcript path provided", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("Provide via:", file=sys.stderr)
+        print("  --transcript-path argument", file=sys.stderr)
+        print("  CLAUDE_TRANSCRIPT_PATH environment variable", file=sys.stderr)
+        print("  stdin JSON (hook mode)", file=sys.stderr)
+        sys.exit(1)
+
+    # Verify file exists
+    if not Path(transcript_path).exists():
+        print(f"Error: Transcript file not found: {transcript_path}", file=sys.stderr)
         sys.exit(1)
 
     # Parse the transcript
@@ -446,9 +420,9 @@ Examples:
 
     # Output the metrics
     if args.json:
-        print(format_metrics_json(metrics, args.max_context))
+        print(format_metrics_json(metrics, args.max_context, transcript_path))
     else:
-        print(format_metrics_human(metrics, args.max_context))
+        print(format_metrics_human(metrics, args.max_context, transcript_path))
 
 
 if __name__ == "__main__":

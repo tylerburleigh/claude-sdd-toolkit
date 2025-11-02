@@ -4,12 +4,22 @@ Unified SDD CLI - Single entry point for all SDD commands.
 """
 import sys
 import argparse
+import io
 from pathlib import Path
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.cli.sdd.options import add_global_options, create_global_parent_parser
 from claude_skills.cli.sdd.registry import register_all_subcommands
+
+
+def _get_version():
+    """Get package version from metadata."""
+    try:
+        from importlib.metadata import version
+        return version('claude-skills')
+    except Exception:
+        return '0.0.0-dev'
 
 
 def reorder_args_for_subcommand(cmd_line):
@@ -125,11 +135,30 @@ def main():
     # Reorder arguments to support global options before subcommand
     cmd_line = reorder_args_for_subcommand(sys.argv[1:])
 
+    # Check for common --entry-type completion mistake BEFORE parsing
+    # This allows us to provide a better error message
+    if 'add-journal' in cmd_line and '--entry-type' in cmd_line:
+        try:
+            entry_type_idx = cmd_line.index('--entry-type')
+            if entry_type_idx + 1 < len(cmd_line) and cmd_line[entry_type_idx + 1] == 'completion':
+                # Provide custom helpful error message immediately
+                print(f"\n❌ Invalid entry type: 'completion'", file=sys.stderr)
+                print(f"💡 Did you mean: --entry-type status_change?", file=sys.stderr)
+                print(f"\nNote: 'completion' is a template option for bulk-journal, not an entry type.", file=sys.stderr)
+                print(f"Valid entry types: status_change, deviation, blocker, decision, note\n", file=sys.stderr)
+                sys.exit(2)
+        except (ValueError, IndexError):
+            pass
+
     parser = argparse.ArgumentParser(
         prog='sdd',
         description='Spec-Driven Development unified CLI',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
+
+    # Add version flag
+    parser.add_argument('--version', action='version',
+                        version=f'%(prog)s {_get_version()}')
 
     # Add global options to main parser so they work in any position
     add_global_options(parser)

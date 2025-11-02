@@ -19,98 +19,12 @@ from claude_skills.common.integrations import get_session_state
 # Configuration
 CLAUDE_HOME = Path.home() / ".claude"
 SETTINGS_FILE = CLAUDE_HOME / "settings.json"
-TRANSCRIPT_CACHE_DIR = Path.home() / ".config" / "claude-sdd-toolkit"
-TRANSCRIPT_CACHE_FILE = TRANSCRIPT_CACHE_DIR / "transcript-cache.json"
-
-
-def cache_current_transcript():
-    """
-    Cache the current session's transcript path.
-
-    This is called from /sdd-begin to ensure sdd context reads the right transcript.
-    Reads CLAUDE_TRANSCRIPT_PATH from environment.
-    """
-    transcript_path = os.environ.get('CLAUDE_TRANSCRIPT_PATH')
-    session_id = os.environ.get('CLAUDE_SESSION_ID')
-
-    if not transcript_path or not session_id:
-        # No transcript info available - skip silently
-        return
-
-    cwd = str(Path.cwd().resolve())
-    current_time = int(time.time())
-
-    # Find stable PPID (try using process_utils if available)
-    try:
-        from claude_skills.context_tracker.process_utils import find_stable_claude_process
-        stable_ppid = find_stable_claude_process()
-    except ImportError:
-        stable_ppid = None
-
-    if not stable_ppid:
-        # Fallback to parent PID
-        stable_ppid = os.getppid()
-
-    # Load existing cache
-    cache = {}
-    if TRANSCRIPT_CACHE_FILE.exists():
-        try:
-            with open(TRANSCRIPT_CACHE_FILE, 'r') as f:
-                cache = json.load(f)
-        except (json.JSONDecodeError, IOError):
-            pass
-
-    # Initialize directory entry if needed
-    if cwd not in cache:
-        cache[cwd] = {'sessions': {}}
-
-    # Add/update this session
-    session_data = {
-        'transcript_path': transcript_path,
-        'timestamp': current_time,
-        'started_at': current_time,
-        'ppid': stable_ppid
-    }
-
-    cache[cwd]['sessions'][session_id] = session_data
-    cache[cwd]['most_recent'] = session_id
-
-    # Clean stale sessions (>1 hour old with dead PIDs)
-    sessions = cache[cwd].get('sessions', {})
-    stale_session_ids = []
-    for sid, sdata in list(sessions.items()):
-        spid = sdata.get('ppid')
-        started = sdata.get('started_at', 0)
-        age = current_time - started
-
-        if spid and age > 3600:
-            try:
-                os.kill(spid, 0)  # Check if process alive
-            except (OSError, ProcessLookupError):
-                # Process is dead
-                stale_session_ids.append(sid)
-
-    # Remove stale sessions
-    for sid in stale_session_ids:
-        del sessions[sid]
-
-    # Update most_recent if it was removed
-    if cache[cwd].get('most_recent') in stale_session_ids and sessions:
-        cache[cwd]['most_recent'] = max(
-            sessions.keys(),
-            key=lambda s: sessions[s].get('timestamp', 0)
-        )
-
-    # Write cache
-    TRANSCRIPT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    with open(TRANSCRIPT_CACHE_FILE, 'w') as f:
-        json.dump(cache, f, indent=2)
 
 
 def cmd_check_permissions(args, printer: PrettyPrinter) -> int:
     """Check if SDD permissions are configured for the project."""
-    # Cache current transcript for sdd context
-    cache_current_transcript()
+    # Note: CLAUDE_TRANSCRIPT_PATH env var is automatically set by session-start hook
+    # and inherited by all child processes. No cache or validation needed.
 
     project_root = Path(args.project_root) if args.project_root else Path.cwd()
     project_root = project_root.resolve()
@@ -253,7 +167,6 @@ def cmd_find_active_work(args, printer: PrettyPrinter) -> int:
 def cmd_format_output(args, printer: PrettyPrinter) -> int:
     """Format active work as human-readable text with last-accessed task info."""
     # Cache current transcript for sdd context
-    cache_current_transcript()
 
     project_root = Path(args.project_root) if args.project_root else Path.cwd()
     project_root = project_root.resolve()
