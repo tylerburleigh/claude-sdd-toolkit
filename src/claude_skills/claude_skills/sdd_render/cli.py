@@ -11,10 +11,15 @@ from claude_skills.common import (
     PrettyPrinter
 )
 from .renderer import SpecRenderer
+from .orchestrator import AIEnhancedRenderer
 
 
 def cmd_render(args, printer: PrettyPrinter) -> int:
     """Render JSON spec to human-readable markdown.
+
+    Supports multiple rendering modes:
+    - basic: Base markdown using SpecRenderer (fast, no AI features)
+    - enhanced: AI-enhanced markdown with analysis, insights, visualizations (slower, richer output)
 
     Args:
         args: Command line arguments
@@ -23,7 +28,18 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     Returns:
         Exit code (0 for success, 1 for error)
     """
-    printer.action("Rendering spec to markdown...")
+    mode = getattr(args, 'mode', 'basic')
+    enhancement_level = getattr(args, 'enhancement_level', 'full')
+
+    if mode == 'enhanced':
+        if enhancement_level == 'summary':
+            printer.action("Rendering spec with executive summary only...")
+        elif enhancement_level == 'standard':
+            printer.action("Rendering spec with standard enhancements...")
+        else:  # full
+            printer.action("Rendering spec with full AI enhancements...")
+    else:
+        printer.action("Rendering spec to markdown...")
 
     spec_id = args.spec_id
 
@@ -34,6 +50,10 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
         try:
             with open(spec_file) as f:
                 spec_data = json.load(f)
+        except json.JSONDecodeError as e:
+            printer.error(f"Invalid JSON in spec file: {e}")
+            printer.info("The spec file contains malformed JSON. Please check the file syntax.")
+            return 1
         except Exception as e:
             printer.error(f"Failed to load spec file: {e}")
             return 1
@@ -50,6 +70,32 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
         if not spec_data:
             printer.error(f"Spec not found: {spec_id}")
             return 1
+
+    # Validate spec structure
+    if not isinstance(spec_data, dict):
+        printer.error("Invalid spec format: expected JSON object")
+        return 1
+
+    if 'hierarchy' not in spec_data:
+        printer.warning("Spec missing 'hierarchy' field - using minimal structure")
+        # Create minimal hierarchy to allow rendering
+        spec_data['hierarchy'] = {
+            'spec-root': {
+                'type': 'root',
+                'title': spec_data.get('project_metadata', {}).get('name', 'Untitled Spec'),
+                'total_tasks': 0,
+                'completed_tasks': 0
+            }
+        }
+
+    if 'spec-root' not in spec_data.get('hierarchy', {}):
+        printer.warning("Spec hierarchy missing 'spec-root' - adding default root")
+        spec_data['hierarchy']['spec-root'] = {
+            'type': 'root',
+            'title': spec_data.get('project_metadata', {}).get('name', 'Untitled Spec'),
+            'total_tasks': 0,
+            'completed_tasks': 0
+        }
 
     # Determine output path
     if args.output:
@@ -71,8 +117,54 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
 
     # Render spec to markdown
     try:
-        renderer = SpecRenderer(spec_data)
-        markdown = renderer.to_markdown()
+        # Choose renderer based on mode
+        if mode == 'enhanced':
+            # Try AI-enhanced rendering with fallback to basic
+            try:
+                # Use AI-enhanced renderer with full pipeline
+                renderer = AIEnhancedRenderer(spec_data)
+                # Enable AI features with specified enhancement level
+                markdown = renderer.render(
+                    output_format='markdown',
+                    enable_ai=True,
+                    enhancement_level=enhancement_level
+                )
+
+                if args.verbose:
+                    printer.detail("AI enhancement pipeline:")
+                    pipeline_status = renderer.get_pipeline_status()
+                    for stage, implemented in pipeline_status.items():
+                        status = "✓ Implemented" if implemented else "⧗ Planned"
+                        printer.detail(f"  - {stage}: {status}")
+
+                    printer.detail(f"Enhancement level: {enhancement_level}")
+                    if enhancement_level == 'summary':
+                        printer.detail("  Features: Executive summary only")
+                    elif enhancement_level == 'standard':
+                        printer.detail("  Features: Base markdown + narrative enhancements")
+                    else:  # full
+                        printer.detail("  Features: All AI enhancements (analysis, insights, visualizations)")
+
+            except Exception as ai_error:
+                # AI enhancement failed - fall back to basic rendering
+                printer.warning(f"AI enhancement failed: {ai_error}")
+                printer.info("Falling back to basic rendering...")
+
+                if args.debug:
+                    import traceback
+                    traceback.print_exc()
+
+                # Fallback to basic renderer
+                renderer = SpecRenderer(spec_data)
+                markdown = renderer.to_markdown()
+
+                if args.verbose:
+                    printer.detail("Fallback: Using basic SpecRenderer")
+
+        else:
+            # Use basic renderer (fast, no AI features)
+            renderer = SpecRenderer(spec_data)
+            markdown = renderer.to_markdown()
 
         # Write output
         output_path.write_text(markdown, encoding='utf-8')
@@ -83,6 +175,7 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
             total_tasks = spec_data.get('hierarchy', {}).get('spec-root', {}).get('total_tasks', 0)
             printer.detail(f"Total tasks: {total_tasks}")
             printer.detail(f"Output size: {len(markdown)} characters")
+            printer.detail(f"Rendering mode: {mode}")
 
         return 0
 
@@ -122,6 +215,20 @@ def register_render(subparsers, parent_parser):
         choices=['markdown', 'md'],
         default='markdown',
         help='Output format (currently only markdown supported)'
+    )
+
+    parser.add_argument(
+        '--mode',
+        choices=['basic', 'enhanced'],
+        default='basic',
+        help='Rendering mode: basic (fast, SpecRenderer) or enhanced (AI features, slower)'
+    )
+
+    parser.add_argument(
+        '--enhancement-level',
+        choices=['full', 'standard', 'summary'],
+        default='full',
+        help='Enhancement level for enhanced mode: full (all AI features), standard (base + narrative), summary (executive summary only)'
     )
 
     parser.set_defaults(func=cmd_render)

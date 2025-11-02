@@ -13,9 +13,14 @@ from claude_skills.common import (
     PrettyPrinter,
 )
 
+# SDD Render - Convert JSON specs to human-readable markdown
+from claude_skills.sdd_render import SpecRenderer, AIEnhancedRenderer
+
 __all__ = [
     "__version__",
     "find_specs_directory",
     "load_json_spec",
     "PrettyPrinter",
+    "SpecRenderer",
+    "AIEnhancedRenderer",
 ]

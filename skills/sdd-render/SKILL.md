@@ -21,21 +21,69 @@ Transform JSON specification files into beautifully formatted, human-readable ma
 
 ## Core Workflow
 
-**IMPORTANT: Always Ask User for Rendering Mode**
+**⚠️ CRITICAL REQUIREMENT: MANDATORY PRE-EXECUTION CHECKLIST ⚠️**
+
+Before executing ANY `sdd render` command, you MUST complete this validation:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ PRE-EXECUTION DECISION TREE (MANDATORY)                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ ❓ Has user EXPLICITLY specified a rendering mode?         │
+│    (e.g., "use basic mode", "render with full AI")         │
+│                                                             │
+│         YES ─────────┐              NO                      │
+│                      │               │                      │
+│                      │               ▼                      │
+│                      │      ✋ STOP - DO NOT RENDER YET     │
+│                      │               │                      │
+│                      │               ▼                      │
+│                      │      🔴 REQUIRED ACTION:            │
+│                      │         Use AskUserQuestion tool     │
+│                      │         to ask for mode preference   │
+│                      │               │                      │
+│                      │               ▼                      │
+│                      └──────────► ✅ Proceed with render    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**CRITICAL: Always Ask User for Rendering Mode**
 
 Unless the user has explicitly specified a rendering mode in their request, you MUST use the AskUserQuestion tool to ask which mode they want:
 
+**Example Usage:**
 ```
-Use AskUserQuestion with these options:
-- Question: "Which rendering mode would you like to use?"
-- Header: "Render Mode"
-- multiSelect: false
-- Options:
-  1. "Basic (fast, no AI)" - Quick rendering without AI features (< 2 seconds)
-  2. "Enhanced - Summary" - Executive summary with AI (~30 seconds)
-  3. "Enhanced - Standard (recommended)" - Balanced AI features (~60 seconds) [DEFAULT]
-  4. "Enhanced - Full" - Complete AI analysis (~90 seconds)
-  5. "Generate all versions for comparison" - Creates basic, standard, and full versions
+AskUserQuestion(
+  questions: [{
+    question: "Which rendering mode would you like to use?",
+    header: "Render Mode",
+    multiSelect: false,
+    options: [
+      {
+        label: "Basic (fast, no AI)",
+        description: "Quick rendering without AI features (< 2 seconds)"
+      },
+      {
+        label: "Enhanced - Summary",
+        description: "Executive summary with AI (~1-2 minutes)"
+      },
+      {
+        label: "Enhanced - Standard (recommended)",
+        description: "Balanced AI features (~3-5 minutes) [DEFAULT]"
+      },
+      {
+        label: "Enhanced - Full",
+        description: "Complete AI analysis (~5-8 minutes)"
+      },
+      {
+        label: "Generate all versions for comparison",
+        description: "Creates basic, standard, and full versions"
+      }
+    ]
+  }]
+)
 ```
 
 **When to skip asking:**
@@ -47,6 +95,69 @@ Use AskUserQuestion with these options:
 - Map user's choice to the appropriate CLI flags
 - Execute sdd render with the selected mode
 - Report the rendering time and output location
+
+---
+
+### ❌ ANTI-PATTERNS: What NOT to Do
+
+**WRONG APPROACH #1: Immediate execution without asking**
+
+```
+User: "Let's call the sdd-render skill for /path/to/spec.json"
+
+❌ Assistant: I'll render the specification file for you.
+   [Immediately executes: sdd render /path/to/spec.json]
+
+   PROBLEM: Skipped asking about rendering mode preference
+```
+
+**CORRECT APPROACH #1: Ask first, then execute**
+
+```
+User: "Let's call the sdd-render skill for /path/to/spec.json"
+
+✅ Assistant: I'll help you render that specification. First, let me ask
+   which rendering mode you'd like to use.
+   [Uses AskUserQuestion tool to present mode options]
+   [After user answers, executes with chosen mode]
+```
+
+---
+
+**WRONG APPROACH #2: Assuming default is okay**
+
+```
+User: "Can you render this spec?"
+
+❌ Assistant: I'll use the default enhanced standard mode.
+   [Executes without asking]
+
+   PROBLEM: Assumed user wants default without confirming
+```
+
+**CORRECT APPROACH #2: Explicit confirmation**
+
+```
+User: "Can you render this spec?"
+
+✅ Assistant: Which rendering mode would you prefer?
+   [Presents options with AskUserQuestion]
+   [User selects mode]
+   [Executes with selected mode]
+```
+
+---
+
+**ONLY ACCEPTABLE: User explicitly specifies mode**
+
+```
+User: "Render this spec with basic mode for speed"
+
+✅ Assistant: I'll render using basic mode as you requested.
+   [Executes: sdd render <spec-id> --mode basic]
+
+   REASON: User explicitly specified "basic mode" - no need to ask
+```
 
 **3-Phase Process:**
 
@@ -188,6 +299,10 @@ If the verification command fails, ensure the SDD toolkit is properly installed 
 
 This skill transforms JSON specs into markdown. It NEVER modifies the source specification files or any code.
 
+**MANDATORY: Pre-Execution Mode Selection**
+
+Before executing ANY render command, you MUST ask the user for their preferred rendering mode using the AskUserQuestion tool (unless the user explicitly specified a mode in their request). This is a non-negotiable requirement of the skill contract. See the Pre-Execution Decision Tree in the Core Workflow section above.
+
 **What this skill does:**
 - ✅ Reads JSON spec files from specs/active, specs/completed, specs/archived
 - ✅ Generates markdown output files
@@ -244,60 +359,64 @@ This skill transforms JSON specs into markdown. It NEVER modifies the source spe
 
 ## Quick Start
 
-**Default Rendering (Recommended):**
+**Execution Workflow:**
 
-The simplest command uses AI-enhanced rendering with balanced features (~60 seconds):
+1. **Ask user for mode preference** (unless they explicitly specified):
+   - Use AskUserQuestion tool (see example in Core Workflow section above)
+   - Present the 5 mode options
 
-```bash
-sdd render {spec-id}
-# Uses: Enhanced mode with standard level (default)
-```
+2. **Execute the appropriate command** based on user's answer:
 
-**Fast Rendering (When Speed Matters):**
+   **If user chose "Basic (fast, no AI)":**
+   ```bash
+   sdd render {spec-id} --mode basic
+   # ~2 seconds
+   ```
 
-For quick status checks without AI features (< 2 seconds):
+   **If user chose "Enhanced - Summary":**
+   ```bash
+   sdd render {spec-id} --enhancement-level summary
+   # ~1-2 minutes
+   ```
 
-```bash
-sdd render {spec-id} --mode basic
-```
+   **If user chose "Enhanced - Standard" (or didn't specify):**
+   ```bash
+   sdd render {spec-id}
+   # Default: enhanced mode with standard level (~3-5 minutes)
+   ```
 
-**Full AI Analysis (Maximum Detail):**
+   **If user chose "Enhanced - Full":**
+   ```bash
+   sdd render {spec-id} --enhancement-level full
+   # ~5-8 minutes
+   ```
 
-For comprehensive insights and visualizations (~90 seconds):
+   **If user chose "Generate all versions for comparison":**
+   ```bash
+   # Generate all three versions with different output names
+   sdd render {spec-id} --mode basic -o specs/.human-readable/{spec-id}-basic.md
+   sdd render {spec-id} --enhancement-level standard -o specs/.human-readable/{spec-id}-standard.md
+   sdd render {spec-id} --enhancement-level full -o specs/.human-readable/{spec-id}-full.md
+   ```
 
-```bash
-sdd render {spec-id} --enhancement-level full
-```
-
-**Basic 3-Step Workflow:**
-
-1. **Render** → Convert JSON spec to markdown (with AI enhancements by default)
-```bash
-sdd render {spec-id}
-```
-
-2. **View** → Open the generated markdown
-```bash
-cat specs/.human-readable/{spec-id}.md
-# or
-less specs/.human-readable/{spec-id}.md
-```
-
-3. **Share** → Copy to docs or send to team
-```bash
-cp specs/.human-readable/{spec-id}.md docs/planning/project-status.md
-```
+3. **Report results** to the user (output location and any relevant information)
 
 **Output Location:**
 By default, rendered markdown is saved to `specs/.human-readable/{spec-id}.md`
 
-**Choosing Your Mode:**
-- **No flags (default)** → Enhanced standard (~60s) - Best for most use cases
-- **--mode basic** → Fast, no AI (~2s) - For quick checks
-- **--enhancement-level summary** → Light AI (~30s) - For executive summaries
-- **--enhancement-level full** → Complete AI (~90s) - For comprehensive analysis
+**Mode Options for AskUserQuestion:**
 
-See the [AI Enhancement Modes](#ai-enhancement-modes) section below for detailed comparison.
+Present these 5 options to the user:
+
+| Option Label | CLI Command | Use Case |
+|-------------|-------------|----------|
+| "Basic (fast, no AI)" | `--mode basic` | Quick status checks (~2s) |
+| "Enhanced - Summary" | `--enhancement-level summary` | Executive summaries (~1-2 min) |
+| "Enhanced - Standard (recommended)" | (default, no flags needed) | Most use cases (~3-5 min) [DEFAULT] |
+| "Enhanced - Full" | `--enhancement-level full` | Comprehensive analysis (~5-8 min) |
+| "Generate all versions for comparison" | Multiple commands with different `-o` paths | Side-by-side comparison |
+
+See the [AI Enhancement Modes](#ai-enhancement-modes) section below for detailed feature comparison.
 
 ---
 
@@ -406,7 +525,7 @@ The sdd-render skill supports multiple rendering modes to balance speed and feat
 ### Mode Overview
 
 **Default Rendering:**
-When you run `sdd render {spec-id}` without any flags, it uses **Enhanced Mode with Standard level** for balanced performance and features (~60 seconds).
+When you run `sdd render {spec-id}` without any flags, it uses **Enhanced Mode with Standard level** for balanced performance and features (~3-5 minutes).
 
 **Two primary modes:**
 
@@ -421,7 +540,7 @@ When you run `sdd render {spec-id}` without any flags, it uses **Enhanced Mode w
    - AI-powered analysis and insights
    - Uses external AI CLI tools (gemini, cursor-agent, codex)
    - Requires `--enhancement-level` parameter (defaults to `standard` if omitted)
-   - Typical rendering time: 30-90 seconds depending on level
+   - Typical rendering time: 1-8 minutes depending on level
    - Automatically falls back to basic mode if AI tools unavailable
 
 ### Enhancement Levels
@@ -430,9 +549,9 @@ When using `--mode enhanced`, specify one of three enhancement levels:
 
 | Level | Features | Performance | Best For |
 |-------|----------|-------------|----------|
-| **summary** | Executive summary only | ~30 seconds | Quick AI overview for stakeholders |
-| **standard** | Base features + narrative enhancement | ~60 seconds | Team reviews and status reports |
-| **full** | All AI features (insights, visualizations, analysis) | ~90 seconds | Comprehensive documentation and planning |
+| **summary** | Executive summary only | ~1-2 minutes | Quick AI overview for stakeholders |
+| **standard** | Base features + narrative enhancement | ~3-5 minutes | Team reviews and status reports |
+| **full** | All AI features (insights, visualizations, analysis) | ~5-8 minutes | Comprehensive documentation and planning |
 
 ### Feature Comparison
 
@@ -537,7 +656,7 @@ ls -lh specs/.human-readable/${SPEC_ID}-*.md
 **Override to Enhanced Summary when:**
 - Stakeholders need high-level AI overview only
 - Executive reporting required (lighter than standard)
-- Want faster than standard (~30 vs ~60 seconds)
+- Want faster than standard (~1-2 minutes vs ~3-5 minutes)
 - AI-generated executive summary is the primary value
 - Quick decision-making with AI context
 
@@ -547,7 +666,7 @@ ls -lh specs/.human-readable/${SPEC_ID}-*.md
 - Visual dependency graphs are valuable
 - Archiving/documentation purposes (one-time comprehensive render)
 - New team member onboarding (detailed explanations helpful)
-- Performance not critical (~90 seconds acceptable)
+- Performance not critical (~5-8 minutes acceptable)
 - Maximum information density desired
 
 ### Interactive Mode Selection
@@ -559,9 +678,9 @@ The skill will proactively ask you which rendering mode you prefer using an inte
 ```
 Which rendering mode would you like to use?
 ○ Basic (fast, < 2 seconds, no AI)
-○ Enhanced - Summary (executive summary, ~30 seconds)
-○ Enhanced - Standard (recommended, balanced, ~60 seconds) ← default
-○ Enhanced - Full (comprehensive analysis, ~90 seconds)
+○ Enhanced - Summary (executive summary, ~1-2 minutes)
+○ Enhanced - Standard (recommended, balanced, ~3-5 minutes) ← default
+○ Enhanced - Full (comprehensive analysis, ~5-8 minutes)
 ```
 
 **Benefits of interactive selection:**
@@ -598,9 +717,9 @@ Enhanced mode uses external CLI tools for AI processing:
 
 **Rendering Times:**
 - Basic: < 2 seconds (deterministic, no network calls)
-- Enhanced (summary): ~30 seconds (one AI call for executive summary)
-- Enhanced (standard): ~60 seconds (summary + narrative enhancement)
-- Enhanced (full): ~90 seconds (all AI features, multiple analysis passes)
+- Enhanced (summary): ~1-2 minutes (one AI call for executive summary)
+- Enhanced (standard): ~3-5 minutes (summary + narrative enhancement)
+- Enhanced (full): ~5-8 minutes (all AI features, multiple analysis passes)
 
 **Network Requirements:**
 - Basic mode: No network required
@@ -806,16 +925,16 @@ Directly render a JSON file by providing its full path
 
 - `--mode basic` - Disables AI features for fast rendering (< 2 seconds)
 - `--mode enhanced` - Enables AI features (default, can be omitted)
-- `--enhancement-level summary` - Executive summary only (~30 seconds)
-- `--enhancement-level standard` - Balanced AI features (default, ~60 seconds)
-- `--enhancement-level full` - All AI features including visualizations (~90 seconds)
+- `--enhancement-level summary` - Executive summary only (~1-2 minutes)
+- `--enhancement-level standard` - Balanced AI features (default, ~3-5 minutes)
+- `--enhancement-level full` - All AI features including visualizations (~5-8 minutes)
 
 ### Examples
 
 **Render with default settings (enhanced standard):**
 ```bash
 sdd render user-auth-2025-10-24-001
-# Uses: mode=enhanced, level=standard (~60 seconds)
+# Uses: mode=enhanced, level=standard (~3-5 minutes)
 ```
 
 **Fast render without AI (basic mode):**
@@ -827,13 +946,13 @@ sdd render user-auth-2025-10-24-001 --mode basic
 **Executive summary only:**
 ```bash
 sdd render user-auth-2025-10-24-001 --enhancement-level summary
-# Lighter AI enhancement (~30 seconds)
+# Lighter AI enhancement (~1-2 minutes)
 ```
 
 **Full AI analysis:**
 ```bash
 sdd render user-auth-2025-10-24-001 --enhancement-level full
-# Maximum features (~90 seconds)
+# Maximum features (~5-8 minutes)
 ```
 
 **Render to custom location:**
@@ -1465,9 +1584,9 @@ Performance depends on the enhancement level chosen:
 | Mode | Small Spec | Medium Spec | Large Spec | Very Large Spec |
 |------|-----------|-------------|------------|-----------------|
 | Basic (no AI) | < 100ms | < 500ms | < 2s | < 5s |
-| Enhanced (summary) | ~25s | ~30s | ~35s | ~40s |
-| Enhanced (standard) | ~55s | ~60s | ~70s | ~80s |
-| Enhanced (full) | ~85s | ~90s | ~100s | ~120s |
+| Enhanced (summary) | ~1 min | ~1.5 min | ~2 min | ~2.5 min |
+| Enhanced (standard) | ~3 min | ~4 min | ~5 min | ~6 min |
+| Enhanced (full) | ~5 min | ~6 min | ~7 min | ~8 min |
 
 **Note:** Enhanced mode times are dominated by AI processing rather than spec size, so scaling is relatively flat.
 
@@ -1519,7 +1638,7 @@ sdd render my-spec-001 --enhancement-level full --output docs/comprehensive.md
 **Default Behavior:**
 - Mode: Enhanced (can be changed with `--mode basic`)
 - Level: Standard (can be changed with `--enhancement-level`)
-- Estimated time: ~60 seconds for most specs
+- Estimated time: ~3-5 minutes for most specs
 
 **AI Tooling:**
 AI enhancements use external CLI tools via subprocess. The default priority order is:
