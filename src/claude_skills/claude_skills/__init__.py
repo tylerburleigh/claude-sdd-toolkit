@@ -3,7 +3,14 @@
 A professional Python package for SDD workflows.
 """
 
-__version__ = "0.1.0"
+# Get version from installed package metadata
+try:
+    from importlib.metadata import version
+    __version__ = version("claude-skills")
+except Exception:
+    # Fallback if package not installed (development mode)
+    __version__ = "0.0.0-dev"
+
 __author__ = "Claude Code Team"
 
 # Export commonly used functions for convenience

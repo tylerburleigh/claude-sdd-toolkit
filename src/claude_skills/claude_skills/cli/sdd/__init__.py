@@ -13,6 +13,15 @@ from claude_skills.cli.sdd.options import add_global_options, create_global_pare
 from claude_skills.cli.sdd.registry import register_all_subcommands
 
 
+def _get_version():
+    """Get package version from metadata."""
+    try:
+        from importlib.metadata import version
+        return version('claude-skills')
+    except Exception:
+        return '0.0.0-dev'
+
+
 def reorder_args_for_subcommand(cmd_line):
     """
     Reorder command line arguments to support global options anywhere.
@@ -146,6 +155,10 @@ def main():
         description='Spec-Driven Development unified CLI',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
+
+    # Add version flag
+    parser.add_argument('--version', action='version',
+                        version=f'%(prog)s {_get_version()}')
 
     # Add global options to main parser so they work in any position
     add_global_options(parser)

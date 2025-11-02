@@ -50,6 +50,59 @@ except:
 }
 
 # =============================================================================
+# VERSION CHECKING
+# =============================================================================
+
+check_version_mismatch() {
+    python3 <<'EOF'
+import json
+import re
+import sys
+
+try:
+    # Get installed package version
+    try:
+        from importlib.metadata import version
+        installed_version = version('claude-skills')
+    except Exception:
+        # Package not installed - skip check
+        sys.exit(0)
+
+    # Get plugin version from pyproject.toml
+    import os
+    plugin_root = os.environ.get('CLAUDE_PLUGIN_ROOT', '')
+    if not plugin_root:
+        sys.exit(0)
+
+    pyproject_path = f"{plugin_root}/src/claude_skills/pyproject.toml"
+
+    try:
+        with open(pyproject_path, 'r') as f:
+            content = f.read()
+            match = re.search(r'version\s*=\s*"([^"]+)"', content)
+            plugin_version = match.group(1) if match else None
+    except Exception:
+        # Can't read plugin version - skip check
+        sys.exit(0)
+
+    # Compare versions
+    if installed_version != plugin_version:
+        result = {
+            "mismatch": True,
+            "installed": installed_version,
+            "plugin": plugin_version
+        }
+        print(json.dumps(result))
+    else:
+        print(json.dumps({"mismatch": False}))
+
+except Exception as e:
+    # On any error, silently skip check
+    print(json.dumps({"mismatch": False, "error": str(e)}))
+EOF
+}
+
+# =============================================================================
 # PERMISSION CHECKING
 # =============================================================================
 
@@ -180,6 +233,28 @@ main() {
 
     # Clean up old marker files
     cleanup_old_markers
+
+    # Check for version mismatch (always check, regardless of auto-offer setting)
+    local version_check_result=$(check_version_mismatch 2>/dev/null || echo '{"mismatch":false}')
+    local version_mismatch=$(echo "$version_check_result" | python3 -c "import json, sys; data = json.load(sys.stdin); print('true' if data.get('mismatch', False) else 'false')" 2>/dev/null || echo "false")
+
+    # If version mismatch, show warning and exit (this takes priority)
+    if [ "$version_mismatch" = "true" ]; then
+        local installed_ver=$(echo "$version_check_result" | python3 -c "import json, sys; print(json.load(sys.stdin).get('installed', 'unknown'))" 2>/dev/null || echo "unknown")
+        local plugin_ver=$(echo "$version_check_result" | python3 -c "import json, sys; print(json.load(sys.stdin).get('plugin', 'unknown'))" 2>/dev/null || echo "unknown")
+
+        # Output JSON for Claude to read
+        cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "Plugin version $plugin_ver detected, but installed Python package is $installed_ver"
+  },
+  "systemMessage": "⚠️  Plugin updated to v$plugin_ver but Python package is v$installed_ver. Reinstall: cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills && pip install -e ."
+}
+EOF
+        exit 0
+    fi
 
     # Check if auto-offer is enabled
     if [ "$(is_auto_offer_enabled)" != "true" ]; then

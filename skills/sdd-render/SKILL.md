@@ -5,8 +5,6 @@ description: Render JSON specs to human-readable markdown with AI-enhanced insig
 
 # Spec Rendering Skill
 
-Base directory for this skill: /home/tyler/.claude/plugins/cache/sdd-toolkit/skills/sdd-render
-
 ## Overview
 
 Transform JSON specification files into beautifully formatted, human-readable markdown documentation. The sdd-render skill bridges the gap between machine-readable specs and human comprehension, making it easy to review progress, share status, and understand project structure at a glance.
