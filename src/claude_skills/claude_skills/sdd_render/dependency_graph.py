@@ -106,7 +106,8 @@ class DependencyGraphGenerator:
                       phase_filter: Optional[str] = None,
                       highlight_critical_path: bool = True,
                       show_status: bool = True,
-                      simplify: bool = False) -> str:
+                      simplify: bool = False,
+                      group_by_phase: bool = False) -> str:
         """Generate Mermaid graph syntax.
 
         Args:
@@ -115,6 +116,7 @@ class DependencyGraphGenerator:
             highlight_critical_path: Emphasize critical path tasks
             show_status: Apply status-based styling
             simplify: Show only major tasks (skip subtasks)
+            group_by_phase: Group tasks by phase (currently ignored for compatibility)
 
         Returns:
             Mermaid diagram syntax as string
@@ -154,28 +156,69 @@ class DependencyGraphGenerator:
             critical_path = self.analyzer.get_critical_path()
             critical_path_set = set(critical_path)
 
-        # Generate nodes
-        for task_id in tasks:
-            task_data = self.hierarchy.get(task_id, {})
-            node_line = self._generate_node(
-                task_id,
-                task_data,
-                in_critical_path=task_id in critical_path_set
-            )
-            if node_line:
-                lines.append(f"    {node_line}")
+        # If grouping by phase, organize tasks by their phase
+        if group_by_phase:
+            phases = [t for t in tasks if self.hierarchy.get(t, {}).get('type') == 'phase']
 
-        # Generate edges
-        for task_id in tasks:
-            deps = self.task_graph.get(task_id, [])
-            for dep_id in deps:
-                if dep_id in tasks:  # Only show edge if both nodes visible
-                    edge_line = self._generate_edge(
-                        task_id,
-                        dep_id,
-                        is_critical=task_id in critical_path_set and dep_id in critical_path_set
-                    )
-                    lines.append(f"    {edge_line}")
+            for phase_id in phases:
+                phase_data = self.hierarchy.get(phase_id, {})
+                phase_title = phase_data.get('title', phase_id)
+
+                # Start subgraph for this phase
+                lines.append(f"    subgraph {phase_id} [\"{phase_title}\"]")
+
+                # Get tasks in this phase
+                phase_tasks = phase_data.get('children', [])
+
+                # Generate nodes for tasks in this phase
+                for task_id in phase_tasks:
+                    if task_id in tasks:
+                        task_data = self.hierarchy.get(task_id, {})
+                        node_line = self._generate_node(
+                            task_id,
+                            task_data,
+                            in_critical_path=task_id in critical_path_set
+                        )
+                        if node_line:
+                            lines.append(f"        {node_line}")
+
+                # End subgraph
+                lines.append("    end")
+
+            # Generate all edges (outside subgraphs)
+            for task_id in tasks:
+                deps = self.task_graph.get(task_id, [])
+                for dep_id in deps:
+                    if dep_id in tasks:
+                        edge_line = self._generate_edge(
+                            task_id,
+                            dep_id,
+                            is_critical=task_id in critical_path_set and dep_id in critical_path_set
+                        )
+                        lines.append(f"    {edge_line}")
+        else:
+            # Generate nodes (no grouping)
+            for task_id in tasks:
+                task_data = self.hierarchy.get(task_id, {})
+                node_line = self._generate_node(
+                    task_id,
+                    task_data,
+                    in_critical_path=task_id in critical_path_set
+                )
+                if node_line:
+                    lines.append(f"    {node_line}")
+
+            # Generate edges
+            for task_id in tasks:
+                deps = self.task_graph.get(task_id, [])
+                for dep_id in deps:
+                    if dep_id in tasks:  # Only show edge if both nodes visible
+                        edge_line = self._generate_edge(
+                            task_id,
+                            dep_id,
+                            is_critical=task_id in critical_path_set and dep_id in critical_path_set
+                        )
+                        lines.append(f"    {edge_line}")
 
         # Apply styling
         if show_status:
@@ -185,6 +228,16 @@ class DependencyGraphGenerator:
         lines.append("```")
 
         return "\n".join(lines)
+
+    def generate(self, **kwargs) -> str:
+        """Alias for generate_graph() for backward compatibility.
+
+        Accepts all the same parameters as generate_graph().
+
+        Returns:
+            Mermaid diagram syntax as string
+        """
+        return self.generate_graph(**kwargs)
 
     def generate_phase_graph(self, phase_id: str) -> str:
         """Generate graph for a specific phase.

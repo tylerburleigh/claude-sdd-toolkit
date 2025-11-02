@@ -342,6 +342,20 @@ class ComplexityScorer:
             rationale=rationale
         )
 
+    def calculate_complexity(self, task_id: str) -> ComplexityScore:
+        """Alias for score_task() for backward compatibility.
+
+        Args:
+            task_id: Task identifier
+
+        Returns:
+            ComplexityScore object with score and breakdown
+
+        Raises:
+            KeyError: If task_id not found in hierarchy
+        """
+        return self.score_task(task_id)
+
     def score_all_tasks(self, status_filter: Optional[str] = None) -> List[Tuple[str, ComplexityScore]]:
         """Score all tasks in the spec.
 

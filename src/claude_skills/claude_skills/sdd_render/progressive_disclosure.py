@@ -85,27 +85,27 @@ class DetailLevelCalculator:
 
     def __init__(
         self,
-        spec_data: Dict[str, Any],
+        spec_data: Optional[Dict[str, Any]] = None,
         priority_ranker: Optional[Any] = None,
         user_focus: Optional[str] = None
     ):
         """Initialize detail level calculator.
 
         Args:
-            spec_data: Complete JSON spec dictionary
+            spec_data: Optional complete JSON spec dictionary (defaults to empty dict)
             priority_ranker: Optional PriorityRanker instance
             user_focus: Optional user focus (e.g., "phase-2", "authentication")
         """
-        self.spec_data = spec_data
-        self.hierarchy = spec_data.get('hierarchy', {})
+        self.spec_data = spec_data or {}
+        self.hierarchy = self.spec_data.get('hierarchy', {})
         self.priority_ranker = priority_ranker
         self.user_focus = user_focus
 
-    def calculate_detail_level(self, task_id: str) -> DetailLevel:
+    def calculate_detail_level(self, task_id_or_context) -> DetailLevel:
         """Calculate appropriate detail level for a task.
 
         Args:
-            task_id: Task identifier
+            task_id_or_context: Either a task identifier string or a DetailContext object
 
         Returns:
             DetailLevel enum (SUMMARY, MEDIUM, or FULL)
@@ -115,11 +115,18 @@ class DetailLevelCalculator:
             >>> level = calculator.calculate_detail_level("task-2-1")
             >>> print(level)
             DetailLevel.FULL
-        """
-        task_data = self.hierarchy.get(task_id, {})
 
-        # Build context
-        context = self._build_context(task_id, task_data)
+            >>> context = DetailContext(task_status='in_progress', priority_score=5.0, ...)
+            >>> level = calculator.calculate_detail_level(context)
+        """
+        # Check if argument is a DetailContext object or a task_id string
+        if isinstance(task_id_or_context, DetailContext):
+            context = task_id_or_context
+        else:
+            task_id = task_id_or_context
+            task_data = self.hierarchy.get(task_id, {})
+            # Build context
+            context = self._build_context(task_id, task_data)
 
         # Calculate detail level using rules
         return self._apply_detail_rules(context)
