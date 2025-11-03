@@ -26,7 +26,7 @@ from .git_commit import (
     generate_commit_message,
     stage_and_commit,
 )
-from claude_skills.common.git_metadata import add_commit_metadata
+from claude_skills.common.git_metadata import add_commit_metadata, show_commit_preview_and_wait
 
 
 def _get_timestamp() -> str:
