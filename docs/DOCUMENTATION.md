@@ -1,20 +1,20 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 09:24:59
+**Generated:** 2025-11-03 09:49:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 68211
+- **Total Lines:** 68227
 - **Total Classes:** 268
 - **Total Functions:** 756
-- **Avg Complexity:** 5.59
-- **Max Complexity:** 43
+- **Avg Complexity:** 5.6
+- **Max Complexity:** 44
 - **High Complexity Functions:**
-  - complete_task_workflow (43)
+  - complete_task_workflow (44)
   - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
@@ -5535,7 +5535,7 @@ Returns:
 ### `_bump_version(current_version, bump) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:122`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:123`
 **Complexity:** 5
 
 **Description:**
@@ -5550,7 +5550,7 @@ Returns:
 ### `_calculate_diff(before, after, task_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:255`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:256`
 **Complexity:** 8
 
 **Parameters:**
@@ -5669,7 +5669,7 @@ Returns:
 ### `_derive_default_journal(task_id, task_title, actual_hours, note) -> Tuple[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:104`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:105`
 **Complexity:** 4
 
 **Parameters:**
@@ -6076,7 +6076,7 @@ Returns:
 ### `_get_timestamp() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:32`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:33`
 **Complexity:** 1
 
 ---
@@ -6165,7 +6165,7 @@ Returns True if any of the following conditions are met:
 ### `_journal_completed_parents(spec_id, task_id, specs_dir, author, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:36`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:37`
 **Complexity:** 10
 
 **Description:**
@@ -6278,7 +6278,7 @@ Args:
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:303`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:304`
 **Complexity:** 8
 
 **Parameters:**
@@ -6524,7 +6524,7 @@ Returns:
 ### `_simulate_workflow(state, task_id, actual_hours, note, journal_title, journal_content, journal_entry_type, author, revision_version, revision_changes) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:147`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:148`
 ⚠️ **Complexity:** 16 (High)
 
 **Parameters:**
@@ -9622,8 +9622,8 @@ Returns:
 ### `complete_task_workflow() -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:327`
-⚠️ **Complexity:** 43 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:328`
+⚠️ **Complexity:** 44 (High)
 
 **Description:**
 > Complete a task with optional journaling, time tracking, and revision updates.
@@ -20726,7 +20726,9 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_update/workflow.py`
 
 - `__future__.annotations`
+- `claude_skills.common.git_config.load_git_config`
 - `claude_skills.common.git_metadata.add_commit_metadata`
+- `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.git_metadata.show_commit_preview_and_wait`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
