@@ -327,13 +327,13 @@ def cmd_next_task(args, printer):
     task_id, task_data = next_task
 
     if args.json:
-        print(json.dumps({
+        print_json_output({
             "task_id": task_id,
             "title": task_data.get("title", ""),
             "status": task_data.get("status", ""),
             "file_path": task_data.get("metadata", {}).get("file_path", ""),
             "estimated_hours": task_data.get("metadata", {}).get("estimated_hours", 0)
-        }, indent=2))
+        }, compact=args.compact)
     else:
         printer.success("Next task identified")
         printer.result("Task ID", task_id)
@@ -1100,6 +1100,7 @@ def register_next(subparsers, parent_parser):
     # next-task
     parser_next = subparsers.add_parser('next-task', parents=[parent_parser], help='Find next actionable task')
     parser_next.add_argument('spec_id', help='Specification ID')
+    parser_next.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_next.set_defaults(func=cmd_next_task)
 
     # task-info
