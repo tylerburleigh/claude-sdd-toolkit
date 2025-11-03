@@ -407,4 +407,32 @@ def register_start_helper(subparsers, parent_parser):
     )
     setup_git.add_argument('project_root', nargs='?', help='Project root directory')
     setup_git.add_argument('--force', action='store_true', help='Force reconfiguration')
+    setup_git.add_argument('--non-interactive', action='store_true',
+                          help='Non-interactive mode - use CLI flags or defaults')
+    setup_git.add_argument('--enabled', action='store_true', default=None,
+                          help='Enable git integration (default: True in non-interactive mode)')
+    setup_git.add_argument('--no-enabled', dest='enabled', action='store_false',
+                          help='Disable git integration')
+    setup_git.add_argument('--auto-branch', action='store_true', default=None,
+                          help='Auto-create feature branches (default: True)')
+    setup_git.add_argument('--no-auto-branch', dest='auto_branch', action='store_false',
+                          help='Disable auto-branch')
+    setup_git.add_argument('--auto-commit', action='store_true', default=None,
+                          help='Auto-commit on task completion (default: True)')
+    setup_git.add_argument('--no-auto-commit', dest='auto_commit', action='store_false',
+                          help='Disable auto-commit')
+    setup_git.add_argument('--auto-push', action='store_true', default=None,
+                          help='Auto-push to remote (default: False)')
+    setup_git.add_argument('--no-auto-push', dest='auto_push', action='store_false',
+                          help='Disable auto-push')
+    setup_git.add_argument('--commit-cadence', choices=['task', 'phase', 'manual'],
+                          help='When to commit: task, phase, or manual (default: task)')
+    setup_git.add_argument('--show-files', action='store_true', default=None,
+                          help='Show files before commit (default: True)')
+    setup_git.add_argument('--no-show-files', dest='show_files', action='store_false',
+                          help='Do not show files before commit')
+    setup_git.add_argument('--ai-pr', action='store_true', default=None,
+                          help='Enable AI-powered PRs (default: True, always uses sonnet model)')
+    setup_git.add_argument('--no-ai-pr', dest='ai_pr', action='store_false',
+                          help='Disable AI-powered PRs')
     setup_git.set_defaults(func=cmd_setup_git_config)

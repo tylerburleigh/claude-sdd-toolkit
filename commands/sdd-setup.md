@@ -137,29 +137,125 @@ Use AskUserQuestion tool:
 
 **If user chooses "Yes, configure now":**
 
-Run the interactive setup wizard:
+Gather all git configuration preferences using AskUserQuestion (you can ask up to 4 questions at once):
+
+**Question Set 1 (Required):**
+- **Header**: "Git Features"
+- **Question**: "Enable git integration?"
+- **Options**:
+  1. Yes, enable (recommended)
+  2. No, disable
+
+**If user chooses "No, disable":**
+
+Write minimal config and skip to Step 5:
 ```bash
-sdd skills-dev setup-git-config .
+sdd skills-dev start-helper setup-git-config . --non-interactive --no-enabled
 ```
 
-The wizard will ask questions about:
-- Enable git integration? (yes/no)
-- Auto-branch on task start? (yes/no)
-- Auto-commit on task completion? (yes/no)
-- Commit cadence? (task/phase/manual)
-- Show files before commit? (yes/no)
-- Auto-push to remote? (yes/no)
-- Enable AI-powered PRs? (yes/no)
-- AI model for PRs? (sonnet/haiku/opus)
+Display:
+```
+✅ Git integration disabled. Config saved to .claude/git_config.json
+```
 
-Configuration will be saved to `.claude/git_config.json`
+Then proceed to Step 5.
+
+**If user chooses "Yes, enable":**
+
+Ask the remaining configuration questions (you can ask all 4 in one AskUserQuestion call):
+
+**Question 2:**
+- **Header**: "Auto Branch"
+- **Question**: "Auto-create feature branches when starting specs?"
+- **Options**:
+  1. Yes (recommended)
+  2. No
+
+**Question 3:**
+- **Header**: "Auto Commit"
+- **Question**: "Auto-commit changes when completing tasks?"
+- **Options**:
+  1. Yes (recommended)
+  2. No
+
+**Question 4 (only if auto-commit is Yes):**
+- **Header**: "Commit When"
+- **Question**: "When should commits be created?"
+- **Options**:
+  1. Per task (recommended)
+  2. Per phase
+  3. Manually
+
+**Additional Questions (if needed, ask in next batch):**
+
+**Question 5:**
+- **Header**: "File Review"
+- **Question**: "Show files for review before committing?"
+- **Options**:
+  1. Yes (recommended)
+  2. No
+
+**Question 6:**
+- **Header**: "Auto Push"
+- **Question**: "⚠️ Auto-push commits to remote? (Use with caution)"
+- **Options**:
+  1. No (recommended)
+  2. Yes
+
+**Question 7:**
+- **Header**: "AI PRs"
+- **Question**: "Enable AI-powered pull request creation?"
+- **Options**:
+  1. Yes (recommended)
+  2. No
+
+After gathering all answers, build the CLI command with flags (always use sonnet model for AI PRs):
+
+```bash
+sdd skills-dev start-helper setup-git-config . --non-interactive \
+  --enabled \
+  [--auto-branch OR --no-auto-branch] \
+  [--auto-commit OR --no-auto-commit] \
+  --commit-cadence [task|phase|manual] \
+  [--show-files OR --no-show-files] \
+  [--auto-push OR --no-auto-push] \
+  [--ai-pr OR --no-ai-pr]
+```
+
+**Example command:**
+```bash
+sdd skills-dev start-helper setup-git-config . --non-interactive \
+  --enabled \
+  --auto-branch \
+  --auto-commit \
+  --commit-cadence task \
+  --show-files \
+  --no-auto-push \
+  --ai-pr
+```
+
+Note: AI PRs always use the Sonnet model for optimal balance of quality and speed.
+
+After the command completes successfully, check the return code:
+- **Exit code 0**: Success - proceed to Step 5
+- **Exit code non-zero**: Error - display error message and provide manual instructions
+
+**On error:**
+```
+❌ Failed to save git configuration.
+
+You can manually create .claude/git_config.json or run:
+  sdd skills-dev start-helper setup-git-config . --force
+
+See error output above for details.
+```
 
 **If user chooses "No, skip for now":**
 
 Display message and proceed to Step 5:
 ```
 ⏭️  Skipping git configuration. You can configure it later by running:
-   sdd skills-dev setup-git-config .
+   sdd skills-dev start-helper setup-git-config .
 ```
 
 ### Step 5: Show Success & Next Steps

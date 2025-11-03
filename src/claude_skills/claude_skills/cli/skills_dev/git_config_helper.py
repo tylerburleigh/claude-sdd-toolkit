@@ -161,9 +161,20 @@ def cmd_check_git_config(args, printer: PrettyPrinter) -> int:
 
 
 def ask_yes_no(question: str, default: bool = True) -> bool:
-    """Ask a yes/no question and return boolean answer."""
+    """Ask a yes/no question and return boolean answer.
+
+    Raises:
+        EOFError: If input is not available (non-interactive context)
+    """
+    # Check if stdin is a TTY
+    if not sys.stdin.isatty():
+        raise EOFError("Cannot read input in non-interactive context")
+
     default_str = "Y/n" if default else "y/N"
-    response = input(f"{question} [{default_str}]: ").strip().lower()
+    try:
+        response = input(f"{question} [{default_str}]: ").strip().lower()
+    except EOFError:
+        raise EOFError("Cannot read input in non-interactive context")
 
     if not response:
         return default
@@ -172,14 +183,25 @@ def ask_yes_no(question: str, default: bool = True) -> bool:
 
 
 def ask_choice(question: str, choices: list, default: str) -> str:
-    """Ask a multiple choice question."""
+    """Ask a multiple choice question.
+
+    Raises:
+        EOFError: If input is not available (non-interactive context)
+    """
+    # Check if stdin is a TTY
+    if not sys.stdin.isatty():
+        raise EOFError("Cannot read input in non-interactive context")
+
     print(f"\n{question}")
     for i, choice in enumerate(choices, 1):
         marker = "*" if choice == default else " "
         print(f"  {marker} {i}) {choice}")
 
     while True:
-        response = input(f"Choice [1-{len(choices)}] (default: {default}): ").strip()
+        try:
+            response = input(f"Choice [1-{len(choices)}] (default: {default}): ").strip()
+        except EOFError:
+            raise EOFError("Cannot read input in non-interactive context")
 
         if not response:
             return default
@@ -195,12 +217,19 @@ def ask_choice(question: str, choices: list, default: str) -> str:
 
 
 def cmd_setup_git_config(args, printer: PrettyPrinter) -> int:
-    """Interactive git configuration wizard."""
+    """Interactive git configuration wizard.
+
+    Supports both interactive (terminal) and non-interactive (CLI flags) modes.
+    """
     project_path = Path(args.project_root).resolve()
     git_config_file = project_path / ".claude" / "git_config.json"
 
     # Create .claude directory if it doesn't exist
-    git_config_file.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        git_config_file.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        printer.error(f"Failed to create .claude directory: {e}")
+        return 1
 
     # Check if config already exists
     exists, enabled, needs_setup = detect_git_config_state(project_path)
@@ -211,6 +240,95 @@ def cmd_setup_git_config(args, printer: PrettyPrinter) -> int:
             printer.info("Use --force to reconfigure")
             return 0
 
+    # Determine if we're in non-interactive mode
+    non_interactive = getattr(args, 'non_interactive', False) or not sys.stdin.isatty()
+
+    # In non-interactive mode, use CLI args or defaults
+    if non_interactive:
+        return _setup_non_interactive(args, printer, git_config_file)
+
+    # Interactive mode - use wizard
+    try:
+        return _setup_interactive(args, printer, git_config_file)
+    except EOFError:
+        printer.error("")
+        printer.error("Error: Cannot run interactive wizard in non-interactive context")
+        printer.error("")
+        printer.error("Please use one of these options:")
+        printer.error("  1. Run with --non-interactive flag to use defaults")
+        printer.error("  2. Pass configuration as CLI flags (see --help)")
+        printer.error("  3. Run this command in an interactive terminal")
+        printer.error("")
+        return 1
+
+
+def _setup_non_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> int:
+    """Set up git config in non-interactive mode using CLI flags or defaults."""
+    printer.info("Running git setup in non-interactive mode...")
+
+    config = {}
+
+    # Use CLI args if provided, otherwise use defaults
+    config["enabled"] = getattr(args, 'enabled', True)
+
+    if not config["enabled"]:
+        # Git disabled - write minimal config
+        try:
+            with open(git_config_file, 'w') as f:
+                json.dump({"enabled": False}, f, indent=2)
+                f.write('\n')
+            printer.success(f"Git integration disabled. Config saved to {git_config_file}")
+            return 0
+        except (IOError, OSError) as e:
+            printer.error(f"Failed to write config file: {e}")
+            return 1
+
+    # Build full config from args or defaults
+    config["auto_branch"] = getattr(args, 'auto_branch', True)
+    config["auto_commit"] = getattr(args, 'auto_commit', True)
+    config["auto_push"] = getattr(args, 'auto_push', False)
+    config["commit_cadence"] = getattr(args, 'commit_cadence', 'task')
+
+    config["file_staging"] = {
+        "show_before_commit": getattr(args, 'show_files', True)
+    }
+
+    ai_pr_enabled = getattr(args, 'ai_pr', True)
+    # Always use sonnet for AI PRs - it's the best balance of quality and speed
+    config["ai_pr"] = {
+        "enabled": ai_pr_enabled,
+        "model": "sonnet",
+        "include_journals": True,
+        "include_diffs": True,
+        "max_diff_size_kb": 50
+    }
+
+    # Legacy field
+    config["auto_pr"] = False
+
+    # Write configuration
+    try:
+        with open(git_config_file, 'w') as f:
+            json.dump(config, f, indent=2)
+            f.write('\n')
+    except (IOError, OSError) as e:
+        printer.error(f"Failed to write config file: {e}")
+        return 1
+
+    # Show summary
+    printer.success(f"✅ Git configuration saved to {git_config_file}")
+    printer.info(f"  • Auto-branch: {'Yes' if config['auto_branch'] else 'No'}")
+    printer.info(f"  • Auto-commit: {'Yes' if config['auto_commit'] else 'No'}")
+    printer.info(f"  • Commit cadence: {config['commit_cadence']}")
+    printer.info(f"  • Show files before commit: {'Yes' if config['file_staging']['show_before_commit'] else 'No'}")
+    printer.info(f"  • Auto-push: {'Yes' if config['auto_push'] else 'No'}")
+    printer.info(f"  • AI-powered PRs: {'Yes' if config['ai_pr']['enabled'] else 'No'}")
+
+    return 0
+
+
+def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> int:
+    """Set up git config in interactive mode using wizard."""
     # Start interactive wizard
     printer.header("="*70)
     printer.header("Git Integration Setup")
@@ -233,9 +351,13 @@ def cmd_setup_git_config(args, printer: PrettyPrinter) -> int:
         printer.info("")
         printer.info("Git integration disabled. Writing config...")
 
-        with open(git_config_file, 'w') as f:
-            json.dump({"enabled": False}, f, indent=2)
-            f.write('\n')
+        try:
+            with open(git_config_file, 'w') as f:
+                json.dump({"enabled": False}, f, indent=2)
+                f.write('\n')
+        except (IOError, OSError) as e:
+            printer.error(f"Failed to write config file: {e}")
+            return 1
 
         printer.success(f"Configuration saved to {git_config_file}")
         return 0
@@ -321,9 +443,13 @@ def cmd_setup_git_config(args, printer: PrettyPrinter) -> int:
     printer.info("")
     printer.info("Writing configuration...")
 
-    with open(git_config_file, 'w') as f:
-        json.dump(config, f, indent=2)
-        f.write('\n')
+    try:
+        with open(git_config_file, 'w') as f:
+            json.dump(config, f, indent=2)
+            f.write('\n')
+    except (IOError, OSError) as e:
+        printer.error(f"Failed to write config file: {e}")
+        return 1
 
     # Show summary
     printer.info("")
