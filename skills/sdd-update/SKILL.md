@@ -326,19 +326,73 @@ task_title = "Implement JWT verification middleware"
 commit_message = f"{task_id}: {task_title}"
 ```
 
-**4. Stage and Commit Changes**
+**4. Preview and Stage Changes (Two-Step Workflow)**
 
-Execute git commands to stage all changes and create the commit:
+The workflow now supports **agent-controlled file staging** with two approaches:
+
+**Option A: Show Preview (Default - Recommended)**
+
+When `file_staging.show_before_commit = true` (default), the agent sees uncommitted files and can selectively stage:
 
 ```bash
-# Stage all changes (no file picker UI - stage everything)
+# Step 1: Preview uncommitted files (automatic via show_commit_preview_and_wait)
+# Shows: modified, untracked, and staged files
+sdd complete-task SPEC_ID TASK_ID
+
+# Step 2: Agent stages only task-related files
+git add specs/active/spec.json
+git add src/feature/implementation.py
+git add tests/test_feature.py
+# (Deliberately skip unrelated files like debug scripts, personal notes)
+
+# Step 3: Create commit with staged files only
+sdd create-task-commit SPEC_ID TASK_ID
+```
+
+**Benefits:**
+- ✅ Agent controls what files are committed
+- ✅ Unrelated files protected from accidental commits
+- ✅ Clean, focused task commits
+
+**Option B: Auto-Stage All (Backward Compatible)**
+
+When `file_staging.show_before_commit = false`, the old behavior is preserved:
+
+```bash
+# Automatically stages all files and commits (old behavior)
 git add --all
-
-# Create commit with generated message
 git commit -m "{task-id}: {task-title}"
+```
 
-# Example:
-git commit -m "task-2-3: Implement JWT verification middleware"
+**Configuration:**
+
+File staging behavior is controlled in `.claude/git_config.json`:
+
+```json
+{
+  "enabled": true,
+  "auto_commit": true,
+  "commit_cadence": "task",
+  "file_staging": {
+    "show_before_commit": true  // false = auto-stage all (backward compatible)
+  }
+}
+```
+
+**Command Reference:**
+
+```bash
+# Complete task (shows preview if enabled)
+sdd complete-task SPEC_ID TASK_ID
+
+# Create commit from staged files
+sdd create-task-commit SPEC_ID TASK_ID
+
+# Example workflow:
+sdd complete-task user-auth-001 task-1-2
+# (Review preview, stage desired files)
+git add specs/active/user-auth-001.json src/auth/service.py
+sdd create-task-commit user-auth-001 task-1-2
 ```
 
 **All git commands use `cwd=repo_root`** obtained from `find_git_root()` to ensure they run in the correct repository directory.
