@@ -167,7 +167,16 @@ Use AskUserQuestion tool:
 
 **If user selects Autonomous Mode, check context first:**
 
-Run `sdd context --json` and parse the output to get context percentage.
+Use the two-command session marker pattern:
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker (in SEPARATE command)
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+Parse the output to get context percentage.
 
 If context percentage > 50%:
 ```
@@ -217,7 +226,16 @@ Use AskUserQuestion tool:
 
 **If user selects Autonomous Mode, check context first:**
 
-Run `sdd context --json` and parse the output to get context percentage.
+Use the two-command session marker pattern:
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker (in SEPARATE command)
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+Parse the output to get context percentage.
 
 If context percentage > 50%:
 ```

@@ -176,6 +176,101 @@ class TestUpdateParentStatus:
         assert updated_state["hierarchy"]["phase-1"]["status"] == "in_progress"
 
 
+class TestParentNodeJournaling:
+    """Tests for parent node auto-completion and journaling flags."""
+
+    def test_parent_node_flagged_when_auto_completed(self, sample_json_spec_simple, specs_structure):
+        """Test that parent nodes get needs_journaling flag when auto-completed."""
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+
+        # Mark phase-1 as pending initially (not completed)
+        spec_data["hierarchy"]["phase-1"]["status"] = "pending"
+
+        # Complete all tasks in phase-1
+        spec_data["hierarchy"]["task-1-1"]["status"] = "completed"
+        spec_data["hierarchy"]["task-1-2"]["status"] = "completed"
+
+        # Recalculate progress - this should auto-complete phase-1
+        spec_data = recalculate_progress(spec_data, "spec-root")
+
+        # Phase-1 should now be completed and flagged for journaling
+        phase_1 = spec_data["hierarchy"]["phase-1"]
+        assert phase_1["status"] == "completed"
+        assert phase_1.get("metadata", {}).get("needs_journaling") is True
+        assert "completed_at" in phase_1.get("metadata", {})
+
+    def test_parent_node_not_flagged_if_already_completed(self, sample_json_spec_simple, specs_structure):
+        """Test that parent nodes are NOT re-flagged if already completed."""
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+
+        # Pre-mark phase-1 as already completed (simulate manual completion)
+        spec_data["hierarchy"]["phase-1"]["status"] = "completed"
+        spec_data["hierarchy"]["phase-1"]["metadata"] = {}
+
+        # Complete all tasks in phase-1
+        spec_data["hierarchy"]["task-1-1"]["status"] = "completed"
+        spec_data["hierarchy"]["task-1-2"]["status"] = "completed"
+
+        # Recalculate progress
+        spec_data = recalculate_progress(spec_data, "spec-root")
+
+        # Phase-1 should remain completed but NOT get flagged
+        # (because it was already completed before recalculation)
+        phase_1 = spec_data["hierarchy"]["phase-1"]
+        assert phase_1["status"] == "completed"
+        # Should NOT have needs_journaling flag set by recalculation
+        assert phase_1.get("metadata", {}).get("needs_journaling") is not True
+
+    def test_group_node_flagged_when_auto_completed(self, sample_spec_complex, sample_json_spec_complex, specs_structure, tmp_path):
+        """Test that group nodes (not just phases) get flagged when auto-completed."""
+        spec_data = load_json_spec("complex-spec-2025-01-01-002", specs_structure)
+
+        # Find a group node in the hierarchy
+        group_id = None
+        group_tasks = []
+        for node_id, node in spec_data["hierarchy"].items():
+            if node.get("type") == "group":
+                group_id = node_id
+                group_tasks = node.get("children", [])
+                break
+
+        if not group_id:
+            pytest.skip("No group nodes found in complex spec")
+
+        # Ensure group starts as not completed
+        spec_data["hierarchy"][group_id]["status"] = "pending"
+
+        # Complete all tasks in the group
+        for task_id in group_tasks:
+            if spec_data["hierarchy"].get(task_id, {}).get("type") == "task":
+                spec_data["hierarchy"][task_id]["status"] = "completed"
+
+        # Recalculate progress
+        spec_data = recalculate_progress(spec_data, "spec-root")
+
+        # Group should be auto-completed and flagged
+        group = spec_data["hierarchy"][group_id]
+        assert group["status"] == "completed"
+        assert group.get("metadata", {}).get("needs_journaling") is True
+
+    def test_leaf_tasks_not_flagged_on_auto_completion(self, sample_json_spec_simple, specs_structure):
+        """Test that leaf tasks (type=task) are NOT auto-flagged by progress calculation."""
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+
+        # Manually set a task status to completed (simulating manual status update)
+        spec_data["hierarchy"]["task-1-1"]["status"] = "completed"
+
+        # Recalculate progress
+        spec_data = recalculate_progress(spec_data, "spec-root")
+
+        # Leaf task should NOT get needs_journaling flag from recalculation
+        # (it's set manually via update_task_status, not by recalculate_progress)
+        task = spec_data["hierarchy"]["task-1-1"]
+        assert task["status"] == "completed"
+        # This flag should only be set by update_task_status, not recalculate_progress
+        assert task.get("metadata", {}).get("needs_journaling") is not True
+
+
 @pytest.mark.integration
 class TestProgressIntegration:
     """Integration tests for progress calculation."""

@@ -3,19 +3,18 @@
 Context Tracker - Monitor Claude Code token and context usage.
 
 Parses Claude Code transcript files to display real-time token usage metrics.
-Adopts a stateless design inspired by ccstatusline - transcript path is provided
-directly via CLI arg, environment variable, or stdin (hook mode).
+Uses a two-command session marker pattern to identify the current session's transcript.
 
-Usage:
-  # From CLI with explicit path
-  sdd context --transcript-path /path/to/transcript.jsonl
+Usage (Recommended):
+  # Step 1: Generate and log a session marker
+  sdd session-marker
 
-  # From hook (reads stdin JSON)
-  echo '{"transcript_path": "/path/to/transcript.jsonl"}' | sdd context
+  # Step 2: Check context using that marker (in a SEPARATE command)
+  sdd context --session-marker <marker-from-step-1>
 
-  # From environment variable
-  export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl
-  sdd context
+This two-command approach ensures the marker is written to the transcript before
+attempting to locate it, enabling reliable session identification in concurrent
+Claude Code sessions.
 """
 
 import argparse
@@ -45,7 +44,7 @@ def generate_session_marker() -> str:
     return marker
 
 
-def find_transcript_by_specific_marker(cwd: Path, marker: str) -> str | None:
+def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int = 5) -> str | None:
     """
     Search transcripts for a specific SESSION_MARKER to identify current session.
 
@@ -53,9 +52,14 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str) -> str | None:
     for a specific marker string. The transcript containing that exact marker
     is the current session's transcript.
 
+    To handle race conditions where the marker may not be flushed to disk yet,
+    this function will retry with exponential backoff if the marker is not found
+    on the first attempt.
+
     Args:
         cwd: Current working directory (used to find project-specific transcripts)
         marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
+        max_retries: Maximum number of retry attempts (default: 5)
 
     Returns:
         Path to transcript containing the marker, or None if not found
@@ -67,25 +71,33 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str) -> str | None:
     if not transcript_dir.exists():
         return None
 
-    current_time = time.time()
+    # Retry with exponential backoff: 100ms, 200ms, 400ms, 800ms, 1600ms
+    delays = [0.1 * (2 ** i) for i in range(max_retries)]
 
-    try:
-        for transcript_path in transcript_dir.glob("*.jsonl"):
-            try:
-                # Only check recent transcripts (modified in last 24 hours)
-                mtime = transcript_path.stat().st_mtime
-                if (current_time - mtime) > 86400:
+    for attempt in range(max_retries):
+        current_time = time.time()
+
+        try:
+            for transcript_path in transcript_dir.glob("*.jsonl"):
+                try:
+                    # Only check recent transcripts (modified in last 24 hours)
+                    mtime = transcript_path.stat().st_mtime
+                    if (current_time - mtime) > 86400:
+                        continue
+
+                    # Search for the specific marker in the transcript
+                    with open(transcript_path, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            if marker in line:
+                                return str(transcript_path)
+                except (OSError, IOError, UnicodeDecodeError):
                     continue
+        except (OSError, IOError):
+            pass
 
-                # Search for the specific marker in the transcript
-                with open(transcript_path, 'r', encoding='utf-8') as f:
-                    for line in f:
-                        if marker in line:
-                            return str(transcript_path)
-            except (OSError, IOError, UnicodeDecodeError):
-                continue
-    except (OSError, IOError):
-        pass
+        # If not found and we have retries left, wait before next attempt
+        if attempt < max_retries - 1:
+            time.sleep(delays[attempt])
 
     return None
 
@@ -124,10 +136,10 @@ def get_transcript_path(args) -> str | None:
     Get transcript path from multiple sources (priority order).
 
     Priority:
-    1. Explicit CLI argument (--transcript-path)
-    2. Environment variable (CLAUDE_TRANSCRIPT_PATH)
-    3. stdin JSON (hook mode)
-    4. Session marker discovery (if --session-marker provided)
+    1. Session marker discovery (if --session-marker provided)
+    2. Explicit CLI argument (--transcript-path)
+    3. Environment variable (CLAUDE_TRANSCRIPT_PATH)
+    4. stdin JSON (hook mode)
 
     Args:
         args: Parsed CLI arguments
@@ -135,27 +147,27 @@ def get_transcript_path(args) -> str | None:
     Returns:
         Transcript path string, or None if not found
     """
-    # Priority 1: Explicit CLI argument
-    if hasattr(args, 'transcript_path') and args.transcript_path:
-        return args.transcript_path
-
-    # Priority 2: Environment variable
-    env_path = os.environ.get("CLAUDE_TRANSCRIPT_PATH")
-    if env_path:
-        return env_path
-
-    # Priority 3: stdin (hook mode)
-    stdin_path = get_transcript_path_from_stdin()
-    if stdin_path:
-        return stdin_path
-
-    # Priority 4: Session marker discovery
+    # Priority 1: Session marker discovery (recommended approach)
     # Search for transcripts containing the specific session marker
     if hasattr(args, 'session_marker') and args.session_marker:
         cwd = Path.cwd()
         marker_path = find_transcript_by_specific_marker(cwd, args.session_marker)
         if marker_path:
             return marker_path
+
+    # Priority 2: Explicit CLI argument
+    if hasattr(args, 'transcript_path') and args.transcript_path:
+        return args.transcript_path
+
+    # Priority 3: Environment variable
+    env_path = os.environ.get("CLAUDE_TRANSCRIPT_PATH")
+    if env_path:
+        return env_path
+
+    # Priority 4: stdin (hook mode)
+    stdin_path = get_transcript_path_from_stdin()
+    if stdin_path:
+        return stdin_path
 
     return None
 
@@ -258,20 +270,23 @@ def cmd_context(args, printer):
             printer.error(f"Could not find transcript containing marker: {args.session_marker}")
             printer.error("")
             printer.error("This usually means the marker hasn't been written to the transcript yet.")
-            printer.error("If you're using the two-command approach, make sure to:")
+            printer.error("")
+            printer.error("Make sure you're using the two-command pattern:")
             printer.error("  1. Call 'sdd session-marker' first (generates and logs marker)")
             printer.error("  2. Call 'sdd context --session-marker <marker>' in a SEPARATE command")
             printer.error("")
             printer.error("The marker must be logged to the transcript before it can be found.")
             printer.error("Try running 'sdd session-marker' again, then retry this command.")
         else:
-            printer.error("No transcript path provided.")
+            printer.error("Error: No session marker provided.")
             printer.error("")
-            printer.error("Please provide transcript path via:")
-            printer.error("  1. Session marker: sdd context --session-marker $(sdd session-marker)")
-            printer.error("  2. CLI argument: sdd context --transcript-path /path/to/transcript.jsonl")
-            printer.error("  3. Environment variable: export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl")
-            printer.error("  4. stdin (hook mode): echo '{\"transcript_path\": \"...\"}' | sdd context")
+            printer.error("Usage: Use the two-command pattern to check context:")
+            printer.error("")
+            printer.error("  Step 1: Generate and log a session marker")
+            printer.error("    sdd session-marker")
+            printer.error("")
+            printer.error("  Step 2: Check context using that marker (in a SEPARATE command)")
+            printer.error("    sdd context --session-marker <marker-from-step-1>")
         sys.exit(1)
 
     # Verify file exists
@@ -356,19 +371,20 @@ def main():
         description="Monitor Claude Code token and context usage",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  # Check context usage from transcript path
-  sdd context --transcript-path /path/to/transcript.jsonl
+Usage (Recommended):
+  Use the two-command session marker pattern:
 
-  # Use environment variable
-  export CLAUDE_TRANSCRIPT_PATH=/path/to/transcript.jsonl
-  sdd context
+  Step 1: Generate and log a session marker
+    sdd session-marker
 
-  # Use as a Claude Code hook (reads from stdin)
-  echo '{"transcript_path": "/path/to/transcript.jsonl"}' | sdd context
+  Step 2: Check context using that marker (in a SEPARATE command)
+    sdd context --session-marker <marker-from-step-1>
 
-  # Get JSON output
-  sdd context --transcript-path /path/to/transcript.jsonl --json
+  Get JSON output:
+    sdd context --session-marker <marker> --json
+
+This two-command approach ensures reliable session identification
+when running multiple concurrent Claude Code sessions.
         """,
     )
 
@@ -398,12 +414,15 @@ Examples:
 
     if not transcript_path:
         parser.print_help()
-        print("\nError: No transcript path provided", file=sys.stderr)
+        print("\nError: No session marker provided.", file=sys.stderr)
         print("", file=sys.stderr)
-        print("Provide via:", file=sys.stderr)
-        print("  --transcript-path argument", file=sys.stderr)
-        print("  CLAUDE_TRANSCRIPT_PATH environment variable", file=sys.stderr)
-        print("  stdin JSON (hook mode)", file=sys.stderr)
+        print("Usage: Use the two-command pattern to check context:", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("  Step 1: Generate and log a session marker", file=sys.stderr)
+        print("    sdd session-marker", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("  Step 2: Check context using that marker (in a SEPARATE command)", file=sys.stderr)
+        print("    sdd context --session-marker <marker-from-step-1>", file=sys.stderr)
         sys.exit(1)
 
     # Verify file exists

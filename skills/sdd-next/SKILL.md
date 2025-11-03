@@ -178,6 +178,62 @@ The CLI provides proper error handling, validation, argument parsing, and interf
 
 If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
 
+## Context Checking Pattern
+
+**⚠️ CRITICAL: Before checking context usage, you MUST generate a session marker first.**
+
+The `sdd context` command requires a session marker to locate the transcript. This is a **two-step process** that must be executed sequentially.
+
+**Correct Pattern (ALWAYS use this):**
+
+```bash
+# Step 1: Generate session marker (REQUIRED FIRST)
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**CRITICAL REQUIREMENTS:**
+
+1. ✅ **Run as TWO SEPARATE commands** - Use separate Bash tool calls
+2. ✅ **Run SEQUENTIALLY, not in parallel** - Step 2 depends on step 1 being logged
+3. ❌ **NEVER combine with && or $()** - The marker must be logged to transcript before use
+4. ❌ **NEVER run in parallel** - Step 2 will fail if step 1 hasn't been logged yet
+
+**Why Sequential Execution Matters:**
+
+The session marker from step 1 must be written to the conversation transcript before step 2 can search for it. Running them in parallel or combining them with `&&` or `$()` breaks this requirement and causes failures.
+
+**Example of WRONG approaches:**
+
+```bash
+# ❌ WRONG - Combined with &&
+sdd session-marker && sdd context --session-marker "..." --json
+
+# ❌ WRONG - Combined with $()
+sdd context --session-marker "$(sdd session-marker)" --json
+
+# ❌ WRONG - Run in parallel (both in same message)
+# Bash call 1: sdd session-marker
+# Bash call 2: sdd context --session-marker "..." --json
+```
+
+**When to Check Context:**
+
+- **Autonomous mode**: After each task completion (REQUIRED to avoid hitting limits)
+- **Single-task mode**: After task completion (recommended)
+- **Session start**: Before starting intensive work (optional)
+- **Before continuing**: When resuming after high context usage (recommended)
+
+**Context Thresholds:**
+
+- **< 75%**: Safe to continue
+- **≥ 75%**: Stop and prompt user (use AskUserQuestion)
+- **≥ 90%**: Strongly recommend stopping
+
+See [Autonomous Workflow](#autonomous-workflow-phase-completion-mode) and [Post-Implementation](#post-implementation) sections for usage in workflows.
+
 ## Automated Workflow (Skill Invocation)
 
 When this skill is invoked automatically (via `Skill(sdd-toolkit:sdd-next)`), use these simplified commands:
@@ -408,21 +464,34 @@ If detected, execute the autonomous workflow below. Otherwise, use the standard 
 ### Autonomous Workflow Loop
 
 **Step 1: Initialize**
+
 ```bash
 # Verify tools (optional, recommended on first task only)
 sdd verify-tools
+```
 
-# Check initial context (optional)
-# IMPORTANT: Run these as TWO SEPARATE commands, not combined with && or $()
+**Check initial context (recommended):**
 
-# Step 1: Generate session marker
+⚠️ **CRITICAL: Use the two-step pattern documented in [Context Checking Pattern](#context-checking-pattern).**
+
+Run these as **TWO SEPARATE, SEQUENTIAL Bash tool calls:**
+
+```bash
+# First Bash call: Generate session marker
 sdd session-marker
+```
 
-# Step 2: Check context using the marker from step 1
+```bash
+# Second Bash call: Check context using the marker from first call
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
 
-**Note:** The marker from step 1 must be logged to the transcript before step 2 can find it. Always run these as separate, sequential Bash tool calls. **Do NOT run them in parallel** - step 2 must wait for step 1 to complete and be logged.
+**NEVER:**
+- ❌ Combine with `&&`: `sdd session-marker && sdd context ...`
+- ❌ Combine with `$()`: `sdd context --session-marker "$(sdd session-marker)" ...`
+- ❌ Run in parallel (both in same message)
+
+**Why:** The marker from the first call must be logged to the transcript before the second call can find it.
 
 If initial context ≥75%, recommend stopping before starting with AskUserQuestion.
 
@@ -472,17 +541,21 @@ Task(
 
 8. **Check context usage (REQUIRED):**
 
-Run these as TWO SEPARATE, SEQUENTIAL commands:
+⚠️ **CRITICAL: Use the two-step pattern documented in [Context Checking Pattern](#context-checking-pattern).**
+
+Run as **TWO SEPARATE, SEQUENTIAL Bash tool calls:**
 
 ```bash
-# Step 1: Generate session marker
+# First Bash call: Generate session marker
 sdd session-marker
+```
 
-# Step 2: Check context using the marker from step 1
+```bash
+# Second Bash call: Check context using the marker from first call
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
 
-**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
+**NEVER combine with `&&`, `$()`, or run in parallel.** The marker must be logged to the transcript first.
 
    - If context ≥75%: **STOP**, exit loop, go to Step 3 (Summary)
    - If context <75%: Continue to next iteration
@@ -945,7 +1018,7 @@ Ready to implement?
 
 **Step 1: Check Context (Optional)**
 
-If needed: `sdd context --json`. If ≥75%, recommend reset with `AskUserQuestion` (options: "Stop and Reset" or "Continue").
+If needed: Check context using the two-step pattern (see [Context Checking Pattern](#context-checking-pattern)). If ≥75%, recommend reset with `AskUserQuestion` (options: "Stop and Reset" or "Continue").
 
 **Step 2: Run Automated Workflow**
 
@@ -1161,17 +1234,21 @@ Task(
 
 After the task is marked complete, you MUST check context usage.
 
-Run these as TWO SEPARATE, SEQUENTIAL commands:
+⚠️ **CRITICAL: Use the two-step pattern documented in [Context Checking Pattern](#context-checking-pattern).**
+
+Run as **TWO SEPARATE, SEQUENTIAL Bash tool calls:**
 
 ```bash
-# Step 1: Generate session marker
+# First Bash call: Generate session marker
 sdd session-marker
+```
 
-# Step 2: Check context using the marker from step 1
+```bash
+# Second Bash call: Check context using the marker from first call
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
 
-**IMPORTANT:** These must be run SEQUENTIALLY, not in parallel. Do NOT combine with `&&` or `$()`. Use separate Bash tool calls so the marker from step 1 gets logged to the transcript before step 2 searches for it.
+**NEVER combine with `&&`, `$()`, or run in parallel.** The marker must be logged to the transcript first.
 
 If context usage is ≥75%, use `AskUserQuestion` to prompt the user:
 
@@ -1403,6 +1480,258 @@ If deviation discovered during implementation:
 
 For verification tasks (type: verify), use `Skill(sdd-toolkit:run-tests)` to execute tests and verification steps. After verification completes, present findings to user and use `AskUserQuestion` to get approval before marking complete with sdd-update. See run-tests SKILL.md for details.
 
+## Git Integration Workflow
+
+The sdd-next skill supports optional git integration when enabled in configuration. This section explains how git operations integrate with the task preparation and execution workflow.
+
+### Overview
+
+When git integration is enabled (`git_config.is_git_enabled()` returns True), the workflow automatically handles:
+- Branch creation when starting work on a spec
+- Drift detection between spec metadata and actual git state
+- Commit cadence preference tracking
+
+All git operations are **optional** and **non-blocking**. If git is disabled or unavailable, the skill continues normally without git features.
+
+### Branch Creation Workflow
+
+When starting work on a spec without an existing branch (no `metadata.git.branch_name`):
+
+**Step 1: Find Git Repository Root**
+```python
+from claude_skills.common.git_metadata import find_git_root
+
+repo_root = find_git_root()
+if not repo_root:
+    # Not in a git repository - skip git operations
+    continue_without_git()
+```
+
+**Step 2: Check for Uncommitted Changes**
+```python
+from claude_skills.common.git_metadata import check_dirty_tree
+
+is_dirty, message = check_dirty_tree(repo_root)
+if is_dirty:
+    # Inform user but don't block
+    print(f"⚠️  Working tree has uncommitted changes: {message}")
+    print("You may want to commit or stash these changes before creating a new branch.")
+```
+
+**Step 3: Offer Branch Creation**
+
+Use `AskUserQuestion` to offer branch creation:
+
+```python
+AskUserQuestion(
+    questions: [{
+        question: "Create a new git branch for this spec?",
+        header: "Git Branch",
+        multiSelect: false,
+        options: [
+            {
+                label: "Create branch",
+                description: f"Run: git checkout -b feat/{spec_id}"
+            },
+            {
+                label: "Use current branch",
+                description: "Continue on current branch without creating new one"
+            },
+            {
+                label: "Skip git integration",
+                description: "Disable git operations for this session"
+            }
+        ]
+    }]
+)
+```
+
+**Step 4: Execute Branch Creation**
+
+If user selects "Create branch":
+```bash
+# Use Bash tool to create branch
+git checkout -b feat/{spec-id}
+```
+
+Then update spec metadata:
+```python
+from claude_skills.common.git_metadata import update_branch_metadata
+
+# Get current branch for base_branch
+result = subprocess.run(
+    ["git", "branch", "--show-current"],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+base_branch = result.stdout.strip()
+
+# Update spec with branch metadata
+update_branch_metadata(
+    spec,
+    branch_name=f"feat/{spec_id}",
+    base_branch=base_branch
+)
+```
+
+### Commit Cadence Preference
+
+After branch creation OR when resuming a git-enabled spec, ask the user about commit cadence:
+
+```python
+AskUserQuestion(
+    questions: [{
+        question: "When should commits be created automatically?",
+        header: "Commit Cadence",
+        multiSelect: false,
+        options: [
+            {
+                label: "After each task",
+                description: "Create a commit when each task is completed (granular history)"
+            },
+            {
+                label: "After each phase",
+                description: "Create a commit when each phase is completed (fewer commits)"
+            },
+            {
+                label: "Manual",
+                description: "I'll create commits manually (no automatic commits)"
+            }
+        ]
+    }]
+)
+```
+
+Store the user's choice in spec metadata:
+```python
+# Store in session preferences (not persisted to file)
+if 'session_preferences' not in spec['metadata']:
+    spec['metadata']['session_preferences'] = {}
+
+spec['metadata']['session_preferences']['commit_cadence'] = user_choice  # "task", "phase", or "manual"
+```
+
+**Note:** This preference is stored in `metadata.session_preferences` which is **not** persisted to the spec JSON file. It's only for the current session. The persistent `metadata.git.commit_cadence` setting comes from git_config.
+
+### Drift Detection
+
+When resuming work on a spec with existing git metadata, detect drift between spec and actual git state:
+
+```python
+from claude_skills.common.git_metadata import detect_git_drift
+
+warnings = detect_git_drift(spec, repo_root)
+if warnings:
+    print("⚠️  Git drift detected:")
+    for warning in warnings:
+        print(f"  - {warning}")
+    print("\nThis is informational only and won't block your work.")
+```
+
+**Common drift scenarios:**
+- **Branch mismatch**: Spec expects `feat/user-auth` but current branch is `main`
+- **Missing branch**: Branch in spec metadata doesn't exist in repository
+- **Missing commits**: Commits recorded in spec not found in repository
+
+Drift warnings are **non-blocking** - they inform the user but don't prevent task execution.
+
+### Git Command Execution Pattern
+
+All git commands follow this pattern:
+
+**1. Find Repository Root**
+```python
+repo_root = find_git_root()
+if not repo_root:
+    # Handle gracefully - git not available
+    return
+```
+
+**2. Execute with subprocess.run**
+```python
+import subprocess
+
+result = subprocess.run(
+    ["git", "command", "args"],
+    cwd=repo_root,  # Always use repo root as cwd
+    capture_output=True,
+    text=True,
+    timeout=10
+)
+```
+
+**3. Check Return Code**
+```python
+if result.returncode != 0:
+    logger.warning(f"Git command failed: {result.stderr}")
+    # Handle error gracefully - don't crash
+    return
+```
+
+**4. Process Output**
+```python
+output = result.stdout.strip()
+# Use output as needed
+```
+
+### Error Handling
+
+Git operations should **never block** the main workflow:
+
+**DO:**
+- ✅ Log warnings for git errors
+- ✅ Continue without git features if git unavailable
+- ✅ Provide informative messages to users
+- ✅ Use timeouts on all subprocess calls
+- ✅ Handle `CalledProcessError`, `TimeoutExpired`, `FileNotFoundError`
+
+**DON'T:**
+- ❌ Raise exceptions that stop task execution
+- ❌ Require git to be installed
+- ❌ Block on git operations
+- ❌ Assume git commands will succeed
+
+### Integration Points
+
+Git workflow integrates at these points in sdd-next:
+
+**1. Task Preparation (prepare-task)**
+- Check if git enabled
+- Detect repository and branch
+- Offer branch creation if needed
+- Detect drift and warn user
+
+**2. Execution Plan Creation**
+- Include git context in plan
+- Mention current branch
+- Note any drift warnings
+
+**3. Post-Implementation (via sdd-update)**
+- Create commits based on cadence preference
+- Update commit metadata in spec
+- Track commit SHAs and messages
+
+### Configuration
+
+Git integration is controlled by `git_config.py`:
+
+```python
+from claude_skills.common.git_config import is_git_enabled, get_git_setting
+
+# Check if git integration is enabled
+if not is_git_enabled():
+    # Skip all git operations
+    return
+
+# Get specific settings
+auto_branch = get_git_setting('auto_branch')  # True/False
+auto_commit = get_git_setting('auto_commit')  # True/False
+commit_cadence = get_git_setting('commit_cadence')  # "task"/"phase"/"manual"
+```
+
+See `.claude/GIT_CONFIG_README.md` for configuration details.
+
 ## Advanced Query Techniques
 
 For power users who need complex task filtering beyond simple `next-task`.
@@ -1468,6 +1797,49 @@ sdd query-tasks {spec-id} --parent phase-2 --json
 ```
 
 ## Troubleshooting
+
+### Issue: Context Check Fails - "No transcript path provided"
+
+**Symptoms:**
+- Error: `❌ Error: No transcript path provided.`
+- Context checking command fails with missing transcript error
+- Session marker not found
+
+**Root Cause:**
+The `sdd context` command was run without first generating a session marker, or the commands were combined/run in parallel instead of sequentially.
+
+**Solution:**
+
+✅ **ALWAYS use the two-step pattern documented in [Context Checking Pattern](#context-checking-pattern):**
+
+```bash
+# First Bash call: Generate session marker
+sdd session-marker
+```
+
+```bash
+# Second Bash call: Check context using the marker from first call
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**Critical Requirements:**
+1. Run as **TWO SEPARATE** Bash tool calls
+2. Run **SEQUENTIALLY** (not in parallel)
+3. **NEVER** combine with `&&` or `$()`
+4. Wait for step 1 to complete and be logged before running step 2
+
+**Why This Fails:**
+```bash
+# ❌ WRONG - Combined with &&
+sdd session-marker && sdd context --session-marker "..." --json
+
+# ❌ WRONG - Combined with $()
+sdd context --session-marker "$(sdd session-marker)" --json
+
+# ❌ WRONG - Run in parallel (both Bash calls in same message)
+```
+
+The session marker must be written to the conversation transcript before the context command can find it. Combining or parallelizing breaks this requirement.
 
 ### Issue: Spec File Not Found / Path Errors
 
@@ -1553,6 +1925,20 @@ Let me know how you'd like to proceed.
 **Solution:** Split into smaller tasks using sdd-update subagent
 
 ## Quick Reference
+
+### Context Checking (Two-Step Pattern)
+
+**⚠️ ALWAYS run session-marker FIRST before checking context:**
+
+```bash
+# Step 1: Generate session marker (REQUIRED FIRST)
+sdd session-marker
+
+# Step 2: Check context using the marker from step 1
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**CRITICAL:** Run as TWO SEPARATE, SEQUENTIAL commands. Never combine with `&&` or `$()`. Never run in parallel. See [Context Checking Pattern](#context-checking-pattern) section for details.
 
 ### Core Workflow Commands
 

@@ -6,17 +6,42 @@
     "title": "Git Integration for SDD Workflow",
     "description": "Integrate git operations into the SDD workflow with optional, permission-based branch creation, commits, and PR management",
     "status": "active",
-    "version": "1.0",
+    "version": "1.1",
     "author": "claude-code",
     "estimated_hours": 70,
     "complexity": "high",
     "objectives": [
       "Enable automatic branch creation when starting work on a spec",
       "Support atomic commits when completing tasks",
+      "Push branches to remote for collaboration and PR creation",
       "Generate pull requests when specs are completed",
       "Maintain git metadata in spec JSON files",
       "Provide manual CLI commands for explicit git operations",
-      "Keep git integration optional and configurable"
+      "Keep git integration optional and configurable via project settings"
+    ],
+    "assumptions": [
+      "Single-user development workflow (single developer per spec/branch)",
+      "Feature branch per spec - each spec has its own dedicated branch",
+      "SDD git commands are the primary workflow for spec-related git operations",
+      "Manual git operations are allowed but not tracked in spec metadata",
+      "Users can disable git integration entirely via configuration",
+      "Each git operation (branch, commit, push, PR) can be individually enabled/disabled"
+    ],
+    "revision_history": [
+      {
+        "version": "1.0",
+        "date": "2025-10-26T00:00:00Z",
+        "author": "claude-code",
+        "changelog": "Initial spec creation"
+      },
+      {
+        "version": "1.1",
+        "date": "2025-11-02T22:40:00Z",
+        "author": "claude-code",
+        "changelog": "Post-review updates: Added single-user/feature-branch assumptions, enhanced gh CLI detection with better error messages and early validation in git-init, updated verification plan to use mocks instead of live GitHub for offline testing",
+        "modified_by": "manual edit",
+        "review_triggered_by": "specs/.reviews/git-integration-2025-10-26-001-review.md"
+      }
     ],
     "progress_percentage": 0,
     "current_phase": "phase-1"
@@ -28,15 +53,13 @@
       "status": "pending",
       "parent": null,
       "children": [
-        "phase-1",
         "phase-2",
-        "phase-3",
         "phase-4",
         "phase-5",
         "phase-6",
         "phase-7"
       ],
-      "total_tasks": 64,
+      "total_tasks": 27,
       "completed_tasks": 0,
       "metadata": {}
     },
@@ -163,8 +186,8 @@
     },
     "task-1-1-3": {
       "type": "subtask",
-      "title": "Commit creation functions",
-      "description": "Implement get_staged_changes(), create_commit(message, files), get_commit_history()",
+      "title": "Commit and push functions",
+      "description": "Implement get_staged_changes(), create_commit(message, files), get_commit_history(), push_branch(remote, branch, set_upstream)",
       "status": "pending",
       "parent": "task-1-1",
       "children": [],
@@ -180,13 +203,13 @@
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
-        "estimated_hours": 1
+        "estimated_hours": 1.5
       }
     },
     "task-1-1-4": {
       "type": "subtask",
-      "title": "PR creation functions",
-      "description": "Implement check_gh_cli(), create_pr(title, body, base, draft), get_pr_status()",
+      "title": "PR creation functions with robust gh CLI detection",
+      "description": "Implement check_gh_cli(), create_pr(title, body, base, draft), get_pr_status(). check_gh_cli() must: (1) Verify gh is installed and in PATH, (2) Check gh auth status, (3) Return clear error messages with installation/auth instructions, (4) Support graceful degradation (return None or raise specific exception). create_pr() must handle gh unavailability gracefully and provide manual PR creation guidance.",
       "status": "pending",
       "parent": "task-1-1",
       "children": [],
@@ -202,7 +225,7 @@
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
-        "estimated_hours": 0.5
+        "estimated_hours": 1.5
       }
     },
     "task-1-1-5": {
@@ -364,7 +387,7 @@
     },
     "verify-1-2": {
       "type": "verify",
-      "title": "Manual test with real git repo",
+      "title": "Manual test with mock git repo",
       "status": "pending",
       "parent": "phase-1-verify",
       "children": [],
@@ -377,7 +400,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Functions work correctly in real git repository: detect repo, create branch, make commit"
+        "expected": "Functions work correctly with mock/test git repository: detect repo, create branch, make commit. Use temporary test repo or mock git commands for offline testing.",
+        "command": ""
       }
     },
     "phase-2": {
@@ -725,8 +749,8 @@
     },
     "task-3-1-1": {
       "type": "subtask",
-      "title": "Implement git-init command",
-      "description": "cmd_git_init(): Initialize git integration, create config, verify repo and gh CLI",
+      "title": "Implement git-init command with early gh CLI validation",
+      "description": "cmd_git_init(): Initialize git integration, create config, verify repo and gh CLI availability. Must check gh CLI early: (1) Run check_gh_cli() during init, (2) Warn user if gh not available/authenticated with clear installation instructions, (3) Store gh availability status in config, (4) Allow init to proceed even if gh unavailable (user can still use manual git commands). Display helpful guidance on how to install gh CLI and authenticate if missing.",
       "status": "pending",
       "parent": "task-3-1",
       "children": [],
@@ -758,7 +782,7 @@
     "task-3-1-3": {
       "type": "subtask",
       "title": "Implement git-commit command",
-      "description": "cmd_git_commit(): Commit changes for task with options --message, --files, --all, --amend",
+      "description": "cmd_git_commit(): Commit changes for task. Options: --message (custom message), --files <paths> (stage specific files with git add), --all (stage all changes with git add --all), --amend (amend previous commit). Default: commit already-staged files. Staging behavior: --all stages everything, --files stages specific paths, no flag uses existing staging area.",
       "status": "pending",
       "parent": "task-3-1",
       "children": [],
@@ -805,8 +829,8 @@
     },
     "task-3-1-6": {
       "type": "subtask",
-      "title": "Implement git-sync command",
-      "description": "cmd_git_sync(): Sync spec metadata with actual git state (commits, PR status)",
+      "title": "Implement git-push command",
+      "description": "cmd_git_push(): Push current branch to remote with --set-upstream. Options: --remote (default: origin), --force-with-lease. Handles: no remote, authentication failures, branch divergence, upstream already set",
       "status": "pending",
       "parent": "task-3-1",
       "children": [],
@@ -903,7 +927,7 @@
     },
     "verify-3-1": {
       "type": "verify",
-      "title": "CLI integration tests pass",
+      "title": "CLI integration tests pass with mocked gh CLI",
       "status": "pending",
       "parent": "phase-3-verify",
       "children": [],
@@ -917,7 +941,7 @@
       "metadata": {
         "verification_type": "auto",
         "command": "pytest src/claude_skills/claude_skills/tests/integration/test_git_cli.py -v",
-        "expected": "All CLI tests pass"
+        "expected": "All CLI tests pass using mocked gh CLI (no real GitHub API calls). Tests use fake remotes and mock subprocess calls for offline testing."
       }
     },
     "verify-3-2": {
@@ -940,7 +964,7 @@
     },
     "verify-3-3": {
       "type": "verify",
-      "title": "Manual workflow test",
+      "title": "Manual workflow test with test repository",
       "status": "pending",
       "parent": "phase-3-verify",
       "children": [],
@@ -953,7 +977,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Successfully run: sdd git-init, sdd git-branch <spec>, sdd git-commit <spec> <task>, sdd git-status <spec>"
+        "expected": "Successfully run: sdd git-init, sdd git-branch <spec>, sdd git-commit <spec> <task>, sdd git-status <spec> using a temporary test git repository. No real remote pushes required.",
+        "command": ""
       }
     },
     "phase-4": {
@@ -1322,7 +1347,7 @@
     "task-5-1-3": {
       "type": "subtask",
       "title": "Add commit creation prompt",
-      "description": "Use AskUserQuestion: Commit changes? Show message preview, staged files. Options: Commit all, Select files, Skip",
+      "description": "Use AskUserQuestion: Commit changes? Show message preview, list of changed files. Options: 'Commit all changes' (uses git add --all), 'Select specific files' (shows file picker, uses git add <paths>), 'Skip commit'. Staging logic: 'Commit all' runs git add --all before commit, 'Select files' runs git add on chosen paths, both create commit with generated message.",
       "status": "pending",
       "parent": "task-5-1",
       "children": [],
@@ -1585,14 +1610,15 @@
     "task-6-2": {
       "type": "task",
       "title": "Add PR logic to sdd_update/lifecycle.py",
-      "description": "Integrate PR creation into complete_spec()",
+      "description": "Integrate PR creation into complete_spec() with push step before PR creation",
       "status": "pending",
       "parent": "phase-6-files",
       "children": [
         "task-6-2-1",
         "task-6-2-2",
         "task-6-2-3",
-        "task-6-2-4"
+        "task-6-2-4",
+        "task-6-2-5"
       ],
       "dependencies": {
         "blocks": [
@@ -1603,11 +1629,11 @@
         ],
         "depends": []
       },
-      "total_tasks": 4,
+      "total_tasks": 5,
       "completed_tasks": 0,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
-        "estimated_hours": 4
+        "estimated_hours": 5
       }
     },
     "task-6-2-1": {
@@ -1630,8 +1656,8 @@
     },
     "task-6-2-2": {
       "type": "subtask",
-      "title": "Generate PR body from template",
-      "description": "Render PR template with spec data: title, description, tasks, journal entries",
+      "title": "Push branch to remote",
+      "description": "Before PR creation, push branch to remote using push_branch(). Handle: upstream already set, push failures, authentication errors. Skip if remote branch already exists and is up-to-date.",
       "status": "pending",
       "parent": "task-6-2",
       "children": [],
@@ -1641,6 +1667,26 @@
         ],
         "blocked_by": [
           "task-6-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2-3": {
+      "type": "subtask",
+      "title": "Generate PR body from template",
+      "description": "Render PR template with spec data: title, description, tasks, journal entries",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-2-4"
+        ],
+        "blocked_by": [
+          "task-6-2-2"
         ],
         "depends": []
       },
@@ -1750,7 +1796,7 @@
     },
     "verify-6-1": {
       "type": "verify",
-      "title": "PR integration tests pass",
+      "title": "PR integration tests pass with mocked gh CLI",
       "status": "pending",
       "parent": "phase-6-verify",
       "children": [],
@@ -1764,12 +1810,12 @@
       "metadata": {
         "verification_type": "auto",
         "command": "pytest src/claude_skills/claude_skills/tests/integration/test_sdd_update_git_pr.py -v",
-        "expected": "All PR integration tests pass"
+        "expected": "All PR integration tests pass using mocked gh CLI. No real PR creation - tests verify PR template generation, metadata updates, and error handling without GitHub API calls."
       }
     },
     "verify-6-2": {
       "type": "verify",
-      "title": "End-to-end PR workflow test",
+      "title": "End-to-end PR workflow test with mock",
       "status": "pending",
       "parent": "phase-6-verify",
       "children": [],
@@ -1782,7 +1828,8 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "manual",
-        "expected": "Complete a spec via sdd-update, verify PR prompt appears, PR is created with correct body, metadata is updated"
+        "expected": "Complete a spec via sdd-update, verify PR prompt appears, PR template is generated correctly, metadata is updated. Use mocked gh CLI or verify manual PR creation instructions are provided.",
+        "command": ""
       }
     },
     "phase-7": {
