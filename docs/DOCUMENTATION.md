@@ -1,6 +1,6 @@
 # src Documentation
 
-**Version:** 1.0.0
+**Version:** 0.4.1
 **Generated:** 2025-11-03 10:25:39
 
 ---

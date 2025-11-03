@@ -5,6 +5,30 @@ All notable changes to the SDD Toolkit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-11-03
+
+### Added
+
+**Git Integration Features (PR #13):**
+- **Agent-Controlled File Staging**: Two-step commit workflow with preview-and-select pattern
+  - New functions for selective file staging with granular control
+  - Prevents unrelated files from being included in commits
+  - Opt-in via `file_staging.show_before_commit` config (backward compatible)
+  - CLI command: `sdd create-task-commit`
+
+- **AI-Powered PR Creation (sdd-pr skill)**: Automated comprehensive PR descriptions
+  - Analyzes spec metadata, git diffs, commit history, and journal entries
+  - Two-step workflow: draft review → user approval → PR creation
+  - Automatic handoff from `sdd-next` after spec completion
+  - Configurable via `.claude/git_config.json` (`ai_pr` section)
+
+### Changed
+- Reorganized README.md for improved readability and user onboarding flow
+
+### Notes
+- Run `sdd setup-permissions update .` to add sdd-pr permissions
+- Enable features in `.claude/git_config.json` as needed
+
 ## [0.4.0] - 2025-11-02
 
 ### Added

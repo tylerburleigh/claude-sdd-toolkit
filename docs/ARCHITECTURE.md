@@ -1,6 +1,6 @@
 # Claude SDD Toolkit - Architecture Documentation
 
-**Version:** 0.4.0
+**Version:** 0.4.1
 **Generated:** 2025-11-02
 
 This document provides a comprehensive architectural overview of the Claude SDD Toolkit, synthesized from multiple AI model analyses (Gemini and Codex).
