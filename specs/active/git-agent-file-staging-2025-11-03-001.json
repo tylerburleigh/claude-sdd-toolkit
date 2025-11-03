@@ -1,7 +1,7 @@
 {
   "spec_id": "git-agent-file-staging-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T13:56:32.631066Z",
+  "last_updated": "2025-11-03T14:02:11.289833Z",
   "metadata": {
     "title": "Agent-Controlled Git File Staging",
     "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
@@ -9,7 +9,7 @@
     "estimated_hours": 4,
     "complexity": "medium",
     "risk_level": "low",
-    "progress_percentage": 37,
+    "progress_percentage": 41,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -25,7 +25,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 9,
+      "completed_tasks": 10,
       "metadata": {
         "objectives": [
           "Replace automatic 'git add --all' with agent-controlled file selection",
@@ -303,7 +303,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Implement show_commit_preview_and_wait() and create_commit_from_staging() functions for two-step workflow",
         "risk_level": "low",
@@ -319,7 +319,7 @@
         "task-2-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -350,7 +350,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
         "task_category": "implementation",
@@ -382,7 +382,7 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "Add create_commit_from_staging() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -391,10 +391,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Step 2 of two-step workflow: create commit from currently staged files",
-        "implementation_notes": "Check staging area with get_staged_files(), error if empty, create commit with staged files, return (success, commit_sha, error_msg)"
+        "implementation_notes": "Check staging area with get_staged_files(), error if empty, create commit with staged files, return (success, commit_sha, error_msg)",
+        "completed_at": "2025-11-03T14:02:11.285438Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T14:02:11.287975Z"
       }
     },
     "task-2-1-3": {
@@ -1060,6 +1063,15 @@
       "content": "Successfully verified the two-step workflow with mock staging.\n\nVerification Steps Completed:\n1. Created test repo with uncommitted files (1 staged, 2 untracked)\n2. Called show_commit_preview_and_wait() - displayed file preview with emoji markers and staging instructions\n3. Manually staged specific files with git add (file2.py in addition to file1.py)\n4. Called create_commit_from_staging() - created commit from staged files\n5. Verified commit contains ONLY staged files (file1.py, file2.py)\n6. Verified untracked file3.py remains uncommitted and untracked\n\nTest Results:\n- show_commit_preview_and_wait() correctly displays:\n  * Staged files (with emoji: \u2728)\n  * Untracked files (with emoji: \u2753)\n  * Clear instructions for next step: 'sdd create-task-commit spec_id task_id'\n\n- create_commit_from_staging() correctly:\n  * Checks staging area with get_staged_files()\n  * Displays what will be committed with file count and names\n  * Creates commit with specified message format\n  * Returns commit SHA for tracking\n  * Displays success message\n\n- Two-step workflow verification:\n  * Agent can preview uncommitted files between steps\n  * Agent can selectively stage files using git add\n  * Only staged files are committed (not untracked files)\n  * Untracked files remain uncommitted for future handling\n\nAll functions tested:\n- show_commit_preview_and_wait() \u2713 Working correctly\n- create_commit_from_staging() \u2713 Working correctly\n- get_staged_files() \u2713 Working correctly (called internally)\n- parse_git_status() \u2713 Working correctly (called internally)\n\nThe two-step workflow successfully demonstrates agent-controlled staging as designed in the spec. The workflow allows agents to see what files have changed, decide which ones to stage, and then commit only the staged files, leaving other files for future handling.",
       "metadata": {},
       "task_id": "verify-2-1"
+    },
+    {
+      "timestamp": "2025-11-03T14:02:11.287963Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add create_commit_from_staging() function",
+      "author": "claude-code",
+      "content": "Force sync - create_commit_from_staging() function implemented at src/claude_skills/claude_skills/common/git_metadata.py lines 453-579. Function is working and tested.",
+      "metadata": {},
+      "task_id": "task-2-1-2"
     }
   ]
 }
