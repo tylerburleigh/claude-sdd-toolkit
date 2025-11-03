@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T12:16:31.322462Z",
+    "generated_at": "2025-11-03T12:20:28.030149Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 200,
-    "total_lines": 66630,
+    "total_files": 201,
+    "total_lines": 66923,
     "total_classes": 265,
-    "total_functions": 745,
+    "total_functions": 750,
     "avg_complexity": 5.5,
     "max_complexity": 43,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 200,
-        "lines": 66630,
+        "files": 201,
+        "lines": 66923,
         "classes": 265,
-        "functions": 745,
+        "functions": 750,
         "avg_complexity": 5.5
       }
     }
@@ -2927,6 +2927,35 @@
       ],
       "exports": [],
       "lines": 227
+    },
+    {
+      "name": "git_pr",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "language": "python",
+      "docstring": "Git push and pull request integration for sdd-update workflows.\n\nProvides utilities for automatic git push and PR creation after spec completion.",
+      "classes": [],
+      "functions": [
+        "generate_pr_body",
+        "push_branch",
+        "check_gh_available",
+        "create_pull_request",
+        "check_pr_readiness"
+      ],
+      "imports": [
+        "__future__.annotations",
+        "subprocess",
+        "logging",
+        "re",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Optional",
+        "typing.Tuple",
+        "typing.Any",
+        "claude_skills.common.git_metadata.find_git_root",
+        "claude_skills.common.git_config.is_git_enabled"
+      ],
+      "exports": [],
+      "lines": 293
     },
     {
       "name": "journal",
@@ -27130,6 +27159,12 @@
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
           "line": 133,
           "call_type": "function_call"
+        },
+        {
+          "name": "check_pr_readiness",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+          "line": 274,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -27146,7 +27181,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 3
     },
     {
       "name": "get_git_setting",
@@ -27238,6 +27273,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "check_pr_readiness",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+          "line": 268,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_find_git_root_from_repo_directory",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
           "line": 40,
@@ -27294,7 +27335,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 6
+      "call_count": 7
     },
     {
       "name": "check_dirty_tree",
@@ -74891,6 +74932,622 @@
       "call_count": 1
     },
     {
+      "name": "generate_pr_body",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "line": 20,
+      "language": "python",
+      "docstring": "Generate PR body template from spec metadata.\n\nCreates a structured PR description including:\n- Spec title and description\n- Completed tasks list\n- Phase completion summary\n- Commit history\n- Verification results\n\nArgs:\n    spec_data: JSON spec file data\n\nReturns:\n    Formatted PR body as markdown string",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 14,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 39,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 40,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 42,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 42,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 43,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 44,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 46,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 46,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 49,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 56,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 56,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 57,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 58,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 61,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 64,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 69,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 75,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 79,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 81,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 91,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 99,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 101,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 108,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 116,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "push_branch",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "line": 119,
+      "language": "python",
+      "docstring": "Push branch to remote repository.\n\nArgs:\n    repo_root: Path to repository root directory\n    branch_name: Name of branch to push\n\nReturns:\n    Tuple of (success: bool, error_message: str)\n    - success: True if push succeeded, False otherwise\n    - error_message: Error message if failed, empty string if successful",
+      "parameters": [
+        {
+          "name": "repo_root",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "branch_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Tuple[bool, str]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 136,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 146,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "check_gh_available",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "line": 158,
+      "language": "python",
+      "docstring": "Check if GitHub CLI (gh) is installed and available.\n\nReturns:\n    True if gh is available, False otherwise",
+      "parameters": [],
+      "return_type": "bool",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "create_pull_request",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+          "line": 198,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "create_pull_request",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "line": 176,
+      "language": "python",
+      "docstring": "Create pull request via GitHub CLI.\n\nArgs:\n    repo_root: Path to repository root directory\n    title: PR title\n    body: PR body (markdown formatted)\n    base_branch: Base branch to merge into (e.g., 'main', 'develop')\n\nReturns:\n    Tuple of (success: bool, pr_url: Optional[str], pr_number: Optional[int], error_message: str)\n    - success: True if PR created successfully, False otherwise\n    - pr_url: URL of created PR if successful, None otherwise\n    - pr_number: PR number if successful, None otherwise\n    - error_message: Error message if failed, empty string if successful",
+      "parameters": [
+        {
+          "name": "repo_root",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "body",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "base_branch",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Tuple[bool, Optional[str], Optional[int], str]",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "check_gh_available",
+          "file": "unknown",
+          "line": 198,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 200,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 218,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 222,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 227,
+          "call_type": "method_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "function_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 231,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 236,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "check_pr_readiness",
+      "file": "src/claude_skills/claude_skills/sdd_update/git_pr.py",
+      "line": 240,
+      "language": "python",
+      "docstring": "Check if PR workflow should be triggered.\n\nThis is the main entry point that orchestrates all PR checks:\n1. Check if git integration is enabled\n2. Find repository root\n3. Check if branch metadata exists\n4. Check if auto_push is enabled\n\nArgs:\n    spec_data: JSON spec file data\n    spec_path: Path to spec file\n\nReturns:\n    Dict with PR readiness info if PR workflow should be triggered:\n    {\n        \"should_create_pr\": True,\n        \"repo_root\": Path to repository,\n        \"branch_name\": Feature branch name,\n        \"base_branch\": Base branch name\n    }\n\n    Returns None if PR workflow should not be triggered.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "spec_path",
+          "type": "Path",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[Dict[str, Any]]",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "find_git_root",
+          "file": "unknown",
+          "line": 268,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 270,
+          "call_type": "method_call"
+        },
+        {
+          "name": "is_git_enabled",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 275,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 279,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 279,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 280,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 281,
+          "call_type": "method_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 284,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
       "name": "mark_task_journaled",
       "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
       "line": 24,
@@ -102392,6 +103049,19 @@
       "__future__.annotations",
       "subprocess",
       "logging",
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.Optional",
+      "typing.Tuple",
+      "typing.Any",
+      "claude_skills.common.git_metadata.find_git_root",
+      "claude_skills.common.git_config.is_git_enabled"
+    ],
+    "src/claude_skills/claude_skills/sdd_update/git_pr.py": [
+      "__future__.annotations",
+      "subprocess",
+      "logging",
+      "re",
       "pathlib.Path",
       "typing.Dict",
       "typing.Optional",

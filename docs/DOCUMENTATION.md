@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 07:16:31
+**Generated:** 2025-11-03 07:20:28
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 200
-- **Total Lines:** 66630
+- **Total Files:** 201
+- **Total Lines:** 66923
 - **Total Classes:** 265
-- **Total Functions:** 745
+- **Total Functions:** 750
 - **Avg Complexity:** 5.5
 - **Max Complexity:** 43
 - **High Complexity Functions:**
@@ -7736,6 +7736,20 @@ Returns:
 
 ---
 
+### `check_gh_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:158`
+**Complexity:** 2
+
+**Description:**
+> Check if GitHub CLI (gh) is installed and available.
+
+Returns:
+    True if gh is available, False otherwise
+
+---
+
 ### `check_git_commit_readiness(spec_data, spec_path, event_type) -> Optional[Dict[str, Any]]`
 
 **Language:** python
@@ -7799,6 +7813,42 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
+
+---
+
+### `check_pr_readiness(spec_data, spec_path) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:240`
+**Complexity:** 5
+
+**Description:**
+> Check if PR workflow should be triggered.
+
+This is the main entry point that orchestrates all PR checks:
+1. Check if git integration is enabled
+2. Find repository root
+3. Check if branch metadata exists
+4. Check if auto_push is enabled
+
+Args:
+    spec_data: JSON spec file data
+    spec_path: Path to spec file
+
+Returns:
+    Dict with PR readiness info if PR workflow should be triggered:
+    {
+        "should_create_pr": True,
+        "repo_root": Path to repository,
+        "branch_name": Feature branch name,
+        "base_branch": Base branch name
+    }
+
+    Returns None if PR workflow should not be triggered.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `spec_path`: Path
 
 ---
 
@@ -9805,6 +9855,36 @@ Returns:
 - `project_root`: Path
 - `exclude_patterns`: Optional[List[str]]
 - `languages`: Optional[List[Language]]
+
+---
+
+### `create_pull_request(repo_root, title, body, base_branch) -> Tuple[bool, Optional[str], Optional[int], str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:176`
+**Complexity:** 5
+
+**Description:**
+> Create pull request via GitHub CLI.
+
+Args:
+    repo_root: Path to repository root directory
+    title: PR title
+    body: PR body (markdown formatted)
+    base_branch: Base branch to merge into (e.g., 'main', 'develop')
+
+Returns:
+    Tuple of (success: bool, pr_url: Optional[str], pr_number: Optional[int], error_message: str)
+    - success: True if PR created successfully, False otherwise
+    - pr_url: URL of created PR if successful, None otherwise
+    - pr_number: PR number if successful, None otherwise
+    - error_message: Error message if failed, empty string if successful
+
+**Parameters:**
+- `repo_root`: Path
+- `title`: str
+- `body`: str
+- `base_branch`: str
 
 ---
 
@@ -12225,6 +12305,33 @@ Returns:
 - `spec_title`: str
 - `review_type`: str
 - `parsed_responses`: List[Dict[str, Any]]
+
+---
+
+### `generate_pr_body(spec_data) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:20`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Generate PR body template from spec metadata.
+
+Creates a structured PR description including:
+- Spec title and description
+- Completed tasks list
+- Phase completion summary
+- Commit history
+- Verification results
+
+Args:
+    spec_data: JSON spec file data
+
+Returns:
+    Formatted PR body as markdown string
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -14959,6 +15066,30 @@ Examples:
 - `skill_name`: Optional[str]
 - `context`: Optional[str]
 - `timeout_seconds`: Optional[int]
+
+---
+
+### `push_branch(repo_root, branch_name) -> Tuple[bool, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:119`
+**Complexity:** 3
+
+**Description:**
+> Push branch to remote repository.
+
+Args:
+    repo_root: Path to repository root directory
+    branch_name: Name of branch to push
+
+Returns:
+    Tuple of (success: bool, error_message: str)
+    - success: True if push succeeded, False otherwise
+    - error_message: Error message if failed, empty string if successful
+
+**Parameters:**
+- `repo_root`: Path
+- `branch_name`: str
 
 ---
 
@@ -20145,6 +20276,20 @@ Returns:
 - `claude_skills.common.git_metadata.find_git_root`
 - `logging`
 - `pathlib.Path`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+- `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_update/git_pr.py`
+
+- `__future__.annotations`
+- `claude_skills.common.git_config.is_git_enabled`
+- `claude_skills.common.git_metadata.find_git_root`
+- `logging`
+- `pathlib.Path`
+- `re`
 - `subprocess`
 - `typing.Any`
 - `typing.Dict`
