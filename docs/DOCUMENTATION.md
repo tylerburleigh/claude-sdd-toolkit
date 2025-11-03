@@ -1,20 +1,20 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 17:46:33
+**Generated:** 2025-11-03 18:23:39
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 208
-- **Total Lines:** 70266
+- **Total Lines:** 70271
 - **Total Classes:** 268
 - **Total Functions:** 784
 - **Avg Complexity:** 5.57
-- **Max Complexity:** 44
+- **Max Complexity:** 45
 - **High Complexity Functions:**
-  - complete_task_workflow (44)
+  - complete_task_workflow (45)
   - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
@@ -9729,7 +9729,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:328`
-⚠️ **Complexity:** 44 (High)
+⚠️ **Complexity:** 45 (High)
 
 **Description:**
 > Complete a task with optional journaling, time tracking, and revision updates.

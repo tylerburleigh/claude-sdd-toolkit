@@ -366,7 +366,7 @@ def cmd_task_info(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(task_data, indent=2))
+        print_json_output(task_data, compact=args.compact)
     else:
         printer.success("Task information retrieved")
         printer.result("Task ID", args.task_id)
@@ -1106,6 +1106,7 @@ def register_next(subparsers, parent_parser):
     parser_info = subparsers.add_parser('task-info', parents=[parent_parser], help='Get task information')
     parser_info.add_argument('spec_id', help='Specification ID')
     parser_info.add_argument('task_id', help='Task ID')
+    parser_info.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_info.set_defaults(func=cmd_task_info)
 
     # check-deps
