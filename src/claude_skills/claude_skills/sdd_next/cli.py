@@ -412,7 +412,7 @@ def cmd_check_deps(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(deps, indent=2))
+        print_json_output(deps, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
         printer.result("Task ID", deps['task_id'])
@@ -454,7 +454,7 @@ def _check_all_task_deps(spec_data, args, printer):
                 all_results.append(deps)
 
     if args.json:
-        print(json.dumps(all_results, indent=2))
+        print_json_output(all_results, compact=args.compact)
     else:
         # Categorize tasks
         ready = [d for d in all_results if d['can_start']]
@@ -1113,6 +1113,7 @@ def register_next(subparsers, parent_parser):
     parser_deps = subparsers.add_parser('check-deps', parents=[parent_parser], help='Check task dependencies')
     parser_deps.add_argument('spec_id', help='Specification ID')
     parser_deps.add_argument('task_id', nargs='?', help='Task ID (optional, checks all tasks if not provided)')
+    parser_deps.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_deps.set_defaults(func=cmd_check_deps)
 
     # progress
