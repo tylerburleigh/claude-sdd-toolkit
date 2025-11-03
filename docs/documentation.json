@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T13:16:46.323279Z",
+    "generated_at": "2025-11-03T14:03:34.502859Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 201,
-    "total_lines": 67848,
+    "total_lines": 68125,
     "total_classes": 268,
-    "total_functions": 753,
-    "avg_complexity": 5.56,
+    "total_functions": 755,
+    "avg_complexity": 5.59,
     "max_complexity": 43,
     "high_complexity_functions": [
       "complete_task_workflow (43)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 201,
-        "lines": 67848,
+        "lines": 68125,
         "classes": 268,
-        "functions": 753,
-        "avg_complexity": 5.56
+        "functions": 755,
+        "avg_complexity": 5.59
       }
     }
   },
@@ -953,6 +953,8 @@
         "check_dirty_tree",
         "parse_git_status",
         "show_commit_preview",
+        "show_commit_preview_and_wait",
+        "create_commit_from_staging",
         "get_staged_files",
         "detect_git_drift",
         "update_branch_metadata",
@@ -970,7 +972,7 @@
         "typing.Any"
       ],
       "exports": [],
-      "lines": 718
+      "lines": 906
     },
     {
       "name": "hierarchy_validation",
@@ -1325,7 +1327,7 @@
         "claude_skills.common.PrettyPrinter"
       ],
       "exports": [],
-      "lines": 448
+      "lines": 520
     },
     {
       "name": "parser",
@@ -2926,10 +2928,11 @@
         "typing.Tuple",
         "typing.Any",
         "claude_skills.common.git_metadata.find_git_root",
+        "claude_skills.common.git_metadata.create_commit_from_staging",
         "claude_skills.common.git_config.is_git_enabled"
       ],
       "exports": [],
-      "lines": 227
+      "lines": 244
     },
     {
       "name": "git_pr",
@@ -7088,6 +7091,22 @@
           ]
         },
         {
+          "instantiator": "show_commit_preview_and_wait",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 435,
+          "context": [
+            "show_commit_preview_and_wait"
+          ]
+        },
+        {
+          "instantiator": "create_commit_from_staging",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 492,
+          "context": [
+            "create_commit_from_staging"
+          ]
+        },
+        {
           "instantiator": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 510,
@@ -7757,7 +7776,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 80
+      "instantiation_count": 82
     },
     {
       "name": "EnhancedError",
@@ -15938,7 +15957,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -27719,6 +27738,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "show_commit_preview_and_wait",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 438,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_parse_git_status_empty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
           "line": 174,
@@ -27895,7 +27920,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 17
+      "call_count": 18
     },
     {
       "name": "show_commit_preview",
@@ -27922,6 +27947,12 @@
       "is_exported": false,
       "is_public": true,
       "callers": [
+        {
+          "name": "show_commit_preview_and_wait",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 445,
+          "call_type": "function_call"
+        },
         {
           "name": "test_show_commit_preview_no_changes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
@@ -28351,12 +28382,304 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
+    },
+    {
+      "name": "show_commit_preview_and_wait",
+      "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+      "line": 394,
+      "language": "python",
+      "docstring": "Show uncommitted file preview and exit for agent-controlled staging (Step 1).\n\nThis is step 1 of the two-step commit workflow. It displays uncommitted files\ngrouped by status, then exits to allow the agent to stage files using git add.\nAfter staging, the agent should call create_commit_from_staging() to complete\nthe commit (step 2).\n\nWorkflow:\n1. Agent calls this function to see what files have changed\n2. Agent reviews changes and decides which files to stage\n3. Agent uses git add commands to stage selected files\n4. Agent calls create_commit_from_staging() to create the commit\n\nArgs:\n    repo_root: Path to git repository root\n    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')\n    task_id: Task ID (e.g., 'task-2-1')\n    printer: Optional PrettyPrinter instance for output. If None, creates one.\n\nReturns:\n    None (displays output and exits)\n\nExample:\n    >>> show_commit_preview_and_wait(Path('/repo'), 'user-auth-001', 'task-2-1')\n    Uncommitted Changes\n    \ud83d\udcdd Modified (2):\n      \u2022 src/main.py\n      \u2022 lib/utils.py\n\n    To stage files: git add <file>\n    After staging, create commit with: sdd create-task-commit user-auth-001 task-2-1",
+      "parameters": [
+        {
+          "name": "repo_root",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "task_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "parse_git_status",
+          "file": "unknown",
+          "line": 438,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 441,
+          "call_type": "method_call"
+        },
+        {
+          "name": "show_commit_preview",
+          "file": "unknown",
+          "line": 445,
+          "call_type": "function_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 448,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 449,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 450,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "create_commit_from_staging",
+      "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+      "line": 453,
+      "language": "python",
+      "docstring": "Create commit from currently staged files (Step 2 of two-step workflow).\n\nThis is step 2 of the two-step commit workflow. After the agent has staged\nfiles using git add, this function creates a commit with those staged files.\n\nWorkflow:\n1. Agent calls show_commit_preview_and_wait() to see changes (step 1)\n2. Agent stages selected files with git add\n3. Agent calls this function to create the commit (step 2)\n\nArgs:\n    repo_root: Path to git repository root\n    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')\n    task_id: Task ID (e.g., 'task-2-1')\n    printer: Optional PrettyPrinter instance for output. If None, creates one.\n\nReturns:\n    Tuple of (success, commit_sha, error_msg):\n    - success: True if commit created successfully, False otherwise\n    - commit_sha: Full commit SHA if successful, None otherwise\n    - error_msg: Error message if failed, None if successful\n\nExample:\n    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')\n    (True, 'a1b2c3d4e5f6...', None)\n\n    >>> # No files staged:\n    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')\n    (False, None, 'No files staged for commit')",
+      "parameters": [
+        {
+          "name": "repo_root",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "task_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": "Tuple[bool, Optional[str], Optional[str]]",
+      "complexity": 13,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "get_staged_files",
+          "file": "unknown",
+          "line": 495,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 499,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 500,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 504,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 505,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 506,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 507,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 507,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 509,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 516,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 527,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 527,
+          "call_type": "method_call"
+        },
+        {
+          "name": "find",
+          "file": "unknown",
+          "line": 534,
+          "call_type": "method_call"
+        },
+        {
+          "name": "find",
+          "file": "unknown",
+          "line": 534,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 535,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 536,
+          "call_type": "function_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 543,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 551,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 553,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 554,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 559,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 560,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 564,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 565,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 566,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 571,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 572,
+          "call_type": "method_call"
+        },
+        {
+          "name": "type",
+          "file": "unknown",
+          "line": 576,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 577,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 578,
+          "call_type": "method_call"
+        }
+      ]
     },
     {
       "name": "get_staged_files",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 394,
+      "line": 582,
       "language": "python",
       "docstring": "Get list of files currently staged for commit.\n\nRuns 'git diff --cached --name-only' to get files in the staging area.\n\nArgs:\n    repo_root: Path to git repository root\n\nReturns:\n    List of file paths (relative to repo root) that are currently staged.\n    Returns empty list if no files are staged or if an error occurs.\n\nExample:\n    >>> get_staged_files(Path('/repo'))\n    ['src/main.py', 'tests/test_main.py']",
       "parameters": [
@@ -28373,6 +28696,18 @@
       "is_exported": false,
       "is_public": true,
       "callers": [
+        {
+          "name": "create_commit_from_staging",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 495,
+          "call_type": "function_call"
+        },
+        {
+          "name": "stage_and_commit",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+          "line": 202,
+          "call_type": "function_call"
+        },
         {
           "name": "test_get_staged_files_empty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
@@ -28426,76 +28761,76 @@
         {
           "name": "run",
           "file": "unknown",
-          "line": 411,
+          "line": 599,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 420,
+          "line": 608,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 426,
+          "line": 614,
           "call_type": "method_call"
         },
         {
           "name": "split",
           "file": "unknown",
-          "line": 426,
+          "line": 614,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 426,
+          "line": 614,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 427,
+          "line": 615,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 427,
+          "line": 615,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 431,
+          "line": 619,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 435,
+          "line": 623,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 439,
+          "line": 627,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 443,
+          "line": 631,
           "call_type": "method_call"
         }
       ],
-      "call_count": 8
+      "call_count": 10
     },
     {
       "name": "detect_git_drift",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 447,
+      "line": 635,
       "language": "python",
       "docstring": "Detect drift between spec metadata and actual git state.\n\nCompares the git metadata stored in the spec with the actual git repository state.\nReturns a list of warnings for any discrepancies found.\n\nThis is a non-blocking check - warnings are informational and don't prevent operations.\n\nArgs:\n    spec: Specification dictionary containing metadata.git section\n    repo_root: Path to git repository root\n\nReturns:\n    List of warning messages (empty list if no drift detected)",
       "parameters": [
@@ -28552,157 +28887,157 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 465,
+          "line": 653,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 465,
+          "line": 653,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 468,
+          "line": 656,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 473,
+          "line": 661,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 481,
+          "line": 669,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 483,
+          "line": 671,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 486,
+          "line": 674,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 489,
+          "line": 677,
           "call_type": "method_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 489,
+          "line": 677,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 493,
+          "line": 681,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 495,
+          "line": 683,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 503,
+          "line": 691,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 511,
+          "line": 699,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 516,
+          "line": 704,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 519,
+          "line": 707,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 527,
+          "line": 715,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 532,
+          "line": 720,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 536,
+          "line": 724,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 539,
+          "line": 727,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 547,
+          "line": 735,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 552,
+          "line": 740,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 553,
+          "line": 741,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 557,
+          "line": 745,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 557,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 559,
+          "line": 747,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 561,
+          "line": 749,
           "call_type": "method_call"
         }
       ],
@@ -28711,7 +29046,7 @@
     {
       "name": "update_branch_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 570,
+      "line": 758,
       "language": "python",
       "docstring": "Update git branch metadata in spec.\n\nUpdates the metadata.git section with branch information. Creates the section\nif it doesn't exist. Preserves existing commits and PR metadata.\n\nArgs:\n    spec: Specification dictionary to update\n    branch_name: Name of the feature branch (e.g., 'feat/user-auth-001')\n    base_branch: Name of the base branch (e.g., 'main', 'develop')\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -28761,13 +29096,13 @@
         {
           "name": "info",
           "file": "unknown",
-          "line": 600,
+          "line": 788,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 611,
+          "line": 799,
           "call_type": "method_call"
         }
       ],
@@ -28776,7 +29111,7 @@
     {
       "name": "add_commit_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 616,
+      "line": 804,
       "language": "python",
       "docstring": "Add a commit record to spec git metadata.\n\nAppends a new commit object to the metadata.git.commits array. Creates the\ngit metadata section if it doesn't exist.\n\nArgs:\n    spec: Specification dictionary to update\n    sha: Git commit SHA hash (full or abbreviated)\n    message: Commit message\n    task_id: Task ID associated with this commit (e.g., 'task-1-1')\n    timestamp: ISO 8601 timestamp string (optional, will use current time if not provided)\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -28848,31 +29183,31 @@
         {
           "name": "warning",
           "file": "unknown",
-          "line": 650,
+          "line": 838,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 658,
+          "line": 846,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 658,
+          "line": 846,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 669,
+          "line": 857,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 670,
+          "line": 858,
           "call_type": "method_call"
         }
       ],
@@ -28881,7 +29216,7 @@
     {
       "name": "update_pr_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 675,
+      "line": 863,
       "language": "python",
       "docstring": "Update pull request metadata in spec.\n\nUpdates or creates the metadata.git.pr section with PR information.\n\nArgs:\n    spec: Specification dictionary to update\n    pr_url: Full URL to the pull request\n    pr_number: Pull request number\n    status: PR status ('open', 'closed', 'merged') - defaults to 'open'\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -28966,25 +29301,25 @@
         {
           "name": "warning",
           "file": "unknown",
-          "line": 706,
+          "line": 894,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 713,
+          "line": 901,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 713,
+          "line": 901,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 716,
+          "line": 904,
           "call_type": "method_call"
         }
       ],
@@ -39622,7 +39957,7 @@
         {
           "name": "cmd_session_marker",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 252,
+          "line": 295,
           "call_type": "function_call"
         }
       ],
@@ -39641,7 +39976,7 @@
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
       "line": 47,
       "language": "python",
-      "docstring": "Search transcripts for a specific SESSION_MARKER to identify current session.\n\nThis function searches all .jsonl transcript files in the project directory\nfor a specific marker string. The transcript containing that exact marker\nis the current session's transcript.\n\nTo handle race conditions where the marker may not be flushed to disk yet,\nthis function will retry with exponential backoff if the marker is not found\non the first attempt.\n\nArgs:\n    cwd: Current working directory (used to find project-specific transcripts)\n    marker: Specific marker to search for (e.g., \"SESSION_MARKER_abc12345\")\n    max_retries: Maximum number of retry attempts (default: 5)\n\nReturns:\n    Path to transcript containing the marker, or None if not found",
+      "docstring": "Search transcripts for a specific SESSION_MARKER to identify current session.\n\nThis function searches all .jsonl transcript files in the project directory\nfor a specific marker string. The transcript containing that exact marker\nis the current session's transcript.\n\nTo handle race conditions where the marker may not be flushed to disk yet,\nthis function will retry with exponential backoff if the marker is not found\non the first attempt.\n\nTranscripts are searched in reverse chronological order (most recently modified\nfirst) to prioritize active sessions over historical ones.\n\nIf the exact CWD-based transcript directory doesn't exist, this function will\nsearch parent directories as a fallback to handle cases where commands are run\nfrom subdirectories of the project root.\n\nArgs:\n    cwd: Current working directory (used to find project-specific transcripts)\n    marker: Specific marker to search for (e.g., \"SESSION_MARKER_abc12345\")\n    max_retries: Maximum number of retry attempts (default: 10)\n\nReturns:\n    Path to transcript containing the marker, or None if not found",
       "parameters": [
         {
           "name": "cwd",
@@ -39660,7 +39995,7 @@
         }
       ],
       "return_type": "str | None",
-      "complexity": 10,
+      "complexity": 18,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -39669,87 +40004,123 @@
         {
           "name": "get_transcript_path",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 154,
+          "line": 197,
           "call_type": "function_call"
         }
       ],
       "calls": [
         {
-          "name": "replace",
-          "file": "unknown",
-          "line": 68,
-          "call_type": "method_call"
-        },
-        {
-          "name": "str",
-          "file": "unknown",
-          "line": 68,
-          "call_type": "function_call"
-        },
-        {
           "name": "resolve",
           "file": "unknown",
-          "line": 68,
+          "line": 79,
           "call_type": "method_call"
         },
         {
-          "name": "home",
-          "file": "unknown",
-          "line": 69,
-          "call_type": "method_call"
-        },
-        {
-          "name": "exists",
-          "file": "unknown",
-          "line": 71,
-          "call_type": "method_call"
-        },
-        {
-          "name": "range",
-          "file": "unknown",
-          "line": 75,
-          "call_type": "function_call"
-        },
-        {
-          "name": "range",
-          "file": "unknown",
-          "line": 77,
-          "call_type": "function_call"
-        },
-        {
-          "name": "time",
-          "file": "unknown",
-          "line": 78,
-          "call_type": "method_call"
-        },
-        {
-          "name": "glob",
+          "name": "replace",
           "file": "unknown",
           "line": 81,
           "call_type": "method_call"
         },
         {
-          "name": "stat",
+          "name": "str",
+          "file": "unknown",
+          "line": 81,
+          "call_type": "function_call"
+        },
+        {
+          "name": "home",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
           "file": "unknown",
           "line": 84,
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "min",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "function_call"
+        },
+        {
+          "name": "range",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "function_call"
+        },
+        {
+          "name": "range",
+          "file": "unknown",
+          "line": 99,
+          "call_type": "function_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "method_call"
+        },
+        {
+          "name": "glob",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "stat",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sort",
+          "file": "unknown",
+          "line": 119,
+          "call_type": "method_call"
+        },
+        {
           "name": "open",
           "file": "unknown",
-          "line": 89,
+          "line": 125,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 92,
+          "line": 128,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 138,
           "call_type": "function_call"
         },
         {
           "name": "sleep",
           "file": "unknown",
-          "line": 100,
+          "line": 143,
           "call_type": "method_call"
         }
       ],
@@ -39758,7 +40129,7 @@
     {
       "name": "get_transcript_path_from_stdin",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 105,
+      "line": 148,
       "language": "python",
       "docstring": "Read transcript path from stdin JSON (hook mode).\n\nExpected JSON format:\n{\n    \"transcript_path\": \"/path/to/transcript.jsonl\",\n    \"session_id\": \"...\",\n    \"cwd\": \"...\",\n    ...\n}\n\nReturns:\n    Transcript path from stdin, or None if stdin is a TTY or parsing fails",
       "parameters": [],
@@ -39772,7 +40143,7 @@
         {
           "name": "get_transcript_path",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 168,
+          "line": 211,
           "call_type": "function_call"
         }
       ],
@@ -39780,31 +40151,31 @@
         {
           "name": "isatty",
           "file": "unknown",
-          "line": 120,
+          "line": 163,
           "call_type": "method_call"
         },
         {
           "name": "read",
           "file": "unknown",
-          "line": 124,
+          "line": 167,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 125,
+          "line": 168,
           "call_type": "method_call"
         },
         {
           "name": "loads",
           "file": "unknown",
-          "line": 128,
+          "line": 171,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 129,
+          "line": 172,
           "call_type": "method_call"
         }
       ],
@@ -39813,7 +40184,7 @@
     {
       "name": "get_transcript_path",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 134,
+      "line": 177,
       "language": "python",
       "docstring": "Get transcript path from multiple sources (priority order).\n\nPriority:\n1. Session marker discovery (if --session-marker provided)\n2. Explicit CLI argument (--transcript-path)\n3. Environment variable (CLAUDE_TRANSCRIPT_PATH)\n4. stdin JSON (hook mode)\n\nArgs:\n    args: Parsed CLI arguments\n\nReturns:\n    Transcript path string, or None if not found",
       "parameters": [
@@ -39833,13 +40204,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 265,
+          "line": 308,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 413,
+          "line": 485,
           "call_type": "function_call"
         }
       ],
@@ -39847,37 +40218,37 @@
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 152,
+          "line": 195,
           "call_type": "function_call"
         },
         {
           "name": "cwd",
           "file": "unknown",
-          "line": 153,
+          "line": 196,
           "call_type": "method_call"
         },
         {
           "name": "find_transcript_by_specific_marker",
           "file": "unknown",
-          "line": 154,
+          "line": 197,
           "call_type": "function_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 159,
+          "line": 202,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 163,
+          "line": 206,
           "call_type": "method_call"
         },
         {
           "name": "get_transcript_path_from_stdin",
           "file": "unknown",
-          "line": 168,
+          "line": 211,
           "call_type": "function_call"
         }
       ],
@@ -39886,7 +40257,7 @@
     {
       "name": "format_number",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 175,
+      "line": 218,
       "language": "python",
       "docstring": "Format a number with thousands separators.",
       "parameters": [
@@ -39906,37 +40277,37 @@
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 202,
+          "line": 245,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 202,
+          "line": 245,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 205,
+          "line": 248,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 206,
+          "line": 249,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 207,
+          "line": 250,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 208,
+          "line": 251,
           "call_type": "function_call"
         }
       ],
@@ -39946,7 +40317,7 @@
     {
       "name": "format_metrics_human",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 180,
+      "line": 223,
       "language": "python",
       "docstring": "Format token metrics for human-readable output.\n\nArgs:\n    metrics: TokenMetrics object\n    max_context: Maximum context window size\n    transcript_path: Optional path to transcript file (for display)",
       "parameters": [
@@ -39976,13 +40347,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 308,
+          "line": 380,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 444,
+          "line": 516,
           "call_type": "function_call"
         }
       ],
@@ -39990,121 +40361,121 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 192,
+          "line": 235,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 193,
+          "line": 236,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 194,
+          "line": 237,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 199,
+          "line": 242,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 201,
+          "line": 244,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 202,
-          "call_type": "method_call"
-        },
-        {
-          "name": "format_number",
-          "file": "unknown",
-          "line": 202,
-          "call_type": "function_call"
-        },
-        {
-          "name": "format_number",
-          "file": "unknown",
-          "line": 202,
-          "call_type": "function_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 203,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 204,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 205,
+          "line": 245,
           "call_type": "method_call"
         },
         {
           "name": "format_number",
           "file": "unknown",
-          "line": 205,
+          "line": 245,
+          "call_type": "function_call"
+        },
+        {
+          "name": "format_number",
+          "file": "unknown",
+          "line": 245,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 206,
+          "line": 246,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 247,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 248,
           "call_type": "method_call"
         },
         {
           "name": "format_number",
           "file": "unknown",
-          "line": 206,
+          "line": 248,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 207,
+          "line": 249,
           "call_type": "method_call"
         },
         {
           "name": "format_number",
           "file": "unknown",
-          "line": 207,
+          "line": 249,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 208,
+          "line": 250,
           "call_type": "method_call"
         },
         {
           "name": "format_number",
           "file": "unknown",
-          "line": 208,
+          "line": 250,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 209,
+          "line": 251,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_number",
+          "file": "unknown",
+          "line": 251,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 252,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 211,
+          "line": 254,
           "call_type": "method_call"
         }
       ],
@@ -40113,7 +40484,7 @@
     {
       "name": "format_metrics_json",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 214,
+      "line": 257,
       "language": "python",
       "docstring": "Format token metrics as JSON.\n\nArgs:\n    metrics: TokenMetrics object\n    max_context: Maximum context window size\n    transcript_path: Optional path to transcript file (for metadata)",
       "parameters": [
@@ -40143,13 +40514,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 306,
+          "line": 378,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 442,
+          "line": 514,
           "call_type": "function_call"
         }
       ],
@@ -40157,13 +40528,13 @@
         {
           "name": "round",
           "file": "unknown",
-          "line": 227,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 238,
+          "line": 281,
           "call_type": "method_call"
         }
       ],
@@ -40172,7 +40543,7 @@
     {
       "name": "cmd_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 241,
+      "line": 284,
       "language": "python",
       "docstring": "Handler for 'sdd session-marker' command.\n\nGenerates and outputs a unique session marker that can be used\nto identify the current session's transcript.\n\nArgs:\n    args: Parsed arguments from ArgumentParser\n    printer: PrettyPrinter instance for output",
       "parameters": [
@@ -40198,13 +40569,13 @@
         {
           "name": "generate_session_marker",
           "file": "unknown",
-          "line": 252,
+          "line": 295,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 254,
+          "line": 297,
           "call_type": "function_call"
         }
       ]
@@ -40212,7 +40583,7 @@
     {
       "name": "cmd_context",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 257,
+      "line": 300,
       "language": "python",
       "docstring": "Handler for 'sdd context' command.\n\nArgs:\n    args: Parsed arguments from ArgumentParser\n    printer: PrettyPrinter instance for output",
       "parameters": [
@@ -40228,7 +40599,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 7,
+      "complexity": 13,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -40238,193 +40609,337 @@
         {
           "name": "get_transcript_path",
           "file": "unknown",
-          "line": 265,
+          "line": 308,
           "call_type": "function_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 269,
+          "line": 312,
           "call_type": "function_call"
         },
         {
-          "name": "error",
+          "name": "cwd",
           "file": "unknown",
-          "line": 270,
+          "line": 313,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "resolve",
           "file": "unknown",
-          "line": 271,
+          "line": 317,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "replace",
           "file": "unknown",
-          "line": 272,
+          "line": 319,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "str",
           "file": "unknown",
-          "line": 273,
-          "call_type": "method_call"
+          "line": 319,
+          "call_type": "function_call"
         },
         {
-          "name": "error",
+          "name": "home",
           "file": "unknown",
-          "line": 274,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 275,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 276,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 277,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 278,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 279,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 281,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 282,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 283,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 284,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 285,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 286,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 287,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 288,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 289,
-          "call_type": "method_call"
-        },
-        {
-          "name": "exit",
-          "file": "unknown",
-          "line": 290,
+          "line": 320,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 293,
+          "line": 321,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 322,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 323,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 327,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 294,
+          "line": 328,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 329,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 330,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 331,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 332,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 333,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 334,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 335,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 336,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 338,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 340,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 340,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 340,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 342,
+          "call_type": "function_call"
+        },
+        {
+          "name": "list",
+          "file": "unknown",
+          "line": 342,
+          "call_type": "function_call"
+        },
+        {
+          "name": "glob",
+          "file": "unknown",
+          "line": 342,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 343,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 345,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 346,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 347,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 348,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 349,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 350,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 351,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 353,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 355,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 356,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 357,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 358,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 359,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 360,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 361,
           "call_type": "method_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 295,
+          "line": 362,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 365,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 366,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exit",
+          "file": "unknown",
+          "line": 367,
           "call_type": "method_call"
         },
         {
           "name": "parse_transcript",
           "file": "unknown",
-          "line": 298,
+          "line": 370,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 301,
+          "line": 373,
           "call_type": "method_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 302,
+          "line": 374,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 306,
+          "line": 378,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_json",
           "file": "unknown",
-          "line": 306,
+          "line": 378,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 308,
+          "line": 380,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 308,
+          "line": 380,
           "call_type": "function_call"
         }
       ]
@@ -40432,7 +40947,7 @@
     {
       "name": "register_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 311,
+      "line": 383,
       "language": "python",
       "docstring": "Register 'session-marker' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -40465,13 +40980,13 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 319,
+          "line": 391,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 326,
+          "line": 398,
           "call_type": "method_call"
         }
       ],
@@ -40480,7 +40995,7 @@
     {
       "name": "register_context",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 329,
+      "line": 401,
       "language": "python",
       "docstring": "Register 'context' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -40513,31 +41028,31 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 337,
+          "line": 409,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 344,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 350,
+          "line": 422,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 356,
+          "line": 428,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 365,
+          "line": 437,
           "call_type": "method_call"
         }
       ],
@@ -40546,7 +41061,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 368,
+      "line": 440,
       "language": "python",
       "docstring": "Main CLI entry point.",
       "parameters": [],
@@ -40572,7 +41087,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -40634,163 +41149,163 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 370,
+          "line": 442,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 391,
+          "line": 463,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 397,
+          "line": 469,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 404,
+          "line": 476,
           "call_type": "method_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 410,
+          "line": 482,
           "call_type": "method_call"
         },
         {
           "name": "get_transcript_path",
           "file": "unknown",
-          "line": 413,
+          "line": 485,
           "call_type": "function_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 416,
+          "line": 488,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 417,
+          "line": 489,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 418,
+          "line": 490,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 419,
+          "line": 491,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 420,
+          "line": 492,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 421,
+          "line": 493,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 422,
+          "line": 494,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 423,
+          "line": 495,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 424,
+          "line": 496,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 425,
+          "line": 497,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 426,
+          "line": 498,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 429,
+          "line": 501,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 430,
+          "line": 502,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 431,
+          "line": 503,
           "call_type": "method_call"
         },
         {
           "name": "parse_transcript",
           "file": "unknown",
-          "line": 434,
+          "line": 506,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 437,
+          "line": 509,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 438,
+          "line": 510,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 442,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_json",
           "file": "unknown",
-          "line": 442,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 444,
+          "line": 516,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 444,
+          "line": 516,
           "call_type": "function_call"
         }
       ],
@@ -40886,13 +41401,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 298,
+          "line": 370,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 434,
+          "line": 506,
           "call_type": "function_call"
         }
       ],
@@ -41736,7 +42251,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -42845,7 +43360,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -43304,7 +43819,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -49048,7 +49563,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 448,
+          "line": 520,
           "call_type": "function_call"
         },
         {
@@ -75850,7 +76365,7 @@
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
       "line": 160,
       "language": "python",
-      "docstring": "Stage all changes and create a commit.\n\nArgs:\n    repo_root: Path to repository root directory\n    commit_message: Commit message to use\n\nReturns:\n    Tuple of (success: bool, commit_sha: Optional[str], error_message: str)\n    - success: True if commit succeeded, False otherwise\n    - commit_sha: SHA of created commit if successful, None otherwise\n    - error_message: Error message if failed, empty string if successful",
+      "docstring": "Stage all changes and create a commit.\n\nThis function maintains backward compatibility by automatically staging all\nchanges (git add --all) and then creating a commit. It now uses the new\ncreate_commit_from_staging() workflow internally.\n\nArgs:\n    repo_root: Path to repository root directory\n    commit_message: Commit message to use\n\nReturns:\n    Tuple of (success: bool, commit_sha: Optional[str], error_message: str)\n    - success: True if commit succeeded, False otherwise\n    - commit_sha: SHA of created commit if successful, None otherwise\n    - error_message: Error message if failed, empty string if successful",
       "parameters": [
         {
           "name": "repo_root",
@@ -75864,7 +76379,7 @@
         }
       ],
       "return_type": "Tuple[bool, Optional[str], str]",
-      "complexity": 5,
+      "complexity": 6,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -75881,55 +76396,67 @@
         {
           "name": "run",
           "file": "unknown",
-          "line": 178,
+          "line": 182,
           "call_type": "method_call"
         },
         {
           "name": "warning",
-          "file": "unknown",
-          "line": 188,
-          "call_type": "method_call"
-        },
-        {
-          "name": "run",
           "file": "unknown",
           "line": 192,
           "call_type": "method_call"
         },
         {
-          "name": "warning",
+          "name": "get_staged_files",
           "file": "unknown",
           "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 205,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 206,
+          "line": 209,
           "call_type": "method_call"
         },
         {
           "name": "warning",
-          "file": "unknown",
-          "line": 215,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
           "file": "unknown",
           "line": 219,
           "call_type": "method_call"
         },
         {
-          "name": "info",
+          "name": "run",
           "file": "unknown",
-          "line": 220,
+          "line": 223,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 226,
+          "line": 232,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 236,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 237,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 243,
           "call_type": "method_call"
         }
       ],
@@ -104217,6 +104744,7 @@
       "typing.Tuple",
       "typing.Any",
       "claude_skills.common.git_metadata.find_git_root",
+      "claude_skills.common.git_metadata.create_commit_from_staging",
       "claude_skills.common.git_config.is_git_enabled"
     ],
     "src/claude_skills/claude_skills/sdd_update/git_pr.py": [

@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 08:16:46
+**Generated:** 2025-11-03 09:03:34
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 67848
+- **Total Lines:** 68125
 - **Total Classes:** 268
-- **Total Functions:** 753
-- **Avg Complexity:** 5.56
+- **Total Functions:** 755
+- **Avg Complexity:** 5.59
 - **Max Complexity:** 43
 - **High Complexity Functions:**
   - complete_task_workflow (43)
@@ -6653,7 +6653,7 @@ Returns:
 ### `add_commit_metadata(spec, sha, message, task_id, timestamp) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:616`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:804`
 **Complexity:** 5
 
 **Description:**
@@ -8406,8 +8406,8 @@ Example:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:257`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:300`
+⚠️ **Complexity:** 13 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -9169,7 +9169,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:241`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:284`
 **Complexity:** 1
 
 **Description:**
@@ -9846,6 +9846,51 @@ Example:
 
 ---
 
+### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:453`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Create commit from currently staged files (Step 2 of two-step workflow).
+
+This is step 2 of the two-step commit workflow. After the agent has staged
+files using git add, this function creates a commit with those staged files.
+
+Workflow:
+1. Agent calls show_commit_preview_and_wait() to see changes (step 1)
+2. Agent stages selected files with git add
+3. Agent calls this function to create the commit (step 2)
+
+Args:
+    repo_root: Path to git repository root
+    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+    task_id: Task ID (e.g., 'task-2-1')
+    printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+Returns:
+    Tuple of (success, commit_sha, error_msg):
+    - success: True if commit created successfully, False otherwise
+    - commit_sha: Full commit SHA if successful, None otherwise
+    - error_msg: Error message if failed, None if successful
+
+Example:
+    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+    (True, 'a1b2c3d4e5f6...', None)
+
+    >>> # No files staged:
+    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+    (False, None, 'No files staged for commit')
+
+**Parameters:**
+- `repo_root`: Path
+- `spec_id`: str
+- `task_id`: str
+- `printer`: None
+
+---
+
 ### `create_context_summary(framework_info, key_files, layers, statistics, readme_content) -> str`
 
 **Language:** python
@@ -10136,7 +10181,7 @@ Returns:
 ### `detect_git_drift(spec, repo_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:447`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:635`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -11098,7 +11143,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:47`
-**Complexity:** 10
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Search transcripts for a specific SESSION_MARKER to identify current session.
@@ -11111,10 +11156,17 @@ To handle race conditions where the marker may not be flushed to disk yet,
 this function will retry with exponential backoff if the marker is not found
 on the first attempt.
 
+Transcripts are searched in reverse chronological order (most recently modified
+first) to prioritize active sessions over historical ones.
+
+If the exact CWD-based transcript directory doesn't exist, this function will
+search parent directories as a fallback to handle cases where commands are run
+from subdirectories of the project root.
+
 Args:
     cwd: Current working directory (used to find project-specific transcripts)
     marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
-    max_retries: Maximum number of retry attempts (default: 5)
+    max_retries: Maximum number of retry attempts (default: 10)
 
 Returns:
     Path to transcript containing the marker, or None if not found
@@ -11603,7 +11655,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:180`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:223`
 **Complexity:** 2
 
 **Description:**
@@ -11624,7 +11676,7 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:214`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:257`
 **Complexity:** 2
 
 **Description:**
@@ -11645,7 +11697,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:175`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:218`
 **Complexity:** 1
 
 **Description:**
@@ -13469,7 +13521,7 @@ Example:
 ### `get_staged_files(repo_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:582`
 **Complexity:** 6
 
 **Description:**
@@ -13834,7 +13886,7 @@ Returns:
 ### `get_transcript_path(args) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:134`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:177`
 **Complexity:** 8
 
 **Description:**
@@ -13860,7 +13912,7 @@ Returns:
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:105`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:148`
 **Complexity:** 4
 
 **Description:**
@@ -14600,7 +14652,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:368`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:440`
 **Complexity:** 5
 
 **Description:**
@@ -15438,7 +15490,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:329`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:401`
 **Complexity:** 1
 
 **Description:**
@@ -15578,7 +15630,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:311`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:383`
 **Complexity:** 1
 
 **Description:**
@@ -16517,6 +16569,53 @@ Example:
 
 ---
 
+### `show_commit_preview_and_wait(repo_root, spec_id, task_id, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Complexity:** 3
+
+**Description:**
+> Show uncommitted file preview and exit for agent-controlled staging (Step 1).
+
+This is step 1 of the two-step commit workflow. It displays uncommitted files
+grouped by status, then exits to allow the agent to stage files using git add.
+After staging, the agent should call create_commit_from_staging() to complete
+the commit (step 2).
+
+Workflow:
+1. Agent calls this function to see what files have changed
+2. Agent reviews changes and decides which files to stage
+3. Agent uses git add commands to stage selected files
+4. Agent calls create_commit_from_staging() to create the commit
+
+Args:
+    repo_root: Path to git repository root
+    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+    task_id: Task ID (e.g., 'task-2-1')
+    printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+Returns:
+    None (displays output and exits)
+
+Example:
+    >>> show_commit_preview_and_wait(Path('/repo'), 'user-auth-001', 'task-2-1')
+    Uncommitted Changes
+    📝 Modified (2):
+      • src/main.py
+      • lib/utils.py
+
+    To stage files: git add <file>
+    After staging, create commit with: sdd create-task-commit user-auth-001 task-2-1
+
+**Parameters:**
+- `repo_root`: Path
+- `spec_id`: str
+- `task_id`: str
+- `printer`: None
+
+---
+
 ### `spec_stats(spec_file, json_spec_file) -> Dict`
 
 **Language:** python
@@ -16627,10 +16726,14 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:160`
-**Complexity:** 5
+**Complexity:** 6
 
 **Description:**
 > Stage all changes and create a commit.
+
+This function maintains backward compatibility by automatically staging all
+changes (git add --all) and then creating a commit. It now uses the new
+create_commit_from_staging() workflow internally.
 
 Args:
     repo_root: Path to repository root directory
@@ -18492,7 +18595,7 @@ Returns:
 ### `update_branch_metadata(spec, branch_name, base_branch) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:570`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:758`
 **Complexity:** 5
 
 **Description:**
@@ -18636,7 +18739,7 @@ Returns:
 ### `update_pr_metadata(spec, pr_url, pr_number, status) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:675`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:863`
 **Complexity:** 3
 
 **Description:**
@@ -20465,6 +20568,7 @@ Returns:
 
 - `__future__.annotations`
 - `claude_skills.common.git_config.is_git_enabled`
+- `claude_skills.common.git_metadata.create_commit_from_staging`
 - `claude_skills.common.git_metadata.find_git_root`
 - `logging`
 - `pathlib.Path`
