@@ -1,7 +1,7 @@
 {
   "spec_id": "git-agent-file-staging-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T13:23:43.247442Z",
+  "last_updated": "2025-11-03T13:25:30.222948Z",
   "metadata": {
     "title": "Agent-Controlled Git File Staging",
     "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
@@ -9,8 +9,8 @@
     "estimated_hours": 4,
     "complexity": "medium",
     "risk_level": "low",
-    "progress_percentage": 25,
-    "current_phase": "phase-1"
+    "progress_percentage": 29,
+    "current_phase": "phase-2"
   },
   "hierarchy": {
     "spec-root": {
@@ -25,7 +25,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "objectives": [
           "Replace automatic 'git add --all' with agent-controlled file selection",
@@ -287,7 +287,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Two-Step Workflow Functions",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -303,7 +303,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Implement show_commit_preview_and_wait() and create_commit_from_staging() functions for two-step workflow",
         "risk_level": "low",
@@ -313,13 +313,13 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -330,7 +330,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -350,7 +350,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
         "task_category": "implementation",
@@ -361,7 +361,7 @@
     "task-2-1-1": {
       "type": "subtask",
       "title": "Add show_commit_preview_and_wait() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -370,10 +370,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Step 1 of two-step workflow: show preview and exit for agent to stage files",
-        "implementation_notes": "Takes repo_root, spec_id, task_id, printer. Calls parse_git_status(), show_commit_preview(), then displays instruction to run create-task-commit"
+        "implementation_notes": "Takes repo_root, spec_id, task_id, printer. Calls parse_git_status(), show_commit_preview(), then displays instruction to run create-task-commit",
+        "completed_at": "2025-11-03T13:25:30.208772Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T13:25:30.210906Z"
       }
     },
     "task-2-1-2": {
@@ -1024,6 +1027,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-03T13:25:30.210893Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add show_commit_preview_and_wait() function",
+      "author": "claude-code",
+      "content": "Successfully implemented show_commit_preview_and_wait() function in src/claude_skills/claude_skills/common/git_metadata.py (lines 394-450). Function implements step 1 of the two-step commit workflow:\n- Takes repo_root, spec_id, task_id, and optional printer parameters\n- Calls parse_git_status() to check for uncommitted changes\n- If no changes: displays 'No uncommitted changes' and returns\n- If changes exist: calls show_commit_preview() to display grouped file list\n- Displays instruction to agent: 'sdd create-task-commit {spec_id} {task_id}'\n- Includes comprehensive docstring with workflow explanation and example\n- Function import tested successfully\n- Python syntax validated",
+      "metadata": {},
+      "task_id": "task-2-1-1"
     }
   ]
 }

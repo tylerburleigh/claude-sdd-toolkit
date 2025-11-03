@@ -391,6 +391,65 @@ def show_commit_preview(repo_root: Path, printer=None) -> Dict[str, List[str]]:
     return categories
 
 
+def show_commit_preview_and_wait(
+    repo_root: Path,
+    spec_id: str,
+    task_id: str,
+    printer=None
+) -> None:
+    """Show uncommitted file preview and exit for agent-controlled staging (Step 1).
+
+    This is step 1 of the two-step commit workflow. It displays uncommitted files
+    grouped by status, then exits to allow the agent to stage files using git add.
+    After staging, the agent should call create_commit_from_staging() to complete
+    the commit (step 2).
+
+    Workflow:
+    1. Agent calls this function to see what files have changed
+    2. Agent reviews changes and decides which files to stage
+    3. Agent uses git add commands to stage selected files
+    4. Agent calls create_commit_from_staging() to create the commit
+
+    Args:
+        repo_root: Path to git repository root
+        spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+        task_id: Task ID (e.g., 'task-2-1')
+        printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+    Returns:
+        None (displays output and exits)
+
+    Example:
+        >>> show_commit_preview_and_wait(Path('/repo'), 'user-auth-001', 'task-2-1')
+        Uncommitted Changes
+        📝 Modified (2):
+          • src/main.py
+          • lib/utils.py
+
+        To stage files: git add <file>
+        After staging, create commit with: sdd create-task-commit user-auth-001 task-2-1
+    """
+    from claude_skills.common.printer import PrettyPrinter
+
+    if printer is None:
+        printer = PrettyPrinter()
+
+    # Check for uncommitted changes
+    files = parse_git_status(repo_root)
+
+    if not files:
+        printer.info("No uncommitted changes")
+        return
+
+    # Show the preview (grouped by status with emojis)
+    show_commit_preview(repo_root, printer)
+
+    # Display next step instruction
+    printer.blank()
+    printer.info(f"After staging files, create commit with:")
+    printer.result("Command", f"sdd create-task-commit {spec_id} {task_id}")
+
+
 def get_staged_files(repo_root: Path) -> List[str]:
     """Get list of files currently staged for commit.
 
