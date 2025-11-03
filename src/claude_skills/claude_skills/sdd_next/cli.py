@@ -504,7 +504,7 @@ def cmd_progress(args, printer):
     progress = get_progress_summary(spec_data)
 
     if args.json:
-        print(json.dumps(progress, indent=2))
+        print_json_output(progress, compact=args.compact)
     else:
         printer.success("Progress calculated")
         printer.result("Spec", f"{progress['title']} ({progress['spec_id']})")
@@ -1119,6 +1119,7 @@ def register_next(subparsers, parent_parser):
     # progress
     parser_progress = subparsers.add_parser('progress', parents=[parent_parser], help='Show overall progress')
     parser_progress.add_argument('spec_id', help='Specification ID')
+    parser_progress.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_progress.set_defaults(func=cmd_progress)
 
 
