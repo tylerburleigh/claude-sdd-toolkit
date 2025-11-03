@@ -14,6 +14,10 @@ import time
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.integrations import get_session_state
+from claude_skills.cli.skills_dev.git_config_helper import (
+    cmd_check_git_config,
+    cmd_setup_git_config
+)
 
 
 # Configuration
@@ -385,3 +389,22 @@ def register_start_helper(subparsers, parent_parser):
     )
     session_info.add_argument('project_root', nargs='?', help='Project root directory')
     session_info.set_defaults(func=cmd_get_session_info)
+
+    # check-git-config command
+    check_git = start_helper_subparsers.add_parser(
+        'check-git-config',
+        parents=[parent_parser],
+        help='Check if git configuration is set up'
+    )
+    check_git.add_argument('project_root', nargs='?', help='Project root directory')
+    check_git.set_defaults(func=cmd_check_git_config)
+
+    # setup-git-config command
+    setup_git = start_helper_subparsers.add_parser(
+        'setup-git-config',
+        parents=[parent_parser],
+        help='Interactive git configuration wizard'
+    )
+    setup_git.add_argument('project_root', nargs='?', help='Project root directory')
+    setup_git.add_argument('--force', action='store_true', help='Force reconfiguration')
+    setup_git.set_defaults(func=cmd_setup_git_config)
