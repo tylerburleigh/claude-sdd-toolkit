@@ -20,6 +20,7 @@ from claude_skills.common.git_metadata import (
     check_dirty_tree,
     parse_git_status,
     show_commit_preview,
+    get_staged_files,
     detect_git_drift,
     update_branch_metadata,
     add_commit_metadata,
@@ -564,6 +565,103 @@ class TestShowCommitPreview:
 
         assert result == {}
         mock_parse.assert_called_once_with(tmp_path)
+
+
+class TestGetStagedFiles:
+    """Tests for get_staged_files function."""
+
+    @patch('subprocess.run')
+    def test_get_staged_files_empty(self, mock_run, tmp_path):
+        """Test with no staged files."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="",
+            stderr=""
+        )
+
+        result = get_staged_files(tmp_path)
+
+        assert result == []
+        mock_run.assert_called_once()
+
+    @patch('subprocess.run')
+    def test_get_staged_files_single_file(self, mock_run, tmp_path):
+        """Test with single staged file."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="file1.py\n",
+            stderr=""
+        )
+
+        result = get_staged_files(tmp_path)
+
+        assert len(result) == 1
+        assert result[0] == 'file1.py'
+
+    @patch('subprocess.run')
+    def test_get_staged_files_multiple_files(self, mock_run, tmp_path):
+        """Test with multiple staged files."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="file1.py\nfile2.py\nfile3.py\n",
+            stderr=""
+        )
+
+        result = get_staged_files(tmp_path)
+
+        assert len(result) == 3
+        assert result == ['file1.py', 'file2.py', 'file3.py']
+
+    @patch('subprocess.run')
+    def test_get_staged_files_with_subdirectories(self, mock_run, tmp_path):
+        """Test with files in subdirectories."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="src/main.py\ntests/test_main.py\n",
+            stderr=""
+        )
+
+        result = get_staged_files(tmp_path)
+
+        assert len(result) == 2
+        assert 'src/main.py' in result
+        assert 'tests/test_main.py' in result
+
+    @patch('subprocess.run')
+    def test_get_staged_files_handles_timeout(self, mock_run, tmp_path):
+        """Test handling of git command timeout."""
+        mock_run.side_effect = subprocess.TimeoutExpired('git', 10)
+
+        result = get_staged_files(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_get_staged_files_handles_error(self, mock_run, tmp_path):
+        """Test handling of git command error."""
+        mock_run.side_effect = subprocess.CalledProcessError(1, 'git', stderr='error')
+
+        result = get_staged_files(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_get_staged_files_handles_git_not_found(self, mock_run, tmp_path):
+        """Test handling when git command not found."""
+        mock_run.side_effect = FileNotFoundError()
+
+        result = get_staged_files(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_get_staged_files_handles_unexpected_error(self, mock_run, tmp_path):
+        """Test handling of unexpected errors."""
+        mock_run.side_effect = RuntimeError("Unexpected error")
+
+        result = get_staged_files(tmp_path)
+
+        assert result == []
 
 
 class TestDetectGitDrift:

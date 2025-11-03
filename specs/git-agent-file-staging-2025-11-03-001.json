@@ -1,7 +1,7 @@
 {
   "spec_id": "git-agent-file-staging-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T13:07:05.849262Z",
+  "last_updated": "2025-11-03T13:10:05.997823Z",
   "metadata": {
     "title": "Agent-Controlled Git File Staging",
     "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
@@ -9,17 +9,17 @@
     "estimated_hours": 4,
     "complexity": "medium",
     "risk_level": "low",
-    "progress_percentage": 4,
+    "progress_percentage": 8,
     "current_phase": "phase-1",
     "git": {
       "branch_name": null,
       "base_branch": null,
       "commits": [
         {
-          "sha": "cea0a3beda88fc510f8881f2e1a6e717c93fa112",
-          "message": "task-1-1-1: Add parse_git_status() function",
-          "task_id": "task-1-1-1",
-          "timestamp": "2025-11-03T13:07:05.995384Z"
+          "sha": "ee2a855984c5f04bf1e28b872554d4859feffc18",
+          "message": "task-1-1-2: Add show_commit_preview() function",
+          "task_id": "task-1-1-2",
+          "timestamp": "2025-11-03T13:10:06.114283Z"
         }
       ],
       "pr": null
@@ -38,7 +38,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "objectives": [
           "Replace automatic 'git add --all' with agent-controlled file selection",
@@ -65,7 +65,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Add functions to parse git status, display file previews, and check staging area",
         "risk_level": "low",
@@ -86,7 +86,7 @@
         "task-1-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -114,7 +114,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
         "task_category": "implementation",
@@ -148,7 +148,7 @@
     "task-1-1-2": {
       "type": "subtask",
       "title": "Add show_commit_preview() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -159,11 +159,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Display uncommitted files grouped by status (Modified/Added/Deleted) with emoji markers and staging instructions",
         "implementation_notes": "Use PrettyPrinter for output, group files by status code, include emojis (\ud83d\udcdd \u2728 \u274c)",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "completed_at": "2025-11-03T13:10:05.993591Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T13:10:05.996054Z"
       }
     },
     "task-1-1-3": {
@@ -939,6 +942,15 @@
       "content": "Successfully implemented parse_git_status() function in src/claude_skills/claude_skills/common/git_metadata.py. The function parses 'git status --porcelain' output into a structured list of dictionaries with 'status' and 'path' keys.\n\nKey accomplishments:\n- Added parse_git_status() function with comprehensive docstring explaining git porcelain format\n- Implemented parsing logic with proper handling of all common status codes (M, A, D, R, ??, MM, AM, etc.)\n- Added robust error handling for timeouts, git errors, and edge cases\n- Created 16 comprehensive unit tests in test_git_metadata.py covering all scenarios\n- Fixed critical bug: Used rstrip() instead of strip() to preserve leading spaces in status codes\n- All 42 tests in test_git_metadata.py pass (16 new + 26 existing)\n- Updated module docstring to include new function\n- Function follows existing code patterns and error handling conventions in the module\n\nFiles modified:\n- src/claude_skills/claude_skills/common/git_metadata.py (added parse_git_status function)\n- src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py (added 16 test cases)\n\nThis task unblocks task-1-1-2 (show_commit_preview function) which depends on parse_git_status().",
       "metadata": {},
       "task_id": "task-1-1-1"
+    },
+    {
+      "timestamp": "2025-11-03T13:10:05.996041Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Show Commit Preview Function",
+      "author": "claude-code",
+      "content": "Successfully implemented show_commit_preview() function in src/claude_skills/claude_skills/common/git_metadata.py. The function displays uncommitted files grouped by status with emoji markers and staging instructions using the PrettyPrinter utility.\n\nKey accomplishments:\n- Added show_commit_preview() function that uses parse_git_status() from task-1-1-1\n- Implemented comprehensive file categorization (staged/unstaged modified, added, deleted, untracked, renamed, copied)\n- Integrated PrettyPrinter for beautiful, consistent console output\n- Added emoji markers: \ud83d\udcdd (modified), \u2728 (added), \u274c (deleted), \u2753 (untracked), \ud83d\udd04 (renamed), \ud83d\udccb (copied)\n- Included helpful staging instructions (git add, git commit commands)\n- Function returns dictionary with all categorized files for programmatic use\n- Creates PrettyPrinter automatically if none provided (optional parameter)\n- Created 11 comprehensive unit tests covering all status categories\n- All 53 tests in test_git_metadata.py pass (26 existing + 16 from task-1-1-1 + 11 new)\n- Updated module docstring to include new function\n\nFiles modified:\n- src/claude_skills/claude_skills/common/git_metadata.py (added show_commit_preview function)\n- src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py (added 11 test cases)",
+      "metadata": {},
+      "task_id": "task-1-1-2"
     }
   ]
 }

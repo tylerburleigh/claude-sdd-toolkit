@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T13:07:32.079591Z",
+    "generated_at": "2025-11-03T13:10:32.800151Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 201,
-    "total_lines": 67346,
-    "total_classes": 266,
-    "total_functions": 751,
-    "avg_complexity": 5.52,
+    "total_lines": 67697,
+    "total_classes": 267,
+    "total_functions": 752,
+    "avg_complexity": 5.56,
     "max_complexity": 43,
     "high_complexity_functions": [
       "complete_task_workflow (43)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 201,
-        "lines": 67346,
-        "classes": 266,
-        "functions": 751,
-        "avg_complexity": 5.52
+        "lines": 67697,
+        "classes": 267,
+        "functions": 752,
+        "avg_complexity": 5.56
       }
     }
   },
@@ -946,12 +946,13 @@
       "name": "git_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
       "language": "python",
-      "docstring": "Git metadata management and helper functions for SDD toolkit.\n\nThis module provides utilities for git operations and metadata synchronization.\nAll git commands execute with subprocess.run and include basic error handling.\n\nFunctions are organized into categories:\n- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, detect_git_drift\n- Metadata Updates: update_branch_metadata, add_commit_metadata, update_pr_metadata",
+      "docstring": "Git metadata management and helper functions for SDD toolkit.\n\nThis module provides utilities for git operations and metadata synchronization.\nAll git commands execute with subprocess.run and include basic error handling.\n\nFunctions are organized into categories:\n- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, show_commit_preview, detect_git_drift\n- Metadata Updates: update_branch_metadata, add_commit_metadata, update_pr_metadata",
       "classes": [],
       "functions": [
         "find_git_root",
         "check_dirty_tree",
         "parse_git_status",
+        "show_commit_preview",
         "detect_git_drift",
         "update_branch_metadata",
         "add_commit_metadata",
@@ -968,7 +969,7 @@
         "typing.Any"
       ],
       "exports": [],
-      "lines": 496
+      "lines": 665
     },
     {
       "name": "hierarchy_validation",
@@ -4390,6 +4391,7 @@
         "TestFindGitRoot",
         "TestCheckDirtyTree",
         "TestParseGitStatus",
+        "TestShowCommitPreview",
         "TestDetectGitDrift",
         "TestUpdateBranchMetadata",
         "TestAddCommitMetadata",
@@ -4407,13 +4409,14 @@
         "claude_skills.common.git_metadata.find_git_root",
         "claude_skills.common.git_metadata.check_dirty_tree",
         "claude_skills.common.git_metadata.parse_git_status",
+        "claude_skills.common.git_metadata.show_commit_preview",
         "claude_skills.common.git_metadata.detect_git_drift",
         "claude_skills.common.git_metadata.update_branch_metadata",
         "claude_skills.common.git_metadata.add_commit_metadata",
         "claude_skills.common.git_metadata.update_pr_metadata"
       ],
       "exports": [],
-      "lines": 660
+      "lines": 842
     },
     {
       "name": "test_integrations",
@@ -7074,6 +7077,14 @@
           ]
         },
         {
+          "instantiator": "show_commit_preview",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 260,
+          "context": [
+            "show_commit_preview"
+          ]
+        },
+        {
           "instantiator": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 510,
@@ -7343,6 +7354,96 @@
           "line": 348,
           "context": [
             "complete_task_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_no_changes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 406,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_no_changes"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_staged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 423,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_staged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_unstaged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 439,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_unstaged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_both_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 454,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_both_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_added_files",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 469,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_added_files"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_staged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 484,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_staged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_unstaged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 499,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_unstaged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_untracked",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 514,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_untracked"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_renamed",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 529,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_renamed"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_mixed_statuses",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 548,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_mixed_statuses"
           ]
         },
         {
@@ -7653,7 +7754,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 69
+      "instantiation_count": 80
     },
     {
       "name": "EnhancedError",
@@ -13706,7 +13807,7 @@
     {
       "name": "TestFindGitRoot",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 29,
+      "line": 30,
       "language": "python",
       "docstring": "Tests for find_git_root function.",
       "bases": [],
@@ -13725,7 +13826,7 @@
     {
       "name": "TestCheckDirtyTree",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 70,
+      "line": 71,
       "language": "python",
       "docstring": "Tests for check_dirty_tree function.",
       "bases": [],
@@ -13746,7 +13847,7 @@
     {
       "name": "TestParseGitStatus",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 160,
+      "line": 161,
       "language": "python",
       "docstring": "Tests for parse_git_status function.",
       "bases": [],
@@ -13775,9 +13876,35 @@
       "imported_by": []
     },
     {
+      "name": "TestShowCommitPreview",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+      "line": 388,
+      "language": "python",
+      "docstring": "Tests for show_commit_preview function.",
+      "bases": [],
+      "methods": [
+        "test_show_commit_preview_no_changes",
+        "test_show_commit_preview_staged_modified",
+        "test_show_commit_preview_unstaged_modified",
+        "test_show_commit_preview_both_modified",
+        "test_show_commit_preview_added_files",
+        "test_show_commit_preview_deleted_staged",
+        "test_show_commit_preview_deleted_unstaged",
+        "test_show_commit_preview_untracked",
+        "test_show_commit_preview_renamed",
+        "test_show_commit_preview_mixed_statuses",
+        "test_show_commit_preview_creates_printer_if_none"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestDetectGitDrift",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 387,
+      "line": 569,
       "language": "python",
       "docstring": "Tests for detect_git_drift function.",
       "bases": [],
@@ -13796,7 +13923,7 @@
     {
       "name": "TestUpdateBranchMetadata",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 467,
+      "line": 649,
       "language": "python",
       "docstring": "Tests for update_branch_metadata function.",
       "bases": [],
@@ -13814,7 +13941,7 @@
     {
       "name": "TestAddCommitMetadata",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 520,
+      "line": 702,
       "language": "python",
       "docstring": "Tests for add_commit_metadata function.",
       "bases": [],
@@ -13833,7 +13960,7 @@
     {
       "name": "TestUpdatePRMetadata",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-      "line": 585,
+      "line": 767,
       "language": "python",
       "docstring": "Tests for update_pr_metadata function.",
       "bases": [],
@@ -27320,25 +27447,25 @@
         {
           "name": "test_find_git_root_from_repo_directory",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         },
         {
           "name": "test_find_git_root_from_git_root",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 51,
+          "line": 52,
           "call_type": "function_call"
         },
         {
           "name": "test_find_git_root_returns_none_when_not_found",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 58,
+          "line": 59,
           "call_type": "function_call"
         },
         {
           "name": "test_find_git_root_uses_cwd_by_default",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 65,
+          "line": 66,
           "call_type": "function_call"
         }
       ],
@@ -27405,37 +27532,37 @@
         {
           "name": "test_check_dirty_tree_clean",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 83,
+          "line": 84,
           "call_type": "function_call"
         },
         {
           "name": "test_check_dirty_tree_with_staged_changes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 99,
+          "line": 100,
           "call_type": "function_call"
         },
         {
           "name": "test_check_dirty_tree_with_unstaged_changes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 118,
+          "line": 119,
           "call_type": "function_call"
         },
         {
           "name": "test_check_dirty_tree_with_untracked_files",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 134,
+          "line": 135,
           "call_type": "function_call"
         },
         {
           "name": "test_check_dirty_tree_handles_timeout",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 144,
+          "line": 145,
           "call_type": "function_call"
         },
         {
           "name": "test_check_dirty_tree_handles_error",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 154,
+          "line": 155,
           "call_type": "function_call"
         }
       ],
@@ -27560,99 +27687,105 @@
       "is_public": true,
       "callers": [
         {
+          "name": "show_commit_preview",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 263,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_parse_git_status_empty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 172,
+          "line": 173,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_staged_modification",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 186,
+          "line": 187,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_unstaged_modification",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 203,
+          "line": 204,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_staged_and_unstaged",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 218,
+          "line": 219,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_untracked_file",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 233,
+          "line": 234,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_added_file",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 248,
+          "line": 249,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_deleted_file",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 263,
+          "line": 264,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_multiple_files",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 278,
+          "line": 279,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_with_subdirectories",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_quoted_paths",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 311,
+          "line": 312,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_handles_timeout",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 323,
+          "line": 324,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_handles_error",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 332,
+          "line": 333,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_handles_git_not_found",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 341,
+          "line": 342,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_handles_unexpected_error",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 350,
+          "line": 351,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_renamed_file",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 364,
+          "line": 365,
           "call_type": "function_call"
         },
         {
           "name": "test_parse_git_status_added_with_unstaged_changes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 380,
+          "line": 381,
           "call_type": "function_call"
         }
       ],
@@ -27736,12 +27869,468 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 16
+      "call_count": 17
+    },
+    {
+      "name": "show_commit_preview",
+      "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+      "line": 225,
+      "language": "python",
+      "docstring": "Display uncommitted files grouped by status with staging instructions.\n\nUses parse_git_status() to get file changes and groups them by type\n(modified, added, deleted, untracked) with emoji markers for better visibility.\n\nArgs:\n    repo_root: Path to git repository root\n    printer: Optional PrettyPrinter instance for output. If None, creates one.\n\nReturns:\n    Dictionary with status categories as keys and file lists as values:\n    {\n        'staged_modified': [...],\n        'unstaged_modified': [...],\n        'added': [...],\n        'deleted': [...],\n        'untracked': [...]\n    }\n\nExample:\n    >>> show_commit_preview(Path('/repo'))\n    \ud83d\udcdd Modified (2):\n      \u2022 src/main.py\n      \u2022 lib/utils.py\n\n    \u2728 Added (1):\n      \u2022 tests/new_test.py\n\n    To stage all changes: git add .\n    To stage specific files: git add <file>",
+      "parameters": [
+        {
+          "name": "repo_root",
+          "type": "Path",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, List[str]]",
+      "complexity": 37,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_show_commit_preview_no_changes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 407,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_staged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 424,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_unstaged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 440,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_both_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 455,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_added_files",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 470,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_deleted_staged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 485,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_deleted_unstaged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 500,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_untracked",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 515,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_renamed",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 530,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_mixed_statuses",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 549,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_commit_preview_creates_printer_if_none",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 563,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "parse_git_status",
+          "file": "unknown",
+          "line": 263,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 289,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 291,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "method_call"
+        },
+        {
+          "name": "startswith",
+          "file": "unknown",
+          "line": 294,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 295,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 297,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 299,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 301,
+          "call_type": "method_call"
+        },
+        {
+          "name": "startswith",
+          "file": "unknown",
+          "line": 302,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 303,
+          "call_type": "method_call"
+        },
+        {
+          "name": "startswith",
+          "file": "unknown",
+          "line": 304,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 305,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 307,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 310,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 311,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 316,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 316,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 318,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 319,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 323,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 323,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 325,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 326,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 330,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 330,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 332,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 333,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 339,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 340,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 344,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 344,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 346,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 347,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 351,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 351,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 353,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 358,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 358,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 360,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 361,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 365,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 365,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 367,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 368,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 372,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 372,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 374,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 375,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 379,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 379,
+          "call_type": "function_call"
+        },
+        {
+          "name": "item",
+          "file": "unknown",
+          "line": 381,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 382,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 387,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 388,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 389,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 11
     },
     {
       "name": "detect_git_drift",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 225,
+      "line": 394,
       "language": "python",
       "docstring": "Detect drift between spec metadata and actual git state.\n\nCompares the git metadata stored in the spec with the actual git repository state.\nReturns a list of warnings for any discrepancies found.\n\nThis is a non-blocking check - warnings are informational and don't prevent operations.\n\nArgs:\n    spec: Specification dictionary containing metadata.git section\n    repo_root: Path to git repository root\n\nReturns:\n    List of warning messages (empty list if no drift detected)",
       "parameters": [
@@ -27772,25 +28361,25 @@
         {
           "name": "test_detect_git_drift_no_metadata",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 395,
+          "line": 577,
           "call_type": "function_call"
         },
         {
           "name": "test_detect_git_drift_matching_branch",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 419,
+          "line": 601,
           "call_type": "function_call"
         },
         {
           "name": "test_detect_git_drift_different_branch",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 442,
+          "line": 624,
           "call_type": "function_call"
         },
         {
           "name": "test_detect_git_drift_handles_timeout",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 461,
+          "line": 643,
           "call_type": "function_call"
         }
       ],
@@ -27798,157 +28387,157 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 243,
+          "line": 412,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 243,
+          "line": 412,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 246,
+          "line": 415,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 251,
+          "line": 420,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 259,
+          "line": 428,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 261,
+          "line": 430,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 264,
+          "line": 433,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 267,
+          "line": 436,
           "call_type": "method_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 267,
+          "line": 436,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 271,
+          "line": 440,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 273,
+          "line": 442,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 281,
+          "line": 450,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 289,
+          "line": 458,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 294,
+          "line": 463,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 297,
+          "line": 466,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 305,
+          "line": 474,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 310,
+          "line": 479,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 314,
+          "line": 483,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 317,
+          "line": 486,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 325,
+          "line": 494,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 330,
+          "line": 499,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 331,
+          "line": 500,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 335,
+          "line": 504,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 335,
+          "line": 504,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 337,
+          "line": 506,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 339,
+          "line": 508,
           "call_type": "method_call"
         }
       ],
@@ -27957,7 +28546,7 @@
     {
       "name": "update_branch_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 348,
+      "line": 517,
       "language": "python",
       "docstring": "Update git branch metadata in spec.\n\nUpdates the metadata.git section with branch information. Creates the section\nif it doesn't exist. Preserves existing commits and PR metadata.\n\nArgs:\n    spec: Specification dictionary to update\n    branch_name: Name of the feature branch (e.g., 'feat/user-auth-001')\n    base_branch: Name of the base branch (e.g., 'main', 'develop')\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -27987,19 +28576,19 @@
         {
           "name": "test_update_branch_metadata_creates_metadata",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 474,
+          "line": 656,
           "call_type": "function_call"
         },
         {
           "name": "test_update_branch_metadata_updates_existing",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 496,
+          "line": 678,
           "call_type": "function_call"
         },
         {
           "name": "test_update_branch_metadata_preserves_other_metadata",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 513,
+          "line": 695,
           "call_type": "function_call"
         }
       ],
@@ -28007,13 +28596,13 @@
         {
           "name": "info",
           "file": "unknown",
-          "line": 378,
+          "line": 547,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 389,
+          "line": 558,
           "call_type": "method_call"
         }
       ],
@@ -28022,7 +28611,7 @@
     {
       "name": "add_commit_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 394,
+      "line": 563,
       "language": "python",
       "docstring": "Add a commit record to spec git metadata.\n\nAppends a new commit object to the metadata.git.commits array. Creates the\ngit metadata section if it doesn't exist.\n\nArgs:\n    spec: Specification dictionary to update\n    sha: Git commit SHA hash (full or abbreviated)\n    message: Commit message\n    task_id: Task ID associated with this commit (e.g., 'task-1-1')\n    timestamp: ISO 8601 timestamp string (optional, will use current time if not provided)\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -28068,25 +28657,25 @@
         {
           "name": "test_add_commit_metadata_creates_metadata",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 527,
+          "line": 709,
           "call_type": "function_call"
         },
         {
           "name": "test_add_commit_metadata_appends_to_existing",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 550,
+          "line": 732,
           "call_type": "function_call"
         },
         {
           "name": "test_add_commit_metadata_auto_generates_timestamp",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 560,
+          "line": 742,
           "call_type": "function_call"
         },
         {
           "name": "test_add_commit_metadata_preserves_branch_info",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 579,
+          "line": 761,
           "call_type": "function_call"
         }
       ],
@@ -28094,31 +28683,31 @@
         {
           "name": "warning",
           "file": "unknown",
-          "line": 428,
+          "line": 597,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 436,
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 436,
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 447,
+          "line": 616,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 448,
+          "line": 617,
           "call_type": "method_call"
         }
       ],
@@ -28127,7 +28716,7 @@
     {
       "name": "update_pr_metadata",
       "file": "src/claude_skills/claude_skills/common/git_metadata.py",
-      "line": 453,
+      "line": 622,
       "language": "python",
       "docstring": "Update pull request metadata in spec.\n\nUpdates or creates the metadata.git.pr section with PR information.\n\nArgs:\n    spec: Specification dictionary to update\n    pr_url: Full URL to the pull request\n    pr_number: Pull request number\n    status: PR status ('open', 'closed', 'merged') - defaults to 'open'\n\nReturns:\n    Updated spec dictionary (modified in-place, but also returned for convenience)",
       "parameters": [
@@ -28168,43 +28757,43 @@
         {
           "name": "test_update_pr_metadata_creates_metadata",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 592,
+          "line": 774,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_updates_existing",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 615,
+          "line": 797,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_default_status",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 624,
+          "line": 806,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_preserves_commits",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 641,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_status_values",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 651,
+          "line": 833,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_status_values",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 655,
+          "line": 837,
           "call_type": "function_call"
         },
         {
           "name": "test_update_pr_metadata_status_values",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
-          "line": 659,
+          "line": 841,
           "call_type": "function_call"
         }
       ],
@@ -28212,25 +28801,25 @@
         {
           "name": "warning",
           "file": "unknown",
-          "line": 484,
+          "line": 653,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 491,
+          "line": 660,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 491,
+          "line": 660,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 494,
+          "line": 663,
           "call_type": "method_call"
         }
       ],
@@ -103978,6 +104567,7 @@
       "claude_skills.common.git_metadata.find_git_root",
       "claude_skills.common.git_metadata.check_dirty_tree",
       "claude_skills.common.git_metadata.parse_git_status",
+      "claude_skills.common.git_metadata.show_commit_preview",
       "claude_skills.common.git_metadata.detect_git_drift",
       "claude_skills.common.git_metadata.update_branch_metadata",
       "claude_skills.common.git_metadata.add_commit_metadata",

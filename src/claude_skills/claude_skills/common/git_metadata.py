@@ -4,7 +4,7 @@ This module provides utilities for git operations and metadata synchronization.
 All git commands execute with subprocess.run and include basic error handling.
 
 Functions are organized into categories:
-- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, show_commit_preview, detect_git_drift
+- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, show_commit_preview, get_staged_files, detect_git_drift
 - Metadata Updates: update_branch_metadata, add_commit_metadata, update_pr_metadata
 """
 
@@ -389,6 +389,59 @@ def show_commit_preview(repo_root: Path, printer=None) -> Dict[str, List[str]]:
         printer.info("To commit staged changes: git commit -m \"message\"")
 
     return categories
+
+
+def get_staged_files(repo_root: Path) -> List[str]:
+    """Get list of files currently staged for commit.
+
+    Runs 'git diff --cached --name-only' to get files in the staging area.
+
+    Args:
+        repo_root: Path to git repository root
+
+    Returns:
+        List of file paths (relative to repo root) that are currently staged.
+        Returns empty list if no files are staged or if an error occurs.
+
+    Example:
+        >>> get_staged_files(Path('/repo'))
+        ['src/main.py', 'tests/test_main.py']
+    """
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10
+        )
+
+        output = result.stdout.strip()
+
+        if not output:
+            return []
+
+        # Split by newlines to get list of files
+        files = [line.strip() for line in output.split('\n') if line.strip()]
+        logger.debug(f"Found {len(files)} staged file(s)")
+        return files
+
+    except subprocess.TimeoutExpired:
+        logger.warning(f"Git diff check timed out at {repo_root}")
+        return []
+
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"Git diff check failed at {repo_root}: {e.stderr}")
+        return []
+
+    except FileNotFoundError:
+        logger.error("Git command not found - is git installed?")
+        return []
+
+    except Exception as e:
+        logger.warning(f"Unexpected error checking staged files: {e}")
+        return []
 
 
 def detect_git_drift(spec: Dict[str, Any], repo_root: Path) -> List[str]:
