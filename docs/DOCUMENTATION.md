@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 07:20:28
+**Generated:** 2025-11-03 07:24:07
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 66923
+- **Total Lines:** 66992
 - **Total Classes:** 265
 - **Total Functions:** 750
-- **Avg Complexity:** 5.5
+- **Avg Complexity:** 5.51
 - **Max Complexity:** 43
 - **High Complexity Functions:**
   - complete_task_workflow (43)
@@ -6260,7 +6260,7 @@ Args:
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:184`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:191`
 **Complexity:** 5
 
 **Description:**
@@ -6550,7 +6550,7 @@ Returns:
 ### `activate_spec(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:91`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -9500,8 +9500,8 @@ Example:
 ### `complete_spec(spec_id, spec_file, specs_dir, skip_doc_regen, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:232`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:239`
+⚠️ **Complexity:** 27 (High)
 
 **Description:**
 > Mark a spec as completed and move it to completed folder.
@@ -14677,7 +14677,7 @@ Returns:
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:22`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:29`
 **Complexity:** 8
 
 **Description:**
@@ -20315,11 +20315,16 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/lifecycle.py`
 
+- `claude_skills.common.git_metadata.update_pr_metadata`
 - `claude_skills.common.paths.ensure_directory`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
+- `claude_skills.sdd_update.git_pr.check_pr_readiness`
+- `claude_skills.sdd_update.git_pr.create_pull_request`
+- `claude_skills.sdd_update.git_pr.generate_pr_body`
+- `claude_skills.sdd_update.git_pr.push_branch`
 - `claude_skills.sdd_update.time_tracking.aggregate_task_times`
 - `datetime.datetime`
 - `datetime.timezone`

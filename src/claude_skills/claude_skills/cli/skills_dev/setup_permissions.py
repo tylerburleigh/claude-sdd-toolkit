@@ -52,6 +52,18 @@ SDD_PERMISSIONS = [
     "Bash(gemini:*)",
     "Bash(codex:*)",
 
+    # Git/GitHub CLI permissions (specific allowlist, no wildcards for security)
+    "Bash(git checkout -b *)",
+    "Bash(git add *)",
+    "Bash(git commit *)",
+    "Bash(git push *)",
+    "Bash(git status *)",
+    "Bash(git branch --show-current)",
+    "Bash(git log *)",
+    "Bash(git rev-parse HEAD)",
+    "Bash(gh pr create *)",
+    "Bash(gh pr view *)",
+
     # File access permissions
     "Read(//Users/tylerburleigh/.claude/skills/**)",
     "Write(//**/specs/active/**)",
