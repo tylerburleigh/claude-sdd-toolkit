@@ -1,7 +1,7 @@
 {
   "spec_id": "git-agent-file-staging-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T14:15:08.566377Z",
+  "last_updated": "2025-11-03T14:22:40.979145Z",
   "metadata": {
     "title": "Agent-Controlled Git File Staging",
     "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
@@ -9,17 +9,17 @@
     "estimated_hours": 4,
     "complexity": "medium",
     "risk_level": "low",
-    "progress_percentage": 50,
-    "current_phase": "phase-2",
+    "progress_percentage": 54,
+    "current_phase": "phase-3",
     "git": {
       "branch_name": null,
       "base_branch": null,
       "commits": [
         {
-          "sha": "101aa6fe74cb0c93ee989b96c99db4230e6aebb4",
-          "message": "verify-2-2: Test backward compatibility with stage_and_commit()",
-          "task_id": "verify-2-2",
-          "timestamp": "2025-11-03T14:15:08.805078Z"
+          "sha": "f5db859349c0a2c14075ee920c9db66c7512d648",
+          "message": "task-3-1-1: Add cmd_create_task_commit() function",
+          "task_id": "task-3-1-1",
+          "timestamp": "2025-11-03T14:22:41.021048Z"
         }
       ],
       "pr": null
@@ -38,7 +38,7 @@
         "phase-4"
       ],
       "total_tasks": 24,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "objectives": [
           "Replace automatic 'git add --all' with agent-controlled file selection",
@@ -546,7 +546,7 @@
     "phase-3": {
       "type": "phase",
       "title": "CLI Command and Workflow Integration",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -562,7 +562,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Add create-task-commit CLI command and integrate preview workflow into complete_task_workflow()",
         "risk_level": "medium",
@@ -572,14 +572,14 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3",
       "children": [
         "task-3-1",
         "task-3-2"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -590,7 +590,7 @@
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -605,7 +605,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
         "task_category": "implementation",
@@ -616,7 +616,7 @@
     "task-3-1-1": {
       "type": "subtask",
       "title": "Add cmd_create_task_commit() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -625,10 +625,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "CLI command handler for creating commit from staged files",
-        "implementation_notes": "Load spec, find task, verify task is completed, generate commit message, call create_commit_from_staging(), update spec with commit SHA"
+        "implementation_notes": "Load spec, find task, verify task is completed, generate commit message, call create_commit_from_staging(), update spec with commit SHA",
+        "completed_at": "2025-11-03T14:22:40.965802Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T14:22:40.970982Z"
       }
     },
     "task-3-1-2": {
@@ -1147,6 +1150,15 @@
       "content": "All child tasks in phase phase-2 have been completed.",
       "metadata": {},
       "task_id": "phase-2"
+    },
+    {
+      "timestamp": "2025-11-03T14:22:40.970960Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add cmd_create_task_commit() function",
+      "author": "claude-code",
+      "content": "Successfully implemented cmd_create_task_commit() CLI command function.\n\nImplementation details:\n- Added cmd_create_task_commit() function to src/claude_skills/claude_skills/sdd_update/cli.py (lines 746-817)\n- Function loads spec, validates task exists, finds repo root, and calls create_commit_from_staging()\n- Includes status validation with --skip-status-check and --force flags\n- Registered command in register_update() function with proper argument parser\n- Command accepts spec_id and task_id as positional arguments\n- Returns JSON output with --json flag including commit SHA and task info\n\nTesting:\n- Created comprehensive test at /tmp/test_task_3_1_1/test_cmd_create_task_commit.py\n- All test cases passed including:\n  * Command registration and accessibility\n  * Spec loading and task validation\n  * Commit creation from staged files\n  * Commit message format verification\n  * Task status validation (warns for non-completed tasks)\n  * --force flag functionality\n  * JSON output format\n\nThe command is now available via `sdd create-task-commit <spec-id> <task-id>` and integrates seamlessly with the two-step workflow.",
+      "metadata": {},
+      "task_id": "task-3-1-1"
     }
   ]
 }

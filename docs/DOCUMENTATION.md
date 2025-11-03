@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 09:03:34
+**Generated:** 2025-11-03 09:23:19
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 68125
+- **Total Lines:** 68211
 - **Total Classes:** 268
-- **Total Functions:** 755
+- **Total Functions:** 756
 - **Avg Complexity:** 5.59
 - **Max Complexity:** 43
 - **High Complexity Functions:**
@@ -8367,7 +8367,7 @@ Example:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:746`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:820`
 **Complexity:** 6
 
 **Description:**
@@ -8442,6 +8442,21 @@ Args:
 
 **Description:**
 > Create a new specification.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
+### `cmd_create_task_commit(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:746`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Create commit from staged files for a task (two-step workflow).
 
 **Parameters:**
 - `args`: None
@@ -8872,7 +8887,7 @@ Args:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:779`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:853`
 **Complexity:** 3
 
 **Description:**
@@ -9248,7 +9263,7 @@ Args:
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:797`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:871`
 **Complexity:** 3
 
 **Description:**
@@ -9398,7 +9413,7 @@ Args:
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:816`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:890`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -15679,7 +15694,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:896`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:970`
 **Complexity:** 1
 
 **Description:**
