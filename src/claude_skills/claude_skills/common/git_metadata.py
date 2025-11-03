@@ -4,7 +4,7 @@ This module provides utilities for git operations and metadata synchronization.
 All git commands execute with subprocess.run and include basic error handling.
 
 Functions are organized into categories:
-- Git Utilities: find_git_root, check_dirty_tree, detect_git_drift
+- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, detect_git_drift
 - Metadata Updates: update_branch_metadata, add_commit_metadata, update_pr_metadata
 """
 
@@ -118,6 +118,108 @@ def check_dirty_tree(repo_root: Path) -> Tuple[bool, str]:
     except Exception as e:
         logger.warning(f"Unexpected error checking git status: {e}")
         return (True, f"Unknown (error: {type(e).__name__})")
+
+
+def parse_git_status(repo_root: Path) -> List[Dict[str, str]]:
+    """Parse git status output into structured list of file changes.
+
+    Runs 'git status --porcelain' and parses the output into a list of
+    dictionaries, where each dictionary represents a file with its status.
+
+    Git porcelain format: "XY path"
+    - X = index status (left column)
+    - Y = worktree status (right column)
+
+    Common status codes:
+    - 'M ' = staged modification
+    - ' M' = unstaged modification
+    - 'MM' = staged AND unstaged modification
+    - 'A ' = added (new file, staged)
+    - 'D ' = deleted (staged)
+    - ' D' = deleted (unstaged)
+    - 'R ' = renamed (staged)
+    - '??' = untracked file
+    - 'AM' = added (staged) with unstaged modifications
+
+    Args:
+        repo_root: Path to git repository root
+
+    Returns:
+        List of dictionaries with keys:
+        - 'status': Two-character status code (e.g., 'M ', '??', 'MM')
+        - 'path': File path relative to repo root
+
+        Returns empty list if there are no changes or if an error occurs.
+
+    Example:
+        >>> parse_git_status(Path('/repo'))
+        [
+            {'status': 'M ', 'path': 'src/main.py'},
+            {'status': '??', 'path': 'test.txt'},
+            {'status': 'MM', 'path': 'lib/utils.py'}
+        ]
+    """
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10
+        )
+
+        # Don't strip leading whitespace as git porcelain format uses leading spaces
+        # for status codes (e.g., " M" means unstaged modification)
+        output = result.stdout.rstrip()
+
+        if not output:
+            return []
+
+        # Parse each line of porcelain output
+        # Format: "XY PATH" where XY is 2-char status code, space, then path
+        # Example: "M  file.py" means M (staged), space (unchanged in worktree), space separator, then path
+        # Example: " M file.py" means space (not staged), M (modified in worktree), space separator, then path
+        parsed_files = []
+        for line in output.split('\n'):
+            if len(line) < 3:
+                # Invalid line, skip
+                continue
+
+            # First 2 characters are status code
+            status = line[0:2]
+            # Path starts at character 3 (after the space separator)
+            path = line[3:]
+
+            # Handle quoted paths (paths with special characters are quoted)
+            if path.startswith('"') and path.endswith('"'):
+                # Remove quotes - for simplicity, just strip them
+                # Git uses C-style escaping in quotes, but for basic cases this works
+                path = path[1:-1]
+
+            parsed_files.append({
+                'status': status,
+                'path': path
+            })
+
+        logger.debug(f"Parsed {len(parsed_files)} file(s) from git status")
+        return parsed_files
+
+    except subprocess.TimeoutExpired:
+        logger.warning(f"Git status parsing timed out at {repo_root}")
+        return []
+
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"Git status parsing failed at {repo_root}: {e.stderr}")
+        return []
+
+    except FileNotFoundError:
+        logger.error("Git command not found - is git installed?")
+        return []
+
+    except Exception as e:
+        logger.warning(f"Unexpected error parsing git status: {e}")
+        return []
 
 
 def detect_git_drift(spec: Dict[str, Any], repo_root: Path) -> List[str]:

@@ -18,6 +18,7 @@ from unittest.mock import Mock, patch, MagicMock
 from claude_skills.common.git_metadata import (
     find_git_root,
     check_dirty_tree,
+    parse_git_status,
     detect_git_drift,
     update_branch_metadata,
     add_commit_metadata,
@@ -154,6 +155,233 @@ class TestCheckDirtyTree:
 
         assert is_dirty is True
         assert "error" in message.lower()
+
+
+class TestParseGitStatus:
+    """Tests for parse_git_status function."""
+
+    @patch('subprocess.run')
+    def test_parse_git_status_empty(self, mock_run, tmp_path):
+        """Test parsing empty status (clean working tree)."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert result == []
+        mock_run.assert_called_once()
+
+    @patch('subprocess.run')
+    def test_parse_git_status_staged_modification(self, mock_run, tmp_path):
+        """Test parsing staged modification."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="M  file1.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'M '
+        assert result[0]['path'] == 'file1.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_unstaged_modification(self, mock_run, tmp_path):
+        """Test parsing unstaged modification."""
+        # Note: Git porcelain format is "XY path" where X=index, Y=worktree
+        # " M" means not staged (space), modified in worktree (M)
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout=" M file2.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == ' M'
+        assert result[0]['path'] == 'file2.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_staged_and_unstaged(self, mock_run, tmp_path):
+        """Test parsing file with both staged and unstaged changes."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="MM file3.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'MM'
+        assert result[0]['path'] == 'file3.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_untracked_file(self, mock_run, tmp_path):
+        """Test parsing untracked file."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="?? new.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == '??'
+        assert result[0]['path'] == 'new.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_added_file(self, mock_run, tmp_path):
+        """Test parsing added (new) file."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="A  added.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'A '
+        assert result[0]['path'] == 'added.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_deleted_file(self, mock_run, tmp_path):
+        """Test parsing deleted file."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout=" D deleted.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == ' D'
+        assert result[0]['path'] == 'deleted.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_multiple_files(self, mock_run, tmp_path):
+        """Test parsing multiple files with mixed statuses."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="M  file1.py\n M file2.py\n?? file3.py\nA  file4.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 4
+        assert result[0] == {'status': 'M ', 'path': 'file1.py'}
+        assert result[1] == {'status': ' M', 'path': 'file2.py'}
+        assert result[2] == {'status': '??', 'path': 'file3.py'}
+        assert result[3] == {'status': 'A ', 'path': 'file4.py'}
+
+    @patch('subprocess.run')
+    def test_parse_git_status_with_subdirectories(self, mock_run, tmp_path):
+        """Test parsing files in subdirectories."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="M  src/main.py\n?? tests/new_test.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 2
+        assert result[0] == {'status': 'M ', 'path': 'src/main.py'}
+        assert result[1] == {'status': '??', 'path': 'tests/new_test.py'}
+
+    @patch('subprocess.run')
+    def test_parse_git_status_quoted_paths(self, mock_run, tmp_path):
+        """Test parsing paths with special characters (quoted)."""
+        # Git quotes paths with spaces or special characters
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout='M  "file with spaces.py"\n',
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'M '
+        # Quotes should be removed
+        assert result[0]['path'] == 'file with spaces.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_handles_timeout(self, mock_run, tmp_path):
+        """Test handling of git command timeout."""
+        mock_run.side_effect = subprocess.TimeoutExpired('git', 10)
+
+        result = parse_git_status(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_parse_git_status_handles_error(self, mock_run, tmp_path):
+        """Test handling of git command error."""
+        mock_run.side_effect = subprocess.CalledProcessError(1, 'git', stderr='error')
+
+        result = parse_git_status(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_parse_git_status_handles_git_not_found(self, mock_run, tmp_path):
+        """Test handling when git command not found."""
+        mock_run.side_effect = FileNotFoundError()
+
+        result = parse_git_status(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_parse_git_status_handles_unexpected_error(self, mock_run, tmp_path):
+        """Test handling of unexpected errors."""
+        mock_run.side_effect = RuntimeError("Unexpected error")
+
+        result = parse_git_status(tmp_path)
+
+        assert result == []
+
+    @patch('subprocess.run')
+    def test_parse_git_status_renamed_file(self, mock_run, tmp_path):
+        """Test parsing renamed file."""
+        # Renamed files show as "R  old.py -> new.py"
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="R  old.py -> new.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'R '
+        # For now, we treat the entire "old.py -> new.py" as the path
+        assert result[0]['path'] == 'old.py -> new.py'
+
+    @patch('subprocess.run')
+    def test_parse_git_status_added_with_unstaged_changes(self, mock_run, tmp_path):
+        """Test parsing file that's added (staged) with unstaged modifications."""
+        mock_run.return_value = Mock(
+            returncode=0,
+            stdout="AM file.py\n",
+            stderr=""
+        )
+
+        result = parse_git_status(tmp_path)
+
+        assert len(result) == 1
+        assert result[0]['status'] == 'AM'
+        assert result[0]['path'] == 'file.py'
 
 
 class TestDetectGitDrift:

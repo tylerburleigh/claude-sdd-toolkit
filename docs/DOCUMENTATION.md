@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 07:24:07
+**Generated:** 2025-11-03 07:54:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 66992
+- **Total Lines:** 67016
 - **Total Classes:** 265
 - **Total Functions:** 750
 - **Avg Complexity:** 5.51
@@ -7805,7 +7805,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:119`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:131`
 **Complexity:** 2
 
 **Description:**
@@ -8164,7 +8164,7 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:127`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:139`
 **Complexity:** 5
 
 **Description:**
@@ -9282,7 +9282,7 @@ Args:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:66`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:78`
 **Complexity:** 8
 
 **Description:**
@@ -14532,7 +14532,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:160`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:172`
 **Complexity:** 3
 
 ---
@@ -15449,7 +15449,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:178`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:190`
 **Complexity:** 1
 
 **Description:**
@@ -18430,7 +18430,7 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:58`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:70`
 **Complexity:** 7
 
 **Description:**

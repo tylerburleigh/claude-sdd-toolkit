@@ -1,0 +1,931 @@
+{
+  "spec_id": "git-agent-file-staging-2025-11-03-001",
+  "generated": "2025-11-03T00:00:00Z",
+  "last_updated": "2025-11-03T13:07:05.849262Z",
+  "metadata": {
+    "title": "Agent-Controlled Git File Staging",
+    "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
+    "status": "active",
+    "estimated_hours": 4,
+    "complexity": "medium",
+    "risk_level": "low",
+    "progress_percentage": 4,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Agent-Controlled Git File Staging",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4"
+      ],
+      "total_tasks": 24,
+      "completed_tasks": 1,
+      "metadata": {
+        "objectives": [
+          "Replace automatic 'git add --all' with agent-controlled file selection",
+          "Implement two-step workflow: preview files \u2192 agent stages \u2192 commit",
+          "Maintain backward compatibility with existing auto-commit behavior",
+          "Prevent unrelated files from being included in task commits"
+        ],
+        "success_criteria": [
+          "Agent can see uncommitted files before committing",
+          "Agent can selectively stage files using git add commands",
+          "Two-step workflow (preview \u2192 commit) functions correctly",
+          "Old auto-commit behavior still works when preview disabled",
+          "No breaking changes to existing workflows"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core Functions - File Status and Preview",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Add functions to parse git status, display file previews, and check staging area",
+        "risk_level": "low",
+        "estimated_hours": 1
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+      "status": "in_progress",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3",
+        "task-1-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-1",
+          "task-3-1"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Add parse_git_status(), show_commit_preview(), and get_staged_files() functions"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Add parse_git_status() function",
+      "status": "completed",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Parse 'git status --porcelain' output into structured list of dicts with 'status' and 'path' keys",
+        "implementation_notes": "Similar to existing has_uncommitted_changes() but returns structured data instead of boolean",
+        "completed_at": "2025-11-03T13:07:05.834944Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T13:07:05.837362Z"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Add show_commit_preview() function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Display uncommitted files grouped by status (Modified/Added/Deleted) with emoji markers and staging instructions",
+        "implementation_notes": "Use PrettyPrinter for output, group files by status code, include emojis (\ud83d\udcdd \u2728 \u274c)",
+        "task_category": "implementation"
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Add get_staged_files() function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Check what files are currently staged using 'git diff --cached --name-only'",
+        "implementation_notes": "Returns list of file paths, used by create_commit_from_staging() to verify staging area"
+      }
+    },
+    "task-1-1-4": {
+      "type": "subtask",
+      "title": "Add imports for new dependencies",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add List import from typing if not already present",
+        "implementation_notes": "Check existing imports, add only if needed"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Test parse_git_status() with sample repo",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Create test repo with modified, added, and deleted files",
+          "Call parse_git_status() and verify structured output",
+          "Check that status codes and paths are correctly parsed"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Test show_commit_preview() output format",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Call show_commit_preview() with sample file list",
+          "Verify files are grouped by status (Modified/Added/Deleted)",
+          "Check emojis display correctly",
+          "Verify instructions are clear and accurate"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Two-Step Workflow Functions",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement show_commit_preview_and_wait() and create_commit_from_staging() functions for two-step workflow",
+        "risk_level": "low",
+        "estimated_hours": 1
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-1",
+          "task-4-1",
+          "task-3-2"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Add show_commit_preview_and_wait(), create_commit_from_staging(), and update stage_and_commit() for backward compatibility"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Add show_commit_preview_and_wait() function",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Step 1 of two-step workflow: show preview and exit for agent to stage files",
+        "implementation_notes": "Takes repo_root, spec_id, task_id, printer. Calls parse_git_status(), show_commit_preview(), then displays instruction to run create-task-commit"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add create_commit_from_staging() function",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Step 2 of two-step workflow: create commit from currently staged files",
+        "implementation_notes": "Check staging area with get_staged_files(), error if empty, create commit with staged files, return (success, commit_sha, error_msg)"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Update stage_and_commit() for backward compatibility",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Preserve old auto-commit behavior by using git add --all then calling create_commit_from_staging()",
+        "implementation_notes": "Keep existing function signature, run git add --all, then call create_commit_from_staging() for actual commit"
+      }
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "Add comprehensive docstrings",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Document all new functions with clear descriptions, parameters, return values, and workflow steps",
+        "implementation_notes": "Explain two-step workflow pattern in docstrings"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test two-step workflow with mock staging",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Create test repo with uncommitted files",
+          "Call show_commit_preview_and_wait()",
+          "Manually stage specific files with git add",
+          "Call create_commit_from_staging()",
+          "Verify commit contains only staged files"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Test backward compatibility with stage_and_commit()",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Call stage_and_commit() with test repo",
+          "Verify it still auto-stages all files",
+          "Verify commit is created successfully",
+          "Confirm no breaking changes to existing behavior"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "CLI Command and Workflow Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add create-task-commit CLI command and integrate preview workflow into complete_task_workflow()",
+        "risk_level": "medium",
+        "estimated_hours": 1.5
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1",
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Add create-task-commit command to CLI"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Add cmd_create_task_commit() function",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "CLI command handler for creating commit from staged files",
+        "implementation_notes": "Load spec, find task, verify task is completed, generate commit message, call create_commit_from_staging(), update spec with commit SHA"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Register create-task-commit in CLI parser",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add subcommand to argument parser with spec_id and task_id arguments",
+        "implementation_notes": "Follow existing pattern for other CLI commands in cli.py"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2",
+        "task-3-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Integrate preview workflow into complete_task_workflow() with config check"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Import show_commit_preview_and_wait from git_commit",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Add import for new function at top of file",
+        "implementation_notes": "Add to existing git_commit imports"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Add config check for file_staging.show_before_commit",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Load git config and check if preview mode is enabled",
+        "implementation_notes": "Default to True (enable preview by default), check git_config.get('file_staging', {}).get('show_before_commit', True)"
+      }
+    },
+    "task-3-2-3": {
+      "type": "subtask",
+      "title": "Modify complete_task_workflow() to call preview function",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "If preview enabled, call show_commit_preview_and_wait() and exit. Otherwise use old stage_and_commit() behavior",
+        "implementation_notes": "Find existing git commit integration section (around line 550), add config check and conditional logic"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Test complete two-step workflow end-to-end",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Create test spec with task",
+          "Add uncommitted files (spec + source + unrelated)",
+          "Run sdd complete-task (should show preview)",
+          "Verify preview displays files correctly",
+          "Stage only spec + source files with git add",
+          "Run sdd create-task-commit",
+          "Verify commit contains only staged files",
+          "Verify spec updated with commit SHA",
+          "Verify unrelated file remains uncommitted"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Test backward compatibility with preview disabled",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Set git config: file_staging.show_before_commit = false",
+          "Run sdd complete-task",
+          "Verify it auto-stages all files (old behavior)",
+          "Verify commit created automatically",
+          "Verify no preview shown"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Documentation and Configuration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update documentation, add git config structure, and document in agent/skill files",
+        "risk_level": "low",
+        "estimated_hours": 0.5
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": ".claude/git_config.json",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": ".claude/git_config.json",
+        "task_category": "implementation",
+        "estimated_hours": 0.1,
+        "changes": "Add file_staging configuration section",
+        "implementation_notes": "Add: {\"file_staging\": {\"show_before_commit\": true, \"mode\": \"manual\"}}"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "agents/sdd-update.md",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "agents/sdd-update.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.2,
+        "changes": "Document two-step workflow pattern for agent use",
+        "implementation_notes": "Add section explaining preview \u2192 stage \u2192 commit workflow with examples"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "skills/sdd-update/SKILL.md",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-update/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.2,
+        "changes": "Update Workflow 7 (Git Commit Integration) with new create-task-commit command",
+        "implementation_notes": "Document new command, explain agent-controlled staging, update examples"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Review documentation clarity",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Read agents/sdd-update.md workflow section",
+          "Verify two-step pattern is clearly explained",
+          "Check that examples are accurate and helpful",
+          "Confirm SKILL.md documents new command correctly"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Test with real sdd-update workflow",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": [
+          "Use sdd-update skill to complete a real task",
+          "Follow the preview \u2192 stage \u2192 commit workflow",
+          "Verify agent can understand and follow instructions",
+          "Confirm workflow feels natural and intuitive",
+          "Test error cases (no staged files, etc.)"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-03T13:07:05.837348Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add parse_git_status() function",
+      "author": "claude-code",
+      "content": "Successfully implemented parse_git_status() function in src/claude_skills/claude_skills/common/git_metadata.py. The function parses 'git status --porcelain' output into a structured list of dictionaries with 'status' and 'path' keys.\n\nKey accomplishments:\n- Added parse_git_status() function with comprehensive docstring explaining git porcelain format\n- Implemented parsing logic with proper handling of all common status codes (M, A, D, R, ??, MM, AM, etc.)\n- Added robust error handling for timeouts, git errors, and edge cases\n- Created 16 comprehensive unit tests in test_git_metadata.py covering all scenarios\n- Fixed critical bug: Used rstrip() instead of strip() to preserve leading spaces in status codes\n- All 42 tests in test_git_metadata.py pass (16 new + 26 existing)\n- Updated module docstring to include new function\n- Function follows existing code patterns and error handling conventions in the module\n\nFiles modified:\n- src/claude_skills/claude_skills/common/git_metadata.py (added parse_git_status function)\n- src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py (added 16 test cases)\n\nThis task unblocks task-1-1-2 (show_commit_preview function) which depends on parse_git_status().",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ]
+}
