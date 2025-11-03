@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T21:41:18.005250Z",
+    "generated_at": "2025-11-03T21:44:21.598586Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 207,
-    "total_lines": 70006,
+    "total_files": 208,
+    "total_lines": 70182,
     "total_classes": 268,
-    "total_functions": 781,
-    "avg_complexity": 5.59,
+    "total_functions": 783,
+    "avg_complexity": 5.58,
     "max_complexity": 44,
     "high_complexity_functions": [
       "complete_task_workflow (44)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 207,
-        "lines": 70006,
+        "files": 208,
+        "lines": 70182,
         "classes": 268,
-        "functions": 781,
-        "avg_complexity": 5.59
+        "functions": 783,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -1088,6 +1088,32 @@
       ],
       "exports": [],
       "lines": 506
+    },
+    {
+      "name": "json_output",
+      "file": "src/claude_skills/claude_skills/common/json_output.py",
+      "language": "python",
+      "docstring": "JSON output formatting utilities for SDD CLI commands.\n\nThis module provides utilities for formatting CLI command outputs as JSON,\nwith support for both pretty-printed (human-readable) and compact (minified)\nformats. The compact format uses functional contracts to reduce token usage\nwhile preserving all decision-enabling information.\n\nUsage:\n    from claude_skills.common.json_output import format_json_output, format_compact_output\n\n    # Pretty-printed JSON (default)\n    output = format_json_output(data)\n\n    # Compact minified JSON\n    output = format_json_output(data, compact=True)\n\n    # Apply contract extraction and format as compact JSON\n    output = format_compact_output(data, command_type='prepare-task')",
+      "classes": [],
+      "functions": [
+        "format_json_output",
+        "format_compact_output"
+      ],
+      "imports": [
+        "json",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Literal",
+        "logging",
+        "claude_skills.common.contracts.extract_prepare_task_contract",
+        "claude_skills.common.contracts.extract_task_info_contract",
+        "claude_skills.common.contracts.extract_check_deps_contract",
+        "claude_skills.common.contracts.extract_progress_contract",
+        "claude_skills.common.contracts.extract_next_task_contract"
+      ],
+      "exports": [],
+      "lines": 176
     },
     {
       "name": "metrics",
@@ -33720,6 +33746,117 @@
       "call_count": 9
     },
     {
+      "name": "format_json_output",
+      "file": "src/claude_skills/claude_skills/common/json_output.py",
+      "line": 41,
+      "language": "python",
+      "docstring": "Format data as JSON string with optional compact (minified) output.\n\nThis is the central JSON formatting function used by all CLI commands.\nIt provides consistent formatting behavior across the toolkit.\n\nArgs:\n    data: Dictionary data to format as JSON\n    compact: If True, output minified JSON without whitespace.\n            If False (default), output pretty-printed JSON with indentation.\n    sort_keys: If True, sort dictionary keys in output. Default False.\n\nReturns:\n    Formatted JSON string\n\nExamples:\n    >>> data = {\"task_id\": \"task-1-1\", \"title\": \"Example task\"}\n\n    >>> # Pretty-printed (default)\n    >>> print(format_json_output(data))\n    {\n      \"task_id\": \"task-1-1\",\n      \"title\": \"Example task\"\n    }\n\n    >>> # Compact minified\n    >>> print(format_json_output(data, compact=True))\n    {\"task_id\":\"task-1-1\",\"title\":\"Example task\"}\n\nNotes:\n    - Pretty format uses 2-space indentation for readability\n    - Compact format uses minimal separators to reduce size\n    - Both formats ensure valid JSON output\n    - Non-ASCII characters are preserved (ensure_ascii=False)",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "compact",
+          "type": "bool",
+          "default": null
+        },
+        {
+          "name": "sort_keys",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_trace_entry",
+          "file": "src/claude_skills/claude_skills/doc_query/cli.py",
+          "line": 845,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "format_compact_output",
+      "file": "src/claude_skills/claude_skills/common/json_output.py",
+      "line": 100,
+      "language": "python",
+      "docstring": "Apply contract extraction and format as compact JSON.\n\nThis function combines contract extraction (to reduce data) with\ncompact JSON formatting (to reduce whitespace), providing maximum\ntoken efficiency while preserving all decision-enabling information.\n\nThe two-step process:\n1. Extract minimal contract based on command_type\n2. Format as minified JSON\n\nArgs:\n    data: Full command output data\n    command_type: Type of command that generated the data.\n                 Must be one of: 'prepare-task', 'task-info',\n                 'check-deps', 'progress', 'next-task'\n\nReturns:\n    Compact JSON string with minimal contract\n\nRaises:\n    ValueError: If command_type is not recognized\n\nExamples:\n    >>> full_output = {\n    ...     \"success\": True,\n    ...     \"task_id\": \"task-1-1\",\n    ...     \"task_data\": {\"title\": \"Example\", \"status\": \"pending\"},\n    ...     \"dependencies\": {\"can_start\": True, \"blocked_by\": []},\n    ...     # ... many other fields\n    ... }\n\n    >>> # Apply contract extraction and compact formatting\n    >>> output = format_compact_output(full_output, 'prepare-task')\n    >>> print(output)\n    {\"task_id\":\"task-1-1\",\"title\":\"Example\",\"can_start\":true,\"blocked_by\":[],...}\n\nToken Savings:\n    Typical savings compared to pretty-printed full output:\n    - prepare-task: 85-90%\n    - task-info: 70-75%\n    - check-deps: 80-85%\n    - progress: 85-90%\n    - next-task: 60-70%\n\nNotes:\n    - Contract extraction is command-specific\n    - See contracts.py for detailed field inclusion rules\n    - All decision-enabling information is preserved\n    - This is the recommended format for agent consumption",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "command_type",
+          "type": "CommandType",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 168,
+          "call_type": "method_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 168,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extractor",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "function_call"
+        },
+        {
+          "name": "format_json_output",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
       "name": "_is_test_environment",
       "file": "src/claude_skills/claude_skills/common/metrics.py",
       "line": 28,
@@ -53364,6 +53501,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_trace_entry",
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
@@ -53378,7 +53521,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "find_refactor_candidates",
@@ -54690,6 +54833,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_trace_entry",
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
@@ -54704,7 +54853,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "trace_data_lifecycle",
@@ -56041,6 +56190,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_trace_entry",
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
@@ -56055,7 +56210,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "trace_execution_flow",
@@ -56894,6 +57049,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_trace_entry",
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
@@ -56908,7 +57069,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "_dump_json",
@@ -108146,6 +108307,19 @@
       "pathlib.Path",
       "datetime.datetime",
       "hierarchy_validation.validate_spec_hierarchy"
+    ],
+    "src/claude_skills/claude_skills/common/json_output.py": [
+      "json",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "typing.Literal",
+      "logging",
+      "claude_skills.common.contracts.extract_prepare_task_contract",
+      "claude_skills.common.contracts.extract_task_info_contract",
+      "claude_skills.common.contracts.extract_check_deps_contract",
+      "claude_skills.common.contracts.extract_progress_contract",
+      "claude_skills.common.contracts.extract_next_task_contract"
     ],
     "src/claude_skills/claude_skills/common/metrics.py": [
       "os",

@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 16:41:17
+**Generated:** 2025-11-03 16:44:21
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 207
-- **Total Lines:** 70006
+- **Total Files:** 208
+- **Total Lines:** 70182
 - **Total Classes:** 268
-- **Total Functions:** 781
-- **Avg Complexity:** 5.59
+- **Total Functions:** 783
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - complete_task_workflow (44)
@@ -11857,6 +11857,69 @@ Returns:
 
 ---
 
+### `format_compact_output(data, command_type) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:100`
+**Complexity:** 2
+
+**Description:**
+> Apply contract extraction and format as compact JSON.
+
+This function combines contract extraction (to reduce data) with
+compact JSON formatting (to reduce whitespace), providing maximum
+token efficiency while preserving all decision-enabling information.
+
+The two-step process:
+1. Extract minimal contract based on command_type
+2. Format as minified JSON
+
+Args:
+    data: Full command output data
+    command_type: Type of command that generated the data.
+                 Must be one of: 'prepare-task', 'task-info',
+                 'check-deps', 'progress', 'next-task'
+
+Returns:
+    Compact JSON string with minimal contract
+
+Raises:
+    ValueError: If command_type is not recognized
+
+Examples:
+    >>> full_output = {
+    ...     "success": True,
+    ...     "task_id": "task-1-1",
+    ...     "task_data": {"title": "Example", "status": "pending"},
+    ...     "dependencies": {"can_start": True, "blocked_by": []},
+    ...     # ... many other fields
+    ... }
+
+    >>> # Apply contract extraction and compact formatting
+    >>> output = format_compact_output(full_output, 'prepare-task')
+    >>> print(output)
+    {"task_id":"task-1-1","title":"Example","can_start":true,"blocked_by":[],...}
+
+Token Savings:
+    Typical savings compared to pretty-printed full output:
+    - prepare-task: 85-90%
+    - task-info: 70-75%
+    - check-deps: 80-85%
+    - progress: 85-90%
+    - next-task: 60-70%
+
+Notes:
+    - Contract extraction is command-specific
+    - See contracts.py for detailed field inclusion rules
+    - All decision-enabling information is preserved
+    - This is the recommended format for agent consumption
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `command_type`: CommandType
+
+---
+
 ### `format_completion_prompt(spec_data, phase_id, show_hours_input) -> Dict`
 
 **Language:** python
@@ -12050,6 +12113,54 @@ Returns:
 
 **Parameters:**
 - `trace_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(data, compact, sort_keys) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:41`
+**Complexity:** 2
+
+**Description:**
+> Format data as JSON string with optional compact (minified) output.
+
+This is the central JSON formatting function used by all CLI commands.
+It provides consistent formatting behavior across the toolkit.
+
+Args:
+    data: Dictionary data to format as JSON
+    compact: If True, output minified JSON without whitespace.
+            If False (default), output pretty-printed JSON with indentation.
+    sort_keys: If True, sort dictionary keys in output. Default False.
+
+Returns:
+    Formatted JSON string
+
+Examples:
+    >>> data = {"task_id": "task-1-1", "title": "Example task"}
+
+    >>> # Pretty-printed (default)
+    >>> print(format_json_output(data))
+    {
+      "task_id": "task-1-1",
+      "title": "Example task"
+    }
+
+    >>> # Compact minified
+    >>> print(format_json_output(data, compact=True))
+    {"task_id":"task-1-1","title":"Example task"}
+
+Notes:
+    - Pretty format uses 2-space indentation for readability
+    - Compact format uses minimal separators to reduce size
+    - Both formats ensure valid JSON output
+    - Non-ASCII characters are preserved (ensure_ascii=False)
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `compact`: bool
+- `sort_keys`: bool
 
 ---
 
@@ -20582,6 +20693,20 @@ Returns:
 - `pathlib.Path`
 - `subprocess`
 - `time`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/json_output.py`
+
+- `claude_skills.common.contracts.extract_check_deps_contract`
+- `claude_skills.common.contracts.extract_next_task_contract`
+- `claude_skills.common.contracts.extract_prepare_task_contract`
+- `claude_skills.common.contracts.extract_progress_contract`
+- `claude_skills.common.contracts.extract_task_info_contract`
+- `json`
+- `logging`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Literal`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/metrics.py`

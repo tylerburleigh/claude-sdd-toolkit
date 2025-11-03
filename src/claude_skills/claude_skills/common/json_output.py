@@ -174,3 +174,54 @@ def format_compact_output(
 
     # Format as compact JSON
     return format_json_output(contract, compact=True)
+
+
+def print_json_output(
+    data: Dict[str, Any],
+    compact: bool = False,
+    sort_keys: bool = False
+) -> None:
+    """
+    Format and print JSON output to stdout.
+
+    Convenience wrapper around format_json_output() that prints the result
+    to stdout. Simplifies CLI command implementations by combining formatting
+    and output in a single function call.
+
+    Args:
+        data: Dictionary data to format as JSON
+        compact: If True, output minified JSON. If False (default), pretty-print.
+        sort_keys: If True, sort dictionary keys in output. Default False.
+
+    Returns:
+        None (prints to stdout)
+
+    Examples:
+        >>> data = {"task_id": "task-1-1", "status": "pending"}
+
+        >>> # Pretty-print to stdout
+        >>> print_json_output(data)
+        {
+          "task_id": "task-1-1",
+          "status": "pending"
+        }
+
+        >>> # Compact output to stdout
+        >>> print_json_output(data, compact=True)
+        {"task_id":"task-1-1","status":"pending"}
+
+    Usage in CLI commands:
+        Instead of:
+            output = format_json_output(data, compact=args.compact)
+            print(output)
+
+        Use:
+            print_json_output(data, compact=args.compact)
+
+    Notes:
+        - Output goes to stdout for easy piping and redirection
+        - No trailing newline is added (print() adds it automatically)
+        - For error messages, use stderr instead (logger.error, print to sys.stderr)
+    """
+    output = format_json_output(data, compact=compact, sort_keys=sort_keys)
+    print(output)
