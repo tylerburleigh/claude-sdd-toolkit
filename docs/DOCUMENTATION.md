@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 16:38:46
+**Generated:** 2025-11-03 16:41:17
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 207
-- **Total Lines:** 69731
+- **Total Lines:** 70006
 - **Total Classes:** 268
-- **Total Functions:** 777
-- **Avg Complexity:** 5.6
+- **Total Functions:** 781
+- **Avg Complexity:** 5.59
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - complete_task_workflow (44)
@@ -10876,6 +10876,65 @@ Example:
 
 ---
 
+### `extract_check_deps_contract(check_deps_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:248`
+**Complexity:** 3
+
+**Description:**
+> Extract minimal contract from `sdd check-deps` output.
+
+Purpose:
+    Verify whether a specific task's dependencies are satisfied.
+    Enable decisions about:
+    1. Can I start this task?
+    2. What's blocking me?
+    3. What will I unblock?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - can_start: Boolean indicating if task can be started
+
+    CONDITIONALLY INCLUDE (Optional):
+    - blocked_by: List of blocking task IDs (only if non-empty)
+    - blocks: List of task IDs this task blocks (only if non-empty)
+
+    OMIT (Not Needed):
+    - task_id: Already known from command argument
+    - soft_depends: Soft dependencies don't block work
+
+Special Rules:
+    - When can_start is true and blocked_by is empty, omit blocked_by
+    - When blocks is empty, omit blocks
+    - Minimal successful case: just {"can_start": true}
+
+Args:
+    check_deps_output: Full output from sdd check-deps command
+
+Returns:
+    Minimal contract dict with dependency information
+
+Example:
+    >>> full_output = {
+    ...     "task_id": "task-1-1-2",
+    ...     "can_start": True,
+    ...     "blocked_by": [],
+    ...     "soft_depends": [],
+    ...     "blocks": []
+    ... }
+    >>> contract = extract_check_deps_contract(full_output)
+    >>> contract
+    {
+        "can_start": True
+    }
+
+**Parameters:**
+- `check_deps_output`: Dict[str, Any]
+
+---
+
 ### `extract_frontmatter(spec_file) -> Dict[str, Any]`
 
 **Language:** python
@@ -10897,6 +10956,57 @@ Returns:
 
 **Parameters:**
 - `spec_file`: Union[str, Path]
+
+---
+
+### `extract_next_task_contract(next_task_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:390`
+**Complexity:** 1
+
+**Description:**
+> Extract minimal contract from `sdd next-task` output.
+
+Purpose:
+    Identify which task to work on next (lightweight version of prepare-task).
+    Enable decisions about:
+    1. What task should I work on?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier
+    - title: Concise description of what to do
+
+    OMIT (Not Needed):
+    - status: Always "pending" for next task
+    - file_path: Use prepare-task or task-info for details
+    - estimated_hours: Not actionable for agent
+
+Args:
+    next_task_output: Full output from sdd next-task command
+
+Returns:
+    Minimal contract dict with next task information
+
+Example:
+    >>> full_output = {
+    ...     "task_id": "task-1-1-2",
+    ...     "title": "Implement extract_task_info_contract()...",
+    ...     "status": "pending",
+    ...     "file_path": "",
+    ...     "estimated_hours": 0
+    ... }
+    >>> contract = extract_next_task_contract(full_output)
+    >>> contract
+    {
+        "task_id": "task-1-1-2",
+        "title": "Implement extract_task_info_contract()..."
+    }
+
+**Parameters:**
+- `next_task_output`: Dict[str, Any]
 
 ---
 
@@ -10988,6 +11098,73 @@ Example:
 
 ---
 
+### `extract_progress_contract(progress_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:314`
+**Complexity:** 1
+
+**Description:**
+> Extract minimal contract from `sdd progress` output.
+
+Purpose:
+    Understand overall spec completion status.
+    Enable decisions about:
+    1. How much is done?
+    2. How much is left?
+    3. What's active?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - total: Total number of tasks
+    - completed: Number of completed tasks
+    - in_progress: Number of tasks currently in progress
+    - pending: Number of pending tasks
+
+    OMIT (Not Needed):
+    - node_id: Not needed for agent
+    - spec_id: Already known from command argument
+    - title: Already known
+    - type: Always "spec"
+    - status: Derivable from counts
+    - percentage: Derivable (completed/total * 100)
+    - remaining_tasks: Derivable (total - completed)
+    - current_phase: Use separate command if needed
+
+Args:
+    progress_output: Full output from sdd progress command
+
+Returns:
+    Minimal contract dict with progress counts
+
+Example:
+    >>> full_output = {
+    ...     "node_id": "spec-root",
+    ...     "spec_id": "compact-json-output-2025-11-03-001",
+    ...     "title": "Compact JSON Output for SDD CLI Commands",
+    ...     "type": "spec",
+    ...     "status": "in_progress",
+    ...     "total_tasks": 38,
+    ...     "completed_tasks": 1,
+    ...     "percentage": 2,
+    ...     "remaining_tasks": 37,
+    ...     "current_phase": {...}
+    ... }
+    >>> contract = extract_progress_contract(full_output)
+    >>> contract
+    {
+        "total": 38,
+        "completed": 1,
+        "in_progress": 0,
+        "pending": 37
+    }
+
+**Parameters:**
+- `progress_output`: Dict[str, Any]
+
+---
+
 ### `extract_readme(project_root) -> Optional[str]`
 
 **Language:** python
@@ -11019,6 +11196,79 @@ Returns:
 
 **Parameters:**
 - `parser`: argparse.ArgumentParser
+
+---
+
+### `extract_task_info_contract(task_info_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:165`
+**Complexity:** 2
+
+**Description:**
+> Extract minimal contract from `sdd task-info` output.
+
+Purpose:
+    Get detailed information about a specific task (not necessarily the next one).
+    Enable decisions about:
+    1. What is this task?
+    2. What's its current state?
+    3. What blocks it?
+    4. What does it block?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier (derived from command argument, not in output)
+    - title: Task description
+    - status: Current task status
+    - blocked_by: List of blocking task IDs
+    - blocks: List of task IDs this task blocks
+
+    CONDITIONALLY INCLUDE (Optional):
+    - file_path: Target file path (only if non-empty)
+
+    OMIT (Not Needed):
+    - type: Not needed for agent decisions
+    - parent: Not actionable
+    - children: Use separate query if needed
+    - total_tasks, completed_tasks: Use progress command instead
+    - metadata: Use prepare-task for implementation details
+    - dependencies object: Flattened to blocked_by and blocks
+
+Args:
+    task_info_output: Full output from sdd task-info command
+
+Returns:
+    Minimal contract dict with essential task information
+
+Example:
+    >>> full_output = {
+    ...     "type": "subtask",
+    ...     "title": "Implement extract_task_info_contract()",
+    ...     "status": "completed",
+    ...     "parent": "task-1-1",
+    ...     "children": [],
+    ...     "dependencies": {
+    ...         "blocks": [],
+    ...         "blocked_by": [],
+    ...         "depends": []
+    ...     },
+    ...     "total_tasks": 1,
+    ...     "completed_tasks": 1,
+    ...     "metadata": {...}
+    ... }
+    >>> contract = extract_task_info_contract(full_output)
+    >>> contract
+    {
+        "title": "Implement extract_task_info_contract()",
+        "status": "completed",
+        "blocked_by": [],
+        "blocks": []
+    }
+
+**Parameters:**
+- `task_info_output`: Dict[str, Any]
 
 ---
 
