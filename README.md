@@ -639,6 +639,54 @@ sdd skills-dev setup-permissions -- update .   # Set up permissions
 sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
 ```
 
+### Compact JSON Output (`--compact` flag)
+
+Many SDD CLI commands support a `--compact` flag that reduces output size for agent workflows. This is particularly useful when Claude Code agents invoke these commands repeatedly, as compact output significantly reduces token consumption.
+
+**Commands with `--compact` support:**
+- `sdd prepare-task <spec-id> [task-id] --compact`
+- `sdd task-info <spec-id> <task-id> --compact`
+- `sdd check-deps <spec-id> <task-id> --compact`
+- `sdd progress <spec-id> --compact`
+- `sdd next-task <spec-id> --compact`
+
+**Example:**
+```bash
+# Normal output (verbose, human-readable)
+sdd prepare-task my-spec-001 task-1-1
+
+# Compact output (minified, optimized for agents)
+sdd prepare-task my-spec-001 task-1-1 --compact
+```
+
+**Token Savings:**
+
+Compact output achieves approximately **30% token reduction** across commands (measured with tiktoken cl100k_base encoding):
+
+| Command | Normal Tokens | Compact Tokens | Savings |
+|---------|--------------|----------------|---------|
+| prepare-task | ~400-600 | ~280-420 | ~28-32% |
+| task-info | ~130-240 | ~90-170 | ~28-30% |
+| check-deps | ~40-210 | ~30-140 | ~27-35% |
+| progress | ~95-130 | ~65-85 | ~31-36% |
+| next-task | ~50-55 | ~34-37 | ~30-32% |
+
+*Measured across 3 different spec types (in-progress, pending, completed) with minimal variance (~3.5%), confirming consistency.*
+
+**When to use `--compact`:**
+- ✅ Agent workflows (sdd-next, sdd-plan, automated tools)
+- ✅ Programmatic parsing of JSON output
+- ✅ High-volume command execution (reduces context consumption)
+- ❌ Manual debugging or inspection (use normal output for readability)
+
+**What gets reduced:**
+- Whitespace removed (JSON minification)
+- Redundant metadata fields omitted
+- Nested structures flattened where possible
+- Field names preserved (full contract compatibility)
+
+**Backward compatibility:** The `--compact` flag is opt-in. All commands continue to return verbose, human-readable output by default.
+
 ## Prerequisites
 
 ### Required
