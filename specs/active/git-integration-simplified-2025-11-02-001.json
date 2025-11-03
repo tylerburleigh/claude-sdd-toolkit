@@ -1,7 +1,7 @@
 {
   "spec_id": "git-integration-simplified-2025-11-02-001",
   "generated": "2025-11-02T23:30:00Z",
-  "last_updated": "2025-11-03T12:20:49.518564Z",
+  "last_updated": "2025-11-03T12:21:56.623247Z",
   "metadata": {
     "title": "Git Integration for SDD Workflow (Simplified)",
     "description": "Integrate git operations into SDD workflow using direct git/gh commands via Bash tool with SKILL.md instructions. Lightweight metadata tracking without custom CLI wrappers.",
@@ -27,7 +27,7 @@
       "Users can disable git integration entirely via configuration",
       "Each git operation (branch, commit, push, PR) can be individually enabled/disabled"
     ],
-    "progress_percentage": 82,
+    "progress_percentage": 86,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -44,7 +44,7 @@
         "phase-5"
       ],
       "total_tasks": 29,
-      "completed_tasks": 24,
+      "completed_tasks": 25,
       "metadata": {}
     },
     "phase-1": {
@@ -818,7 +818,7 @@
         "phase-4-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "estimated_hours": 7,
         "risk_level": "medium",
@@ -837,15 +837,19 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1",
         "task-4-2"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-03T12:21:56.603970Z",
+        "journaled_at": "2025-11-03T12:21:56.623135Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -881,7 +885,7 @@
       "type": "task",
       "title": "Update sdd_update/lifecycle.py with PR logic",
       "description": "In complete_spec(): check is_git_enabled(), generate PR body from template (spec title, objectives, task list, journal highlights), push via 'git push -u origin {branch}', create PR via 'gh pr create --title ... --body ...', call update_pr_metadata() on success",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-2-1",
@@ -894,7 +898,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
         "estimated_hours": 4,
@@ -945,7 +949,7 @@
       "type": "subtask",
       "title": "Update spec metadata on successful PR creation",
       "description": "Parse PR number from gh output, call update_pr_metadata(spec, pr_url, pr_number, 'open')",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-2",
       "children": [],
       "dependencies": {
@@ -954,8 +958,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-03T12:21:56.603816Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-03T12:21:56.610348Z"
+      }
     },
     "phase-4-verify": {
       "type": "group",
@@ -1388,6 +1396,24 @@
       "content": "PR creation via gh CLI already implemented in git_pr.py module (created in task-4-2-1). The create_pull_request() function includes:\n\n1. **GitHub CLI check**: Uses check_gh_available() to verify gh is installed via `which gh` command\n\n2. **PR creation**: Executes gh pr create with:\n   - --title flag for PR title\n   - --body flag for PR description (markdown formatted)\n   - --base flag for base branch (e.g., main, develop)\n   - Runs with cwd=repo_root for correct repository context\n\n3. **Output parsing**: Extracts PR URL and number from gh output using regex pattern `/pull/(\\d+)`\n\n4. **Graceful gh unavailability handling**:\n   - Returns false, None, None, error_msg when gh not found\n   - Logs warning with installation instructions (https://cli.github.com/)\n   - Suggests manual PR creation URL\n   - Non-blocking (spec completion continues)\n\n5. **Error handling**:\n   - Checks returncode for gh command\n   - Logs warnings for failures\n   - Provides actionable error messages\n   - Returns structured tuple (success, pr_url, pr_number, error_msg)\n\nImplementation verified in src/claude_skills/claude_skills/sdd_update/git_pr.py:create_pull_request() (lines 183-254).",
       "metadata": {},
       "task_id": "task-4-2-2"
+    },
+    {
+      "timestamp": "2025-11-03T12:21:56.610322Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Update spec metadata on successful PR creation",
+      "author": "claude-code",
+      "content": "Integrated PR workflow into complete_spec() function in src/claude_skills/claude_skills/sdd_update/lifecycle.py. Implementation includes:\n\n1. **Imports added**: Imported PR workflow functions from git_pr module and update_pr_metadata from git_metadata\n\n2. **PR workflow integration** (after spec completion, before moving to completed/):\n   - Checks PR readiness via check_pr_readiness(spec_data, spec_file)\n   - Generates PR body from spec metadata using generate_pr_body()\n   - Pushes branch to remote via push_branch()\n   - Creates PR via create_pull_request() with title, body, and base branch\n   - Updates spec metadata with PR info via update_pr_metadata()\n   - Saves spec with PR metadata\n\n3. **Error handling** (non-blocking):\n   - Push failures: Log warning, provide manual push instructions\n   - PR creation failures: Log warning, provide gh installation URL\n   - gh unavailability: Provide manual PR creation URL\n   - Metadata save failures: Log warning but continue\n   - All failures allow spec completion to succeed\n\n4. **User feedback**:\n   - Progress messages for each step (pushing, creating PR)\n   - Success messages with PR URL\n   - Clear fallback instructions on failures\n   - Manual PR creation URLs when automation fails\n\n5. **PR metadata recording**: Calls update_pr_metadata() with pr_url, pr_number, and status='open'\n\nPython syntax verified with no errors. The workflow follows the same non-blocking pattern as git commit integration.",
+      "metadata": {},
+      "task_id": "task-4-2-3"
+    },
+    {
+      "timestamp": "2025-11-03T12:21:56.623100Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-files"
     }
   ]
 }
