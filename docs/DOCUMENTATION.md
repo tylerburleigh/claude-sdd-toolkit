@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 16:44:21
+**Generated:** 2025-11-03 16:53:43
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 208
-- **Total Lines:** 70182
+- **Total Lines:** 70233
 - **Total Classes:** 268
-- **Total Functions:** 783
-- **Avg Complexity:** 5.58
+- **Total Functions:** 784
+- **Avg Complexity:** 5.57
 - **Max Complexity:** 44
 - **High Complexity Functions:**
   - complete_task_workflow (44)
@@ -15979,6 +15979,61 @@ Returns:
 - `show_markers`: bool
 - `show_detailed`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `print_json_output(data, compact, sort_keys) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:179`
+**Complexity:** 1
+
+**Description:**
+> Format and print JSON output to stdout.
+
+Convenience wrapper around format_json_output() that prints the result
+to stdout. Simplifies CLI command implementations by combining formatting
+and output in a single function call.
+
+Args:
+    data: Dictionary data to format as JSON
+    compact: If True, output minified JSON. If False (default), pretty-print.
+    sort_keys: If True, sort dictionary keys in output. Default False.
+
+Returns:
+    None (prints to stdout)
+
+Examples:
+    >>> data = {"task_id": "task-1-1", "status": "pending"}
+
+    >>> # Pretty-print to stdout
+    >>> print_json_output(data)
+    {
+      "task_id": "task-1-1",
+      "status": "pending"
+    }
+
+    >>> # Compact output to stdout
+    >>> print_json_output(data, compact=True)
+    {"task_id":"task-1-1","status":"pending"}
+
+Usage in CLI commands:
+    Instead of:
+        output = format_json_output(data, compact=args.compact)
+        print(output)
+
+    Use:
+        print_json_output(data, compact=args.compact)
+
+Notes:
+    - Output goes to stdout for easy piping and redirection
+    - No trailing newline is added (print() adds it automatically)
+    - For error messages, use stderr instead (logger.error, print to sys.stderr)
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `compact`: bool
+- `sort_keys`: bool
 
 ---
 
