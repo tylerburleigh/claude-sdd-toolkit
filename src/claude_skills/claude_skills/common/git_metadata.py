@@ -4,7 +4,7 @@ This module provides utilities for git operations and metadata synchronization.
 All git commands execute with subprocess.run and include basic error handling.
 
 Functions are organized into categories:
-- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, detect_git_drift
+- Git Utilities: find_git_root, check_dirty_tree, parse_git_status, show_commit_preview, detect_git_drift
 - Metadata Updates: update_branch_metadata, add_commit_metadata, update_pr_metadata
 """
 
@@ -220,6 +220,175 @@ def parse_git_status(repo_root: Path) -> List[Dict[str, str]]:
     except Exception as e:
         logger.warning(f"Unexpected error parsing git status: {e}")
         return []
+
+
+def show_commit_preview(repo_root: Path, printer=None) -> Dict[str, List[str]]:
+    """Display uncommitted files grouped by status with staging instructions.
+
+    Uses parse_git_status() to get file changes and groups them by type
+    (modified, added, deleted, untracked) with emoji markers for better visibility.
+
+    Args:
+        repo_root: Path to git repository root
+        printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+    Returns:
+        Dictionary with status categories as keys and file lists as values:
+        {
+            'staged_modified': [...],
+            'unstaged_modified': [...],
+            'added': [...],
+            'deleted': [...],
+            'untracked': [...]
+        }
+
+    Example:
+        >>> show_commit_preview(Path('/repo'))
+        📝 Modified (2):
+          • src/main.py
+          • lib/utils.py
+
+        ✨ Added (1):
+          • tests/new_test.py
+
+        To stage all changes: git add .
+        To stage specific files: git add <file>
+    """
+    from claude_skills.common.printer import PrettyPrinter
+
+    if printer is None:
+        printer = PrettyPrinter()
+
+    # Get parsed status
+    files = parse_git_status(repo_root)
+
+    if not files:
+        printer.info("No uncommitted changes")
+        return {}
+
+    # Group files by status category
+    categories = {
+        'staged_modified': [],      # M  (staged modification)
+        'unstaged_modified': [],    #  M (unstaged modification)
+        'both_modified': [],        # MM (staged and unstaged)
+        'added': [],                # A  (added/new, staged)
+        'deleted_staged': [],       # D  (deleted, staged)
+        'deleted_unstaged': [],     #  D (deleted, unstaged)
+        'untracked': [],            # ?? (untracked)
+        'renamed': [],              # R  (renamed)
+        'copied': [],               # C  (copied)
+        'other': []                 # Other status codes
+    }
+
+    # Categorize each file
+    for file_info in files:
+        status = file_info['status']
+        path = file_info['path']
+
+        if status == 'M ':
+            categories['staged_modified'].append(path)
+        elif status == ' M':
+            categories['unstaged_modified'].append(path)
+        elif status == 'MM':
+            categories['both_modified'].append(path)
+        elif status == 'A ' or status.startswith('A'):
+            categories['added'].append(path)
+        elif status == 'D ':
+            categories['deleted_staged'].append(path)
+        elif status == ' D':
+            categories['deleted_unstaged'].append(path)
+        elif status == '??':
+            categories['untracked'].append(path)
+        elif status == 'R ' or status.startswith('R'):
+            categories['renamed'].append(path)
+        elif status == 'C ' or status.startswith('C'):
+            categories['copied'].append(path)
+        else:
+            categories['other'].append(path)
+
+    # Display grouped files with emojis
+    printer.blank()
+    printer.header("Uncommitted Changes")
+
+    displayed_any = False
+
+    if categories['staged_modified']:
+        printer.result("📝 Staged (Modified)", f"{len(categories['staged_modified'])} file(s)")
+        for path in categories['staged_modified']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['added']:
+        printer.result("✨ Staged (Added)", f"{len(categories['added'])} file(s)")
+        for path in categories['added']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['deleted_staged']:
+        printer.result("❌ Staged (Deleted)", f"{len(categories['deleted_staged'])} file(s)")
+        for path in categories['deleted_staged']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['unstaged_modified']:
+        printer.result("📝 Unstaged (Modified)", f"{len(categories['unstaged_modified'])} file(s)")
+        for path in categories['unstaged_modified']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['deleted_unstaged']:
+        printer.result("❌ Unstaged (Deleted)", f"{len(categories['deleted_unstaged'])} file(s)")
+        for path in categories['deleted_unstaged']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['both_modified']:
+        printer.result("📝 Modified (Staged + Unstaged)", f"{len(categories['both_modified'])} file(s)")
+        for path in categories['both_modified']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['untracked']:
+        printer.result("❓ Untracked", f"{len(categories['untracked'])} file(s)")
+        for path in categories['untracked']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['renamed']:
+        printer.result("🔄 Renamed", f"{len(categories['renamed'])} file(s)")
+        for path in categories['renamed']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['copied']:
+        printer.result("📋 Copied", f"{len(categories['copied'])} file(s)")
+        for path in categories['copied']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    if categories['other']:
+        printer.result("❔ Other", f"{len(categories['other'])} file(s)")
+        for path in categories['other']:
+            printer.item(path, indent=1)
+        printer.blank()
+        displayed_any = True
+
+    # Show staging instructions
+    if displayed_any:
+        printer.info("To stage all changes: git add .")
+        printer.info("To stage specific files: git add <file>")
+        printer.info("To commit staged changes: git commit -m \"message\"")
+
+    return categories
 
 
 def detect_git_drift(spec: Dict[str, Any], repo_root: Path) -> List[str]:

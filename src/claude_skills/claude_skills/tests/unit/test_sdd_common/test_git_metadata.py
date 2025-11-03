@@ -19,6 +19,7 @@ from claude_skills.common.git_metadata import (
     find_git_root,
     check_dirty_tree,
     parse_git_status,
+    show_commit_preview,
     detect_git_drift,
     update_branch_metadata,
     add_commit_metadata,
@@ -382,6 +383,187 @@ class TestParseGitStatus:
         assert len(result) == 1
         assert result[0]['status'] == 'AM'
         assert result[0]['path'] == 'file.py'
+
+
+class TestShowCommitPreview:
+    """Tests for show_commit_preview function."""
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_no_changes(self, mock_parse, tmp_path):
+        """Test preview with no changes."""
+        from claude_skills.common.printer import PrettyPrinter
+        from io import StringIO
+        import sys
+
+        mock_parse.return_value = []
+
+        # Capture output
+        captured_output = StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = captured_output
+
+        try:
+            printer = PrettyPrinter(use_color=False, verbose=True)
+            result = show_commit_preview(tmp_path, printer=printer)
+
+            assert result == {}
+            mock_parse.assert_called_once_with(tmp_path)
+        finally:
+            sys.stdout = old_stdout
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_staged_modified(self, mock_parse, tmp_path):
+        """Test preview with staged modified files."""
+        mock_parse.return_value = [
+            {'status': 'M ', 'path': 'file1.py'},
+            {'status': 'M ', 'path': 'file2.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'staged_modified' in result
+        assert len(result['staged_modified']) == 2
+        assert 'file1.py' in result['staged_modified']
+        assert 'file2.py' in result['staged_modified']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_unstaged_modified(self, mock_parse, tmp_path):
+        """Test preview with unstaged modified files."""
+        mock_parse.return_value = [
+            {'status': ' M', 'path': 'file1.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'unstaged_modified' in result
+        assert len(result['unstaged_modified']) == 1
+        assert 'file1.py' in result['unstaged_modified']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_both_modified(self, mock_parse, tmp_path):
+        """Test preview with files that have both staged and unstaged changes."""
+        mock_parse.return_value = [
+            {'status': 'MM', 'path': 'file1.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'both_modified' in result
+        assert len(result['both_modified']) == 1
+        assert 'file1.py' in result['both_modified']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_added_files(self, mock_parse, tmp_path):
+        """Test preview with added files."""
+        mock_parse.return_value = [
+            {'status': 'A ', 'path': 'new_file.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'added' in result
+        assert len(result['added']) == 1
+        assert 'new_file.py' in result['added']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_deleted_staged(self, mock_parse, tmp_path):
+        """Test preview with deleted files (staged)."""
+        mock_parse.return_value = [
+            {'status': 'D ', 'path': 'old_file.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'deleted_staged' in result
+        assert len(result['deleted_staged']) == 1
+        assert 'old_file.py' in result['deleted_staged']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_deleted_unstaged(self, mock_parse, tmp_path):
+        """Test preview with deleted files (unstaged)."""
+        mock_parse.return_value = [
+            {'status': ' D', 'path': 'old_file.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'deleted_unstaged' in result
+        assert len(result['deleted_unstaged']) == 1
+        assert 'old_file.py' in result['deleted_unstaged']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_untracked(self, mock_parse, tmp_path):
+        """Test preview with untracked files."""
+        mock_parse.return_value = [
+            {'status': '??', 'path': 'untracked.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'untracked' in result
+        assert len(result['untracked']) == 1
+        assert 'untracked.py' in result['untracked']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_renamed(self, mock_parse, tmp_path):
+        """Test preview with renamed files."""
+        mock_parse.return_value = [
+            {'status': 'R ', 'path': 'old.py -> new.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert 'renamed' in result
+        assert len(result['renamed']) == 1
+        assert 'old.py -> new.py' in result['renamed']
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_mixed_statuses(self, mock_parse, tmp_path):
+        """Test preview with mixed file statuses."""
+        mock_parse.return_value = [
+            {'status': 'M ', 'path': 'staged.py'},
+            {'status': ' M', 'path': 'unstaged.py'},
+            {'status': 'A ', 'path': 'new.py'},
+            {'status': '??', 'path': 'untracked.py'},
+            {'status': ' D', 'path': 'deleted.py'}
+        ]
+
+        from claude_skills.common.printer import PrettyPrinter
+        printer = PrettyPrinter(use_color=False, quiet=True)
+        result = show_commit_preview(tmp_path, printer=printer)
+
+        assert len(result['staged_modified']) == 1
+        assert len(result['unstaged_modified']) == 1
+        assert len(result['added']) == 1
+        assert len(result['untracked']) == 1
+        assert len(result['deleted_unstaged']) == 1
+
+    @patch('claude_skills.common.git_metadata.parse_git_status')
+    def test_show_commit_preview_creates_printer_if_none(self, mock_parse, tmp_path):
+        """Test that function creates PrettyPrinter if none provided."""
+        mock_parse.return_value = []
+
+        # Call without printer parameter
+        result = show_commit_preview(tmp_path)
+
+        assert result == {}
+        mock_parse.assert_called_once_with(tmp_path)
 
 
 class TestDetectGitDrift:
