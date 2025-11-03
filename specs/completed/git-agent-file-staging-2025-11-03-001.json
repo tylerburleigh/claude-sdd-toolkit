@@ -1,7 +1,7 @@
 {
   "spec_id": "git-agent-file-staging-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T15:20:51.334910Z",
+  "last_updated": "2025-11-03T15:25:38.621871Z",
   "metadata": {
     "title": "Agent-Controlled Git File Staging",
     "description": "Implement two-step workflow for agent-controlled file staging in git commits, replacing automatic 'git add --all' with preview-and-select pattern.",
@@ -10,7 +10,21 @@
     "complexity": "medium",
     "risk_level": "low",
     "progress_percentage": 100,
-    "current_phase": "phase-4"
+    "current_phase": "phase-4",
+    "completed_date": "2025-11-03T15:25:38.621152Z",
+    "git": {
+      "branch_name": "feat12",
+      "base_branch": "main",
+      "commits": [
+        {
+          "sha": "0cd110cb993ac7c5923cc55609fe33b63d5386c4",
+          "message": "verify-4-2: Test with real sdd-update workflow",
+          "task_id": "verify-4-2",
+          "timestamp": "2025-11-03T15:20:51.362278Z"
+        }
+      ],
+      "pr": null
+    }
   },
   "hierarchy": {
     "spec-root": {
