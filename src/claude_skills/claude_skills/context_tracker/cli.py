@@ -59,6 +59,10 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     Transcripts are searched in reverse chronological order (most recently modified
     first) to prioritize active sessions over historical ones.
 
+    If the exact CWD-based transcript directory doesn't exist, this function will
+    search parent directories as a fallback to handle cases where commands are run
+    from subdirectories of the project root.
+
     Args:
         cwd: Current working directory (used to find project-specific transcripts)
         marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
@@ -67,11 +71,25 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     Returns:
         Path to transcript containing the marker, or None if not found
     """
-    # Claude Code stores transcripts in project-specific directories
-    project_dir_name = str(cwd.resolve()).replace("/", "-")
-    transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
+    # Build list of candidate transcript directories to search
+    # Start with the exact CWD, then try parent directories
+    candidate_dirs = []
 
-    if not transcript_dir.exists():
+    # Claude Code stores transcripts in project-specific directories
+    current_path = cwd.resolve()
+    while True:
+        project_dir_name = str(current_path).replace("/", "-")
+        transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
+
+        if transcript_dir.exists():
+            candidate_dirs.append(transcript_dir)
+
+        # Stop at root or after checking enough parents
+        if current_path.parent == current_path or len(candidate_dirs) >= 5:
+            break
+        current_path = current_path.parent
+
+    if not candidate_dirs:
         return None
 
     # Extended retry with exponential backoff, capped at 30 seconds total
@@ -81,35 +99,37 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     for attempt in range(max_retries):
         current_time = time.time()
 
-        try:
-            # Get all recent transcript files
-            transcript_files = []
-            for transcript_path in transcript_dir.glob("*.jsonl"):
-                try:
-                    mtime = transcript_path.stat().st_mtime
-                    # Only check recent transcripts (modified in last 24 hours)
-                    if (current_time - mtime) > 86400:
+        # Search all candidate directories (prioritizing exact CWD match first)
+        for transcript_dir in candidate_dirs:
+            try:
+                # Get all recent transcript files
+                transcript_files = []
+                for transcript_path in transcript_dir.glob("*.jsonl"):
+                    try:
+                        mtime = transcript_path.stat().st_mtime
+                        # Only check recent transcripts (modified in last 24 hours)
+                        if (current_time - mtime) > 86400:
+                            continue
+                        transcript_files.append((transcript_path, mtime))
+                    except (OSError, IOError):
                         continue
-                    transcript_files.append((transcript_path, mtime))
-                except (OSError, IOError):
-                    continue
 
-            # Sort by modification time (most recent first)
-            # This prioritizes the active session over historical transcripts
-            transcript_files.sort(key=lambda x: x[1], reverse=True)
+                # Sort by modification time (most recent first)
+                # This prioritizes the active session over historical transcripts
+                transcript_files.sort(key=lambda x: x[1], reverse=True)
 
-            # Search through transcripts in order of recency
-            for transcript_path, _ in transcript_files:
-                try:
-                    # Search for the specific marker in the transcript
-                    with open(transcript_path, 'r', encoding='utf-8') as f:
-                        for line in f:
-                            if marker in line:
-                                return str(transcript_path)
-                except (OSError, IOError, UnicodeDecodeError):
-                    continue
-        except (OSError, IOError):
-            pass
+                # Search through transcripts in order of recency
+                for transcript_path, _ in transcript_files:
+                    try:
+                        # Search for the specific marker in the transcript
+                        with open(transcript_path, 'r', encoding='utf-8') as f:
+                            for line in f:
+                                if marker in line:
+                                    return str(transcript_path)
+                    except (OSError, IOError, UnicodeDecodeError):
+                        continue
+            except (OSError, IOError):
+                continue
 
         # If not found and we have retries left, wait before next attempt
         if attempt < max_retries - 1:
@@ -291,8 +311,18 @@ def cmd_context(args, printer):
         # Provide context-specific error message
         if hasattr(args, 'session_marker') and args.session_marker:
             cwd = Path.cwd()
-            project_dir_name = str(cwd.resolve()).replace("/", "-")
-            transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
+
+            # Build list of searched directories (same logic as find_transcript_by_specific_marker)
+            searched_dirs = []
+            current_path = cwd.resolve()
+            while True:
+                project_dir_name = str(current_path).replace("/", "-")
+                transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
+                if transcript_dir.exists():
+                    searched_dirs.append(transcript_dir)
+                if current_path.parent == current_path or len(searched_dirs) >= 5:
+                    break
+                current_path = current_path.parent
 
             printer.error(f"Could not find transcript containing marker: {args.session_marker}")
             printer.error("")
@@ -306,12 +336,13 @@ def cmd_context(args, printer):
             printer.error("not just separate bash commands. The marker must be logged to the")
             printer.error("transcript file before it can be found.")
             printer.error("")
-            printer.error(f"Searched in: {transcript_dir}")
-            if transcript_dir.exists():
-                transcript_count = len(list(transcript_dir.glob("*.jsonl")))
-                printer.error(f"Found {transcript_count} transcript file(s) in the last 24 hours")
+            if searched_dirs:
+                printer.error(f"Searched in {len(searched_dirs)} transcript director{'y' if len(searched_dirs) == 1 else 'ies'}:")
+                for dir_path in searched_dirs:
+                    transcript_count = len(list(dir_path.glob("*.jsonl")))
+                    printer.error(f"  • {dir_path} ({transcript_count} transcript file(s))")
             else:
-                printer.error("Warning: Transcript directory does not exist")
+                printer.error("Warning: No transcript directories found")
             printer.error("")
             printer.error("Troubleshooting:")
             printer.error("  • Wait a few seconds after generating the marker")
