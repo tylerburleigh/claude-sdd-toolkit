@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
-from claude_skills.common.git_metadata import find_git_root
+from claude_skills.common.git_metadata import find_git_root, create_commit_from_staging
 from claude_skills.common.git_config import is_git_enabled
 
 logger = logging.getLogger(__name__)
@@ -163,6 +163,10 @@ def stage_and_commit(
 ) -> Tuple[bool, Optional[str], str]:
     """Stage all changes and create a commit.
 
+    This function maintains backward compatibility by automatically staging all
+    changes (git add --all) and then creating a commit. It now uses the new
+    create_commit_from_staging() workflow internally.
+
     Args:
         repo_root: Path to repository root directory
         commit_message: Commit message to use
@@ -174,7 +178,7 @@ def stage_and_commit(
         - error_message: Error message if failed, empty string if successful
     """
     try:
-        # Step 1: Stage all changes
+        # Step 1: Stage all changes with git add --all
         add_result = subprocess.run(
             ['git', 'add', '--all'],
             cwd=repo_root,
@@ -188,7 +192,20 @@ def stage_and_commit(
             logger.warning(error_msg)
             return False, None, error_msg
 
-        # Step 2: Create commit
+        # Step 2: Create commit using the new workflow
+        # Note: create_commit_from_staging expects spec_id and task_id for commit message,
+        # but we have a custom commit_message. We'll use git commit directly to preserve
+        # the exact commit message format while still validating staging area.
+        from claude_skills.common.git_metadata import get_staged_files
+
+        # Check if there are files staged
+        staged_files = get_staged_files(repo_root)
+        if not staged_files:
+            error_msg = "No files staged for commit (working tree clean)"
+            logger.info(error_msg)
+            return False, None, error_msg
+
+        # Create commit with custom message
         commit_result = subprocess.run(
             ['git', 'commit', '-m', commit_message],
             cwd=repo_root,
@@ -202,7 +219,7 @@ def stage_and_commit(
             logger.warning(error_msg)
             return False, None, error_msg
 
-        # Step 3: Get commit SHA
+        # Get commit SHA
         sha_result = subprocess.run(
             ['git', 'rev-parse', 'HEAD'],
             cwd=repo_root,

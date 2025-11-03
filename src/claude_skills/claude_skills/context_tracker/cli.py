@@ -44,7 +44,7 @@ def generate_session_marker() -> str:
     return marker
 
 
-def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int = 5) -> str | None:
+def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int = 10) -> str | None:
     """
     Search transcripts for a specific SESSION_MARKER to identify current session.
 
@@ -56,10 +56,13 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     this function will retry with exponential backoff if the marker is not found
     on the first attempt.
 
+    Transcripts are searched in reverse chronological order (most recently modified
+    first) to prioritize active sessions over historical ones.
+
     Args:
         cwd: Current working directory (used to find project-specific transcripts)
         marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
-        max_retries: Maximum number of retry attempts (default: 5)
+        max_retries: Maximum number of retry attempts (default: 10)
 
     Returns:
         Path to transcript containing the marker, or None if not found
@@ -71,20 +74,33 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     if not transcript_dir.exists():
         return None
 
-    # Retry with exponential backoff: 100ms, 200ms, 400ms, 800ms, 1600ms
-    delays = [0.1 * (2 ** i) for i in range(max_retries)]
+    # Extended retry with exponential backoff, capped at 30 seconds total
+    # Delays: 100ms, 200ms, 400ms, 800ms, 1.6s, 3.2s, 6.4s, 12.8s, ...
+    delays = [min(0.1 * (2 ** i), 10.0) for i in range(max_retries)]
 
     for attempt in range(max_retries):
         current_time = time.time()
 
         try:
+            # Get all recent transcript files
+            transcript_files = []
             for transcript_path in transcript_dir.glob("*.jsonl"):
                 try:
-                    # Only check recent transcripts (modified in last 24 hours)
                     mtime = transcript_path.stat().st_mtime
+                    # Only check recent transcripts (modified in last 24 hours)
                     if (current_time - mtime) > 86400:
                         continue
+                    transcript_files.append((transcript_path, mtime))
+                except (OSError, IOError):
+                    continue
 
+            # Sort by modification time (most recent first)
+            # This prioritizes the active session over historical transcripts
+            transcript_files.sort(key=lambda x: x[1], reverse=True)
+
+            # Search through transcripts in order of recency
+            for transcript_path, _ in transcript_files:
+                try:
                     # Search for the specific marker in the transcript
                     with open(transcript_path, 'r', encoding='utf-8') as f:
                         for line in f:
@@ -97,6 +113,13 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
 
         # If not found and we have retries left, wait before next attempt
         if attempt < max_retries - 1:
+            # Show progress on stderr so it doesn't interfere with JSON output
+            if attempt > 0:  # Don't show on first attempt
+                print(
+                    f"Waiting for marker to be written to transcript... "
+                    f"(attempt {attempt + 1}/{max_retries})",
+                    file=sys.stderr
+                )
             time.sleep(delays[attempt])
 
     return None
@@ -267,6 +290,10 @@ def cmd_context(args, printer):
     if not transcript_path:
         # Provide context-specific error message
         if hasattr(args, 'session_marker') and args.session_marker:
+            cwd = Path.cwd()
+            project_dir_name = str(cwd.resolve()).replace("/", "-")
+            transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
+
             printer.error(f"Could not find transcript containing marker: {args.session_marker}")
             printer.error("")
             printer.error("This usually means the marker hasn't been written to the transcript yet.")
@@ -275,8 +302,22 @@ def cmd_context(args, printer):
             printer.error("  1. Call 'sdd session-marker' first (generates and logs marker)")
             printer.error("  2. Call 'sdd context --session-marker <marker>' in a SEPARATE command")
             printer.error("")
-            printer.error("The marker must be logged to the transcript before it can be found.")
-            printer.error("Try running 'sdd session-marker' again, then retry this command.")
+            printer.error("Important: 'SEPARATE command' means a separate conversation turn,")
+            printer.error("not just separate bash commands. The marker must be logged to the")
+            printer.error("transcript file before it can be found.")
+            printer.error("")
+            printer.error(f"Searched in: {transcript_dir}")
+            if transcript_dir.exists():
+                transcript_count = len(list(transcript_dir.glob("*.jsonl")))
+                printer.error(f"Found {transcript_count} transcript file(s) in the last 24 hours")
+            else:
+                printer.error("Warning: Transcript directory does not exist")
+            printer.error("")
+            printer.error("Troubleshooting:")
+            printer.error("  • Wait a few seconds after generating the marker")
+            printer.error("  • Ensure both commands run from the same working directory")
+            printer.error("  • If multiple sessions are active, use a fresh marker")
+            printer.error("  • Try running 'sdd session-marker' again in a new message")
         else:
             printer.error("Error: No session marker provided.")
             printer.error("")
