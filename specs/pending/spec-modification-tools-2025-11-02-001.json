@@ -1,0 +1,1706 @@
+{
+  "spec_id": "spec-modification-tools-2025-11-02-001",
+  "generated": "2025-11-02T22:30:00Z",
+  "last_updated": "2025-11-02T22:32:55.626840Z",
+  "metadata": {
+    "title": "SDD Spec Modification & Review Enhancement Tools",
+    "description": "Non-interactive CLI tools for modifying existing specs, tracking revisions, and applying review feedback. Enables programmatic spec updates without manual JSON editing.",
+    "status": "pending",
+    "version": "1.0",
+    "author": "claude-code",
+    "estimated_hours": 45,
+    "complexity": "high",
+    "objectives": [
+      "Enable programmatic spec modification via CLI commands",
+      "Track spec versions and revisions with automatic changelog",
+      "Provide tools to apply sdd-plan-review feedback systematically",
+      "Maintain JSON spec integrity with automatic validation",
+      "Support bulk modifications via declarative JSON files",
+      "Integrate with existing sdd-update workflow"
+    ],
+    "assumptions": [
+      "Single-user workflow (no concurrent modifications)",
+      "JSON spec file is single source of truth",
+      "All modifications auto-validate before saving",
+      "Non-interactive CLI design (no prompts, all args explicit)"
+    ],
+    "progress_percentage": 0,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "SDD Spec Modification & Review Enhancement Tools",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6"
+      ],
+      "total_tasks": 47,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core Modification Engine",
+      "description": "Core library for safe, atomic spec modifications with validation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "high",
+        "complexity": "high"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create spec_modifier.py module",
+      "description": "Core modification engine with atomic operations for adding/removing/updating nodes",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3",
+        "task-1-1-4",
+        "task-1-1-5"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/spec_modifier.py",
+        "estimated_hours": 5,
+        "task_category": "implementation",
+        "changes": "New module with atomic spec modification operations",
+        "reasoning": "Need safe, validated modifications to prevent corruption"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Implement add_node(spec, parent_id, node_data, position)",
+      "description": "Add new task/subtask/phase to hierarchy at specified position",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Implement remove_node(spec, node_id, cascade)",
+      "description": "Remove node and optionally cascade to children, update dependencies",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Implement update_node_field(spec, node_id, field, value)",
+      "description": "Update any field on a node (title, description, metadata, etc.)",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-4": {
+      "type": "subtask",
+      "title": "Implement move_node(spec, node_id, new_parent_id, position)",
+      "description": "Move node to different parent, update hierarchy and dependencies",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-5": {
+      "type": "subtask",
+      "title": "Implement transaction support and rollback",
+      "description": "Wrap modifications in transactions, rollback on validation failure",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Create unit tests for spec_modifier.py",
+      "description": "Comprehensive tests for all modification operations",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_spec_modifier.py",
+        "estimated_hours": 3,
+        "task_category": "implementation",
+        "test_path": "src/claude_skills/claude_skills/tests/unit/test_spec_modifier.py"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Test add/remove/update/move operations",
+      "description": "Unit tests for all CRUD operations with edge cases",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Test transaction rollback on validation failure",
+      "description": "Ensure spec remains unchanged if modifications fail validation",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Update common/__init__.py exports",
+      "description": "Export spec_modifier functions for use in CLI commands",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/__init__.py",
+        "estimated_hours": 0.25,
+        "task_category": "implementation",
+        "parallel_safe": true
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Unit tests pass",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_spec_modifier.py -v",
+        "expected": "All tests pass with 100% coverage"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Manual test: Modify existing spec without corruption",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Can add/remove/update nodes in test spec, validate still passes",
+        "command": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Revision Tracking System",
+      "description": "Version control for specs with automatic changelog generation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 8,
+        "risk_level": "medium",
+        "complexity": "medium"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Create revision.py module",
+      "description": "Revision tracking with automatic version bumping and changelog",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/revision.py",
+        "estimated_hours": 3,
+        "task_category": "implementation"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Implement create_revision(spec, changelog, modified_by)",
+      "description": "Bump version, add revision entry to metadata.revision_history[]",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Implement get_revision_history(spec)",
+      "description": "Return list of all revisions with details",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 0.5
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Implement rollback_to_version(spec, version)",
+      "description": "Revert spec to previous version (if history preserved)",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1.5
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Update sdd-spec-schema.json",
+      "description": "Add revision_history and assumptions arrays to metadata schema",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/schemas/sdd-spec-schema.json",
+        "estimated_hours": 1,
+        "task_category": "implementation"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add revision_history and assumptions to schema",
+      "description": "Define schema for metadata.revision_history[] and metadata.assumptions[]",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Create unit tests for revision.py",
+      "description": "Test revision creation, history tracking, version bumping",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+        "estimated_hours": 2,
+        "task_category": "implementation",
+        "test_path": "src/claude_skills/claude_skills/tests/unit/test_revision.py"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Test revision creation and version bumping",
+      "description": "Ensure versions increment correctly (1.0 \u2192 1.1 \u2192 2.0)",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Unit tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_revision.py -v",
+        "expected": "All tests pass"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Schema validation accepts new fields",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate specs/active/spec-modification-tools-2025-11-02-001.json",
+        "expected": "Validation passes with revision_history and assumptions in metadata"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Basic Modification CLI Commands",
+      "description": "Non-interactive CLI commands for common spec modifications",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 12,
+        "risk_level": "medium",
+        "complexity": "medium"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Create sdd_modify CLI module",
+      "description": "CLI command handlers for spec modification operations",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4",
+        "task-3-1-5"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/cli.py",
+        "estimated_hours": 6,
+        "task_category": "implementation"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Implement cmd_add_assumption(args, printer)",
+      "description": "sdd add-assumption <spec> <text> [--type constraint|requirement]",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Implement cmd_update_estimate(args, printer)",
+      "description": "sdd update-estimate <spec> <task-id> --hours N [--complexity low|medium|high]",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "Implement cmd_add_task(args, printer)",
+      "description": "sdd add-task <spec> --parent <id> --title <text> [--description <text>] [--position N]",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2
+      }
+    },
+    "task-3-1-4": {
+      "type": "subtask",
+      "title": "Implement cmd_remove_task(args, printer)",
+      "description": "sdd remove-task <spec> <task-id> [--cascade]",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-3-1-5": {
+      "type": "subtask",
+      "title": "Implement cmd_list_assumptions(args, printer)",
+      "description": "sdd list-assumptions <spec>",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 0.5
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Register commands in CLI registry",
+      "description": "Add sdd_modify command registration to unified CLI",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/registry.py",
+        "estimated_hours": 1,
+        "task_category": "implementation"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Import and register modify commands",
+      "description": "Add register_modify() call in register_all_subcommands()",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Create integration tests for CLI commands",
+      "description": "Test all modify commands with real spec files",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_modify_cli.py",
+        "estimated_hours": 4,
+        "task_category": "implementation",
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_modify_cli.py"
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Test all commands end-to-end",
+      "description": "Test add-assumption, update-estimate, add-task, remove-task, list-assumptions",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 3
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_modify_cli.py -v",
+        "expected": "All CLI tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "All commands accessible via sdd CLI",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "sdd --help shows modify subcommands",
+        "command": ""
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Manual workflow test",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Successfully add assumption, update estimate, add/remove task on test spec",
+        "command": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Bulk Modifications & Apply-Review",
+      "description": "Apply declarative modification files and review feedback",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "medium",
+        "complexity": "high"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Create modifications.py module",
+      "description": "Parse and apply declarative modification JSON files",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2",
+          "task-4-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/modifications.py",
+        "estimated_hours": 3,
+        "task_category": "implementation"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Implement apply_modifications(spec, modifications_file)",
+      "description": "Read JSON modification file, apply operations sequentially",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Define modification JSON schema",
+      "description": "Document format for modifications file with examples",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Create review_parser.py module",
+      "description": "Parse sdd-plan-review markdown/JSON reports to extract actionable issues",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-3"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/review_parser.py",
+        "estimated_hours": 3,
+        "task_category": "implementation"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Implement parse_review_report(report_path)",
+      "description": "Extract issues by severity from markdown or JSON review report",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2
+      }
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Implement suggest_modifications(issues)",
+      "description": "Generate modification suggestions for common review issues",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Add apply-modifications and review-report commands to CLI",
+      "description": "CLI commands for bulk modifications and review parsing",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-4"
+        ],
+        "blocked_by": [
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/cli.py",
+        "estimated_hours": 2,
+        "task_category": "implementation"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Implement cmd_apply_modifications(args, printer)",
+      "description": "sdd apply-modifications <spec> --from <file.json>",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-4-3-2": {
+      "type": "subtask",
+      "title": "Implement cmd_parse_review(args, printer)",
+      "description": "sdd parse-review <spec> --review <report.md> [--output suggestions.json]",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "Create integration tests for bulk operations",
+      "description": "Test apply-modifications and review parsing",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1",
+          "task-4-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+        "estimated_hours": 3,
+        "task_category": "implementation",
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py -v",
+        "expected": "All bulk operation tests pass"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "End-to-end review workflow",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Parse git-integration review report, generate suggestions, apply modifications",
+        "command": ""
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Validation Integration",
+      "description": "Auto-validate after modifications, prevent corruption",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 5,
+        "risk_level": "low",
+        "complexity": "low"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ]
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Add validation hooks to spec_modifier.py",
+      "description": "Auto-validate after every modification, rollback on failure",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_modify/spec_modifier.py",
+        "estimated_hours": 2,
+        "task_category": "refactoring"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Integrate sdd-validate after save",
+      "description": "Call validate_spec() after every modification, rollback if fails",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1.5
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Create integration tests for validation",
+      "description": "Test that invalid modifications are rejected and rolled back",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+        "estimated_hours": 2,
+        "task_category": "implementation",
+        "test_path": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py"
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Test rollback on validation failure",
+      "description": "Attempt invalid modifications, ensure spec unchanged",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1.5
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/integration/test_modify_validation.py -v",
+        "expected": "All validation tests pass"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Manual test: Invalid modification rejected",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Attempt to add task with invalid parent ID, verify rejection and rollback",
+        "command": ""
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Documentation & Testing",
+      "description": "Comprehensive documentation and end-to-end testing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 10,
+        "risk_level": "low",
+        "complexity": "low"
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3",
+        "task-6-4"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ]
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "Create user guide",
+      "description": "Comprehensive guide for spec modification workflow",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/spec-modification.md",
+        "estimated_hours": 3,
+        "task_category": "implementation",
+        "parallel_safe": true
+      }
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "Create review workflow guide",
+      "description": "Guide for applying review feedback using new tools",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/review-workflow.md",
+        "estimated_hours": 2,
+        "task_category": "implementation",
+        "parallel_safe": true
+      }
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "Update main README",
+      "description": "Add spec modification feature overview to README",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "estimated_hours": 1,
+        "task_category": "implementation",
+        "parallel_safe": true
+      }
+    },
+    "task-6-4": {
+      "type": "task",
+      "title": "Create example modification files",
+      "description": "Example JSON modification files for common scenarios",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "examples/modifications/",
+        "estimated_hours": 2,
+        "task_category": "implementation",
+        "parallel_safe": true
+      }
+    },
+    "task-6-4-1": {
+      "type": "subtask",
+      "title": "Create example files",
+      "description": "add-tasks.json, update-estimates.json, apply-review-feedback.json",
+      "status": "pending",
+      "parent": "task-6-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1.5
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2",
+        "verify-6-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "All tests pass",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/ -k modify -v",
+        "expected": "All modification-related tests pass"
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "Documentation is complete",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "User guide covers all commands with examples",
+        "command": ""
+      }
+    },
+    "verify-6-3": {
+      "type": "verify",
+      "title": "End-to-end workflow test",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Complete workflow: create spec \u2192 review \u2192 parse review \u2192 apply modifications \u2192 validate",
+        "command": ""
+      }
+    }
+  },
+  "journal": []
+}

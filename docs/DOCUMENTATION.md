@@ -1,24 +1,24 @@
-# Claude SDD Toolkit Documentation
+# src Documentation
 
-**Version:** 0.4.0
-**Generated:** 2025-11-02 16:20:07
+**Version:** 1.0.0
+**Generated:** 2025-11-03 10:25:39
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 120
-- **Total Lines:** 41959
-- **Total Classes:** 86
-- **Total Functions:** 551
-- **Avg Complexity:** 6.85
-- **Max Complexity:** 42
+- **Total Files:** 201
+- **Total Lines:** 68230
+- **Total Classes:** 268
+- **Total Functions:** 756
+- **Avg Complexity:** 5.6
+- **Max Complexity:** 44
 - **High Complexity Functions:**
+  - complete_task_workflow (44)
   - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
   - execute_verify_task (38)
-  - complete_task_workflow (37)
 
 
 
@@ -234,7 +234,7 @@ Example:
 ### `CollapsibleMarkdownGenerator`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_render/progressive_disclosure.py:325`
+**Defined in:** `src/claude_skills/claude_skills/sdd_render/progressive_disclosure.py:332`
 
 **Description:**
 > Generates collapsible markdown sections for progressive disclosure.
@@ -254,59 +254,6 @@ Supports multiple output formats:
 - `_generate_html_details()`
 - `_generate_markdown_extension()`
 - `_generate_custom_markers()`
-
----
-
-### `Command`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:19`
-
-**Description:**
-> Represents an extracted sdd command.
-
----
-
-### `Command`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:21`
-
-**Description:**
-> Represents an extracted sdd command.
-
----
-
-### `CommandExtractor`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:139`
-
-**Description:**
-> Extract sdd commands from SKILL.md files.
-
-**Methods:**
-- `__init__()`
-- `find_skill_files()`
-- `extract_from_file()`
-- `extract_all()`
-
----
-
-### `CommandRegistry`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:38`
-
-**Description:**
-> Registry of valid sdd commands.
-
-**Methods:**
-- `__init__()`
-- `add_command()`
-- `add_alias()`
-- `is_valid()`
-- `get_similar_commands()`
 
 ---
 
@@ -397,6 +344,7 @@ Example:
 - `_estimate_file_count()`
 - `_get_complexity_level()`
 - `score_task()`
+- `calculate_complexity()`
 - `score_all_tasks()`
 - `get_high_complexity_tasks()`
 - `get_complexity_stats()`
@@ -505,6 +453,7 @@ Example:
 **Methods:**
 - `__init__()`
 - `generate_graph()`
+- `generate()`
 - `generate_phase_graph()`
 - `generate_simplified_graph()`
 - `_generate_node()`
@@ -1923,6 +1872,3279 @@ Attributes:
 
 ---
 
+### `TestActivateSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py:339`
+
+**Description:**
+> Test activate_spec() function.
+
+**Methods:**
+- `test_activate_spec_success()`
+- `test_activate_spec_not_found()`
+- `test_activate_spec_already_active()`
+
+---
+
+### `TestAddCommitMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:800`
+
+**Description:**
+> Tests for add_commit_metadata function.
+
+**Methods:**
+- `test_add_commit_metadata_creates_metadata()`
+- `test_add_commit_metadata_appends_to_existing()`
+- `test_add_commit_metadata_auto_generates_timestamp()`
+- `test_add_commit_metadata_preserves_branch_info()`
+
+---
+
+### `TestAddJournalEntry`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_journal.py:13`
+
+**Description:**
+> Test add_journal_entry() function.
+
+**Methods:**
+- `test_add_journal_entry_basic()`
+- `test_add_journal_entry_with_task_id()`
+- `test_add_journal_entry_custom_author()`
+- `test_add_journal_entry_updates_timestamp()`
+- `test_add_journal_entry_dry_run()`
+- `test_add_journal_entry_invalid_spec()`
+
+---
+
+### `TestAddRevisionEntry`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_journal.py:222`
+
+**Description:**
+> Test add_revision_entry() function.
+
+**Methods:**
+- `test_add_revision_entry_basic()`
+- `test_add_revision_entry_custom_author()`
+- `test_add_revision_entry_multiple()`
+- `test_add_revision_entry_dry_run()`
+
+---
+
+### `TestAddVerificationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_verification.py:14`
+
+**Description:**
+> Test add_verification_result() function.
+
+**Methods:**
+- `test_add_verification_result_passed()`
+- `test_add_verification_result_failed()`
+- `test_add_verification_result_partial()`
+- `test_add_verification_result_updates_timestamp()`
+- `test_add_verification_result_invalid_status()`
+- `test_add_verification_result_nonexistent_verify_id()`
+- `test_add_verification_result_dry_run()`
+- `test_add_verification_result_minimal()`
+
+---
+
+### `TestAggregateTaskTimes`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:293`
+
+**Description:**
+> Test aggregate_task_times() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_aggregate_task_times_basic()`
+- `test_aggregate_task_times_no_data()`
+- `test_aggregate_task_times_partial_data()`
+- `test_aggregate_task_times_nonexistent_spec()`
+- `test_aggregate_task_times_empty_hierarchy()`
+- `test_aggregate_task_times_mixed_node_types()`
+- `test_aggregate_task_times_invalid_values()`
+- `test_aggregate_task_times_precision()`
+- `test_aggregate_task_times_with_printer()`
+- `test_aggregate_task_times_single_task()`
+- `test_aggregate_task_times_zero_hours()`
+- `test_aggregate_task_times_negative_hours()`
+
+---
+
+### `TestBackupJsonSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:165`
+
+**Description:**
+> Tests for backup_json_spec function.
+
+**Methods:**
+- `test_create_backup_of_existing_json_spec()`
+- `test_backup_nonexistent_json_spec()`
+- `test_multiple_backups_dont_overwrite()`
+
+---
+
+### `TestBackwardsCompatibility`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:290`
+
+**Description:**
+> Tests for backwards compatibility with old command style.
+
+**Methods:**
+- `test_new_sdd_command_works()`
+
+---
+
+### `TestBaseParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:158`
+
+**Description:**
+> Test BaseParser abstract class.
+
+**Methods:**
+- `test_base_parser_is_abstract()`
+- `test_base_parser_interface()`
+
+---
+
+### `TestBasicRenderingPipeline`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_render/test_render_pipeline.py:13`
+
+**Description:**
+> Integration tests for basic rendering mode.
+
+**Methods:**
+- `test_render_small_spec()`
+- `test_render_spec_with_metadata()`
+- `test_render_spec_with_complex_dependencies()`
+
+---
+
+### `TestBuildGenerationPrompt`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:431`
+
+**Description:**
+> Tests for _build_generation_prompt helper function.
+
+**Methods:**
+- `test_build_prompt_sdd_plan()`
+- `test_build_prompt_sdd_next()`
+- `test_build_prompt_sdd_update()`
+- `test_build_prompt_default()`
+- `test_build_prompt_with_context()`
+- `test_build_prompt_without_context()`
+- `test_build_prompt_none_skill_name()`
+
+---
+
+### `TestCLIBasics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:68`
+
+**Description:**
+> Basic CLI functionality tests.
+
+**Methods:**
+- `test_cli_help()`
+- `test_cli_version()`
+
+---
+
+### `TestCLIBasics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:69`
+
+**Description:**
+> Basic CLI functionality tests.
+
+**Methods:**
+- `test_cli_help()`
+- `test_cli_shows_new_commands()`
+
+---
+
+### `TestCLIWorkflows`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:303`
+
+**Description:**
+> End-to-end CLI workflow tests.
+
+**Methods:**
+- `test_complete_task_discovery_workflow()`
+
+---
+
+### `TestCSSParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py:17`
+
+**Description:**
+> Test CSS parser functionality.
+
+**Methods:**
+- `parser()`
+- `test_parse_simple_css()`
+- `test_parse_css_selectors()`
+- `test_parse_css_variables()`
+- `test_parse_media_queries()`
+- `test_parse_keyframes()`
+- `test_parse_imports()`
+- `test_parse_empty_css()`
+- `test_line_counting()`
+
+---
+
+### `TestCSSParserAdvanced`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py:170`
+
+**Description:**
+> Advanced CSS parser tests.
+
+**Methods:**
+- `parser()`
+- `test_parse_nested_rules()`
+- `test_parse_mixins()`
+- `test_parse_css_grid()`
+- `test_parse_css_flexbox()`
+
+---
+
+### `TestCaching`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:194`
+
+**Description:**
+> Tests for caching behavior.
+
+**Methods:**
+- `test_caching_works()`
+- `test_force_refresh_bypasses_cache()`
+- `test_clear_cache_function()`
+
+---
+
+### `TestCalculateTimeFromTimestamps`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:16`
+
+**Description:**
+> Test calculate_time_from_timestamps() function.
+
+**Methods:**
+- `test_calculate_time_basic()`
+- `test_calculate_time_whole_hours()`
+- `test_calculate_time_fractional()`
+- `test_calculate_time_across_days()`
+- `test_calculate_time_with_timezone_offset()`
+- `test_calculate_time_invalid_format()`
+- `test_calculate_time_negative_duration()`
+- `test_calculate_time_same_timestamp()`
+- `test_calculate_time_with_seconds()`
+- `test_calculate_time_missing_z_suffix()`
+- `test_calculate_time_one_hour()`
+- `test_calculate_time_two_and_half_hours()`
+- `test_calculate_time_six_minutes()`
+- `test_calculate_time_over_24_hours()`
+- `test_calculate_time_none_input()`
+- `test_calculate_time_empty_string()`
+- `test_calculate_time_both_none()`
+- `test_calculate_time_end_none()`
+- `test_calculate_time_whitespace_strings()`
+- `test_calculate_time_very_large_difference()`
+- `test_calculate_time_with_printer_none_input()`
+- `test_calculate_time_with_printer_invalid_format()`
+- `test_calculate_time_with_printer_negative_duration()`
+
+---
+
+### `TestCheckComplete`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:272`
+
+**Description:**
+> Tests for check_complete function.
+
+**Methods:**
+- `test_check_completed_spec()`
+- `test_check_incomplete_spec()`
+- `test_check_phase_complete()`
+- `test_check_phase_incomplete()`
+- `test_check_nonexistent_phase()`
+- `test_check_invalid_spec()`
+
+---
+
+### `TestCheckCompleteCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:288`
+
+**Description:**
+> Tests for check-complete command.
+
+**Methods:**
+- `test_check_complete_spec()`
+- `test_check_complete_phase()`
+- `test_check_complete_json()`
+- `test_check_complete_exit_code()`
+
+---
+
+### `TestCheckDependencies`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:159`
+
+**Description:**
+> Tests for check_dependencies function.
+
+**Methods:**
+- `test_check_dependencies_no_blockers()`
+- `test_check_dependencies_with_blockers()`
+- `test_check_dependencies_nonexistent_task()`
+- `test_check_dependencies_includes_blocks()`
+- `test_check_dependencies_resolved_when_complete()`
+
+---
+
+### `TestCheckDepsCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:202`
+
+**Description:**
+> Tests for check-deps command.
+
+**Methods:**
+- `test_check_deps_no_blockers()`
+- `test_check_deps_with_blockers()`
+- `test_check_deps_json()`
+
+---
+
+### `TestCheckDepsCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:290`
+
+**Description:**
+> Tests for the check-deps command.
+
+**Methods:**
+- `test_check_deps_clean_spec()`
+- `test_check_deps_with_cycles()`
+- `test_check_deps_json()`
+- `test_check_deps_with_bottleneck_threshold()`
+- `test_check_deps_orphaned()`
+
+---
+
+### `TestCheckDirtyTree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:72`
+
+**Description:**
+> Tests for check_dirty_tree function.
+
+**Methods:**
+- `test_check_dirty_tree_clean()`
+- `test_check_dirty_tree_with_staged_changes()`
+- `test_check_dirty_tree_with_unstaged_changes()`
+- `test_check_dirty_tree_with_untracked_files()`
+- `test_check_dirty_tree_handles_timeout()`
+- `test_check_dirty_tree_handles_error()`
+
+---
+
+### `TestCheckDocAvailability`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:46`
+
+**Description:**
+> Tests for check_doc_availability function.
+
+**Methods:**
+- `test_available_success()`
+- `test_missing_returncode_1()`
+- `test_error_other_returncode()`
+- `test_error_command_not_found()`
+- `test_error_timeout()`
+- `test_error_invalid_json()`
+- `test_error_unexpected_exception()`
+- `test_stale_with_staleness_field()`
+- `test_stale_by_age()`
+- `test_available_recent_docs()`
+
+---
+
+### `TestCheckDocQueryAvailable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py:21`
+
+**Description:**
+> Tests for check_doc_query_available function.
+
+**Methods:**
+- `test_doc_query_available()`
+- `test_doc_query_not_found()`
+- `test_doc_query_command_not_found()`
+- `test_doc_query_timeout()`
+
+---
+
+### `TestCheckEnvironment`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py:118`
+
+**Description:**
+> Tests for check_environment function.
+
+**Methods:**
+- `test_check_environment_valid_project()`
+- `test_check_environment_with_requirements()`
+- `test_check_environment_missing_dependencies()`
+- `test_check_environment_includes_config_files()`
+- `test_check_environment_warnings()`
+
+---
+
+### `TestCheckSddIntegrationAvailable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py:72`
+
+**Description:**
+> Tests for check_sdd_integration_available function.
+
+**Methods:**
+- `test_sdd_integration_available()`
+- `test_sdd_integration_not_available()`
+
+---
+
+### `TestCheckSpecCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:124`
+
+**Description:**
+> Tests for check_spec_completion() function.
+
+**Methods:**
+- `test_all_tasks_complete()`
+- `test_partial_completion()`
+- `test_empty_spec()`
+- `test_specific_phase_completion()`
+- `test_nested_task_hierarchy()`
+- `test_blocked_tasks_not_complete()`
+- `test_in_progress_tasks_not_complete()`
+- `test_no_spec_data()`
+- `test_no_hierarchy()`
+- `test_invalid_phase_id()`
+- `test_percentage_calculation()`
+
+---
+
+### `TestClassSchemaEnhancements`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:1419`
+
+**Description:**
+> Test class schema v1.1 enhancements with usage tracking fields.
+
+**Methods:**
+- `parser()`
+- `test_instantiation_reference_creation()`
+- `test_instantiation_reference_to_dict()`
+- `test_instantiation_reference_without_context()`
+- `test_import_reference_creation()`
+- `test_import_reference_to_dict()`
+- `test_import_reference_without_alias()`
+- `test_enhance_class_with_instantiated_by()`
+- `test_enhance_class_with_imported_by()`
+- `test_enhance_class_with_instantiation_count()`
+- `test_enhance_class_without_instantiation_count()`
+- `test_enhance_class_preserves_base_fields()`
+- `test_enhance_class_with_empty_tracking()`
+- `test_enhance_class_with_none_tracking()`
+- `test_enhance_class_complete_example()`
+- `test_different_import_types()`
+- `test_instantiation_context_types()`
+
+---
+
+### `TestColdStartPerformance`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:304`
+
+**Description:**
+> Tests for CLI cold-start performance.
+
+**Methods:**
+- `test_help_fast_response()`
+- `test_command_help_fast_response()`
+
+---
+
+### `TestCommandDelegation`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:251`
+
+**Description:**
+> Tests that unified CLI correctly delegates to command implementations.
+
+**Methods:**
+- `test_next_command_works()`
+- `test_update_command_works()`
+- `test_validate_command_works()`
+
+---
+
+### `TestCompleteSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py:129`
+
+**Description:**
+> Test complete_spec() function.
+
+**Methods:**
+- `test_complete_spec_all_tasks_done()`
+- `test_complete_spec_without_actual_hours()`
+- `test_complete_spec_without_time_data()`
+- `test_complete_spec_incomplete_tasks()`
+- `test_complete_spec_dry_run()`
+- `test_complete_spec_creates_metadata()`
+- `test_complete_spec_updates_last_updated()`
+
+---
+
+### `TestCompleteTaskWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py:14`
+
+**Description:**
+> Test complete_task_workflow() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_complete_task_workflow_auto_calculates_time()`
+- `test_complete_task_workflow_manual_hours_not_overridden()`
+- `test_complete_task_workflow_no_started_at_no_calculation()`
+- `test_complete_task_workflow_journals_parent_nodes()`
+- `test_complete_task_workflow_journals_multiple_parent_levels()`
+- `test_complete_task_workflow_does_not_journal_already_completed_parents()`
+
+---
+
+### `TestCompletionDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:346`
+
+**Description:**
+> Tests for automatic spec completion detection in sdd-next workflow.
+
+**Methods:**
+- `test_completion_detection_prepare_task()`
+- `test_all_blocked_messaging()`
+- `test_prepare_task_with_completion_and_blockers()`
+
+---
+
+### `TestCompletionDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:649`
+
+**Description:**
+> Tests for automatic spec completion detection after update-status.
+
+**Methods:**
+- `test_completion_detection_after_update()`
+- `test_completion_prompt_skipped_when_blocked()`
+- `test_user_confirmation_flow()`
+- `test_user_decline_flow()`
+
+---
+
+### `TestComplexityScorer`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_complexity_scorer.py:7`
+
+**Description:**
+> Tests for ComplexityScorer class.
+
+**Methods:**
+- `test_initialization()`
+- `test_simple_task_scoring()`
+- `test_complex_task_scoring()`
+- `test_depth_score_calculation()`
+- `test_dependency_score_calculation()`
+- `test_effort_score_calculation()`
+- `test_complexity_levels()`
+- `test_all_tasks_scoreable()`
+- `test_rationale_generation()`
+- `test_score_consistency()`
+- `test_invalid_task_handling()`
+
+---
+
+### `TestConsultation`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:122`
+
+**Description:**
+> Tests for run_consultation().
+
+**Methods:**
+- `test_run_consultation_success()`
+- `test_run_consultation_failure()`
+- `test_run_consultation_dry_run()`
+- `test_run_consultation_unknown_tool()`
+
+---
+
+### `TestContextSummary`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:247`
+
+**Description:**
+> Tests for create_context_summary().
+
+**Methods:**
+- `test_create_basic_summary()`
+- `test_summary_with_readme()`
+- `test_summary_structure()`
+
+---
+
+### `TestCountBlockedTasks`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:408`
+
+**Description:**
+> Tests for count_blocked_tasks() function.
+
+**Methods:**
+- `test_no_blocked_tasks()`
+- `test_single_blocked_task()`
+- `test_multiple_blocked_tasks()`
+- `test_nested_blocked_tasks()`
+- `test_invalid_node_id()`
+
+---
+
+### `TestCreateParserFactory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:155`
+
+**Description:**
+> Test create_parser_factory helper function.
+
+**Methods:**
+- `test_create_factory_defaults()`
+- `test_create_factory_with_options()`
+
+---
+
+### `TestDependencyGraphGenerator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_dependency_graph.py:7`
+
+**Description:**
+> Tests for DependencyGraphGenerator class.
+
+**Methods:**
+- `test_initialization()`
+- `test_basic_mermaid_generation()`
+- `test_flowchart_style()`
+- `test_graph_style()`
+- `test_nodes_generated()`
+- `test_edges_generated()`
+- `test_status_styling()`
+- `test_phase_grouping()`
+- `test_simplified_view()`
+- `test_critical_path_highlighting()`
+- `test_empty_spec_handling()`
+- `test_phase_filtering()`
+- `test_node_shapes_by_type()`
+- `test_blocked_task_highlighting()`
+- `test_dependency_arrow_types()`
+
+---
+
+### `TestDetailLevelCalculator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_progressive_disclosure.py:11`
+
+**Description:**
+> Tests for DetailLevelCalculator class.
+
+**Methods:**
+- `test_initialization()`
+- `test_in_progress_task_gets_full_detail()`
+- `test_completed_task_gets_summary()`
+- `test_blocked_task_gets_medium_detail()`
+- `test_high_priority_gets_more_detail()`
+- `test_blocking_task_gets_more_detail()`
+- `test_high_risk_gets_more_detail()`
+- `test_user_focus_overrides_default()`
+- `test_depth_level_affects_detail()`
+- `test_all_detail_levels_achievable()`
+- `test_context_validation()`
+- `test_priority_score_bounds()`
+
+---
+
+### `TestDetectGitDrift`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:667`
+
+**Description:**
+> Tests for detect_git_drift function.
+
+**Methods:**
+- `test_detect_git_drift_no_metadata()`
+- `test_detect_git_drift_matching_branch()`
+- `test_detect_git_drift_different_branch()`
+- `test_detect_git_drift_handles_timeout()`
+
+---
+
+### `TestDetectProject`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py:13`
+
+**Description:**
+> Tests for detect_project function.
+
+**Methods:**
+- `test_detect_node_project()`
+- `test_detect_python_project()`
+- `test_detect_project_includes_config_files()`
+- `test_detect_project_extracts_dependencies()`
+- `test_detect_project_extracts_dev_dependencies()`
+- `test_detect_unknown_project()`
+
+---
+
+### `TestDetermineStatusFromStats`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:264`
+
+**Description:**
+> Tests for _determine_status_from_stats helper function.
+
+**Methods:**
+- `test_available_with_staleness_false()`
+- `test_stale_with_staleness_true()`
+- `test_available_no_generated_at()`
+- `test_available_invalid_timestamp()`
+- `test_stale_old_timestamp()`
+- `test_available_recent_timestamp()`
+
+---
+
+### `TestDiscoveryIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:259`
+
+**Description:**
+> Integration tests for discovery operations.
+
+**Methods:**
+- `test_complete_task_discovery_workflow()`
+- `test_task_progression_through_phase()`
+
+---
+
+### `TestDocIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_doc_integration.py:29`
+
+**Description:**
+> Integration tests for doc integration in sdd-next.
+
+**Methods:**
+- `test_docs_available()`
+- `test_docs_missing_no_prompt_in_json_mode()`
+- `test_docs_missing_accept()`
+- `test_docs_missing_decline()`
+- `test_prepare_task_complete_workflow()`
+- `test_next_task_command_workflow()`
+- `test_task_info_command_workflow()`
+- `test_doc_availability_check_integration()`
+- `test_user_prompt_integration()`
+- `test_graceful_degradation_comprehensive()`
+
+---
+
+### `TestDocIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_doc_integration.py:15`
+
+**Description:**
+> Tests for documentation integration in sdd-next.
+
+**Methods:**
+- `test_prepare_task_calls_check_doc_availability()`
+- `test_prepare_task_sets_flag_when_docs_missing()`
+- `test_prepare_task_sets_flag_when_docs_stale()`
+- `test_prepare_task_no_flag_when_docs_available()`
+- `test_graceful_degradation_continues_workflow()`
+- `test_graceful_degradation_with_error_status()`
+
+---
+
+### `TestDocStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:30`
+
+**Description:**
+> Tests for DocStatus enum.
+
+**Methods:**
+- `test_enum_values()`
+- `test_enum_comparison()`
+
+---
+
+### `TestEnhancedRenderingPipeline`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_render/test_render_pipeline.py:201`
+
+**Description:**
+> Integration tests for AI-enhanced rendering mode.
+
+**Methods:**
+- `test_enhanced_render_basic_spec()`
+- `test_enhanced_render_falls_back_gracefully()`
+
+---
+
+### `TestEnsureDocumentationExists`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py:200`
+
+**Description:**
+> Tests for ensure_documentation_exists function.
+
+**Methods:**
+- `test_fast_path_docs_exist()`
+- `test_docs_missing_no_generation()`
+- `test_auto_generate_success()`
+- `test_auto_generate_failure()`
+- `test_auto_generate_timeout()`
+- `test_prompt_user_mode()`
+
+---
+
+### `TestErrorHandling`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:355`
+
+**Description:**
+> Tests for error handling.
+
+**Methods:**
+- `test_invalid_command()`
+- `test_missing_spec_file_argument()`
+- `test_invalid_json_file()`
+
+---
+
+### `TestErrorHandling`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:223`
+
+**Description:**
+> Tests for error handling and edge cases.
+
+**Methods:**
+- `test_invalid_command()`
+- `test_missing_required_arg()`
+
+---
+
+### `TestExecuteVerifyTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_integrations.py:135`
+
+**Description:**
+> Tests for execute_verify_task function.
+
+**Methods:**
+- `test_verify_task_not_found()`
+- `test_manual_verification_task()`
+- `test_verify_task_no_command_or_skill()`
+- `test_run_tests_skill_success()`
+- `test_run_tests_skill_failure()`
+- `test_command_execution_success()`
+- `test_execution_timeout()`
+- `test_unknown_skill()`
+- `test_duration_tracking()`
+- `test_on_failure_retry_logic()`
+- `test_on_failure_max_retries_exhausted()`
+- `test_on_failure_consult_flag()`
+- `test_on_failure_notification()`
+- `test_on_failure_continue_on_failure()`
+- `test_on_failure_custom_revert_status()`
+- `test_on_failure_all_actions_combined()`
+- `test_new_skill_sdd_validate()`
+- `test_new_skill_code_doc()`
+- `test_new_skill_doc_query()`
+- `test_hierarchy_lookup()`
+- `test_backward_compat_tasks_field()`
+
+---
+
+### `TestExtractFrontmatter`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:17`
+
+**Description:**
+> Tests for ``extract_frontmatter`` helper.
+
+**Methods:**
+- `test_extract_frontmatter_from_json_spec()`
+- `test_extract_frontmatter_handles_missing_fields()`
+- `test_extract_frontmatter_invalid_json()`
+- `test_extract_frontmatter_markdown()`
+- `test_extract_frontmatter_missing_file()`
+
+---
+
+### `TestFindCircularDeps`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_validation.py:53`
+
+**Description:**
+> Tests for find_circular_deps function.
+
+**Methods:**
+- `test_find_circular_deps_none()`
+- `test_find_circular_deps_detected()`
+- `test_find_circular_deps_shows_chains()`
+- `test_find_orphaned_tasks()`
+
+---
+
+### `TestFindGitRoot`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:31`
+
+**Description:**
+> Tests for find_git_root function.
+
+**Methods:**
+- `test_find_git_root_from_repo_directory()`
+- `test_find_git_root_from_git_root()`
+- `test_find_git_root_returns_none_when_not_found()`
+- `test_find_git_root_uses_cwd_by_default()`
+
+---
+
+### `TestFindPattern`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_workflow.py:30`
+
+**Description:**
+> Tests for find_pattern function.
+
+**Methods:**
+- `test_find_pattern_simple()`
+- `test_find_pattern_recursive()`
+
+---
+
+### `TestFindRelatedFiles`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py:167`
+
+**Description:**
+> Tests for find_related_files function.
+
+**Methods:**
+- `test_find_related_files_test_files()`
+- `test_find_related_files_same_directory()`
+- `test_find_related_files_similar_files()`
+- `test_find_related_files_includes_source()`
+- `test_find_related_files_nonexistent()`
+
+---
+
+### `TestFindSpecFile`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:120`
+
+**Description:**
+> Tests for find_spec_file function.
+
+**Methods:**
+- `test_find_spec_file_in_pending()`
+- `test_find_spec_file_pending_priority_over_active()`
+- `test_find_spec_file_in_active()`
+- `test_find_spec_file_not_found()`
+
+---
+
+### `TestFindSpecsCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:107`
+
+**Description:**
+> Tests for find-specs command.
+
+**Methods:**
+- `test_find_specs_basic()`
+- `test_find_specs_verbose()`
+
+---
+
+### `TestFindSpecsDirectory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:12`
+
+**Description:**
+> Tests for find_specs_directory function.
+
+**Methods:**
+- `test_find_specs_from_project_root()`
+- `test_find_specs_with_explicit_path()`
+- `test_find_specs_returns_none_when_not_found()`
+- `test_find_specs_validates_structure()`
+- `test_find_specs_from_subdirectory()`
+
+---
+
+### `TestFindTests`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py:68`
+
+**Description:**
+> Tests for find_tests function.
+
+**Methods:**
+- `test_find_tests_in_node_project()`
+- `test_find_tests_in_python_project()`
+- `test_find_tests_detects_framework()`
+- `test_find_corresponding_test_file()`
+- `test_find_tests_empty_project()`
+
+---
+
+### `TestFixCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:127`
+
+**Description:**
+> Tests for the fix command.
+
+**Methods:**
+- `test_fix_preview_clean_spec()`
+- `test_fix_preview_with_issues()`
+- `test_fix_preview_json()`
+- `test_fix_dry_run()`
+- `test_fix_apply_creates_backup()`
+- `test_fix_apply_no_backup()`
+- `test_fix_apply_json_output()`
+
+---
+
+### `TestFormatCompletionPrompt`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:708`
+
+**Description:**
+> Tests for format_completion_prompt() function.
+
+**Methods:**
+- `test_spec_level_prompt_with_hours()`
+- `test_spec_level_prompt_without_hours_estimate()`
+- `test_phase_level_prompt_with_hours()`
+- `test_phase_level_prompt_without_hours()`
+- `test_show_hours_input_disabled()`
+- `test_empty_spec_prompt()`
+- `test_nested_task_hierarchy()`
+- `test_no_spec_data()`
+- `test_invalid_phase_id()`
+- `test_no_hierarchy()`
+- `test_node_without_title()`
+- `test_estimated_hours_zero()`
+- `test_prompt_text_structure()`
+- `test_completion_context_completeness()`
+
+---
+
+### `TestFormatOutputEnhanced`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_dev_tools/test_sdd_start_helper.py:107`
+
+**Description:**
+> Tests for enhanced format_output with last-accessed task info.
+
+**Methods:**
+- `test_format_output_shows_last_task()`
+- `test_format_output_no_last_task()`
+- `test_format_output_no_active_specs()`
+- `test_format_output_no_specs_directory()`
+
+---
+
+### `TestFormatVerificationSummary`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_verification.py:219`
+
+**Description:**
+> Test format_verification_summary() function.
+
+**Methods:**
+- `test_format_verification_summary_all_passed()`
+- `test_format_verification_summary_mixed_results()`
+- `test_format_verification_summary_empty_list()`
+- `test_format_verification_summary_includes_command()`
+- `test_format_verification_summary_includes_notes()`
+
+---
+
+### `TestFrameworkDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:21`
+
+**Description:**
+> Tests for detect_framework().
+
+**Methods:**
+- `test_detect_fastapi()`
+- `test_detect_django()`
+- `test_detect_flask()`
+- `test_detect_multiple_frameworks()`
+- `test_detect_no_framework()`
+- `test_confidence_scores()`
+
+---
+
+### `TestGenerateSpecWithCategory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_templates.py:174`
+
+**Description:**
+> Test cases for generate_spec_from_template with default_category.
+
+**Methods:**
+- `test_generate_spec_with_category()`
+- `test_generate_spec_without_category()`
+- `test_generate_spec_all_categories()`
+- `test_generate_spec_category_none()`
+
+---
+
+### `TestGetAllTasksInSubtree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:49`
+
+**Description:**
+> Tests for get_all_tasks_in_subtree() function.
+
+**Methods:**
+- `test_single_task()`
+- `test_nested_tasks()`
+- `test_only_tasks_included()`
+- `test_empty_hierarchy()`
+- `test_node_with_no_children()`
+
+---
+
+### `TestGetJournalEntries`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:551`
+
+**Description:**
+> Tests for get_journal_entries function.
+
+**Methods:**
+- `test_get_all_journal_entries()`
+- `test_get_journal_entries_filtered_by_task()`
+- `test_get_journal_entries_empty()`
+- `test_get_journal_entries_no_matching_task()`
+- `test_get_journal_entries_invalid_spec()`
+
+---
+
+### `TestGetNextTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:14`
+
+**Description:**
+> Tests for get_next_task function.
+
+**Methods:**
+- `test_get_next_task_returns_first_pending()`
+- `test_get_next_task_skips_completed()`
+- `test_get_next_task_respects_dependencies()`
+- `test_get_next_task_from_current_phase()`
+- `test_get_next_task_none_when_all_complete()`
+- `test_get_next_task_empty_hierarchy()`
+- `test_get_next_task_finds_verify_tasks()`
+
+---
+
+### `TestGetNode`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:197`
+
+**Description:**
+> Tests for get_node function.
+
+**Methods:**
+- `test_get_existing_task_node()`
+- `test_get_existing_phase_node()`
+- `test_get_nonexistent_node()`
+- `test_get_node_from_empty_hierarchy()`
+- `test_get_node_validates_structure()`
+
+---
+
+### `TestGetProgressSummary`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:18`
+
+**Description:**
+> Tests for get_progress_summary function.
+
+**Methods:**
+- `test_get_progress_summary_simple_spec()`
+- `test_progress_summary_calculates_percentage()`
+- `test_progress_summary_with_all_completed()`
+- `test_progress_summary_includes_current_phase()`
+
+---
+
+### `TestGetSessionInfo`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_dev_tools/test_sdd_start_helper.py:22`
+
+**Description:**
+> Tests for get_session_info command.
+
+**Methods:**
+- `test_get_session_info_with_last_task()`
+- `test_get_session_info_no_last_task()`
+- `test_get_session_info_no_specs_dir()`
+
+---
+
+### `TestGetSessionState`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_integrations.py:663`
+
+**Description:**
+> Tests for get_session_state function.
+
+**Methods:**
+- `test_no_specs_directory()`
+- `test_active_specs_found()`
+- `test_multiple_in_progress_tasks()`
+- `test_completed_specs_ignored()`
+- `test_invalid_json_specs_skipped()`
+
+---
+
+### `TestGetStagedFiles`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:570`
+
+**Description:**
+> Tests for get_staged_files function.
+
+**Methods:**
+- `test_get_staged_files_empty()`
+- `test_get_staged_files_single_file()`
+- `test_get_staged_files_multiple_files()`
+- `test_get_staged_files_with_subdirectories()`
+- `test_get_staged_files_handles_timeout()`
+- `test_get_staged_files_handles_error()`
+- `test_get_staged_files_handles_git_not_found()`
+- `test_get_staged_files_handles_unexpected_error()`
+
+---
+
+### `TestGetTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:129`
+
+**Description:**
+> Tests for get_task function.
+
+**Methods:**
+- `test_get_existing_task()`
+- `test_get_task_with_metadata()`
+- `test_get_task_with_dependencies()`
+- `test_get_nonexistent_task()`
+- `test_get_task_invalid_spec()`
+
+---
+
+### `TestGetTaskCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:188`
+
+**Description:**
+> Tests for get-task command.
+
+**Methods:**
+- `test_get_task_basic()`
+- `test_get_task_json()`
+- `test_get_task_nonexistent()`
+
+---
+
+### `TestGetTaskContextFromDocs`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py:95`
+
+**Description:**
+> Tests for get_task_context_from_docs function.
+
+**Methods:**
+- `test_get_context_success()`
+- `test_get_context_tool_unavailable()`
+- `test_get_context_command_failed()`
+- `test_get_context_timeout()`
+- `test_get_context_invalid_json()`
+
+---
+
+### `TestGetTaskInfo`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:118`
+
+**Description:**
+> Tests for get_task_info function.
+
+**Methods:**
+- `test_get_task_info_existing_task()`
+- `test_get_task_info_nonexistent_task()`
+- `test_get_task_info_includes_all_fields()`
+- `test_get_task_info_for_different_tasks()`
+
+---
+
+### `TestGetTaskJournal`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:732`
+
+**Description:**
+> Tests for get_task_journal function.
+
+**Methods:**
+- `test_get_task_journal()`
+
+---
+
+### `TestGetTaskWithJournal`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:773`
+
+**Description:**
+> Tests for get_task with include_journal parameter.
+
+**Methods:**
+- `test_get_task_with_journal()`
+- `test_get_task_without_journal()`
+- `test_get_task_with_journal_no_entries()`
+
+---
+
+### `TestGlobalFlags`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:327`
+
+**Description:**
+> Tests for global flags.
+
+**Methods:**
+- `test_quiet_flag()`
+- `test_no_color_flag()`
+- `test_verbose_flag()`
+- `test_help_flag()`
+
+---
+
+### `TestGlobalFlags`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:161`
+
+**Description:**
+> Tests for global flags (--json, --quiet, --verbose).
+
+**Methods:**
+- `test_json_flag()`
+- `test_quiet_flag()`
+- `test_verbose_flag()`
+
+---
+
+### `TestGoParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_go.py:17`
+
+**Description:**
+> Test Go parser functionality.
+
+**Methods:**
+- `parser()`
+- `test_parse_simple_function()`
+- `test_parse_function_with_parameters()`
+- `test_parse_multiple_return_values()`
+- `test_parse_struct()`
+- `test_parse_interface()`
+- `test_parse_method()`
+- `test_parse_imports()`
+- `test_parse_package_name()`
+- `test_parse_empty_file()`
+- `test_line_counting()`
+
+---
+
+### `TestHTMLParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py:17`
+
+**Description:**
+> Test HTML parser functionality.
+
+**Methods:**
+- `parser()`
+- `test_parse_simple_html()`
+- `test_parse_htmx_attributes()`
+- `test_parse_custom_data_attributes()`
+- `test_count_elements()`
+- `test_parse_empty_html()`
+- `test_line_counting()`
+
+---
+
+### `TestHTMLParserAdvanced`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py:141`
+
+**Description:**
+> Advanced HTML parser tests.
+
+**Methods:**
+- `parser()`
+- `test_parse_forms()`
+- `test_parse_scripts_and_styles()`
+- `test_parse_semantic_html5()`
+
+---
+
+### `TestInferTaskCategory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_templates.py:16`
+
+**Description:**
+> Test cases for infer_task_category() function.
+
+**Methods:**
+- `test_investigation_keywords()`
+- `test_implementation_keywords()`
+- `test_refactoring_keywords()`
+- `test_decision_keywords()`
+- `test_research_keywords()`
+- `test_default_fallback()`
+- `test_case_insensitivity()`
+- `test_priority_order()`
+- `test_empty_and_none_handling()`
+- `test_task_type_parameter()`
+- `test_multi_word_phrases()`
+
+---
+
+### `TestInitEnvironment`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_workflow.py:9`
+
+**Description:**
+> Tests for init_environment function.
+
+**Methods:**
+- `test_init_environment_from_specs_dir()`
+- `test_init_environment_creates_directories()`
+
+---
+
+### `TestIntegrationWithGetSessionState`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_dev_tools/test_sdd_start_helper.py:234`
+
+**Description:**
+> Integration tests to ensure sdd_start_helper properly uses get_session_state.
+
+**Methods:**
+- `test_get_session_state_called_with_correct_path()`
+- `test_multiple_in_progress_tasks_display()`
+
+---
+
+### `TestIsTaskComplete`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:16`
+
+**Description:**
+> Tests for is_task_complete() function.
+
+**Methods:**
+- `test_completed_task()`
+- `test_pending_task()`
+- `test_in_progress_task()`
+- `test_blocked_task()`
+- `test_no_status()`
+- `test_none_task()`
+
+---
+
+### `TestJavaScriptParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py:17`
+
+**Description:**
+> Test JavaScript parser functionality.
+
+**Methods:**
+- `parser()`
+- `test_parse_simple_function()`
+- `test_parse_arrow_function()`
+- `test_parse_async_function()`
+- `test_parse_simple_class()`
+- `test_parse_class_with_inheritance()`
+- `test_parse_imports()`
+- `test_parse_exports()`
+- `test_parse_typescript_types()`
+- `test_parse_jsx_component()`
+- `test_parse_empty_file()`
+- `test_line_counting()`
+
+---
+
+### `TestJsonSpecIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:248`
+
+**Description:**
+> Integration tests for JSON spec operations.
+
+**Methods:**
+- `test_load_modify_save_workflow()`
+- `test_backup_before_modification()`
+
+---
+
+### `TestJsonSpecValidationIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:559`
+
+**Description:**
+> Integration tests for state validation.
+
+**Methods:**
+- `test_complete_validation_workflow()`
+- `test_validation_catches_multiple_issues()`
+
+---
+
+### `TestKeyFileIdentification`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:74`
+
+**Description:**
+> Tests for identify_key_files().
+
+**Methods:**
+- `test_identify_main_py()`
+- `test_identify_config_files()`
+- `test_prioritize_root_files()`
+- `test_prioritize_with_docstrings()`
+- `test_exclude_test_files_from_top()`
+- `test_limit_key_files()`
+- `test_with_readme()`
+
+---
+
+### `TestLanguageEnum`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:18`
+
+**Description:**
+> Test Language enum.
+
+**Methods:**
+- `test_language_values()`
+- `test_language_from_string()`
+
+---
+
+### `TestLayerDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:134`
+
+**Description:**
+> Tests for detect_layers().
+
+**Methods:**
+- `test_detect_routers_layer()`
+- `test_detect_models_layer()`
+- `test_detect_services_layer()`
+- `test_detect_repositories_layer()`
+- `test_detect_utils_layer()`
+- `test_detect_middleware_layer()`
+- `test_detect_config_layer()`
+- `test_detect_tests_layer()`
+
+---
+
+### `TestListBlockers`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:491`
+
+**Description:**
+> Tests for list_blockers function.
+
+**Methods:**
+- `test_list_blocked_tasks()`
+- `test_list_no_blockers()`
+- `test_list_blockers_metadata()`
+- `test_list_blockers_invalid_spec()`
+
+---
+
+### `TestListBlockersCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:416`
+
+**Description:**
+> Tests for list-blockers command.
+
+**Methods:**
+- `test_list_blockers_basic()`
+- `test_list_blockers_json()`
+- `test_list_blockers_no_blockers()`
+
+---
+
+### `TestListPhases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:74`
+
+**Description:**
+> Tests for list_phases function.
+
+**Methods:**
+- `test_list_phases_returns_all_phases()`
+- `test_list_phases_structure()`
+- `test_list_phases_calculates_task_counts()`
+- `test_list_phases_with_complex_spec()`
+
+---
+
+### `TestListPhases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:199`
+
+**Description:**
+> Tests for list_phases function.
+
+**Methods:**
+- `test_list_all_phases()`
+- `test_list_phases_with_progress()`
+- `test_list_phases_invalid_spec()`
+- `test_list_phases_empty()`
+
+---
+
+### `TestListPhasesCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:241`
+
+**Description:**
+> Tests for list-phases command.
+
+**Methods:**
+- `test_list_phases_basic()`
+- `test_list_phases_json()`
+- `test_list_phases_help()`
+
+---
+
+### `TestListPhasesCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:273`
+
+**Description:**
+> Tests for list-phases command.
+
+**Methods:**
+- `test_list_phases()`
+- `test_list_phases_json()`
+
+---
+
+### `TestLoadJsonSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:71`
+
+**Description:**
+> Tests for ``load_json_spec`` function.
+
+**Methods:**
+- `test_load_existing_json_spec()`
+- `test_load_nonexistent_json_spec()`
+- `test_load_invalid_json_spec()`
+- `test_load_json_spec_with_dependencies()`
+
+---
+
+### `TestMarkdownParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_markdown_parser.py:98`
+
+**Description:**
+> Tests for MarkdownParser class.
+
+**Methods:**
+- `test_parse_header()`
+- `test_parse_objectives()`
+- `test_parse_complete_spec()`
+- `test_parse_phase()`
+- `test_parse_group()`
+- `test_parse_task()`
+- `test_parse_task_with_all_fields()`
+- `test_parse_verification()`
+- `test_parse_empty_spec()`
+- `test_parse_task_status_icons()`
+- `test_parse_preserves_raw_markdown()`
+
+---
+
+### `TestMarkdownParserEdgeCases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_markdown_parser.py:308`
+
+**Description:**
+> Test edge cases and error handling.
+
+**Methods:**
+- `test_parse_phase_without_progress()`
+- `test_parse_task_without_file_path()`
+- `test_parse_verification_without_command()`
+- `test_parse_multiple_phases()`
+
+---
+
+### `TestMoveSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py:12`
+
+**Description:**
+> Test move_spec() function.
+
+**Methods:**
+- `test_move_spec_to_completed()`
+- `test_move_spec_to_archived()`
+- `test_move_spec_to_active()`
+- `test_move_spec_invalid_target()`
+- `test_move_spec_file_not_found()`
+- `test_move_spec_target_exists()`
+- `test_move_spec_dry_run()`
+
+---
+
+### `TestNextCommands`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:78`
+
+**Description:**
+> Tests for sdd-next commands (flat structure).
+
+**Methods:**
+- `test_verify_tools()`
+- `test_find_specs()`
+
+---
+
+### `TestNextTaskCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:132`
+
+**Description:**
+> Tests for next-task command.
+
+**Methods:**
+- `test_next_task_success()`
+- `test_next_task_json_output()`
+- `test_next_task_nonexistent_spec()`
+
+---
+
+### `TestParentNodeJournaling`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:179`
+
+**Description:**
+> Tests for parent node auto-completion and journaling flags.
+
+**Methods:**
+- `test_parent_node_flagged_when_auto_completed()`
+- `test_parent_node_not_flagged_if_already_completed()`
+- `test_group_node_flagged_when_auto_completed()`
+- `test_leaf_tasks_not_flagged_on_auto_completion()`
+
+---
+
+### `TestParseGitStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:162`
+
+**Description:**
+> Tests for parse_git_status function.
+
+**Methods:**
+- `test_parse_git_status_empty()`
+- `test_parse_git_status_staged_modification()`
+- `test_parse_git_status_unstaged_modification()`
+- `test_parse_git_status_staged_and_unstaged()`
+- `test_parse_git_status_untracked_file()`
+- `test_parse_git_status_added_file()`
+- `test_parse_git_status_deleted_file()`
+- `test_parse_git_status_multiple_files()`
+- `test_parse_git_status_with_subdirectories()`
+- `test_parse_git_status_quoted_paths()`
+- `test_parse_git_status_handles_timeout()`
+- `test_parse_git_status_handles_error()`
+- `test_parse_git_status_handles_git_not_found()`
+- `test_parse_git_status_handles_unexpected_error()`
+- `test_parse_git_status_renamed_file()`
+- `test_parse_git_status_added_with_unstaged_changes()`
+
+---
+
+### `TestParseResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:104`
+
+**Description:**
+> Test ParseResult aggregation.
+
+**Methods:**
+- `test_empty_parse_result()`
+- `test_parse_result_with_data()`
+- `test_parse_result_merge()`
+
+---
+
+### `TestParsedDataStructures`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:37`
+
+**Description:**
+> Test parsed data structures.
+
+**Methods:**
+- `test_parsed_parameter_creation()`
+- `test_parsed_function_creation()`
+- `test_parsed_class_creation()`
+- `test_parsed_module_creation()`
+
+---
+
+### `TestParserFactory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:11`
+
+**Description:**
+> Test ParserFactory functionality.
+
+**Methods:**
+- `test_factory_creation()`
+- `test_factory_with_languages_filter()`
+- `test_factory_with_exclude_patterns()`
+- `test_detect_languages_empty_project()`
+- `test_detect_languages_python_project()`
+- `test_detect_languages_multi_language_project()`
+- `test_get_parser_for_language_python()`
+- `test_get_parser_for_language_javascript()`
+- `test_get_parser_for_language_unknown()`
+- `test_parse_all_empty_project()`
+- `test_parse_all_python_project()`
+- `test_parse_all_with_language_filter()`
+- `test_parse_all_respects_exclude_patterns()`
+
+---
+
+### `TestParserFactoryMultiLanguage`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:174`
+
+**Description:**
+> Integration tests for multi-language parsing.
+
+**Methods:**
+- `test_parse_mixed_language_project()`
+- `test_statistics_across_languages()`
+- `test_verbose_output()`
+
+---
+
+### `TestPathIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:193`
+
+**Description:**
+> Integration tests for path utilities.
+
+**Methods:**
+- `test_path_resolution_with_symlinks()`
+- `test_specs_directory_traversal()`
+
+---
+
+### `TestPhaseTime`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:351`
+
+**Description:**
+> Tests for phase_time function.
+
+**Methods:**
+- `test_phase_with_time_data()`
+- `test_phase_without_time_data()`
+- `test_phase_time_variance_positive()`
+- `test_phase_time_variance_negative()`
+- `test_phase_time_nonexistent_phase()`
+- `test_phase_time_invalid_spec()`
+
+---
+
+### `TestPhaseTimeCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:362`
+
+**Description:**
+> Tests for phase-time command.
+
+**Methods:**
+- `test_phase_time_basic()`
+- `test_phase_time_json()`
+- `test_phase_time_nonexistent_phase()`
+
+---
+
+### `TestPrepareTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py:213`
+
+**Description:**
+> Tests for prepare_task function.
+
+**Methods:**
+- `test_prepare_task_success()`
+- `test_prepare_task_includes_dependencies()`
+- `test_prepare_task_returns_metadata_only()`
+- `test_prepare_task_nonexistent()`
+- `test_prepare_task_auto_finds_next()`
+
+---
+
+### `TestPrettyPrinterColorMode`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:103`
+
+**Description:**
+> Tests for color/no-color modes.
+
+**Methods:**
+- `test_colored_output_contains_ansi_codes()`
+- `test_no_color_output_lacks_ansi_codes()`
+
+---
+
+### `TestPrettyPrinterFormatting`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:165`
+
+**Description:**
+> Tests for message formatting.
+
+**Methods:**
+- `test_result_formatting_aligns_output()`
+- `test_detail_with_indentation()`
+
+---
+
+### `TestPrettyPrinterInit`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:12`
+
+**Description:**
+> Tests for PrettyPrinter initialization.
+
+**Methods:**
+- `test_printer_default_initialization()`
+- `test_printer_with_no_color()`
+- `test_printer_with_verbose()`
+- `test_printer_with_quiet()`
+
+---
+
+### `TestPrettyPrinterIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:197`
+
+**Description:**
+> Integration tests for PrettyPrinter.
+
+**Methods:**
+- `test_printer_combined_output_flow()`
+- `test_printer_error_warning_flow()`
+
+---
+
+### `TestPrettyPrinterMethods`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:43`
+
+**Description:**
+> Tests for PrettyPrinter methods.
+
+**Methods:**
+- `test_printer_success_message()`
+- `test_printer_error_message()`
+- `test_printer_warning_message()`
+- `test_printer_info_message()`
+- `test_printer_action_message()`
+- `test_printer_result_message()`
+- `test_printer_detail_message()`
+
+---
+
+### `TestPrettyPrinterVerbosity`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:128`
+
+**Description:**
+> Tests for verbosity modes.
+
+**Methods:**
+- `test_quiet_mode_minimal_output()`
+- `test_quiet_mode_shows_errors()`
+- `test_verbose_mode_shows_details()`
+
+---
+
+### `TestPriorityRanker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_priority_ranker.py:11`
+
+**Description:**
+> Tests for PriorityRanker class.
+
+**Methods:**
+- `test_initialization()`
+- `test_initialization_with_analyzer()`
+- `test_calculate_priority()`
+- `test_deterministic_ranking_single_run()`
+- `test_deterministic_priority_calculation()`
+- `test_deterministic_across_instances()`
+- `test_rank_tasks_pending_only()`
+- `test_rank_tasks_with_min_score()`
+- `test_get_top_priorities()`
+- `test_get_priority_breakdown()`
+- `test_high_risk_task_prioritization()`
+- `test_blocking_task_prioritization()`
+- `test_invalid_task_raises_error()`
+- `test_spec_root_excluded_from_ranking()`
+- `test_empty_spec_handles_gracefully()`
+- `test_deterministic_ordering_with_ties()`
+- `test_category_weights_applied_correctly()`
+- `test_effort_factor_affects_score()`
+- `test_dependency_penalty_applied()`
+- `test_rationale_generation()`
+
+---
+
+### `TestProgressCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:242`
+
+**Description:**
+> Tests for progress command.
+
+**Methods:**
+- `test_progress_command()`
+- `test_progress_json()`
+
+---
+
+### `TestProgressIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:275`
+
+**Description:**
+> Integration tests for progress calculation.
+
+**Methods:**
+- `test_complete_workflow_progress_tracking()`
+
+---
+
+### `TestProjectIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py:219`
+
+**Description:**
+> Integration tests for project analysis.
+
+**Methods:**
+- `test_complete_project_analysis_workflow()`
+- `test_python_project_full_analysis()`
+
+---
+
+### `TestPromptContentValidation`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:182`
+
+**Description:**
+> Tests to ensure prompts contain critical information.
+
+**Methods:**
+- `test_architecture_prompt_has_output_format()`
+- `test_architecture_prompt_requests_component_analysis()`
+- `test_ai_context_prompt_limits_output()`
+- `test_prompts_include_context_summary()`
+
+---
+
+### `TestPromptForGeneration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:313`
+
+**Description:**
+> Tests for prompt_for_generation function.
+
+**Methods:**
+- `test_prompt_returns_true_for_yes()`
+- `test_prompt_returns_true_for_y()`
+- `test_prompt_returns_true_for_empty()`
+- `test_prompt_returns_false_for_no()`
+- `test_prompt_returns_false_for_n()`
+- `test_prompt_returns_false_for_invalid()`
+- `test_prompt_keyboard_interrupt()`
+- `test_prompt_eof_error()`
+- `test_prompt_with_skill_name()`
+- `test_prompt_with_context()`
+- `test_prompt_case_insensitive()`
+- `test_prompt_strips_whitespace()`
+
+---
+
+### `TestPromptFormatting`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:20`
+
+**Description:**
+> Tests for prompt formatting functions.
+
+**Methods:**
+- `test_format_architecture_prompt_structure()`
+- `test_format_architecture_prompt_key_files()`
+- `test_format_ai_context_prompt_structure()`
+- `test_format_ai_context_prompt_concise()`
+
+---
+
+### `TestPythonParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:11`
+
+**Description:**
+> Test Python parser functionality.
+
+**Methods:**
+- `parser()`
+- `test_parse_simple_function()`
+- `test_parse_function_with_parameters()`
+- `test_parse_async_function()`
+- `test_parse_function_with_decorators()`
+- `test_parse_simple_class()`
+- `test_parse_class_with_inheritance()`
+- `test_parse_class_with_properties()`
+- `test_parse_imports()`
+- `test_parse_module_docstring()`
+- `test_calculate_complexity()`
+- `test_parse_empty_file()`
+- `test_parse_syntax_error_file()`
+- `test_line_counting()`
+
+---
+
+### `TestPythonParserAdvanced`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:252`
+
+**Description:**
+> Advanced Python parser tests.
+
+**Methods:**
+- `parser()`
+- `test_parse_nested_classes()`
+- `test_parse_class_methods()`
+- `test_parse_type_hints()`
+
+---
+
+### `TestPythonParserCrossReferences`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:314`
+
+**Description:**
+> Test cross-reference tracking in Python parser.
+
+**Methods:**
+- `parser()`
+- `test_track_simple_function_call()`
+- `test_track_nested_function_calls()`
+- `test_track_method_calls()`
+- `test_track_calls_in_class_methods()`
+- `test_track_module_level_calls()`
+- `test_cross_reference_bidirectional()`
+- `test_cross_reference_in_result()`
+- `test_multiple_callers()`
+- `test_call_tracking_with_decorators()`
+- `test_empty_file_has_graph()`
+- `test_line_numbers_tracked()`
+- `test_import_tracking_integration()`
+- `test_class_instantiation_detection()`
+- `test_instantiation_vs_function_call()`
+- `test_method_call_not_instantiation()`
+- `test_multiple_instantiations()`
+- `test_module_level_instantiation()`
+- `test_get_instantiators_method()`
+- `test_get_imports_method()`
+- `test_bidirectional_symmetry_complete()`
+- `test_get_instantiators_empty_result()`
+
+---
+
+### `TestPythonParserDynamicPatterns`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:856`
+
+**Description:**
+> Test dynamic pattern warning detection.
+
+**Methods:**
+- `parser()`
+- `test_decorator_warning()`
+- `test_eval_exec_warning()`
+- `test_getattr_setattr_warning()`
+- `test_dynamic_import_warning()`
+- `test_warning_statistics()`
+- `test_no_warnings_for_clean_code()`
+- `test_warnings_in_to_dict()`
+- `test_decorator_in_class_method()`
+- `test_module_level_dynamic_pattern()`
+
+---
+
+### `TestQueryTasks`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py:26`
+
+**Description:**
+> Tests for query_tasks function.
+
+**Methods:**
+- `test_query_all_tasks()`
+- `test_query_by_status_pending()`
+- `test_query_by_status_blocked()`
+- `test_query_by_status_completed()`
+- `test_query_by_type_task()`
+- `test_query_by_type_phase()`
+- `test_query_by_parent()`
+- `test_query_invalid_spec_id()`
+
+---
+
+### `TestQueryTasksCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:99`
+
+**Description:**
+> Tests for query-tasks command.
+
+**Methods:**
+- `test_query_tasks_basic()`
+- `test_query_tasks_status_filter()`
+- `test_query_tasks_type_filter()`
+- `test_query_tasks_format_simple()`
+- `test_query_tasks_json_output()`
+- `test_query_tasks_invalid_spec()`
+
+---
+
+### `TestReadingOrder`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:194`
+
+**Description:**
+> Tests for suggest_reading_order().
+
+**Methods:**
+- `test_reading_order_entry_first()`
+- `test_reading_order_config_early()`
+- `test_reading_order_models_before_routes()`
+
+---
+
+### `TestReadmeExtraction`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:230`
+
+**Description:**
+> Tests for extract_readme().
+
+**Methods:**
+- `test_extract_readme_md()`
+- `test_extract_readme_not_found()`
+
+---
+
+### `TestRecalculateProgress`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:116`
+
+**Description:**
+> Tests for recalculate_progress function.
+
+**Methods:**
+- `test_recalculate_progress_updates_counts()`
+- `test_recalculate_progress_propagates_to_parents()`
+
+---
+
+### `TestRenderEdgeCases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_render/test_render_pipeline.py:370`
+
+**Description:**
+> Integration tests for edge cases and error conditions.
+
+**Methods:**
+- `test_empty_spec()`
+- `test_spec_with_all_completed_tasks()`
+- `test_spec_with_unicode_characters()`
+
+---
+
+### `TestRenderOutputFormats`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_render/test_render_pipeline.py:279`
+
+**Description:**
+> Integration tests for different output formats and modes.
+
+**Methods:**
+- `test_markdown_output_format()`
+- `test_large_spec_rendering()`
+
+---
+
+### `TestReportCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:192`
+
+**Description:**
+> Tests for the report command.
+
+**Methods:**
+- `test_report_markdown()`
+- `test_report_json()`
+- `test_report_stdout()`
+- `test_report_with_dependencies()`
+- `test_report_json_stdout()`
+- `test_report_with_bottleneck_threshold()`
+
+---
+
+### `TestRoutingMatrix`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:162`
+
+**Description:**
+> Tests for documentation type routing.
+
+**Methods:**
+- `test_routing_matrix_has_architecture()`
+- `test_routing_matrix_has_ai_context()`
+- `test_routing_matrix_valid_tools()`
+
+---
+
+### `TestRunTestsDocIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py:30`
+
+**Description:**
+> Integration tests for run-tests doc integration.
+
+**Methods:**
+- `test_check_tools_basic()`
+- `test_docs_available_workflow()`
+- `test_docs_missing_graceful_degradation()`
+- `test_no_interactive_prompts_in_json_mode()`
+- `test_docs_missing_user_accepts_prompt()`
+- `test_docs_missing_user_declines_prompt()`
+- `test_consult_command_with_routing()`
+- `test_integration_with_external_tools_check()`
+
+---
+
+### `TestSaveJsonSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py:108`
+
+**Description:**
+> Tests for save_json_spec function.
+
+**Methods:**
+- `test_save_new_json_spec()`
+- `test_save_updates_existing_json_spec()`
+- `test_save_json_spec_with_nonexistent_path_creates_dir()`
+
+---
+
+### `TestSchemaEnhancements`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:1109`
+
+**Description:**
+> Test schema v1.1 enhancements with cross-reference fields.
+
+**Methods:**
+- `parser()`
+- `test_call_reference_creation()`
+- `test_call_reference_to_dict()`
+- `test_enhance_function_with_callers()`
+- `test_enhance_function_with_calls()`
+- `test_enhance_function_with_call_count()`
+- `test_enhance_function_without_call_count()`
+- `test_enhance_function_preserves_base_fields()`
+- `test_enhance_function_with_empty_cross_refs()`
+- `test_enhance_function_with_none_cross_refs()`
+- `test_enhance_function_complete_example()`
+- `test_schema_version_constants()`
+- `test_call_reference_different_types()`
+- `test_enhance_with_method_calls()`
+
+---
+
+### `TestSddPlanDocIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_plan_doc_integration.py:31`
+
+**Description:**
+> Integration tests for sdd-plan doc integration.
+
+**Methods:**
+- `test_detect_project_basic()`
+- `test_detect_project_workflow()`
+- `test_docs_available_workflow()`
+- `test_docs_missing_graceful_degradation()`
+- `test_no_interactive_prompts_in_json_mode()`
+- `test_docs_missing_user_accepts_prompt()`
+- `test_docs_missing_user_declines_prompt()`
+- `test_find_related_files_command()`
+- `test_check_environment_command()`
+- `test_doc_availability_check_integration()`
+- `test_comprehensive_planning_workflow()`
+
+---
+
+### `TestShouldGenerateDocs`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py:163`
+
+**Description:**
+> Tests for should_generate_docs function.
+
+**Methods:**
+- `test_should_not_generate_if_available()`
+- `test_should_generate_if_missing()`
+- `test_interactive_mode()`
+
+---
+
+### `TestShouldPromptCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py:502`
+
+**Description:**
+> Tests for should_prompt_completion() function.
+
+**Methods:**
+- `test_should_prompt_when_complete_and_no_blocks()`
+- `test_should_not_prompt_when_incomplete()`
+- `test_should_not_prompt_when_blocked_tasks_exist()`
+- `test_should_not_prompt_when_in_progress()`
+- `test_phase_level_prompt_check()`
+- `test_all_complete_but_has_blocked_tasks()`
+- `test_empty_spec_should_prompt()`
+- `test_error_handling_no_spec_data()`
+- `test_error_handling_no_hierarchy()`
+- `test_error_handling_invalid_phase_id()`
+
+---
+
+### `TestShowCommitPreview`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:389`
+
+**Description:**
+> Tests for show_commit_preview function.
+
+**Methods:**
+- `test_show_commit_preview_no_changes()`
+- `test_show_commit_preview_staged_modified()`
+- `test_show_commit_preview_unstaged_modified()`
+- `test_show_commit_preview_both_modified()`
+- `test_show_commit_preview_added_files()`
+- `test_show_commit_preview_deleted_staged()`
+- `test_show_commit_preview_deleted_unstaged()`
+- `test_show_commit_preview_untracked()`
+- `test_show_commit_preview_renamed()`
+- `test_show_commit_preview_mixed_statuses()`
+- `test_show_commit_preview_creates_printer_if_none()`
+
+---
+
+### `TestSpecAnalyzer`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_spec_analyzer.py:7`
+
+**Description:**
+> Tests for SpecAnalyzer class.
+
+**Methods:**
+- `test_initialization()`
+- `test_graph_building()`
+- `test_critical_path()`
+- `test_bottlenecks()`
+- `test_topological_sort()`
+- `test_task_depth()`
+- `test_parallelizable_tasks()`
+- `test_stats()`
+- `test_empty_spec()`
+
+---
+
+### `TestSpecStats`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_validation.py:130`
+
+**Description:**
+> Tests for spec_stats function.
+
+**Methods:**
+- `test_spec_stats_basic()`
+- `test_spec_stats_counts()`
+- `test_spec_stats_with_json_spec()`
+- `test_spec_stats_nonexistent()`
+
+---
+
+### `TestStatsCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:252`
+
+**Description:**
+> Tests for the stats command.
+
+**Methods:**
+- `test_stats_basic()`
+- `test_stats_json()`
+- `test_stats_deep_hierarchy()`
+- `test_stats_verification_coverage()`
+
+---
+
+### `TestStatusReportCompletion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_status_report.py:78`
+
+**Description:**
+> Tests for status-report completion detection.
+
+**Methods:**
+- `test_completion_message_in_status_report()`
+- `test_non_interactive_behavior()`
+- `test_command_hint_displayed()`
+- `test_incomplete_spec_no_completion_message()`
+
+---
+
+### `TestSyncMetadataFromState`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_journal.py:312`
+
+**Description:**
+> Test sync_metadata_from_state() function.
+
+**Methods:**
+- `test_sync_metadata_calculates_progress()`
+- `test_sync_metadata_sets_completed_status()`
+- `test_sync_metadata_finds_current_phase()`
+- `test_sync_metadata_dry_run()`
+
+---
+
+### `TestTaskGrouper`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_task_grouper.py:12`
+
+**Description:**
+> Tests for TaskGrouper class.
+
+**Methods:**
+- `test_initialization()`
+- `test_initialization_with_analyzer()`
+- `test_group_by_file()`
+- `test_group_by_directory()`
+- `test_group_by_category()`
+- `test_group_by_risk()`
+- `test_group_by_dependency()`
+- `test_group_by_status()`
+- `test_group_by_effort()`
+- `test_complete_coverage()`
+- `test_no_duplicate_coverage_within_strategy()`
+- `test_status_filter()`
+- `test_get_groups_with_strategy_enum()`
+- `test_invalid_grouping_strategy()`
+- `test_empty_spec_handles_gracefully()`
+- `test_task_group_dataclass()`
+- `test_metadata_consistency()`
+- `test_group_descriptions_are_meaningful()`
+- `test_tasks_without_metadata_handled_gracefully()`
+
+---
+
+### `TestTaskInfoCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:172`
+
+**Description:**
+> Tests for task-info command.
+
+**Methods:**
+- `test_task_info_success()`
+- `test_task_info_json()`
+
+---
+
+### `TestTemplates`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_templates.py:152`
+
+**Description:**
+> Test cases for template management functions.
+
+**Methods:**
+- `test_list_templates_returns_dict()`
+- `test_get_template_valid()`
+- `test_get_template_invalid()`
+
+---
+
+### `TestToolSelection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:86`
+
+**Description:**
+> Tests for AI tool selection.
+
+**Methods:**
+- `test_get_best_tool_for_architecture()`
+- `test_get_best_tool_fallback()`
+- `test_get_best_tool_no_tools()`
+- `test_get_best_tool_unknown_type()`
+
+---
+
+### `TestTypeScriptParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py:227`
+
+**Description:**
+> Test TypeScript-specific parsing.
+
+**Methods:**
+- `parser()`
+- `test_parse_interface()`
+- `test_parse_type_alias()`
+- `test_parse_enum()`
+- `test_parse_generic_function()`
+- `test_parse_tsx_component()`
+
+---
+
+### `TestUnifiedCLIBasics`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:41`
+
+**Description:**
+> Basic unified CLI functionality tests.
+
+**Methods:**
+- `test_cli_help()`
+- `test_cli_no_args()`
+- `test_cli_version_implicit()`
+
+---
+
+### `TestUpdateBranchMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:747`
+
+**Description:**
+> Tests for update_branch_metadata function.
+
+**Methods:**
+- `test_update_branch_metadata_creates_metadata()`
+- `test_update_branch_metadata_updates_existing()`
+- `test_update_branch_metadata_preserves_other_metadata()`
+
+---
+
+### `TestUpdateCommands`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:109`
+
+**Description:**
+> Tests for sdd-update commands (flat structure).
+
+**Methods:**
+- `test_status_report_help()`
+- `test_update_command_exists()`
+
+---
+
+### `TestUpdateMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_journal.py:141`
+
+**Description:**
+> Test update_metadata() function.
+
+**Methods:**
+- `test_update_metadata_simple()`
+- `test_update_metadata_numeric_value()`
+- `test_update_metadata_creates_metadata_object()`
+- `test_update_metadata_dry_run()`
+
+---
+
+### `TestUpdatePRMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:865`
+
+**Description:**
+> Tests for update_pr_metadata function.
+
+**Methods:**
+- `test_update_pr_metadata_creates_metadata()`
+- `test_update_pr_metadata_updates_existing()`
+- `test_update_pr_metadata_default_status()`
+- `test_update_pr_metadata_preserves_commits()`
+- `test_update_pr_metadata_status_values()`
+
+---
+
+### `TestUpdateParentStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py:149`
+
+**Description:**
+> Tests for update_parent_status function.
+
+**Methods:**
+- `test_update_parent_when_all_children_complete()`
+- `test_update_parent_when_some_children_in_progress()`
+
+---
+
+### `TestUpdateTaskStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py:16`
+
+**Description:**
+> Test update_task_status() function.
+
+**Methods:**
+- `_create_test_spec()`
+- `test_started_at_resets_on_each_in_progress_transition()`
+- `test_started_at_set_on_first_in_progress()`
+- `test_completed_at_set_on_completion()`
+
+---
+
+### `TestUpdatedCLICommands`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:468`
+
+**Description:**
+> Tests for updated CLI commands using new JSON-only signatures.
+
+**Methods:**
+- `test_add_journal_new_signature()`
+- `test_add_journal_with_task_id()`
+- `test_add_journal_custom_author()`
+- `test_sync_metadata_new_command()`
+- `test_add_verification_new_signature()`
+- `test_add_verification_failed_status()`
+- `test_bulk_journal_new_signature()`
+- `test_bulk_journal_specific_tasks()`
+
+---
+
+### `TestValidateCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:42`
+
+**Description:**
+> Tests for the validate command.
+
+**Methods:**
+- `test_validate_clean_spec_exit_0()`
+- `test_validate_warnings_spec_exit_1()`
+- `test_validate_errors_spec_exit_2()`
+- `test_validate_json_output()`
+- `test_validate_json_verbose()`
+- `test_validate_verbose_output()`
+- `test_validate_nonexistent_file()`
+- `test_validate_with_report()`
+- `test_validate_with_report_json_format()`
+
+---
+
+### `TestValidateCommands`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:135`
+
+**Description:**
+> Tests for sdd-validate commands (flat structure).
+
+**Methods:**
+- `test_validate_help()`
+- `test_validate_command_exists()`
+
+---
+
+### `TestValidateDependencies`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:226`
+
+**Description:**
+> Tests for validate_dependencies function.
+
+**Methods:**
+- `test_valid_dependencies()`
+- `test_circular_dependencies()`
+- `test_dependency_on_nonexistent_task()`
+- `test_bidirectional_dependency_consistency()`
+
+---
+
+### `TestValidateHierarchy`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:74`
+
+**Description:**
+> Tests for validate_hierarchy function.
+
+**Methods:**
+- `test_valid_hierarchy()`
+- `test_orphaned_nodes()`
+- `test_circular_parent_child()`
+
+---
+
+### `TestValidateJsonSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:499`
+
+**Description:**
+> Tests for validate_spec_hierarchy main function.
+
+**Methods:**
+- `test_validate_valid_json_spec()`
+- `test_validate_state_with_structure_issues()`
+- `test_validate_state_with_circular_deps()`
+- `test_validate_state_with_orphaned_nodes()`
+- `test_validation_result_structure()`
+- `test_validation_counts_nodes_correctly()`
+
+---
+
+### `TestValidateMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:293`
+
+**Description:**
+> Tests for validate_metadata function.
+
+**Methods:**
+- `test_valid_metadata()`
+- `test_task_missing_file_path()`
+- `test_implementation_task_requires_file_path()`
+- `test_investigation_task_no_file_path_required()`
+- `test_missing_category_defaults_to_implementation()`
+- `test_invalid_task_category_rejected()`
+- `test_investigation_task_with_file_path_warns()`
+- `test_backward_compat_no_category_with_file_path()`
+- `test_backward_compat_old_style_spec()`
+
+---
+
+### `TestValidateNodes`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:122`
+
+**Description:**
+> Tests for validate_nodes function.
+
+**Methods:**
+- `test_valid_nodes()`
+- `test_node_missing_required_fields()`
+- `test_invalid_node_status()`
+- `test_invalid_node_type()`
+
+---
+
+### `TestValidatePath`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py:64`
+
+**Description:**
+> Tests for validate_path function.
+
+**Methods:**
+- `test_validate_existing_file()`
+- `test_validate_existing_directory()`
+- `test_validate_nonexistent_path()`
+- `test_validate_relative_path()`
+- `test_validate_path_with_string_input()`
+- `test_validate_multiple_paths()`
+
+---
+
+### `TestValidatePaths`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_validation.py:97`
+
+**Description:**
+> Tests for validate_paths function.
+
+**Methods:**
+- `test_validate_existing_paths()`
+- `test_validate_mixed_paths()`
+- `test_validate_paths_with_base_dir()`
+
+---
+
+### `TestValidateSpec`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_validation.py:14`
+
+**Description:**
+> Tests for validate_spec function.
+
+**Methods:**
+- `test_validate_valid_spec()`
+- `test_validate_invalid_spec()`
+- `test_validate_spec_checks_frontmatter()`
+- `test_validate_spec_checks_json_spec()`
+- `test_validate_nonexistent_spec()`
+
+---
+
+### `TestValidateSpecBeforeProceed`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_integrations.py:22`
+
+**Description:**
+> Tests for validate_spec_before_proceed function.
+
+**Methods:**
+- `test_valid_spec()`
+- `test_spec_with_errors()`
+- `test_spec_with_warnings()`
+- `test_file_not_found()`
+- `test_invalid_json()`
+- `test_autofix_detection()`
+
+---
+
+### `TestValidateStructure`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:24`
+
+**Description:**
+> Tests for validate_structure function.
+
+**Methods:**
+- `test_valid_structure()`
+- `test_missing_required_fields()`
+- `test_empty_hierarchy()`
+- `test_invalid_json_types()`
+
+---
+
+### `TestValidateTaskCounts`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py:182`
+
+**Description:**
+> Tests for validate_task_counts function.
+
+**Methods:**
+- `test_valid_task_counts()`
+- `test_children_count_mismatch()`
+
+---
+
+### `TestValidateTimestampPair`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py:213`
+
+**Description:**
+> Test validate_timestamp_pair() function.
+
+**Methods:**
+- `test_validate_timestamp_pair_valid()`
+- `test_validate_timestamp_pair_none_start()`
+- `test_validate_timestamp_pair_none_end()`
+- `test_validate_timestamp_pair_empty_start()`
+- `test_validate_timestamp_pair_invalid_format()`
+- `test_validate_timestamp_pair_negative_disallowed()`
+- `test_validate_timestamp_pair_negative_allowed()`
+- `test_validate_timestamp_pair_with_printer()`
+
+---
+
+### `TestVerifyToolsCommand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:93`
+
+**Description:**
+> Tests for verify-tools command.
+
+**Methods:**
+- `test_verify_tools_success()`
+
+---
+
 ### `TokenMetrics`
 
 **Language:** python
@@ -1933,16 +5155,6 @@ Attributes:
 
 **Properties:**
 - `context_percentage`
-
----
-
-### `ValidationResult`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:30`
-
-**Description:**
-> Result of validating a command.
 
 ---
 
@@ -2323,7 +5535,7 @@ Returns:
 ### `_bump_version(current_version, bump) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:48`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:123`
 **Complexity:** 5
 
 **Description:**
@@ -2338,7 +5550,7 @@ Returns:
 ### `_calculate_diff(before, after, task_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:181`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:256`
 **Complexity:** 8
 
 **Parameters:**
@@ -2457,7 +5669,7 @@ Returns:
 ### `_derive_default_journal(task_id, task_title, actual_hours, note) -> Tuple[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:30`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:105`
 **Complexity:** 4
 
 **Parameters:**
@@ -2864,8 +6076,19 @@ Returns:
 ### `_get_timestamp() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:26`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:33`
 **Complexity:** 1
+
+---
+
+### `_get_version() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:16`
+**Complexity:** 2
+
+**Description:**
+> Get package version from metadata.
 
 ---
 
@@ -2936,6 +6159,36 @@ Returns True if any of the following conditions are met:
 
 **Parameters:**
 - `file_path`: str
+
+---
+
+### `_journal_completed_parents(spec_id, task_id, specs_dir, author, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:37`
+**Complexity:** 10
+
+**Description:**
+> Journal parent nodes (phases, groups) that were auto-completed.
+
+When a leaf task is completed, parent nodes may automatically transition
+to "completed" status via progress recalculation. This function walks up
+the parent chain and creates journal entries for any parents that were
+auto-completed and flagged with needs_journaling.
+
+Args:
+    spec_id: Spec identifier
+    task_id: ID of the task that was just completed
+    specs_dir: Directory containing spec files
+    author: Author name for journal entries
+    printer: Optional printer for output
+
+**Parameters:**
+- `spec_id`: str
+- `task_id`: str
+- `specs_dir`: Path
+- `author`: str
+- `printer`: Optional[PrettyPrinter]
 
 ---
 
@@ -3025,7 +6278,7 @@ Returns True if any of the following conditions are met:
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:229`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:304`
 **Complexity:** 8
 
 **Parameters:**
@@ -3078,7 +6331,7 @@ Returns True if any of the following conditions are met:
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:184`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:191`
 **Complexity:** 5
 
 **Description:**
@@ -3271,7 +6524,7 @@ Returns:
 ### `_simulate_workflow(state, task_id, actual_hours, note, journal_title, journal_content, journal_entry_type, author, revision_version, revision_changes) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:73`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:148`
 ⚠️ **Complexity:** 16 (High)
 
 **Parameters:**
@@ -3322,6 +6575,29 @@ Returns:
 
 ---
 
+### `_validate_git_config(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:86`
+**Complexity:** 8
+
+**Description:**
+> Validate and sanitize git configuration values.
+
+Ensures all configuration values have correct types and valid values.
+Invalid values are replaced with defaults and warnings are logged.
+
+Args:
+    config: Raw configuration dictionary
+
+Returns:
+    Validated configuration dictionary
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
 ### `_validate_spec_structure(spec_data) -> bool`
 
 **Language:** python
@@ -3345,7 +6621,7 @@ Returns:
 ### `activate_spec(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:91`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -3371,6 +6647,37 @@ Returns:
 - `specs_dir`: Path
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `add_commit_metadata(spec, sha, message, task_id, timestamp) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:804`
+**Complexity:** 5
+
+**Description:**
+> Add a commit record to spec git metadata.
+
+Appends a new commit object to the metadata.git.commits array. Creates the
+git metadata section if it doesn't exist.
+
+Args:
+    spec: Specification dictionary to update
+    sha: Git commit SHA hash (full or abbreviated)
+    message: Commit message
+    task_id: Task ID associated with this commit (e.g., 'task-1-1')
+    timestamp: ISO 8601 timestamp string (optional, will use current time if not provided)
+
+Returns:
+    Updated spec dictionary (modified in-place, but also returned for convenience)
+
+**Parameters:**
+- `spec`: Dict[str, Any]
+- `sha`: str
+- `message`: str
+- `task_id`: str
+- `timestamp`: Optional[str]
 
 ---
 
@@ -3807,6 +7114,19 @@ Returns:
 
 ---
 
+### `assert_json_structure() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:1007`
+**Complexity:** 2
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Helper to assert JSON structure.
+
+---
+
 ### `audit_spec(spec_id, specs_dir, printer) -> Dict`
 
 **Language:** python
@@ -3968,20 +7288,6 @@ Returns:
 - `path`: Optional[str]
 - `pattern`: Optional[str]
 - `extra_args`: Optional[List[str]]
-
----
-
-### `build_registry() -> CommandRegistry`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:238`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Build the command registry from sdd --help output.
-
-Returns:
-    CommandRegistry with all valid commands
 
 ---
 
@@ -4325,7 +7631,7 @@ Returns:
 ### `check_dependencies(spec_data, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:179`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:184`
 **Complexity:** 8
 
 **Description:**
@@ -4341,6 +7647,31 @@ Returns:
 **Parameters:**
 - `spec_data`: Dict
 - `task_id`: str
+
+---
+
+### `check_dirty_tree(repo_root) -> Tuple[bool, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:59`
+**Complexity:** 9
+
+**Description:**
+> Check if the working tree has uncommitted changes.
+
+Runs 'git status --porcelain' to detect any uncommitted changes,
+including staged, unstaged, and untracked files.
+
+Args:
+    repo_root: Path to git repository root
+
+Returns:
+    Tuple of (is_dirty, message):
+    - is_dirty: True if there are uncommitted changes, False otherwise
+    - message: Description of the dirty state or "Clean" if no changes
+
+**Parameters:**
+- `repo_root`: Path
 
 ---
 
@@ -4476,6 +7807,58 @@ Returns:
 
 ---
 
+### `check_gh_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:158`
+**Complexity:** 2
+
+**Description:**
+> Check if GitHub CLI (gh) is installed and available.
+
+Returns:
+    True if gh is available, False otherwise
+
+---
+
+### `check_git_commit_readiness(spec_data, spec_path, event_type) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:97`
+**Complexity:** 5
+
+**Description:**
+> Check if git commit workflow should be triggered.
+
+This is the main entry point that orchestrates all git commit checks:
+1. Check if git integration is enabled
+2. Find repository root
+3. Check commit cadence preference
+4. Check for uncommitted changes
+
+Args:
+    spec_data: JSON spec file data
+    spec_path: Path to spec file
+    event_type: Type of completion event - "task" or "phase"
+
+Returns:
+    Dict with commit readiness info if commit should be offered:
+    {
+        "should_commit": True,
+        "repo_root": Path to repository,
+        "status_output": Git status output,
+        "commit_cadence": Configured cadence
+    }
+
+    Returns None if commit should not be offered.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `spec_path`: Path
+- `event_type`: str
+
+---
+
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
@@ -4493,7 +7876,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:117`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:131`
 **Complexity:** 2
 
 **Description:**
@@ -4501,6 +7884,42 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
+
+---
+
+### `check_pr_readiness(spec_data, spec_path) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:240`
+**Complexity:** 5
+
+**Description:**
+> Check if PR workflow should be triggered.
+
+This is the main entry point that orchestrates all PR checks:
+1. Check if git integration is enabled
+2. Find repository root
+3. Check if branch metadata exists
+4. Check if auto_push is enabled
+
+Args:
+    spec_data: JSON spec file data
+    spec_path: Path to spec file
+
+Returns:
+    Dict with PR readiness info if PR workflow should be triggered:
+    {
+        "should_create_pr": True,
+        "repo_root": Path to repository,
+        "branch_name": Feature branch name,
+        "base_branch": Base branch name
+    }
+
+    Returns None if PR workflow should not be triggered.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `spec_path`: Path
 
 ---
 
@@ -4604,6 +8023,19 @@ Returns:
 
 **Parameters:**
 - `tool_name`: str
+
+---
+
+### `clear_cache() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py:23`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture(autouse=True)`
+
+**Description:**
+> Clear the cache before each test.
 
 ---
 
@@ -4758,7 +8190,7 @@ Example:
 ### `cmd_call_graph(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:748`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:753`
 **Complexity:** 9
 
 **Description:**
@@ -4773,7 +8205,7 @@ Example:
 ### `cmd_callees(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:712`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:717`
 **Complexity:** 5
 
 **Description:**
@@ -4788,7 +8220,7 @@ Example:
 ### `cmd_callers(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:676`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:681`
 **Complexity:** 5
 
 **Description:**
@@ -4803,7 +8235,7 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:125`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:139`
 **Complexity:** 5
 
 **Description:**
@@ -4935,7 +8367,7 @@ Example:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:746`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:820`
 **Complexity:** 6
 
 **Description:**
@@ -4974,8 +8406,8 @@ Example:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:245`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:300`
+⚠️ **Complexity:** 13 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -4993,7 +8425,7 @@ Args:
 ### `cmd_context(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:506`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:511`
 **Complexity:** 3
 
 **Parameters:**
@@ -5017,6 +8449,21 @@ Args:
 
 ---
 
+### `cmd_create_task_commit(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:746`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Create commit from staged files for a task (two-step workflow).
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_dependencies(args, printer) -> int`
 
 **Language:** python
@@ -5032,7 +8479,7 @@ Args:
 ### `cmd_describe_module(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:522`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:527`
 **Complexity:** 3
 
 **Parameters:**
@@ -5344,7 +8791,7 @@ Args:
 ### `cmd_impact(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:894`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:899`
 **Complexity:** 8
 
 **Description:**
@@ -5389,7 +8836,7 @@ Args:
 ### `cmd_list_classes(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:565`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:570`
 **Complexity:** 7
 
 **Parameters:**
@@ -5401,7 +8848,7 @@ Args:
 ### `cmd_list_functions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:602`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:607`
 **Complexity:** 7
 
 **Parameters:**
@@ -5413,7 +8860,7 @@ Args:
 ### `cmd_list_modules(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:639`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:644`
 **Complexity:** 7
 
 **Parameters:**
@@ -5440,7 +8887,7 @@ Args:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:779`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:853`
 **Complexity:** 3
 
 **Description:**
@@ -5642,7 +9089,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_refactor_candidates(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:938`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:943`
 **Complexity:** 8
 
 **Description:**
@@ -5658,7 +9105,7 @@ The completion_info dict structure (from should_prompt_completion):
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_render/cli.py:17`
-⚠️ **Complexity:** 27 (High)
+⚠️ **Complexity:** 32 (High)
 
 **Description:**
 > Render JSON spec to human-readable markdown.
@@ -5726,7 +9173,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:495`
-**Complexity:** 3
+**Complexity:** 5
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -5737,7 +9184,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:229`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:284`
 **Complexity:** 1
 
 **Description:**
@@ -5774,7 +9221,7 @@ Args:
 ### `cmd_stats(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:538`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:543`
 **Complexity:** 4
 
 **Parameters:**
@@ -5816,7 +9263,7 @@ Args:
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:797`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:871`
 **Complexity:** 3
 
 **Description:**
@@ -5876,7 +9323,7 @@ Args:
 ### `cmd_trace_data(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:850`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:855`
 **Complexity:** 8
 
 **Description:**
@@ -5891,7 +9338,7 @@ Args:
 ### `cmd_trace_entry(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:806`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:811`
 **Complexity:** 8
 
 **Description:**
@@ -5921,7 +9368,7 @@ Args:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:64`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:78`
 **Complexity:** 8
 
 **Description:**
@@ -5966,7 +9413,7 @@ Args:
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:816`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:890`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -6139,8 +9586,8 @@ Example:
 ### `complete_spec(spec_id, spec_file, specs_dir, skip_doc_regen, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:232`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:239`
+⚠️ **Complexity:** 27 (High)
 
 **Description:**
 > Mark a spec as completed and move it to completed folder.
@@ -6175,8 +9622,8 @@ Returns:
 ### `complete_task_workflow() -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:253`
-⚠️ **Complexity:** 37 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:328`
+⚠️ **Complexity:** 44 (High)
 
 **Description:**
 > Complete a task with optional journaling, time tracking, and revision updates.
@@ -6414,6 +9861,51 @@ Example:
 
 ---
 
+### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:453`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Create commit from currently staged files (Step 2 of two-step workflow).
+
+This is step 2 of the two-step commit workflow. After the agent has staged
+files using git add, this function creates a commit with those staged files.
+
+Workflow:
+1. Agent calls show_commit_preview_and_wait() to see changes (step 1)
+2. Agent stages selected files with git add
+3. Agent calls this function to create the commit (step 2)
+
+Args:
+    repo_root: Path to git repository root
+    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+    task_id: Task ID (e.g., 'task-2-1')
+    printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+Returns:
+    Tuple of (success, commit_sha, error_msg):
+    - success: True if commit created successfully, False otherwise
+    - commit_sha: Full commit SHA if successful, None otherwise
+    - error_msg: Error message if failed, None if successful
+
+Example:
+    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+    (True, 'a1b2c3d4e5f6...', None)
+
+    >>> # No files staged:
+    >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+    (False, None, 'No files staged for commit')
+
+**Parameters:**
+- `repo_root`: Path
+- `spec_id`: str
+- `task_id`: str
+- `printer`: None
+
+---
+
 ### `create_context_summary(framework_info, key_files, layers, statistics, readme_content) -> str`
 
 **Language:** python
@@ -6497,6 +9989,85 @@ Returns:
 
 ---
 
+### `create_pull_request(repo_root, title, body, base_branch) -> Tuple[bool, Optional[str], Optional[int], str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:176`
+**Complexity:** 5
+
+**Description:**
+> Create pull request via GitHub CLI.
+
+Args:
+    repo_root: Path to repository root directory
+    title: PR title
+    body: PR body (markdown formatted)
+    base_branch: Base branch to merge into (e.g., 'main', 'develop')
+
+Returns:
+    Tuple of (success: bool, pr_url: Optional[str], pr_number: Optional[int], error_message: str)
+    - success: True if PR created successfully, False otherwise
+    - pr_url: URL of created PR if successful, None otherwise
+    - pr_number: PR number if successful, None otherwise
+    - error_message: Error message if failed, empty string if successful
+
+**Parameters:**
+- `repo_root`: Path
+- `title`: str
+- `body`: str
+- `base_branch`: str
+
+---
+
+### `create_sample_spec_content(spec_id, title, estimated_hours, num_phases, tasks_per_phase, include_verify, include_subtasks) -> Dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:27`
+**Complexity:** 9
+
+**Description:**
+> Create a sample spec JSON structure.
+
+Args:
+    spec_id: Specification identifier
+    title: Specification title
+    estimated_hours: Estimated hours for the spec
+    num_phases: Number of phases to create
+    tasks_per_phase: Number of tasks per phase
+    include_verify: Whether to include verify nodes (default: False)
+    include_subtasks: Whether to include subtask nodes (default: False)
+
+Returns:
+    Complete spec data dictionary
+
+**Parameters:**
+- `spec_id`: str
+- `title`: str
+- `estimated_hours`: float
+- `num_phases`: int
+- `tasks_per_phase`: int
+- `include_verify`: bool
+- `include_subtasks`: bool
+
+---
+
+### `create_sample_spec_data(spec_id, num_phases, tasks_per_phase, with_dependencies) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:174`
+**Complexity:** 6
+
+**Description:**
+> Create sample JSON spec data.
+
+**Parameters:**
+- `spec_id`: str
+- `num_phases`: int
+- `tasks_per_phase`: int
+- `with_dependencies`: bool
+
+---
+
 ### `create_spec_interactive(title, template, specs_dir, default_category) -> Tuple[bool, str, Optional[Dict[str, Any]]]`
 
 **Language:** python
@@ -6521,6 +10092,38 @@ Returns:
 - `template`: str
 - `specs_dir`: Path
 - `default_category`: Optional[str]
+
+---
+
+### `create_temp_json_spec(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:1027`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Factory fixture to create temporary JSON specs.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `create_temp_spec_file(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:1017`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Factory fixture to create temporary JSON spec files.
+
+**Parameters:**
+- `tmp_path`: None
 
 ---
 
@@ -6587,6 +10190,33 @@ Returns:
 
 **Parameters:**
 - `modules`: List[Dict[str, Any]]
+
+---
+
+### `detect_git_drift(spec, repo_root) -> List[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:635`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Detect drift between spec metadata and actual git state.
+
+Compares the git metadata stored in the spec with the actual git repository state.
+Returns a list of warnings for any discrepancies found.
+
+This is a non-blocking check - warnings are informational and don't prevent operations.
+
+Args:
+    spec: Specification dictionary containing metadata.git section
+    repo_root: Path to git repository root
+
+Returns:
+    List of warning messages (empty list if no drift detected)
+
+**Parameters:**
+- `spec`: Dict[str, Any]
+- `repo_root`: Path
 
 ---
 
@@ -6679,6 +10309,35 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `django_modules() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:108`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample Django module data.
+
+---
+
+### `doc_query_samples(tmp_path) -> Dict[str, Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/conftest.py:9`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create sample documentation payloads for doc_query tests.
+
+**Parameters:**
+- `tmp_path`: Path
 
 ---
 
@@ -6920,6 +10579,35 @@ Example:
 
 ---
 
+### `ensure_json_spec(specs_structure) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:254`
+**Complexity:** 3
+
+**Description:**
+> Ensure a JSON spec file exists for the given spec_id.
+
+**Parameters:**
+- `specs_structure`: Path
+
+---
+
+### `ensure_json_spec_file(specs_structure, spec_data) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:279`
+**Complexity:** 2
+
+**Description:**
+> Ensure matching JSON spec file is created for given spec data.
+
+**Parameters:**
+- `specs_structure`: Path
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `ensure_reports_directory(specs_dir) -> Path`
 
 **Language:** python
@@ -7017,46 +10705,6 @@ Example:
 - `task_id`: str
 - `spec_root`: str
 - `retry_count`: int
-
----
-
-### `extract_all_commands(skills_dir) -> Dict[Path, List[Command]]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:67`
-**Complexity:** 3
-
-**Description:**
-> Extract commands from all SKILL.md files.
-
-Args:
-    skills_dir: Path to skills directory
-
-Returns:
-    Dictionary mapping file paths to lists of commands
-
-**Parameters:**
-- `skills_dir`: Path
-
----
-
-### `extract_commands_from_file(file_path) -> List[Command]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:27`
-**Complexity:** 4
-
-**Description:**
-> Extract all sdd commands from a SKILL.md file.
-
-Args:
-    file_path: Path to SKILL.md file
-
-Returns:
-    List of extracted commands
-
-**Parameters:**
-- `file_path`: Path
 
 ---
 
@@ -7247,6 +10895,29 @@ Example:
 - `pattern`: str
 - `recursive`: bool
 - `max_depth`: Optional[int]
+
+---
+
+### `find_git_root(start_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:23`
+**Complexity:** 5
+
+**Description:**
+> Find the git repository root by traversing up directories.
+
+Searches for a .git directory starting from start_path and moving up
+through parent directories until found or filesystem root is reached.
+
+Args:
+    start_path: Path to start searching from. Defaults to current working directory.
+
+Returns:
+    Path to git repository root (directory containing .git) if found, None otherwise
+
+**Parameters:**
+- `start_path`: Optional[Path]
 
 ---
 
@@ -7483,11 +11154,11 @@ Returns:
 
 ---
 
-### `find_transcript_by_specific_marker(cwd, marker) -> str | None`
+### `find_transcript_by_specific_marker(cwd, marker, max_retries) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:48`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:47`
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Search transcripts for a specific SESSION_MARKER to identify current session.
@@ -7496,9 +11167,21 @@ This function searches all .jsonl transcript files in the project directory
 for a specific marker string. The transcript containing that exact marker
 is the current session's transcript.
 
+To handle race conditions where the marker may not be flushed to disk yet,
+this function will retry with exponential backoff if the marker is not found
+on the first attempt.
+
+Transcripts are searched in reverse chronological order (most recently modified
+first) to prioritize active sessions over historical ones.
+
+If the exact CWD-based transcript directory doesn't exist, this function will
+search parent directories as a fallback to handle cases where commands are run
+from subdirectories of the project root.
+
 Args:
     cwd: Current working directory (used to find project-specific transcripts)
     marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
+    max_retries: Maximum number of retry attempts (default: 10)
 
 Returns:
     Path to transcript containing the marker, or None if not found
@@ -7506,6 +11189,7 @@ Returns:
 **Parameters:**
 - `cwd`: Path
 - `marker`: str
+- `max_retries`: int
 
 ---
 
@@ -7533,6 +11217,19 @@ Returns:
 **Parameters:**
 - `spec_data`: dict
 - `task_id`: str
+
+---
+
+### `flask_modules() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:133`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample Flask module data.
 
 ---
 
@@ -7973,7 +11670,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:168`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:223`
 **Complexity:** 2
 
 **Description:**
@@ -7994,7 +11691,7 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:202`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:257`
 **Complexity:** 2
 
 **Description:**
@@ -8015,7 +11712,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:163`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:218`
 **Complexity:** 1
 
 **Description:**
@@ -8596,6 +12293,28 @@ Returns:
 
 ---
 
+### `generate_commit_message(task_id, task_title) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:84`
+**Complexity:** 1
+
+**Description:**
+> Generate commit message from task metadata.
+
+Args:
+    task_id: Task identifier (e.g., "task-2-3")
+    task_title: Human-readable task title
+
+Returns:
+    Formatted commit message: "{task-id}: {task-title}"
+
+**Parameters:**
+- `task_id`: str
+- `task_title`: str
+
+---
+
 ### `generate_documentation(skill_name, sections) -> str`
 
 **Language:** python
@@ -8727,6 +12446,33 @@ Returns:
 
 ---
 
+### `generate_pr_body(spec_data) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:20`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Generate PR body template from spec metadata.
+
+Creates a structured PR description including:
+- Spec title and description
+- Completed tasks list
+- Phase completion summary
+- Commit history
+- Verification results
+
+Args:
+    spec_data: JSON spec file data
+
+Returns:
+    Formatted PR body as markdown string
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `generate_recommendations(entity_name, entity_type, blast_radius, test_coverage, risk_assessment) -> List[str]`
 
 **Language:** python
@@ -8830,7 +12576,7 @@ Returns:
 ### `generate_session_marker() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:34`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:33`
 **Complexity:** 1
 
 **Description:**
@@ -9109,6 +12855,31 @@ Returns:
 
 ---
 
+### `get_config_path(project_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:39`
+**Complexity:** 6
+
+**Description:**
+> Get the path to the git_config.json file.
+
+Checks multiple locations in order of precedence:
+1. Project-local: {project_path}/.claude/git_config.json
+2. Global: ~/.claude/git_config.json
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root or use cwd.
+
+Returns:
+    Path to git_config.json if found, None otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `get_config_path() -> Path`
 
 **Language:** python
@@ -9298,6 +13069,31 @@ Returns:
 
 ---
 
+### `get_git_setting(key, project_path, default) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:202`
+**Complexity:** 2
+
+**Description:**
+> Get a specific git configuration setting with validation.
+
+Args:
+    key: Configuration key to retrieve
+    project_path: Path to project root (optional)
+    default: Default value to return if key not found (optional).
+            If not provided, uses DEFAULT_GIT_CONFIG default.
+
+Returns:
+    Configuration value for the specified key
+
+**Parameters:**
+- `key`: str
+- `project_path`: Optional[Path]
+- `default`: Optional[Any]
+
+---
+
 ### `get_impact_analysis(module_path, docs_path) -> Dict[str, any]`
 
 **Language:** python
@@ -9444,7 +13240,7 @@ Returns:
 ### `get_next_task(spec_data) -> Optional[Tuple[str, Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:109`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:114`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -9559,7 +13355,7 @@ Returns:
 ### `get_progress_summary(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:151`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:162`
 **Complexity:** 8
 
 **Description:**
@@ -9737,6 +13533,33 @@ Example:
 
 ---
 
+### `get_staged_files(repo_root) -> List[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:582`
+**Complexity:** 6
+
+**Description:**
+> Get list of files currently staged for commit.
+
+Runs 'git diff --cached --name-only' to get files in the staging area.
+
+Args:
+    repo_root: Path to git repository root
+
+Returns:
+    List of file paths (relative to repo root) that are currently staged.
+    Returns empty list if no files are staged or if an error occurs.
+
+Example:
+    >>> get_staged_files(Path('/repo'))
+    ['src/main.py', 'tests/test_main.py']
+
+**Parameters:**
+- `repo_root`: Path
+
+---
+
 ### `get_stance_instruction(stance) -> str`
 
 **Language:** python
@@ -9888,7 +13711,7 @@ Example:
 ### `get_task_counts_by_status(spec_data) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:252`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:263`
 **Complexity:** 5
 
 **Description:**
@@ -9908,7 +13731,7 @@ Returns:
 ### `get_task_info(spec_data, task_id) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:165`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:170`
 **Complexity:** 1
 
 **Description:**
@@ -10078,17 +13901,17 @@ Returns:
 ### `get_transcript_path(args) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:122`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:177`
 **Complexity:** 8
 
 **Description:**
 > Get transcript path from multiple sources (priority order).
 
 Priority:
-1. Explicit CLI argument (--transcript-path)
-2. Environment variable (CLAUDE_TRANSCRIPT_PATH)
-3. stdin JSON (hook mode)
-4. Session marker discovery (if --session-marker provided)
+1. Session marker discovery (if --session-marker provided)
+2. Explicit CLI argument (--transcript-path)
+3. Environment variable (CLAUDE_TRANSCRIPT_PATH)
+4. stdin JSON (hook mode)
 
 Args:
     args: Parsed CLI arguments
@@ -10104,7 +13927,7 @@ Returns:
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:93`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:148`
 **Complexity:** 4
 
 **Description:**
@@ -10120,26 +13943,6 @@ Expected JSON format:
 
 Returns:
     Transcript path from stdin, or None if stdin is a TTY or parsing fails
-
----
-
-### `get_unique_commands(commands_by_file) -> List[str]`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:87`
-**Complexity:** 3
-
-**Description:**
-> Get sorted list of unique command patterns.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-Returns:
-    Sorted list of unique command strings
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
 
 ---
 
@@ -10168,6 +13971,39 @@ Example:
 **Parameters:**
 - `graph`: Dict[str, List[str]]
 - `node`: str
+
+---
+
+### `has_sdd_command() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:19`
+**Complexity:** 1
+
+**Description:**
+> Check if sdd command is available on PATH.
+
+---
+
+### `has_uncommitted_changes(repo_root) -> Tuple[bool, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:50`
+**Complexity:** 3
+
+**Description:**
+> Check if there are uncommitted changes in the git repository.
+
+Args:
+    repo_root: Path to repository root directory
+
+Returns:
+    Tuple of (has_changes: bool, status_output: str)
+    - has_changes: True if there are uncommitted changes, False otherwise
+    - status_output: Output from git status --porcelain
+
+**Parameters:**
+- `repo_root`: Path
 
 ---
 
@@ -10376,6 +14212,22 @@ Returns:
 
 ---
 
+### `invalid_state_structure(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:747`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with nodes missing required fields.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
 ### `is_clear_command(entry) -> bool`
 
 **Language:** python
@@ -10399,10 +14251,32 @@ Returns:
 
 ---
 
+### `is_git_enabled(project_path) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:187`
+**Complexity:** 1
+
+**Description:**
+> Check if git integration is enabled.
+
+Quick convenience function to check the 'enabled' setting.
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    True if git integration is enabled, False otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `is_in_current_phase(spec_data, task_id, phase_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:80`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:85`
 **Complexity:** 5
 
 **Description:**
@@ -10483,7 +14357,7 @@ Returns:
 ### `is_unblocked(spec_data, task_id, task_data) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:25`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:30`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10536,7 +14410,7 @@ Returns:
 ### `list_phases(spec_data) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:215`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:226`
 **Complexity:** 4
 
 **Description:**
@@ -10677,6 +14551,32 @@ Returns:
 
 ---
 
+### `load_git_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:136`
+**Complexity:** 6
+
+**Description:**
+> Load git configuration from file with fallback to defaults.
+
+Attempts to load configuration from:
+1. Project-local config ({project_path}/.claude/git_config.json)
+2. Global config (~/.claude/git_config.json)
+3. Built-in defaults (DEFAULT_GIT_CONFIG)
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root.
+
+Returns:
+    Dict with complete git configuration (validated and merged with defaults)
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `load_json_spec(spec_id, specs_dir) -> Optional[Dict]`
 
 **Language:** python
@@ -10754,29 +14654,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:194`
-**Complexity:** 8
-
-**Description:**
-> Main entry point.
-
----
-
-### `main() -> None`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:451`
-**Complexity:** 2
-
-**Description:**
-> Main entry point.
-
----
-
-### `main() -> None`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:124`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:133`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@track_metrics('sdd')`
@@ -10789,7 +14667,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:353`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:440`
 **Complexity:** 5
 
 **Description:**
@@ -10819,7 +14697,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:158`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:172`
 **Complexity:** 3
 
 ---
@@ -10897,10 +14775,74 @@ Returns:
 
 ---
 
+### `minimal_specs_dir(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:343`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a minimal specs directory structure for testing.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `mock_printer(mocker) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:995`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Mock PrettyPrinter for testing output.
+
+**Parameters:**
+- `mocker`: None
+
+---
+
+### `mock_subprocess_run(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:214`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Mock subprocess.run for AI tool testing.
+
+**Parameters:**
+- `monkeypatch`: None
+
+---
+
+### `mock_subprocess_run_failure(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:230`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Mock subprocess.run returning failure.
+
+**Parameters:**
+- `monkeypatch`: None
+
+---
+
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:22`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:29`
 **Complexity:** 8
 
 **Description:**
@@ -10997,6 +14939,56 @@ Returns:
 
 ---
 
+### `parse_git_status(repo_root) -> List[Dict[str, str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:123`
+**Complexity:** 10
+
+**Description:**
+> Parse git status output into structured list of file changes.
+
+Runs 'git status --porcelain' and parses the output into a list of
+dictionaries, where each dictionary represents a file with its status.
+
+Git porcelain format: "XY path"
+- X = index status (left column)
+- Y = worktree status (right column)
+
+Common status codes:
+- 'M ' = staged modification
+- ' M' = unstaged modification
+- 'MM' = staged AND unstaged modification
+- 'A ' = added (new file, staged)
+- 'D ' = deleted (staged)
+- ' D' = deleted (unstaged)
+- 'R ' = renamed (staged)
+- '??' = untracked file
+- 'AM' = added (staged) with unstaged modifications
+
+Args:
+    repo_root: Path to git repository root
+
+Returns:
+    List of dictionaries with keys:
+    - 'status': Two-character status code (e.g., 'M ', '??', 'MM')
+    - 'path': File path relative to repo root
+
+    Returns empty list if there are no changes or if an error occurs.
+
+Example:
+    >>> parse_git_status(Path('/repo'))
+    [
+        {'status': 'M ', 'path': 'src/main.py'},
+        {'status': '??', 'path': 'test.txt'},
+        {'status': 'MM', 'path': 'lib/utils.py'}
+    ]
+
+**Parameters:**
+- `repo_root`: Path
+
+---
+
 ### `parse_response(tool_output, tool_name) -> Dict[str, Any]`
 
 **Language:** python
@@ -11070,11 +15062,24 @@ Returns:
 
 ---
 
+### `plain_modules() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:149`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample plain Python library (no framework).
+
+---
+
 ### `prepare_task(spec_id, specs_dir, task_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:245`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:250`
+⚠️ **Complexity:** 24 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
@@ -11111,23 +15116,6 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `task_id`: Optional[str]
-
----
-
-### `print_by_file(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:103`
-**Complexity:** 3
-
-**Description:**
-> Print commands grouped by file.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
 
 ---
 
@@ -11175,40 +15163,6 @@ Returns:
 
 ---
 
-### `print_grouped(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:139`
-**Complexity:** 5
-
-**Description:**
-> Print commands grouped by command pattern.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
-### `print_json_output(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:163`
-**Complexity:** 2
-
-**Description:**
-> Print commands in JSON format.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `print_module_summary(summary, verbose) -> None`
 
 **Language:** python
@@ -11218,27 +15172,6 @@ Args:
 **Parameters:**
 - `summary`: Dict[str, Any]
 - `verbose`: bool
-
----
-
-### `print_report(results, verbose, json_output) -> None`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:357`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Print validation report.
-
-Args:
-    results: Validation results grouped by file
-    verbose: Whether to print verbose output
-    json_output: Whether to output JSON
-
-**Parameters:**
-- `results`: Dict[Path, List[ValidationResult]]
-- `verbose`: bool
-- `json_output`: bool
 
 ---
 
@@ -11300,23 +15233,6 @@ Args:
 
 ---
 
-### `print_unique(commands_by_file) -> None`
-
-**Language:** python
-**Defined in:** `scripts/extract_sdd_commands.py:124`
-**Complexity:** 2
-
-**Description:**
-> Print unique commands.
-
-Args:
-    commands_by_file: Commands grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-
----
-
 ### `prompt_for_generation(skill_name, context, timeout_seconds) -> bool`
 
 **Language:** python
@@ -11365,6 +15281,30 @@ Examples:
 - `skill_name`: Optional[str]
 - `context`: Optional[str]
 - `timeout_seconds`: Optional[int]
+
+---
+
+### `push_branch(repo_root, branch_name) -> Tuple[bool, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:119`
+**Complexity:** 3
+
+**Description:**
+> Push branch to remote repository.
+
+Args:
+    repo_root: Path to repository root directory
+    branch_name: Name of branch to push
+
+Returns:
+    Tuple of (success: bool, error_message: str)
+    - success: True if push succeeded, False otherwise
+    - error_message: Error message if failed, empty string if successful
+
+**Parameters:**
+- `repo_root`: Path
+- `branch_name`: str
 
 ---
 
@@ -11425,7 +15365,7 @@ Returns:
 ### `recalculate_progress(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:9`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:10`
 **Complexity:** 5
 
 **Description:**
@@ -11565,7 +15505,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:314`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:401`
 **Complexity:** 1
 
 **Description:**
@@ -11584,7 +15524,7 @@ Args:
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:987`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:992`
 **Complexity:** 1
 
 **Description:**
@@ -11674,7 +15614,7 @@ Args:
 ### `register_render(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_render/cli.py:190`
+**Defined in:** `src/claude_skills/claude_skills/sdd_render/cli.py:204`
 **Complexity:** 1
 
 **Description:**
@@ -11705,7 +15645,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:296`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:383`
 **Complexity:** 1
 
 **Description:**
@@ -11724,7 +15664,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:176`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:190`
 **Complexity:** 1
 
 **Description:**
@@ -11754,7 +15694,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:896`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:970`
 **Complexity:** 1
 
 **Description:**
@@ -11809,7 +15749,7 @@ Note:
 ### `reorder_args_for_subcommand(cmd_line) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:16`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:25`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -11856,6 +15796,92 @@ Returns:
 - `spec_id`: str
 - `spec_title`: str
 - `parallel`: bool
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py:19`
+**Complexity:** 2
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py:20`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_next_doc_integration.py:18`
+**Complexity:** 2
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_plan_doc_integration.py:20`
+**Complexity:** 2
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:20`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py:24`
+**Complexity:** 2
+
+**Description:**
+> Helper to run sdd CLI with unified command (sdd-validate commands).
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_status_report.py:19`
+**Complexity:** 7
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
 
 ---
 
@@ -11915,6 +15941,17 @@ Returns:
 
 ---
 
+### `run_doc_cli() -> subprocess.CompletedProcess[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py:14`
+**Complexity:** 1
+
+**Description:**
+> Run doc CLI via sdd.
+
+---
+
 ### `run_pytest(preset, path, pattern, extra_args, printer) -> int`
 
 **Language:** python
@@ -11943,6 +15980,41 @@ Returns:
 
 ---
 
+### `run_sdd_command() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:24`
+**Complexity:** 2
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+This ensures tests work in different environments.
+
+---
+
+### `run_skills_dev_cli() -> subprocess.CompletedProcess[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py:15`
+**Complexity:** 1
+
+**Description:**
+> Run skills-dev CLI via sdd.
+
+---
+
+### `run_test_cli() -> subprocess.CompletedProcess[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_test_cli.py:15`
+**Complexity:** 1
+
+**Description:**
+> Run test CLI via sdd.
+
+---
+
 ### `run_tool_parallel(tool, prompt, failure_type) -> ConsultationResponse`
 
 **Language:** python
@@ -11964,6 +16036,342 @@ Returns:
 - `tool`: str
 - `prompt`: str
 - `failure_type`: Optional[str]
+
+---
+
+### `sample_framework_info() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:188`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample framework detection result.
+
+---
+
+### `sample_frontmatter() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:956`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample frontmatter data.
+
+---
+
+### `sample_json_spec_circular_deps(specs_structure, sample_spec_simple) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:499`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with circular dependencies.
+
+**Parameters:**
+- `specs_structure`: None
+- `sample_spec_simple`: None
+
+---
+
+### `sample_json_spec_completed(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:618`
+**Complexity:** 5
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a fully completed JSON spec.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `sample_json_spec_complex(specs_structure, sample_spec_complex) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:455`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a complex JSON spec for the complex spec.
+
+**Parameters:**
+- `specs_structure`: None
+- `sample_spec_complex`: None
+
+---
+
+### `sample_json_spec_simple(specs_structure, sample_spec_simple) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:435`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a simple JSON spec for testing basic operations.
+
+**Parameters:**
+- `specs_structure`: None
+- `sample_spec_simple`: None
+
+---
+
+### `sample_json_spec_with_blockers(specs_structure, sample_spec_simple) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:534`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with some blocked tasks.
+
+**Parameters:**
+- `specs_structure`: None
+- `sample_spec_simple`: None
+
+---
+
+### `sample_json_spec_with_deps(specs_structure, sample_spec_simple) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:471`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with task dependencies.
+
+**Parameters:**
+- `specs_structure`: None
+- `sample_spec_simple`: None
+
+---
+
+### `sample_json_spec_with_time(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:578`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with time tracking data.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `sample_layers() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:199`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample layer detection result.
+
+---
+
+### `sample_modules() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:11`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample module data for testing framework and layer detection.
+
+---
+
+### `sample_node_project(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:889`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a sample Node.js project structure.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `sample_python_project(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:925`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a sample Python project structure.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `sample_spec_complex(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:355`
+**Complexity:** 3
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a complex spec file with 3 phases, 3 tasks each.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `sample_spec_data() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_render/conftest.py:9`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample spec data for testing.
+
+---
+
+### `sample_spec_file(minimal_specs_dir) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py:355`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a minimal sample spec file for testing.
+
+**Parameters:**
+- `minimal_specs_dir`: None
+
+---
+
+### `sample_spec_invalid(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:415`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create an invalid spec file (missing frontmatter).
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `sample_spec_invalid_frontmatter(create_temp_spec_file) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:1042`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a spec missing required top-level fields.
+
+**Parameters:**
+- `create_temp_spec_file`: None
+
+---
+
+### `sample_spec_invalid_phases(create_temp_spec_file) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:1054`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a spec with invalid phase structure.
+
+**Parameters:**
+- `create_temp_spec_file`: None
+
+---
+
+### `sample_spec_simple(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:342`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a simple spec file with 2 phases, 2 tasks each.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `sample_statistics() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:174`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample code statistics.
+
+---
+
+### `sample_task_data() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:969`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Sample task data.
 
 ---
 
@@ -12055,6 +16463,28 @@ Example:
 
 ---
 
+### `should_offer_commit(spec_data, event_type) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:20`
+**Complexity:** 3
+
+**Description:**
+> Check if commit should be offered based on commit cadence preference.
+
+Args:
+    spec_data: JSON spec file data
+    event_type: Type of completion event - "task" or "phase"
+
+Returns:
+    True if commit should be offered for this event type, False otherwise
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `event_type`: str
+
+---
+
 ### `should_prompt_completion(spec_data, phase_id) -> Dict`
 
 **Language:** python
@@ -12110,6 +16540,97 @@ Example:
 
 ---
 
+### `show_commit_preview(repo_root, printer) -> Dict[str, List[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:225`
+⚠️ **Complexity:** 37 (High)
+
+**Description:**
+> Display uncommitted files grouped by status with staging instructions.
+
+Uses parse_git_status() to get file changes and groups them by type
+(modified, added, deleted, untracked) with emoji markers for better visibility.
+
+Args:
+    repo_root: Path to git repository root
+    printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+Returns:
+    Dictionary with status categories as keys and file lists as values:
+    {
+        'staged_modified': [...],
+        'unstaged_modified': [...],
+        'added': [...],
+        'deleted': [...],
+        'untracked': [...]
+    }
+
+Example:
+    >>> show_commit_preview(Path('/repo'))
+    📝 Modified (2):
+      • src/main.py
+      • lib/utils.py
+
+    ✨ Added (1):
+      • tests/new_test.py
+
+    To stage all changes: git add .
+    To stage specific files: git add <file>
+
+**Parameters:**
+- `repo_root`: Path
+- `printer`: None
+
+---
+
+### `show_commit_preview_and_wait(repo_root, spec_id, task_id, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Complexity:** 3
+
+**Description:**
+> Show uncommitted file preview and exit for agent-controlled staging (Step 1).
+
+This is step 1 of the two-step commit workflow. It displays uncommitted files
+grouped by status, then exits to allow the agent to stage files using git add.
+After staging, the agent should call create_commit_from_staging() to complete
+the commit (step 2).
+
+Workflow:
+1. Agent calls this function to see what files have changed
+2. Agent reviews changes and decides which files to stage
+3. Agent uses git add commands to stage selected files
+4. Agent calls create_commit_from_staging() to create the commit
+
+Args:
+    repo_root: Path to git repository root
+    spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+    task_id: Task ID (e.g., 'task-2-1')
+    printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+Returns:
+    None (displays output and exits)
+
+Example:
+    >>> show_commit_preview_and_wait(Path('/repo'), 'user-auth-001', 'task-2-1')
+    Uncommitted Changes
+    📝 Modified (2):
+      • src/main.py
+      • lib/utils.py
+
+    To stage files: git add <file>
+    After staging, create commit with: sdd create-task-commit user-auth-001 task-2-1
+
+**Parameters:**
+- `repo_root`: Path
+- `spec_id`: str
+- `task_id`: str
+- `printer`: None
+
+---
+
 ### `spec_stats(spec_file, json_spec_file) -> Dict`
 
 **Language:** python
@@ -12122,6 +16643,158 @@ Example:
 **Parameters:**
 - `spec_file`: Path
 - `json_spec_file`: Optional[Path]
+
+---
+
+### `spec_with_all_categories() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:27`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a test spec with all five task_category types.
+
+---
+
+### `spec_with_issues() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:19`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a test spec with various fixable issues.
+
+---
+
+### `spec_with_mixed_categories() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:184`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a test spec with mix of categorized and uncategorized tasks.
+
+---
+
+### `spec_with_placeholder_paths() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:257`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create spec with placeholder file_path values that need migration.
+
+---
+
+### `spec_without_categories() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:126`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a test spec in old format (no task_category field).
+
+---
+
+### `specs_structure(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:311`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a complete specs directory structure.
+
+Structure:
+    tmp_path/
+    └── specs/
+        ├── active/      (JSON spec files)
+        ├── completed/   (completed specs)
+        └── archived/    (archived specs)
+
+Returns:
+    Path to the specs directory (containing active/completed/archived subdirectories)
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `stage_and_commit(repo_root, commit_message) -> Tuple[bool, Optional[str], str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:160`
+**Complexity:** 6
+
+**Description:**
+> Stage all changes and create a commit.
+
+This function maintains backward compatibility by automatically staging all
+changes (git add --all) and then creating a commit. It now uses the new
+create_commit_from_staging() workflow internally.
+
+Args:
+    repo_root: Path to repository root directory
+    commit_message: Commit message to use
+
+Returns:
+    Tuple of (success: bool, commit_sha: Optional[str], error_message: str)
+    - success: True if commit succeeded, False otherwise
+    - commit_sha: SHA of created commit if successful, None otherwise
+    - error_message: Error message if failed, empty string if successful
+
+**Parameters:**
+- `repo_root`: Path
+- `commit_message`: str
+
+---
+
+### `state_with_circular_deps_plan(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:797`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with circular dependencies.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
+### `state_with_orphaned_nodes(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:675`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a JSON spec with orphaned nodes (missing parents/invalid dependencies).
+
+**Parameters:**
+- `specs_structure`: None
 
 ---
 
@@ -12267,6 +16940,1510 @@ Returns:
 - `spec_id`: str
 - `spec_title`: str
 - `working_dir`: str
+
+---
+
+### `temp_dir(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:304`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Provide a temporary directory that's cleaned up after test.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `temp_project_dir(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:246`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a temporary project directory with README.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_apply_fix_actions_dry_run() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:374`
+**Complexity:** 1
+
+**Description:**
+> Test applying actions in dry-run mode.
+
+---
+
+### `test_apply_fix_actions_handles_errors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:450`
+**Complexity:** 1
+
+**Description:**
+> Test that apply_fix_actions handles errors gracefully.
+
+---
+
+### `test_apply_fix_actions_real_apply(mock_backup, mock_save, mock_validate, mock_recalc) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:401`
+**Complexity:** 1
+
+**Decorators:** `@patch('claude_skills.sdd_validate.fix.recalculate_progress')`, `@patch('claude_skills.sdd_validate.fix.validate_spec_hierarchy')`, `@patch('claude_skills.sdd_validate.fix.save_json_spec')`, `@patch('claude_skills.sdd_validate.fix.backup_json_spec')`
+
+**Description:**
+> Test actually applying fix actions.
+
+**Parameters:**
+- `mock_backup`: None
+- `mock_save`: None
+- `mock_validate`: None
+- `mock_recalc`: None
+
+---
+
+### `test_apply_fix_actions_with_diff(spec_with_issues, tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:88`
+**Complexity:** 1
+
+**Description:**
+> Test apply_fix_actions with diff capture.
+
+**Parameters:**
+- `spec_with_issues`: None
+- `tmp_path`: None
+
+---
+
+### `test_apply_pattern_filter_custom_key_exact_match() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:827`
+**Complexity:** 1
+
+**Description:**
+> Test custom key function with exact matching.
+
+---
+
+### `test_apply_pattern_filter_custom_key_function() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:805`
+**Complexity:** 1
+
+**Description:**
+> Test custom key function for nested fields.
+
+---
+
+### `test_apply_pattern_filter_empty_items() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:798`
+**Complexity:** 1
+
+**Description:**
+> Test with empty items list.
+
+---
+
+### `test_apply_pattern_filter_empty_string_values() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:861`
+**Complexity:** 1
+
+**Description:**
+> Test that empty string values are skipped.
+
+---
+
+### `test_apply_pattern_filter_exact_match() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:716`
+**Complexity:** 1
+
+**Description:**
+> Test exact name matching.
+
+---
+
+### `test_apply_pattern_filter_exact_match_no_results() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:730`
+**Complexity:** 1
+
+**Description:**
+> Test exact match returns empty list when no match found.
+
+---
+
+### `test_apply_pattern_filter_invalid_regex() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:788`
+**Complexity:** 1
+
+**Description:**
+> Test that invalid regex raises re.error.
+
+---
+
+### `test_apply_pattern_filter_key_func_exception() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:889`
+**Complexity:** 1
+
+**Description:**
+> Test that exceptions in key_func are handled gracefully.
+
+---
+
+### `test_apply_pattern_filter_missing_key() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:846`
+**Complexity:** 1
+
+**Description:**
+> Test graceful handling when key is missing from some items.
+
+---
+
+### `test_apply_pattern_filter_multiple_matches() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:923`
+**Complexity:** 1
+
+**Description:**
+> Test pattern that matches multiple items.
+
+---
+
+### `test_apply_pattern_filter_preserves_item_structure() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:910`
+**Complexity:** 1
+
+**Description:**
+> Test that filtered items maintain their full structure.
+
+---
+
+### `test_apply_pattern_filter_regex_case_insensitive() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:756`
+**Complexity:** 1
+
+**Description:**
+> Test that regex pattern matching is case-insensitive.
+
+---
+
+### `test_apply_pattern_filter_regex_complex_pattern() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:770`
+**Complexity:** 1
+
+**Description:**
+> Test regex with more complex pattern.
+
+---
+
+### `test_apply_pattern_filter_regex_empty_string() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:875`
+**Complexity:** 1
+
+**Description:**
+> Test regex pattern with empty string values.
+
+---
+
+### `test_apply_pattern_filter_regex_pattern() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:739`
+**Complexity:** 1
+
+**Description:**
+> Test regex pattern matching (case-insensitive).
+
+---
+
+### `test_backward_compatibility_no_breaking_changes(spec_without_categories) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:508`
+**Complexity:** 2
+
+**Description:**
+> Test that existing workflows work unchanged with old-format specs.
+
+**Parameters:**
+- `spec_without_categories`: None
+
+---
+
+### `test_build_call_graph_both_directions(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:440`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() with direction='both'.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_callees_only(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:360`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() with direction='callees'.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_callers_only(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:400`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() with direction='callers'.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_depth_values(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:665`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() assigns correct depth values.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_function_not_found(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:561`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() with non-existent function.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_handles_cycles(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:521`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() handles circular dependencies.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_include_metadata(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:599`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() includes metadata when requested.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_invalid_direction(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:702`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() raises error for invalid direction.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_isolated_function(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:577`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() with function that has no callers or callees.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_max_depth(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:474`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() respects max_depth.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_call_graph_without_metadata(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:634`
+**Complexity:** 1
+
+**Description:**
+> Test build_call_graph() excludes metadata when not requested.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_build_counts_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:65`
+**Complexity:** 1
+
+**Description:**
+> Test building counts fix action.
+
+---
+
+### `test_build_date_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:282`
+**Complexity:** 1
+
+**Description:**
+> Test building date normalization action.
+
+---
+
+### `test_build_hierarchy_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:246`
+**Complexity:** 1
+
+**Description:**
+> Test building hierarchy fix action.
+
+---
+
+### `test_build_metadata_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:91`
+**Complexity:** 1
+
+**Description:**
+> Test building metadata fix action.
+
+---
+
+### `test_build_metadata_action_verify() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:123`
+**Complexity:** 1
+
+**Description:**
+> Test building metadata fix action for verification nodes.
+
+---
+
+### `test_build_placeholder_file_path_action_all_placeholders() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:667`
+**Complexity:** 2
+
+**Description:**
+> Test detection of all placeholder patterns.
+
+---
+
+### `test_build_placeholder_file_path_action_case_insensitive() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:620`
+**Complexity:** 2
+
+**Description:**
+> Test that placeholder detection is case-insensitive.
+
+---
+
+### `test_build_placeholder_file_path_action_category_mapping() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:986`
+**Complexity:** 2
+
+**Description:**
+> Test that category-name placeholders map directly to their category.
+
+---
+
+### `test_build_placeholder_file_path_action_category_name() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:522`
+**Complexity:** 1
+
+**Description:**
+> Test detecting file_path with category name as placeholder.
+
+---
+
+### `test_build_placeholder_file_path_action_generic_placeholder_uses_title() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1041`
+**Complexity:** 1
+
+**Description:**
+> Test that generic placeholders (n/a, none, null) use title-based inference.
+
+---
+
+### `test_build_placeholder_file_path_action_no_file_path() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:743`
+**Complexity:** 1
+
+**Description:**
+> Test that nodes without file_path are skipped.
+
+---
+
+### `test_build_placeholder_file_path_action_non_placeholder() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:707`
+**Complexity:** 2
+
+**Description:**
+> Test that real file paths are not detected as placeholders.
+
+---
+
+### `test_build_placeholder_file_path_action_non_task_node() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:815`
+**Complexity:** 2
+
+**Description:**
+> Test that placeholder detection only applies to task/subtask nodes.
+
+---
+
+### `test_build_placeholder_file_path_action_preserves_existing_category() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:845`
+**Complexity:** 1
+
+**Description:**
+> Test that existing task_category is not overwritten.
+
+---
+
+### `test_build_placeholder_file_path_action_preview_shows_category() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1087`
+**Complexity:** 2
+
+**Description:**
+> Test that the preview message shows the inferred category.
+
+---
+
+### `test_build_placeholder_file_path_action_subtask() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:770`
+**Complexity:** 1
+
+**Description:**
+> Test that placeholder detection works for subtasks.
+
+---
+
+### `test_build_placeholder_file_path_action_tbd() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:571`
+**Complexity:** 1
+
+**Description:**
+> Test detecting file_path with TBD placeholder.
+
+TBD (To Be Determined) maps to 'decision' category because it indicates
+a decision needs to be made about what to implement.
+
+---
+
+### `test_build_placeholder_file_path_action_tbd_maps_to_decision() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:941`
+**Complexity:** 1
+
+**Description:**
+> Test that 'tbd' placeholder maps to 'decision' category.
+
+---
+
+### `test_build_placeholder_file_path_action_whitespace() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:897`
+**Complexity:** 1
+
+**Description:**
+> Test that placeholders with whitespace are detected.
+
+---
+
+### `test_build_status_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:309`
+**Complexity:** 1
+
+**Description:**
+> Test building status normalization action.
+
+---
+
+### `test_build_task_category_action() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:154`
+**Complexity:** 1
+
+**Description:**
+> Test building task_category fix action for implementation task.
+
+---
+
+### `test_build_task_category_action_investigation() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:201`
+**Complexity:** 1
+
+**Description:**
+> Test building task_category fix action for investigation task.
+
+---
+
+### `test_calculate_statistics_basic() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:12`
+**Complexity:** 1
+
+**Description:**
+> Test basic statistics calculation.
+
+---
+
+### `test_calculate_statistics_empty_hierarchy() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:104`
+**Complexity:** 1
+
+**Description:**
+> Test statistics with empty hierarchy.
+
+---
+
+### `test_calculate_statistics_status_counts() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:122`
+**Complexity:** 1
+
+**Description:**
+> Test status counting.
+
+---
+
+### `test_calculate_statistics_with_verifications() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:66`
+**Complexity:** 1
+
+**Description:**
+> Test statistics with verification nodes.
+
+---
+
+### `test_case_sensitivity_of_categories() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:613`
+**Complexity:** 1
+
+**Description:**
+> Test that task_category values are case-sensitive.
+
+---
+
+### `test_collect_fix_actions_deduplicates() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:483`
+**Complexity:** 1
+
+**Description:**
+> Test that collect_fix_actions doesn't create duplicate actions.
+
+---
+
+### `test_collect_fix_actions_empty() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:26`
+**Complexity:** 1
+
+**Description:**
+> Test collecting actions from a clean validation result.
+
+---
+
+### `test_collect_fix_actions_finds_multiple_issues(spec_with_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:72`
+**Complexity:** 1
+
+**Description:**
+> Test that collect_fix_actions finds all auto-fixable issues.
+
+**Parameters:**
+- `spec_with_issues`: None
+
+---
+
+### `test_collect_fix_actions_with_enhanced_errors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:40`
+**Complexity:** 1
+
+**Description:**
+> Test collecting actions from enhanced errors.
+
+---
+
+### `test_context_for_area_includes_docstrings_and_stats(doc_query_samples) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:52`
+**Complexity:** 1
+
+**Parameters:**
+- `doc_query_samples`: None
+
+---
+
+### `test_describe_module_returns_summary(doc_query_samples) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:40`
+**Complexity:** 1
+
+**Parameters:**
+- `doc_query_samples`: None
+
+---
+
+### `test_diff_computation() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:169`
+**Complexity:** 1
+
+**Description:**
+> Test diff computation with before/after states.
+
+---
+
+### `test_doc_help_lists_key_subcommands() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py:22`
+**Complexity:** 2
+
+---
+
+### `test_doc_requires_subcommand() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py:37`
+**Complexity:** 2
+
+---
+
+### `test_empty_task_category_field() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:569`
+**Complexity:** 1
+
+**Description:**
+> Test handling of empty/null task_category (should use default inference).
+
+---
+
+### `test_format_validation_summary_basic() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:71`
+**Complexity:** 1
+
+**Description:**
+> Test basic summary formatting.
+
+---
+
+### `test_format_validation_summary_verbose() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:90`
+**Complexity:** 1
+
+**Description:**
+> Test verbose summary formatting.
+
+---
+
+### `test_full_workflow_with_categories(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:475`
+**Complexity:** 1
+
+**Description:**
+> Test complete workflow: generate -> validate -> use spec with task_category.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_generate_report_empty_dependency_analysis() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:348`
+**Complexity:** 1
+
+**Description:**
+> Test report with empty dependency analysis.
+
+---
+
+### `test_generate_report_invalid_format() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:336`
+**Complexity:** 1
+
+**Description:**
+> Test that invalid format raises ValueError.
+
+---
+
+### `test_generate_report_json_clean() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:63`
+**Complexity:** 1
+
+**Description:**
+> Test generating JSON report for clean validation.
+
+---
+
+### `test_generate_report_json_with_errors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:82`
+**Complexity:** 1
+
+**Description:**
+> Test generating JSON report with errors.
+
+---
+
+### `test_generate_report_legacy_dependency_keys() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:286`
+**Complexity:** 1
+
+**Description:**
+> Test report generation with legacy dependency key names.
+
+---
+
+### `test_generate_report_markdown_clean() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:10`
+**Complexity:** 1
+
+**Description:**
+> Test generating markdown report for clean validation.
+
+---
+
+### `test_generate_report_markdown_with_errors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:27`
+**Complexity:** 1
+
+**Description:**
+> Test generating markdown report with errors.
+
+---
+
+### `test_generate_report_markdown_with_warnings() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:47`
+**Complexity:** 1
+
+**Description:**
+> Test generating markdown report with warnings.
+
+---
+
+### `test_generate_report_mixed_dependency_keys() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:313`
+**Complexity:** 1
+
+**Description:**
+> Test report generation with mixed new and legacy keys.
+
+---
+
+### `test_generate_report_with_dependencies_all_types() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:236`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with all dependency types.
+
+---
+
+### `test_generate_report_with_dependencies_bottlenecks() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:213`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with bottlenecks (CLI format).
+
+---
+
+### `test_generate_report_with_dependencies_cycles() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:144`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with dependency cycles (CLI format).
+
+---
+
+### `test_generate_report_with_dependencies_deadlocks() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:190`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with deadlocks (CLI format).
+
+---
+
+### `test_generate_report_with_dependencies_json() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:260`
+**Complexity:** 1
+
+**Description:**
+> Test generating JSON report with dependencies.
+
+---
+
+### `test_generate_report_with_dependencies_orphaned() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:167`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with orphaned dependencies (CLI format).
+
+---
+
+### `test_generate_report_with_stats() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:100`
+**Complexity:** 1
+
+**Description:**
+> Test generating report with statistics.
+
+---
+
+### `test_generate_report_with_stats_json() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py:123`
+**Complexity:** 1
+
+**Description:**
+> Test generating JSON report with statistics.
+
+---
+
+### `test_get_call_count_function_not_found(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:299`
+**Complexity:** 1
+
+**Description:**
+> Test get_call_count() returns None when function not found.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_call_count_none(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:281`
+**Complexity:** 1
+
+**Description:**
+> Test get_call_count() returns None when not available.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_call_count_with_value(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:263`
+**Complexity:** 1
+
+**Description:**
+> Test get_call_count() returns count when available.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callees_exclude_file(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:225`
+**Complexity:** 1
+
+**Description:**
+> Test get_callees() with include_file=False.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callees_function_not_found(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:251`
+**Complexity:** 1
+
+**Description:**
+> Test get_callees() returns empty list when function not found.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callees_with_v2_schema(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:192`
+**Complexity:** 1
+
+**Description:**
+> Test get_callees() with schema v2.0 cross-reference data.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callers_exclude_file(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:106`
+**Complexity:** 1
+
+**Description:**
+> Test get_callers() with include_file=False.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callers_exclude_line(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:134`
+**Complexity:** 1
+
+**Description:**
+> Test get_callers() with include_line=False.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callers_function_not_found(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:162`
+**Complexity:** 1
+
+**Description:**
+> Test get_callers() returns empty list when function not found.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callers_no_callers(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:174`
+**Complexity:** 1
+
+**Description:**
+> Test get_callers() returns empty list when function has no callers.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_get_callers_with_v2_schema(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:72`
+**Complexity:** 1
+
+**Description:**
+> Test get_callers() with schema v2.0 cross-reference data.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_gradual_migration_path(spec_with_mixed_categories, tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:533`
+**Complexity:** 4
+
+**Description:**
+> Test that specs can be gradually migrated (some tasks categorized, some not).
+
+**Parameters:**
+- `spec_with_mixed_categories`: None
+- `tmp_path`: None
+
+---
+
+### `test_migrate_old_spec_preserves_functionality(spec_without_categories, tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:413`
+**Complexity:** 1
+
+**Description:**
+> Test that old specs can be migrated without breaking functionality.
+
+**Parameters:**
+- `spec_without_categories`: None
+- `tmp_path`: None
+
+---
+
+### `test_migrate_placeholder_file_paths(spec_with_placeholder_paths, tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:439`
+**Complexity:** 2
+
+**Description:**
+> Test that placeholder file_path values can be migrated with task_category.
+
+**Parameters:**
+- `spec_with_placeholder_paths`: None
+- `tmp_path`: None
+
+---
+
+### `test_new_fix_builders_work(spec_with_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:150`
+**Complexity:** 2
+
+**Description:**
+> Test that the new fix builders are functional.
+
+**Parameters:**
+- `spec_with_issues`: None
+
+---
+
+### `test_normalize_status() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:354`
+**Complexity:** 1
+
+**Description:**
+> Test status normalization.
+
+---
+
+### `test_normalize_timestamp() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:343`
+**Complexity:** 1
+
+**Description:**
+> Test timestamp normalization.
+
+---
+
+### `test_normalize_v2_schema_fields(tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:311`
+**Complexity:** 1
+
+**Description:**
+> Test that v2.0 schema fields are properly normalized.
+
+**Parameters:**
+- `tmp_path`: None
+
+---
+
+### `test_normalize_validation_result_clean() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:12`
+**Complexity:** 1
+
+**Description:**
+> Test normalization of a clean validation result.
+
+---
+
+### `test_normalize_validation_result_with_errors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:32`
+**Complexity:** 1
+
+**Description:**
+> Test normalization with errors.
+
+---
+
+### `test_normalize_validation_result_with_warnings() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:52`
+**Complexity:** 1
+
+**Description:**
+> Test normalization with warnings only.
+
+---
+
+### `test_normalized_validation_result_properties() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py:128`
+**Complexity:** 1
+
+**Description:**
+> Test NormalizedValidationResult computed properties.
+
+---
+
+### `test_normalizes_legacy_payload(doc_query_samples) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:25`
+**Complexity:** 1
+
+**Parameters:**
+- `doc_query_samples`: None
+
+---
+
+### `test_normalizes_modern_payload(doc_query_samples) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py:6`
+**Complexity:** 1
+
+**Parameters:**
+- `doc_query_samples`: None
+
+---
+
+### `test_render_statistics_json() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:197`
+**Complexity:** 1
+
+**Description:**
+> Test JSON rendering of statistics.
+
+---
+
+### `test_render_statistics_text() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py:169`
+**Complexity:** 1
+
+**Description:**
+> Test text rendering of statistics.
+
+---
+
+### `test_selective_fix_application(spec_with_issues, tmp_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py:125`
+**Complexity:** 3
+
+**Description:**
+> Test that we can selectively apply only certain fixes.
+
+**Parameters:**
+- `spec_with_issues`: None
+- `tmp_path`: None
+
+---
+
+### `test_skills_dev_help_lists_key_subcommands() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py:23`
+**Complexity:** 2
+
+---
+
+### `test_skills_dev_migrate_shows_guidance() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py:43`
+**Complexity:** 1
+
+---
+
+### `test_skills_dev_requires_subcommand() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py:36`
+**Complexity:** 2
+
+---
+
+### `test_test_help_lists_key_subcommands() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_test_cli.py:23`
+**Complexity:** 2
+
+---
+
+### `test_test_requires_subcommand() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_test_cli.py:36`
+**Complexity:** 2
+
+---
+
+### `test_test_run_list_presets_success() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_test_cli.py:43`
+**Complexity:** 2
+
+---
+
+### `test_validate_mixed_format_spec(spec_with_mixed_categories) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:399`
+**Complexity:** 1
+
+**Description:**
+> Test that validation accepts spec with mix of categorized/uncategorized tasks.
+
+**Parameters:**
+- `spec_with_mixed_categories`: None
+
+---
+
+### `test_validate_spec_with_all_categories(spec_with_all_categories) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:318`
+**Complexity:** 5
+
+**Description:**
+> Test that validation accepts spec with all valid task_category types.
+
+**Parameters:**
+- `spec_with_all_categories`: None
+
+---
+
+### `test_validate_spec_with_invalid_category() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:351`
+**Complexity:** 1
+
+**Description:**
+> Test that validation rejects invalid task_category values.
+
+---
+
+### `test_validate_spec_without_categories(spec_without_categories) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py:341`
+**Complexity:** 1
+
+**Description:**
+> Test that validation accepts old-format spec without task_category (backward compat).
+
+**Parameters:**
+- `spec_without_categories`: None
 
 ---
 
@@ -12430,6 +18607,33 @@ Returns:
 
 ---
 
+### `update_branch_metadata(spec, branch_name, base_branch) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:758`
+**Complexity:** 5
+
+**Description:**
+> Update git branch metadata in spec.
+
+Updates the metadata.git section with branch information. Creates the section
+if it doesn't exist. Preserves existing commits and PR metadata.
+
+Args:
+    spec: Specification dictionary to update
+    branch_name: Name of the feature branch (e.g., 'feat/user-auth-001')
+    base_branch: Name of the base branch (e.g., 'main', 'develop')
+
+Returns:
+    Updated spec dictionary (modified in-place, but also returned for convenience)
+
+**Parameters:**
+- `spec`: Dict[str, Any]
+- `branch_name`: str
+- `base_branch`: str
+
+---
+
 ### `update_metadata(spec_id, key, value, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -12490,8 +18694,8 @@ Returns:
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:60`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:61`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Update a node's status based on its children's progress.
@@ -12512,7 +18716,7 @@ Args:
 ### `update_parent_status(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:115`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:126`
 **Complexity:** 5
 
 **Description:**
@@ -12536,7 +18740,7 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:56`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:70`
 **Complexity:** 7
 
 **Description:**
@@ -12544,6 +18748,34 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
+
+---
+
+### `update_pr_metadata(spec, pr_url, pr_number, status) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:863`
+**Complexity:** 3
+
+**Description:**
+> Update pull request metadata in spec.
+
+Updates or creates the metadata.git.pr section with PR information.
+
+Args:
+    spec: Specification dictionary to update
+    pr_url: Full URL to the pull request
+    pr_number: Pull request number
+    status: PR status ('open', 'closed', 'merged') - defaults to 'open'
+
+Returns:
+    Updated spec dictionary (modified in-place, but also returned for convenience)
+
+**Parameters:**
+- `spec`: Dict[str, Any]
+- `pr_url`: str
+- `pr_number`: int
+- `status`: str
 
 ---
 
@@ -12581,6 +18813,22 @@ Returns:
 
 ---
 
+### `valid_json_spec(specs_structure) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:650`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture`
+
+**Description:**
+> Create a valid JSON spec with verification nodes for testing verification operations.
+
+**Parameters:**
+- `specs_structure`: None
+
+---
+
 ### `validate_and_normalize_paths(paths, base_directory) -> Dict`
 
 **Language:** python
@@ -12611,28 +18859,6 @@ Example:
 **Parameters:**
 - `paths`: List[str]
 - `base_directory`: Optional[Path]
-
----
-
-### `validate_commands(commands_by_file, registry) -> Dict[Path, List[ValidationResult]]`
-
-**Language:** python
-**Defined in:** `scripts/validate_sdd_commands.py:312`
-**Complexity:** 4
-
-**Description:**
-> Validate all commands against the registry.
-
-Args:
-    commands_by_file: Commands grouped by file
-    registry: Command registry
-
-Returns:
-    Validation results grouped by file
-
-**Parameters:**
-- `commands_by_file`: Dict[Path, List[Command]]
-- `registry`: CommandRegistry
 
 ---
 
@@ -13051,35 +19277,23 @@ Returns:
 
 ---
 
+### `write_spec_data(specs_structure, data) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/conftest.py:292`
+**Complexity:** 1
+
+**Description:**
+> Write updated spec data to the active specs directory.
+
+**Parameters:**
+- `specs_structure`: Path
+- `data`: Dict[str, Any]
+
+---
+
 
 ## 📦 Dependencies
-
-### `scripts/extract_sdd_commands.py`
-
-- `argparse`
-- `collections.defaultdict`
-- `dataclasses.dataclass`
-- `json`
-- `pathlib.Path`
-- `re`
-- `typing.Dict`
-- `typing.List`
-
-### `scripts/validate_sdd_commands.py`
-
-- `argparse`
-- `collections.defaultdict`
-- `dataclasses.dataclass`
-- `json`
-- `pathlib.Path`
-- `re`
-- `subprocess`
-- `sys`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `typing.Set`
-- `typing.Tuple`
 
 ### `src/claude_skills/claude_skills/__init__.py`
 
@@ -13503,6 +19717,26 @@ Returns:
 - `subprocess`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/common/git_config.py`
+
+- `json`
+- `logging`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/git_metadata.py`
+
+- `logging`
+- `pathlib.Path`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Tuple`
+
 ### `src/claude_skills/claude_skills/common/hierarchy_validation.py`
 
 - `claude_skills.common.EnhancedError`
@@ -13560,6 +19794,8 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/progress.py`
 
+- `datetime.datetime`
+- `datetime.timezone`
 - `typing.Dict`
 - `typing.List`
 
@@ -13913,9 +20149,15 @@ Returns:
 - `claude_skills.common.doc_integration.prompt_for_generation`
 - `claude_skills.common.get_node`
 - `claude_skills.common.get_task_context_from_docs`
+- `claude_skills.common.git_config.is_git_enabled`
+- `claude_skills.common.git_metadata.check_dirty_tree`
+- `claude_skills.common.git_metadata.detect_git_drift`
+- `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.git_metadata.update_branch_metadata`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.validate_spec_before_proceed`
+- `logging`
 - `pathlib.Path`
 - `typing.Dict`
 - `typing.Optional`
@@ -14337,6 +20579,34 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
+### `src/claude_skills/claude_skills/sdd_update/git_commit.py`
+
+- `__future__.annotations`
+- `claude_skills.common.git_config.is_git_enabled`
+- `claude_skills.common.git_metadata.create_commit_from_staging`
+- `claude_skills.common.git_metadata.find_git_root`
+- `logging`
+- `pathlib.Path`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+- `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_update/git_pr.py`
+
+- `__future__.annotations`
+- `claude_skills.common.git_config.is_git_enabled`
+- `claude_skills.common.git_metadata.find_git_root`
+- `logging`
+- `pathlib.Path`
+- `re`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+- `typing.Tuple`
+
 ### `src/claude_skills/claude_skills/sdd_update/journal.py`
 
 - `claude_skills.common.paths.find_specs_directory`
@@ -14356,11 +20626,16 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/lifecycle.py`
 
+- `claude_skills.common.git_metadata.update_pr_metadata`
 - `claude_skills.common.paths.ensure_directory`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
+- `claude_skills.sdd_update.git_pr.check_pr_readiness`
+- `claude_skills.sdd_update.git_pr.create_pull_request`
+- `claude_skills.sdd_update.git_pr.generate_pr_body`
+- `claude_skills.sdd_update.git_pr.push_branch`
 - `claude_skills.sdd_update.time_tracking.aggregate_task_times`
 - `datetime.datetime`
 - `datetime.timezone`
@@ -14451,11 +20726,18 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_update/workflow.py`
 
 - `__future__.annotations`
+- `claude_skills.common.git_config.load_git_config`
+- `claude_skills.common.git_metadata.add_commit_metadata`
+- `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.git_metadata.show_commit_preview_and_wait`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
 - `copy`
 - `datetime.datetime`
 - `datetime.timezone`
+- `git_commit.check_git_commit_readiness`
+- `git_commit.generate_commit_message`
+- `git_commit.stage_and_commit`
 - `journal._build_journal_entry`
 - `journal._ensure_journal_container`
 - `journal.add_journal_entry`
@@ -14576,3 +20858,617 @@ Returns:
 - `pathlib.Path`
 - `typing.Any`
 - `typing.Dict`
+
+### `src/claude_skills/claude_skills/tests/conftest.py`
+
+- `copy`
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `tempfile`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py`
+
+- `__future__.annotations`
+- `os`
+- `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_next_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_next_doc_integration.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_plan_doc_integration.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_render/test_render_pipeline.py`
+
+- `claude_skills.sdd_render.AIEnhancedRenderer`
+- `claude_skills.sdd_render.SpecRenderer`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py`
+
+- `claude_skills.common.validate_spec_hierarchy`
+- `claude_skills.sdd_validate.apply_fix_actions`
+- `claude_skills.sdd_validate.collect_fix_actions`
+- `claude_skills.sdd_validate.compute_diff`
+- `claude_skills.sdd_validate.format_diff_markdown`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
+### `src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py`
+
+- `__future__.annotations`
+- `os`
+- `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_status_report.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py`
+
+- `claude_skills.common.hierarchy_validation.validate_spec_hierarchy`
+- `claude_skills.sdd_plan.templates.generate_spec_from_template`
+- `claude_skills.sdd_validate.fix.apply_fix_actions`
+- `claude_skills.sdd_validate.fix.collect_fix_actions`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
+### `src/claude_skills/claude_skills/tests/integration/test_test_cli.py`
+
+- `__future__.annotations`
+- `os`
+- `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py`
+
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.MagicMock`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py`
+
+- `claude_skills.code_doc.ai_consultation.DOC_TYPE_ROUTING`
+- `claude_skills.code_doc.ai_consultation.format_ai_context_research_prompt`
+- `claude_skills.code_doc.ai_consultation.format_architecture_research_prompt`
+- `claude_skills.code_doc.ai_consultation.get_best_tool`
+- `claude_skills.code_doc.ai_consultation.run_consultation`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py`
+
+- `claude_skills.code_doc.detectors.create_context_summary`
+- `claude_skills.code_doc.detectors.detect_framework`
+- `claude_skills.code_doc.detectors.detect_layers`
+- `claude_skills.code_doc.detectors.extract_readme`
+- `claude_skills.code_doc.detectors.identify_key_files`
+- `claude_skills.code_doc.detectors.suggest_reading_order`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py`
+
+- `claude_skills.code_doc.parsers.base.BaseParser`
+- `claude_skills.code_doc.parsers.base.Language`
+- `claude_skills.code_doc.parsers.base.ParseResult`
+- `claude_skills.code_doc.parsers.base.ParsedClass`
+- `claude_skills.code_doc.parsers.base.ParsedFunction`
+- `claude_skills.code_doc.parsers.base.ParsedModule`
+- `claude_skills.code_doc.parsers.base.ParsedParameter`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `claude_skills.code_doc.parsers.factory.ParserFactory`
+- `claude_skills.code_doc.parsers.factory.create_parser_factory`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_go.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py`
+
+- `claude_skills.code_doc.parsers.base.Language`
+- `claude_skills.code_doc.parsers.python.PythonParser`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_dev_tools/test_sdd_start_helper.py`
+
+- `io.StringIO`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `sdd_start_helper`
+- `sys`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_doc_query/conftest.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `typing.Dict`
+
+### `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py`
+
+- `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`
+
+- `claude_skills.common.completion.check_spec_completion`
+- `claude_skills.common.completion.count_blocked_tasks`
+- `claude_skills.common.completion.format_completion_prompt`
+- `claude_skills.common.completion.get_all_tasks_in_subtree`
+- `claude_skills.common.completion.is_task_complete`
+- `claude_skills.common.completion.should_prompt_completion`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_helper.py`
+
+- `claude_skills.common.doc_helper.check_doc_query_available`
+- `claude_skills.common.doc_helper.check_sdd_integration_available`
+- `claude_skills.common.doc_helper.ensure_documentation_exists`
+- `claude_skills.common.doc_helper.get_task_context_from_docs`
+- `claude_skills.common.doc_helper.should_generate_docs`
+- `pytest`
+- `subprocess`
+- `unittest.mock.MagicMock`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_doc_integration.py`
+
+- `claude_skills.common.doc_integration.DocStatus`
+- `claude_skills.common.doc_integration._build_generation_prompt`
+- `claude_skills.common.doc_integration._determine_status_from_stats`
+- `claude_skills.common.doc_integration.check_doc_availability`
+- `claude_skills.common.doc_integration.clear_doc_status_cache`
+- `claude_skills.common.doc_integration.prompt_for_generation`
+- `datetime.datetime`
+- `datetime.timedelta`
+- `datetime.timezone`
+- `json`
+- `pytest`
+- `subprocess`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py`
+
+- `claude_skills.common.git_metadata.add_commit_metadata`
+- `claude_skills.common.git_metadata.check_dirty_tree`
+- `claude_skills.common.git_metadata.detect_git_drift`
+- `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.git_metadata.get_staged_files`
+- `claude_skills.common.git_metadata.parse_git_status`
+- `claude_skills.common.git_metadata.show_commit_preview`
+- `claude_skills.common.git_metadata.update_branch_metadata`
+- `claude_skills.common.git_metadata.update_pr_metadata`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `subprocess`
+- `unittest.mock.MagicMock`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_integrations.py`
+
+- `claude_skills.common.integrations.execute_verify_task`
+- `claude_skills.common.integrations.get_session_state`
+- `claude_skills.common.integrations.validate_spec_before_proceed`
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.common.validation.EnhancedError`
+- `claude_skills.common.validation.JsonSpecValidationResult`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `subprocess`
+- `unittest.mock.MagicMock`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_paths.py`
+
+- `claude_skills.common.find_spec_file`
+- `claude_skills.common.find_specs_directory`
+- `claude_skills.common.validate_path`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py`
+
+- `claude_skills.common.PrettyPrinter`
+- `io.StringIO`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py`
+
+- `claude_skills.common.get_progress_summary`
+- `claude_skills.common.list_phases`
+- `claude_skills.common.load_json_spec`
+- `claude_skills.common.recalculate_progress`
+- `claude_skills.common.update_parent_status`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py`
+
+- `claude_skills.common.backup_json_spec`
+- `claude_skills.common.extract_frontmatter`
+- `claude_skills.common.get_node`
+- `claude_skills.common.load_json_spec`
+- `claude_skills.common.save_json_spec`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/conftest.py`
+
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_discovery.py`
+
+- `claude_skills.common.load_json_spec`
+- `claude_skills.sdd_next.discovery.check_dependencies`
+- `claude_skills.sdd_next.discovery.get_next_task`
+- `claude_skills.sdd_next.discovery.get_task_info`
+- `claude_skills.sdd_next.discovery.prepare_task`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_doc_integration.py`
+
+- `claude_skills.common.doc_integration.DocStatus`
+- `claude_skills.sdd_next.discovery.prepare_task`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_project.py`
+
+- `claude_skills.sdd_next.project.check_environment`
+- `claude_skills.sdd_next.project.detect_project`
+- `claude_skills.sdd_next.project.find_related_files`
+- `claude_skills.sdd_next.project.find_tests`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_validation.py`
+
+- `claude_skills.common.load_json_spec`
+- `claude_skills.sdd_next.validation.find_circular_deps`
+- `claude_skills.sdd_next.validation.spec_stats`
+- `claude_skills.sdd_next.validation.validate_paths`
+- `claude_skills.sdd_next.validation.validate_spec`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/test_workflow.py`
+
+- `claude_skills.sdd_next.workflow.find_pattern`
+- `claude_skills.sdd_next.workflow.init_environment`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/conftest.py`
+
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_hierarchy_validation.py`
+
+- `claude_skills.common.hierarchy_validation.validate_dependencies`
+- `claude_skills.common.hierarchy_validation.validate_hierarchy`
+- `claude_skills.common.hierarchy_validation.validate_metadata`
+- `claude_skills.common.hierarchy_validation.validate_nodes`
+- `claude_skills.common.hierarchy_validation.validate_spec_hierarchy`
+- `claude_skills.common.hierarchy_validation.validate_structure`
+- `claude_skills.common.hierarchy_validation.validate_task_counts`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_plan/test_templates.py`
+
+- `claude_skills.sdd_plan.templates.get_template`
+- `claude_skills.sdd_plan.templates.infer_task_category`
+- `claude_skills.sdd_plan.templates.list_templates`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/conftest.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_complexity_scorer.py`
+
+- `claude_skills.sdd_render.ComplexityScore`
+- `claude_skills.sdd_render.ComplexityScorer`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_dependency_graph.py`
+
+- `claude_skills.sdd_render.DependencyGraphGenerator`
+- `claude_skills.sdd_render.GraphStyle`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_markdown_parser.py`
+
+- `claude_skills.sdd_render.markdown_parser.MarkdownParser`
+- `claude_skills.sdd_render.markdown_parser.ParsedGroup`
+- `claude_skills.sdd_render.markdown_parser.ParsedPhase`
+- `claude_skills.sdd_render.markdown_parser.ParsedSpec`
+- `claude_skills.sdd_render.markdown_parser.ParsedTask`
+- `claude_skills.sdd_render.markdown_parser.ParsedVerification`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_priority_ranker.py`
+
+- `claude_skills.sdd_render.PriorityRanker`
+- `claude_skills.sdd_render.SpecAnalyzer`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_progressive_disclosure.py`
+
+- `claude_skills.sdd_render.DetailContext`
+- `claude_skills.sdd_render.DetailLevel`
+- `claude_skills.sdd_render.DetailLevelCalculator`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_spec_analyzer.py`
+
+- `claude_skills.sdd_render.SpecAnalyzer`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_render/test_task_grouper.py`
+
+- `claude_skills.sdd_render.SpecAnalyzer`
+- `claude_skills.sdd_render.TaskGrouper`
+- `claude_skills.sdd_render.task_grouper.GroupingStrategy`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/conftest.py`
+
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_journal.py`
+
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.journal.add_journal_entry`
+- `claude_skills.sdd_update.journal.add_revision_entry`
+- `claude_skills.sdd_update.journal.bulk_journal_tasks`
+- `claude_skills.sdd_update.journal.sync_metadata_from_state`
+- `claude_skills.sdd_update.journal.update_metadata`
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_lifecycle.py`
+
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.common.spec.save_json_spec`
+- `claude_skills.sdd_update.lifecycle.activate_spec`
+- `claude_skills.sdd_update.lifecycle.complete_spec`
+- `claude_skills.sdd_update.lifecycle.move_spec`
+- `json`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_query_operations.py`
+
+- `claude_skills.common.query_operations.get_journal_entries`
+- `claude_skills.common.query_operations.get_task_journal`
+- `claude_skills.sdd_update.query.check_complete`
+- `claude_skills.sdd_update.query.get_task`
+- `claude_skills.sdd_update.query.list_blockers`
+- `claude_skills.sdd_update.query.list_phases`
+- `claude_skills.sdd_update.query.phase_time`
+- `claude_skills.sdd_update.query.query_tasks`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.status.update_task_status`
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+- `time`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.sdd_update.time_tracking.aggregate_task_times`
+- `claude_skills.sdd_update.time_tracking.calculate_time_from_timestamps`
+- `claude_skills.sdd_update.time_tracking.validate_timestamp_pair`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_verification.py`
+
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.verification.add_verification_result`
+- `claude_skills.sdd_update.verification.format_verification_summary`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py`
+
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.common.spec.load_json_spec`
+- `claude_skills.sdd_update.workflow.complete_task_workflow`
+- `datetime.datetime`
+- `datetime.timedelta`
+- `datetime.timezone`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py`
+
+- `claude_skills.common.validation.EnhancedError`
+- `claude_skills.common.validation.JsonSpecValidationResult`
+- `claude_skills.sdd_validate.fix.FixAction`
+- `claude_skills.sdd_validate.fix.FixReport`
+- `claude_skills.sdd_validate.fix._build_counts_action`
+- `claude_skills.sdd_validate.fix._build_date_action`
+- `claude_skills.sdd_validate.fix._build_hierarchy_action`
+- `claude_skills.sdd_validate.fix._build_metadata_action`
+- `claude_skills.sdd_validate.fix._build_placeholder_file_path_action`
+- `claude_skills.sdd_validate.fix._build_status_action`
+- `claude_skills.sdd_validate.fix._build_task_category_action`
+- `claude_skills.sdd_validate.fix._normalize_status`
+- `claude_skills.sdd_validate.fix._normalize_timestamp`
+- `claude_skills.sdd_validate.fix.apply_fix_actions`
+- `claude_skills.sdd_validate.fix.collect_fix_actions`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.mock_open`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_formatting.py`
+
+- `claude_skills.common.validation.JsonSpecValidationResult`
+- `claude_skills.sdd_validate.formatting.NormalizedValidationResult`
+- `claude_skills.sdd_validate.formatting.format_validation_summary`
+- `claude_skills.sdd_validate.formatting.normalize_validation_result`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_reporting.py`
+
+- `claude_skills.common.validation.JsonSpecValidationResult`
+- `claude_skills.sdd_validate.reporting.generate_report`
+- `json`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_stats.py`
+
+- `claude_skills.sdd_validate.stats.SpecStatistics`
+- `claude_skills.sdd_validate.stats.calculate_statistics`
+- `claude_skills.sdd_validate.stats.render_statistics`
+- `json`
+- `pytest`

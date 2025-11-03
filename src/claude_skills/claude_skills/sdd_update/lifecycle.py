@@ -17,6 +17,14 @@ from claude_skills.common.printer import PrettyPrinter
 
 # Import from sdd_update
 from claude_skills.sdd_update.time_tracking import aggregate_task_times
+from claude_skills.sdd_update.git_pr import (
+    check_pr_readiness,
+    generate_pr_body,
+    push_branch,
+    create_pull_request,
+)
+from claude_skills.common.git_metadata import update_pr_metadata
+from claude_skills.common.git_config import load_git_config
 
 
 def move_spec(
@@ -328,6 +336,103 @@ def complete_spec(
     if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
         printer.error("Failed to save spec file with completion metadata")
         return False
+
+    # Git PR workflow integration (after spec completion, before moving)
+    # Check if PR workflow should be triggered
+    pr_info = check_pr_readiness(spec_data, spec_file)
+
+    if pr_info:
+        repo_root = pr_info['repo_root']
+        branch_name = pr_info['branch_name']
+        base_branch = pr_info['base_branch']
+
+        # Load git config to check PR preferences
+        git_config = load_git_config(repo_root)
+        ai_pr_enabled = git_config.get('ai_pr', {}).get('enabled', False)
+
+        if ai_pr_enabled:
+            # NEW: AI-powered PR creation via sdd-next skill handoff
+            printer.info("")
+            printer.header("="*70)
+            printer.header("Spec Completion - Next Steps Available")
+            printer.header("="*70)
+            printer.info("")
+            printer.info("Spec completed successfully. To determine next steps:")
+            printer.info("")
+            printer.result("  Skill(sdd-toolkit:sdd-next)", "Find next action")
+            printer.info("")
+            printer.detail(f"  Spec ID: {spec_id}")
+            printer.detail(f"  Branch: {branch_name}")
+            printer.detail(f"  Base: {base_branch}")
+            printer.info("")
+            printer.info("Suggested action: Create pull request")
+            printer.info("")
+            printer.info("sdd-next will:")
+            printer.info("  1. Detect spec completion status")
+            printer.info("  2. Suggest creating PR via sdd-pr skill")
+            printer.info("  3. Guide you through PR creation workflow")
+            printer.info("")
+            printer.header("="*70)
+            printer.info("")
+
+            # Return True to signal handoff - agent will see output and invoke sdd-next
+            # Spec will remain in active/ until next steps are taken
+            return True
+        else:
+            # Existing auto_pr logic (backward compatible)
+            printer.info("Git integration enabled - initiating PR workflow...")
+
+            # Generate PR body from spec metadata
+            pr_body = generate_pr_body(spec_data)
+            pr_title = spec_data.get('metadata', {}).get('title', spec_id)
+
+            # Push branch to remote
+            printer.action(f"Pushing branch '{branch_name}' to remote...")
+            push_success, push_error = push_branch(repo_root, branch_name)
+
+            if push_success:
+                printer.success(f"Branch '{branch_name}' pushed successfully")
+
+                # Create PR via gh CLI
+                printer.action("Creating pull request...")
+                pr_success, pr_url, pr_number, pr_error = create_pull_request(
+                    repo_root=repo_root,
+                    title=pr_title,
+                    body=pr_body,
+                    base_branch=base_branch
+                )
+
+                if pr_success and pr_url and pr_number:
+                    printer.success(f"Pull request created: {pr_url}")
+
+                    # Update spec metadata with PR information
+                    update_pr_metadata(
+                        spec=spec_data,
+                        pr_url=pr_url,
+                        pr_number=pr_number,
+                        status='open'
+                    )
+
+                    # Save spec with PR metadata
+                    if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
+                        printer.warning("Failed to save PR metadata to spec")
+                    else:
+                        printer.info("PR metadata added to spec")
+
+                elif pr_error:
+                    # Non-blocking failure - log warning but continue
+                    printer.warning(f"PR creation failed: {pr_error}")
+                    if "gh not found" in pr_error:
+                        printer.info("Install GitHub CLI: https://cli.github.com/")
+                    # Provide manual PR creation instructions
+                    github_compare_url = f"https://github.com/{{owner}}/{{repo}}/compare/{branch_name}"
+                    printer.info(f"Or create PR manually at: {github_compare_url}")
+
+            elif push_error:
+                # Non-blocking failure - log warning but continue
+                printer.warning(f"Branch push failed: {push_error}")
+                printer.info(f"Push manually with: git push -u origin {branch_name}")
+                printer.info("Then create PR at: https://github.com/{{owner}}/{{repo}}/compare/{branch_name}")
 
     # Move to completed folder
     printer.action("Moving spec to completed/...")

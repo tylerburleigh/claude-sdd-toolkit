@@ -26,6 +26,7 @@ def register_all_subcommands(subparsers, parent_parser):
     from claude_skills.sdd_plan.cli import register_plan
     from claude_skills.sdd_plan_review.cli import register_plan_review
     from claude_skills.sdd_render.cli import register_render
+    from claude_skills.sdd_pr.cli import register_pr
     from claude_skills.context_tracker.cli import register_context, register_session_marker
 
     # Register core SDD subcommands
@@ -35,6 +36,7 @@ def register_all_subcommands(subparsers, parent_parser):
     register_plan(subparsers, parent_parser)
     register_plan_review(subparsers, parent_parser)
     register_render(subparsers, parent_parser)
+    register_pr(subparsers, parent_parser)
     register_context(subparsers, parent_parser)
     register_session_marker(subparsers, parent_parser)
 

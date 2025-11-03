@@ -21,10 +21,85 @@ from .journal import (
 )
 from .status import update_task_status
 from .time_tracking import track_time, calculate_time_from_timestamps
+from .git_commit import (
+    check_git_commit_readiness,
+    generate_commit_message,
+    stage_and_commit,
+)
+from claude_skills.common.git_metadata import add_commit_metadata, show_commit_preview_and_wait, find_git_root
+from claude_skills.common.git_config import load_git_config
 
 
 def _get_timestamp() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _journal_completed_parents(
+    spec_id: str,
+    task_id: str,
+    specs_dir: Path,
+    author: str,
+    printer: Optional[PrettyPrinter]
+) -> None:
+    """
+    Journal parent nodes (phases, groups) that were auto-completed.
+
+    When a leaf task is completed, parent nodes may automatically transition
+    to "completed" status via progress recalculation. This function walks up
+    the parent chain and creates journal entries for any parents that were
+    auto-completed and flagged with needs_journaling.
+
+    Args:
+        spec_id: Spec identifier
+        task_id: ID of the task that was just completed
+        specs_dir: Directory containing spec files
+        author: Author name for journal entries
+        printer: Optional printer for output
+    """
+    state = load_json_spec(spec_id, specs_dir)
+    if not state:
+        return
+
+    hierarchy = state.get("hierarchy", {})
+    current_id = task_id
+    journaled_parents = []
+
+    # Walk up the parent chain
+    while current_id:
+        node = hierarchy.get(current_id)
+        if not node:
+            break
+
+        parent_id = node.get("parent")
+        if not parent_id:
+            break
+
+        parent = hierarchy.get(parent_id)
+        if (parent and
+            parent.get("status") == "completed" and
+            parent.get("metadata", {}).get("needs_journaling")):
+
+            # Create journal entry for auto-completed parent
+            parent_type = parent.get("type", "node").title()
+            parent_title = parent.get("title", parent_id)
+
+            add_journal_entry(
+                spec_id=spec_id,
+                title=f"{parent_type} Completed: {parent_title}",
+                content=f"All child tasks in {parent.get('type', 'node')} {parent_id} have been completed.",
+                task_id=parent_id,
+                entry_type="status_change",
+                author=author,
+                specs_dir=specs_dir,
+                dry_run=False,
+                printer=None  # Suppress individual output to avoid clutter
+            )
+            journaled_parents.append(parent_id)
+
+        current_id = parent_id
+
+    if journaled_parents and printer:
+        printer.info(f"Auto-journaled {len(journaled_parents)} parent node(s): {', '.join(journaled_parents)}")
 
 
 def _derive_default_journal(
@@ -445,6 +520,77 @@ def complete_task_workflow(
         printer=printer,
     ):
         return None
+
+    # Auto-journal parent nodes that were completed
+    _journal_completed_parents(
+        spec_id=spec_id,
+        task_id=task_id,
+        specs_dir=specs_dir,
+        author=author,
+        printer=printer
+    )
+
+    # Git commit integration (after task completion)
+    # Check if git commit should be offered based on commit cadence preference
+    spec_path = specs_dir / f"{spec_id}.json"
+    updated_spec = load_json_spec(spec_id, specs_dir)
+    if updated_spec:
+        commit_info = check_git_commit_readiness(
+            spec_data=updated_spec,
+            spec_path=spec_path,
+            event_type="task"
+        )
+
+        if commit_info:
+            printer.info("Creating git commit for task completion...")
+
+            # Generate commit message
+            task_title = task.get('title', task_id)
+            commit_message = generate_commit_message(task_id, task_title)
+
+            # Check if preview should be shown before commit
+            repo_root = commit_info['repo_root']
+            git_config = load_git_config(repo_root)
+            show_preview = git_config.get('file_staging', {}).get('show_before_commit', True)
+
+            if show_preview:
+                # Show preview of changes before staging/committing
+                printer.info("Showing commit preview (configured via file_staging.show_before_commit)...")
+                show_commit_preview_and_wait(
+                    repo_root=repo_root,
+                    spec_id=spec_id,
+                    task_id=task_id,
+                    printer=printer
+                )
+
+            # Stage and commit changes
+            success, commit_sha, error_msg = stage_and_commit(
+                repo_root=commit_info['repo_root'],
+                commit_message=commit_message
+            )
+
+            if success and commit_sha:
+                printer.success(f"Created commit: {commit_sha[:8]}")
+
+                # Add commit metadata to spec
+                add_commit_metadata(
+                    spec=updated_spec,
+                    sha=commit_sha,
+                    message=commit_message,
+                    task_id=task_id,
+                    timestamp=_get_timestamp()
+                )
+
+                # Save updated spec with commit metadata
+                try:
+                    with open(spec_path, 'w') as f:
+                        json.dump(updated_spec, f, indent=2)
+                    printer.info("Updated spec with commit metadata")
+                except Exception as e:
+                    printer.warning(f"Failed to save commit metadata to spec: {e}")
+            elif error_msg:
+                # Non-blocking failure - log warning but continue
+                printer.warning(f"Git commit failed: {error_msg}")
 
     # Load final state for diff / reporting
     state_after = load_json_spec(spec_id, specs_dir)

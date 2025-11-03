@@ -173,6 +173,144 @@ Skill(sdd-toolkit:sdd-update) with prompt:
 "Update task metadata for task-1-2 in spec user-auth-001. Set file_path to 'src/auth/service.ts', description to 'Auth service with JWT support', task_category to 'implementation', and actual_hours to 2.5."
 ```
 
+## Two-Step Workflow for Task Completion with Git Commits
+
+When completing tasks that involve code changes, the SDD toolkit supports a **two-step workflow** that gives agents control over what files are committed:
+
+### Workflow Pattern: Preview → Stage → Commit
+
+**Step 1: Preview Changes (Optional, Configurable)**
+
+Before committing, the agent can see all uncommitted changes to decide what files are task-related:
+
+```bash
+# Preview is shown automatically by sdd complete-task (if enabled in config)
+sdd complete-task SPEC_ID TASK_ID
+```
+
+The preview displays:
+- Modified files
+- Untracked files
+- Staged files
+
+**Step 2: Selective Staging**
+
+The agent stages only task-related files using git:
+
+```bash
+# Stage spec file and task-related source files only
+git add specs/active/my-spec.json
+git add src/feature/implementation.py
+git add tests/test_feature.py
+
+# Deliberately SKIP unrelated files
+# (e.g., debug scripts, personal notes, unfinished work)
+```
+
+**Step 3: Create Task Commit**
+
+The agent creates a commit with only the staged files:
+
+```bash
+# Creates commit with only staged files
+sdd create-task-commit SPEC_ID TASK_ID
+```
+
+This ensures:
+- ✅ Only task-related files are committed
+- ✅ Unrelated files remain uncommitted
+- ✅ Clean, focused task commits
+- ✅ Spec is automatically updated with commit SHA
+
+### Configuration Options
+
+The preview behavior is controlled by `.claude/git_config.json`:
+
+```json
+{
+  "enabled": true,
+  "auto_commit": true,
+  "commit_cadence": "task",
+  "file_staging": {
+    "show_before_commit": true  // false = auto-stage all files (backward compatible)
+  }
+}
+```
+
+**Options:**
+- `show_before_commit: true` (default) - Show preview, require manual staging
+- `show_before_commit: false` - Auto-stage all files (old behavior, backward compatible)
+
+### Example: Complete Task with Selective Staging
+
+**Scenario:** Agent completed task-1-2 (implement auth service), but also has unrelated debug files.
+
+**Step 1: Complete task (shows preview)**
+```
+Skill(sdd-toolkit:sdd-update) with prompt:
+"Complete task-1-2 for spec user-auth-001. Completion note: Implemented JWT authentication service with token refresh logic. All tests passing."
+```
+
+Output shows:
+```
+Uncommitted Changes:
+  M specs/active/user-auth-001.json
+  M src/auth/service.py
+  M tests/test_auth.py
+  ?? debug_script.py         # ← unrelated!
+  ?? scratch_notes.txt       # ← unrelated!
+```
+
+**Step 2: Stage only task-related files**
+```bash
+git add specs/active/user-auth-001.json
+git add src/auth/service.py
+git add tests/test_auth.py
+# Skip: debug_script.py, scratch_notes.txt
+```
+
+**Step 3: Create commit**
+```bash
+sdd create-task-commit user-auth-001 task-1-2
+```
+
+Result: Commit contains only 3 task-related files. Debug files remain uncommitted.
+
+### Benefits of Two-Step Workflow
+
+- **Agent Control:** Agent decides what files to commit
+- **Clean Commits:** Only task-related changes included
+- **Protected Work:** Unrelated files not accidentally committed
+- **Backward Compatible:** Can disable preview to auto-stage all files
+- **Traceability:** Commit SHA stored in spec for tracking
+
+### Workflow Variants
+
+**Variant 1: Accept all changes**
+```bash
+# Stage all uncommitted files
+git add --all
+
+# Create commit
+sdd create-task-commit SPEC_ID TASK_ID
+```
+
+**Variant 2: Accept preview defaults (task-related files only)**
+```bash
+# Stage files mentioned in task metadata (automatic detection)
+git add specs/active/spec.json src/feature/file.py
+
+# Create commit
+sdd create-task-commit SPEC_ID TASK_ID
+```
+
+**Variant 3: Disable preview (backward compatible)**
+Set `"show_before_commit": false` in `.claude/git_config.json`, then:
+```bash
+# Automatically stages all files and commits (old behavior)
+sdd complete-task SPEC_ID TASK_ID
+```
+
 ## Error Handling
 
 If the skill encounters errors, report:

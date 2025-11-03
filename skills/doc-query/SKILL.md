@@ -778,7 +778,7 @@ dot -Tpng callgraph.dot -o callgraph.png
 Search across all entities (classes, functions, modules).
 
 ```bash
-sdd doc search <query> [--docs-path PATH]
+sdd doc search <query> [--limit N] [--docs-path PATH]
 ```
 
 **Examples:**
@@ -788,12 +788,16 @@ sdd doc search "auth"
 
 # Search for scoring-related entities
 sdd doc search "score.*"
+
+# Limit results to first 10 matches
+sdd doc search "CLI" --limit 10
 ```
 
 **When to use:**
 - Exploratory searches
 - Finding all related entities
 - Broad context gathering
+- Use `--limit` to control output volume for broad searches
 
 ### 10. Context
 

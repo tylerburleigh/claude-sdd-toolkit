@@ -52,14 +52,14 @@ After creating a spec with this skill, you'll typically validate and review it u
 # Step 2: Validate Specification
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/myspec.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate specs/pending/myspec.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec structure"
 )
 
 # Step 3: Review Specification (Optional but Recommended)
 Task(
   subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
-  prompt: "Review specs/active/myspec.json with full multi-model review. Evaluate architecture, security, and feasibility.",
+  prompt: "Review specs/pending/myspec.json with full multi-model review. Evaluate architecture, security, and feasibility.",
   description: "Multi-model spec review"
 )
 
@@ -69,7 +69,7 @@ Task(
 # Step 5: Final Validation
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/myspec.json one final time before implementation.",
+  prompt: "Validate specs/pending/myspec.json one final time before implementation.",
   description: "Final validation"
 )
 
@@ -88,6 +88,74 @@ For detailed review workflow and metadata tracking, see the [Review Workflow](#r
 **Planning Modes:**
 - **Staged (Recommended for complex features)**: Generate phase structure → user review → detailed tasks
 - **Direct (For simple features)**: Generate complete specification in one pass
+
+## Spec Lifecycle and Folder Management
+
+Specifications move through a defined lifecycle as they progress from initial planning to completion:
+
+### Folder Structure
+
+```
+specs/
+├── pending/      # New specs awaiting activation (backlog)
+├── active/       # Specs currently being worked on
+├── completed/    # Successfully completed specs
+└── archived/     # Deprecated or cancelled specs
+```
+
+### Lifecycle Stages
+
+**1. Pending (Backlog)**
+- New specs created by `sdd-plan` start here
+- Location: `specs/pending/{spec-id}.json`
+- Status: Waiting to be activated for implementation
+- Multiple specs can remain pending simultaneously
+
+**2. Active (In Progress)**
+- Specs currently being implemented
+- Location: `specs/active/{spec-id}.json`
+- Move here when ready to start work using `sdd activate-spec <spec-id>`
+- Multiple specs can be active simultaneously for parallel workstreams
+
+**3. Completed**
+- Successfully implemented and verified specs
+- Location: `specs/completed/{spec-id}.json`
+- Automatically moved by `sdd-update` when all tasks complete
+
+**4. Archived**
+- Cancelled, superseded, or deprecated specs
+- Location: `specs/archived/{spec-id}.json`
+- Manual archival for specs that won't be completed
+
+### Moving Between Stages
+
+**Pending → Active:**
+```bash
+# Interactive selection (recommended)
+/sdd-begin
+# or
+Skill(sdd-toolkit:sdd-next)
+
+# Direct activation
+sdd activate-spec <spec-id>
+```
+
+**Active → Completed:**
+- Automatic when `sdd-update` detects all tasks are completed
+- Validates spec integrity before moving
+
+**Active/Pending → Archived:**
+```bash
+Skill(sdd-toolkit:sdd-update) with prompt:
+"Archive spec <spec-id>. Move to archived folder as it's no longer needed."
+```
+
+### Best Practices
+
+- **Keep pending/ as your backlog**: Create specs when you plan features, activate when ready to implement
+- **Limit active specs**: While multiple active specs are supported, focus helps maintain context
+- **Validate before activating**: Run validation and review on pending specs before moving to active
+- **Clean completed regularly**: Archive old completed specs to keep the workspace manageable
 
 ## Core Philosophy
 
@@ -841,14 +909,14 @@ You don't need to manually calculate task counts - the sdd-validate subagent can
 # Preview fixes without applying (recommended first step)
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  prompt: "Preview auto-fixes for specs/pending/your-spec.json. Show what would be changed without applying.",
   description: "Preview task count fixes"
 )
 
 # Apply fixes to task counts and hierarchy integrity
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues.",
+  prompt: "Auto-fix specs/pending/your-spec.json. Apply all fixable issues.",
   description: "Apply task count fixes"
 )
 ```
@@ -904,7 +972,7 @@ Task(
 **Note:** Generate this JSON file manually following the structure described below.
 
 **Location:**
-`specs/active/{spec-id}.json`
+`specs/pending/{spec-id}.json`
 
 **Initial Spec File Structure:**
 
@@ -1056,7 +1124,7 @@ Task(
 - JSON spec file is the single source of truth
 - Updated by sdd-update, not this skill
 - Read by sdd-next to find next tasks
-- Store in specs/active/, specs/completed/, or specs/archived/
+- Store in specs/pending/ (new specs), specs/active/ (in progress), specs/completed/, or specs/archived/
 - Consider adding to .gitignore (user preference)
 - Human-readable views can be generated on-demand using `sdd render`
 
@@ -1227,7 +1295,7 @@ To validate specs within Claude Code, invoke the sdd-validate subagent using the
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate the spec at specs/pending/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec file"
 )
 ```
@@ -1256,7 +1324,7 @@ Validates the JSON spec file structure, hierarchy, and integrity.
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate the spec at specs/pending/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec file"
 )
 ```
@@ -1269,7 +1337,7 @@ Produces in-depth analysis, grouped by severity, with suggested remedies.
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Generate a detailed validation report for specs/active/your-spec.json. Save the report to specs/reports/your-spec.md.",
+  prompt: "Generate a detailed validation report for specs/pending/your-spec.json. Save the report to specs/reports/your-spec.md.",
   description: "Generate validation report"
 )
 ```
@@ -1282,7 +1350,7 @@ Automatically fixes common JSON spec issues. Preview before applying.
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  prompt: "Preview auto-fixes for specs/pending/your-spec.json. Show what would be changed without applying.",
   description: "Preview spec fixes"
 )
 ```
@@ -1291,7 +1359,7 @@ Task(
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues and validate afterward.",
+  prompt: "Auto-fix specs/pending/your-spec.json. Apply all fixable issues and validate afterward.",
   description: "Apply spec fixes"
 )
 ```
@@ -1304,7 +1372,7 @@ Summarizes hierarchy composition, depth, and verification footprint.
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Generate comprehensive statistics for specs/active/your-spec.json. Include quality score, progress metrics, and completeness analysis.",
+  prompt: "Generate comprehensive statistics for specs/pending/your-spec.json. Include quality score, progress metrics, and completeness analysis.",
   description: "Generate spec statistics"
 )
 ```
@@ -1330,7 +1398,7 @@ The `sdd render` command converts JSON specifications into well-formatted markdo
 sdd render semantic-search-2025-10-24-001 --path specs
 
 # Render by direct file path
-sdd render specs/active/my-spec.json
+sdd render specs/pending/my-spec.json
 
 # Custom output location
 sdd render my-spec --path specs -o documentation/my-spec.md
@@ -1422,7 +1490,7 @@ The rendered markdown includes:
 # 2. Validate with subagent
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/my-spec.json",
+  prompt: "Validate specs/pending/my-spec.json",
   description: "Validate spec"
 )
 
@@ -1445,7 +1513,7 @@ Invoke the sdd-validate subagent to ensure the JSON spec file is properly format
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate the spec at specs/active/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
+  prompt: "Validate the spec at specs/pending/your-spec.json. Check for structural errors, missing fields, and dependency issues.",
   description: "Validate spec before implementation"
 )
 ```
@@ -1475,7 +1543,7 @@ If validation fails with fixable errors, use the sdd-validate subagent to previe
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Preview auto-fixes for specs/active/your-spec.json. Show what would be changed without applying.",
+  prompt: "Preview auto-fixes for specs/pending/your-spec.json. Show what would be changed without applying.",
   description: "Preview fixes"
 )
 ```
@@ -1484,7 +1552,7 @@ Task(
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Auto-fix specs/active/your-spec.json. Apply all fixable issues and validate afterward.",
+  prompt: "Auto-fix specs/pending/your-spec.json. Apply all fixable issues and validate afterward.",
   description: "Apply fixes"
 )
 ```
@@ -1533,14 +1601,14 @@ not_reviewed (default) → in_review → reviewed → approved → implementatio
 # 2. Validate JSON spec file with subagent
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/myspec.json",
+  prompt: "Validate specs/pending/myspec.json",
   description: "Validate spec"
 )
 
 # 3. Review spec (use sdd-plan-review subagent)
 Task(
   subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
-  prompt: "Review specs/active/myspec.json with full multi-model review",
+  prompt: "Review specs/pending/myspec.json with full multi-model review",
   description: "Review spec"
 )
 
@@ -1551,7 +1619,7 @@ Task(
 # 5. Re-run validation before handoff
 Task(
   subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/myspec.json",
+  prompt: "Validate specs/pending/myspec.json",
   description: "Final validation"
 )
 

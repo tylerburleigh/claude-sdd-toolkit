@@ -628,8 +628,8 @@ sdd doc refactor-candidates           # Find complex code needing refactoring
 sdd test run tests/                   # Run tests with AI debugging
 
 # Context Monitoring
-sdd context                           # Show current session token usage
-sdd context --transcript-path <path>  # Check specific transcript
+sdd session-marker                    # Generate session marker (Step 1)
+sdd context --session-marker <marker> # Check context using marker (Step 2)
 sdd context --json                    # Get JSON output
 
 # Development tools

@@ -743,6 +743,80 @@ def cmd_bulk_journal(args, printer):
     return 0 if success else 1
 
 
+def cmd_create_task_commit(args, printer):
+    """Create commit from staged files for a task (two-step workflow)."""
+    printer.action(f"Creating commit from staged files for task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load JSON spec file
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load JSON spec file for {args.spec_id}")
+        return 1
+
+    # Verify task exists in hierarchy
+    hierarchy = spec_data.get("hierarchy", {})
+    if args.task_id not in hierarchy:
+        printer.error(f"Task '{args.task_id}' not found in spec {args.spec_id}")
+        return 1
+
+    # Get task info for validation
+    task = hierarchy[args.task_id]
+    task_title = task.get("title", "Untitled")
+    task_status = task.get("status", "pending")
+
+    # Optional: Warn if task is not completed (but don't block)
+    if task_status != "completed" and not args.skip_status_check:
+        printer.warning(f"Task {args.task_id} is not marked as completed (status: {task_status})")
+        printer.warning("Consider completing the task first with 'sdd complete-task'")
+        if not args.force:
+            printer.error("Use --force to create commit anyway, or --skip-status-check to disable this check")
+            return 1
+
+    # Find repository root
+    from claude_skills.common.git_metadata import find_git_root, create_commit_from_staging
+
+    repo_root = find_git_root(specs_dir)
+    if not repo_root:
+        printer.error("No git repository found")
+        return 1
+
+    # Create commit from staged files
+    printer.info(f"Creating commit for: {task_title}")
+    printer.info(f"Repository: {repo_root}")
+
+    success, commit_sha, error_msg = create_commit_from_staging(
+        repo_root=repo_root,
+        spec_id=args.spec_id,
+        task_id=args.task_id,
+        printer=printer
+    )
+
+    if not success:
+        printer.error(f"Failed to create commit: {error_msg}")
+        return 1
+
+    # Success!
+    printer.success(f"Commit created successfully: {commit_sha[:8] if commit_sha else 'unknown'}")
+
+    # Output JSON if requested
+    if args.json:
+        result = {
+            "success": True,
+            "commit_sha": commit_sha,
+            "spec_id": args.spec_id,
+            "task_id": args.task_id,
+            "task_title": task_title
+        }
+        print(json.dumps(result, indent=2))
+
+    return 0
+
+
 def cmd_complete_task(args, printer):
     """Complete task workflow (status, journaling, metadata sync)."""
     printer.action(f"Completing task {args.task_id}...")
@@ -1086,6 +1160,18 @@ def register_update(subparsers, parent_parser):
     p_bulk_journal.add_argument("--template-author", help="Override author for templated entries")
     p_bulk_journal.add_argument("--dry-run", action="store_true", help="Preview journal entries without saving")
     p_bulk_journal.set_defaults(func=cmd_bulk_journal)
+
+    # create-task-commit command
+    p_create_commit = subparsers.add_parser(
+        "create-task-commit",
+        help="Create commit from staged files for a task (two-step workflow)",
+        parents=[parent_parser],
+    )
+    p_create_commit.add_argument("spec_id", help="Specification ID")
+    p_create_commit.add_argument("task_id", help="Task ID to commit")
+    p_create_commit.add_argument("--skip-status-check", action="store_true", help="Skip checking if task is completed")
+    p_create_commit.add_argument("--force", action="store_true", help="Force commit even if task is not completed")
+    p_create_commit.set_defaults(func=cmd_create_task_commit)
 
     # complete-task command
     p_complete_task = subparsers.add_parser(

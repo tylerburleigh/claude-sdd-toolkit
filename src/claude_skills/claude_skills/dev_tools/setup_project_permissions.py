@@ -19,6 +19,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan)",
     "Skill(sdd-toolkit:sdd-next)",
     "Skill(sdd-toolkit:sdd-update)",
+    "Skill(sdd-toolkit:sdd-pr)",
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
@@ -30,6 +31,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-plan)",
     "Skill(sdd-next)",
     "Skill(sdd-update)",
+    "Skill(sdd-pr)",
     "Skill(sdd-plan-review)",
     "Skill(sdd-validate)",
     "Skill(sdd-render)",
@@ -44,6 +46,18 @@ SDD_PERMISSIONS = [
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
     "Bash(codex:*)",
+
+    # Git/GitHub CLI permissions (specific allowlist, no wildcards for security)
+    "Bash(git checkout -b *)",
+    "Bash(git add *)",
+    "Bash(git commit *)",
+    "Bash(git push *)",
+    "Bash(git status *)",
+    "Bash(git branch --show-current)",
+    "Bash(git log *)",
+    "Bash(git rev-parse HEAD)",
+    "Bash(gh pr create *)",
+    "Bash(gh pr view *)",
 
     # File access permissions
     "Write(//**/specs/active/**)",

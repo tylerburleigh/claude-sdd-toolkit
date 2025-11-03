@@ -19,6 +19,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan)",
     "Skill(sdd-toolkit:sdd-next)",
     "Skill(sdd-toolkit:sdd-update)",
+    "Skill(sdd-toolkit:sdd-pr)",
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
@@ -30,6 +31,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-plan)",
     "Skill(sdd-next)",
     "Skill(sdd-update)",
+    "Skill(sdd-pr)",
     "Skill(sdd-plan-review)",
     "Skill(sdd-validate)",
     "Skill(sdd-render)",
@@ -51,6 +53,18 @@ SDD_PERMISSIONS = [
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
     "Bash(codex:*)",
+
+    # Git/GitHub CLI permissions (specific allowlist, no wildcards for security)
+    "Bash(git checkout -b *)",
+    "Bash(git add *)",
+    "Bash(git commit *)",
+    "Bash(git push *)",
+    "Bash(git status *)",
+    "Bash(git branch --show-current)",
+    "Bash(git log *)",
+    "Bash(git rev-parse HEAD)",
+    "Bash(gh pr create *)",
+    "Bash(gh pr view *)",
 
     # File access permissions
     "Read(//Users/tylerburleigh/.claude/skills/**)",
@@ -100,6 +114,16 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
             new_permissions.append(perm)
             settings["permissions"]["allow"].append(perm)
 
+    # Show what's being added (if not in JSON mode)
+    if not args.json and new_permissions:
+        printer.info(f"Adding {len(new_permissions)} permissions:")
+        # Show first 5 permissions
+        for perm in new_permissions[:5]:
+            printer.info(f"  • {perm}")
+        if len(new_permissions) > 5:
+            printer.info(f"  ... and {len(new_permissions) - 5} more")
+        printer.info("")
+
     # Write updated settings
     with open(settings_file, 'w') as f:
         json.dump(settings, f, indent=2)
@@ -117,11 +141,33 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         print(json.dumps(result, indent=2))
     else:
         if new_permissions:
-            printer.success(f"Added {len(new_permissions)} new SDD permissions to {settings_file}")
+            printer.success(f"✅ Added {len(new_permissions)} new SDD permissions to {settings_file}")
         else:
-            printer.success(f"All SDD permissions already configured in {settings_file}")
+            printer.success(f"✅ All SDD permissions already configured in {settings_file}")
 
     return 0
+
+
+def categorize_missing_permissions(missing: list) -> dict:
+    """Categorize missing permissions by type for better reporting."""
+    categories = {
+        "skills": [],
+        "commands": [],
+        "bash": [],
+        "file_access": []
+    }
+
+    for perm in missing:
+        if perm.startswith("Skill("):
+            categories["skills"].append(perm)
+        elif perm.startswith("SlashCommand("):
+            categories["commands"].append(perm)
+        elif perm.startswith("Bash("):
+            categories["bash"].append(perm)
+        elif perm.startswith(("Read(", "Write(", "Edit(")):
+            categories["file_access"].append(perm)
+
+    return categories
 
 
 def cmd_check(args, printer: PrettyPrinter) -> int:
@@ -132,14 +178,19 @@ def cmd_check(args, printer: PrettyPrinter) -> int:
     if not settings_file.exists():
         result = {
             "configured": False,
+            "status": "not_configured",
             "settings_file": str(settings_file),
             "exists": False,
+            "total_required": len(SDD_PERMISSIONS),
+            "total_present": 0,
+            "total_missing": len(SDD_PERMISSIONS),
             "message": "Settings file does not exist"
         }
         if args.json:
             print(json.dumps(result, indent=2))
         else:
             printer.error(f"Settings file does not exist: {settings_file}")
+            printer.info(f"Missing all {len(SDD_PERMISSIONS)} SDD permissions")
         return 1
 
     with open(settings_file, 'r') as f:
@@ -147,30 +198,83 @@ def cmd_check(args, printer: PrettyPrinter) -> int:
 
     existing_permissions = set(settings.get("permissions", {}).get("allow", []))
 
-    # Check if key SDD permissions are present
-    required_permissions = [
+    # Check which permissions are present and which are missing
+    present = []
+    missing = []
+
+    for perm in SDD_PERMISSIONS:
+        if perm in existing_permissions:
+            present.append(perm)
+        else:
+            missing.append(perm)
+
+    # Determine configuration status
+    total_required = len(SDD_PERMISSIONS)
+    total_present = len(present)
+    total_missing = len(missing)
+
+    # Define core permissions needed for basic functionality
+    core_permissions = [
         "Skill(sdd-toolkit:sdd-plan)",
         "Skill(sdd-toolkit:sdd-next)",
         "Skill(sdd-toolkit:sdd-update)",
     ]
+    has_core = all(perm in existing_permissions for perm in core_permissions)
 
-    configured = all(perm in existing_permissions for perm in required_permissions)
+    if total_missing == 0:
+        status = "fully_configured"
+        configured = True
+    elif has_core and total_present >= 3:
+        status = "partially_configured"
+        configured = False
+    else:
+        status = "not_configured"
+        configured = False
+
+    # Categorize missing permissions
+    missing_by_category = categorize_missing_permissions(missing)
 
     result = {
         "configured": configured,
+        "status": status,
         "settings_file": str(settings_file),
         "exists": True,
-        "total_permissions": len(existing_permissions),
-        "has_required": configured
+        "total_required": total_required,
+        "total_present": total_present,
+        "total_missing": total_missing,
+        "missing_permissions": missing,
+        "missing_by_category": missing_by_category
     }
 
     if args.json:
         print(json.dumps(result, indent=2))
     else:
-        if configured:
-            printer.success("SDD permissions are configured")
+        if status == "fully_configured":
+            printer.success(f"SDD permissions are fully configured ({total_present}/{total_required})")
+        elif status == "partially_configured":
+            printer.warning(f"SDD permissions are partially configured ({total_present}/{total_required})")
+            printer.info("")
+            printer.info(f"Missing {total_missing} permissions:")
+
+            # Show categorized missing permissions
+            if missing_by_category["skills"]:
+                count = len(missing_by_category["skills"])
+                printer.info(f"  • {count} skill permission{'s' if count != 1 else ''}")
+            if missing_by_category["bash"]:
+                count = len(missing_by_category["bash"])
+                printer.info(f"  • {count} bash/git permission{'s' if count != 1 else ''}")
+            if missing_by_category["commands"]:
+                count = len(missing_by_category["commands"])
+                printer.info(f"  • {count} slash command{'s' if count != 1 else ''}")
+            if missing_by_category["file_access"]:
+                count = len(missing_by_category["file_access"])
+                printer.info(f"  • {count} file access permission{'s' if count != 1 else ''}")
+
+            printer.info("")
+            printer.info("Run 'sdd skills-dev setup-permissions update .' to add missing permissions")
         else:
-            printer.warning("SDD permissions need to be configured")
+            printer.error(f"SDD permissions not configured ({total_present}/{total_required})")
+            printer.info("Run 'sdd skills-dev setup-permissions update .' to configure")
 
     return 0 if configured else 1
 

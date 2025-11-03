@@ -71,28 +71,7 @@ sdd add-journal {spec-id} --title "Implementation Note" --content "Using Redis f
 
 **Entry types:** `decision`, `deviation`, `blocker`, `note`, `status_change`
 
-⚠️ **IMPORTANT:** Do NOT use `completion` as an entry-type value. While `completion` exists as a template option for `bulk-journal --template completion`, it is NOT a valid entry type for `add-journal --entry-type`.
-
-**To document task completion:**
-- Use `--entry-type status_change` for individual completion journal entries
-- OR use `sdd bulk-journal {spec-id} --template completion` to journal multiple completed tasks at once
-
-### Bulk Journal Completed Tasks
-
-The CLI tracks which completed tasks need journal entries:
-
-```bash
-# Check which tasks need journaling
-sdd check-journaling {spec-id}
-
-# Journal all unjournaled tasks at once
-sdd bulk-journal {spec-id}
-
-# Preview what will be journaled
-sdd bulk-journal {spec-id} --dry-run
-```
-
-**Best Practice:** Use `bulk-journal` periodically to document multiple completed tasks efficiently.
+⚠️ **IMPORTANT:** Do NOT use `completion` as an entry-type value. Use `--entry-type status_change` for task completion journal entries.
 
 ## Workflow 3: Handling Blockers
 
@@ -218,8 +197,26 @@ sdd complete-task {spec-id} {task-id} \
 3. Creates a journal entry documenting the completion
 4. Clears the `needs_journaling` flag
 5. Syncs metadata and recalculates progress
+6. Automatically journals parent nodes (phases, groups) that auto-complete
 
 **This is the recommended approach** because it ensures proper documentation of task completion.
+
+#### Parent Node Journaling
+
+When completing a task causes parent nodes (phases or task groups) to auto-complete, `complete-task` automatically creates journal entries for those parents:
+
+- **Automatic detection**: The system detects when all child tasks in a phase/group are completed
+- **Automatic journaling**: Creates journal entries like "Phase Completed: Phase 1" for each auto-completed parent
+- **No manual action needed**: You don't need to manually journal parent completions
+- **Hierarchical**: Works for multiple levels (e.g., completing a task can journal both its group AND its phase)
+
+Example output:
+```bash
+$ sdd complete-task my-spec-001 task-1-2 --journal-content "Completed final task"
+✓ Task marked complete
+✓ Journal entry added
+✓ Auto-journaled 2 parent node(s): group-1, phase-1
+```
 
 ### Alternative: Status-Only Update (Not Recommended for Completion)
 
@@ -269,6 +266,627 @@ Move specs that are no longer relevant:
 ```bash
 sdd move-spec {spec-id} archived
 ```
+
+## Workflow 7: Git Commit Integration
+
+When git integration is enabled (via `.claude/git_config.json`), the sdd-update skill can automatically create commits after task completion based on configured commit cadence preferences.
+
+### Commit Cadence Configuration
+
+The commit cadence determines when to offer automatic commits:
+
+- **task**: Commit after each task completion (frequent commits, granular history)
+- **phase**: Commit after each phase completion (fewer commits, milestone-based)
+- **manual**: Never auto-commit (user manages commits manually)
+
+The cadence preference is stored in `metadata.session_preferences.commit_cadence` in the spec file.
+
+### Commit Workflow Steps
+
+When completing a task and git integration is enabled, the workflow follows these steps:
+
+**1. Check Commit Cadence**
+
+First, check if automatic commits should be offered based on the current event:
+
+```python
+# From spec JSON
+session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
+commit_cadence = session_prefs.get('commit_cadence', 'task')
+
+# For task completion:
+should_offer_commit = (commit_cadence == 'task')
+
+# For phase completion:
+should_offer_commit = (commit_cadence == 'phase')
+```
+
+**2. Check for Changes**
+
+Before offering a commit, verify there are uncommitted changes:
+
+```bash
+# Check for changes (run in repo root directory)
+git status --porcelain
+
+# If output is empty, skip commit offer (nothing to commit)
+# If output has content, proceed with commit workflow
+```
+
+**3. Generate Commit Message**
+
+Create a structured commit message from task metadata:
+
+```python
+# Format: "{task-id}: {task-title}"
+# Example: "task-2-3: Implement JWT verification middleware"
+
+task_id = "task-2-3"
+task_title = "Implement JWT verification middleware"
+commit_message = f"{task_id}: {task_title}"
+```
+
+**4. Preview and Stage Changes (Two-Step Workflow)**
+
+The workflow now supports **agent-controlled file staging** with two approaches:
+
+**Option A: Show Preview (Default - Recommended)**
+
+When `file_staging.show_before_commit = true` (default), the agent sees uncommitted files and can selectively stage:
+
+```bash
+# Step 1: Preview uncommitted files (automatic via show_commit_preview_and_wait)
+# Shows: modified, untracked, and staged files
+sdd complete-task SPEC_ID TASK_ID
+
+# Step 2: Agent stages only task-related files
+git add specs/active/spec.json
+git add src/feature/implementation.py
+git add tests/test_feature.py
+# (Deliberately skip unrelated files like debug scripts, personal notes)
+
+# Step 3: Create commit with staged files only
+sdd create-task-commit SPEC_ID TASK_ID
+```
+
+**Benefits:**
+- ✅ Agent controls what files are committed
+- ✅ Unrelated files protected from accidental commits
+- ✅ Clean, focused task commits
+
+**Option B: Auto-Stage All (Backward Compatible)**
+
+When `file_staging.show_before_commit = false`, the old behavior is preserved:
+
+```bash
+# Automatically stages all files and commits (old behavior)
+git add --all
+git commit -m "{task-id}: {task-title}"
+```
+
+**Configuration:**
+
+File staging behavior is controlled in `.claude/git_config.json`:
+
+```json
+{
+  "enabled": true,
+  "auto_commit": true,
+  "commit_cadence": "task",
+  "file_staging": {
+    "show_before_commit": true  // false = auto-stage all (backward compatible)
+  }
+}
+```
+
+**Command Reference:**
+
+```bash
+# Complete task (shows preview if enabled)
+sdd complete-task SPEC_ID TASK_ID
+
+# Create commit from staged files
+sdd create-task-commit SPEC_ID TASK_ID
+
+# Example workflow:
+sdd complete-task user-auth-001 task-1-2
+# (Review preview, stage desired files)
+git add specs/active/user-auth-001.json src/auth/service.py
+sdd create-task-commit user-auth-001 task-1-2
+```
+
+**All git commands use `cwd=repo_root`** obtained from `find_git_root()` to ensure they run in the correct repository directory.
+
+**5. Record Commit Metadata**
+
+After successful commit, capture the commit SHA and update spec metadata:
+
+```bash
+# Get the commit SHA
+git rev-parse HEAD
+
+# Example output: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0
+```
+
+Then call `add_commit_metadata(spec_data, task_id, commit_sha)` to record the commit in the task's metadata:
+
+```python
+# Updates task metadata in spec JSON:
+task_metadata.commits = [
+    {
+        "sha": "a1b2c3d4e5f6...",
+        "timestamp": "2025-11-02T19:30:00Z",
+        "message": "task-2-3: Implement JWT verification middleware"
+    }
+]
+```
+
+### Error Handling
+
+Git operations should be non-blocking - failures should not prevent task completion:
+
+```python
+# Execute git command
+result = subprocess.run(
+    ['git', 'commit', '-m', commit_message],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+# Check return code
+if result.returncode != 0:
+    # Log warning but continue
+    logger.warning(f"Git commit failed: {result.stderr}")
+    # Task completion still succeeds
+else:
+    # Success - record commit metadata
+    commit_sha = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        cwd=repo_root,
+        capture_output=True,
+        text=True
+    ).stdout.strip()
+    add_commit_metadata(spec_data, task_id, commit_sha)
+```
+
+**Error handling principles:**
+
+- Check `returncode` for all git commands
+- Log warnings for failures but continue execution
+- Git failures do NOT prevent task completion
+- User can manually commit if automatic commit fails
+- Provide clear error messages in logs for debugging
+
+### Repository Root Detection
+
+All git commands must run in the repository root directory:
+
+```python
+from claude_skills.common.git_metadata import find_git_root
+
+# Find repository root from spec file location
+repo_root = find_git_root(spec_file_path.parent)
+
+if repo_root is None:
+    # Not in a git repository - skip git operations
+    logger.debug("No git repository found, skipping commit workflow")
+else:
+    # Execute git commands with cwd=repo_root
+    subprocess.run(['git', 'status'], cwd=repo_root, ...)
+```
+
+### Complete Example Workflow
+
+```python
+# 1. Task completion triggered
+complete_task(spec_id, task_id)
+
+# 2. Check if git integration enabled
+if not is_git_enabled(repo_root):
+    return  # Skip git workflow
+
+# 3. Check commit cadence
+if commit_cadence != 'task':  # For task completion
+    return  # Don't offer commit for this event
+
+# 4. Find repository root
+repo_root = find_git_root(spec_path.parent)
+if repo_root is None:
+    return  # Not in git repo
+
+# 5. Check for uncommitted changes
+result = subprocess.run(
+    ['git', 'status', '--porcelain'],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+if not result.stdout.strip():
+    return  # No changes to commit
+
+# 6. Generate commit message
+commit_message = f"{task_id}: {task_data['title']}"
+
+# 7. Stage all changes
+subprocess.run(['git', 'add', '--all'], cwd=repo_root)
+
+# 8. Create commit
+result = subprocess.run(
+    ['git', 'commit', '-m', commit_message],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+# 9. Handle result
+if result.returncode == 0:
+    # Get commit SHA
+    sha_result = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'],
+        cwd=repo_root,
+        capture_output=True,
+        text=True
+    )
+    commit_sha = sha_result.stdout.strip()
+
+    # Record metadata
+    add_commit_metadata(spec_data, task_id, commit_sha)
+    logger.info(f"Committed changes: {commit_sha[:8]}")
+else:
+    # Log error but don't fail
+    logger.warning(f"Commit failed: {result.stderr}")
+```
+
+### Configuration File
+
+Git integration is configured via `.claude/git_config.json`:
+
+```json
+{
+  "enabled": true,
+  "auto_branch": true,
+  "auto_commit": true,
+  "auto_push": false,
+  "auto_pr": false,
+  "commit_cadence": "task"
+}
+```
+
+**Settings:**
+- `enabled`: Enable/disable all git integration
+- `auto_commit`: Enable automatic commits (requires enabled: true)
+- `commit_cadence`: When to commit - "task", "phase", or "manual"
+
+See **Workflow 7: Git Commit Integration** in sdd-next SKILL.md for branch creation workflow details.
+
+## Workflow 8: Git Push and Pull Request Integration
+
+When a spec is completed, the workflow can automatically push commits to the remote repository and create a pull request for review.
+
+### When PR Workflow is Triggered
+
+The PR workflow is offered when:
+
+1. **Spec completion** is detected (all tasks completed, ready to finalize)
+2. Git integration is **enabled** (`.claude/git_config.json` has `enabled: true`)
+3. Repository **has uncommitted changes** or **unpushed commits**
+4. User confirms they want to push and create PR
+
+### PR Workflow Steps
+
+**1. Push Commits to Remote**
+
+Push the feature branch to the remote repository:
+
+```bash
+# Push with upstream tracking (-u flag)
+git push -u origin {branch-name}
+
+# Example:
+git push -u origin feat/user-auth-001
+```
+
+**Key details:**
+- Uses `-u` flag to set upstream tracking for the branch
+- Branch name comes from `metadata.git.branch_name` in spec
+- Runs with `cwd=repo_root` to ensure correct repository context
+- Non-blocking: If push fails, log warning but continue
+
+**2. Generate PR Body Template**
+
+Create a structured PR description from spec metadata:
+
+```markdown
+## Summary
+
+{spec-title}
+
+{spec-description}
+
+## Completed Tasks
+
+- ✅ {task-1-title}
+- ✅ {task-2-title}
+- ✅ {task-3-title}
+...
+
+## Phases Completed
+
+- **{phase-1-title}**: {phase-1-completed}/{phase-1-total} tasks
+- **{phase-2-title}**: {phase-2-completed}/{phase-2-total} tasks
+...
+
+## Commits
+
+- {commit-1-sha}: {commit-1-message}
+- {commit-2-sha}: {commit-2-message}
+...
+
+## Verification
+
+{List of verification tasks and their results}
+
+---
+Generated by SDD Toolkit
+```
+
+**Template variables:**
+- `spec-title`: From `metadata.title`
+- `spec-description`: From `metadata.description`
+- Tasks: From `hierarchy` with status `completed`
+- Phases: From phase nodes in `hierarchy`
+- Commits: From `metadata.git.commits[]` array
+- Verification: From verification task results
+
+**3. Create Pull Request via GitHub CLI**
+
+Use `gh pr create` to create the PR:
+
+```bash
+# Create PR with title and body
+gh pr create \
+  --title "{spec-title}" \
+  --body "{generated-pr-body}" \
+  --base {base-branch}
+
+# Example:
+gh pr create \
+  --title "User Authentication System" \
+  --body "$(cat <<'EOF'
+## Summary
+...
+EOF
+)" \
+  --base main
+```
+
+**Required:**
+- `gh` CLI must be installed and authenticated
+- Repository must be on GitHub
+- User must have push access to the repository
+
+**4. Handle gh Unavailability**
+
+If `gh` CLI is not available:
+
+```python
+# Check if gh is installed
+result = subprocess.run(
+    ['which', 'gh'],
+    capture_output=True,
+    text=True
+)
+
+if result.returncode != 0:
+    # gh not available
+    logger.warning("GitHub CLI (gh) not found")
+    logger.info("Install gh: https://cli.github.com/")
+    logger.info("Or create PR manually at: https://github.com/{owner}/{repo}/compare/{branch}")
+    # Continue without creating PR
+    return None
+```
+
+**Fallback actions when gh unavailable:**
+- Log warning message
+- Provide installation instructions
+- Provide manual PR creation URL
+- Continue workflow (non-blocking)
+
+**5. Record PR Metadata**
+
+After successful PR creation, update spec metadata:
+
+```bash
+# Parse PR URL and number from gh output
+# Example output: https://github.com/owner/repo/pull/123
+
+# Extract PR number from URL
+pr_number = 123
+pr_url = "https://github.com/owner/repo/pull/123"
+```
+
+Call `update_pr_metadata(spec_data, pr_url, pr_number, status='open')` to record:
+
+```python
+# Updates spec metadata.git.pr:
+metadata.git.pr = {
+    "url": "https://github.com/owner/repo/pull/123",
+    "number": 123,
+    "status": "open",
+    "created_at": "2025-11-03T15:30:00Z"
+}
+```
+
+### Error Handling for PR Workflow
+
+All PR workflow operations are **non-blocking** - failures should not prevent spec completion:
+
+```python
+# Push to remote
+push_result = subprocess.run(
+    ['git', 'push', '-u', 'origin', branch_name],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+if push_result.returncode != 0:
+    # Log error but continue
+    logger.warning(f"Git push failed: {push_result.stderr}")
+    logger.info("Push manually with: git push -u origin {branch_name}")
+    # Spec completion still succeeds, PR creation skipped
+    return None
+
+# Create PR via gh
+pr_result = subprocess.run(
+    ['gh', 'pr', 'create', '--title', title, '--body', body, '--base', base_branch],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+if pr_result.returncode != 0:
+    # Log error but continue
+    logger.warning(f"PR creation failed: {pr_result.stderr}")
+    logger.info("Create PR manually at: {github_url}")
+    # Spec completion still succeeds
+    return None
+```
+
+**Error handling principles:**
+- Check `returncode` for all git/gh commands
+- Log warnings for failures with actionable guidance
+- Provide manual fallback instructions
+- Failures do NOT prevent spec completion
+- User can manually push/create PR if automatic workflow fails
+
+### Configuration
+
+PR workflow is controlled via `.claude/git_config.json`:
+
+```json
+{
+  "enabled": true,
+  "auto_commit": true,
+  "auto_push": true,
+  "auto_pr": true,
+  "pr_template": "default"
+}
+```
+
+**Settings:**
+- `enabled`: Master switch for all git integration
+- `auto_push`: Enable automatic push after spec completion (requires enabled: true)
+- `auto_pr`: Enable automatic PR creation (requires enabled: true and auto_push: true)
+- `pr_template`: PR body template style ("default", "detailed", "minimal")
+
+**Dependency chain:**
+- `auto_pr` requires `auto_push` to be true
+- `auto_push` requires `enabled` to be true
+- If any requirement is false, skip that step in the workflow
+
+### Complete Example: Spec Completion with PR
+
+```python
+# 1. User triggers spec completion
+complete_spec(spec_id)
+
+# 2. Verify all tasks completed
+if not all_tasks_completed(spec):
+    raise Error("Cannot complete spec - tasks remaining")
+
+# 3. Check if git integration enabled
+if not is_git_enabled(repo_root):
+    return  # Skip git workflow
+
+# 4. Check if auto_push enabled
+config = load_git_config(repo_root)
+if not config.get('auto_push'):
+    return  # Skip push workflow
+
+# 5. Find repository root
+repo_root = find_git_root(spec_path.parent)
+if repo_root is None:
+    return  # Not in git repo
+
+# 6. Get branch name from spec metadata
+branch_name = spec_data['metadata']['git']['branch_name']
+base_branch = spec_data['metadata']['git']['base_branch']
+
+# 7. Push commits to remote
+result = subprocess.run(
+    ['git', 'push', '-u', 'origin', branch_name],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+if result.returncode != 0:
+    logger.warning(f"Push failed: {result.stderr}")
+    return  # Skip PR creation
+
+# 8. Check if auto_pr enabled
+if not config.get('auto_pr'):
+    logger.info(f"Pushed to {branch_name}. Create PR manually.")
+    return
+
+# 9. Generate PR body from spec
+pr_body = generate_pr_body(spec_data)
+pr_title = spec_data['metadata']['title']
+
+# 10. Create PR via gh CLI
+pr_result = subprocess.run(
+    ['gh', 'pr', 'create',
+     '--title', pr_title,
+     '--body', pr_body,
+     '--base', base_branch],
+    cwd=repo_root,
+    capture_output=True,
+    text=True
+)
+
+if pr_result.returncode == 0:
+    # Parse PR URL from output
+    pr_url = pr_result.stdout.strip()
+    pr_number = extract_pr_number(pr_url)
+
+    # Record PR metadata
+    update_pr_metadata(spec_data, pr_url, pr_number, status='open')
+    logger.info(f"Created PR #{pr_number}: {pr_url}")
+else:
+    logger.warning(f"PR creation failed: {pr_result.stderr}")
+    logger.info("Create PR manually at: {github_compare_url}")
+```
+
+### GitHub CLI (gh) Requirements
+
+The PR workflow requires the GitHub CLI (`gh`):
+
+**Installation:**
+- macOS: `brew install gh`
+- Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+- Windows: `winget install --id GitHub.cli`
+
+**Authentication:**
+```bash
+# Login to GitHub
+gh auth login
+
+# Verify authentication
+gh auth status
+```
+
+**Alternative: Manual PR Creation**
+
+If `gh` is unavailable, users can create PRs manually:
+
+1. Push branch: `git push -u origin {branch-name}`
+2. Visit: `https://github.com/{owner}/{repo}/compare/{branch-name}`
+3. Click "Create pull request"
+4. Fill in title and description from spec
+
+The spec completion workflow provides the manual PR creation URL when `gh` is not available.
 
 ## Common CLI Patterns
 

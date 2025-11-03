@@ -32,7 +32,101 @@
       "properties": {
         "estimated_hours": { "type": "number", "minimum": 0 },
         "owner": { "type": "string" },
-        "status": { "type": "string", "enum": ["active", "archived", "completed"] }
+        "status": { "type": "string", "enum": ["active", "archived", "completed"] },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Design assumptions and constraints for this spec (e.g., single-user workflow, feature branch ownership)"
+        },
+        "revision_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["version", "date", "changelog"],
+            "properties": {
+              "version": { "type": "string", "description": "Version number (e.g., 1.0, 1.1, 2.0)" },
+              "date": { "type": "string", "format": "date-time", "description": "ISO 8601 timestamp of revision" },
+              "author": { "type": "string", "description": "Who made the revision" },
+              "changelog": { "type": "string", "description": "Description of changes made in this revision" },
+              "modified_by": { "type": "string", "description": "Tool or command that made the modification (e.g., sdd modify-spec)" },
+              "review_triggered_by": { "type": "string", "description": "Path to review report that triggered this revision (if applicable)" }
+            }
+          },
+          "description": "Version history tracking spec modifications over time"
+        },
+        "git": {
+          "type": "object",
+          "description": "Git integration metadata for tracking spec development in version control",
+          "required": ["branch_name", "base_branch", "commits"],
+          "properties": {
+            "branch_name": {
+              "type": "string",
+              "description": "Name of the feature branch created for this spec (e.g., 'feat/user-authentication')"
+            },
+            "base_branch": {
+              "type": "string",
+              "description": "Base branch name that this feature branch was created from (e.g., 'main', 'develop')"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when the git branch was created"
+            },
+            "commits": {
+              "type": "array",
+              "description": "Array of commit records associated with this spec",
+              "items": {
+                "type": "object",
+                "required": ["sha", "message", "task_id", "timestamp"],
+                "properties": {
+                  "sha": {
+                    "type": "string",
+                    "description": "Git commit SHA hash"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Commit message"
+                  },
+                  "task_id": {
+                    "type": "string",
+                    "description": "Task ID associated with this commit (e.g., 'task-1-1')"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO 8601 timestamp when the commit was created"
+                  }
+                }
+              }
+            },
+            "pr_url": {
+              "type": "string",
+              "format": "uri",
+              "description": "GitHub pull request URL (if PR has been created)"
+            },
+            "pr_number": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Pull request number (if PR has been created)"
+            },
+            "pr_status": {
+              "type": "string",
+              "enum": ["open", "merged", "closed"],
+              "description": "Current status of the pull request"
+            }
+          }
+        },
+        "session_preferences": {
+          "type": "object",
+          "description": "User preferences for session behavior and workflows",
+          "properties": {
+            "commit_cadence": {
+              "type": "string",
+              "enum": ["task", "phase", "manual"],
+              "description": "Preferred cadence for creating git commits: 'task' (commit after each task), 'phase' (commit after each phase), 'manual' (user controls when to commit)"
+            }
+          }
+        }
       }
     },
     "hierarchy": {

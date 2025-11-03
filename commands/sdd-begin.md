@@ -17,7 +17,7 @@ This command helps you resume spec-driven development (SDD) work at the start of
 
 **You are assisting the user with resuming their spec-driven development work.**
 
-### Phase 0: Check Project Permissions
+### Phase 1: Check Project Permissions
 
 **FIRST**, check if SDD permissions are configured for this project:
 
@@ -25,7 +25,45 @@ This command helps you resume spec-driven development (SDD) work at the start of
 sdd skills-dev start-helper check-permissions
 ```
 
-**If `needs_setup: true`** (permissions not configured):
+**If check returns `status: "fully_configured"`:**
+- Proceed directly to Phase 2 (Git Configuration)
+
+**If check returns `status: "partially_configured"`:**
+
+Present this message to the user:
+```
+⚠️  Some SDD permissions are missing (35/41 configured)
+
+Missing permissions:
+  • 2 skill permissions
+  • 4 bash/git permissions
+```
+
+Then use the AskUserQuestion tool:
+- **Header**: "Permissions"
+- **Question**: "Would you like to add the missing permissions now?"
+- **Options**:
+  1. Yes, add missing permissions
+  2. No, continue anyway
+
+**If user chooses "Yes, add missing permissions":**
+```bash
+# Run the setup helper to add missing permissions
+sdd skills-dev setup-permissions update .
+
+# Inform the user
+echo "✅ SDD permissions updated! Added missing permissions."
+
+# Then proceed to Phase 2 to configure git
+```
+
+**If user chooses "No, continue anyway":**
+```
+⚠️  Continuing with partial permissions. Some features may not work.
+```
+- Proceed to Phase 2 (Git Configuration)
+
+**If check returns `status: "not_configured"`:**
 
 Present this message to the user:
 ```
@@ -49,15 +87,69 @@ sdd skills-dev setup-permissions update .
 # Inform the user
 echo "✅ SDD permissions configured! You can now use SDD skills in this project."
 
-# Then proceed to Phase 1 to discover active work
+# Then proceed to Phase 2 to configure git
 ```
 
-**If user chooses "No, skip for now"** OR **if permissions already configured**:
-- Proceed directly to Phase 1
+**If user chooses "No, skip for now":**
+- Proceed directly to Phase 2 (Git Configuration)
 
 ---
 
-### Phase 1: Discover Active Work
+### Phase 2: Check Git Configuration
+
+**AFTER permissions are configured**, check if git integration is configured:
+
+```bash
+sdd skills-dev start-helper check-git-config .
+```
+
+**If `needs_setup: true`** (git config not configured):
+
+Present this message to the user:
+```
+I noticed git integration hasn't been configured yet.
+
+Git integration enables automatic branch creation, commits, and AI-powered PR generation. Would you like to set it up now?
+```
+
+Then use the AskUserQuestion tool:
+- **Header**: "Git Setup"
+- **Question**: "Configure git integration?"
+- **Options**:
+  1. Yes, configure now (runs interactive wizard)
+  2. No, skip for now (continue without git features)
+
+**If user chooses "Yes, configure now":**
+```bash
+# Run the interactive setup wizard
+sdd skills-dev setup-git-config .
+
+# The wizard will ask questions like:
+# - Enable git integration? (yes/no)
+# - Auto-create branches? (yes/no)
+# - Auto-commit on task completion? (yes/no)
+# - Show files before commit? (yes/no)
+# - Enable AI-powered PRs? (yes/no)
+# etc.
+
+# Configuration will be saved to .claude/git_config.json
+```
+
+**If user chooses "No, skip for now"**:
+- Proceed directly to Phase 3
+
+**If git already configured**:
+
+Optionally display current git config status (brief, non-intrusive):
+```
+Git integration: ✅ Enabled (auto-branch, auto-commit per task, AI PRs)
+```
+
+Then proceed directly to Phase 3.
+
+---
+
+### Phase 3: Discover Active Work
 
 **⚠️ USE HELPER SCRIPT ONLY - DO NOT READ SPEC FILES DIRECTLY**
 
@@ -75,7 +167,7 @@ The script will return properly formatted text with active specs, their progress
 - **NEVER use Read() on .json spec files** - the helper script handles all spec parsing efficiently
 - JSON specs can be 50KB+ and waste context tokens when read directly
 
-### Phase 2: Present Options Based on Findings
+### Phase 4: Present Options Based on Findings
 
 **If active work found:**
 
@@ -144,7 +236,7 @@ Then use AskUserQuestion tool with options:
   1. Write new spec (auto-runs sdd-plan)
   2. Something else (exit)
 
-### Phase 3: Execute User's Choice
+### Phase 5: Execute User's Choice
 
 Based on the user's selection:
 
@@ -167,7 +259,16 @@ Use AskUserQuestion tool:
 
 **If user selects Autonomous Mode, check context first:**
 
-Run `sdd context --json` and parse the output to get context percentage.
+Use the two-command session marker pattern:
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker (in SEPARATE command)
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+Parse the output to get context percentage.
 
 If context percentage > 50%:
 ```
@@ -217,7 +318,16 @@ Use AskUserQuestion tool:
 
 **If user selects Autonomous Mode, check context first:**
 
-Run `sdd context --json` and parse the output to get context percentage.
+Use the two-command session marker pattern:
+```bash
+# Step 1: Generate session marker
+sdd session-marker
+
+# Step 2: Check context using the marker (in SEPARATE command)
+sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+Parse the output to get context percentage.
 
 If context percentage > 50%:
 ```
@@ -330,7 +440,7 @@ No problem! Let me know if you need any help with your project.
 
 Exit gracefully without invoking any skills.
 
-### Phase 4: Handle Multiple Specs (if applicable)
+### Phase 6: Handle Multiple Specs (if applicable)
 
 If user chose "Continue with next task" and there are multiple specs:
 
@@ -352,8 +462,10 @@ Use AskUserQuestion to let them choose the spec, then invoke sdd-next with that 
 
 ## Helper Script Reference
 
-The `skills-dev start-helper --` CLI provides:
+The `skills-dev start-helper` CLI provides:
 - `check-permissions` - Check if SDD permissions are configured (returns JSON)
+- `check-git-config` - Check if git integration is configured (returns JSON)
+- `setup-git-config` - Interactive git configuration wizard
 - `format-output` - Returns human-readable formatted text with last-accessed task info (PREFERRED - use this for display)
 - `get-session-info` - Returns session state with last-accessed task as JSON (for programmatic access)
 - `find-active-work` - Returns JSON with all resumable specs (for programmatic use)

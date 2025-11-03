@@ -497,6 +497,11 @@ def cmd_search(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.search_entities(args.query)
+
+    # Apply limit if provided
+    if hasattr(args, 'limit') and args.limit is not None:
+        results = results[:args.limit]
+
     if _maybe_json(args, _results_to_json(results, include_meta=True)):
         return 0
     _print_results(args, results)
@@ -1014,6 +1019,7 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
 
     search = subparsers.add_parser('search', parents=[parent_parser], help='Search all documented entities')
     search.add_argument('query', help='Search query (regex)')
+    search.add_argument('--limit', type=int, default=None, help='Limit number of results shown')
     search.set_defaults(func=cmd_search)
 
     context = subparsers.add_parser('context', parents=[parent_parser], help='Gather context for feature area')

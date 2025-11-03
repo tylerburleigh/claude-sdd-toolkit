@@ -3,6 +3,7 @@ Progress calculation utilities for SDD JSON specs.
 Provides hierarchical progress recalculation and status updates.
 """
 
+from datetime import datetime, timezone
 from typing import Dict, List
 
 
@@ -107,7 +108,17 @@ def update_node_status(node: Dict, hierarchy: Dict = None) -> None:
     elif completed == 0:
         node["status"] = "pending"
     elif completed == total:
+        # Check if status is changing to completed (auto-completion)
+        was_completed = node.get("status") == "completed"
         node["status"] = "completed"
+
+        # Set needs_journaling flag for parent nodes (groups, phases)
+        # when they auto-complete (not manually set)
+        if not was_completed and node.get("type") in ["group", "phase"]:
+            if "metadata" not in node:
+                node["metadata"] = {}
+            node["metadata"]["needs_journaling"] = True
+            node["metadata"]["completed_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     else:
         node["status"] = "in_progress"
 
