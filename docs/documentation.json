@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T14:49:18.655451Z",
+    "generated_at": "2025-11-03T15:25:39.804223Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 201,
-    "total_lines": 68227,
+    "total_lines": 68230,
     "total_classes": 268,
     "total_functions": 756,
     "avg_complexity": 5.6,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 201,
-        "lines": 68227,
+        "lines": 68230,
         "classes": 268,
         "functions": 756,
         "avg_complexity": 5.6
@@ -940,7 +940,7 @@
         "typing.Any"
       ],
       "exports": [],
-      "lines": 221
+      "lines": 224
     },
     {
       "name": "git_metadata",
@@ -24029,7 +24029,7 @@
         {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 148,
+          "line": 151,
           "call_type": "function_call"
         },
         {
@@ -27001,7 +27001,7 @@
     {
       "name": "get_config_path",
       "file": "src/claude_skills/claude_skills/common/git_config.py",
-      "line": 36,
+      "line": 39,
       "language": "python",
       "docstring": "Get the path to the git_config.json file.\n\nChecks multiple locations in order of precedence:\n1. Project-local: {project_path}/.claude/git_config.json\n2. Global: ~/.claude/git_config.json\n\nArgs:\n    project_path: Path to project root (optional). If not provided,\n                 will attempt to find project root or use cwd.\n\nReturns:\n    Path to git_config.json if found, None otherwise",
       "parameters": [
@@ -27027,7 +27027,7 @@
         {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 148,
+          "line": 151,
           "call_type": "function_call"
         },
         {
@@ -27065,55 +27065,55 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 55,
+          "line": 58,
           "call_type": "method_call"
         },
         {
           "name": "cwd",
           "file": "unknown",
-          "line": 58,
+          "line": 61,
           "call_type": "method_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 60,
+          "line": 63,
           "call_type": "function_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 62,
+          "line": 65,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 63,
+          "line": 66,
           "call_type": "method_call"
         },
         {
           "name": "append",
-          "file": "unknown",
-          "line": 67,
-          "call_type": "method_call"
-        },
-        {
-          "name": "home",
           "file": "unknown",
           "line": 70,
           "call_type": "method_call"
         },
         {
+          "name": "home",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
           "name": "append",
           "file": "unknown",
-          "line": 72,
+          "line": 75,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 76,
+          "line": 79,
           "call_type": "method_call"
         }
       ],
@@ -27122,7 +27122,7 @@
     {
       "name": "_validate_git_config",
       "file": "src/claude_skills/claude_skills/common/git_config.py",
-      "line": 83,
+      "line": 86,
       "language": "python",
       "docstring": "Validate and sanitize git configuration values.\n\nEnsures all configuration values have correct types and valid values.\nInvalid values are replaced with defaults and warnings are logged.\n\nArgs:\n    config: Raw configuration dictionary\n\nReturns:\n    Validated configuration dictionary",
       "parameters": [
@@ -27142,7 +27142,7 @@
         {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 165,
+          "line": 168,
           "call_type": "function_call"
         }
       ],
@@ -27150,73 +27150,73 @@
         {
           "name": "copy",
           "file": "unknown",
-          "line": 95,
+          "line": 98,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 102,
+          "line": 105,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 105,
+          "line": 108,
           "call_type": "method_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 106,
+          "line": 109,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 113,
-          "call_type": "function_call"
-        },
-        {
-          "name": "warning",
-          "file": "unknown",
           "line": 116,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set",
-          "file": "unknown",
-          "line": 123,
           "call_type": "function_call"
-        },
-        {
-          "name": "keys",
-          "file": "unknown",
-          "line": 123,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set",
-          "file": "unknown",
-          "line": 124,
-          "call_type": "function_call"
-        },
-        {
-          "name": "keys",
-          "file": "unknown",
-          "line": 124,
-          "call_type": "method_call"
         },
         {
           "name": "warning",
+          "file": "unknown",
+          "line": 119,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
           "file": "unknown",
           "line": 126,
           "call_type": "method_call"
         },
         {
-          "name": "join",
+          "name": "set",
           "file": "unknown",
           "line": 127,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 127,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 129,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 130,
           "call_type": "method_call"
         }
       ],
@@ -27225,7 +27225,7 @@
     {
       "name": "load_git_config",
       "file": "src/claude_skills/claude_skills/common/git_config.py",
-      "line": 133,
+      "line": 136,
       "language": "python",
       "docstring": "Load git configuration from file with fallback to defaults.\n\nAttempts to load configuration from:\n1. Project-local config ({project_path}/.claude/git_config.json)\n2. Global config (~/.claude/git_config.json)\n3. Built-in defaults (DEFAULT_GIT_CONFIG)\n\nArgs:\n    project_path: Path to project root (optional). If not provided,\n                 will attempt to find project root.\n\nReturns:\n    Dict with complete git configuration (validated and merged with defaults)",
       "parameters": [
@@ -27245,13 +27245,13 @@
         {
           "name": "is_git_enabled",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 195,
+          "line": 198,
           "call_type": "function_call"
         },
         {
           "name": "get_git_setting",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 215,
+          "line": 218,
           "call_type": "function_call"
         },
         {
@@ -27265,85 +27265,85 @@
         {
           "name": "get_config_path",
           "file": "unknown",
-          "line": 148,
+          "line": 151,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 152,
+          "line": 155,
           "call_type": "method_call"
         },
         {
           "name": "copy",
           "file": "unknown",
-          "line": 153,
+          "line": 156,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "unknown",
-          "line": 156,
+          "line": 159,
           "call_type": "function_call"
         },
         {
           "name": "load",
           "file": "unknown",
-          "line": 157,
+          "line": 160,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 159,
+          "line": 162,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 161,
+          "line": 164,
           "call_type": "method_call"
         },
         {
           "name": "copy",
           "file": "unknown",
-          "line": 162,
+          "line": 165,
           "call_type": "method_call"
         },
         {
           "name": "_validate_git_config",
           "file": "unknown",
-          "line": 165,
+          "line": 168,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 166,
+          "line": 169,
           "call_type": "method_call"
         },
         {
           "name": "warning",
-          "file": "unknown",
-          "line": 171,
-          "call_type": "method_call"
-        },
-        {
-          "name": "copy",
           "file": "unknown",
           "line": 174,
           "call_type": "method_call"
         },
         {
+          "name": "copy",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
           "name": "warning",
           "file": "unknown",
-          "line": 178,
+          "line": 181,
           "call_type": "method_call"
         },
         {
           "name": "copy",
           "file": "unknown",
-          "line": 181,
+          "line": 184,
           "call_type": "method_call"
         }
       ],
@@ -27352,7 +27352,7 @@
     {
       "name": "is_git_enabled",
       "file": "src/claude_skills/claude_skills/common/git_config.py",
-      "line": 184,
+      "line": 187,
       "language": "python",
       "docstring": "Check if git integration is enabled.\n\nQuick convenience function to check the 'enabled' setting.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    True if git integration is enabled, False otherwise",
       "parameters": [
@@ -27392,13 +27392,13 @@
         {
           "name": "load_git_config",
           "file": "unknown",
-          "line": 195,
+          "line": 198,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 196,
+          "line": 199,
           "call_type": "method_call"
         }
       ],
@@ -27407,7 +27407,7 @@
     {
       "name": "get_git_setting",
       "file": "src/claude_skills/claude_skills/common/git_config.py",
-      "line": 199,
+      "line": 202,
       "language": "python",
       "docstring": "Get a specific git configuration setting with validation.\n\nArgs:\n    key: Configuration key to retrieve\n    project_path: Path to project root (optional)\n    default: Default value to return if key not found (optional).\n            If not provided, uses DEFAULT_GIT_CONFIG default.\n\nReturns:\n    Configuration value for the specified key",
       "parameters": [
@@ -27438,25 +27438,25 @@
         {
           "name": "load_git_config",
           "file": "unknown",
-          "line": 215,
+          "line": 218,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 219,
+          "line": 222,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 221,
+          "line": 224,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 221,
+          "line": 224,
           "call_type": "method_call"
         }
       ]
@@ -60117,7 +60117,7 @@
         {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 148,
+          "line": 151,
           "call_type": "function_call"
         },
         {

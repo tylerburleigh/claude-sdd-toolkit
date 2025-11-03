@@ -29,6 +29,13 @@ DEFAULT_GIT_CONFIG = {
     "commit_cadence": "task",  # When to commit: "task", "phase", or "manual"
     "file_staging": {  # File staging behavior for commits
         "show_before_commit": True,  # Show preview of files before committing (default: true)
+    },
+    "ai_pr": {  # AI-powered PR creation settings
+        "enabled": False,  # Use AI to generate comprehensive PR descriptions (default: false)
+        "model": "sonnet",  # AI model to use for PR generation (sonnet recommended for better writing)
+        "include_journals": True,  # Include journal entries in context analysis
+        "include_diffs": True,  # Include git diffs in context analysis
+        "max_diff_size_kb": 50,  # Maximum diff size in KB before truncation
     }
 }
 
@@ -121,6 +128,41 @@ def _validate_git_config(config: Dict[str, Any]) -> Dict[str, Any]:
                 f"Must be one of {VALID_COMMIT_CADENCE}. "
                 f"Using default: {DEFAULT_GIT_CONFIG['commit_cadence']}"
             )
+
+    # Validate file_staging section
+    if "file_staging" in config and isinstance(config["file_staging"], dict):
+        file_staging = config["file_staging"]
+        if "show_before_commit" in file_staging:
+            value = file_staging["show_before_commit"]
+            if isinstance(value, bool):
+                validated["file_staging"]["show_before_commit"] = value
+
+    # Validate ai_pr section
+    if "ai_pr" in config and isinstance(config["ai_pr"], dict):
+        ai_pr = config["ai_pr"]
+
+        # Validate boolean fields
+        if "enabled" in ai_pr and isinstance(ai_pr["enabled"], bool):
+            validated["ai_pr"]["enabled"] = ai_pr["enabled"]
+        if "include_journals" in ai_pr and isinstance(ai_pr["include_journals"], bool):
+            validated["ai_pr"]["include_journals"] = ai_pr["include_journals"]
+        if "include_diffs" in ai_pr and isinstance(ai_pr["include_diffs"], bool):
+            validated["ai_pr"]["include_diffs"] = ai_pr["include_diffs"]
+
+        # Validate string fields
+        if "model" in ai_pr and isinstance(ai_pr["model"], str):
+            validated["ai_pr"]["model"] = ai_pr["model"]
+
+        # Validate numeric fields
+        if "max_diff_size_kb" in ai_pr:
+            value = ai_pr["max_diff_size_kb"]
+            if isinstance(value, (int, float)) and value > 0:
+                validated["ai_pr"]["max_diff_size_kb"] = int(value)
+            else:
+                logger.warning(
+                    f"Invalid value for ai_pr.max_diff_size_kb: {value}. "
+                    f"Must be a positive number. Using default: {DEFAULT_GIT_CONFIG['ai_pr']['max_diff_size_kb']}"
+                )
 
     # Warn about unknown keys (but don't fail)
     known_keys = set(DEFAULT_GIT_CONFIG.keys())

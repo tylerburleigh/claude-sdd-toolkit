@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 09:49:18
+**Generated:** 2025-11-03 10:25:39
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 68227
+- **Total Lines:** 68230
 - **Total Classes:** 268
 - **Total Functions:** 756
 - **Avg Complexity:** 5.6
@@ -6578,7 +6578,7 @@ Returns:
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:83`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:86`
 **Complexity:** 8
 
 **Description:**
@@ -12858,7 +12858,7 @@ Returns:
 ### `get_config_path(project_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:36`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:39`
 **Complexity:** 6
 
 **Description:**
@@ -13072,7 +13072,7 @@ Returns:
 ### `get_git_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:199`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:202`
 **Complexity:** 2
 
 **Description:**
@@ -14254,7 +14254,7 @@ Returns:
 ### `is_git_enabled(project_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:184`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:187`
 **Complexity:** 1
 
 **Description:**
@@ -14554,7 +14554,7 @@ Returns:
 ### `load_git_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:133`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:136`
 **Complexity:** 6
 
 **Description:**

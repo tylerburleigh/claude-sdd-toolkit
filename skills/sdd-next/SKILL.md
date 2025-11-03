@@ -1434,7 +1434,69 @@ AskUserQuestion(
 - ✅ Saves main agent context for actual implementation
 - ✅ Provides structured options ready for AskUserQuestion
 
-### Workflow 4: Plan Refinement
+### Workflow 4: Spec Completion
+**Situation:** All tasks in spec are completed, ready for next steps
+
+**When this happens:**
+- sdd-update completes final task
+- Detects spec completion with AI PR enabled
+- Hands off to sdd-next for orchestration
+
+Steps:
+1. Check spec status via `sdd check-complete {spec-id}`
+2. Verify all tasks are completed
+3. Check git integration status and ai_pr configuration
+4. Present completion summary to user
+5. Suggest next action based on configuration
+
+**If AI PR is enabled:**
+```
+🎉 Spec Completed: {spec-title}
+
+All 23 tasks completed across 4 phases.
+
+Branch: {branch-name}
+Base: {base-branch}
+Commits: {N} commits ready
+
+Next Step: Create Pull Request
+
+To create an AI-powered PR with comprehensive description:
+  Skill(sdd-toolkit:sdd-pr)
+
+The sdd-pr skill will:
+1. Analyze spec metadata, git diffs, commit history, and journals
+2. Generate comprehensive PR description
+3. Show draft for your approval
+4. Create PR after confirmation
+
+Would you like to create the PR now?
+```
+
+**If AI PR is disabled:**
+```
+🎉 Spec Completed: {spec-title}
+
+All 23 tasks completed.
+
+Next Steps:
+1. Create PR manually: gh pr create
+2. Move spec to completed: sdd move-spec {spec-id} completed
+3. Start new spec: Skill(sdd-toolkit:sdd-next) with different spec
+
+What would you like to do?
+```
+
+**Agent actions:**
+- Present completion summary
+- Check configuration for ai_pr.enabled
+- If enabled: Suggest `Skill(sdd-toolkit:sdd-pr)` with spec_id
+- If disabled: Provide manual next steps
+- Wait for user decision
+
+**Important:** The agent should invoke `Skill(sdd-toolkit:sdd-pr)` only after user confirmation, passing the spec_id clearly.
+
+### Workflow 5: Plan Refinement
 **Situation:** Initial plan needs adjustment during implementation
 
 **Recommended: Proactive Verification**
