@@ -450,6 +450,135 @@ def show_commit_preview_and_wait(
     printer.result("Command", f"sdd create-task-commit {spec_id} {task_id}")
 
 
+def create_commit_from_staging(
+    repo_root: Path,
+    spec_id: str,
+    task_id: str,
+    printer=None
+) -> Tuple[bool, Optional[str], Optional[str]]:
+    """Create commit from currently staged files (Step 2 of two-step workflow).
+
+    This is step 2 of the two-step commit workflow. After the agent has staged
+    files using git add, this function creates a commit with those staged files.
+
+    Workflow:
+    1. Agent calls show_commit_preview_and_wait() to see changes (step 1)
+    2. Agent stages selected files with git add
+    3. Agent calls this function to create the commit (step 2)
+
+    Args:
+        repo_root: Path to git repository root
+        spec_id: Specification ID (e.g., 'user-auth-2025-10-24-001')
+        task_id: Task ID (e.g., 'task-2-1')
+        printer: Optional PrettyPrinter instance for output. If None, creates one.
+
+    Returns:
+        Tuple of (success, commit_sha, error_msg):
+        - success: True if commit created successfully, False otherwise
+        - commit_sha: Full commit SHA if successful, None otherwise
+        - error_msg: Error message if failed, None if successful
+
+    Example:
+        >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+        (True, 'a1b2c3d4e5f6...', None)
+
+        >>> # No files staged:
+        >>> create_commit_from_staging(Path('/repo'), 'user-auth-001', 'task-2-1')
+        (False, None, 'No files staged for commit')
+    """
+    from claude_skills.common.printer import PrettyPrinter
+
+    if printer is None:
+        printer = PrettyPrinter()
+
+    # Check if there are files staged
+    staged_files = get_staged_files(repo_root)
+
+    if not staged_files:
+        error_msg = "No files staged for commit"
+        printer.error(error_msg)
+        printer.info("Stage files with: git add <file>")
+        return (False, None, error_msg)
+
+    # Show what will be committed
+    printer.blank()
+    printer.header("Creating Commit")
+    printer.result("Task", task_id)
+    printer.result("Staged Files", f"{len(staged_files)} file(s)")
+    for file_path in staged_files:
+        printer.item(file_path, indent=1)
+
+    # Create commit message
+    commit_message = f"{task_id}: Implement task from spec {spec_id}"
+
+    try:
+        # Execute git commit
+        result = subprocess.run(
+            ["git", "commit", "-m", commit_message],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30
+        )
+
+        # Extract commit SHA from output
+        # Git commit output typically includes "[branch commit_sha]" in first line
+        output_lines = result.stdout.strip().split('\n')
+        commit_sha = None
+
+        for line in output_lines:
+            # Look for pattern like "[main a1b2c3d]" or "[branch a1b2c3d]"
+            if '[' in line and ']' in line:
+                # Extract text between brackets
+                bracket_content = line[line.find('[')+1:line.find(']')]
+                parts = bracket_content.split()
+                if len(parts) >= 2:
+                    # Second part is the abbreviated SHA
+                    commit_sha = parts[1]
+                    break
+
+        # If we couldn't parse SHA from output, get it from git log
+        if not commit_sha:
+            sha_result = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=repo_root,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=10
+            )
+            commit_sha = sha_result.stdout.strip()
+
+        printer.blank()
+        printer.success(f"Commit created: {commit_sha}")
+        return (True, commit_sha, None)
+
+    except subprocess.TimeoutExpired:
+        error_msg = "Git commit command timed out"
+        printer.error(error_msg)
+        logger.warning(f"Git commit timed out at {repo_root}")
+        return (False, None, error_msg)
+
+    except subprocess.CalledProcessError as e:
+        error_msg = f"Git commit failed: {e.stderr.strip()}"
+        printer.error(error_msg)
+        logger.warning(f"Git commit failed at {repo_root}: {e.stderr}")
+        return (False, None, error_msg)
+
+    except FileNotFoundError:
+        error_msg = "Git command not found - is git installed?"
+        printer.error(error_msg)
+        logger.error("Git command not found")
+        return (False, None, error_msg)
+
+    except Exception as e:
+        error_msg = f"Unexpected error creating commit: {type(e).__name__}"
+        printer.error(error_msg)
+        logger.warning(f"Unexpected error creating commit: {e}")
+        return (False, None, error_msg)
+
+
 def get_staged_files(repo_root: Path) -> List[str]:
     """Get list of files currently staged for commit.
 
