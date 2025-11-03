@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 09:23:19
+**Generated:** 2025-11-03 09:24:59
 
 ---
 
@@ -20727,6 +20727,7 @@ Returns:
 
 - `__future__.annotations`
 - `claude_skills.common.git_metadata.add_commit_metadata`
+- `claude_skills.common.git_metadata.show_commit_preview_and_wait`
 - `claude_skills.common.printer.PrettyPrinter`
 - `claude_skills.common.spec.load_json_spec`
 - `copy`

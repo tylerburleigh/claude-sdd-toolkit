@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T14:23:19.612721Z",
+    "generated_at": "2025-11-03T14:24:59.991160Z",
     "languages": [
       "python"
     ],
@@ -3233,7 +3233,8 @@
         "git_commit.check_git_commit_readiness",
         "git_commit.generate_commit_message",
         "git_commit.stage_and_commit",
-        "claude_skills.common.git_metadata.add_commit_metadata"
+        "claude_skills.common.git_metadata.add_commit_metadata",
+        "claude_skills.common.git_metadata.show_commit_preview_and_wait"
       ],
       "exports": [],
       "lines": 598
@@ -105128,7 +105129,8 @@
       "git_commit.check_git_commit_readiness",
       "git_commit.generate_commit_message",
       "git_commit.stage_and_commit",
-      "claude_skills.common.git_metadata.add_commit_metadata"
+      "claude_skills.common.git_metadata.add_commit_metadata",
+      "claude_skills.common.git_metadata.show_commit_preview_and_wait"
     ],
     "src/claude_skills/claude_skills/sdd_validate/__init__.py": [
       "formatting.NormalizedValidationResult",

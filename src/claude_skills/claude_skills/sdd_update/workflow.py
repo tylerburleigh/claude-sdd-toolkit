@@ -26,7 +26,8 @@ from .git_commit import (
     generate_commit_message,
     stage_and_commit,
 )
-from claude_skills.common.git_metadata import add_commit_metadata, show_commit_preview_and_wait
+from claude_skills.common.git_metadata import add_commit_metadata, show_commit_preview_and_wait, find_git_root
+from claude_skills.common.git_config import load_git_config
 
 
 def _get_timestamp() -> str:
@@ -546,6 +547,21 @@ def complete_task_workflow(
             # Generate commit message
             task_title = task.get('title', task_id)
             commit_message = generate_commit_message(task_id, task_title)
+
+            # Check if preview should be shown before commit
+            repo_root = commit_info['repo_root']
+            git_config = load_git_config(repo_root)
+            show_preview = git_config.get('file_staging', {}).get('show_before_commit', True)
+
+            if show_preview:
+                # Show preview of changes before staging/committing
+                printer.info("Showing commit preview (configured via file_staging.show_before_commit)...")
+                show_commit_preview_and_wait(
+                    repo_root=repo_root,
+                    spec_id=spec_id,
+                    task_id=task_id,
+                    printer=printer
+                )
 
             # Stage and commit changes
             success, commit_sha, error_msg = stage_and_commit(
