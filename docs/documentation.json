@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T21:25:37.324782Z",
+    "generated_at": "2025-11-03T21:38:46.030031Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 206,
-    "total_lines": 69569,
+    "total_files": 207,
+    "total_lines": 69731,
     "total_classes": 268,
-    "total_functions": 776,
+    "total_functions": 777,
     "avg_complexity": 5.6,
     "max_complexity": 44,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 206,
-        "lines": 69569,
+        "files": 207,
+        "lines": 69731,
         "classes": 268,
-        "functions": 776,
+        "functions": 777,
         "avg_complexity": 5.6
       }
     }
@@ -868,6 +868,24 @@
       ],
       "exports": [],
       "lines": 487
+    },
+    {
+      "name": "contracts",
+      "file": "src/claude_skills/claude_skills/common/contracts.py",
+      "language": "python",
+      "docstring": "Contract extraction functions for SDD CLI commands.\n\nThis module provides functions to extract minimal, functional contracts from\nfull CLI command outputs. These contracts preserve all decision-enabling\ninformation while significantly reducing token usage (typically 60-88% savings).\n\nThe contracts follow the principle of \"smart defaults\":\n- Omit null/empty values\n- Omit fields with default values\n- Include only fields needed for agent decision-making\n- Conditionally include optional fields when they have meaningful values\n\nFor detailed contract specifications, see /tmp/functional-contracts-analysis.md",
+      "classes": [],
+      "functions": [
+        "extract_prepare_task_contract"
+      ],
+      "imports": [
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "logging"
+      ],
+      "exports": [],
+      "lines": 162
     },
     {
       "name": "dependency_analysis",
@@ -26740,6 +26758,143 @@
         }
       ],
       "call_count": 16
+    },
+    {
+      "name": "extract_prepare_task_contract",
+      "file": "src/claude_skills/claude_skills/common/contracts.py",
+      "line": 23,
+      "language": "python",
+      "docstring": "Extract minimal contract from `sdd prepare-task` output.\n\nPurpose:\n    Enable the agent to:\n    1. Identify the next task to work on\n    2. Determine if the task can be started\n    3. Understand what work needs to be done\n    4. Prepare the git environment appropriately\n    5. Detect if the spec is complete\n\nField Inclusion Rules:\n\n    ALWAYS INCLUDE (Essential):\n    - task_id: Task identifier for referencing in subsequent commands\n    - title: Concise description of what to do\n    - can_start: Boolean indicating if task can be started now\n    - blocked_by: List of blocking task IDs (if can't start)\n    - git.needs_branch: Whether a new branch should be created\n    - git.suggested_branch: Branch name to use\n    - git.dirty: Whether working tree has uncommitted changes\n    - spec_complete: Whether the spec is finished\n\n    CONDITIONALLY INCLUDE (Optional):\n    - file_path: Target file path (only if specified in task metadata)\n    - details: Implementation details (only if specified in task metadata)\n    - status: Task status (only if not \"pending\")\n    - validation_warnings: Spec validation warnings (only if non-empty)\n    - completion_info: Completion details (only if spec_complete is True)\n\n    OMIT (Redundant/Not Needed):\n    - success, error: Exit code indicates success/failure\n    - task_data: Fields duplicated at top level\n    - task_details, spec_file, doc_context: Always null\n    - dependencies object: Flattened to top-level fields\n    - repo_root: Agent knows from environment\n    - needs_branch_creation: Duplicate of git.needs_branch\n    - dirty_tree_status: Verbose, git.dirty is sufficient\n    - UI-only fields: needs_commit_cadence, commit_cadence_options, etc.\n\nArgs:\n    prepare_task_output: Full output from sdd prepare-task command\n\nReturns:\n    Minimal contract dict with essential and conditionally-included fields\n\nExample:\n    >>> full_output = {\n    ...     \"success\": True,\n    ...     \"task_id\": \"task-1-1-1\",\n    ...     \"task_data\": {\n    ...         \"title\": \"Implement extract_prepare_task_contract()\",\n    ...         \"metadata\": {\"details\": \"Extract fields: ...\"}\n    ...     },\n    ...     \"dependencies\": {\"can_start\": True, \"blocked_by\": []},\n    ...     \"needs_branch_creation\": True,\n    ...     \"suggested_branch_name\": \"feat/compact-json\",\n    ...     \"dirty_tree_status\": {\"is_dirty\": False},\n    ...     \"spec_complete\": False,\n    ...     # ... many other fields\n    ... }\n    >>> contract = extract_prepare_task_contract(full_output)\n    >>> contract\n    {\n        \"task_id\": \"task-1-1-1\",\n        \"title\": \"Implement extract_prepare_task_contract()\",\n        \"can_start\": True,\n        \"blocked_by\": [],\n        \"git\": {\n            \"needs_branch\": True,\n            \"suggested_branch\": \"feat/compact-json\",\n            \"dirty\": False\n        },\n        \"spec_complete\": False,\n        \"details\": \"Extract fields: ...\"\n    }",
+      "parameters": [
+        {
+          "name": "prepare_task_output",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 108,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 112,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 122,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 127,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 133,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 158,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 159,
+          "call_type": "method_call"
+        }
+      ]
     },
     {
       "name": "analyze_dependencies",
@@ -107730,6 +107885,12 @@
       "typing.Dict",
       "typing.List",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/common/contracts.py": [
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "logging"
     ],
     "src/claude_skills/claude_skills/common/dependency_analysis.py": [
       "dataclasses.dataclass",

@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 16:25:37
+**Generated:** 2025-11-03 16:38:46
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 206
-- **Total Lines:** 69569
+- **Total Files:** 207
+- **Total Lines:** 69731
 - **Total Classes:** 268
-- **Total Functions:** 776
+- **Total Functions:** 777
 - **Avg Complexity:** 5.6
 - **Max Complexity:** 44
 - **High Complexity Functions:**
@@ -10900,6 +10900,94 @@ Returns:
 
 ---
 
+### `extract_prepare_task_contract(prepare_task_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:23`
+**Complexity:** 8
+
+**Description:**
+> Extract minimal contract from `sdd prepare-task` output.
+
+Purpose:
+    Enable the agent to:
+    1. Identify the next task to work on
+    2. Determine if the task can be started
+    3. Understand what work needs to be done
+    4. Prepare the git environment appropriately
+    5. Detect if the spec is complete
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier for referencing in subsequent commands
+    - title: Concise description of what to do
+    - can_start: Boolean indicating if task can be started now
+    - blocked_by: List of blocking task IDs (if can't start)
+    - git.needs_branch: Whether a new branch should be created
+    - git.suggested_branch: Branch name to use
+    - git.dirty: Whether working tree has uncommitted changes
+    - spec_complete: Whether the spec is finished
+
+    CONDITIONALLY INCLUDE (Optional):
+    - file_path: Target file path (only if specified in task metadata)
+    - details: Implementation details (only if specified in task metadata)
+    - status: Task status (only if not "pending")
+    - validation_warnings: Spec validation warnings (only if non-empty)
+    - completion_info: Completion details (only if spec_complete is True)
+
+    OMIT (Redundant/Not Needed):
+    - success, error: Exit code indicates success/failure
+    - task_data: Fields duplicated at top level
+    - task_details, spec_file, doc_context: Always null
+    - dependencies object: Flattened to top-level fields
+    - repo_root: Agent knows from environment
+    - needs_branch_creation: Duplicate of git.needs_branch
+    - dirty_tree_status: Verbose, git.dirty is sufficient
+    - UI-only fields: needs_commit_cadence, commit_cadence_options, etc.
+
+Args:
+    prepare_task_output: Full output from sdd prepare-task command
+
+Returns:
+    Minimal contract dict with essential and conditionally-included fields
+
+Example:
+    >>> full_output = {
+    ...     "success": True,
+    ...     "task_id": "task-1-1-1",
+    ...     "task_data": {
+    ...         "title": "Implement extract_prepare_task_contract()",
+    ...         "metadata": {"details": "Extract fields: ..."}
+    ...     },
+    ...     "dependencies": {"can_start": True, "blocked_by": []},
+    ...     "needs_branch_creation": True,
+    ...     "suggested_branch_name": "feat/compact-json",
+    ...     "dirty_tree_status": {"is_dirty": False},
+    ...     "spec_complete": False,
+    ...     # ... many other fields
+    ... }
+    >>> contract = extract_prepare_task_contract(full_output)
+    >>> contract
+    {
+        "task_id": "task-1-1-1",
+        "title": "Implement extract_prepare_task_contract()",
+        "can_start": True,
+        "blocked_by": [],
+        "git": {
+            "needs_branch": True,
+            "suggested_branch": "feat/compact-json",
+            "dirty": False
+        },
+        "spec_complete": False,
+        "details": "Extract fields: ..."
+    }
+
+**Parameters:**
+- `prepare_task_output`: Dict[str, Any]
+
+---
+
 ### `extract_readme(project_root) -> Optional[str]`
 
 **Language:** python
@@ -20161,6 +20249,13 @@ Returns:
 
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/contracts.py`
+
+- `logging`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/dependency_analysis.py`

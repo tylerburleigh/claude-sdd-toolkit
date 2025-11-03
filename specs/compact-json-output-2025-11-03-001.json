@@ -1,7 +1,7 @@
 {
   "spec_id": "compact-json-output-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-03T21:40:55.750335Z",
+  "last_updated": "2025-11-03T21:38:23.614904Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 38,
-      "completed_tasks": 2,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Implement contract-based compact JSON output to achieve 65-85% token savings for agent workflows while maintaining backward compatibility",
         "objectives": [
@@ -44,7 +44,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 11,
-      "completed_tasks": 2,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Create shared infrastructure for contract-based JSON output formatting",
         "estimated_hours": 6,
@@ -67,7 +67,7 @@
         "task-1-3"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -101,7 +101,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/contracts.py",
         "task_category": "implementation",
@@ -134,7 +134,7 @@
     "task-1-1-2": {
       "type": "subtask",
       "title": "Implement extract_task_info_contract(), extract_check_deps_contract(), extract_progress_contract(), extract_next_task_contract()",
-      "status": "completed",
+      "status": "pending",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -143,14 +143,9 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 1,
+      "completed_tasks": 0,
       "metadata": {
-        "details": "Implement remaining 4 contract extractors following functional contract specifications from /tmp/functional-contracts-analysis.md",
-        "started_at": "2025-11-03T21:39:03.108953Z",
-        "completed_at": "2025-11-03T21:40:55.737612Z",
-        "needs_journaling": false,
-        "actual_hours": 0.031,
-        "journaled_at": "2025-11-03T21:40:55.747896Z"
+        "details": "Implement remaining 4 contract extractors following functional contract specifications from /tmp/functional-contracts-analysis.md"
       }
     },
     "task-1-1-3": {
@@ -1170,29 +1165,24 @@
       "content": "Successfully implemented extract_prepare_task_contract() function in src/claude_skills/claude_skills/common/contracts.py. The function extracts minimal contracts from prepare-task output with these achievements:\n\n1. **All essential fields included**: task_id, title, can_start, blocked_by, git object (needs_branch, suggested_branch, dirty), spec_complete\n2. **Smart conditional inclusion**: file_path and details included only when present, status only if not \"pending\", validation_warnings only if non-empty, completion_info only if spec complete\n3. **Proper omissions**: Redundant fields (success, error, task_data, repo_root, UI-only fields) correctly excluded\n4. **Comprehensive documentation**: Detailed docstring explaining purpose, field inclusion rules, and examples\n5. **Type hints**: Full type annotations using Dict[str, Any]\n6. **Verified with real data**: Tested with actual prepare-task output, achieved 62.5% token savings\n\nThe implementation follows the functional contract specification from /tmp/functional-contracts-analysis.md and successfully reduces token usage while preserving all decision-enabling information for the agent.",
       "metadata": {},
       "task_id": "task-1-1-1"
-    },
-    {
-      "timestamp": "2025-11-03T21:39:06.648588Z",
-      "entry_type": "note",
-      "title": "Implementation Started: Contract Extraction Functions",
-      "author": "claude-code",
-      "content": "Beginning implementation of the remaining 4 contract extraction functions: extract_task_info_contract(), extract_check_deps_contract(), extract_progress_contract(), and extract_next_task_contract(). These functions will follow the established contract extraction pattern and integrate with the overall contract-based JSON output system.",
-      "metadata": {},
-      "task_id": "task-1-1-2"
-    },
-    {
-      "timestamp": "2025-11-03T21:40:55.747877Z",
-      "entry_type": "status_change",
-      "title": "Task Completed: Implement extract_task_info_contract(), extract_check_deps_contract(), extract_progress_contract(), extract_next_task_contract()",
-      "author": "claude-code",
-      "content": "Successfully implemented all 4 remaining contract extraction functions in src/claude_skills/claude_skills/common/contracts.py:\n\n1. **extract_task_info_contract()**: Extracts task_id, title, status, blocked_by, blocks, and optional file_path. Token savings: 75.7% (37\u21929 tokens)\n\n2. **extract_check_deps_contract()**: Extracts can_start with conditional blocked_by/blocks arrays. Minimal case is just {\"can_start\": true}. Token savings: 80% (10\u21922 tokens)\n\n3. **extract_progress_contract()**: Extracts total, completed, in_progress, pending counts. Token savings: 77.8% (36\u21928 tokens)\n\n4. **extract_next_task_contract()**: Extracts only task_id and title. Token savings: 42.9% (14\u21928 tokens)\n\nAll functions:\n- Follow functional contract specifications from /tmp/functional-contracts-analysis.md\n- Include comprehensive docstrings with purpose, field inclusion rules, and examples\n- Have full type annotations (Dict[str, Any] \u2192 Dict[str, Any])\n- Tested successfully with real CLI command outputs\n- Implement smart defaults (omit null/empty values, conditional inclusion)\n\nAverage token savings across all 4 functions: ~69%",
-      "metadata": {},
-      "task_id": "task-1-1-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 5,
+    "progress_percentage": 2,
     "status": "active",
-    "current_phase": "phase-1"
+    "current_phase": "phase-1",
+    "git": {
+      "branch_name": null,
+      "base_branch": null,
+      "commits": [
+        {
+          "sha": "f829fbf4a7789276d05e5dee862085c5dd6f8079",
+          "message": "task-1-1-1: Implement extract_prepare_task_contract()",
+          "task_id": "task-1-1-1",
+          "timestamp": "2025-11-03T21:38:23.920549Z"
+        }
+      ],
+      "pr": null
+    }
   }
 }
