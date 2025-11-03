@@ -27,6 +27,9 @@ DEFAULT_GIT_CONFIG = {
     "auto_push": False,  # Do NOT automatically push (requires user confirmation)
     "auto_pr": False,  # Do NOT automatically create PRs (requires user confirmation)
     "commit_cadence": "task",  # When to commit: "task", "phase", or "manual"
+    "file_staging": {  # File staging behavior for commits
+        "show_before_commit": True,  # Show preview of files before committing (default: true)
+    }
 }
 
 # Valid values for commit_cadence setting
