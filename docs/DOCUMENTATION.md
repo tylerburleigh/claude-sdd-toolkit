@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 08:10:32
+**Generated:** 2025-11-03 08:16:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 201
-- **Total Lines:** 67697
-- **Total Classes:** 267
-- **Total Functions:** 752
+- **Total Lines:** 67848
+- **Total Classes:** 268
+- **Total Functions:** 753
 - **Avg Complexity:** 5.56
 - **Max Complexity:** 43
 - **High Complexity Functions:**
@@ -1890,7 +1890,7 @@ Attributes:
 ### `TestAddCommitMetadata`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:702`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:800`
 
 **Description:**
 > Tests for add_commit_metadata function.
@@ -2273,7 +2273,7 @@ Attributes:
 ### `TestCheckDirtyTree`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:71`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:72`
 
 **Description:**
 > Tests for check_dirty_tree function.
@@ -2646,7 +2646,7 @@ Attributes:
 ### `TestDetectGitDrift`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:569`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:667`
 
 **Description:**
 > Tests for detect_git_drift function.
@@ -2893,7 +2893,7 @@ Attributes:
 ### `TestFindGitRoot`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:30`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:31`
 
 **Description:**
 > Tests for find_git_root function.
@@ -3228,6 +3228,26 @@ Attributes:
 - `test_multiple_in_progress_tasks()`
 - `test_completed_specs_ignored()`
 - `test_invalid_json_specs_skipped()`
+
+---
+
+### `TestGetStagedFiles`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:570`
+
+**Description:**
+> Tests for get_staged_files function.
+
+**Methods:**
+- `test_get_staged_files_empty()`
+- `test_get_staged_files_single_file()`
+- `test_get_staged_files_multiple_files()`
+- `test_get_staged_files_with_subdirectories()`
+- `test_get_staged_files_handles_timeout()`
+- `test_get_staged_files_handles_error()`
+- `test_get_staged_files_handles_git_not_found()`
+- `test_get_staged_files_handles_unexpected_error()`
 
 ---
 
@@ -3801,7 +3821,7 @@ Attributes:
 ### `TestParseGitStatus`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:161`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:162`
 
 **Description:**
 > Tests for parse_git_status function.
@@ -4547,7 +4567,7 @@ Attributes:
 ### `TestShowCommitPreview`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:388`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:389`
 
 **Description:**
 > Tests for show_commit_preview function.
@@ -4764,7 +4784,7 @@ Attributes:
 ### `TestUpdateBranchMetadata`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:649`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:747`
 
 **Description:**
 > Tests for update_branch_metadata function.
@@ -4809,7 +4829,7 @@ Attributes:
 ### `TestUpdatePRMetadata`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:767`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:865`
 
 **Description:**
 > Tests for update_pr_metadata function.
@@ -6633,7 +6653,7 @@ Returns:
 ### `add_commit_metadata(spec, sha, message, task_id, timestamp) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:563`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:616`
 **Complexity:** 5
 
 **Description:**
@@ -10116,7 +10136,7 @@ Returns:
 ### `detect_git_drift(spec, repo_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:447`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -13443,6 +13463,33 @@ Example:
 **Parameters:**
 - `spec_file`: Path
 - `json_spec_file`: Optional[Path]
+
+---
+
+### `get_staged_files(repo_root) -> List[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Complexity:** 6
+
+**Description:**
+> Get list of files currently staged for commit.
+
+Runs 'git diff --cached --name-only' to get files in the staging area.
+
+Args:
+    repo_root: Path to git repository root
+
+Returns:
+    List of file paths (relative to repo root) that are currently staged.
+    Returns empty list if no files are staged or if an error occurs.
+
+Example:
+    >>> get_staged_files(Path('/repo'))
+    ['src/main.py', 'tests/test_main.py']
+
+**Parameters:**
+- `repo_root`: Path
 
 ---
 
@@ -18445,7 +18492,7 @@ Returns:
 ### `update_branch_metadata(spec, branch_name, base_branch) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:517`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:570`
 **Complexity:** 5
 
 **Description:**
@@ -18589,7 +18636,7 @@ Returns:
 ### `update_pr_metadata(spec, pr_url, pr_number, status) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:622`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:675`
 **Complexity:** 3
 
 **Description:**
@@ -20983,6 +21030,7 @@ Returns:
 - `claude_skills.common.git_metadata.check_dirty_tree`
 - `claude_skills.common.git_metadata.detect_git_drift`
 - `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.git_metadata.get_staged_files`
 - `claude_skills.common.git_metadata.parse_git_status`
 - `claude_skills.common.git_metadata.show_commit_preview`
 - `claude_skills.common.git_metadata.update_branch_metadata`
