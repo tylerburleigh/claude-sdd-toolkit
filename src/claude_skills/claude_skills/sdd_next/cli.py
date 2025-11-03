@@ -26,7 +26,9 @@ from claude_skills.common import (
     # Query operations
     query_tasks,
     check_complete,
-    list_blockers as list_blocked_tasks
+    list_blockers as list_blocked_tasks,
+    # JSON output formatting
+    print_json_output,
 )
 from claude_skills.common.completion import format_completion_prompt
 
@@ -665,7 +667,7 @@ def cmd_prepare_task(args, printer):
         completion_info = task_prep.get('completion_info', {})
 
         if args.json:
-            print(json.dumps(task_prep, indent=2))
+            print_json_output(task_prep, compact=args.compact)
         else:
             # Show completion message
             printer.success("All tasks completed!")
@@ -712,7 +714,7 @@ def cmd_prepare_task(args, printer):
     #   - dependencies: Dependency analysis (blocked_by, soft_depends, blocks)
     #   - doc_context: Optional codebase context from doc-query
     if args.json:
-        print(json.dumps(task_prep, indent=2))
+        print_json_output(task_prep, compact=args.compact)
     else:
         printer.success(f"Task prepared: {task_prep['task_id']}")
         printer.result("Task", task_prep['task_data'].get('title', ''))
@@ -1128,6 +1130,7 @@ def register_next(subparsers, parent_parser):
     parser_prepare = subparsers.add_parser('prepare-task', parents=[parent_parser], help='Prepare task for implementation')
     parser_prepare.add_argument('spec_id', help='Specification ID')
     parser_prepare.add_argument('task_id', nargs='?', help='Task ID (optional, finds next task if not provided)')
+    parser_prepare.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_prepare.set_defaults(func=cmd_prepare_task)
 
     # format-plan
