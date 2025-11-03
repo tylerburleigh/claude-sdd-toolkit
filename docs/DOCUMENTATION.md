@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 16:53:43
+**Generated:** 2025-11-03 16:55:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 208
-- **Total Lines:** 70233
+- **Total Lines:** 70263
 - **Total Classes:** 268
 - **Total Functions:** 784
 - **Avg Complexity:** 5.57
@@ -20582,6 +20582,11 @@ Returns:
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
+- `contracts.extract_check_deps_contract`
+- `contracts.extract_next_task_contract`
+- `contracts.extract_prepare_task_contract`
+- `contracts.extract_progress_contract`
+- `contracts.extract_task_info_contract`
 - `dependency_analysis.DEFAULT_BOTTLENECK_THRESHOLD`
 - `dependency_analysis.analyze_dependencies`
 - `dependency_analysis.find_blocking_tasks`
@@ -20604,6 +20609,10 @@ Returns:
 - `integrations.execute_verify_task`
 - `integrations.get_session_state`
 - `integrations.validate_spec_before_proceed`
+- `json_output.CommandType`
+- `json_output.format_compact_output`
+- `json_output.format_json_output`
+- `json_output.print_json_output`
 - `metrics.capture_metrics`
 - `metrics.get_metrics_file_path`
 - `metrics.is_metrics_enabled`

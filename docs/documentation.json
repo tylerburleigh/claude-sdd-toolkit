@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T21:53:43.334696Z",
+    "generated_at": "2025-11-03T21:55:02.795752Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 208,
-    "total_lines": 70233,
+    "total_lines": 70263,
     "total_classes": 268,
     "total_functions": 784,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 208,
-        "lines": 70233,
+        "lines": 70263,
         "classes": 268,
         "functions": 784,
         "avg_complexity": 5.57
@@ -816,10 +816,19 @@
         "ai_config.get_agent_command",
         "ai_config.get_timeout",
         "ai_config.get_tool_config",
-        "ai_config.is_tool_enabled"
+        "ai_config.is_tool_enabled",
+        "contracts.extract_prepare_task_contract",
+        "contracts.extract_task_info_contract",
+        "contracts.extract_check_deps_contract",
+        "contracts.extract_progress_contract",
+        "contracts.extract_next_task_contract",
+        "json_output.format_json_output",
+        "json_output.format_compact_output",
+        "json_output.print_json_output",
+        "json_output.CommandType"
       ],
       "exports": [],
-      "lines": 231
+      "lines": 261
     },
     {
       "name": "ai_config",
@@ -108295,7 +108304,16 @@
       "ai_config.get_agent_command",
       "ai_config.get_timeout",
       "ai_config.get_tool_config",
-      "ai_config.is_tool_enabled"
+      "ai_config.is_tool_enabled",
+      "contracts.extract_prepare_task_contract",
+      "contracts.extract_task_info_contract",
+      "contracts.extract_check_deps_contract",
+      "contracts.extract_progress_contract",
+      "contracts.extract_next_task_contract",
+      "json_output.format_json_output",
+      "json_output.format_compact_output",
+      "json_output.print_json_output",
+      "json_output.CommandType"
     ],
     "src/claude_skills/claude_skills/common/ai_config.py": [
       "yaml",
