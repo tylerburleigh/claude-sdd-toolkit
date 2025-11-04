@@ -375,8 +375,8 @@ def cmd_context(args, printer):
 
     # Output the metrics
     if args.json:
-        # Check if verbose mode is requested
-        if hasattr(args, 'verbose') and args.verbose:
+        # Check if verbose mode is requested (inherited from global --verbose flag)
+        if args.verbose:
             # Full output with all fields
             print(format_metrics_json(metrics, args.max_context, transcript_path))
         else:
