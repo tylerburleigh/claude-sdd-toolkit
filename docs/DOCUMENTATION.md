@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:18:06
+**Generated:** 2025-11-04 07:19:31
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70518
+- **Total Lines:** 70527
 - **Total Classes:** 268
 - **Total Functions:** 788
 - **Avg Complexity:** 5.58
@@ -6084,7 +6084,7 @@ Returns:
 ### `_get_version() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:16`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:17`
 **Complexity:** 2
 
 **Description:**
@@ -15561,7 +15561,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:134`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:135`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@track_metrics('sdd')`
@@ -16756,7 +16756,7 @@ Note:
 ### `reorder_args_for_subcommand(cmd_line) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:25`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:26`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -20376,6 +20376,7 @@ Returns:
 - `claude_skills.cli.sdd.registry.register_all_subcommands`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.metrics.track_metrics`
+- `claude_skills.common.sdd_config.load_sdd_config`
 - `io`
 - `pathlib.Path`
 - `sys`

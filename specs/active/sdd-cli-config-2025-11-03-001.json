@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-cli-config-2025-11-03-001",
   "generated": "2025-11-03T19:00:00Z",
-  "last_updated": "2025-11-04T12:19:01.872748Z",
+  "last_updated": "2025-11-04T12:19:54.168698Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "description": "Add project and global configuration support for --json and --compact flags, making them configurable via .claude/sdd_config.json files",
         "objectives": [
@@ -429,7 +429,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Integrate configuration loading into CLI and consolidate --compact flag",
         "risk_level": "medium",
@@ -439,7 +439,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -447,8 +447,12 @@
         "task-2-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-04T12:19:54.152151Z",
+        "journaled_at": "2025-11-04T12:19:54.168591Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-verify"
@@ -560,7 +564,7 @@
     "task-2-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "dependencies": {
@@ -571,12 +575,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
         "task_category": "refactoring",
         "estimated_hours": 0.25,
-        "details": "Remove 5 duplicate --compact argument definitions (lines 1103, 1110, 1117, 1123, 1137) since it's now global"
+        "details": "Remove 5 duplicate --compact argument definitions (lines 1103, 1110, 1117, 1123, 1137) since it's now global",
+        "completed_at": "2025-11-04T12:19:54.152054Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T12:19:54.156075Z"
       }
     },
     "phase-2-verify": {
@@ -1221,10 +1228,28 @@
       "content": "Successfully integrated SDD config loading into CLI. Config loaded before parsing, defaults set from config values, CLI args properly override config settings.",
       "metadata": {},
       "task_id": "task-2-2"
+    },
+    {
+      "timestamp": "2025-11-04T12:19:54.156059Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_next/cli.py",
+      "author": "claude-code",
+      "content": "Removed 5 duplicate --compact argument definitions from sdd_next/cli.py. The subcommands (next-task, task-info, check-deps, progress, prepare-task) now inherit --compact from the global parser, eliminating argparse conflicts.",
+      "metadata": {},
+      "task_id": "task-2-3"
+    },
+    {
+      "timestamp": "2025-11-04T12:19:54.168565Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
     }
   ],
   "metadata": {
-    "progress_percentage": 46,
+    "progress_percentage": 50,
     "status": "active",
     "current_phase": "phase-2",
     "git": {
@@ -1326,6 +1351,12 @@
           "message": "task-2-2-2: Set argparse defaults from config",
           "task_id": "task-2-2-2",
           "timestamp": "2025-11-04T12:18:59.172111Z"
+        },
+        {
+          "sha": "7b0ef55474c6ef27ff3174bf03ea6a110114c991",
+          "message": "task-2-2: src/claude_skills/claude_skills/cli/sdd/__init__.py",
+          "task_id": "task-2-2",
+          "timestamp": "2025-11-04T12:19:01.915650Z"
         }
       ],
       "pr": null

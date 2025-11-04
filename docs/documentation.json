@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-04T12:18:06.012917Z",
+    "generated_at": "2025-11-04T12:19:31.820889Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 209,
-    "total_lines": 70518,
+    "total_lines": 70527,
     "total_classes": 268,
     "total_functions": 788,
     "avg_complexity": 5.58,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 209,
-        "lines": 70518,
+        "lines": 70527,
         "classes": 268,
         "functions": 788,
         "avg_complexity": 5.58
@@ -79,12 +79,13 @@
         "pathlib.Path",
         "claude_skills.common.PrettyPrinter",
         "claude_skills.common.metrics.track_metrics",
+        "claude_skills.common.sdd_config.load_sdd_config",
         "claude_skills.cli.sdd.options.add_global_options",
         "claude_skills.cli.sdd.options.create_global_parent_parser",
         "claude_skills.cli.sdd.registry.register_all_subcommands"
       ],
       "exports": [],
-      "lines": 228
+      "lines": 237
     },
     {
       "name": "options",
@@ -7296,7 +7297,7 @@
         {
           "instantiator": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 205,
+          "line": 214,
           "context": [
             "main"
           ]
@@ -15992,7 +15993,7 @@
     {
       "name": "_get_version",
       "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-      "line": 16,
+      "line": 17,
       "language": "python",
       "docstring": "Get package version from metadata.",
       "parameters": [],
@@ -16006,7 +16007,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 162,
+          "line": 163,
           "call_type": "function_call"
         }
       ],
@@ -16014,7 +16015,7 @@
         {
           "name": "version",
           "file": "unknown",
-          "line": 20,
+          "line": 21,
           "call_type": "function_call"
         }
       ],
@@ -16023,7 +16024,7 @@
     {
       "name": "reorder_args_for_subcommand",
       "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-      "line": 25,
+      "line": 26,
       "language": "python",
       "docstring": "Reorder command line arguments to support global options anywhere.\n\nUses argparse.parse_known_args() to robustly extract global options,\nthen reorders to place them after the subcommand.\n\nArgs:\n    cmd_line: List of command line arguments\n\nReturns:\n    Reordered list of arguments",
       "parameters": [
@@ -16043,7 +16044,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 137,
+          "line": 138,
           "call_type": "function_call"
         }
       ],
@@ -16051,83 +16052,77 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 42,
+          "line": 43,
           "call_type": "method_call"
         },
         {
           "name": "add_global_options",
           "file": "unknown",
-          "line": 43,
+          "line": 44,
           "call_type": "function_call"
         },
         {
           "name": "parse_known_args",
           "file": "unknown",
-          "line": 47,
+          "line": 48,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 57,
+          "line": 58,
           "call_type": "function_call"
         },
         {
           "name": "startswith",
           "file": "unknown",
-          "line": 59,
+          "line": 60,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 62,
+          "line": 63,
           "call_type": "function_call"
         },
         {
           "name": "startswith",
           "file": "unknown",
-          "line": 62,
+          "line": 63,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 97,
+          "line": 98,
           "call_type": "method_call"
         },
         {
           "name": "vars",
           "file": "unknown",
-          "line": 97,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 99,
+          "line": 100,
           "call_type": "method_call"
         },
         {
           "name": "replace",
-          "file": "unknown",
-          "line": 103,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 104,
           "call_type": "method_call"
         },
         {
-          "name": "replace",
+          "name": "append",
           "file": "unknown",
-          "line": 107,
+          "line": 105,
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "replace",
           "file": "unknown",
           "line": 108,
           "call_type": "method_call"
@@ -16139,15 +16134,21 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
           "name": "str",
           "file": "unknown",
-          "line": 109,
+          "line": 110,
           "call_type": "function_call"
         },
         {
           "name": "startswith",
           "file": "unknown",
-          "line": 115,
+          "line": 116,
           "call_type": "method_call"
         }
       ],
@@ -16156,7 +16157,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-      "line": 134,
+      "line": 135,
       "language": "python",
       "docstring": "Main entry point for unified SDD CLI.",
       "parameters": [],
@@ -16172,7 +16173,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -16252,25 +16253,19 @@
         {
           "name": "reorder_args_for_subcommand",
           "file": "unknown",
-          "line": 137,
+          "line": 138,
           "call_type": "function_call"
         },
         {
           "name": "index",
           "file": "unknown",
-          "line": 143,
+          "line": 144,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 144,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 146,
+          "line": 145,
           "call_type": "function_call"
         },
         {
@@ -16292,148 +16287,142 @@
           "call_type": "function_call"
         },
         {
-          "name": "exit",
+          "name": "print",
           "file": "unknown",
           "line": 150,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exit",
+          "file": "unknown",
+          "line": 151,
           "call_type": "method_call"
         },
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 154,
+          "line": 155,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 161,
+          "line": 162,
           "call_type": "method_call"
         },
         {
           "name": "_get_version",
           "file": "unknown",
-          "line": 162,
+          "line": 163,
           "call_type": "function_call"
         },
         {
           "name": "add_global_options",
           "file": "unknown",
-          "line": 165,
+          "line": 166,
           "call_type": "function_call"
         },
         {
           "name": "create_global_parent_parser",
           "file": "unknown",
-          "line": 168,
+          "line": 169,
           "call_type": "function_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 171,
+          "line": 172,
           "call_type": "method_call"
         },
         {
           "name": "register_all_subcommands",
           "file": "unknown",
-          "line": 179,
+          "line": 180,
           "call_type": "function_call"
+        },
+        {
+          "name": "load_sdd_config",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "method_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 183,
+          "line": 192,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 186,
+          "line": 195,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 192,
+          "line": 201,
           "call_type": "function_call"
         },
         {
           "name": "lower",
           "file": "unknown",
-          "line": 193,
+          "line": 202,
           "call_type": "method_call"
         },
         {
           "name": "print",
-          "file": "unknown",
-          "line": 198,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 199,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 200,
-          "call_type": "function_call"
-        },
-        {
-          "name": "getattr",
-          "file": "unknown",
-          "line": 206,
-          "call_type": "function_call"
-        },
-        {
-          "name": "getattr",
-          "file": "unknown",
-          "line": 206,
-          "call_type": "function_call"
-        },
-        {
-          "name": "getattr",
           "file": "unknown",
           "line": 207,
           "call_type": "function_call"
         },
         {
-          "name": "getattr",
+          "name": "print",
           "file": "unknown",
           "line": 208,
           "call_type": "function_call"
         },
         {
-          "name": "func",
+          "name": "print",
           "file": "unknown",
-          "line": 214,
-          "call_type": "method_call"
-        },
-        {
-          "name": "exit",
-          "file": "unknown",
-          "line": 215,
-          "call_type": "method_call"
-        },
-        {
-          "name": "exit",
-          "file": "unknown",
-          "line": 219,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 221,
-          "call_type": "method_call"
+          "line": 209,
+          "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 222,
+          "line": 215,
           "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 215,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "func",
+          "file": "unknown",
+          "line": 223,
+          "call_type": "method_call"
         },
         {
           "name": "exit",
@@ -16442,9 +16431,33 @@
           "call_type": "method_call"
         },
         {
+          "name": "exit",
+          "file": "unknown",
+          "line": 228,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 230,
+          "call_type": "method_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 231,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exit",
+          "file": "unknown",
+          "line": 233,
+          "call_type": "method_call"
+        },
+        {
           "name": "track_metrics",
           "file": "unknown",
-          "line": 133,
+          "line": 134,
           "call_type": "function_call"
         }
       ],
@@ -16467,7 +16480,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 168,
+          "line": 169,
           "call_type": "function_call"
         }
       ],
@@ -16510,13 +16523,13 @@
         {
           "name": "reorder_args_for_subcommand",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 43,
+          "line": 44,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 165,
+          "line": 166,
           "call_type": "function_call"
         },
         {
@@ -16688,7 +16701,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 179,
+          "line": 180,
           "call_type": "function_call"
         }
       ],
@@ -18074,7 +18087,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 179,
+          "line": 180,
           "call_type": "function_call"
         }
       ],
@@ -34346,7 +34359,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 133,
+          "line": 134,
           "call_type": "function_call"
         }
       ],
@@ -39098,6 +39111,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "main",
+          "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_sdd_setting",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
           "line": 195,
@@ -39190,7 +39209,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "get_sdd_setting",
@@ -43636,7 +43655,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -44812,7 +44831,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -45927,7 +45946,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -46392,7 +46411,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -52142,7 +52161,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -75058,7 +75077,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
-          "line": 228,
+          "line": 237,
           "call_type": "function_call"
         },
         {
@@ -108460,6 +108479,7 @@
       "pathlib.Path",
       "claude_skills.common.PrettyPrinter",
       "claude_skills.common.metrics.track_metrics",
+      "claude_skills.common.sdd_config.load_sdd_config",
       "claude_skills.cli.sdd.options.add_global_options",
       "claude_skills.cli.sdd.options.create_global_parent_parser",
       "claude_skills.cli.sdd.registry.register_all_subcommands"
