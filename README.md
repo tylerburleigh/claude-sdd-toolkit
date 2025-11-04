@@ -483,6 +483,32 @@ The setup creates `.claude/settings.json` with permissions like:
 }
 ```
 
+### SDD CLI Configuration (Optional)
+
+The SDD CLI supports optional configuration files that control output formatting defaults. During project setup, you'll be prompted to configure your preferences interactively.
+
+**Configuration file location:**
+- Project-local: `.claude/sdd_config.json` (recommended)
+- Global: `~/.claude/sdd_config.json`
+
+**What it configures:**
+- `output.json` - Default to JSON output (true/false)
+- `output.compact` - Use compact JSON formatting (true/false)
+
+**Example configuration:**
+```json
+{
+  "output": {
+    "json": true,
+    "compact": true
+  }
+}
+```
+
+This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
+
+For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
+
 ## Troubleshooting
 
 ### Skills Not Working

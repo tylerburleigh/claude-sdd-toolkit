@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:25:35
+**Generated:** 2025-11-04 07:33:47
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70513
+- **Total Lines:** 70616
 - **Total Classes:** 268
-- **Total Functions:** 788
+- **Total Functions:** 790
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -5655,6 +5655,30 @@ Returns:
 
 ---
 
+### `_create_config_file(project_path, config, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:136`
+**Complexity:** 3
+
+**Description:**
+> Create .claude/sdd_config.json with user preferences.
+
+Args:
+    project_path: Project root directory
+    config: Configuration dict to write
+    printer: PrettyPrinter instance
+
+Returns:
+    True if config was created successfully, False otherwise
+
+**Parameters:**
+- `project_path`: Path
+- `config`: dict
+- `printer`: PrettyPrinter
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -6324,6 +6348,23 @@ Args:
 **Parameters:**
 - `specs_info`: List[Dict[str, Any]]
 - `verbose`: bool
+- `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_config(printer) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:80`
+**Complexity:** 8
+
+**Description:**
+> Prompt user for SDD configuration preferences.
+
+Returns:
+    Dict with user's configuration preferences
+
+**Parameters:**
 - `printer`: PrettyPrinter
 
 ---
@@ -7628,7 +7669,7 @@ Args:
 ### `categorize_missing_permissions(missing) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:151`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:254`
 **Complexity:** 6
 
 **Description:**
@@ -8303,7 +8344,7 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:173`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:276`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -9497,8 +9538,8 @@ Args:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:80`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:173`
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
@@ -16671,7 +16712,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:282`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:385`
 **Complexity:** 1
 
 **Description:**
