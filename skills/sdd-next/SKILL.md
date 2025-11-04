@@ -72,8 +72,8 @@ This skill is part of the **Spec-Driven Development** family:
 - Spec files are large and reading them directly wastes valuable context window space
 
 **Fast Context Checklist (daily driver):**
-1. `sdd prepare-task {spec-id} --json` (auto-discovers specs, selects the next task, and includes dependency status)
-2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json` and `sdd check-deps {spec-id} {task-id} --json`
+1. `sdd prepare-task {spec-id} --json --compact` (auto-discovers specs, selects the next task, and includes dependency status)
+2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json --compact` and `sdd check-deps {spec-id} {task-id} --json --compact`
 3. Review task metadata, then open the mentioned source/test files; helpers like `sdd find-related-files {path}` and `sdd find-tests --source-file {path}` keep this fast
 4. If `prepare-task` or `check-deps` warns about blockers, run `sdd list-blockers {spec-id}`
 5. Capture verification steps or linked docs noted in the spec before planning changes
@@ -245,7 +245,7 @@ sdd verify-tools
 
 **Step 2: Prepare task (discovers specs automatically)**
 ```bash
-sdd prepare-task {spec-id}
+sdd prepare-task {spec-id} --compact
 ```
 
 **If prepare-task fails:**
@@ -292,7 +292,7 @@ The `prepare-task` command includes two automatic enhancements:
 
 **If you need to specify a custom specs path:**
 ```bash
-sdd prepare-task {spec-id} --path /absolute/path/to/specs
+sdd prepare-task {spec-id} --path /absolute/path/to/specs --compact
 ```
 
 ### Manual Spec Validation (Optional)
@@ -368,7 +368,7 @@ For complete validation workflow details, see the [sdd-plan skill validation doc
 sdd verify-tools
 
 # 2. Prepare task automatically (handles everything)
-sdd prepare-task {spec-id}
+sdd prepare-task {spec-id} --compact
 
 # This single command:
 # - Discovers specs directory
@@ -392,7 +392,7 @@ Task(
 )
 
 # Then prepare task if validation passes
-sdd prepare-task {spec-id}
+sdd prepare-task {spec-id} --compact
 ```
 
 **When to validate first:**
@@ -423,7 +423,7 @@ For more validation options, see [Manual Spec Validation](#manual-spec-validatio
 └────────────┬────────────────────────────┘
              │
         ┌────▼────┐
-        │   YES   │──────────> Use Automated: sdd prepare-task {spec-id}
+        │   YES   │──────────> Use Automated: sdd prepare-task {spec-id} --compact
         └─────────┘            If succeeds: Skip to Phase 4
                                If fails: See troubleshooting or use manual
 
@@ -501,7 +501,7 @@ For each task in the current phase:
 
 1. **Prepare next task:**
 ```bash
-sdd prepare-task {spec-id} --json
+sdd prepare-task {spec-id} --json --compact
 ```
 
 2. **Check if phase complete:**
@@ -1024,7 +1024,7 @@ If needed: Check context using the two-step pattern (see [Context Checking Patte
 
 ```bash
 # If you know the spec-id:
-sdd prepare-task {spec-id} --json
+sdd prepare-task {spec-id} --json --compact
 
 # If you don't know the spec-id:
 # See "Edge Case: Multiple Specs" below
@@ -1284,7 +1284,7 @@ Include the current context percentage in the completion report.
 **Situation:** Spec exists, no tasks started yet
 
 Steps:
-1. Run `sdd prepare-task {spec-id} --json`
+1. Run `sdd prepare-task {spec-id} --json --compact`
 2. Review task details and dependencies
 3. **Optional: Use Plan subagent for complex/architectural tasks**
    - Analyzes codebase patterns, recommends approach
@@ -1296,7 +1296,7 @@ Steps:
 **Example with Plan subagent:**
 
 ```
-sdd prepare-task user-auth-001 --json  # Returns task-1-1 "Create AuthService"
+sdd prepare-task user-auth-001 --json --compact  # Returns task-1-1 "Create AuthService"
 
 Task(subagent_type: "Plan",
      prompt: "Analyze service classes in src/services/ for patterns. Task creates
@@ -1317,7 +1317,7 @@ Task(subagent_type: "Plan",
 **Situation:** Some tasks completed, need to continue
 
 Steps:
-1. Run `sdd prepare-task {spec-id} --json`
+1. Run `sdd prepare-task {spec-id} --json --compact`
 2. Review progress information from output
 3. Create execution plan for next task
 4. Present plan with context of progress:
@@ -1342,7 +1342,7 @@ or "review progress" for detailed status.
 
 8. Proceed with execution plan automatically
    - User can interrupt with "different task" to use Phase 2.3 (Present Task Options)
-   - User can ask "review progress" to run `sdd progress {spec-id}`
+   - User can ask "review progress" to run `sdd progress {spec-id} --compact`
    - User can say "stop" or "pause" to defer
 9. Continue implementation
 
@@ -1938,7 +1938,7 @@ Use the Python tool for dependency analysis:
 
 ```bash
 sdd find-circular-deps {spec-id}
-sdd next-task {spec-id}
+sdd next-task {spec-id} --compact
 ```
 
 Detects circular chains, orphaned tasks, and impossible dependency chains.
@@ -1952,7 +1952,7 @@ Detects circular chains, orphaned tasks, and impossible dependency chains.
 
 **Solution:**
 
-1. Use `sdd check-deps {spec-id} {task-id}` to verify dependency status
+1. Use `sdd check-deps {spec-id} {task-id} --compact` to verify dependency status
 2. If dependency status is still unclear after checking, explain the concern and ask user:
 
 **Present context and ask:**
@@ -2007,22 +2007,22 @@ sdd context --session-marker "SESSION_MARKER_<hash>" --json
 **Automated Workflow (Recommended):**
 ```bash
 # 1. Prepare task (handles discovery automatically)
-sdd prepare-task {spec-id}
+sdd prepare-task {spec-id} --compact
 ```
 
 **Manual Task Discovery:**
 ```bash
 # Find next task
-sdd next-task {spec-id}
+sdd next-task {spec-id} --compact
 
 # Get task details
-sdd task-info {spec-id} {task-id}
+sdd task-info {spec-id} {task-id} --compact
 
 # Check dependencies
-sdd check-deps {spec-id} {task-id}
+sdd check-deps {spec-id} {task-id} --compact
 
 # View progress
-sdd progress {spec-id}
+sdd progress {spec-id} --compact
 ```
 
 **Advanced Querying:**
