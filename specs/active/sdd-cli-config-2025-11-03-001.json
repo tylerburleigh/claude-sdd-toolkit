@@ -182,7 +182,7 @@
     },
     "task-1-2": {
       "type": "task",
-      "title": ".claude/sdd_config.json.template",
+      "title": "docs/sdd_config.json.template",
       "status": "completed",
       "parent": "phase-1-files",
       "children": [],
@@ -196,7 +196,7 @@
       "total_tasks": 1,
       "completed_tasks": 1,
       "metadata": {
-        "file_path": ".claude/sdd_config.json.template",
+        "file_path": "docs/sdd_config.json.template",
         "task_category": "implementation",
         "estimated_hours": 0.25,
         "details": "Create JSON template with comments explaining each setting, precedence rules, and example values",
@@ -207,7 +207,7 @@
     },
     "task-1-3": {
       "type": "task",
-      "title": ".claude/SDD_CONFIG_README.md",
+      "title": "docs/SDD_CONFIG_README.md",
       "status": "completed",
       "parent": "phase-1-files",
       "children": [
@@ -225,7 +225,7 @@
       "total_tasks": 3,
       "completed_tasks": 3,
       "metadata": {
-        "file_path": ".claude/SDD_CONFIG_README.md",
+        "file_path": "docs/SDD_CONFIG_README.md",
         "task_category": "implementation",
         "estimated_hours": 0.75,
         "details": "Comprehensive documentation covering usage, configuration options, precedence, examples, and troubleshooting",
@@ -390,7 +390,7 @@
       "completed_tasks": 0,
       "metadata": {
         "verification_type": "auto",
-        "command": "python -c 'import json; json.load(open(\".claude/sdd_config.json.template\"))'",
+        "command": "python -c 'import json; json.load(open(\"docs/sdd_config.json.template\"))'",
         "expected": "Valid JSON, no parse errors"
       }
     },
@@ -1175,6 +1175,12 @@
           "message": "task-1-3-3: Add troubleshooting and FAQ section",
           "task_id": "task-1-3-3",
           "timestamp": "2025-11-04T12:07:05.499117Z"
+        },
+        {
+          "sha": "4805b217dd8a30d2eddb9e7813b35695c92704e3",
+          "message": "task-1-3: .claude/SDD_CONFIG_README.md",
+          "task_id": "task-1-3",
+          "timestamp": "2025-11-04T12:07:08.505387Z"
         }
       ],
       "pr": null
