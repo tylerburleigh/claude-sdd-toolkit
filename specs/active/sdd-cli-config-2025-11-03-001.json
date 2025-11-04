@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-cli-config-2025-11-03-001",
   "generated": "2025-11-03T19:00:00Z",
-  "last_updated": "2025-11-04T12:13:51.324113Z",
+  "last_updated": "2025-11-04T12:17:35.764410Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "description": "Add project and global configuration support for --json and --compact flags, making them configurable via .claude/sdd_config.json files",
         "objectives": [
@@ -413,7 +413,7 @@
     "phase-2": {
       "type": "phase",
       "title": "CLI Integration",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -429,7 +429,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Integrate configuration loading into CLI and consolidate --compact flag",
         "risk_level": "medium",
@@ -439,7 +439,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -447,7 +447,7 @@
         "task-2-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -460,7 +460,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/cli/sdd/options.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "dependencies": {
@@ -472,12 +472,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/options.py",
         "task_category": "implementation",
         "estimated_hours": 0.25,
-        "details": "Add --compact to add_global_options() function (move from command-specific to global)"
+        "details": "Add --compact to add_global_options() function (move from command-specific to global)",
+        "completed_at": "2025-11-04T12:17:35.753754Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T12:17:35.756791Z"
       }
     },
     "task-2-2": {
@@ -1173,12 +1176,21 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-04T12:17:35.756771Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/cli/sdd/options.py",
+      "author": "claude-code",
+      "content": "Added --compact flag to add_global_options() function in options.py. Flag now available globally across all CLI commands, using action='store_true' for boolean flag behavior. Placed after --json flag for logical grouping of output-related options. Removed duplicate --compact argument definitions from individual subcommands in sdd_next/cli.py (next-task, task-info, check-deps, progress, prepare-task) that were conflicting with the global option. Fixed missing 'compact' entry in defaults dictionary in reorder_args_for_subcommand() function.",
+      "metadata": {},
+      "task_id": "task-2-1"
     }
   ],
   "metadata": {
-    "progress_percentage": 36,
+    "progress_percentage": 40,
     "status": "active",
-    "current_phase": "phase-1",
+    "current_phase": "phase-2",
     "git": {
       "branch_name": null,
       "base_branch": null,
@@ -1254,6 +1266,12 @@
           "message": "verify-1-2: Config loads with defaults when no file exists",
           "task_id": "verify-1-2",
           "timestamp": "2025-11-04T12:13:49.147460Z"
+        },
+        {
+          "sha": "f40f664d3c52b0a7dfc727b6a872a97b0a8f7750",
+          "message": "verify-1-3: Template file is valid JSON",
+          "task_id": "verify-1-3",
+          "timestamp": "2025-11-04T12:13:51.359394Z"
         }
       ],
       "pr": null

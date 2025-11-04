@@ -30,6 +30,11 @@ def add_global_options(parser):
         help='Output in JSON format'
     )
     parser.add_argument(
+        '--compact',
+        action='store_true',
+        help='Use compact JSON formatting (single line)'
+    )
+    parser.add_argument(
         '--path',
         type=str,
         default='.',

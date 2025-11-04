@@ -83,6 +83,7 @@ def reorder_args_for_subcommand(cmd_line):
         'path': '.',
         'quiet': False,
         'json': False,
+        'compact': False,
         'debug': False,
         'verbose': False,
         'no_color': False,

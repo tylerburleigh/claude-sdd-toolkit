@@ -1100,27 +1100,23 @@ def register_next(subparsers, parent_parser):
     # next-task
     parser_next = subparsers.add_parser('next-task', parents=[parent_parser], help='Find next actionable task')
     parser_next.add_argument('spec_id', help='Specification ID')
-    parser_next.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_next.set_defaults(func=cmd_next_task)
 
     # task-info
     parser_info = subparsers.add_parser('task-info', parents=[parent_parser], help='Get task information')
     parser_info.add_argument('spec_id', help='Specification ID')
     parser_info.add_argument('task_id', help='Task ID')
-    parser_info.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_info.set_defaults(func=cmd_task_info)
 
     # check-deps
     parser_deps = subparsers.add_parser('check-deps', parents=[parent_parser], help='Check task dependencies')
     parser_deps.add_argument('spec_id', help='Specification ID')
     parser_deps.add_argument('task_id', nargs='?', help='Task ID (optional, checks all tasks if not provided)')
-    parser_deps.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_deps.set_defaults(func=cmd_check_deps)
 
     # progress
     parser_progress = subparsers.add_parser('progress', parents=[parent_parser], help='Show overall progress')
     parser_progress.add_argument('spec_id', help='Specification ID')
-    parser_progress.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_progress.set_defaults(func=cmd_progress)
 
 
@@ -1134,7 +1130,6 @@ def register_next(subparsers, parent_parser):
     parser_prepare = subparsers.add_parser('prepare-task', parents=[parent_parser], help='Prepare task for implementation')
     parser_prepare.add_argument('spec_id', help='Specification ID')
     parser_prepare.add_argument('task_id', nargs='?', help='Task ID (optional, finds next task if not provided)')
-    parser_prepare.add_argument('--compact', action='store_true', help='Output compact JSON (minified, no whitespace)')
     parser_prepare.set_defaults(func=cmd_prepare_task)
 
     # format-plan
