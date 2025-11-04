@@ -1,7 +1,7 @@
 {
   "spec_id": "compact-json-output-2025-11-03-001",
   "generated": "2025-11-03T00:00:00Z",
-  "last_updated": "2025-11-04T00:04:13.155918Z",
+  "last_updated": "2025-11-04T00:41:38.708153Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 38,
-      "completed_tasks": 33,
+      "completed_tasks": 34,
       "metadata": {
         "description": "Implement contract-based compact JSON output to achieve 65-85% token savings for agent workflows while maintaining backward compatibility",
         "objectives": [
@@ -1123,7 +1123,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Update sdd-next SKILL.md to use compact output and create migration guide for v2.0",
         "estimated_hours": 3,
@@ -1133,7 +1133,7 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1",
@@ -1141,8 +1141,12 @@
         "task-4-3"
       ],
       "total_tasks": 3,
-      "completed_tasks": 2,
-      "metadata": {},
+      "completed_tasks": 3,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-04T00:41:38.692409Z",
+        "journaled_at": "2025-11-04T00:41:38.708092Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -1198,7 +1202,7 @@
     "task-4-3": {
       "type": "task",
       "title": "Create contract documentation",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1207,12 +1211,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "docs/CONTRACTS.md",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "details": "Document functional contracts for all 5 commands with required/optional fields, decisions enabled, and inclusion conditions"
+        "details": "Document functional contracts for all 5 commands with required/optional fields, decisions enabled, and inclusion conditions",
+        "completed_at": "2025-11-04T00:41:38.692320Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T00:41:38.695919Z"
       }
     },
     "phase-4-verify": {
@@ -1664,10 +1671,36 @@
       "content": "Successfully created comprehensive MIGRATION_V2.md guide at docs/MIGRATION_V2.md. Document covers Phase 1 (opt-in --compact), Phase 2 (v2.0 default change), backward compatibility with --verbose flag, migration timeline, format differences, common migration scenarios with code examples, troubleshooting guide, and FAQs. Approximately 400 lines of detailed migration guidance for users and tool authors.",
       "metadata": {},
       "task_id": "task-4-2"
+    },
+    {
+      "timestamp": "2025-11-04T00:21:17.344085Z",
+      "entry_type": "decision",
+      "title": "Decision: Created Separate Config Spec",
+      "author": "claude-code",
+      "content": "Created separate spec for SDD CLI configuration system (sdd-cli-config-2025-11-03-001) to make --json and --compact flags configurable via project settings.\n\nRationale: While working on compact JSON output, user requested making these flags configurable via .claude/sdd_config.json instead of requiring them as CLI arguments every time. This represents a distinct feature (configuration infrastructure) separate from the compact output format itself, so it warrants its own spec.\n\nRelationship: The config spec (sdd-cli-config-2025-11-03-001) will enable users to set project-level defaults for the compact JSON output format introduced in this spec. The two specs are complementary - this one adds the format, the config spec makes it easier to use.\n\nImpact: No changes to current spec scope. All remaining tasks in compact-json-output spec remain valid. Config spec will be implemented separately and can reference the compact output format.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-11-04T00:41:38.695903Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create contract documentation",
+      "author": "claude-code",
+      "content": "Created CONTRACTS.md documentation file in docs/ directory documenting functional contracts for all 5 commands (prepare-task, task-info, check-deps, progress, next-task) with required/optional fields, decisions enabled, and inclusion conditions.",
+      "metadata": {},
+      "task_id": "task-4-3"
+    },
+    {
+      "timestamp": "2025-11-04T00:41:38.708079Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-files"
     }
   ],
   "metadata": {
-    "progress_percentage": 86,
+    "progress_percentage": 89,
     "status": "active",
     "current_phase": "phase-4",
     "git": {
@@ -1769,6 +1802,12 @@
           "message": "task-4-1: Update sdd-next SKILL.md command examples",
           "task_id": "task-4-1",
           "timestamp": "2025-11-04T00:02:17.979803Z"
+        },
+        {
+          "sha": "25ba59ae48db8db7da4d5df3ac46fd2f3363b8c6",
+          "message": "task-4-2: Create MIGRATION.md guide",
+          "task_id": "task-4-2",
+          "timestamp": "2025-11-04T00:04:13.198374Z"
         }
       ],
       "pr": null
