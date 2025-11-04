@@ -145,8 +145,7 @@ def check_git_commit_readiness(
         return None
 
     # All checks passed - commit should be offered
-    session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
-    commit_cadence = session_prefs.get('commit_cadence', 'task')
+    commit_cadence = get_git_setting('commit_cadence', default='task')
 
     return {
         "should_commit": True,
