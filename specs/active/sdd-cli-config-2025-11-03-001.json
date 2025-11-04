@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-cli-config-2025-11-03-001",
   "generated": "2025-11-03T19:00:00Z",
-  "last_updated": "2025-11-04T12:24:56.185257Z",
+  "last_updated": "2025-11-04T12:33:19.417393Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 26,
+      "completed_tasks": 27,
       "metadata": {
         "description": "Add project and global configuration support for --json and --compact flags, making them configurable via .claude/sdd_config.json files",
         "objectives": [
@@ -962,7 +962,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Project Setup & Documentation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -976,7 +976,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Integrate config setup into project initialization workflow",
         "risk_level": "low",
@@ -986,14 +986,14 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [
         "task-4-1",
         "task-4-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1004,7 +1004,7 @@
     "task-4-1": {
       "type": "task",
       "title": "cli/skills_dev/setup_permissions.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1013,12 +1013,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "cli/skills_dev/setup_permissions.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "details": "Add interactive prompts to create .claude/sdd_config.json during project setup with user preferences for json/compact defaults"
+        "details": "Add interactive prompts to create .claude/sdd_config.json during project setup with user preferences for json/compact defaults",
+        "completed_at": "2025-11-04T12:33:19.410709Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T12:33:19.414582Z"
       }
     },
     "task-4-2": {
@@ -1453,12 +1456,29 @@
       "content": "All child tasks in phase phase-3 have been completed.",
       "metadata": {},
       "task_id": "phase-3"
+    },
+    {
+      "timestamp": "2025-11-04T12:27:36.841774Z",
+      "entry_type": "decision",
+      "title": "Decision: File Reorganization (.claude/ vs docs/)",
+      "author": "claude-code",
+      "content": "During implementation, identified that .claude/ directory should only contain project-specific config files generated during setup (e.g., sdd_config.json, git_config.json), not the toolkit's template and documentation files. The template files (*.json.template) and README documentation are part of the toolkit itself, not user configurations, so they belong in docs/ with other toolkit documentation.\n\nImpact: \n- Updated spec file paths for task-1-2 (sdd_config.json.template) and task-1-3 (SDD_CONFIG_README.md)\n- Also moved existing git_config files for consistency\n- Updated verification commands to reference new paths\n- Updated documentation cross-references\n- No impact on functionality - files are still accessible and referenced correctly\n\nThis follows proper separation of concerns: toolkit files in docs/, user configs in .claude/.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-11-04T12:33:19.414563Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: cli/skills_dev/setup_permissions.py",
+      "author": "claude-code",
+      "content": "Successfully added interactive configuration prompts to cli/skills_dev/setup_permissions.py. The implementation includes:\n\n1. New _prompt_for_config() function that asks users for:\n   - JSON output preference (yes/no)\n   - Compact formatting preference (if JSON enabled)\n\n2. New _create_config_file() function that:\n   - Creates .claude/sdd_config.json with user preferences\n   - Shows confirmation message with chosen settings\n   - Handles errors gracefully\n\n3. Integration with cmd_update():\n   - Checks if config already exists\n   - Only prompts in interactive mode (skips when --json flag used)\n   - Creates config before setting up permissions\n   - Preserves all existing setup functionality\n\nVerification performed:\n- Tested config file creation successfully creates valid JSON structure\n- Tested JSON mode (--json flag) correctly skips prompts\n- Verified existing settings.json permissions setup still works\n- Confirmed config file structure matches template exactly\n\nAll requirements met. The interactive setup flow now creates .claude/sdd_config.json with user's output preferences during project setup.",
+      "metadata": {},
+      "task_id": "task-4-1"
     }
   ],
   "metadata": {
-    "progress_percentage": 86,
+    "progress_percentage": 90,
     "status": "active",
-    "current_phase": "phase-3",
+    "current_phase": "phase-4",
     "git": {
       "branch_name": null,
       "base_branch": null,
@@ -1636,6 +1656,12 @@
           "message": "verify-3-2: Integration tests pass",
           "task_id": "verify-3-2",
           "timestamp": "2025-11-04T12:24:55.619121Z"
+        },
+        {
+          "sha": "1845053ff8fea44c579d053d673577b09e0e1f82",
+          "message": "verify-3-3: Existing tests still pass",
+          "task_id": "verify-3-3",
+          "timestamp": "2025-11-04T12:24:56.225080Z"
         }
       ],
       "pr": null

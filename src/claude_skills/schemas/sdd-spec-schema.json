@@ -115,17 +115,6 @@
               "description": "Current status of the pull request"
             }
           }
-        },
-        "session_preferences": {
-          "type": "object",
-          "description": "User preferences for session behavior and workflows",
-          "properties": {
-            "commit_cadence": {
-              "type": "string",
-              "enum": ["task", "phase", "manual"],
-              "description": "Preferred cadence for creating git commits: 'task' (commit after each task), 'phase' (commit after each phase), 'manual' (user controls when to commit)"
-            }
-          }
         }
       }
     },
