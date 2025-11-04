@@ -1,0 +1,216 @@
+"""SDD CLI configuration loader for SDD toolkit.
+
+Loads SDD CLI output settings from configuration files with fallback to sensible defaults.
+Supports both per-project and global configurations.
+
+Configuration Locations (in order of precedence):
+1. Project-local: {project_root}/.claude/sdd_config.json
+2. Global: ~/.claude/sdd_config.json
+3. Defaults: Built-in DEFAULT_SDD_CONFIG
+
+This module provides a common interface for all CLI commands to load output settings.
+"""
+
+import json
+import logging
+from pathlib import Path
+from typing import Dict, Optional, Any
+
+logger = logging.getLogger(__name__)
+
+
+# Default SDD configuration (fallback if config file not found)
+DEFAULT_SDD_CONFIG = {
+    "output": {
+        "json": True,  # Output JSON by default for automation-friendly behavior
+        "compact": True,  # Use compact JSON formatting by default
+    }
+}
+
+
+def get_config_path(project_path: Optional[Path] = None) -> Optional[Path]:
+    """Get the path to the sdd_config.json file.
+
+    Checks multiple locations in order of precedence:
+    1. Project-local: {project_path}/.claude/sdd_config.json
+    2. Global: ~/.claude/sdd_config.json
+
+    Args:
+        project_path: Path to project root (optional). If not provided,
+                     will attempt to find project root or use cwd.
+
+    Returns:
+        Path to sdd_config.json if found, None otherwise
+    """
+    paths_to_check = []
+
+    # Check project-local config first
+    if project_path:
+        project_config = Path(project_path) / ".claude" / "sdd_config.json"
+        paths_to_check.append(project_config)
+    else:
+        # Try to find project root by looking for .claude directory
+        cwd = Path.cwd()
+        # Check current directory and up to 3 levels up
+        for path in [cwd] + list(cwd.parents[:3]):
+            project_config = path / ".claude" / "sdd_config.json"
+            if project_config.exists():
+                paths_to_check.append(project_config)
+                break
+        else:
+            # If not found, still add cwd path as candidate
+            paths_to_check.append(cwd / ".claude" / "sdd_config.json")
+
+    # Check global config
+    home = Path.home()
+    global_config = home / ".claude" / "sdd_config.json"
+    paths_to_check.append(global_config)
+
+    # Return first existing path
+    for path in paths_to_check:
+        if path.exists():
+            return path
+
+    # Return None if no config found (will use defaults)
+    return None
+
+
+def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate and sanitize SDD configuration values.
+
+    Ensures all configuration values have correct types and valid values.
+    Invalid values are replaced with defaults and warnings are logged.
+
+    Args:
+        config: Raw configuration dictionary
+
+    Returns:
+        Validated configuration dictionary
+    """
+    validated = DEFAULT_SDD_CONFIG.copy()
+
+    # Validate output section
+    if "output" in config and isinstance(config["output"], dict):
+        output = config["output"]
+
+        # Validate boolean fields
+        if "json" in output:
+            value = output["json"]
+            if isinstance(value, bool):
+                validated["output"]["json"] = value
+            else:
+                logger.warning(
+                    f"Invalid type for sdd config 'output.json': expected bool, got {type(value).__name__}. "
+                    f"Using default: {DEFAULT_SDD_CONFIG['output']['json']}"
+                )
+
+        if "compact" in output:
+            value = output["compact"]
+            if isinstance(value, bool):
+                validated["output"]["compact"] = value
+            else:
+                logger.warning(
+                    f"Invalid type for sdd config 'output.compact': expected bool, got {type(value).__name__}. "
+                    f"Using default: {DEFAULT_SDD_CONFIG['output']['compact']}"
+                )
+
+    # Warn about unknown keys (but don't fail)
+    known_keys = set(DEFAULT_SDD_CONFIG.keys())
+    unknown_keys = set(config.keys()) - known_keys
+    if unknown_keys:
+        logger.warning(
+            f"Unknown keys in sdd config will be ignored: {', '.join(unknown_keys)}"
+        )
+
+    return validated
+
+
+def load_sdd_config(project_path: Optional[Path] = None) -> Dict[str, Any]:
+    """Load SDD configuration from file with fallback to defaults.
+
+    Attempts to load configuration from:
+    1. Project-local config ({project_path}/.claude/sdd_config.json)
+    2. Global config (~/.claude/sdd_config.json)
+    3. Built-in defaults (DEFAULT_SDD_CONFIG)
+
+    Args:
+        project_path: Path to project root (optional). If not provided,
+                     will attempt to find project root.
+
+    Returns:
+        Dict with complete SDD configuration (validated and merged with defaults)
+    """
+    config_path = get_config_path(project_path)
+
+    if not config_path:
+        # No config file found, use defaults
+        logger.debug("No sdd config file found, using defaults")
+        return DEFAULT_SDD_CONFIG.copy()
+
+    try:
+        with open(config_path, 'r') as f:
+            config_data = json.load(f)
+
+        if not config_data or not isinstance(config_data, dict):
+            # Empty or invalid config, use defaults
+            logger.warning(f"Empty or invalid sdd config at {config_path}, using defaults")
+            return DEFAULT_SDD_CONFIG.copy()
+
+        # Validate and merge with defaults
+        validated_config = _validate_sdd_config(config_data)
+        logger.debug(f"Loaded sdd config from {config_path}")
+        return validated_config
+
+    except json.JSONDecodeError as e:
+        # JSON parsing error, use defaults
+        logger.warning(
+            f"Failed to parse sdd config at {config_path}: {e}. Using defaults."
+        )
+        return DEFAULT_SDD_CONFIG.copy()
+
+    except (IOError, OSError) as e:
+        # File read error, use defaults
+        logger.warning(
+            f"Failed to read sdd config at {config_path}: {e}. Using defaults."
+        )
+        return DEFAULT_SDD_CONFIG.copy()
+
+
+def get_sdd_setting(
+    key: str,
+    project_path: Optional[Path] = None,
+    default: Optional[Any] = None
+) -> Any:
+    """Get a specific SDD configuration setting with validation.
+
+    Args:
+        key: Configuration key to retrieve (supports nested keys with dots, e.g., 'output.json')
+        project_path: Path to project root (optional)
+        default: Default value to return if key not found (optional).
+                If not provided, uses DEFAULT_SDD_CONFIG default.
+
+    Returns:
+        Configuration value for the specified key
+    """
+    config = load_sdd_config(project_path)
+
+    # Support nested keys like 'output.json'
+    keys = key.split('.')
+    value = config
+    for k in keys:
+        if isinstance(value, dict) and k in value:
+            value = value[k]
+        else:
+            # Key not found, return default
+            if default is not None:
+                return default
+            # Try to get from DEFAULT_SDD_CONFIG
+            default_value = DEFAULT_SDD_CONFIG
+            for dk in keys:
+                if isinstance(default_value, dict) and dk in default_value:
+                    default_value = default_value[dk]
+                else:
+                    return None
+            return default_value
+
+    return value

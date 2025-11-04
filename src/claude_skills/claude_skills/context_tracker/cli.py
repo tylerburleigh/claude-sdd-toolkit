@@ -375,7 +375,15 @@ def cmd_context(args, printer):
 
     # Output the metrics
     if args.json:
-        print(format_metrics_json(metrics, args.max_context, transcript_path))
+        # Check if verbose mode is requested
+        if hasattr(args, 'verbose') and args.verbose:
+            # Full output with all fields
+            print(format_metrics_json(metrics, args.max_context, transcript_path))
+        else:
+            # Simplified output: just percentage as whole number
+            context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
+            simplified = {"context_percentage_used": round(context_pct)}
+            print(json.dumps(simplified))
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
@@ -432,7 +440,10 @@ def register_context(subparsers, parent_parser):
         help='Maximum context window size (default: 160000)'
     )
 
-    # Note: --json is inherited from parent_parser global options
+    # Note: --json and --verbose are inherited from parent_parser global options
+    # --verbose flag is used to control output verbosity:
+    #   - Without --verbose: Simplified JSON output (just context_percentage_used)
+    #   - With --verbose: Full JSON output (all metrics)
 
     parser.set_defaults(func=cmd_context)
 
@@ -511,7 +522,10 @@ when running multiple concurrent Claude Code sessions.
 
     # Output the metrics
     if args.json:
-        print(format_metrics_json(metrics, args.max_context, transcript_path))
+        # Note: main() doesn't have --verbose flag, so always use simplified output
+        context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
+        simplified = {"context_percentage_used": round(context_pct)}
+        print(json.dumps(simplified))
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 

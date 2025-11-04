@@ -135,6 +135,13 @@ from .json_output import (
     CommandType,
 )
 
+# SDD configuration
+from .sdd_config import (
+    load_sdd_config,
+    DEFAULT_SDD_CONFIG,
+    get_sdd_setting,
+)
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -258,4 +265,9 @@ __all__ = [
     "format_compact_output",
     "print_json_output",
     "CommandType",
+
+    # SDD configuration
+    "load_sdd_config",
+    "DEFAULT_SDD_CONFIG",
+    "get_sdd_setting",
 ]

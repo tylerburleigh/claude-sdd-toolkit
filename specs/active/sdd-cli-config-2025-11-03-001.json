@@ -1,12 +1,12 @@
 {
   "spec_id": "sdd-cli-config-2025-11-03-001",
   "generated": "2025-11-03T19:00:00Z",
-  "last_updated": "2025-11-04T00:13:27.859939Z",
+  "last_updated": "2025-11-04T12:04:57.003782Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "SDD CLI Configuration System",
-      "status": "pending",
+      "status": "in_progress",
       "parent": null,
       "children": [
         "phase-1",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "description": "Add project and global configuration support for --json and --compact flags, making them configurable via .claude/sdd_config.json files",
         "objectives": [
@@ -33,14 +33,14 @@
     "phase-1": {
       "type": "phase",
       "title": "Core Configuration Module",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-1-files",
         "phase-1-verify"
       ],
       "total_tasks": 11,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Create the configuration loading infrastructure and template files",
         "risk_level": "low",
@@ -55,7 +55,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -64,7 +64,7 @@
         "task-1-4"
       ],
       "total_tasks": 8,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -77,7 +77,7 @@
     "task-1-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/sdd_config.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-1-files",
       "children": [
         "task-1-1-1",
@@ -95,7 +95,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/sdd_config.py",
         "task_category": "implementation",
@@ -106,7 +106,7 @@
     "task-1-1-1": {
       "type": "subtask",
       "title": "Define DEFAULT_SDD_CONFIG constant",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-1",
       "children": [],
       "dependencies": {
@@ -117,9 +117,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Set defaults: {\"output\": {\"json\": true, \"compact\": true}}"
+        "details": "Set defaults: {\"output\": {\"json\": true, \"compact\": true}}",
+        "completed_at": "2025-11-04T12:04:56.999641Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T12:04:57.002000Z"
       }
     },
     "task-1-1-2": {
@@ -975,5 +978,21 @@
         "expected": ""
       }
     }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-04T12:04:57.001989Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define DEFAULT_SDD_CONFIG constant",
+      "author": "claude-code",
+      "content": "Test",
+      "metadata": {},
+      "task_id": "task-1-1-1"
+    }
+  ],
+  "metadata": {
+    "progress_percentage": 3,
+    "status": "active",
+    "current_phase": "phase-1"
   }
 }
