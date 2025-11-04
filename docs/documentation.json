@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-03T23:40:50.453780Z",
+    "generated_at": "2025-11-04T12:05:40.693659Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 208,
-    "total_lines": 70275,
+    "total_files": 209,
+    "total_lines": 70517,
     "total_classes": 268,
-    "total_functions": 784,
-    "avg_complexity": 5.57,
+    "total_functions": 788,
+    "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 208,
-        "lines": 70275,
+        "files": 209,
+        "lines": 70517,
         "classes": 268,
-        "functions": 784,
-        "avg_complexity": 5.57
+        "functions": 788,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -825,10 +825,13 @@
         "json_output.format_json_output",
         "json_output.format_compact_output",
         "json_output.print_json_output",
-        "json_output.CommandType"
+        "json_output.CommandType",
+        "sdd_config.load_sdd_config",
+        "sdd_config.DEFAULT_SDD_CONFIG",
+        "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 261
+      "lines": 273
     },
     {
       "name": "ai_config",
@@ -1280,6 +1283,29 @@
       "lines": 190
     },
     {
+      "name": "sdd_config",
+      "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+      "language": "python",
+      "docstring": "SDD CLI configuration loader for SDD toolkit.\n\nLoads SDD CLI output settings from configuration files with fallback to sensible defaults.\nSupports both per-project and global configurations.\n\nConfiguration Locations (in order of precedence):\n1. Project-local: {project_root}/.claude/sdd_config.json\n2. Global: ~/.claude/sdd_config.json\n3. Defaults: Built-in DEFAULT_SDD_CONFIG\n\nThis module provides a common interface for all CLI commands to load output settings.",
+      "classes": [],
+      "functions": [
+        "get_config_path",
+        "_validate_sdd_config",
+        "load_sdd_config",
+        "get_sdd_setting"
+      ],
+      "imports": [
+        "json",
+        "logging",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Optional",
+        "typing.Any"
+      ],
+      "exports": [],
+      "lines": 216
+    },
+    {
       "name": "spec",
       "file": "src/claude_skills/claude_skills/common/spec.py",
       "language": "python",
@@ -1415,7 +1441,7 @@
         "claude_skills.common.PrettyPrinter"
       ],
       "exports": [],
-      "lines": 520
+      "lines": 534
     },
     {
       "name": "parser",
@@ -16158,7 +16184,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -25441,6 +25467,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_model_config",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 35,
@@ -25479,7 +25511,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 8
     },
     {
       "name": "load_skill_config",
@@ -28758,6 +28790,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_model_config",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 35,
@@ -28844,7 +28882,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 8
     },
     {
       "name": "_validate_git_config",
@@ -38792,6 +38830,420 @@
       ]
     },
     {
+      "name": "get_config_path",
+      "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+      "line": 31,
+      "language": "python",
+      "docstring": "Get the path to the sdd_config.json file.\n\nChecks multiple locations in order of precedence:\n1. Project-local: {project_path}/.claude/sdd_config.json\n2. Global: ~/.claude/sdd_config.json\n\nArgs:\n    project_path: Path to project root (optional). If not provided,\n                 will attempt to find project root or use cwd.\n\nReturns:\n    Path to sdd_config.json if found, None otherwise",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[Path]",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "load_skill_config",
+          "file": "src/claude_skills/claude_skills/common/ai_config.py",
+          "line": 86,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_git_config",
+          "file": "src/claude_skills/claude_skills/common/git_config.py",
+          "line": 193,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_model_config",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 35,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_consensus_config",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_consultation_timeout",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 241,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_tool_config",
+          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
+          "line": 56,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_consensus_config",
+          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
+          "line": 340,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 50,
+          "call_type": "method_call"
+        },
+        {
+          "name": "cwd",
+          "file": "unknown",
+          "line": 53,
+          "call_type": "method_call"
+        },
+        {
+          "name": "list",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 57,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 58,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "home",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 8
+    },
+    {
+      "name": "_validate_sdd_config",
+      "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+      "line": 78,
+      "language": "python",
+      "docstring": "Validate and sanitize SDD configuration values.\n\nEnsures all configuration values have correct types and valid values.\nInvalid values are replaced with defaults and warnings are logged.\n\nArgs:\n    config: Raw configuration dictionary\n\nReturns:\n    Validated configuration dictionary",
+      "parameters": [
+        {
+          "name": "config",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 160,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 99,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "type",
+          "file": "unknown",
+          "line": 103,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 112,
+          "call_type": "method_call"
+        },
+        {
+          "name": "type",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 119,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 119,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 122,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "load_sdd_config",
+      "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+      "line": 128,
+      "language": "python",
+      "docstring": "Load SDD configuration from file with fallback to defaults.\n\nAttempts to load configuration from:\n1. Project-local config ({project_path}/.claude/sdd_config.json)\n2. Global config (~/.claude/sdd_config.json)\n3. Built-in defaults (DEFAULT_SDD_CONFIG)\n\nArgs:\n    project_path: Path to project root (optional). If not provided,\n                 will attempt to find project root.\n\nReturns:\n    Dict with complete SDD configuration (validated and merged with defaults)",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "get_sdd_setting",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 195,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get_config_path",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 147,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 157,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_validate_sdd_config",
+          "file": "unknown",
+          "line": 160,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 161,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 169,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "get_sdd_setting",
+      "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+      "line": 179,
+      "language": "python",
+      "docstring": "Get a specific SDD configuration setting with validation.\n\nArgs:\n    key: Configuration key to retrieve (supports nested keys with dots, e.g., 'output.json')\n    project_path: Path to project root (optional)\n    default: Default value to return if key not found (optional).\n            If not provided, uses DEFAULT_SDD_CONFIG default.\n\nReturns:\n    Configuration value for the specified key",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        },
+        {
+          "name": "default",
+          "type": "Optional[Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Any",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "load_sdd_config",
+          "file": "unknown",
+          "line": 195,
+          "call_type": "function_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 198,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 201,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 210,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
       "name": "extract_frontmatter",
       "file": "src/claude_skills/claude_skills/common/spec.py",
       "line": 16,
@@ -42301,7 +42753,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 485,
+          "line": 496,
           "call_type": "function_call"
         }
       ],
@@ -42438,13 +42890,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 380,
+          "line": 388,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 516,
+          "line": 530,
           "call_type": "function_call"
         }
       ],
@@ -42605,13 +43057,7 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 378,
-          "call_type": "function_call"
-        },
-        {
-          "name": "main",
-          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 514,
+          "line": 381,
           "call_type": "function_call"
         }
       ],
@@ -42629,7 +43075,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 1
     },
     {
       "name": "cmd_session_marker",
@@ -42690,7 +43136,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 13,
+      "complexity": 14,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -43012,25 +43458,43 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 378,
+          "line": 381,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_json",
           "file": "unknown",
-          "line": 378,
+          "line": 381,
+          "call_type": "function_call"
+        },
+        {
+          "name": "round",
+          "file": "unknown",
+          "line": 385,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 380,
+          "line": 386,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 386,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 388,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 380,
+          "line": 388,
           "call_type": "function_call"
         }
       ]
@@ -43038,7 +43502,7 @@
     {
       "name": "register_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 383,
+      "line": 391,
       "language": "python",
       "docstring": "Register 'session-marker' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -43071,13 +43535,13 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 391,
+          "line": 399,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 398,
+          "line": 406,
           "call_type": "method_call"
         }
       ],
@@ -43086,7 +43550,7 @@
     {
       "name": "register_context",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 401,
+      "line": 409,
       "language": "python",
       "docstring": "Register 'context' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -43119,31 +43583,31 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 409,
+          "line": 417,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 416,
+          "line": 424,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 422,
+          "line": 430,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 428,
+          "line": 436,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 437,
+          "line": 448,
           "call_type": "method_call"
         }
       ],
@@ -43152,7 +43616,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 440,
+      "line": 451,
       "language": "python",
       "docstring": "Main CLI entry point.",
       "parameters": [],
@@ -43178,7 +43642,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -43246,110 +43710,56 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 442,
+          "line": 453,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 463,
+          "line": 474,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 469,
+          "line": 480,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 476,
+          "line": 487,
           "call_type": "method_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 482,
+          "line": 493,
           "call_type": "method_call"
         },
         {
           "name": "get_transcript_path",
           "file": "unknown",
-          "line": 485,
+          "line": 496,
           "call_type": "function_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 488,
+          "line": 499,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 489,
+          "line": 500,
           "call_type": "function_call"
         },
         {
           "name": "print",
-          "file": "unknown",
-          "line": 490,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 491,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 492,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 493,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 494,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 495,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 496,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 497,
-          "call_type": "function_call"
-        },
-        {
-          "name": "exit",
-          "file": "unknown",
-          "line": 498,
-          "call_type": "method_call"
-        },
-        {
-          "name": "exists",
           "file": "unknown",
           "line": 501,
-          "call_type": "method_call"
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -43358,13 +43768,25 @@
           "call_type": "function_call"
         },
         {
-          "name": "exit",
+          "name": "print",
           "file": "unknown",
           "line": 503,
-          "call_type": "method_call"
+          "call_type": "function_call"
         },
         {
-          "name": "parse_transcript",
+          "name": "print",
+          "file": "unknown",
+          "line": 504,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 505,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
           "file": "unknown",
           "line": 506,
           "call_type": "function_call"
@@ -43372,37 +43794,85 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 509,
+          "line": 507,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 508,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 510,
+          "line": 509,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 512,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 514,
+          "line": 513,
           "call_type": "function_call"
         },
         {
-          "name": "format_metrics_json",
+          "name": "exit",
           "file": "unknown",
           "line": 514,
+          "call_type": "method_call"
+        },
+        {
+          "name": "parse_transcript",
+          "file": "unknown",
+          "line": 517,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 516,
+          "line": 520,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exit",
+          "file": "unknown",
+          "line": 521,
+          "call_type": "method_call"
+        },
+        {
+          "name": "round",
+          "file": "unknown",
+          "line": 527,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 528,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 528,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 530,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 516,
+          "line": 530,
           "call_type": "function_call"
         }
       ],
@@ -43504,7 +43974,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 506,
+          "line": 517,
           "call_type": "function_call"
         }
       ],
@@ -44348,7 +44818,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -45463,7 +45933,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -45928,7 +46398,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -51678,7 +52148,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -62246,6 +62716,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 143,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_model_config",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 35,
@@ -62277,7 +62753,7 @@
         }
       ],
       "calls": [],
-      "call_count": 7
+      "call_count": 8
     },
     {
       "name": "load_tool_config",
@@ -74618,7 +75094,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 520,
+          "line": 534,
           "call_type": "function_call"
         },
         {
@@ -108364,7 +108840,10 @@
       "json_output.format_json_output",
       "json_output.format_compact_output",
       "json_output.print_json_output",
-      "json_output.CommandType"
+      "json_output.CommandType",
+      "sdd_config.load_sdd_config",
+      "sdd_config.DEFAULT_SDD_CONFIG",
+      "sdd_config.get_sdd_setting"
     ],
     "src/claude_skills/claude_skills/common/ai_config.py": [
       "yaml",
@@ -108512,6 +108991,14 @@
       "typing.List",
       "claude_skills.common.SpecValidationResult",
       "claude_skills.common.JsonSpecValidationResult"
+    ],
+    "src/claude_skills/claude_skills/common/sdd_config.py": [
+      "json",
+      "logging",
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.Optional",
+      "typing.Any"
     ],
     "src/claude_skills/claude_skills/common/spec.py": [
       "sys",

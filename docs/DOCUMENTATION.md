@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-03 18:40:50
+**Generated:** 2025-11-04 07:05:40
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 208
-- **Total Lines:** 70275
+- **Total Files:** 209
+- **Total Lines:** 70517
 - **Total Classes:** 268
-- **Total Functions:** 784
-- **Avg Complexity:** 5.57
+- **Total Functions:** 788
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6598,6 +6598,29 @@ Returns:
 
 ---
 
+### `_validate_sdd_config(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:78`
+**Complexity:** 8
+
+**Description:**
+> Validate and sanitize SDD configuration values.
+
+Ensures all configuration values have correct types and valid values.
+Invalid values are replaced with defaults and warnings are logged.
+
+Args:
+    config: Raw configuration dictionary
+
+Returns:
+    Validated configuration dictionary
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
 ### `_validate_spec_structure(spec_data) -> bool`
 
 **Language:** python
@@ -8467,7 +8490,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:300`
-⚠️ **Complexity:** 13 (High)
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -13608,6 +13631,31 @@ Returns:
 
 ---
 
+### `get_config_path(project_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:31`
+**Complexity:** 6
+
+**Description:**
+> Get the path to the sdd_config.json file.
+
+Checks multiple locations in order of precedence:
+1. Project-local: {project_path}/.claude/sdd_config.json
+2. Global: ~/.claude/sdd_config.json
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root or use cwd.
+
+Returns:
+    Path to sdd_config.json if found, None otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `get_config_path() -> Path`
 
 **Language:** python
@@ -14235,6 +14283,31 @@ Returns:
 
 **Parameters:**
 - `available_tools`: List[str]
+
+---
+
+### `get_sdd_setting(key, project_path, default) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:179`
+**Complexity:** 8
+
+**Description:**
+> Get a specific SDD configuration setting with validation.
+
+Args:
+    key: Configuration key to retrieve (supports nested keys with dots, e.g., 'output.json')
+    project_path: Path to project root (optional)
+    default: Default value to return if key not found (optional).
+            If not provided, uses DEFAULT_SDD_CONFIG default.
+
+Returns:
+    Configuration value for the specified key
+
+**Parameters:**
+- `key`: str
+- `project_path`: Optional[Path]
+- `default`: Optional[Any]
 
 ---
 
@@ -15425,6 +15498,32 @@ Returns:
 
 ---
 
+### `load_sdd_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:128`
+**Complexity:** 6
+
+**Description:**
+> Load SDD configuration from file with fallback to defaults.
+
+Attempts to load configuration from:
+1. Project-local config ({project_path}/.claude/sdd_config.json)
+2. Global config (~/.claude/sdd_config.json)
+3. Built-in defaults (DEFAULT_SDD_CONFIG)
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root.
+
+Returns:
+    Dict with complete SDD configuration (validated and merged with defaults)
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `load_skill_config(skill_name) -> Dict`
 
 **Language:** python
@@ -15475,7 +15574,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:440`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:451`
 **Complexity:** 5
 
 **Description:**
@@ -16379,7 +16478,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:401`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:409`
 **Complexity:** 1
 
 **Description:**
@@ -16553,7 +16652,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:383`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:391`
 **Complexity:** 1
 
 **Description:**
@@ -20647,6 +20746,9 @@ Returns:
 - `reporting.generate_combined_report`
 - `reporting.generate_json_spec_report`
 - `reporting.generate_spec_report`
+- `sdd_config.DEFAULT_SDD_CONFIG`
+- `sdd_config.get_sdd_setting`
+- `sdd_config.load_sdd_config`
 - `spec.backup_json_spec`
 - `spec.extract_frontmatter`
 - `spec.get_node`
@@ -20825,6 +20927,15 @@ Returns:
 - `datetime.datetime`
 - `pathlib.Path`
 - `typing.List`
+
+### `src/claude_skills/claude_skills/common/sdd_config.py`
+
+- `json`
+- `logging`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/spec.py`
 
