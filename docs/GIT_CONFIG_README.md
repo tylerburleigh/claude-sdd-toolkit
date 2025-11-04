@@ -50,12 +50,14 @@ Automatically create pull requests when specs are completed.
 **Why disabled by default:** PR creation is a significant action that should be explicit.
 
 ### `commit_cadence` (string, default: `"task"`)
-Controls when commits are created automatically.
+Controls when commits are created automatically. This is the **single source of truth** for commit cadence - set it once here and it applies to all specs in the project.
 
 **Options:**
 - `"task"`: Commit after completing each task (recommended for granular history)
 - `"phase"`: Commit after completing each phase (fewer, larger commits)
 - `"manual"`: No automatic commits (user controls when to commit)
+
+**Note:** This setting is configured once via `/sdd-setup` and applies project-wide. You will not be prompted per-spec or per-session.
 
 ## Example Configurations
 
