@@ -77,6 +77,99 @@ SDD_PERMISSIONS = [
 ]
 
 
+def _prompt_for_config(printer: PrettyPrinter) -> dict:
+    """Prompt user for SDD configuration preferences.
+
+    Returns:
+        Dict with user's configuration preferences
+    """
+    printer.info("📋 SDD CLI Configuration Setup")
+    printer.info("")
+    printer.info("Let's configure your default output preferences for SDD commands.")
+    printer.info("")
+
+    # Prompt for JSON output preference
+    printer.info("Output Format:")
+    printer.info("  • JSON: Machine-readable format (good for automation)")
+    printer.info("  • Human-readable: Easy-to-read terminal output")
+    printer.info("")
+
+    while True:
+        json_pref = input("Default to JSON output? [Y/n]: ").strip().lower()
+        if json_pref in ['', 'y', 'yes']:
+            use_json = True
+            break
+        elif json_pref in ['n', 'no']:
+            use_json = False
+            break
+        else:
+            printer.warning("Please enter 'y' for yes or 'n' for no")
+
+    # Only ask about compact if JSON is enabled
+    use_compact = True  # default
+    if use_json:
+        printer.info("")
+        printer.info("JSON Formatting:")
+        printer.info("  • Compact: Single-line JSON (smaller output)")
+        printer.info("  • Pretty: Multi-line JSON (more readable)")
+        printer.info("")
+
+        while True:
+            compact_pref = input("Use compact JSON formatting? [Y/n]: ").strip().lower()
+            if compact_pref in ['', 'y', 'yes']:
+                use_compact = True
+                break
+            elif compact_pref in ['n', 'no']:
+                use_compact = False
+                break
+            else:
+                printer.warning("Please enter 'y' for yes or 'n' for no")
+
+    return {
+        "output": {
+            "json": use_json,
+            "compact": use_compact
+        }
+    }
+
+
+def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter) -> bool:
+    """Create .claude/sdd_config.json with user preferences.
+
+    Args:
+        project_path: Project root directory
+        config: Configuration dict to write
+        printer: PrettyPrinter instance
+
+    Returns:
+        True if config was created successfully, False otherwise
+    """
+    config_file = project_path / ".claude" / "sdd_config.json"
+
+    try:
+        # Create .claude directory if needed
+        config_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Write config file
+        with open(config_file, 'w') as f:
+            json.dump(config, f, indent=2)
+            f.write('\n')  # Add trailing newline
+
+        printer.success(f"✅ Created configuration file: {config_file}")
+        printer.info("")
+        printer.info("Your preferences:")
+        printer.info(f"  • JSON output: {'enabled' if config['output']['json'] else 'disabled'}")
+        if config['output']['json']:
+            printer.info(f"  • JSON format: {'compact' if config['output']['compact'] else 'pretty-printed'}")
+        printer.info("")
+
+        return True
+
+    except (IOError, OSError) as e:
+        printer.error(f"❌ Failed to create config file: {e}")
+        return False
+
+
 def cmd_update(args, printer: PrettyPrinter) -> int:
     """Update .claude/settings.json with SDD permissions."""
     project_path = Path(args.project_root).resolve()
@@ -84,6 +177,16 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
 
     # Create .claude directory if it doesn't exist
     settings_file.parent.mkdir(parents=True, exist_ok=True)
+
+    # Check if sdd_config.json already exists
+    config_file = project_path / ".claude" / "sdd_config.json"
+    config_exists = config_file.exists()
+
+    # Prompt for configuration if not in JSON mode and config doesn't exist
+    if not args.json and not config_exists:
+        printer.info("")
+        config = _prompt_for_config(printer)
+        _create_config_file(project_path, config, printer)
 
     # Load existing settings or create new
     if settings_file.exists():

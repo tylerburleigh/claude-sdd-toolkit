@@ -78,18 +78,50 @@ def get_spec_git_diffs(repo_root: Path, base_branch: str, max_size_kb: int = 50)
         return ""
 
 
-def get_commit_history(spec_data: Dict[str, Any]) -> List[Dict[str, str]]:
-    """Extract commit history from spec metadata.
+def get_commit_history(repo_root: Path, base_branch: str) -> List[Dict[str, str]]:
+    """Query git for commit history between base branch and current HEAD.
 
     Args:
-        spec_data: Loaded spec JSON data
+        repo_root: Path to repository root directory
+        base_branch: Base branch name (e.g., 'main', 'develop')
 
     Returns:
-        List of commit dictionaries with keys: sha, message, task_id, timestamp.
-        Returns empty list if no commits found.
+        List of commit dictionaries with keys: sha, message, timestamp.
+        Returns empty list if no commits found or on error.
     """
-    git_metadata = spec_data.get('metadata', {}).get('git', {})
-    return git_metadata.get('commits', [])
+    try:
+        result = subprocess.run(
+            ["git", "log", f"{base_branch}...HEAD", "--format=%H|%s|%aI", "--reverse"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=True
+        )
+
+        commits = []
+        for line in result.stdout.strip().split('\n'):
+            if not line:
+                continue
+            parts = line.split('|', 2)
+            if len(parts) >= 3:
+                commits.append({
+                    'sha': parts[0],
+                    'message': parts[1],
+                    'timestamp': parts[2]
+                })
+
+        return commits
+
+    except subprocess.TimeoutExpired:
+        logger.warning("Git log command timed out")
+        return []
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"Failed to get git log: {e}")
+        return []
+    except Exception as e:
+        logger.warning(f"Unexpected error getting commit history: {e}")
+        return []
 
 
 def get_journal_entries(
@@ -233,29 +265,64 @@ def gather_pr_context(
     if not spec_data:
         raise FileNotFoundError(f"Spec file not found: {spec_id}")
 
-    # Extract git metadata
-    git_metadata = spec_data.get('metadata', {}).get('git', {})
-    branch_name = git_metadata.get('branch_name')
-    base_branch = git_metadata.get('base_branch', 'main')
-
-    if not branch_name:
-        raise ValueError("Spec missing git.branch_name metadata")
-    if not base_branch:
-        raise ValueError("Spec missing git.base_branch metadata")
-
     # Find repository root
     repo_root = find_git_root(spec_path.parent)
     if not repo_root:
         raise ValueError("Git repository not found")
 
-    # Gather git diff
+    # Query git for current branch
+    try:
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10
+        )
+        branch_name = result.stdout.strip()
+        if not branch_name:
+            raise ValueError("Could not determine current branch")
+    except Exception as e:
+        raise ValueError(f"Failed to get current branch: {e}")
+
+    # Get base branch from git config or default to main
+    try:
+        result = subprocess.run(
+            ["git", "config", "--get", f"branch.{branch_name}.base"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        base_branch = result.stdout.strip() or 'main'
+    except Exception:
+        # If git config fails, try to detect from common base branches
+        for candidate in ['main', 'master', 'develop']:
+            try:
+                subprocess.run(
+                    ["git", "rev-parse", "--verify", candidate],
+                    cwd=repo_root,
+                    capture_output=True,
+                    timeout=10,
+                    check=True
+                )
+                base_branch = candidate
+                break
+            except Exception:
+                continue
+        else:
+            base_branch = 'main'  # Final fallback
+
+    # Gather git diff and commit history
     git_diff = get_spec_git_diffs(repo_root, base_branch, max_diff_size_kb)
+    commits = get_commit_history(repo_root, base_branch)
 
     # Gather all context
     context = {
         'spec_data': spec_data,
         'metadata': spec_data.get('metadata', {}),
-        'commits': get_commit_history(spec_data),
+        'commits': commits,
         'journals': get_journal_entries(spec_data, include_internal=False),
         'tasks': get_completed_tasks(spec_data),
         'phases': get_phase_summary(spec_data),

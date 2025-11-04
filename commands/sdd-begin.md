@@ -268,7 +268,7 @@ sdd session-marker
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
 
-Parse the output to get context percentage.
+Parse the JSON output to extract the `context_percentage_used` field (returns whole number, e.g., 78).
 
 If context percentage > 50%:
 ```
@@ -327,7 +327,7 @@ sdd session-marker
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
 ```
 
-Parse the output to get context percentage.
+Parse the JSON output to extract the `context_percentage_used` field (returns whole number, e.g., 78).
 
 If context percentage > 50%:
 ```

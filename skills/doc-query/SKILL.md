@@ -15,7 +15,7 @@ The `Skill(sdd-toolkit:doc-query)` skill provides targeted query capabilities fo
 - **Cross-Reference Tracking**: Find callers/callees, build call graphs, track class instantiations and imports
 - **Call Graph Analysis**: Visualize function call relationships with configurable depth and direction
 - **Module Summaries**: `describe-module` surfaces docstrings, hot spots, dependencies, and key entities in one call
-- **JSON Everywhere**: Pass `--json` to any command for structured output ready for `jq`, scripts, or downstream tools
+- **JSON Output Available**: Use `--json` or `--format json` on commands for structured output ready for `jq`, scripts, or downstream tools
 - **Complexity Analysis**: Identify refactoring candidates with configurable complexity thresholds
 - **Dependency Mapping**: Understand module relationships and perform impact analysis
 - **Context Gathering**: Smart context collection for specific tasks or feature areas

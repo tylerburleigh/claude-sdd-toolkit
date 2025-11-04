@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
 from claude_skills.common.git_metadata import find_git_root, create_commit_from_staging
-from claude_skills.common.git_config import is_git_enabled
+from claude_skills.common.git_config import is_git_enabled, get_git_setting
 
 logger = logging.getLogger(__name__)
 
@@ -24,15 +24,14 @@ def should_offer_commit(
     """Check if commit should be offered based on commit cadence preference.
 
     Args:
-        spec_data: JSON spec file data
+        spec_data: JSON spec file data (unused, kept for backward compatibility)
         event_type: Type of completion event - "task" or "phase"
 
     Returns:
         True if commit should be offered for this event type, False otherwise
     """
-    # Get commit cadence preference from spec metadata
-    session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
-    commit_cadence = session_prefs.get('commit_cadence', 'task')
+    # Get commit cadence preference from git_config.json
+    commit_cadence = get_git_setting('commit_cadence', default='task')
 
     # Determine if we should offer commit based on cadence
     # - "task": Commit after each task completion
@@ -146,8 +145,7 @@ def check_git_commit_readiness(
         return None
 
     # All checks passed - commit should be offered
-    session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
-    commit_cadence = session_prefs.get('commit_cadence', 'task')
+    commit_cadence = get_git_setting('commit_cadence', default='task')
 
     return {
         "should_commit": True,

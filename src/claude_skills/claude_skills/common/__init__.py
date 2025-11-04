@@ -118,6 +118,30 @@ from .ai_config import (
     is_tool_enabled,
 )
 
+# Contract extraction
+from .contracts import (
+    extract_prepare_task_contract,
+    extract_task_info_contract,
+    extract_check_deps_contract,
+    extract_progress_contract,
+    extract_next_task_contract,
+)
+
+# JSON output formatting
+from .json_output import (
+    format_json_output,
+    format_compact_output,
+    print_json_output,
+    CommandType,
+)
+
+# SDD configuration
+from .sdd_config import (
+    load_sdd_config,
+    DEFAULT_SDD_CONFIG,
+    get_sdd_setting,
+)
+
 __version__ = "1.0.0"
 
 __all__ = [
@@ -228,4 +252,22 @@ __all__ = [
     "get_timeout",
     "get_tool_config",
     "is_tool_enabled",
+
+    # Contract extraction
+    "extract_prepare_task_contract",
+    "extract_task_info_contract",
+    "extract_check_deps_contract",
+    "extract_progress_contract",
+    "extract_next_task_contract",
+
+    # JSON output formatting
+    "format_json_output",
+    "format_compact_output",
+    "print_json_output",
+    "CommandType",
+
+    # SDD configuration
+    "load_sdd_config",
+    "DEFAULT_SDD_CONFIG",
+    "get_sdd_setting",
 ]

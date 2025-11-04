@@ -26,7 +26,9 @@ from claude_skills.common import (
     # Query operations
     query_tasks,
     check_complete,
-    list_blockers as list_blocked_tasks
+    list_blockers as list_blocked_tasks,
+    # JSON output formatting
+    print_json_output,
 )
 from claude_skills.common.completion import format_completion_prompt
 
@@ -325,13 +327,13 @@ def cmd_next_task(args, printer):
     task_id, task_data = next_task
 
     if args.json:
-        print(json.dumps({
+        print_json_output({
             "task_id": task_id,
             "title": task_data.get("title", ""),
             "status": task_data.get("status", ""),
             "file_path": task_data.get("metadata", {}).get("file_path", ""),
             "estimated_hours": task_data.get("metadata", {}).get("estimated_hours", 0)
-        }, indent=2))
+        }, compact=args.compact)
     else:
         printer.success("Next task identified")
         printer.result("Task ID", task_id)
@@ -364,7 +366,7 @@ def cmd_task_info(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(task_data, indent=2))
+        print_json_output(task_data, compact=args.compact)
     else:
         printer.success("Task information retrieved")
         printer.result("Task ID", args.task_id)
@@ -410,7 +412,7 @@ def cmd_check_deps(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(deps, indent=2))
+        print_json_output(deps, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
         printer.result("Task ID", deps['task_id'])
@@ -452,7 +454,7 @@ def _check_all_task_deps(spec_data, args, printer):
                 all_results.append(deps)
 
     if args.json:
-        print(json.dumps(all_results, indent=2))
+        print_json_output(all_results, compact=args.compact)
     else:
         # Categorize tasks
         ready = [d for d in all_results if d['can_start']]
@@ -502,7 +504,7 @@ def cmd_progress(args, printer):
     progress = get_progress_summary(spec_data)
 
     if args.json:
-        print(json.dumps(progress, indent=2))
+        print_json_output(progress, compact=args.compact)
     else:
         printer.success("Progress calculated")
         printer.result("Spec", f"{progress['title']} ({progress['spec_id']})")
@@ -665,7 +667,7 @@ def cmd_prepare_task(args, printer):
         completion_info = task_prep.get('completion_info', {})
 
         if args.json:
-            print(json.dumps(task_prep, indent=2))
+            print_json_output(task_prep, compact=args.compact)
         else:
             # Show completion message
             printer.success("All tasks completed!")
@@ -712,7 +714,7 @@ def cmd_prepare_task(args, printer):
     #   - dependencies: Dependency analysis (blocked_by, soft_depends, blocks)
     #   - doc_context: Optional codebase context from doc-query
     if args.json:
-        print(json.dumps(task_prep, indent=2))
+        print_json_output(task_prep, compact=args.compact)
     else:
         printer.success(f"Task prepared: {task_prep['task_id']}")
         printer.result("Task", task_prep['task_data'].get('title', ''))

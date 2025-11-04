@@ -72,8 +72,8 @@ This skill is part of the **Spec-Driven Development** family:
 - Spec files are large and reading them directly wastes valuable context window space
 
 **Fast Context Checklist (daily driver):**
-1. `sdd prepare-task {spec-id} --json` (auto-discovers specs, selects the next task, and includes dependency status)
-2. If you need more detail, run `sdd task-info {spec-id} {task-id} --json` and `sdd check-deps {spec-id} {task-id} --json`
+1. `sdd prepare-task {spec-id}` (auto-discovers specs, selects the next task, and includes dependency status)
+2. If you need more detail, run `sdd task-info {spec-id} {task-id}` and `sdd check-deps {spec-id} {task-id}`
 3. Review task metadata, then open the mentioned source/test files; helpers like `sdd find-related-files {path}` and `sdd find-tests --source-file {path}` keep this fast
 4. If `prepare-task` or `check-deps` warns about blockers, run `sdd list-blockers {spec-id}`
 5. Capture verification steps or linked docs noted in the spec before planning changes
@@ -192,6 +192,18 @@ sdd session-marker
 
 # Step 2: Check context using the marker from step 1
 sdd context --session-marker "SESSION_MARKER_<hash>" --json
+```
+
+**Output Format:**
+
+The command returns simplified JSON with just the percentage as a whole number:
+```json
+{"context_percentage_used": 78}
+```
+
+To get full metrics output, add `--verbose` flag:
+```bash
+sdd context --session-marker "SESSION_MARKER_<hash>" --json --verbose
 ```
 
 **CRITICAL REQUIREMENTS:**
@@ -376,7 +388,6 @@ sdd prepare-task {spec-id}
 # - Gathers dependencies
 # - Extracts task details
 # - Returns everything needed for execution plan
-# Tip: add --json to capture structured output you can reuse for planning
 ```
 
 **Optional: Validate spec before task preparation**
@@ -501,7 +512,7 @@ For each task in the current phase:
 
 1. **Prepare next task:**
 ```bash
-sdd prepare-task {spec-id} --json
+sdd prepare-task {spec-id}
 ```
 
 2. **Check if phase complete:**
@@ -1024,7 +1035,7 @@ If needed: Check context using the two-step pattern (see [Context Checking Patte
 
 ```bash
 # If you know the spec-id:
-sdd prepare-task {spec-id} --json
+sdd prepare-task {spec-id}
 
 # If you don't know the spec-id:
 # See "Edge Case: Multiple Specs" below
@@ -1284,7 +1295,7 @@ Include the current context percentage in the completion report.
 **Situation:** Spec exists, no tasks started yet
 
 Steps:
-1. Run `sdd prepare-task {spec-id} --json`
+1. Run `sdd prepare-task {spec-id}`
 2. Review task details and dependencies
 3. **Optional: Use Plan subagent for complex/architectural tasks**
    - Analyzes codebase patterns, recommends approach
@@ -1296,7 +1307,7 @@ Steps:
 **Example with Plan subagent:**
 
 ```
-sdd prepare-task user-auth-001 --json  # Returns task-1-1 "Create AuthService"
+sdd prepare-task user-auth-001  # Returns task-1-1 "Create AuthService"
 
 Task(subagent_type: "Plan",
      prompt: "Analyze service classes in src/services/ for patterns. Task creates
@@ -1317,7 +1328,7 @@ Task(subagent_type: "Plan",
 **Situation:** Some tasks completed, need to continue
 
 Steps:
-1. Run `sdd prepare-task {spec-id} --json`
+1. Run `sdd prepare-task {spec-id}`
 2. Review progress information from output
 3. Create execution plan for next task
 4. Present plan with context of progress:
@@ -1616,88 +1627,6 @@ If user selects "Create branch":
 git checkout -b feat/{spec-id}
 ```
 
-Then update spec metadata:
-```python
-from claude_skills.common.git_metadata import update_branch_metadata
-
-# Get current branch for base_branch
-result = subprocess.run(
-    ["git", "branch", "--show-current"],
-    cwd=repo_root,
-    capture_output=True,
-    text=True
-)
-base_branch = result.stdout.strip()
-
-# Update spec with branch metadata
-update_branch_metadata(
-    spec,
-    branch_name=f"feat/{spec_id}",
-    base_branch=base_branch
-)
-```
-
-### Commit Cadence Preference
-
-After branch creation OR when resuming a git-enabled spec, ask the user about commit cadence:
-
-```python
-AskUserQuestion(
-    questions: [{
-        question: "When should commits be created automatically?",
-        header: "Commit Cadence",
-        multiSelect: false,
-        options: [
-            {
-                label: "After each task",
-                description: "Create a commit when each task is completed (granular history)"
-            },
-            {
-                label: "After each phase",
-                description: "Create a commit when each phase is completed (fewer commits)"
-            },
-            {
-                label: "Manual",
-                description: "I'll create commits manually (no automatic commits)"
-            }
-        ]
-    }]
-)
-```
-
-Store the user's choice in spec metadata:
-```python
-# Store in session preferences (not persisted to file)
-if 'session_preferences' not in spec['metadata']:
-    spec['metadata']['session_preferences'] = {}
-
-spec['metadata']['session_preferences']['commit_cadence'] = user_choice  # "task", "phase", or "manual"
-```
-
-**Note:** This preference is stored in `metadata.session_preferences` which is **not** persisted to the spec JSON file. It's only for the current session. The persistent `metadata.git.commit_cadence` setting comes from git_config.
-
-### Drift Detection
-
-When resuming work on a spec with existing git metadata, detect drift between spec and actual git state:
-
-```python
-from claude_skills.common.git_metadata import detect_git_drift
-
-warnings = detect_git_drift(spec, repo_root)
-if warnings:
-    print("⚠️  Git drift detected:")
-    for warning in warnings:
-        print(f"  - {warning}")
-    print("\nThis is informational only and won't block your work.")
-```
-
-**Common drift scenarios:**
-- **Branch mismatch**: Spec expects `feat/user-auth` but current branch is `main`
-- **Missing branch**: Branch in spec metadata doesn't exist in repository
-- **Missing commits**: Commits recorded in spec not found in repository
-
-Drift warnings are **non-blocking** - they inform the user but don't prevent task execution.
-
 ### Git Command Execution Pattern
 
 All git commands follow this pattern:
@@ -1804,7 +1733,7 @@ The `query-tasks` command provides flexible filtering for complex scenarios:
 
 **Find all pending tasks in a specific phase:**
 ```bash
-sdd query-tasks {spec-id} --status pending --parent phase-2 --json
+sdd query-tasks {spec-id} --status pending --parent phase-2
 ```
 
 **Find all verification tasks:**
@@ -1837,7 +1766,7 @@ sdd query-tasks {spec-id} --status pending
 **2. Analyze blocked tasks:**
 ```bash
 # See what's blocking progress
-sdd list-blockers {spec-id} --json
+sdd list-blockers {spec-id}
 ```
 
 **3. Check phase completion readiness:**
@@ -1855,7 +1784,7 @@ sdd query-tasks {spec-id} --type verify
 **5. Find tasks by parent (all tasks in a phase):**
 ```bash
 # Get all tasks under phase-2, regardless of status
-sdd query-tasks {spec-id} --parent phase-2 --json
+sdd query-tasks {spec-id} --parent phase-2
 ```
 
 ## Troubleshooting

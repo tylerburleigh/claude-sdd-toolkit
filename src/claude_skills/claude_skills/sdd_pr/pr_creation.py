@@ -11,8 +11,6 @@ from pathlib import Path
 from typing import Dict, Any
 
 from claude_skills.common.printer import PrettyPrinter
-from claude_skills.common.spec import save_json_spec
-from claude_skills.common.git_metadata import update_pr_metadata
 from claude_skills.sdd_update.git_pr import (
     push_branch,
     create_pull_request,
@@ -159,28 +157,6 @@ def create_pr_with_ai_description(
 
     printer.success(f"Pull request created: {pr_url}")
     printer.info(f"PR #{pr_number}")
-    printer.info("")
-
-    # Step 3: Update spec metadata with PR information
-    printer.action("Updating spec metadata...")
-
-    update_pr_metadata(
-        spec=spec_data,
-        pr_url=pr_url,
-        pr_number=pr_number,
-        status='open'
-    )
-
-    # Save spec with PR metadata
-    if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
-        printer.warning("Failed to save PR metadata to spec")
-        printer.info("")
-        printer.info("PR was created successfully, but spec metadata update failed")
-        printer.info(f"Manually add PR info to: {specs_dir}/{spec_id}.json")
-        printer.info("")
-        return True  # PR was created, just metadata update failed
-
-    printer.success("PR metadata added to spec")
     printer.info("")
     printer.header("="*70)
     printer.success("Pull request created successfully!")

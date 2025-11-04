@@ -64,12 +64,11 @@ Switch to manual intervention when:
 Validate the JSON spec structure and print a summary.
 
 ```bash
-sdd validate {spec-id} [--verbose] [--json]
+sdd validate {spec-id} [--verbose]
 ```
 
 **Flags:**
 - `--verbose` - Show detailed issue information with locations
-- `--json` - Machine-readable output for automation
 - `--report` - Generate validation report alongside spec
 - `--report-format {markdown,json}` - Choose report format
 
@@ -106,7 +105,6 @@ sdd fix {spec-id} [--preview] [--dry-run] [--no-backup]
 **Flags:**
 - `--preview` / `--dry-run` - Show what would be fixed without modifying files
 - `--no-backup` - Skip backup creation (use with caution)
-- `--json` - Structured fix report with applied/skipped counts
 - `--diff` - Show before/after changes
 - `--diff-format {markdown,json}` - Choose diff format
 
@@ -171,7 +169,7 @@ Report includes: validation summary, categorized issues, statistics, and depende
 Calculate and display comprehensive spec statistics.
 
 ```bash
-sdd stats {spec-id} [--json]
+sdd stats {spec-id}
 ```
 
 **Shows:**
@@ -187,7 +185,7 @@ sdd stats {spec-id} [--json]
 Analyze dependencies for cycles, orphans, deadlocks, and bottlenecks.
 
 ```bash
-sdd check-deps {spec-id} [--bottleneck-threshold N] [--json]
+sdd check-deps {spec-id} [--bottleneck-threshold N]
 ```
 
 **Analyzes:**
@@ -276,13 +274,13 @@ When error count stays the same for 2+ passes:
 
 ```bash
 # Validate and parse results
-sdd validate {spec-id} --json | jq '.status'
+sdd validate {spec-id} | jq '.status'
 
 # Get statistics for dashboards
-sdd stats {spec-id} --json | jq '.progress'
+sdd stats {spec-id} | jq '.progress'
 
 # Check dependency health
-sdd check-deps {spec-id} --json | jq '.cycles | length'
+sdd check-deps {spec-id} | jq '.cycles | length'
 ```
 
 ### CI/CD Integration
@@ -299,5 +297,4 @@ sdd report {spec-id} --format markdown --output validation-report.md
 
 Available on all commands:
 - `--quiet` / `-q` - Suppress progress messages
-- `--json` - Machine-readable JSON output
 - `--verbose` / `-v` - Show detailed information

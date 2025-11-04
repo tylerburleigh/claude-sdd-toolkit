@@ -1,20 +1,20 @@
 # src Documentation
 
-**Version:** 0.4.1
-**Generated:** 2025-11-03 10:25:39
+**Version:** 1.0.0
+**Generated:** 2025-11-04 07:46:42
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 201
-- **Total Lines:** 68230
-- **Total Classes:** 268
-- **Total Functions:** 756
-- **Avg Complexity:** 5.6
-- **Max Complexity:** 44
+- **Total Files:** 209
+- **Total Lines:** 70079
+- **Total Classes:** 264
+- **Total Functions:** 786
+- **Avg Complexity:** 5.58
+- **Max Complexity:** 45
 - **High Complexity Functions:**
-  - complete_task_workflow (44)
+  - complete_task_workflow (45)
   - update_task_status (42)
   - generate_report (40)
   - format_execution_plan (39)
@@ -1887,22 +1887,6 @@ Attributes:
 
 ---
 
-### `TestAddCommitMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:800`
-
-**Description:**
-> Tests for add_commit_metadata function.
-
-**Methods:**
-- `test_add_commit_metadata_creates_metadata()`
-- `test_add_commit_metadata_appends_to_existing()`
-- `test_add_commit_metadata_auto_generates_timestamp()`
-- `test_add_commit_metadata_preserves_branch_info()`
-
----
-
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -2273,7 +2257,7 @@ Attributes:
 ### `TestCheckDirtyTree`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:72`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:67`
 
 **Description:**
 > Tests for check_dirty_tree function.
@@ -2643,22 +2627,6 @@ Attributes:
 
 ---
 
-### `TestDetectGitDrift`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:667`
-
-**Description:**
-> Tests for detect_git_drift function.
-
-**Methods:**
-- `test_detect_git_drift_no_metadata()`
-- `test_detect_git_drift_matching_branch()`
-- `test_detect_git_drift_different_branch()`
-- `test_detect_git_drift_handles_timeout()`
-
----
-
 ### `TestDetectProject`
 
 **Language:** python
@@ -2893,7 +2861,7 @@ Attributes:
 ### `TestFindGitRoot`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:31`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:26`
 
 **Description:**
 > Tests for find_git_root function.
@@ -3234,7 +3202,7 @@ Attributes:
 ### `TestGetStagedFiles`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:570`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:565`
 
 **Description:**
 > Tests for get_staged_files function.
@@ -3821,7 +3789,7 @@ Attributes:
 ### `TestParseGitStatus`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:162`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:157`
 
 **Description:**
 > Tests for parse_git_status function.
@@ -4567,7 +4535,7 @@ Attributes:
 ### `TestShowCommitPreview`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:389`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:384`
 
 **Description:**
 > Tests for show_commit_preview function.
@@ -4781,21 +4749,6 @@ Attributes:
 
 ---
 
-### `TestUpdateBranchMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:747`
-
-**Description:**
-> Tests for update_branch_metadata function.
-
-**Methods:**
-- `test_update_branch_metadata_creates_metadata()`
-- `test_update_branch_metadata_updates_existing()`
-- `test_update_branch_metadata_preserves_other_metadata()`
-
----
-
 ### `TestUpdateCommands`
 
 **Language:** python
@@ -4823,23 +4776,6 @@ Attributes:
 - `test_update_metadata_numeric_value()`
 - `test_update_metadata_creates_metadata_object()`
 - `test_update_metadata_dry_run()`
-
----
-
-### `TestUpdatePRMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:865`
-
-**Description:**
-> Tests for update_pr_metadata function.
-
-**Methods:**
-- `test_update_pr_metadata_creates_metadata()`
-- `test_update_pr_metadata_updates_existing()`
-- `test_update_pr_metadata_default_status()`
-- `test_update_pr_metadata_preserves_commits()`
-- `test_update_pr_metadata_status_values()`
 
 ---
 
@@ -5574,7 +5510,7 @@ Returns:
 ### `_check_all_task_deps(spec_data, args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:439`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:441`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -5652,6 +5588,30 @@ Returns:
 
 **Parameters:**
 - `context`: Dict[str, List[QueryResult]]
+
+---
+
+### `_create_config_file(project_path, config, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:136`
+**Complexity:** 3
+
+**Description:**
+> Create .claude/sdd_config.json with user preferences.
+
+Args:
+    project_path: Project root directory
+    config: Configuration dict to write
+    printer: PrettyPrinter instance
+
+Returns:
+    True if config was created successfully, False otherwise
+
+**Parameters:**
+- `project_path`: Path
+- `config`: dict
+- `printer`: PrettyPrinter
 
 ---
 
@@ -6084,7 +6044,7 @@ Returns:
 ### `_get_version() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:16`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:17`
 **Complexity:** 2
 
 **Description:**
@@ -6328,6 +6288,23 @@ Args:
 
 ---
 
+### `_prompt_for_config(printer) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:80`
+**Complexity:** 8
+
+**Description:**
+> Prompt user for SDD configuration preferences.
+
+Returns:
+    Dict with user's configuration preferences
+
+**Parameters:**
+- `printer`: PrettyPrinter
+
+---
+
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
@@ -6353,7 +6330,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:57`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:59`
 **Complexity:** 1
 
 **Description:**
@@ -6368,7 +6345,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:95`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:97`
 **Complexity:** 1
 
 **Description:**
@@ -6383,7 +6360,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:77`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:79`
 **Complexity:** 1
 
 **Description:**
@@ -6578,11 +6555,34 @@ Returns:
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:86`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:93`
+⚠️ **Complexity:** 25 (High)
 
 **Description:**
 > Validate and sanitize git configuration values.
+
+Ensures all configuration values have correct types and valid values.
+Invalid values are replaced with defaults and warnings are logged.
+
+Args:
+    config: Raw configuration dictionary
+
+Returns:
+    Validated configuration dictionary
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
+### `_validate_sdd_config(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:78`
+**Complexity:** 8
+
+**Description:**
+> Validate and sanitize SDD configuration values.
 
 Ensures all configuration values have correct types and valid values.
 Invalid values are replaced with defaults and warnings are logged.
@@ -6647,37 +6647,6 @@ Returns:
 - `specs_dir`: Path
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
-
----
-
-### `add_commit_metadata(spec, sha, message, task_id, timestamp) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:804`
-**Complexity:** 5
-
-**Description:**
-> Add a commit record to spec git metadata.
-
-Appends a new commit object to the metadata.git.commits array. Creates the
-git metadata section if it doesn't exist.
-
-Args:
-    spec: Specification dictionary to update
-    sha: Git commit SHA hash (full or abbreviated)
-    message: Commit message
-    task_id: Task ID associated with this commit (e.g., 'task-1-1')
-    timestamp: ISO 8601 timestamp string (optional, will use current time if not provided)
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `sha`: str
-- `message`: str
-- `task_id`: str
-- `timestamp`: Optional[str]
 
 ---
 
@@ -6766,7 +6735,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:80`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:85`
 **Complexity:** 1
 
 **Description:**
@@ -6780,7 +6749,7 @@ Returns:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:88`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:93`
 **Complexity:** 1
 
 **Description:**
@@ -7111,6 +7080,37 @@ Returns:
 **Parameters:**
 - `actions`: Iterable[FixAction]
 - `spec_path`: str
+
+---
+
+### `ask_choice(question, choices, default) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:174`
+**Complexity:** 6
+
+**Description:**
+> Ask a multiple choice question.
+
+**Parameters:**
+- `question`: str
+- `choices`: list
+- `default`: str
+
+---
+
+### `ask_yes_no(question, default) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:163`
+**Complexity:** 2
+
+**Description:**
+> Ask a yes/no question and return boolean answer.
+
+**Parameters:**
+- `question`: str
+- `default`: bool
 
 ---
 
@@ -7571,6 +7571,20 @@ Args:
 
 ---
 
+### `categorize_missing_permissions(missing) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:254`
+**Complexity:** 6
+
+**Description:**
+> Categorize missing permissions by type for better reporting.
+
+**Parameters:**
+- `missing`: list
+
+---
+
 ### `categorize_risk_level(priority_score, complexity, dependent_count) -> str`
 
 **Language:** python
@@ -7653,7 +7667,7 @@ Returns:
 ### `check_dirty_tree(repo_root) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:59`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:56`
 **Complexity:** 9
 
 **Description:**
@@ -7810,7 +7824,7 @@ Returns:
 ### `check_gh_available() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:158`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:184`
 **Complexity:** 2
 
 **Description:**
@@ -7824,7 +7838,7 @@ Returns:
 ### `check_git_commit_readiness(spec_data, spec_path, event_type) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:97`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:96`
 **Complexity:** 5
 
 **Description:**
@@ -7876,7 +7890,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:131`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:133`
 **Complexity:** 2
 
 **Description:**
@@ -7890,7 +7904,7 @@ Returns:
 ### `check_pr_readiness(spec_data, spec_path) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:240`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:266`
 **Complexity:** 5
 
 **Description:**
@@ -8235,8 +8249,8 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:139`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:276`
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
 > Check if SDD permissions are configured.
@@ -8265,7 +8279,7 @@ Example:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:387`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:389`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -8295,7 +8309,7 @@ Example:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:893`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:895`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -8304,6 +8318,21 @@ Example:
 **Parameters:**
 - `args`: None
 - `printer`: None
+
+---
+
+### `cmd_check_git_config(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:118`
+**Complexity:** 6
+
+**Description:**
+> Check if git configuration is set up.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
 
 ---
 
@@ -8325,7 +8354,7 @@ Example:
 ### `cmd_check_permissions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:24`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:28`
 **Complexity:** 8
 
 **Description:**
@@ -8407,7 +8436,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:300`
-⚠️ **Complexity:** 13 (High)
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -8446,6 +8475,37 @@ Args:
 **Parameters:**
 - `args`: None
 - `printer`: None
+
+---
+
+### `cmd_create_pr(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/cli.py:24`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Create PR with AI-generated description.
+
+This command can operate in two modes:
+1. Draft-only (--draft-only): Show draft without creating PR
+2. Full creation (--approve): Create PR with provided description
+
+The typical workflow is:
+1. Skill invokes with --draft-only to show draft
+2. User reviews draft
+3. Agent invokes with --approve and --description to create PR
+
+Args:
+    args: Parsed command-line arguments
+    printer: PrettyPrinter for formatted output
+
+Returns:
+    Exit code: 0 for success, 1 for error
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
 
 ---
 
@@ -8491,7 +8551,7 @@ Args:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:822`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:824`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -8533,7 +8593,7 @@ Args:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:85`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:89`
 **Complexity:** 8
 
 **Description:**
@@ -8548,7 +8608,7 @@ Args:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:936`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:938`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -8599,7 +8659,7 @@ Args:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:801`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:803`
 **Complexity:** 5
 
 **Description:**
@@ -8614,7 +8674,7 @@ Args:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:976`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:978`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -8629,7 +8689,7 @@ Args:
 ### `cmd_find_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:267`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:269`
 **Complexity:** 8
 
 **Description:**
@@ -8644,7 +8704,7 @@ Args:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:861`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:863`
 **Complexity:** 9
 
 **Description:**
@@ -8674,7 +8734,7 @@ Args:
 ### `cmd_format_output(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:167`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:171`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -8689,7 +8749,7 @@ Args:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:745`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:747`
 **Complexity:** 4
 
 **Description:**
@@ -8761,7 +8821,7 @@ Args:
 ### `cmd_get_session_info(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:287`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:291`
 **Complexity:** 5
 
 **Description:**
@@ -8806,7 +8866,7 @@ Args:
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:521`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:523`
 **Complexity:** 6
 
 **Description:**
@@ -8962,7 +9022,7 @@ Args:
 ### `cmd_next_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:295`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:297`
 **Complexity:** 10
 
 **Description:**
@@ -8992,7 +9052,7 @@ Args:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:546`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:548`
 ⚠️ **Complexity:** 24 (High)
 
 **Description:**
@@ -9044,7 +9104,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:488`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:490`
 **Complexity:** 7
 
 **Description:**
@@ -9203,10 +9263,25 @@ Args:
 
 ---
 
+### `cmd_setup_git_config(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:197`
+**Complexity:** 9
+
+**Description:**
+> Interactive git configuration wizard.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1039`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1041`
 **Complexity:** 10
 
 **Description:**
@@ -9278,7 +9353,7 @@ Args:
 ### `cmd_task_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:346`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:348`
 **Complexity:** 9
 
 **Description:**
@@ -9368,8 +9443,8 @@ Args:
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:78`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:173`
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
@@ -9455,7 +9530,7 @@ Args:
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1012`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1014`
 **Complexity:** 7
 
 **Description:**
@@ -9470,7 +9545,7 @@ Args:
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:764`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:766`
 **Complexity:** 10
 
 **Description:**
@@ -9485,7 +9560,7 @@ Args:
 ### `cmd_verify_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:248`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:250`
 **Complexity:** 3
 
 **Description:**
@@ -9623,7 +9698,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/workflow.py:328`
-⚠️ **Complexity:** 44 (High)
+⚠️ **Complexity:** 45 (High)
 
 **Description:**
 > Complete a task with optional journaling, time tracking, and revision updates.
@@ -9864,7 +9939,7 @@ Example:
 ### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:453`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:450`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -9989,10 +10064,52 @@ Returns:
 
 ---
 
+### `create_pr_with_ai_description(repo_root, branch_name, base_branch, pr_title, pr_body, spec_data, spec_id, specs_dir, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:76`
+**Complexity:** 4
+
+**Description:**
+> Create PR with AI-generated description and update spec metadata.
+
+This function:
+1. Checks if gh CLI is available
+2. Pushes the branch to remote
+3. Creates PR via gh CLI
+4. Updates spec metadata with PR URL and number
+
+Args:
+    repo_root: Path to repository root directory
+    branch_name: Feature branch name to push
+    base_branch: Base branch name (e.g., 'main')
+    pr_title: PR title
+    pr_body: PR body (markdown formatted)
+    spec_data: Loaded spec JSON data
+    spec_id: Specification ID
+    specs_dir: Path to specs directory
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    True if PR created successfully and metadata updated, False otherwise
+
+**Parameters:**
+- `repo_root`: Path
+- `branch_name`: str
+- `base_branch`: str
+- `pr_title`: str
+- `pr_body`: str
+- `spec_data`: Dict[str, Any]
+- `spec_id`: str
+- `specs_dir`: Path
+- `printer`: PrettyPrinter
+
+---
+
 ### `create_pull_request(repo_root, title, body, base_branch) -> Tuple[bool, Optional[str], Optional[int], str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:176`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:202`
 **Complexity:** 5
 
 **Description:**
@@ -10193,30 +10310,23 @@ Returns:
 
 ---
 
-### `detect_git_drift(spec, repo_root) -> List[str]`
+### `detect_git_config_state(project_path) -> Tuple[bool, bool, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:635`
-⚠️ **Complexity:** 21 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:37`
+**Complexity:** 3
 
 **Description:**
-> Detect drift between spec metadata and actual git state.
-
-Compares the git metadata stored in the spec with the actual git repository state.
-Returns a list of warnings for any discrepancies found.
-
-This is a non-blocking check - warnings are informational and don't prevent operations.
-
-Args:
-    spec: Specification dictionary containing metadata.git section
-    repo_root: Path to git repository root
+> Detect the state of git configuration.
 
 Returns:
-    List of warning messages (empty list if no drift detected)
+    (exists, enabled, needs_setup)
+    - exists: .claude/git_config.json file exists
+    - enabled: git integration is enabled in config
+    - needs_setup: user should be prompted to configure
 
 **Parameters:**
-- `spec`: Dict[str, Any]
-- `repo_root`: Path
+- `project_path`: Path
 
 ---
 
@@ -10708,6 +10818,65 @@ Example:
 
 ---
 
+### `extract_check_deps_contract(check_deps_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:248`
+**Complexity:** 3
+
+**Description:**
+> Extract minimal contract from `sdd check-deps` output.
+
+Purpose:
+    Verify whether a specific task's dependencies are satisfied.
+    Enable decisions about:
+    1. Can I start this task?
+    2. What's blocking me?
+    3. What will I unblock?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - can_start: Boolean indicating if task can be started
+
+    CONDITIONALLY INCLUDE (Optional):
+    - blocked_by: List of blocking task IDs (only if non-empty)
+    - blocks: List of task IDs this task blocks (only if non-empty)
+
+    OMIT (Not Needed):
+    - task_id: Already known from command argument
+    - soft_depends: Soft dependencies don't block work
+
+Special Rules:
+    - When can_start is true and blocked_by is empty, omit blocked_by
+    - When blocks is empty, omit blocks
+    - Minimal successful case: just {"can_start": true}
+
+Args:
+    check_deps_output: Full output from sdd check-deps command
+
+Returns:
+    Minimal contract dict with dependency information
+
+Example:
+    >>> full_output = {
+    ...     "task_id": "task-1-1-2",
+    ...     "can_start": True,
+    ...     "blocked_by": [],
+    ...     "soft_depends": [],
+    ...     "blocks": []
+    ... }
+    >>> contract = extract_check_deps_contract(full_output)
+    >>> contract
+    {
+        "can_start": True
+    }
+
+**Parameters:**
+- `check_deps_output`: Dict[str, Any]
+
+---
+
 ### `extract_frontmatter(spec_file) -> Dict[str, Any]`
 
 **Language:** python
@@ -10729,6 +10898,212 @@ Returns:
 
 **Parameters:**
 - `spec_file`: Union[str, Path]
+
+---
+
+### `extract_next_task_contract(next_task_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:390`
+**Complexity:** 1
+
+**Description:**
+> Extract minimal contract from `sdd next-task` output.
+
+Purpose:
+    Identify which task to work on next (lightweight version of prepare-task).
+    Enable decisions about:
+    1. What task should I work on?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier
+    - title: Concise description of what to do
+
+    OMIT (Not Needed):
+    - status: Always "pending" for next task
+    - file_path: Use prepare-task or task-info for details
+    - estimated_hours: Not actionable for agent
+
+Args:
+    next_task_output: Full output from sdd next-task command
+
+Returns:
+    Minimal contract dict with next task information
+
+Example:
+    >>> full_output = {
+    ...     "task_id": "task-1-1-2",
+    ...     "title": "Implement extract_task_info_contract()...",
+    ...     "status": "pending",
+    ...     "file_path": "",
+    ...     "estimated_hours": 0
+    ... }
+    >>> contract = extract_next_task_contract(full_output)
+    >>> contract
+    {
+        "task_id": "task-1-1-2",
+        "title": "Implement extract_task_info_contract()..."
+    }
+
+**Parameters:**
+- `next_task_output`: Dict[str, Any]
+
+---
+
+### `extract_prepare_task_contract(prepare_task_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:23`
+**Complexity:** 8
+
+**Description:**
+> Extract minimal contract from `sdd prepare-task` output.
+
+Purpose:
+    Enable the agent to:
+    1. Identify the next task to work on
+    2. Determine if the task can be started
+    3. Understand what work needs to be done
+    4. Prepare the git environment appropriately
+    5. Detect if the spec is complete
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier for referencing in subsequent commands
+    - title: Concise description of what to do
+    - can_start: Boolean indicating if task can be started now
+    - blocked_by: List of blocking task IDs (if can't start)
+    - git.needs_branch: Whether a new branch should be created
+    - git.suggested_branch: Branch name to use
+    - git.dirty: Whether working tree has uncommitted changes
+    - spec_complete: Whether the spec is finished
+
+    CONDITIONALLY INCLUDE (Optional):
+    - file_path: Target file path (only if specified in task metadata)
+    - details: Implementation details (only if specified in task metadata)
+    - status: Task status (only if not "pending")
+    - validation_warnings: Spec validation warnings (only if non-empty)
+    - completion_info: Completion details (only if spec_complete is True)
+
+    OMIT (Redundant/Not Needed):
+    - success, error: Exit code indicates success/failure
+    - task_data: Fields duplicated at top level
+    - task_details, spec_file, doc_context: Always null
+    - dependencies object: Flattened to top-level fields
+    - repo_root: Agent knows from environment
+    - needs_branch_creation: Duplicate of git.needs_branch
+    - dirty_tree_status: Verbose, git.dirty is sufficient
+    - UI-only fields: needs_commit_cadence, commit_cadence_options, etc.
+
+Args:
+    prepare_task_output: Full output from sdd prepare-task command
+
+Returns:
+    Minimal contract dict with essential and conditionally-included fields
+
+Example:
+    >>> full_output = {
+    ...     "success": True,
+    ...     "task_id": "task-1-1-1",
+    ...     "task_data": {
+    ...         "title": "Implement extract_prepare_task_contract()",
+    ...         "metadata": {"details": "Extract fields: ..."}
+    ...     },
+    ...     "dependencies": {"can_start": True, "blocked_by": []},
+    ...     "needs_branch_creation": True,
+    ...     "suggested_branch_name": "feat/compact-json",
+    ...     "dirty_tree_status": {"is_dirty": False},
+    ...     "spec_complete": False,
+    ...     # ... many other fields
+    ... }
+    >>> contract = extract_prepare_task_contract(full_output)
+    >>> contract
+    {
+        "task_id": "task-1-1-1",
+        "title": "Implement extract_prepare_task_contract()",
+        "can_start": True,
+        "blocked_by": [],
+        "git": {
+            "needs_branch": True,
+            "suggested_branch": "feat/compact-json",
+            "dirty": False
+        },
+        "spec_complete": False,
+        "details": "Extract fields: ..."
+    }
+
+**Parameters:**
+- `prepare_task_output`: Dict[str, Any]
+
+---
+
+### `extract_progress_contract(progress_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:314`
+**Complexity:** 1
+
+**Description:**
+> Extract minimal contract from `sdd progress` output.
+
+Purpose:
+    Understand overall spec completion status.
+    Enable decisions about:
+    1. How much is done?
+    2. How much is left?
+    3. What's active?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - total: Total number of tasks
+    - completed: Number of completed tasks
+    - in_progress: Number of tasks currently in progress
+    - pending: Number of pending tasks
+
+    OMIT (Not Needed):
+    - node_id: Not needed for agent
+    - spec_id: Already known from command argument
+    - title: Already known
+    - type: Always "spec"
+    - status: Derivable from counts
+    - percentage: Derivable (completed/total * 100)
+    - remaining_tasks: Derivable (total - completed)
+    - current_phase: Use separate command if needed
+
+Args:
+    progress_output: Full output from sdd progress command
+
+Returns:
+    Minimal contract dict with progress counts
+
+Example:
+    >>> full_output = {
+    ...     "node_id": "spec-root",
+    ...     "spec_id": "compact-json-output-2025-11-03-001",
+    ...     "title": "Compact JSON Output for SDD CLI Commands",
+    ...     "type": "spec",
+    ...     "status": "in_progress",
+    ...     "total_tasks": 38,
+    ...     "completed_tasks": 1,
+    ...     "percentage": 2,
+    ...     "remaining_tasks": 37,
+    ...     "current_phase": {...}
+    ... }
+    >>> contract = extract_progress_contract(full_output)
+    >>> contract
+    {
+        "total": 38,
+        "completed": 1,
+        "in_progress": 0,
+        "pending": 37
+    }
+
+**Parameters:**
+- `progress_output`: Dict[str, Any]
 
 ---
 
@@ -10763,6 +11138,79 @@ Returns:
 
 **Parameters:**
 - `parser`: argparse.ArgumentParser
+
+---
+
+### `extract_task_info_contract(task_info_output) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/contracts.py:165`
+**Complexity:** 2
+
+**Description:**
+> Extract minimal contract from `sdd task-info` output.
+
+Purpose:
+    Get detailed information about a specific task (not necessarily the next one).
+    Enable decisions about:
+    1. What is this task?
+    2. What's its current state?
+    3. What blocks it?
+    4. What does it block?
+
+Field Inclusion Rules:
+
+    ALWAYS INCLUDE (Essential):
+    - task_id: Task identifier (derived from command argument, not in output)
+    - title: Task description
+    - status: Current task status
+    - blocked_by: List of blocking task IDs
+    - blocks: List of task IDs this task blocks
+
+    CONDITIONALLY INCLUDE (Optional):
+    - file_path: Target file path (only if non-empty)
+
+    OMIT (Not Needed):
+    - type: Not needed for agent decisions
+    - parent: Not actionable
+    - children: Use separate query if needed
+    - total_tasks, completed_tasks: Use progress command instead
+    - metadata: Use prepare-task for implementation details
+    - dependencies object: Flattened to blocked_by and blocks
+
+Args:
+    task_info_output: Full output from sdd task-info command
+
+Returns:
+    Minimal contract dict with essential task information
+
+Example:
+    >>> full_output = {
+    ...     "type": "subtask",
+    ...     "title": "Implement extract_task_info_contract()",
+    ...     "status": "completed",
+    ...     "parent": "task-1-1",
+    ...     "children": [],
+    ...     "dependencies": {
+    ...         "blocks": [],
+    ...         "blocked_by": [],
+    ...         "depends": []
+    ...     },
+    ...     "total_tasks": 1,
+    ...     "completed_tasks": 1,
+    ...     "metadata": {...}
+    ... }
+    >>> contract = extract_task_info_contract(full_output)
+    >>> contract
+    {
+        "title": "Implement extract_task_info_contract()",
+        "status": "completed",
+        "blocked_by": [],
+        "blocks": []
+    }
+
+**Parameters:**
+- `task_info_output`: Dict[str, Any]
 
 ---
 
@@ -10901,7 +11349,7 @@ Example:
 ### `find_git_root(start_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:23`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:20`
 **Complexity:** 5
 
 **Description:**
@@ -11351,6 +11799,69 @@ Returns:
 
 ---
 
+### `format_compact_output(data, command_type) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:100`
+**Complexity:** 2
+
+**Description:**
+> Apply contract extraction and format as compact JSON.
+
+This function combines contract extraction (to reduce data) with
+compact JSON formatting (to reduce whitespace), providing maximum
+token efficiency while preserving all decision-enabling information.
+
+The two-step process:
+1. Extract minimal contract based on command_type
+2. Format as minified JSON
+
+Args:
+    data: Full command output data
+    command_type: Type of command that generated the data.
+                 Must be one of: 'prepare-task', 'task-info',
+                 'check-deps', 'progress', 'next-task'
+
+Returns:
+    Compact JSON string with minimal contract
+
+Raises:
+    ValueError: If command_type is not recognized
+
+Examples:
+    >>> full_output = {
+    ...     "success": True,
+    ...     "task_id": "task-1-1",
+    ...     "task_data": {"title": "Example", "status": "pending"},
+    ...     "dependencies": {"can_start": True, "blocked_by": []},
+    ...     # ... many other fields
+    ... }
+
+    >>> # Apply contract extraction and compact formatting
+    >>> output = format_compact_output(full_output, 'prepare-task')
+    >>> print(output)
+    {"task_id":"task-1-1","title":"Example","can_start":true,"blocked_by":[],...}
+
+Token Savings:
+    Typical savings compared to pretty-printed full output:
+    - prepare-task: 85-90%
+    - task-info: 70-75%
+    - check-deps: 80-85%
+    - progress: 85-90%
+    - next-task: 60-70%
+
+Notes:
+    - Contract extraction is command-specific
+    - See contracts.py for detailed field inclusion rules
+    - All decision-enabling information is preserved
+    - This is the recommended format for agent consumption
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `command_type`: CommandType
+
+---
+
 ### `format_completion_prompt(spec_data, phase_id, show_hours_input) -> Dict`
 
 **Language:** python
@@ -11486,7 +11997,7 @@ Returns:
 ### `format_execution_plan(spec_id, task_id, specs_dir) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:58`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:60`
 ⚠️ **Complexity:** 39 (High)
 
 **Description:**
@@ -11507,6 +12018,26 @@ Returns:
 
 ---
 
+### `format_git_config_summary(settings) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:69`
+**Complexity:** 4
+
+**Description:**
+> Format git configuration as human-readable summary.
+
+Args:
+    settings: Dict with git config settings (from check-git-config result)
+
+Returns:
+    Formatted string with config summary
+
+**Parameters:**
+- `settings`: dict
+
+---
+
 ### `format_hot_spots(trace_result) -> str`
 
 **Language:** python
@@ -11524,6 +12055,54 @@ Returns:
 
 **Parameters:**
 - `trace_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(data, compact, sort_keys) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:41`
+**Complexity:** 2
+
+**Description:**
+> Format data as JSON string with optional compact (minified) output.
+
+This is the central JSON formatting function used by all CLI commands.
+It provides consistent formatting behavior across the toolkit.
+
+Args:
+    data: Dictionary data to format as JSON
+    compact: If True, output minified JSON without whitespace.
+            If False (default), output pretty-printed JSON with indentation.
+    sort_keys: If True, sort dictionary keys in output. Default False.
+
+Returns:
+    Formatted JSON string
+
+Examples:
+    >>> data = {"task_id": "task-1-1", "title": "Example task"}
+
+    >>> # Pretty-printed (default)
+    >>> print(format_json_output(data))
+    {
+      "task_id": "task-1-1",
+      "title": "Example task"
+    }
+
+    >>> # Compact minified
+    >>> print(format_json_output(data, compact=True))
+    {"task_id":"task-1-1","title":"Example task"}
+
+Notes:
+    - Pretty format uses 2-space indentation for readability
+    - Compact format uses minimal separators to reduce size
+    - Both formats ensure valid JSON output
+    - Non-ASCII characters are preserved (ensure_ascii=False)
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `compact`: bool
+- `sort_keys`: bool
 
 ---
 
@@ -12172,6 +12751,55 @@ Returns:
 
 ---
 
+### `gather_pr_context(spec_id, spec_path, specs_dir, max_diff_size_kb) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:223`
+**Complexity:** 9
+
+**Description:**
+> Gather all context needed for AI-powered PR generation.
+
+This is the main orchestrator function that collects:
+- Spec metadata (title, description, objectives)
+- Completed tasks and phases
+- Git commit history
+- Journal entries (implementation notes)
+- Git diffs showing code changes
+
+Args:
+    spec_id: Specification ID
+    spec_path: Path to spec file
+    specs_dir: Path to specs directory
+    max_diff_size_kb: Maximum diff size in KB before truncation
+
+Returns:
+    Dictionary with all collected context:
+    - spec_data: Full spec JSON
+    - metadata: Spec metadata section
+    - commits: List of commit dicts
+    - journals: List of journal entries
+    - tasks: List of completed tasks
+    - phases: List of phase summaries
+    - git_diff: String of git diff output
+    - branch_name: Feature branch name
+    - base_branch: Base branch name
+    - repo_root: Repository root path
+    - spec_id: Specification ID
+    - spec_path: Path to spec file
+
+Raises:
+    FileNotFoundError: If spec file not found
+    ValueError: If required git metadata missing
+
+**Parameters:**
+- `spec_id`: str
+- `spec_path`: Path
+- `specs_dir`: Path
+- `max_diff_size_kb`: int
+
+---
+
 ### `generate_ai_context_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
@@ -12296,7 +12924,7 @@ Returns:
 ### `generate_commit_message(task_id, task_title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:83`
 **Complexity:** 1
 
 **Description:**
@@ -12446,11 +13074,11 @@ Returns:
 
 ---
 
-### `generate_pr_body(spec_data) -> str`
+### `generate_pr_body(spec_data, repo_root, base_branch) -> str`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:20`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 20 (High)
 
 **Description:**
 > Generate PR body template from spec metadata.
@@ -12459,17 +13087,21 @@ Creates a structured PR description including:
 - Spec title and description
 - Completed tasks list
 - Phase completion summary
-- Commit history
+- Commit history (queried from git)
 - Verification results
 
 Args:
     spec_data: JSON spec file data
+    repo_root: Path to repository root (optional, for commit history)
+    base_branch: Base branch name (optional, for commit history)
 
 Returns:
     Formatted PR body as markdown string
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
+- `repo_root`: Optional[Path]
+- `base_branch`: Optional[str]
 
 ---
 
@@ -12835,6 +13467,50 @@ Returns:
 
 ---
 
+### `get_commit_history(repo_root, base_branch) -> List[Dict[str, str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:81`
+**Complexity:** 7
+
+**Description:**
+> Query git for commit history between base branch and current HEAD.
+
+Args:
+    repo_root: Path to repository root directory
+    base_branch: Base branch name (e.g., 'main', 'develop')
+
+Returns:
+    List of commit dictionaries with keys: sha, message, timestamp.
+    Returns empty list if no commits found or on error.
+
+**Parameters:**
+- `repo_root`: Path
+- `base_branch`: str
+
+---
+
+### `get_completed_tasks(spec_data) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:160`
+**Complexity:** 4
+
+**Description:**
+> Get all completed tasks from spec hierarchy.
+
+Args:
+    spec_data: Loaded spec JSON data
+
+Returns:
+    List of task dictionaries with keys: id, title, metadata.
+    Only includes tasks with status='completed'.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `get_config_path(skill_name) -> Path`
 
 **Language:** python
@@ -12858,7 +13534,7 @@ Returns:
 ### `get_config_path(project_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:39`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:46`
 **Complexity:** 6
 
 **Description:**
@@ -12874,6 +13550,31 @@ Args:
 
 Returns:
     Path to git_config.json if found, None otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
+### `get_config_path(project_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:31`
+**Complexity:** 6
+
+**Description:**
+> Get the path to the sdd_config.json file.
+
+Checks multiple locations in order of precedence:
+1. Project-local: {project_path}/.claude/sdd_config.json
+2. Global: ~/.claude/sdd_config.json
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root or use cwd.
+
+Returns:
+    Path to sdd_config.json if found, None otherwise
 
 **Parameters:**
 - `project_path`: Optional[Path]
@@ -13072,7 +13773,7 @@ Returns:
 ### `get_git_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:202`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:244`
 **Complexity:** 2
 
 **Description:**
@@ -13139,6 +13840,35 @@ Returns:
 - `specs_dir`: Path
 - `task_id`: Optional[str]
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `get_journal_entries(spec_data, task_id, include_internal) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:127`
+**Complexity:** 3
+
+**Description:**
+> Extract journal entries from spec.
+
+Args:
+    spec_data: Loaded spec JSON data
+    task_id: Optional task ID to filter by
+    include_internal: If True, include internal entries (default: False)
+
+Returns:
+    List of journal entry dictionaries. Each entry contains:
+    - timestamp: ISO format timestamp
+    - entry_type: Type of entry (e.g., 'status_change', 'note')
+    - title: Entry title
+    - content: Entry content
+    - task_id: Associated task ID (if any)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `task_id`: Optional[str]
+- `include_internal`: bool
 
 ---
 
@@ -13295,6 +14025,32 @@ This function attempts to get the parser by:
 
 **Parameters:**
 - `module_name`: str
+
+---
+
+### `get_phase_summary(spec_data) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:186`
+**Complexity:** 3
+
+**Description:**
+> Get phase completion summary from spec hierarchy.
+
+Args:
+    spec_data: Loaded spec JSON data
+
+Returns:
+    List of phase dictionaries with keys:
+    - id: Phase node ID
+    - title: Phase title
+    - status: Phase status (completed/in_progress/pending)
+    - completed_tasks: Number of completed tasks
+    - total_tasks: Total number of tasks
+    - completion_percentage: Percentage complete (0-100)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -13455,6 +14211,31 @@ Returns:
 
 ---
 
+### `get_sdd_setting(key, project_path, default) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:179`
+**Complexity:** 8
+
+**Description:**
+> Get a specific SDD configuration setting with validation.
+
+Args:
+    key: Configuration key to retrieve (supports nested keys with dots, e.g., 'output.json')
+    project_path: Path to project root (optional)
+    default: Default value to return if key not found (optional).
+            If not provided, uses DEFAULT_SDD_CONFIG default.
+
+Returns:
+    Configuration value for the specified key
+
+**Parameters:**
+- `key`: str
+- `project_path`: Optional[Path]
+- `default`: Optional[Any]
+
+---
+
 ### `get_session_info(project_root) -> None`
 
 **Language:** python
@@ -13501,6 +14282,31 @@ Example:
 
 ---
 
+### `get_spec_git_diffs(repo_root, base_branch, max_size_kb) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:20`
+**Complexity:** 6
+
+**Description:**
+> Get git diff between current branch and base branch.
+
+Args:
+    repo_root: Path to repository root directory
+    base_branch: Base branch name (e.g., 'main', 'develop')
+    max_size_kb: Maximum diff size in KB (truncate if larger)
+
+Returns:
+    Git diff output as string, or empty string if error occurs.
+    Large diffs (>max_size_kb) are truncated with a summary message.
+
+**Parameters:**
+- `repo_root`: Path
+- `base_branch`: str
+- `max_size_kb`: int
+
+---
+
 ### `get_spec_statistics(spec_file, json_spec_file) -> Dict`
 
 **Language:** python
@@ -13536,7 +14342,7 @@ Example:
 ### `get_staged_files(repo_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:582`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:579`
 **Complexity:** 6
 
 **Description:**
@@ -13988,7 +14794,7 @@ Example:
 ### `has_uncommitted_changes(repo_root) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:50`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:49`
 **Complexity:** 3
 
 **Description:**
@@ -14254,7 +15060,7 @@ Returns:
 ### `is_git_enabled(project_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:187`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:229`
 **Complexity:** 1
 
 **Description:**
@@ -14554,7 +15360,7 @@ Returns:
 ### `load_git_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:136`
+**Defined in:** `src/claude_skills/claude_skills/common/git_config.py:178`
 **Complexity:** 6
 
 **Description:**
@@ -14617,6 +15423,32 @@ Returns:
 
 ---
 
+### `load_sdd_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:128`
+**Complexity:** 6
+
+**Description:**
+> Load SDD configuration from file with fallback to defaults.
+
+Attempts to load configuration from:
+1. Project-local config ({project_path}/.claude/sdd_config.json)
+2. Global config (~/.claude/sdd_config.json)
+3. Built-in defaults (DEFAULT_SDD_CONFIG)
+
+Args:
+    project_path: Path to project root (optional). If not provided,
+                 will attempt to find project root.
+
+Returns:
+    Dict with complete SDD configuration (validated and merged with defaults)
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `load_skill_config(skill_name) -> Dict`
 
 **Language:** python
@@ -14654,7 +15486,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:133`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:135`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@track_metrics('sdd')`
@@ -14667,7 +15499,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:440`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:451`
 **Complexity:** 5
 
 **Description:**
@@ -14697,7 +15529,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:172`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:174`
 **Complexity:** 3
 
 ---
@@ -14710,6 +15542,17 @@ Returns:
 
 **Description:**
 > Main CLI entry point for sdd-integration commands.
+
+---
+
+### `main() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/cli.py:207`
+**Complexity:** 3
+
+**Description:**
+> CLI entry point for standalone execution.
 
 ---
 
@@ -14942,7 +15785,7 @@ Returns:
 ### `parse_git_status(repo_root) -> List[Dict[str, str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:123`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:120`
 **Complexity:** 10
 
 **Description:**
@@ -15079,7 +15922,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:250`
-⚠️ **Complexity:** 24 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
@@ -15160,6 +16003,61 @@ Returns:
 - `show_markers`: bool
 - `show_detailed`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `print_json_output(data, compact, sort_keys) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:179`
+**Complexity:** 1
+
+**Description:**
+> Format and print JSON output to stdout.
+
+Convenience wrapper around format_json_output() that prints the result
+to stdout. Simplifies CLI command implementations by combining formatting
+and output in a single function call.
+
+Args:
+    data: Dictionary data to format as JSON
+    compact: If True, output minified JSON. If False (default), pretty-print.
+    sort_keys: If True, sort dictionary keys in output. Default False.
+
+Returns:
+    None (prints to stdout)
+
+Examples:
+    >>> data = {"task_id": "task-1-1", "status": "pending"}
+
+    >>> # Pretty-print to stdout
+    >>> print_json_output(data)
+    {
+      "task_id": "task-1-1",
+      "status": "pending"
+    }
+
+    >>> # Compact output to stdout
+    >>> print_json_output(data, compact=True)
+    {"task_id":"task-1-1","status":"pending"}
+
+Usage in CLI commands:
+    Instead of:
+        output = format_json_output(data, compact=args.compact)
+        print(output)
+
+    Use:
+        print_json_output(data, compact=args.compact)
+
+Notes:
+    - Output goes to stdout for easy piping and redirection
+    - No trailing newline is added (print() adds it automatically)
+    - For error messages, use stderr instead (logger.error, print to sys.stderr)
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `compact`: bool
+- `sort_keys`: bool
 
 ---
 
@@ -15287,7 +16185,7 @@ Examples:
 ### `push_branch(repo_root, branch_name) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:119`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:145`
 **Complexity:** 3
 
 **Description:**
@@ -15505,7 +16403,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:401`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:409`
 **Complexity:** 1
 
 **Description:**
@@ -15551,6 +16449,21 @@ Args:
 
 ---
 
+### `register_git_config_helper(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:354`
+**Complexity:** 1
+
+**Description:**
+> Register git config helper commands.
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
 ### `register_migrate(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -15569,7 +16482,7 @@ Args:
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1086`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1088`
 **Complexity:** 1
 
 **Description:**
@@ -15611,6 +16524,25 @@ Args:
 
 ---
 
+### `register_pr(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/cli.py:148`
+**Complexity:** 1
+
+**Description:**
+> Register sdd-pr subcommands in the main CLI.
+
+Args:
+    subparsers: Subparsers object from argparse
+    parent_parser: Parent parser for common arguments
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
 ### `register_render(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -15645,7 +16577,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:383`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:391`
 **Complexity:** 1
 
 **Description:**
@@ -15664,7 +16596,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:190`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:385`
 **Complexity:** 1
 
 **Description:**
@@ -15679,7 +16611,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:336`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:340`
 **Complexity:** 1
 
 **Description:**
@@ -15749,7 +16681,7 @@ Note:
 ### `reorder_args_for_subcommand(cmd_line) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:25`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:26`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -16473,7 +17405,7 @@ Example:
 > Check if commit should be offered based on commit cadence preference.
 
 Args:
-    spec_data: JSON spec file data
+    spec_data: JSON spec file data (unused, kept for backward compatibility)
     event_type: Type of completion event - "task" or "phase"
 
 Returns:
@@ -16543,7 +17475,7 @@ Example:
 ### `show_commit_preview(repo_root, printer) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:225`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:222`
 ⚠️ **Complexity:** 37 (High)
 
 **Description:**
@@ -16587,7 +17519,7 @@ Example:
 ### `show_commit_preview_and_wait(repo_root, spec_id, task_id, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:391`
 **Complexity:** 3
 
 **Description:**
@@ -16628,6 +17560,37 @@ Example:
 - `spec_id`: str
 - `task_id`: str
 - `printer`: None
+
+---
+
+### `show_pr_draft_and_wait(pr_title, pr_body, spec_id, branch_name, base_branch, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:23`
+**Complexity:** 1
+
+**Description:**
+> Display PR draft to user and provide next steps.
+
+This function does NOT implement interactive approval. It displays the draft
+and returns, allowing the Claude Code agent to ask the user if they want to
+proceed. The agent then invokes the creation command with --approve flag.
+
+Args:
+    pr_title: Draft PR title
+    pr_body: Draft PR body (markdown formatted)
+    spec_id: Specification ID
+    branch_name: Feature branch name
+    base_branch: Base branch name
+    printer: PrettyPrinter instance for formatted output
+
+**Parameters:**
+- `pr_title`: str
+- `pr_body`: str
+- `spec_id`: str
+- `branch_name`: str
+- `base_branch`: str
+- `printer`: PrettyPrinter
 
 ---
 
@@ -16740,7 +17703,7 @@ Returns:
 ### `stage_and_commit(repo_root, commit_message) -> Tuple[bool, Optional[str], str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:160`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:158`
 **Complexity:** 6
 
 **Description:**
@@ -18607,33 +19570,6 @@ Returns:
 
 ---
 
-### `update_branch_metadata(spec, branch_name, base_branch) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:758`
-**Complexity:** 5
-
-**Description:**
-> Update git branch metadata in spec.
-
-Updates the metadata.git section with branch information. Creates the section
-if it doesn't exist. Preserves existing commits and PR metadata.
-
-Args:
-    spec: Specification dictionary to update
-    branch_name: Name of the feature branch (e.g., 'feat/user-auth-001')
-    base_branch: Name of the base branch (e.g., 'main', 'develop')
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `branch_name`: str
-- `base_branch`: str
-
----
-
 ### `update_metadata(spec_id, key, value, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -18740,7 +19676,7 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:70`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:72`
 **Complexity:** 7
 
 **Description:**
@@ -18748,34 +19684,6 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
-
----
-
-### `update_pr_metadata(spec, pr_url, pr_number, status) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:863`
-**Complexity:** 3
-
-**Description:**
-> Update pull request metadata in spec.
-
-Updates or creates the metadata.git.pr section with PR information.
-
-Args:
-    spec: Specification dictionary to update
-    pr_url: Full URL to the pull request
-    pr_number: Pull request number
-    status: PR status ('open', 'closed', 'merged') - defaults to 'open'
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `pr_url`: str
-- `pr_number`: int
-- `status`: str
 
 ---
 
@@ -19033,6 +19941,33 @@ Returns:
 **Parameters:**
 - `paths`: list
 - `base_directory`: Optional[Path]
+
+---
+
+### `validate_pr_readiness(spec_data, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:170`
+**Complexity:** 4
+
+**Description:**
+> Validate that spec is ready for PR creation.
+
+Checks:
+- Spec is marked as completed
+- Git metadata exists (branch_name, base_branch)
+- Repository is in clean state (all changes committed)
+
+Args:
+    spec_data: Loaded spec JSON data
+    printer: PrettyPrinter for error messages
+
+Returns:
+    True if ready for PR creation, False otherwise
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `printer`: PrettyPrinter
 
 ---
 
@@ -19311,6 +20246,7 @@ Returns:
 - `claude_skills.cli.sdd.registry.register_all_subcommands`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.metrics.track_metrics`
+- `claude_skills.common.sdd_config.load_sdd_config`
 - `io`
 - `pathlib.Path`
 - `sys`
@@ -19328,6 +20264,16 @@ Returns:
 - `claude_skills.common.PrettyPrinter`
 - `pathlib.Path`
 - `sys`
+
+### `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py`
+
+- `claude_skills.common.PrettyPrinter`
+- `json`
+- `pathlib.Path`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Tuple`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/migrate.py`
 
@@ -19349,6 +20295,8 @@ Returns:
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py`
 
+- `claude_skills.cli.skills_dev.git_config_helper.cmd_check_git_config`
+- `claude_skills.cli.skills_dev.git_config_helper.cmd_setup_git_config`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.integrations.get_session_state`
 - `datetime.datetime`
@@ -19604,6 +20552,11 @@ Returns:
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
+- `contracts.extract_check_deps_contract`
+- `contracts.extract_next_task_contract`
+- `contracts.extract_prepare_task_contract`
+- `contracts.extract_progress_contract`
+- `contracts.extract_task_info_contract`
 - `dependency_analysis.DEFAULT_BOTTLENECK_THRESHOLD`
 - `dependency_analysis.analyze_dependencies`
 - `dependency_analysis.find_blocking_tasks`
@@ -19626,6 +20579,10 @@ Returns:
 - `integrations.execute_verify_task`
 - `integrations.get_session_state`
 - `integrations.validate_spec_before_proceed`
+- `json_output.CommandType`
+- `json_output.format_compact_output`
+- `json_output.format_json_output`
+- `json_output.print_json_output`
 - `metrics.capture_metrics`
 - `metrics.get_metrics_file_path`
 - `metrics.is_metrics_enabled`
@@ -19660,6 +20617,9 @@ Returns:
 - `reporting.generate_combined_report`
 - `reporting.generate_json_spec_report`
 - `reporting.generate_spec_report`
+- `sdd_config.DEFAULT_SDD_CONFIG`
+- `sdd_config.get_sdd_setting`
+- `sdd_config.load_sdd_config`
 - `spec.backup_json_spec`
 - `spec.extract_frontmatter`
 - `spec.get_node`
@@ -19687,6 +20647,13 @@ Returns:
 
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/contracts.py`
+
+- `logging`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/dependency_analysis.py`
@@ -19765,6 +20732,20 @@ Returns:
 - `time`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/common/json_output.py`
+
+- `claude_skills.common.contracts.extract_check_deps_contract`
+- `claude_skills.common.contracts.extract_next_task_contract`
+- `claude_skills.common.contracts.extract_prepare_task_contract`
+- `claude_skills.common.contracts.extract_progress_contract`
+- `claude_skills.common.contracts.extract_task_info_contract`
+- `json`
+- `logging`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Literal`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/common/metrics.py`
 
 - `contextlib.contextmanager`
@@ -19817,6 +20798,15 @@ Returns:
 - `datetime.datetime`
 - `pathlib.Path`
 - `typing.List`
+
+### `src/claude_skills/claude_skills/common/sdd_config.py`
+
+- `json`
+- `logging`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/spec.py`
 
@@ -20117,6 +21107,7 @@ Returns:
 - `claude_skills.common.list_blockers`
 - `claude_skills.common.list_phases`
 - `claude_skills.common.load_json_spec`
+- `claude_skills.common.print_json_output`
 - `claude_skills.common.query_tasks`
 - `claude_skills.sdd_next.discovery.check_dependencies`
 - `claude_skills.sdd_next.discovery.get_next_task`
@@ -20151,9 +21142,7 @@ Returns:
 - `claude_skills.common.get_task_context_from_docs`
 - `claude_skills.common.git_config.is_git_enabled`
 - `claude_skills.common.git_metadata.check_dirty_tree`
-- `claude_skills.common.git_metadata.detect_git_drift`
 - `claude_skills.common.git_metadata.find_git_root`
-- `claude_skills.common.git_metadata.update_branch_metadata`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.validate_spec_before_proceed`
@@ -20308,6 +21297,52 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_pr/__init__.py`
+
+- `claude_skills.sdd_pr.pr_context.gather_pr_context`
+- `claude_skills.sdd_pr.pr_creation.create_pr_with_ai_description`
+- `claude_skills.sdd_pr.pr_creation.show_pr_draft_and_wait`
+
+### `src/claude_skills/claude_skills/sdd_pr/cli.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.common.find_specs_directory`
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.common.spec.find_spec_file`
+- `claude_skills.sdd_pr.pr_context.gather_pr_context`
+- `claude_skills.sdd_pr.pr_creation.create_pr_with_ai_description`
+- `claude_skills.sdd_pr.pr_creation.show_pr_draft_and_wait`
+- `claude_skills.sdd_pr.pr_creation.validate_pr_readiness`
+- `logging`
+- `pathlib.Path`
+- `sys`
+
+### `src/claude_skills/claude_skills/sdd_pr/pr_context.py`
+
+- `__future__.annotations`
+- `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.spec.load_json_spec`
+- `logging`
+- `pathlib.Path`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_pr/pr_creation.py`
+
+- `__future__.annotations`
+- `claude_skills.common.printer.PrettyPrinter`
+- `claude_skills.sdd_update.git_pr.check_gh_available`
+- `claude_skills.sdd_update.git_pr.create_pull_request`
+- `claude_skills.sdd_update.git_pr.push_branch`
+- `logging`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
 
 ### `src/claude_skills/claude_skills/sdd_render/__init__.py`
 
@@ -20582,6 +21617,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_update/git_commit.py`
 
 - `__future__.annotations`
+- `claude_skills.common.git_config.get_git_setting`
 - `claude_skills.common.git_config.is_git_enabled`
 - `claude_skills.common.git_metadata.create_commit_from_staging`
 - `claude_skills.common.git_metadata.find_git_root`
@@ -20626,7 +21662,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/lifecycle.py`
 
-- `claude_skills.common.git_metadata.update_pr_metadata`
+- `claude_skills.common.git_config.load_git_config`
 - `claude_skills.common.paths.ensure_directory`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -20727,7 +21763,6 @@ Returns:
 
 - `__future__.annotations`
 - `claude_skills.common.git_config.load_git_config`
-- `claude_skills.common.git_metadata.add_commit_metadata`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.git_metadata.show_commit_preview_and_wait`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -21148,15 +22183,11 @@ Returns:
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py`
 
-- `claude_skills.common.git_metadata.add_commit_metadata`
 - `claude_skills.common.git_metadata.check_dirty_tree`
-- `claude_skills.common.git_metadata.detect_git_drift`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.git_metadata.get_staged_files`
 - `claude_skills.common.git_metadata.parse_git_status`
 - `claude_skills.common.git_metadata.show_commit_preview`
-- `claude_skills.common.git_metadata.update_branch_metadata`
-- `claude_skills.common.git_metadata.update_pr_metadata`
 - `json`
 - `pathlib.Path`
 - `pytest`

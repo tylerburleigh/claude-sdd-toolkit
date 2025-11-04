@@ -2,33 +2,79 @@
 import argparse
 
 
-def create_global_parent_parser():
+def create_global_parent_parser(config=None):
     """
     Create a parent parser with global options that can be inherited by subparsers.
 
     This allows global options like --verbose, --debug, etc. to work universally
     across all command levels, including nested subcommands.
 
+    Args:
+        config: Optional config dict with defaults (loaded from sdd_config.json)
+
     Returns:
         ArgumentParser configured with global options and add_help=False
     """
     parent_parser = argparse.ArgumentParser(add_help=False)
-    add_global_options(parent_parser)
+    add_global_options(parent_parser, config)
     return parent_parser
 
 
-def add_global_options(parser):
-    """Add global options available to all commands."""
+def add_global_options(parser, config=None):
+    """Add global options available to all commands.
+
+    Args:
+        parser: ArgumentParser instance to add options to
+        config: Optional config dict with defaults (loaded from sdd_config.json)
+    """
+    # Load config defaults if not provided
+    if config is None:
+        from claude_skills.common.sdd_config import load_sdd_config
+        config = load_sdd_config()
+
     parser.add_argument(
         '--quiet', '-q',
         action='store_true',
         help='Suppress non-essential output'
     )
-    parser.add_argument(
+
+    # JSON output - use mutually exclusive group for proper default handling
+    json_group = parser.add_mutually_exclusive_group()
+    json_group.add_argument(
         '--json',
-        action='store_true',
-        help='Output in JSON format'
+        action='store_const',
+        const=True,
+        dest='json',
+        help=f"Output in JSON format (default: {'enabled' if config['output']['json'] else 'disabled'} from config)"
     )
+    json_group.add_argument(
+        '--no-json',
+        action='store_const',
+        const=False,
+        dest='json',
+        help='Disable JSON output (override config)'
+    )
+    # Set default after adding both options
+    parser.set_defaults(json=None)
+
+    # Compact formatting - use mutually exclusive group
+    compact_group = parser.add_mutually_exclusive_group()
+    compact_group.add_argument(
+        '--compact',
+        action='store_const',
+        const=True,
+        dest='compact',
+        help=f"Use compact JSON formatting (default: {'enabled' if config['output']['compact'] else 'disabled'} from config)"
+    )
+    compact_group.add_argument(
+        '--no-compact',
+        action='store_const',
+        const=False,
+        dest='compact',
+        help='Disable compact formatting (override config)'
+    )
+    # Set default after adding both options
+    parser.set_defaults(compact=None)
     parser.add_argument(
         '--path',
         type=str,

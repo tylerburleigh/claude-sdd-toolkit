@@ -17,18 +17,24 @@ from claude_skills.common.git_config import is_git_enabled
 logger = logging.getLogger(__name__)
 
 
-def generate_pr_body(spec_data: Dict[str, Any]) -> str:
+def generate_pr_body(
+    spec_data: Dict[str, Any],
+    repo_root: Optional[Path] = None,
+    base_branch: Optional[str] = None
+) -> str:
     """Generate PR body template from spec metadata.
 
     Creates a structured PR description including:
     - Spec title and description
     - Completed tasks list
     - Phase completion summary
-    - Commit history
+    - Commit history (queried from git)
     - Verification results
 
     Args:
         spec_data: JSON spec file data
+        repo_root: Path to repository root (optional, for commit history)
+        base_branch: Base branch name (optional, for commit history)
 
     Returns:
         Formatted PR body as markdown string
@@ -80,9 +86,29 @@ def generate_pr_body(spec_data: Dict[str, Any]) -> str:
         lines.extend(phases)
         lines.append("")
 
-    # Commits section
-    git_metadata = spec_data.get('metadata', {}).get('git', {})
-    commits = git_metadata.get('commits', [])
+    # Commits section (query from git if repo_root and base_branch provided)
+    commits = []
+    if repo_root and base_branch:
+        try:
+            result = subprocess.run(
+                ["git", "log", f"{base_branch}...HEAD", "--format=%H|%s", "--reverse"],
+                cwd=repo_root,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=True
+            )
+            for line in result.stdout.strip().split('\n'):
+                if not line:
+                    continue
+                parts = line.split('|', 1)
+                if len(parts) >= 2:
+                    commits.append({
+                        'sha': parts[0],
+                        'message': parts[1]
+                    })
+        except Exception as e:
+            logger.warning(f"Failed to get commit history from git: {e}")
 
     if commits:
         lines.append("## Commits")
