@@ -39,9 +39,12 @@ def reorder_args_for_subcommand(cmd_line):
     if not cmd_line:
         return cmd_line
 
+    # Load config for consistent defaults
+    config = load_sdd_config()
+
     # Create a temporary parser with only global options
     temp_parser = argparse.ArgumentParser(add_help=False)
-    add_global_options(temp_parser)
+    add_global_options(temp_parser, config)
 
     # Parse known global options, leaving everything else in remaining_args
     try:
@@ -83,8 +86,8 @@ def reorder_args_for_subcommand(cmd_line):
     defaults = {
         'path': '.',
         'quiet': False,
-        'json': False,
-        'compact': False,
+        'json': None,
+        'compact': None,
         'debug': False,
         'verbose': False,
         'no_color': False,
@@ -100,8 +103,12 @@ def reorder_args_for_subcommand(cmd_line):
         if value is None or value == defaults.get(opt):
             continue
         if value is True:
-            # Boolean flag
+            # Boolean flag set to True
             opt_name = f"--{opt.replace('_', '-')}"
+            global_opts.append(opt_name)
+        elif value is False:
+            # Boolean flag set to False (use --no- prefix)
+            opt_name = f"--no-{opt.replace('_', '-')}"
             global_opts.append(opt_name)
         else:
             # Option with value
@@ -152,6 +159,10 @@ def main():
         except (ValueError, IndexError):
             pass
 
+    # Load SDD configuration first
+    # Config values are used as defaults, but CLI args override them
+    config = load_sdd_config()
+
     parser = argparse.ArgumentParser(
         prog='sdd',
         description='Spec-Driven Development unified CLI',
@@ -163,10 +174,12 @@ def main():
                         version=f'%(prog)s {_get_version()}')
 
     # Add global options to main parser so they work in any position
-    add_global_options(parser)
+    # Pass config so defaults are applied
+    add_global_options(parser, config)
 
     # Create parent parser with global options for inheritance by subcommands
-    global_parent = create_global_parent_parser()
+    # Pass config so nested subcommands also get config defaults
+    global_parent = create_global_parent_parser(config)
 
     # Create subparsers
     subparsers = parser.add_subparsers(
@@ -179,17 +192,16 @@ def main():
     # Pass parent parser so nested subcommands can inherit global options
     register_all_subcommands(subparsers, global_parent)
 
-    # Load SDD configuration and set as argparse defaults
-    # Config values are used as defaults, but CLI args override them
-    config = load_sdd_config()
-    parser.set_defaults(
-        json=config['output']['json'],
-        compact=config['output']['compact']
-    )
-
     # Parse args with reordered command line
     try:
         args = parser.parse_args(cmd_line)
+
+        # Apply config defaults for args that weren't specified (are None)
+        if args.json is None:
+            args.json = config['output']['json']
+        if args.compact is None:
+            args.compact = config['output']['compact']
+
     except SystemExit as e:
         # Check if it's an invalid command error and provide helpful suggestion
         if e.code != 0 and len(cmd_line) > 0:

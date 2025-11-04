@@ -1,163 +1,221 @@
-# PR #15: Add compact JSON output mode for ~30% token savings
+# SDD CLI Configuration System
 
 ## Summary
 
-Implements contract-based compact JSON output for SDD CLI commands, achieving ~30% token savings for AI agent workflows while maintaining 100% backward compatibility. Adds opt-in `--compact` flag to 5 core commands with a clear migration path to v2.0.
+Implements an optional configuration file system for the SDD CLI that allows users to set output preferences once rather than passing flags on every command. Adds interactive setup prompts during project initialization to guide users through configuration.
 
 ## What Changed
 
 ### Key Features
-- **Compact JSON mode**: New `--compact` flag for machine-readable output without emoji decorators
-- **Contract-based extraction**: Functional contracts ensure all decision-enabling fields preserved
-- **~30% token savings**: Measured across all 5 commands (prepare-task, task-info, check-deps, progress, next-task)
-- **Backward compatible**: Phase 1 opt-in, verbose output remains default
-- **Migration path**: Clear v2.0 transition plan with `--verbose` fallback
+- **Interactive configuration prompts**: During `/sdd-setup`, users are asked about output preferences
+- **Configuration file creation**: Automatically creates `.claude/sdd_config.json` with user's choices
+- **Flexible precedence**: Project-local config overrides global config, CLI flags override both
+- **Optional and non-breaking**: Existing workflows continue to work without any config file
+- **Complete documentation**: README section + comprehensive SDD_CONFIG_README.md guide
 
-### Core Infrastructure (Phase 1)
-- `src/claude_skills/claude_skills/common/contracts.py` (437 lines): Contract extractors for all 5 commands
-- `src/claude_skills/claude_skills/common/json_output.py` (227 lines): JSON formatting utilities
-- Updated `common/__init__.py`: Exported new contract functions
+### Core Implementation
 
-### Command Updates (Phase 2)
-Modified `src/claude_skills/claude_skills/sdd_next/cli.py` to support `--compact` flag:
-- `cmd_prepare_task()`: Contract-based compact output
-- `cmd_task_info()`: Minimal task detail extraction
-- `cmd_check_deps()`: Dependency status only
-- `cmd_progress()`: Essential progress metrics
-- `cmd_next_task()`: Next task recommendation
+**1. Interactive Prompts (setup_permissions.py)**
+- Added `_prompt_for_config()`: Asks user for JSON output preference (yes/no) and compact formatting preference
+- Added `_create_config_file()`: Creates `.claude/sdd_config.json` with user's selections
+- Integrated into `cmd_update()`: Prompts appear during project setup (skipped in `--json` mode)
 
-### Documentation (Phase 3)
-- **README.md** (+48 lines): Token savings results and benefits
-- **docs/CONTRACTS.md** (570 lines): Formal contract definitions for all commands
-- **docs/MIGRATION_V2.md** (369 lines): Migration guide for Phase 1 → Phase 2 transition
-- **scripts/measure_token_efficiency.py** (273 lines): Token measurement utilities
-- **skills/sdd-next/SKILL.md** (+40 lines): Updated workflow examples
+**2. Configuration Loader (sdd_config.py)**
+- `load_sdd_config()`: Loads config from project-local or global locations with fallback to defaults
+- `get_sdd_setting()`: Retrieves specific settings with proper precedence
+- `_validate_sdd_config()`: Validates configuration values and logs warnings for invalid entries
+- **Precedence order**: Built-in defaults → Global config → Project config → CLI arguments
 
-## Technical Approach
+**3. Configuration Options**
+```json
+{
+  "output": {
+    "json": true,      // Default to JSON output for automation
+    "compact": true    // Use compact JSON formatting
+  }
+}
+```
 
-### Design Decisions
+**Configuration locations:**
+- Project-local: `{project_root}/.claude/sdd_config.json` (recommended)
+- Global: `~/.claude/sdd_config.json`
 
-**1. Contract-Based Extraction**
-Instead of removing fields arbitrarily, implemented formal contracts specifying:
-- Required fields (always present)
-- Optional fields (conditional inclusion)
-- Decisions enabled (what the output helps you decide)
-- Inclusion conditions (when optional fields appear)
+### Documentation
 
-This ensures compact output contains everything needed for decision-making while removing verbose decorators.
+**README.md Updates**
+- Added "SDD CLI Configuration (Optional)" section in Configuration chapter
+- Documents file locations, configuration options, and example JSON
+- Links to detailed documentation for advanced use cases
 
-**2. Opt-In Phase 1, Default Phase 2**
-- **Phase 1** (current): `--compact` is opt-in, verbose remains default
-- **Phase 2** (v2.0): `--compact` becomes default, `--verbose` restores old behavior
+**SDD_CONFIG_README.md (New)**
+- Comprehensive guide with configuration structure, precedence rules, and examples
+- Common use cases: automation scripts, human-readable defaults, debugging with pretty JSON
+- Validation and error handling behavior
+- Troubleshooting section and FAQ
 
-This two-phase approach ensures zero breaking changes during migration.
-
-**3. Single-Line Minified Output**
-Compact mode uses `json.dumps(compact=True, separators=(',', ':'))` for single-line output, eliminating unnecessary whitespace.
-
-### Token Savings Results
-
-| Command | Normal Tokens | Compact Tokens | Savings |
-|---------|---------------|----------------|---------|
-| prepare-task | ~400-600 | ~280-420 | ~28-32% |
-| task-info | ~130-240 | ~90-170 | ~28-30% |
-| check-deps | ~40-210 | ~30-140 | ~27-35% |
-| progress | ~95-130 | ~65-85 | ~31-36% |
-| next-task | ~50-55 | ~34-37 | ~30-32% |
-
-**Average: ~30% token reduction**
-
-Measured using tiktoken (cl100k_base) across 3 different spec types. Current implementation uses JSON minification only, providing a solid foundation for future optimization strategies.
-
-**Note on Original Targets:** The spec originally targeted 65-85% savings but actual measurements showed ~30% with the current approach (JSON minification). This establishes a baseline, with additional optimization strategies identified for future work to reach higher targets.
+**Template File**
+- `docs/sdd_config.json.template`: Ready-to-use configuration template
 
 ## Implementation Details
 
-### Phase 1: Contract Infrastructure (11 tasks)
-- ✅ Implement 5 contract extractors
-- ✅ Add JSON formatting utilities
+### Phase 1: Research & Planning (4 tasks)
+- ✅ Review existing config patterns (git_config as reference)
+- ✅ Design configuration schema with output.json and output.compact fields
+- ✅ Plan interactive prompts for setup workflow
+- ✅ Document file locations and precedence order
+
+### Phase 2: Core Configuration Module (7 tasks)
+- ✅ Implement sdd_config.py module with loader and validation
+- ✅ Add DEFAULT_SDD_CONFIG with sensible defaults
+- ✅ Implement get_config_path() for multi-location discovery
+- ✅ Add _validate_sdd_config() with type checking and warnings
 - ✅ Export functions from common module
-- ✅ Add contract documentation and type hints
-- ✅ Verify contract extractors, JSON output, verbose mode
+- ✅ Verify config loading, precedence, and validation
 
-### Phase 2: Command Updates (15 tasks)
-- ✅ Update all 5 commands to support `--compact`
-- ✅ Update CLI help text
-- ✅ Verify JSON validity, compact flag support, minification
-- ✅ Verify backward compatibility (non-compact still works)
-- ✅ Measure token savings for each command
+### Phase 3: Integration Tests (9 tasks)
+- ✅ Test project-local config overrides global config
+- ✅ Test global config overrides built-in defaults
+- ✅ Test invalid JSON falls back to defaults gracefully
+- ✅ Test invalid value types trigger warnings
+- ✅ Test missing config files use defaults without errors
+- ✅ Verify get_sdd_setting() retrieves correct values
 
-### Phase 3: Documentation & Verification (7 tasks)
-- ✅ Create token measurement script
-- ✅ Document token savings in README
-- ✅ Verify actual savings (~30%)
-- ✅ Document workflow scenarios and measurements
-
-### Phase 4: Integration & Migration (5 tasks)
-- ✅ Update sdd-next SKILL.md with command examples
-- ✅ Create MIGRATION_V2.md guide
-- ✅ Create CONTRACTS.md documentation
-- ✅ Verify workflows, migration guide, contract accuracy
+### Phase 4: Project Setup & Documentation (4 tasks)
+- ✅ Add interactive prompts to setup_permissions.py
+- ✅ Create configuration file during setup with user preferences
+- ✅ Update README.md with configuration section
+- ✅ Verify setup script creates config correctly
+- ✅ Verify documentation quality and completeness
 
 ## Testing
 
-### Automated Verification
-- ✅ All 5 commands produce valid JSON with `--compact`
-- ✅ Compact output is minified (single-line)
-- ✅ Non-compact output still works (backward compatible)
-- ✅ Compact output smaller than verbose (measured)
-- ✅ Help text updated for all commands
+### Verification Results
 
-### Manual Verification
-- ✅ Token savings measured at ~30% across all commands
-- ✅ Workflow scenarios documented and tested
-- ✅ Migration guide reviewed for completeness
+**Setup Script Verification (verify-4-1)**
+- ✅ Interactive prompts work correctly with user input simulation
+- ✅ Config file created at `.claude/sdd_config.json` with exact user preferences
+- ✅ Config structure matches expected format (output.json and output.compact fields)
+- ✅ User choices respected (both json=true and json=false tested)
+- ✅ Integration with cmd_update confirmed
+- ✅ JSON mode (--json flag) correctly skips prompts
+
+**Documentation Verification (verify-4-2)**
+- ✅ README.md section clear, concise, well-integrated
+- ✅ SDD_CONFIG_README.md comprehensive with examples and troubleshooting
+- ✅ Template file exists and matches expected structure
+- ✅ Implementation documentation (sdd_config.py) has clear docstrings
+- ✅ All links accurate and functional
+- ✅ Terminology consistent across all documentation
+
+### Manual Testing
+```bash
+# Test 1: Interactive prompts with json=yes, compact=yes
+cd /tmp/test_project
+sdd skills-dev setup-permissions update .
+# User selects: y, y
+# Result: .claude/sdd_config.json created with {"output": {"json": true, "compact": true}}
+
+# Test 2: Config file content verification
+cat .claude/sdd_config.json
+# Result: Valid JSON with correct structure
+
+# Test 3: JSON mode skips prompts
+sdd skills-dev setup-permissions update . --json
+# Result: No prompts shown, config not created (correct for automation)
+```
+
+## User Experience
+
+### First-Time Setup Flow
+```
+$ /sdd-setup
+
+📋 SDD CLI Configuration Setup
+
+Let's configure your default output preferences for SDD commands.
+
+Output Format:
+  • JSON: Machine-readable format (good for automation)
+  • Human-readable: Easy-to-read terminal output
+
+Default to JSON output? [Y/n]: y
+
+JSON Formatting:
+  • Compact: Single-line JSON (smaller output)
+  • Pretty: Multi-line JSON (more readable)
+
+Use compact JSON formatting? [Y/n]: y
+
+✅ Created configuration file: /path/to/project/.claude/sdd_config.json
+
+Your preferences:
+  • JSON output: enabled
+  • JSON format: compact
+```
+
+### Configuration Behavior
+- **No config file**: Uses built-in defaults (json: true, compact: true)
+- **Project config exists**: Uses project preferences
+- **Global config exists**: Uses global preferences (if no project config)
+- **CLI flags provided**: Override any config file settings
+
+## Benefits
+
+### For End Users
+- Set preferences once, apply everywhere
+- No need to remember flags for every command
+- Different configs for different projects
+- Interactive guided setup
+
+### For Automation
+- Reliable defaults without manual flag passing
+- Project-specific configuration in version control
+- Graceful fallback if config missing or invalid
+
+### For Development
+- Clean, maintainable configuration system
+- Validation with helpful warnings (not errors)
+- Extensible for future settings
+- Follows established patterns (similar to git_config)
+
+## Files Changed
+
+**New Files:**
+- `src/claude_skills/claude_skills/common/sdd_config.py` (217 lines) - Configuration loader
+- `docs/SDD_CONFIG_README.md` (239 lines) - Complete documentation
+- `docs/sdd_config.json.template` (7 lines) - Configuration template
+
+**Modified Files:**
+- `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py` (+117 lines) - Interactive prompts
+- `README.md` (+29 lines) - Configuration section
+- `docs/DOCUMENTATION.md` (auto-generated) - Architecture documentation update
+- `docs/documentation.json` (auto-generated) - Machine-readable docs update
 
 ## Migration Path
 
-### For Users (Phase 1)
-```bash
-# Default behavior unchanged
-sdd prepare-task my-spec --json
+This is a purely additive feature with no breaking changes:
 
-# Opt into compact mode
-sdd prepare-task my-spec --json --compact
-```
-
-### For v2.0 (Phase 2)
-```bash
-# Compact becomes default
-sdd prepare-task my-spec --json
-
-# Opt into verbose mode
-sdd prepare-task my-spec --json --verbose
-```
-
-See [docs/MIGRATION_V2.md](docs/MIGRATION_V2.md) for complete migration guide.
-
-## Files Changed (Summary)
-
-**New Files:**
-- `src/claude_skills/claude_skills/common/contracts.py` - Contract extractors
-- `src/claude_skills/claude_skills/common/json_output.py` - JSON formatters
-- `docs/CONTRACTS.md` - Contract documentation
-- `docs/MIGRATION_V2.md` - Migration guide
-- `scripts/measure_token_efficiency.py` - Measurement utilities
-
-**Modified Files:**
-- `src/claude_skills/claude_skills/sdd_next/cli.py` - Added --compact support
-- `README.md` - Token savings documentation
-- `skills/sdd-next/SKILL.md` - Updated workflow examples
-- `docs/DOCUMENTATION.md` - Auto-generated docs update
+**Existing users:** Continue working as before, no action needed
+**New users:** Guided through configuration during `/sdd-setup`
+**Power users:** Can manually create config files for fine-tuned control
 
 ## Commits
 
-33 commits across 4 phases:
-- Phase 1 (8 tasks + 5 verifications): Contract infrastructure
-- Phase 2 (6 tasks + 6 verifications): Command updates
-- Phase 3 (2 tasks + 3 verifications): Documentation
-- Phase 4 (3 tasks + 4 verifications): Integration
+4 task commits + automatic documentation updates:
+- **342eb345** - task-4-1: Add interactive prompts to setup_permissions.py
+- **8371d7f4** - task-4-2: Add SDD config section to README.md
+- **e54329ef** - verify-4-1: Verify setup script creates config file
+- **c3f7a6c4** - verify-4-2: Verify documentation quality
 
-See commit history for detailed progression.
+All commits include proper journal entries documenting what was done, tests run, and verification performed.
+
+## Next Steps
+
+After merge:
+1. Users running `/sdd-setup` will see the new configuration prompts
+2. Existing projects can create config files manually or re-run setup
+3. Documentation is available in README and SDD_CONFIG_README.md
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

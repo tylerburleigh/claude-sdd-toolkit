@@ -21,7 +21,7 @@ from claude_skills.common.doc_integration import (
 )
 from claude_skills.common.paths import find_spec_file
 from claude_skills.common.completion import check_spec_completion, should_prompt_completion
-from claude_skills.common.git_metadata import find_git_root, detect_git_drift, check_dirty_tree, update_branch_metadata
+from claude_skills.common.git_metadata import find_git_root, check_dirty_tree
 from claude_skills.common.git_config import is_git_enabled
 
 logger = logging.getLogger(__name__)
@@ -340,51 +340,25 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
         if repo_root is None:
             # Not in a git repository - skip all git operations
             logger.debug("No git repository found, skipping git operations")
-            result["git_warnings"] = []
             result["repo_root"] = None
         else:
             # Step 2: Check if git integration is enabled
             if not is_git_enabled(repo_root):
                 logger.debug("Git integration is disabled, skipping git operations")
-                result["git_warnings"] = []
                 result["repo_root"] = str(repo_root)
             else:
-                # Step 3: Detect drift between spec metadata and actual git state
-                drift_warnings = detect_git_drift(spec_data, repo_root)
+                result["repo_root"] = str(repo_root)
 
-                # Step 4: Log warnings
-                if drift_warnings:
-                    logger.warning(f"Git drift detected ({len(drift_warnings)} warning(s)):")
-                    for warning in drift_warnings:
-                        logger.warning(f"  - {warning}")
-                    result["git_warnings"] = drift_warnings
-                else:
-                    logger.debug("No git drift detected")
-                    result["git_warnings"] = []
+                # Note: Git metadata is no longer stored in specs
+                # Git information is queried on-demand from git/gh CLIs
+                logger.debug("Git integration enabled, repo_root available for git operations")
 
-                # Step 5: Check if branch creation is needed
-                git_metadata = spec_data.get('metadata', {}).get('git')
-                if not git_metadata or not git_metadata.get('branch_name'):
-                    # No branch set in metadata - check preconditions for branch creation
-                    logger.debug("No branch name in metadata, checking preconditions for branch creation")
-
-                    # Check dirty tree status
-                    is_dirty, dirty_message = check_dirty_tree(repo_root)
-                    result["dirty_tree_status"] = {
-                        "is_dirty": is_dirty,
-                        "message": dirty_message
-                    }
-
-                    # Generate suggested branch name from spec_id
-                    # Format: feat/spec-id-prefix (e.g., feat/git-integration-simplified)
-                    spec_id_prefix = spec_id.rsplit('-', 3)[0] if '-' in spec_id else spec_id
-                    suggested_name = f"feat/{spec_id_prefix}"
-                    result["suggested_branch_name"] = suggested_name
-                    result["needs_branch_creation"] = True
-
-                    logger.info(f"Branch creation needed. Suggested name: {suggested_name}")
-                    if is_dirty:
-                        logger.warning(f"Working tree has uncommitted changes: {dirty_message}")
+                # Check dirty tree status
+                is_dirty, dirty_message = check_dirty_tree(repo_root)
+                result["dirty_tree_status"] = {
+                    "is_dirty": is_dirty,
+                    "message": dirty_message
+                }
 
                 result["repo_root"] = str(repo_root)
     except Exception as e:

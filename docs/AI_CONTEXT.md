@@ -1,8 +1,8 @@
 # AI Context - Quick Reference Guide
 
 **Project:** Claude SDD Toolkit
-**Version:** 0.4.1
-**Generated:** 2025-11-02
+**Version:** 0.4.2
+**Generated:** 2025-11-04
 
 This document provides a concise reference for AI assistants working with the SDD Toolkit codebase. It synthesizes insights from multiple AI model analyses (Gemini and Codex).
 

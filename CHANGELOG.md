@@ -2,8 +2,32 @@
 
 All notable changes to the SDD Toolkit will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
+
+## [0.4.2] - 2025-11-04
+
+### Added
+
+**Configurable JSON Output System:**
+- **Compact Mode**: Reduces output from `sdd` commands by an estimated 30%
+  - Single-line output eliminates unnecessary whitespace and newlines
+  - Ideal for machine-to-machine communication and token optimization
+- **Configuration File**: New `.claude/sdd_config.json` for persistent preferences
+  - Configure `json` and `compact` output modes globally
+  - Interactive setup prompts during `sdd setup-permissions`
+  - Config hierarchy: project-local > global > built-in defaults
+- **CLI Flags**: `--json`/`--no-json` and `--compact`/`--no-compact`
+  - Runtime override of config file settings
+  - Full argparse integration with mutually exclusive groups
+
+### Fixed
+- Fixed `--no-compact` flag not being recognized (argument reordering bug)
+- Fixed argument reconstruction for boolean False values (now properly uses `--no-` prefix)
+
+### Documentation
+- Added SDD_CONFIG_README.md with comprehensive configuration guide
+- Updated README.md with configuration section
+- Updated setup scripts with interactive prompts
 
 ## [0.4.1] - 2025-11-03
 

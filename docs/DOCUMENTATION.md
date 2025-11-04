@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:38:18
+**Generated:** 2025-11-04 07:46:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70406
-- **Total Classes:** 268
+- **Total Lines:** 70079
+- **Total Classes:** 264
 - **Total Functions:** 786
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
@@ -1887,22 +1887,6 @@ Attributes:
 
 ---
 
-### `TestAddCommitMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:800`
-
-**Description:**
-> Tests for add_commit_metadata function.
-
-**Methods:**
-- `test_add_commit_metadata_creates_metadata()`
-- `test_add_commit_metadata_appends_to_existing()`
-- `test_add_commit_metadata_auto_generates_timestamp()`
-- `test_add_commit_metadata_preserves_branch_info()`
-
----
-
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -2273,7 +2257,7 @@ Attributes:
 ### `TestCheckDirtyTree`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:72`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:67`
 
 **Description:**
 > Tests for check_dirty_tree function.
@@ -2643,22 +2627,6 @@ Attributes:
 
 ---
 
-### `TestDetectGitDrift`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:667`
-
-**Description:**
-> Tests for detect_git_drift function.
-
-**Methods:**
-- `test_detect_git_drift_no_metadata()`
-- `test_detect_git_drift_matching_branch()`
-- `test_detect_git_drift_different_branch()`
-- `test_detect_git_drift_handles_timeout()`
-
----
-
 ### `TestDetectProject`
 
 **Language:** python
@@ -2893,7 +2861,7 @@ Attributes:
 ### `TestFindGitRoot`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:31`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:26`
 
 **Description:**
 > Tests for find_git_root function.
@@ -3234,7 +3202,7 @@ Attributes:
 ### `TestGetStagedFiles`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:570`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:565`
 
 **Description:**
 > Tests for get_staged_files function.
@@ -3821,7 +3789,7 @@ Attributes:
 ### `TestParseGitStatus`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:162`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:157`
 
 **Description:**
 > Tests for parse_git_status function.
@@ -4567,7 +4535,7 @@ Attributes:
 ### `TestShowCommitPreview`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:389`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:384`
 
 **Description:**
 > Tests for show_commit_preview function.
@@ -4781,21 +4749,6 @@ Attributes:
 
 ---
 
-### `TestUpdateBranchMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:747`
-
-**Description:**
-> Tests for update_branch_metadata function.
-
-**Methods:**
-- `test_update_branch_metadata_creates_metadata()`
-- `test_update_branch_metadata_updates_existing()`
-- `test_update_branch_metadata_preserves_other_metadata()`
-
----
-
 ### `TestUpdateCommands`
 
 **Language:** python
@@ -4823,23 +4776,6 @@ Attributes:
 - `test_update_metadata_numeric_value()`
 - `test_update_metadata_creates_metadata_object()`
 - `test_update_metadata_dry_run()`
-
----
-
-### `TestUpdatePRMetadata`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py:865`
-
-**Description:**
-> Tests for update_pr_metadata function.
-
-**Methods:**
-- `test_update_pr_metadata_creates_metadata()`
-- `test_update_pr_metadata_updates_existing()`
-- `test_update_pr_metadata_default_status()`
-- `test_update_pr_metadata_preserves_commits()`
-- `test_update_pr_metadata_status_values()`
 
 ---
 
@@ -6372,7 +6308,7 @@ Returns:
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:192`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:191`
 **Complexity:** 5
 
 **Description:**
@@ -6685,7 +6621,7 @@ Returns:
 ### `activate_spec(spec_id, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:92`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:91`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -7888,7 +7824,7 @@ Returns:
 ### `check_gh_available() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:158`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:184`
 **Complexity:** 2
 
 **Description:**
@@ -7968,7 +7904,7 @@ Returns:
 ### `check_pr_readiness(spec_data, spec_path) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:240`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:266`
 **Complexity:** 5
 
 **Description:**
@@ -9725,8 +9661,8 @@ Example:
 ### `complete_spec(spec_id, spec_file, specs_dir, skip_doc_regen, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:240`
-⚠️ **Complexity:** 28 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:239`
+⚠️ **Complexity:** 27 (High)
 
 **Description:**
 > Mark a spec as completed and move it to completed folder.
@@ -10131,8 +10067,8 @@ Returns:
 ### `create_pr_with_ai_description(repo_root, branch_name, base_branch, pr_title, pr_body, spec_data, spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:78`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:76`
+**Complexity:** 4
 
 **Description:**
 > Create PR with AI-generated description and update spec metadata.
@@ -10173,7 +10109,7 @@ Returns:
 ### `create_pull_request(repo_root, title, body, base_branch) -> Tuple[bool, Optional[str], Optional[int], str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:176`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:202`
 **Complexity:** 5
 
 **Description:**
@@ -13138,11 +13074,11 @@ Returns:
 
 ---
 
-### `generate_pr_body(spec_data) -> str`
+### `generate_pr_body(spec_data, repo_root, base_branch) -> str`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:20`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 20 (High)
 
 **Description:**
 > Generate PR body template from spec metadata.
@@ -13151,17 +13087,21 @@ Creates a structured PR description including:
 - Spec title and description
 - Completed tasks list
 - Phase completion summary
-- Commit history
+- Commit history (queried from git)
 - Verification results
 
 Args:
     spec_data: JSON spec file data
+    repo_root: Path to repository root (optional, for commit history)
+    base_branch: Base branch name (optional, for commit history)
 
 Returns:
     Formatted PR body as markdown string
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
+- `repo_root`: Optional[Path]
+- `base_branch`: Optional[str]
 
 ---
 
@@ -15745,7 +15685,7 @@ Returns:
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:30`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/lifecycle.py:29`
 **Complexity:** 8
 
 **Description:**
@@ -15982,7 +15922,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:250`
-⚠️ **Complexity:** 23 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
@@ -16245,7 +16185,7 @@ Examples:
 ### `push_branch(repo_root, branch_name) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:119`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_pr.py:145`
 **Complexity:** 3
 
 **Description:**
@@ -17626,7 +17566,7 @@ Example:
 ### `show_pr_draft_and_wait(pr_title, pr_body, spec_id, branch_name, base_branch, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:25`
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:23`
 **Complexity:** 1
 
 **Description:**
@@ -20007,7 +19947,7 @@ Returns:
 ### `validate_pr_readiness(spec_data, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:194`
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_creation.py:170`
 **Complexity:** 4
 
 **Description:**
@@ -21202,9 +21142,7 @@ Returns:
 - `claude_skills.common.get_task_context_from_docs`
 - `claude_skills.common.git_config.is_git_enabled`
 - `claude_skills.common.git_metadata.check_dirty_tree`
-- `claude_skills.common.git_metadata.detect_git_drift`
 - `claude_skills.common.git_metadata.find_git_root`
-- `claude_skills.common.git_metadata.update_branch_metadata`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.validate_spec_before_proceed`
@@ -21397,9 +21335,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_pr/pr_creation.py`
 
 - `__future__.annotations`
-- `claude_skills.common.git_metadata.update_pr_metadata`
 - `claude_skills.common.printer.PrettyPrinter`
-- `claude_skills.common.spec.save_json_spec`
 - `claude_skills.sdd_update.git_pr.check_gh_available`
 - `claude_skills.sdd_update.git_pr.create_pull_request`
 - `claude_skills.sdd_update.git_pr.push_branch`
@@ -21727,7 +21663,6 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_update/lifecycle.py`
 
 - `claude_skills.common.git_config.load_git_config`
-- `claude_skills.common.git_metadata.update_pr_metadata`
 - `claude_skills.common.paths.ensure_directory`
 - `claude_skills.common.paths.find_spec_file`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -21828,7 +21763,6 @@ Returns:
 
 - `__future__.annotations`
 - `claude_skills.common.git_config.load_git_config`
-- `claude_skills.common.git_metadata.add_commit_metadata`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.git_metadata.show_commit_preview_and_wait`
 - `claude_skills.common.printer.PrettyPrinter`
@@ -22249,15 +22183,11 @@ Returns:
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py`
 
-- `claude_skills.common.git_metadata.add_commit_metadata`
 - `claude_skills.common.git_metadata.check_dirty_tree`
-- `claude_skills.common.git_metadata.detect_git_drift`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.git_metadata.get_staged_files`
 - `claude_skills.common.git_metadata.parse_git_status`
 - `claude_skills.common.git_metadata.show_commit_preview`
-- `claude_skills.common.git_metadata.update_branch_metadata`
-- `claude_skills.common.git_metadata.update_pr_metadata`
 - `json`
 - `pathlib.Path`
 - `pytest`

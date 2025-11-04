@@ -262,9 +262,6 @@ sdd test check-tools
 # Get routing for specific failure type
 sdd test check-tools --route assertion
 sdd test check-tools --route fixture
-
-# JSON output
-sdd test check-tools --json
 ```
 
 ### sdd test run
@@ -340,7 +337,6 @@ Available on all commands:
 - `--no-color` - Disable colored output
 - `--verbose`, `-v` - Show detailed output
 - `--quiet`, `-q` - Minimal output (errors only)
-- `--json` - Output results in JSON format
 
 ## Common Patterns
 

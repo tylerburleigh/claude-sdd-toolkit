@@ -23,7 +23,6 @@ from claude_skills.sdd_update.git_pr import (
     push_branch,
     create_pull_request,
 )
-from claude_skills.common.git_metadata import update_pr_metadata
 from claude_skills.common.git_config import load_git_config
 
 
@@ -404,20 +403,6 @@ def complete_spec(
 
                 if pr_success and pr_url and pr_number:
                     printer.success(f"Pull request created: {pr_url}")
-
-                    # Update spec metadata with PR information
-                    update_pr_metadata(
-                        spec=spec_data,
-                        pr_url=pr_url,
-                        pr_number=pr_number,
-                        status='open'
-                    )
-
-                    # Save spec with PR metadata
-                    if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
-                        printer.warning("Failed to save PR metadata to spec")
-                    else:
-                        printer.info("PR metadata added to spec")
 
                 elif pr_error:
                     # Non-blocking failure - log warning but continue

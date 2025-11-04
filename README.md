@@ -2,7 +2,7 @@
 
 > Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-0.4.1-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.4.2-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -81,7 +81,9 @@ Want to see a complete workflow from start to finish? Check out [docs/examples/c
 
 ## Latest Updates
 
-**Version 0.4.1** adds agent-controlled file staging and AI-powered PR creation with the new `sdd-pr` skill. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+**Version 0.4.2** introduces compact mode with estimated 30% token savings from `sdd` command output. Configure via `.claude/sdd_config.json` or use `--compact`/`--no-compact` flags. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Version 0.4.1** adds agent-controlled file staging and AI-powered PR creation with the new `sdd-pr` skill.
 
 **Version 0.4.0** brings major enhancements including AI-powered spec rendering, automatic time tracking, context monitoring, and code-doc integration that provides richer task context.
 
@@ -762,4 +764,4 @@ Ready to get started?
 
 ---
 
-**Version**: 0.4.1 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.4.2 | **License**: MIT | **Author**: Tyler Burleigh
