@@ -9,6 +9,7 @@ from pathlib import Path
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
+from claude_skills.common.sdd_config import load_sdd_config
 from claude_skills.cli.sdd.options import add_global_options, create_global_parent_parser
 from claude_skills.cli.sdd.registry import register_all_subcommands
 
@@ -177,6 +178,14 @@ def main():
     # CRITICAL: Register subcommands BEFORE parsing
     # Pass parent parser so nested subcommands can inherit global options
     register_all_subcommands(subparsers, global_parent)
+
+    # Load SDD configuration and set as argparse defaults
+    # Config values are used as defaults, but CLI args override them
+    config = load_sdd_config()
+    parser.set_defaults(
+        json=config['output']['json'],
+        compact=config['output']['compact']
+    )
 
     # Parse args with reordered command line
     try:

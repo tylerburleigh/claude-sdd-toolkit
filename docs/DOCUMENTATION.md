@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:05:40
+**Generated:** 2025-11-04 07:18:06
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70517
+- **Total Lines:** 70518
 - **Total Classes:** 268
 - **Total Functions:** 788
 - **Avg Complexity:** 5.58
@@ -6789,7 +6789,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:80`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:85`
 **Complexity:** 1
 
 **Description:**
@@ -6803,7 +6803,7 @@ Returns:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:88`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:93`
 **Complexity:** 1
 
 **Description:**
@@ -15561,7 +15561,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:133`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:134`
 ⚠️ **Complexity:** 18 (High)
 
 **Decorators:** `@track_metrics('sdd')`
