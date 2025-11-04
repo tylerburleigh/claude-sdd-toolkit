@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-cli-config-2025-11-03-001",
   "generated": "2025-11-03T19:00:00Z",
-  "last_updated": "2025-11-04T12:22:51.815431Z",
+  "last_updated": "2025-11-04T12:22:55.159592Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 20,
+      "completed_tasks": 21,
       "metadata": {
         "description": "Add project and global configuration support for --json and --compact flags, making them configurable via .claude/sdd_config.json files",
         "objectives": [
@@ -724,7 +724,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Add comprehensive test coverage for configuration system",
         "risk_level": "low",
@@ -741,7 +741,7 @@
         "task-3-2"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -767,7 +767,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "tests/unit/test_common/test_sdd_config.py",
         "task_category": "implementation",
@@ -798,7 +798,7 @@
     "task-3-1-2": {
       "type": "subtask",
       "title": "Test validation and error handling",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -807,9 +807,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Test invalid JSON, missing fields, graceful fallback"
+        "details": "Test invalid JSON, missing fields, graceful fallback",
+        "completed_at": "2025-11-04T12:22:55.148753Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-04T12:22:55.151962Z"
       }
     },
     "task-3-1-3": {
@@ -1331,10 +1334,19 @@
       "content": "Created unit tests for config loading and precedence in TestConfigLoading class. Tests cover: no config file (defaults), custom config, partial config, and project>global precedence.",
       "metadata": {},
       "task_id": "task-3-1-1"
+    },
+    {
+      "timestamp": "2025-11-04T12:22:55.151951Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Test validation and error handling",
+      "author": "claude-code",
+      "content": "Created unit tests for validation and error handling in TestConfigValidation class. Tests cover: valid config, invalid types, unknown keys, invalid JSON, null config, and file read errors.",
+      "metadata": {},
+      "task_id": "task-3-1-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 66,
+    "progress_percentage": 70,
     "status": "active",
     "current_phase": "phase-3",
     "git": {
@@ -1472,6 +1484,12 @@
           "message": "verify-2-4: No duplicate --compact flags in commands",
           "task_id": "verify-2-4",
           "timestamp": "2025-11-04T12:21:01.340635Z"
+        },
+        {
+          "sha": "23b805accfde0118f8f55504d5aaac46e7865001",
+          "message": "task-3-1-1: Test config loading and precedence",
+          "task_id": "task-3-1-1",
+          "timestamp": "2025-11-04T12:22:51.952049Z"
         }
       ],
       "pr": null
