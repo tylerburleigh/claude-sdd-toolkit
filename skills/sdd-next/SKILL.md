@@ -1649,45 +1649,6 @@ update_branch_metadata(
 )
 ```
 
-### Commit Cadence Preference
-
-After branch creation OR when resuming a git-enabled spec, ask the user about commit cadence:
-
-```python
-AskUserQuestion(
-    questions: [{
-        question: "When should commits be created automatically?",
-        header: "Commit Cadence",
-        multiSelect: false,
-        options: [
-            {
-                label: "After each task",
-                description: "Create a commit when each task is completed (granular history)"
-            },
-            {
-                label: "After each phase",
-                description: "Create a commit when each phase is completed (fewer commits)"
-            },
-            {
-                label: "Manual",
-                description: "I'll create commits manually (no automatic commits)"
-            }
-        ]
-    }]
-)
-```
-
-Store the user's choice in spec metadata:
-```python
-# Store in session preferences (not persisted to file)
-if 'session_preferences' not in spec['metadata']:
-    spec['metadata']['session_preferences'] = {}
-
-spec['metadata']['session_preferences']['commit_cadence'] = user_choice  # "task", "phase", or "manual"
-```
-
-**Note:** This preference is stored in `metadata.session_preferences` which is **not** persisted to the spec JSON file. It's only for the current session. The persistent `metadata.git.commit_cadence` setting comes from git_config.
-
 ### Drift Detection
 
 When resuming work on a spec with existing git metadata, detect drift between spec and actual git state:

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:19:31
+**Generated:** 2025-11-04 07:21:43
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70527
+- **Total Lines:** 70513
 - **Total Classes:** 268
 - **Total Functions:** 788
 - **Avg Complexity:** 5.58
@@ -7892,7 +7892,7 @@ Returns:
 ### `check_git_commit_readiness(spec_data, spec_path, event_type) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:97`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:96`
 **Complexity:** 5
 
 **Description:**
@@ -13005,7 +13005,7 @@ Returns:
 ### `generate_commit_message(task_id, task_title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:83`
 **Complexity:** 1
 
 **Description:**
@@ -14869,7 +14869,7 @@ Example:
 ### `has_uncommitted_changes(repo_root) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:50`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:49`
 **Complexity:** 3
 
 **Description:**
@@ -15997,7 +15997,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:250`
-⚠️ **Complexity:** 24 (High)
+⚠️ **Complexity:** 23 (High)
 
 **Description:**
 > Prepare complete context for task implementation.
@@ -17480,7 +17480,7 @@ Example:
 > Check if commit should be offered based on commit cadence preference.
 
 Args:
-    spec_data: JSON spec file data
+    spec_data: JSON spec file data (unused, kept for backward compatibility)
     event_type: Type of completion event - "task" or "phase"
 
 Returns:
@@ -17778,7 +17778,7 @@ Returns:
 ### `stage_and_commit(repo_root, commit_message) -> Tuple[bool, Optional[str], str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:160`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/git_commit.py:158`
 **Complexity:** 6
 
 **Description:**
@@ -21751,6 +21751,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_update/git_commit.py`
 
 - `__future__.annotations`
+- `claude_skills.common.git_config.get_git_setting`
 - `claude_skills.common.git_config.is_git_enabled`
 - `claude_skills.common.git_metadata.create_commit_from_staging`
 - `claude_skills.common.git_metadata.find_git_root`

@@ -279,7 +279,7 @@ The commit cadence determines when to offer automatic commits:
 - **phase**: Commit after each phase completion (fewer commits, milestone-based)
 - **manual**: Never auto-commit (user manages commits manually)
 
-The cadence preference is stored in `metadata.session_preferences.commit_cadence` in the spec file.
+The cadence preference is configured project-wide in `.claude/git_config.json` and accessed via `get_git_setting('commit_cadence')`.
 
 ### Commit Workflow Steps
 
@@ -290,9 +290,9 @@ When completing a task and git integration is enabled, the workflow follows thes
 First, check if automatic commits should be offered based on the current event:
 
 ```python
-# From spec JSON
-session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
-commit_cadence = session_prefs.get('commit_cadence', 'task')
+# From git_config.json
+from claude_skills.common.git_config import get_git_setting
+commit_cadence = get_git_setting('commit_cadence', default='task')
 
 # For task completion:
 should_offer_commit = (commit_cadence == 'task')
@@ -487,6 +487,7 @@ if not is_git_enabled(repo_root):
     return  # Skip git workflow
 
 # 3. Check commit cadence
+commit_cadence = get_git_setting('commit_cadence', default='task')
 if commit_cadence != 'task':  # For task completion
     return  # Don't offer commit for this event
 

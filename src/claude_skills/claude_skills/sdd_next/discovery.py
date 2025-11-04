@@ -386,18 +386,6 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
                     if is_dirty:
                         logger.warning(f"Working tree has uncommitted changes: {dirty_message}")
 
-                # Step 6: Check if commit cadence preference is set
-                session_prefs = spec_data.get('metadata', {}).get('session_preferences', {})
-                commit_cadence = session_prefs.get('commit_cadence')
-
-                if not commit_cadence:
-                    # No commit cadence preference set - flag it for CLI to prompt user
-                    logger.debug("No commit cadence preference set, flagging for user prompt")
-                    result["needs_commit_cadence"] = True
-                    result["commit_cadence_options"] = ["task", "phase"]
-                    result["suggested_commit_cadence"] = "task"
-                    logger.info("Commit cadence preference needed. Suggested: 'task'")
-
                 result["repo_root"] = str(repo_root)
     except Exception as e:
         # Git operations should not block task preparation

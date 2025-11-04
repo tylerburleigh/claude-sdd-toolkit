@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-04T12:19:31.820889Z",
+    "generated_at": "2025-11-04T12:21:43.787689Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 209,
-    "total_lines": 70527,
+    "total_lines": 70513,
     "total_classes": 268,
     "total_functions": 788,
     "avg_complexity": 5.58,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 209,
-        "lines": 70527,
+        "lines": 70513,
         "classes": 268,
         "functions": 788,
         "avg_complexity": 5.58
@@ -2166,7 +2166,7 @@
         "claude_skills.common.git_config.is_git_enabled"
       ],
       "exports": [],
-      "lines": 485
+      "lines": 473
     },
     {
       "name": "project",
@@ -3145,10 +3145,11 @@
         "typing.Any",
         "claude_skills.common.git_metadata.find_git_root",
         "claude_skills.common.git_metadata.create_commit_from_staging",
-        "claude_skills.common.git_config.is_git_enabled"
+        "claude_skills.common.git_config.is_git_enabled",
+        "claude_skills.common.git_config.get_git_setting"
       ],
       "exports": [],
-      "lines": 244
+      "lines": 242
     },
     {
       "name": "git_pr",
@@ -26376,7 +26377,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 421,
+          "line": 409,
           "call_type": "function_call"
         },
         {
@@ -27789,7 +27790,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 463,
+          "line": 451,
           "call_type": "function_call"
         },
         {
@@ -27964,7 +27965,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 470,
+          "line": 458,
           "call_type": "function_call"
         },
         {
@@ -28228,7 +28229,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 453,
+          "line": 441,
           "call_type": "function_call"
         },
         {
@@ -29228,7 +29229,7 @@
         {
           "name": "check_git_commit_readiness",
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-          "line": 133,
+          "line": 132,
           "call_type": "function_call"
         },
         {
@@ -29283,7 +29284,20 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "should_offer_commit",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+          "line": 34,
+          "call_type": "function_call"
+        },
+        {
+          "name": "check_git_commit_readiness",
+          "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
+          "line": 148,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "load_git_config",
@@ -29309,7 +29323,8 @@
           "line": 266,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 2
     },
     {
       "name": "find_git_root",
@@ -29352,7 +29367,7 @@
         {
           "name": "check_git_commit_readiness",
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-          "line": 127,
+          "line": 126,
           "call_type": "function_call"
         },
         {
@@ -30593,7 +30608,7 @@
         {
           "name": "stage_and_commit",
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-          "line": 202,
+          "line": 200,
           "call_type": "function_call"
         },
         {
@@ -67617,7 +67632,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 418,
+          "line": 406,
           "call_type": "function_call"
         },
         {
@@ -67845,7 +67860,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 440,
+          "line": 428,
           "call_type": "function_call"
         },
         {
@@ -67929,7 +67944,7 @@
         {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
-          "line": 448,
+          "line": 436,
           "call_type": "function_call"
         },
         {
@@ -68147,7 +68162,7 @@
         }
       ],
       "return_type": "Dict",
-      "complexity": 24,
+      "complexity": 23,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -68384,123 +68399,93 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
-          "file": "unknown",
-          "line": 390,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 390,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 391,
-          "call_type": "method_call"
-        },
-        {
-          "name": "debug",
-          "file": "unknown",
-          "line": 395,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
-          "file": "unknown",
-          "line": 399,
-          "call_type": "method_call"
-        },
-        {
           "name": "str",
           "file": "unknown",
-          "line": 401,
+          "line": 389,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 404,
+          "line": 392,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 405,
+          "line": 393,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 409,
+          "line": 397,
           "call_type": "function_call"
         },
         {
           "name": "get_next_task",
           "file": "unknown",
-          "line": 418,
+          "line": 406,
           "call_type": "function_call"
         },
         {
           "name": "should_prompt_completion",
           "file": "unknown",
-          "line": 421,
+          "line": 409,
           "call_type": "function_call"
         },
         {
           "name": "get_task_info",
           "file": "unknown",
-          "line": 440,
+          "line": 428,
           "call_type": "function_call"
         },
         {
           "name": "check_dependencies",
           "file": "unknown",
-          "line": 448,
+          "line": 436,
           "call_type": "function_call"
         },
         {
           "name": "check_doc_availability",
           "file": "unknown",
-          "line": 453,
+          "line": 441,
           "call_type": "function_call"
         },
         {
           "name": "check_doc_query_available",
           "file": "unknown",
-          "line": 463,
+          "line": 451,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 466,
+          "line": 454,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 467,
+          "line": 455,
           "call_type": "method_call"
         },
         {
           "name": "get_task_context_from_docs",
           "file": "unknown",
-          "line": 470,
+          "line": 458,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 475,
+          "line": 463,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 477,
+          "line": 465,
           "call_type": "function_call"
         }
       ],
@@ -80813,7 +80798,7 @@
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
       "line": 20,
       "language": "python",
-      "docstring": "Check if commit should be offered based on commit cadence preference.\n\nArgs:\n    spec_data: JSON spec file data\n    event_type: Type of completion event - \"task\" or \"phase\"\n\nReturns:\n    True if commit should be offered for this event type, False otherwise",
+      "docstring": "Check if commit should be offered based on commit cadence preference.\n\nArgs:\n    spec_data: JSON spec file data (unused, kept for backward compatibility)\n    event_type: Type of completion event - \"task\" or \"phase\"\n\nReturns:\n    True if commit should be offered for this event type, False otherwise",
       "parameters": [
         {
           "name": "spec_data",
@@ -80836,28 +80821,16 @@
         {
           "name": "check_git_commit_readiness",
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-          "line": 138,
+          "line": 137,
           "call_type": "function_call"
         }
       ],
       "calls": [
         {
-          "name": "get",
+          "name": "get_git_setting",
           "file": "unknown",
           "line": 34,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 34,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 35,
-          "call_type": "method_call"
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -80865,7 +80838,7 @@
     {
       "name": "has_uncommitted_changes",
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-      "line": 50,
+      "line": 49,
       "language": "python",
       "docstring": "Check if there are uncommitted changes in the git repository.\n\nArgs:\n    repo_root: Path to repository root directory\n\nReturns:\n    Tuple of (has_changes: bool, status_output: str)\n    - has_changes: True if there are uncommitted changes, False otherwise\n    - status_output: Output from git status --porcelain",
       "parameters": [
@@ -80885,7 +80858,7 @@
         {
           "name": "check_git_commit_readiness",
           "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-          "line": 143,
+          "line": 142,
           "call_type": "function_call"
         }
       ],
@@ -80893,31 +80866,31 @@
         {
           "name": "run",
           "file": "unknown",
-          "line": 62,
+          "line": 61,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 71,
+          "line": 70,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 74,
+          "line": 73,
           "call_type": "method_call"
         },
         {
           "name": "bool",
           "file": "unknown",
-          "line": 75,
+          "line": 74,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 80,
+          "line": 79,
           "call_type": "method_call"
         }
       ],
@@ -80926,7 +80899,7 @@
     {
       "name": "generate_commit_message",
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-      "line": 84,
+      "line": 83,
       "language": "python",
       "docstring": "Generate commit message from task metadata.\n\nArgs:\n    task_id: Task identifier (e.g., \"task-2-3\")\n    task_title: Human-readable task title\n\nReturns:\n    Formatted commit message: \"{task-id}: {task-title}\"",
       "parameters": [
@@ -80961,7 +80934,7 @@
     {
       "name": "check_git_commit_readiness",
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-      "line": 97,
+      "line": 96,
       "language": "python",
       "docstring": "Check if git commit workflow should be triggered.\n\nThis is the main entry point that orchestrates all git commit checks:\n1. Check if git integration is enabled\n2. Find repository root\n3. Check commit cadence preference\n4. Check for uncommitted changes\n\nArgs:\n    spec_data: JSON spec file data\n    spec_path: Path to spec file\n    event_type: Type of completion event - \"task\" or \"phase\"\n\nReturns:\n    Dict with commit readiness info if commit should be offered:\n    {\n        \"should_commit\": True,\n        \"repo_root\": Path to repository,\n        \"status_output\": Git status output,\n        \"commit_cadence\": Configured cadence\n    }\n\n    Returns None if commit should not be offered.",
       "parameters": [
@@ -80999,68 +80972,56 @@
         {
           "name": "find_git_root",
           "file": "unknown",
-          "line": 127,
+          "line": 126,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 129,
+          "line": 128,
           "call_type": "method_call"
         },
         {
           "name": "is_git_enabled",
           "file": "unknown",
-          "line": 133,
+          "line": 132,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 134,
+          "line": 133,
           "call_type": "method_call"
         },
         {
           "name": "should_offer_commit",
           "file": "unknown",
-          "line": 138,
+          "line": 137,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 139,
+          "line": 138,
           "call_type": "method_call"
         },
         {
           "name": "has_uncommitted_changes",
           "file": "unknown",
-          "line": 143,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 145,
+          "line": 144,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "get_git_setting",
           "file": "unknown",
-          "line": 149,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 149,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 150,
-          "call_type": "method_call"
+          "line": 148,
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -81068,7 +81029,7 @@
     {
       "name": "stage_and_commit",
       "file": "src/claude_skills/claude_skills/sdd_update/git_commit.py",
-      "line": 160,
+      "line": 158,
       "language": "python",
       "docstring": "Stage all changes and create a commit.\n\nThis function maintains backward compatibility by automatically staging all\nchanges (git add --all) and then creating a commit. It now uses the new\ncreate_commit_from_staging() workflow internally.\n\nArgs:\n    repo_root: Path to repository root directory\n    commit_message: Commit message to use\n\nReturns:\n    Tuple of (success: bool, commit_sha: Optional[str], error_message: str)\n    - success: True if commit succeeded, False otherwise\n    - commit_sha: SHA of created commit if successful, None otherwise\n    - error_message: Error message if failed, empty string if successful",
       "parameters": [
@@ -81101,67 +81062,67 @@
         {
           "name": "run",
           "file": "unknown",
-          "line": 182,
+          "line": 180,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 192,
+          "line": 190,
           "call_type": "method_call"
         },
         {
           "name": "get_staged_files",
           "file": "unknown",
-          "line": 202,
+          "line": 200,
           "call_type": "function_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 205,
+          "line": 203,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 209,
+          "line": 207,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 219,
+          "line": 217,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 223,
+          "line": 221,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 232,
+          "line": 230,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 236,
+          "line": 234,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 237,
+          "line": 235,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 243,
+          "line": 241,
           "call_type": "method_call"
         }
       ],
@@ -109756,7 +109717,8 @@
       "typing.Any",
       "claude_skills.common.git_metadata.find_git_root",
       "claude_skills.common.git_metadata.create_commit_from_staging",
-      "claude_skills.common.git_config.is_git_enabled"
+      "claude_skills.common.git_config.is_git_enabled",
+      "claude_skills.common.git_config.get_git_setting"
     ],
     "src/claude_skills/claude_skills/sdd_update/git_pr.py": [
       "__future__.annotations",
