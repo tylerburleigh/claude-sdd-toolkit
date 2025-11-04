@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:33:47
+**Generated:** 2025-11-04 07:38:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70616
+- **Total Lines:** 70406
 - **Total Classes:** 268
-- **Total Functions:** 790
+- **Total Functions:** 786
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -6714,37 +6714,6 @@ Returns:
 
 ---
 
-### `add_commit_metadata(spec, sha, message, task_id, timestamp) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:804`
-**Complexity:** 5
-
-**Description:**
-> Add a commit record to spec git metadata.
-
-Appends a new commit object to the metadata.git.commits array. Creates the
-git metadata section if it doesn't exist.
-
-Args:
-    spec: Specification dictionary to update
-    sha: Git commit SHA hash (full or abbreviated)
-    message: Commit message
-    task_id: Task ID associated with this commit (e.g., 'task-1-1')
-    timestamp: ISO 8601 timestamp string (optional, will use current time if not provided)
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `sha`: str
-- `message`: str
-- `task_id`: str
-- `timestamp`: Optional[str]
-
----
-
 ### `add_global_options(parser) -> None`
 
 **Language:** python
@@ -7762,7 +7731,7 @@ Returns:
 ### `check_dirty_tree(repo_root) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:59`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:56`
 **Complexity:** 9
 
 **Description:**
@@ -10034,7 +10003,7 @@ Example:
 ### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:453`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:450`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10422,33 +10391,6 @@ Returns:
 
 **Parameters:**
 - `project_path`: Path
-
----
-
-### `detect_git_drift(spec, repo_root) -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:635`
-⚠️ **Complexity:** 21 (High)
-
-**Description:**
-> Detect drift between spec metadata and actual git state.
-
-Compares the git metadata stored in the spec with the actual git repository state.
-Returns a list of warnings for any discrepancies found.
-
-This is a non-blocking check - warnings are informational and don't prevent operations.
-
-Args:
-    spec: Specification dictionary containing metadata.git section
-    repo_root: Path to git repository root
-
-Returns:
-    List of warning messages (empty list if no drift detected)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `repo_root`: Path
 
 ---
 
@@ -11471,7 +11413,7 @@ Example:
 ### `find_git_root(start_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:23`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:20`
 **Complexity:** 5
 
 **Description:**
@@ -12876,8 +12818,8 @@ Returns:
 ### `gather_pr_context(spec_id, spec_path, specs_dir, max_diff_size_kb) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:191`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:223`
+**Complexity:** 9
 
 **Description:**
 > Gather all context needed for AI-powered PR generation.
@@ -13585,31 +13527,33 @@ Returns:
 
 ---
 
-### `get_commit_history(spec_data) -> List[Dict[str, str]]`
+### `get_commit_history(repo_root, base_branch) -> List[Dict[str, str]]`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:81`
-**Complexity:** 1
+**Complexity:** 7
 
 **Description:**
-> Extract commit history from spec metadata.
+> Query git for commit history between base branch and current HEAD.
 
 Args:
-    spec_data: Loaded spec JSON data
+    repo_root: Path to repository root directory
+    base_branch: Base branch name (e.g., 'main', 'develop')
 
 Returns:
-    List of commit dictionaries with keys: sha, message, task_id, timestamp.
-    Returns empty list if no commits found.
+    List of commit dictionaries with keys: sha, message, timestamp.
+    Returns empty list if no commits found or on error.
 
 **Parameters:**
-- `spec_data`: Dict[str, Any]
+- `repo_root`: Path
+- `base_branch`: str
 
 ---
 
 ### `get_completed_tasks(spec_data) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:128`
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:160`
 **Complexity:** 4
 
 **Description:**
@@ -13962,7 +13906,7 @@ Returns:
 ### `get_journal_entries(spec_data, task_id, include_internal) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:95`
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:127`
 **Complexity:** 3
 
 **Description:**
@@ -14147,7 +14091,7 @@ This function attempts to get the parser by:
 ### `get_phase_summary(spec_data) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:154`
+**Defined in:** `src/claude_skills/claude_skills/sdd_pr/pr_context.py:186`
 **Complexity:** 3
 
 **Description:**
@@ -14458,7 +14402,7 @@ Example:
 ### `get_staged_files(repo_root) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:582`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:579`
 **Complexity:** 6
 
 **Description:**
@@ -15901,7 +15845,7 @@ Returns:
 ### `parse_git_status(repo_root) -> List[Dict[str, str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:123`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:120`
 **Complexity:** 10
 
 **Description:**
@@ -17591,7 +17535,7 @@ Example:
 ### `show_commit_preview(repo_root, printer) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:225`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:222`
 ⚠️ **Complexity:** 37 (High)
 
 **Description:**
@@ -17635,7 +17579,7 @@ Example:
 ### `show_commit_preview_and_wait(repo_root, spec_id, task_id, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:394`
+**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:391`
 **Complexity:** 3
 
 **Description:**
@@ -19686,33 +19630,6 @@ Returns:
 
 ---
 
-### `update_branch_metadata(spec, branch_name, base_branch) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:758`
-**Complexity:** 5
-
-**Description:**
-> Update git branch metadata in spec.
-
-Updates the metadata.git section with branch information. Creates the section
-if it doesn't exist. Preserves existing commits and PR metadata.
-
-Args:
-    spec: Specification dictionary to update
-    branch_name: Name of the feature branch (e.g., 'feat/user-auth-001')
-    base_branch: Name of the base branch (e.g., 'main', 'develop')
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `branch_name`: str
-- `base_branch`: str
-
----
-
 ### `update_metadata(spec_id, key, value, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -19827,34 +19744,6 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
-
----
-
-### `update_pr_metadata(spec, pr_url, pr_number, status) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/git_metadata.py:863`
-**Complexity:** 3
-
-**Description:**
-> Update pull request metadata in spec.
-
-Updates or creates the metadata.git.pr section with PR information.
-
-Args:
-    spec: Specification dictionary to update
-    pr_url: Full URL to the pull request
-    pr_number: Pull request number
-    status: PR status ('open', 'closed', 'merged') - defaults to 'open'
-
-Returns:
-    Updated spec dictionary (modified in-place, but also returned for convenience)
-
-**Parameters:**
-- `spec`: Dict[str, Any]
-- `pr_url`: str
-- `pr_number`: int
-- `status`: str
 
 ---
 

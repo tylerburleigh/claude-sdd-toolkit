@@ -383,7 +383,7 @@ def complete_spec(
             printer.info("Git integration enabled - initiating PR workflow...")
 
             # Generate PR body from spec metadata
-            pr_body = generate_pr_body(spec_data)
+            pr_body = generate_pr_body(spec_data, repo_root, base_branch)
             pr_title = spec_data.get('metadata', {}).get('title', spec_id)
 
             # Push branch to remote

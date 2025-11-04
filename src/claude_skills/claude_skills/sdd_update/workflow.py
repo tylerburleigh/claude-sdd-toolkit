@@ -26,7 +26,7 @@ from .git_commit import (
     generate_commit_message,
     stage_and_commit,
 )
-from claude_skills.common.git_metadata import add_commit_metadata, show_commit_preview_and_wait, find_git_root
+from claude_skills.common.git_metadata import show_commit_preview_and_wait, find_git_root
 from claude_skills.common.git_config import load_git_config
 
 
@@ -577,20 +577,11 @@ def complete_task_workflow(
             if success and commit_sha:
                 printer.success(f"Created commit: {commit_sha[:8]}")
 
-                # Add commit metadata to spec
-                add_commit_metadata(
-                    spec=updated_spec,
-                    sha=commit_sha,
-                    message=commit_message,
-                    task_id=task_id,
-                    timestamp=_get_timestamp()
-                )
-
-                # Save updated spec with commit metadata
+                # Save updated spec
                 try:
                     with open(spec_path, 'w') as f:
                         json.dump(updated_spec, f, indent=2)
-                    printer.info("Updated spec with commit metadata")
+                    printer.info("Saved updated spec")
                 except Exception as e:
                     printer.warning(f"Failed to save commit metadata to spec: {e}")
             elif error_msg:
