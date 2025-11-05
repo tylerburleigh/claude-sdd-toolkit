@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:24:09.668932Z",
+    "generated_at": "2025-11-05T21:26:17.248137Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 214,
-    "total_lines": 72992,
-    "total_classes": 277,
+    "total_lines": 73192,
+    "total_classes": 278,
     "total_functions": 794,
     "avg_complexity": 5.61,
     "max_complexity": 45,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 214,
-        "lines": 72992,
-        "classes": 277,
+        "lines": 73192,
+        "classes": 278,
         "functions": 794,
         "avg_complexity": 5.61
       }
@@ -2135,6 +2135,7 @@
       "language": "python",
       "docstring": "Fidelity Review Report Generation Module\n\nGenerates structured reports from fidelity review results.",
       "classes": [
+        "PrettyPrinter",
         "FidelityReport"
       ],
       "functions": [],
@@ -2145,10 +2146,11 @@
         "typing.List",
         "pathlib.Path",
         "datetime.datetime",
-        "json"
+        "json",
+        "sys"
       ],
       "exports": [],
-      "lines": 201
+      "lines": 401
     },
     {
       "name": "review",
@@ -7662,6 +7664,15 @@
           ]
         },
         {
+          "instantiator": "print_console",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+          "line": 299,
+          "context": [
+            "FidelityReport",
+            "print_console"
+          ]
+        },
+        {
           "instantiator": "main",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 241,
@@ -8267,7 +8278,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 82
+      "instantiation_count": 83
     },
     {
       "name": "EnhancedError",
@@ -9694,9 +9705,746 @@
       "instantiation_count": 5
     },
     {
+      "name": "PrettyPrinter",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "line": 14,
+      "language": "python",
+      "docstring": "Pretty printer for console output with optional color support.\n\nProvides formatted console output with ANSI color codes for\nbetter readability. Automatically detects terminal capabilities\nand disables colors when not supported.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_supports_color",
+        "color",
+        "bold",
+        "red",
+        "green",
+        "yellow",
+        "blue",
+        "magenta",
+        "cyan",
+        "severity_color"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+          "line": 226,
+          "context": [
+            "main"
+          ]
+        },
+        {
+          "instantiator": "show_commit_preview",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 257,
+          "context": [
+            "show_commit_preview"
+          ]
+        },
+        {
+          "instantiator": "show_commit_preview_and_wait",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 432,
+          "context": [
+            "show_commit_preview_and_wait"
+          ]
+        },
+        {
+          "instantiator": "create_commit_from_staging",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 489,
+          "context": [
+            "create_commit_from_staging"
+          ]
+        },
+        {
+          "instantiator": "run_consultation",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 467,
+          "context": [
+            "run_consultation"
+          ]
+        },
+        {
+          "instantiator": "print_routing_matrix",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 544,
+          "context": [
+            "print_routing_matrix"
+          ]
+        },
+        {
+          "instantiator": "consult_with_auto_routing",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 584,
+          "context": [
+            "consult_with_auto_routing"
+          ]
+        },
+        {
+          "instantiator": "format_synthesis_output",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 820,
+          "context": [
+            "format_synthesis_output"
+          ]
+        },
+        {
+          "instantiator": "consult_multi_agent",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 927,
+          "context": [
+            "consult_multi_agent"
+          ]
+        },
+        {
+          "instantiator": "run_pytest",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_runner.py",
+          "line": 189,
+          "context": [
+            "run_pytest"
+          ]
+        },
+        {
+          "instantiator": "list_presets",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_runner.py",
+          "line": 239,
+          "context": [
+            "list_presets"
+          ]
+        },
+        {
+          "instantiator": "print_discovery_report",
+          "file": "src/claude_skills/claude_skills/run_tests/test_discovery.py",
+          "line": 328,
+          "context": [
+            "print_discovery_report"
+          ]
+        },
+        {
+          "instantiator": "print_console",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+          "line": 299,
+          "context": [
+            "FidelityReport",
+            "print_console"
+          ]
+        },
+        {
+          "instantiator": "main",
+          "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
+          "line": 241,
+          "context": [
+            "main"
+          ]
+        },
+        {
+          "instantiator": "mark_task_journaled",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 48,
+          "context": [
+            "mark_task_journaled"
+          ]
+        },
+        {
+          "instantiator": "add_journal_entry",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 149,
+          "context": [
+            "add_journal_entry"
+          ]
+        },
+        {
+          "instantiator": "update_metadata",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 233,
+          "context": [
+            "update_metadata"
+          ]
+        },
+        {
+          "instantiator": "add_revision_entry",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 306,
+          "context": [
+            "add_revision_entry"
+          ]
+        },
+        {
+          "instantiator": "bulk_journal_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 415,
+          "context": [
+            "bulk_journal_tasks"
+          ]
+        },
+        {
+          "instantiator": "sync_metadata_from_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 562,
+          "context": [
+            "sync_metadata_from_state"
+          ]
+        },
+        {
+          "instantiator": "move_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 48,
+          "context": [
+            "move_spec"
+          ]
+        },
+        {
+          "instantiator": "activate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 116,
+          "context": [
+            "activate_spec"
+          ]
+        },
+        {
+          "instantiator": "complete_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 268,
+          "context": [
+            "complete_spec"
+          ]
+        },
+        {
+          "instantiator": "list_specs",
+          "file": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+          "line": 32,
+          "context": [
+            "list_specs"
+          ]
+        },
+        {
+          "instantiator": "update_task_status",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 80,
+          "context": [
+            "update_task_status"
+          ]
+        },
+        {
+          "instantiator": "mark_task_blocked",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 327,
+          "context": [
+            "mark_task_blocked"
+          ]
+        },
+        {
+          "instantiator": "unblock_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 417,
+          "context": [
+            "unblock_task"
+          ]
+        },
+        {
+          "instantiator": "validate_timestamp_pair",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 35,
+          "context": [
+            "validate_timestamp_pair"
+          ]
+        },
+        {
+          "instantiator": "calculate_time_from_timestamps",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 78,
+          "context": [
+            "calculate_time_from_timestamps"
+          ]
+        },
+        {
+          "instantiator": "track_time",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 134,
+          "context": [
+            "track_time"
+          ]
+        },
+        {
+          "instantiator": "generate_time_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 197,
+          "context": [
+            "generate_time_report"
+          ]
+        },
+        {
+          "instantiator": "aggregate_task_times",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 289,
+          "context": [
+            "aggregate_task_times"
+          ]
+        },
+        {
+          "instantiator": "validate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 42,
+          "context": [
+            "validate_spec"
+          ]
+        },
+        {
+          "instantiator": "get_status_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 91,
+          "context": [
+            "get_status_report"
+          ]
+        },
+        {
+          "instantiator": "audit_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 188,
+          "context": [
+            "audit_spec"
+          ]
+        },
+        {
+          "instantiator": "reconcile_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 270,
+          "context": [
+            "reconcile_state"
+          ]
+        },
+        {
+          "instantiator": "detect_unjournaled_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 366,
+          "context": [
+            "detect_unjournaled_tasks"
+          ]
+        },
+        {
+          "instantiator": "add_verification_result",
+          "file": "src/claude_skills/claude_skills/sdd_update/verification.py",
+          "line": 48,
+          "context": [
+            "add_verification_result"
+          ]
+        },
+        {
+          "instantiator": "complete_task_workflow",
+          "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+          "line": 349,
+          "context": [
+            "complete_task_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_no_changes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 402,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_no_changes"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_staged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 419,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_staged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_unstaged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 435,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_unstaged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_both_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 450,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_both_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_added_files",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 465,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_added_files"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_staged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 480,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_staged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_unstaged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 495,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_unstaged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_untracked",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 510,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_untracked"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_renamed",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 525,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_renamed"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_mixed_statuses",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 544,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_mixed_statuses"
+          ]
+        },
+        {
+          "instantiator": "test_printer_default_initialization",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 17,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_default_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_no_color",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 26,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_no_color"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_verbose",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 32,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_verbose"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_quiet",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 38,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_quiet"
+          ]
+        },
+        {
+          "instantiator": "test_printer_success_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 48,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_success_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_error_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 56,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_error_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_warning_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 64,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_warning_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_info_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 72,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_info_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_action_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 80,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_action_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_result_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 88,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_result_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_detail_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 96,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_detail_message"
+          ]
+        },
+        {
+          "instantiator": "test_colored_output_contains_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 108,
+          "context": [
+            "TestPrettyPrinterColorMode",
+            "test_colored_output_contains_ansi_codes"
+          ]
+        },
+        {
+          "instantiator": "test_no_color_output_lacks_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 120,
+          "context": [
+            "TestPrettyPrinterColorMode",
+            "test_no_color_output_lacks_ansi_codes"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_minimal_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 133,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_quiet_mode_minimal_output"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_shows_errors",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 146,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_quiet_mode_shows_errors"
+          ]
+        },
+        {
+          "instantiator": "test_verbose_mode_shows_details",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 156,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_verbose_mode_shows_details"
+          ]
+        },
+        {
+          "instantiator": "test_result_formatting_aligns_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 170,
+          "context": [
+            "TestPrettyPrinterFormatting",
+            "test_result_formatting_aligns_output"
+          ]
+        },
+        {
+          "instantiator": "test_detail_with_indentation",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 187,
+          "context": [
+            "TestPrettyPrinterFormatting",
+            "test_detail_with_indentation"
+          ]
+        },
+        {
+          "instantiator": "test_printer_combined_output_flow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 202,
+          "context": [
+            "TestPrettyPrinterIntegration",
+            "test_printer_combined_output_flow"
+          ]
+        },
+        {
+          "instantiator": "test_printer_error_warning_flow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 219,
+          "context": [
+            "TestPrettyPrinterIntegration",
+            "test_printer_error_warning_flow"
+          ]
+        },
+        {
+          "instantiator": "test_started_at_resets_on_each_in_progress_transition",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 70,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_started_at_resets_on_each_in_progress_transition"
+          ]
+        },
+        {
+          "instantiator": "test_started_at_set_on_first_in_progress",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 180,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_started_at_set_on_first_in_progress"
+          ]
+        },
+        {
+          "instantiator": "test_completed_at_set_on_completion",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 245,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_completed_at_set_on_completion"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_none_input",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 183,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_none_input"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_invalid_format",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 193,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_invalid_format"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_negative_duration",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 203,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_negative_duration"
+          ]
+        },
+        {
+          "instantiator": "test_validate_timestamp_pair_with_printer",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 283,
+          "context": [
+            "TestValidateTimestampPair",
+            "test_validate_timestamp_pair_with_printer"
+          ]
+        },
+        {
+          "instantiator": "test_aggregate_task_times_with_printer",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 518,
+          "context": [
+            "TestAggregateTaskTimes",
+            "test_aggregate_task_times_with_printer"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_auto_calculates_time",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 77,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_auto_calculates_time"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_manual_hours_not_overridden",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 160,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_manual_hours_not_overridden"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_no_started_at_no_calculation",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 226,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_no_started_at_no_calculation"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_journals_parent_nodes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 306,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_journals_parent_nodes"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_journals_multiple_parent_levels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 404,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_journals_multiple_parent_levels"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_does_not_journal_already_completed_parents",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 521,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_does_not_journal_already_completed_parents"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 83
+    },
+    {
       "name": "FidelityReport",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-      "line": 13,
+      "line": 130,
       "language": "python",
       "docstring": "Generate structured reports from fidelity review results.\n\nThis class will be implemented in Phase 4 (Report Generation).",
       "bases": [],
@@ -9706,6 +10454,7 @@
         "_convert_to_dict",
         "generate_markdown",
         "generate_json",
+        "print_console",
         "save_to_file",
         "calculate_fidelity_score",
         "summarize_deviations"
@@ -111215,7 +111964,8 @@
       "typing.List",
       "pathlib.Path",
       "datetime.datetime",
-      "json"
+      "json",
+      "sys"
     ],
     "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
       "pathlib.Path",

@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:24:09
+**Generated:** 2025-11-05 16:26:17
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72992
-- **Total Classes:** 277
+- **Total Lines:** 73192
+- **Total Classes:** 278
 - **Total Functions:** 794
 - **Avg Complexity:** 5.61
 - **Max Complexity:** 45
@@ -824,7 +824,7 @@ Example:
 ### `FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:13`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:130`
 
 **Description:**
 > Generate structured reports from fidelity review results.
@@ -837,6 +837,7 @@ This class will be implemented in Phase 4 (Report Generation).
 - `_convert_to_dict()`
 - `generate_markdown()`
 - `generate_json()`
+- `print_console()`
 - `save_to_file()`
 - `calculate_fidelity_score()`
 - `summarize_deviations()`
@@ -1735,6 +1736,33 @@ parsing across multiple languages.
 - `result()`
 - `blank()`
 - `item()`
+
+---
+
+### `PrettyPrinter`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:14`
+
+**Description:**
+> Pretty printer for console output with optional color support.
+
+Provides formatted console output with ANSI color codes for
+better readability. Automatically detects terminal capabilities
+and disables colors when not supported.
+
+**Methods:**
+- `__init__()`
+- `_supports_color()`
+- `color()`
+- `bold()`
+- `red()`
+- `green()`
+- `yellow()`
+- `blue()`
+- `magenta()`
+- `cyan()`
+- `severity_color()`
 
 ---
 
@@ -21894,6 +21922,7 @@ Returns:
 - `datetime.datetime`
 - `json`
 - `pathlib.Path`
+- `sys`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`

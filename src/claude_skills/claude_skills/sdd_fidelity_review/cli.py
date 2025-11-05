@@ -270,7 +270,7 @@ def _handle_list_review_tools(args: argparse.Namespace) -> int:
             if len(available_tools) == 0:
                 print("No AI consultation tools found.")
                 print("Install at least one: gemini, codex, or cursor-agent")
-            elif args.verbose:
+            elif hasattr(args, 'verbose') and args.verbose:
                 print("\nUsage:")
                 print("  Use --ai-tools to specify which tools to consult")
                 print("  Example: sdd fidelity-review SPEC_ID --ai-tools gemini codex")
@@ -279,25 +279,18 @@ def _handle_list_review_tools(args: argparse.Namespace) -> int:
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             import traceback
             traceback.print_exc()
         return 1
 
 
-def register_commands(subparsers: argparse._SubParsersAction) -> None:
-    """
-    Register fidelity review commands with the main CLI parser.
-
-    This function will be called by the main SDD CLI to register
-    fidelity review commands as subcommands.
-
-    Args:
-        subparsers: The subparser object from the main argument parser
-    """
-    # Add 'fidelity-review' subcommand
+def register_fidelity_review_command(subparsers: argparse._SubParsersAction, parent_parser: Optional[argparse.ArgumentParser] = None) -> None:
+    """Register the fidelity-review command."""
+    parents = [parent_parser] if parent_parser is not None else []
     parser = subparsers.add_parser(
         "fidelity-review",
+        parents=parents,
         help="Review implementation fidelity against SDD specifications",
         description="Compare implementation against specification and identify deviations",
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -385,19 +378,18 @@ def register_commands(subparsers: argparse._SubParsersAction) -> None:
         default="text",
         help="Output format (default: text)"
     )
-    parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Show detailed output"
-    )
+    # Note: --verbose inherited from parent_parser (global option)
 
     # Set handler function
     parser.set_defaults(func=_handle_fidelity_review)
 
-    # Add 'list-review-tools' subcommand
+
+def register_list_review_tools_command(subparsers: argparse._SubParsersAction, parent_parser: Optional[argparse.ArgumentParser] = None) -> None:
+    """Register the list-review-tools command."""
+    parents = [parent_parser] if parent_parser is not None else []
     list_tools_parser = subparsers.add_parser(
         "list-review-tools",
+        parents=parents,
         help="List available AI consultation tools",
         description="Show which AI tools (gemini, codex, cursor-agent) are available for fidelity review",
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -410,15 +402,32 @@ def register_commands(subparsers: argparse._SubParsersAction) -> None:
         default="text",
         help="Output format (default: text)"
     )
-    list_tools_parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Show detailed output including usage tips"
-    )
+    # Note: --verbose inherited from parent_parser (global option)
 
     # Set handler function
     list_tools_parser.set_defaults(func=_handle_list_review_tools)
+
+
+def register_commands(subparsers: argparse._SubParsersAction, parent_parser: Optional[argparse.ArgumentParser] = None) -> None:
+    """
+    Register all fidelity review commands with the main CLI parser.
+
+    This function will be called by the main SDD CLI to register
+    fidelity review commands as subcommands.
+
+    Args:
+        subparsers: The subparser object from the main argument parser
+        parent_parser: Parent parser with global options to inherit (optional)
+
+    Note:
+        Currently only registers fidelity-review command. The list-review-tools
+        command can be accessed via the standalone CLI until argparse conflict
+        is resolved:
+            python -m claude_skills.sdd_fidelity_review.cli list-review-tools
+    """
+    register_fidelity_review_command(subparsers, parent_parser)
+    # TODO: Re-enable after resolving argparse conflict with parent_parser
+    # register_list_review_tools_command(subparsers, parent_parser)
 
 
 def main() -> int:
