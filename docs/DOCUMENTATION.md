@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:49:14
+**Generated:** 2025-11-05 09:54:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70923
+- **Total Lines:** 71032
 - **Total Classes:** 267
-- **Total Functions:** 793
-- **Avg Complexity:** 5.59
+- **Total Functions:** 794
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6547,24 +6547,6 @@ Returns:
 
 ---
 
-### `_run_tool_capture(tool, prompt) -> Tuple[bool, str, float]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:607`
-**Complexity:** 1
-
-**Description:**
-> Run tool and capture output (internal helper for parallel execution).
-
-Returns:
-    Tuple of (success, output, duration)
-
-**Parameters:**
-- `tool`: str
-- `prompt`: str
-
----
-
 ### `_serialize_fix_action(action) -> Dict[str, Any]`
 
 **Language:** python
@@ -9928,7 +9910,7 @@ Returns:
 ### `compose_ai_context_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:323`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:324`
 **Complexity:** 1
 
 **Description:**
@@ -9952,7 +9934,7 @@ Returns:
 ### `compose_architecture_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:271`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:272`
 **Complexity:** 1
 
 **Description:**
@@ -9998,8 +9980,8 @@ Returns:
 ### `consult_multi_agent(doc_type, prompt, pair, dry_run, verbose, printer) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:453`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:454`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Consult multiple AI tools in parallel and synthesize responses.
@@ -12011,7 +11993,7 @@ Returns:
 ### `format_ai_context_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:190`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:191`
 **Complexity:** 2
 
 **Description:**
@@ -12035,7 +12017,7 @@ Returns:
 ### `format_architecture_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:104`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:105`
 **Complexity:** 3
 
 **Description:**
@@ -13130,7 +13112,7 @@ Raises:
 ### `generate_ai_context_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:661`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:657`
 **Complexity:** 4
 
 **Description:**
@@ -13164,7 +13146,7 @@ Returns:
 ### `generate_architecture_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:620`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:616`
 **Complexity:** 4
 
 **Description:**
@@ -13725,11 +13707,13 @@ Returns:
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:49`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:63`
+**Complexity:** 1
 
 **Description:**
 > Check which AI CLI tools are available.
+
+Delegates to shared utility function for consistency across skills.
 
 Returns:
     List of available tool names
@@ -13753,7 +13737,7 @@ Returns:
 ### `get_best_tool(doc_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:74`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:75`
 **Complexity:** 6
 
 **Description:**
@@ -14294,6 +14278,50 @@ Returns:
 
 ---
 
+### `get_multi_agent_pairs(skill_name) -> Dict[str, List[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:252`
+**Complexity:** 4
+
+**Description:**
+> Get multi-agent pair configurations for consensus-based consultation.
+
+Loads agent pair definitions from the skill's config.yaml file under the
+'consensus.pairs' section. Each pair defines which agents should be consulted
+together for multi-agent analysis.
+
+Args:
+    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+Returns:
+    Dict mapping pair name to list of agent names. For example:
+    {
+        "default": ["gemini", "cursor-agent"],
+        "code-focus": ["codex", "gemini"],
+        "discovery-focus": ["cursor-agent", "gemini"]
+    }
+
+Examples:
+    >>> pairs = get_multi_agent_pairs('run-tests')
+    >>> pairs['default']
+    ['cursor-agent', 'gemini']
+
+    >>> pairs = get_multi_agent_pairs('nonexistent-skill')
+    >>> pairs['default']  # Falls back to sensible defaults
+    ['gemini', 'cursor-agent']
+
+Notes:
+    - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
+      returns sensible default pairs
+    - Each pair should contain exactly 2 agents for optimal consensus analysis
+    - Agent names must correspond to tools defined in the 'tools' section
+
+**Parameters:**
+- `skill_name`: str
+
+---
+
 ### `get_next_task(spec_data) -> Optional[Tuple[str, Dict]]`
 
 **Language:** python
@@ -14515,6 +14543,54 @@ Returns:
 **Parameters:**
 - `failure_type`: str
 - `available_tools`: Optional[List[str]]
+
+---
+
+### `get_routing_config(skill_name) -> Dict[str, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:304`
+**Complexity:** 4
+
+**Description:**
+> Get routing configuration that maps failure types to multi-agent pairs.
+
+Loads auto-trigger routing rules from the skill's config.yaml file under the
+'consensus.auto_trigger' section. These rules determine which agent pair should
+be used for different types of test failures or analysis scenarios.
+
+Args:
+    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+Returns:
+    Dict mapping failure/scenario type to pair name. For example:
+    {
+        "default": "default",
+        "fixture": "code-focus",
+        "exception": "code-focus",
+        "timeout": "default",
+        "flaky": "default",
+        "multi-file": "discovery-focus"
+    }
+
+Examples:
+    >>> routing = get_routing_config('run-tests')
+    >>> routing['fixture']
+    'code-focus'
+
+    >>> routing = get_routing_config('nonexistent-skill')
+    >>> routing['default']  # Falls back to sensible defaults
+    'default'
+
+Notes:
+    - If config.yaml is missing or doesn't have 'consensus.auto_trigger',
+      returns sensible default routing rules
+    - The pair names in routing values should correspond to keys in the
+      pairs configuration from get_multi_agent_pairs()
+    - The 'default' key is used as fallback when no specific rule matches
+
+**Parameters:**
+- `skill_name`: str
 
 ---
 
@@ -17147,7 +17223,7 @@ Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-col
 ### `run_consultation(tool, prompt, dry_run, verbose, printer) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:374`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:375`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -20645,6 +20721,9 @@ Returns:
 
 ### `src/claude_skills/claude_skills/code_doc/ai_consultation.py`
 
+- `claude_skills.common.ai_tools.build_tool_command`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
 - `concurrent.futures.ThreadPoolExecutor`
 - `concurrent.futures.as_completed`
 - `pathlib.Path`

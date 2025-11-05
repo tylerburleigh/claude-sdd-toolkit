@@ -15,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed, wait
 
 from claude_skills.sdd_plan_review.prompts import generate_review_prompt
 from claude_skills.sdd_plan_review.synthesis import parse_response, build_consensus
+from claude_skills.common.ai_tools import check_tool_available
 
 
 # Available AI CLI tools
@@ -37,44 +38,6 @@ AVAILABLE_TOOLS = {
 }
 
 
-def check_tool_available(tool_name: str) -> bool:
-    """
-    Check if an AI CLI tool is available.
-
-    Args:
-        tool_name: Name of the tool (gemini, codex, cursor-agent)
-
-    Returns:
-        True if tool is available, False otherwise
-    """
-    tool_config = AVAILABLE_TOOLS.get(tool_name)
-    if not tool_config:
-        return False
-
-    try:
-        # Check if command exists
-        result = subprocess.run(
-            ["which", tool_config["command"]],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        if result.returncode != 0:
-            return False
-
-        # Quick version check
-        result = subprocess.run(
-            [tool_config["command"], tool_config["version_flag"]],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        return result.returncode == 0
-
-    except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
-        return False
-
-
 def detect_available_tools() -> List[str]:
     """
     Detect which AI CLI tools are installed and available.
@@ -84,7 +47,7 @@ def detect_available_tools() -> List[str]:
     """
     available = []
     for tool_name in AVAILABLE_TOOLS.keys():
-        if check_tool_available(tool_name):
+        if check_tool_available(tool_name, check_version=True):
             available.append(tool_name)
     return available
 

@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T13:49:14.062332Z",
+    "generated_at": "2025-11-05T14:54:35.334668Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 210,
-    "total_lines": 70923,
+    "total_lines": 71032,
     "total_classes": 267,
-    "total_functions": 793,
-    "avg_complexity": 5.59,
+    "total_functions": 794,
+    "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 210,
-        "lines": 70923,
+        "lines": 71032,
         "classes": 267,
-        "functions": 793,
-        "avg_complexity": 5.59
+        "functions": 794,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -278,7 +278,7 @@
       "name": "ai_consultation",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
       "language": "python",
-      "docstring": "AI Consultation for Documentation Generation\n\nShells out to external AI CLI tools (gemini, codex, cursor-agent) to generate\ncontextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.\n\nBased on run-tests/consultation.py pattern.",
+      "docstring": "AI Consultation for Documentation Generation\n\nShells out to external AI CLI tools (gemini, codex, cursor-agent) to generate\ncontextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.\n\nUses shared AI tool utilities from claude_skills.common.ai_tools:\n- detect_available_tools(): Check which AI tools are installed\n- build_tool_command(): Build command arrays for tool execution\n- execute_tools_parallel(): Run multiple tools concurrently\n\nThis module provides documentation-specific functionality:\n- Prompt formatting for architecture and AI context research\n- Document composition with proper formatting\n- High-level orchestration for documentation generation workflows",
       "classes": [],
       "functions": [
         "get_available_tools",
@@ -289,7 +289,6 @@
         "compose_ai_context_doc",
         "run_consultation",
         "consult_multi_agent",
-        "_run_tool_capture",
         "generate_architecture_docs",
         "generate_ai_context_docs"
       ],
@@ -303,10 +302,13 @@
         "typing.Tuple",
         "concurrent.futures.ThreadPoolExecutor",
         "concurrent.futures.as_completed",
-        "time"
+        "time",
+        "claude_skills.common.ai_tools.detect_available_tools",
+        "claude_skills.common.ai_tools.build_tool_command",
+        "claude_skills.common.ai_tools.execute_tools_parallel"
       ],
       "exports": [],
-      "lines": 699
+      "lines": 695
     },
     {
       "name": "ast_analysis",
@@ -852,7 +854,9 @@
         "get_agent_command",
         "get_timeout",
         "get_tool_config",
-        "is_tool_enabled"
+        "is_tool_enabled",
+        "get_multi_agent_pairs",
+        "get_routing_config"
       ],
       "imports": [
         "yaml",
@@ -862,7 +866,7 @@
         "typing.Optional"
       ],
       "exports": [],
-      "lines": 249
+      "lines": 362
     },
     {
       "name": "ai_tools",
@@ -20669,12 +20673,12 @@
     {
       "name": "get_available_tools",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 49,
+      "line": 63,
       "language": "python",
-      "docstring": "Check which AI CLI tools are available.\n\nReturns:\n    List of available tool names",
+      "docstring": "Check which AI CLI tools are available.\n\nDelegates to shared utility function for consistency across skills.\n\nReturns:\n    List of available tool names",
       "parameters": [],
       "return_type": "List[str]",
-      "complexity": 5,
+      "complexity": 1,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -20683,13 +20687,13 @@
         {
           "name": "get_best_tool",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 86,
+          "line": 87,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 483,
+          "line": 484,
           "call_type": "function_call"
         },
         {
@@ -20743,22 +20747,10 @@
       ],
       "calls": [
         {
-          "name": "items",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 58,
-          "call_type": "method_call"
-        },
-        {
-          "name": "run",
-          "file": "unknown",
-          "line": 61,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 67,
-          "call_type": "method_call"
+          "line": 72,
+          "call_type": "function_call"
         }
       ],
       "call_count": 10
@@ -20766,7 +20758,7 @@
     {
       "name": "get_best_tool",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 74,
+      "line": 75,
       "language": "python",
       "docstring": "Get the best available tool for a documentation type.\n\nArgs:\n    doc_type: Type of documentation (architecture, ai_context, developer_guide)\n    available_tools: List of available tools (auto-detected if None)\n\nReturns:\n    Tool name or None if no tools available",
       "parameters": [
@@ -20791,13 +20783,13 @@
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 653,
+          "line": 649,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 694,
+          "line": 690,
           "call_type": "function_call"
         },
         {
@@ -20835,7 +20827,7 @@
         {
           "name": "get_available_tools",
           "file": "unknown",
-          "line": 86,
+          "line": 87,
           "call_type": "function_call"
         }
       ],
@@ -20844,7 +20836,7 @@
     {
       "name": "format_architecture_research_prompt",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 104,
+      "line": 105,
       "language": "python",
       "docstring": "Format prompt for architecture research (read-only analysis).\n\nArgs:\n    context_summary: Structured codebase context summary\n    key_files: List of key file paths to read\n    project_root: Project root directory\n\nReturns:\n    Formatted prompt string asking for research findings only",
       "parameters": [
@@ -20874,7 +20866,7 @@
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 646,
+          "line": 642,
           "call_type": "function_call"
         },
         {
@@ -20912,12 +20904,6 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 122,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
           "line": 123,
           "call_type": "method_call"
         },
@@ -20948,7 +20934,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 130,
+          "line": 128,
           "call_type": "method_call"
         },
         {
@@ -20960,7 +20946,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 134,
+          "line": 132,
           "call_type": "method_call"
         },
         {
@@ -20976,13 +20962,13 @@
           "call_type": "method_call"
         },
         {
-          "name": "exists",
+          "name": "append",
           "file": "unknown",
-          "line": 139,
+          "line": 137,
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "exists",
           "file": "unknown",
           "line": 140,
           "call_type": "method_call"
@@ -20996,7 +20982,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 144,
+          "line": 142,
           "call_type": "method_call"
         },
         {
@@ -21246,9 +21232,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 187,
+          "line": 188,
           "call_type": "method_call"
         }
       ],
@@ -21257,7 +21249,7 @@
     {
       "name": "format_ai_context_research_prompt",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 190,
+      "line": 191,
       "language": "python",
       "docstring": "Format prompt for AI context research (read-only analysis).\n\nArgs:\n    context_summary: Structured codebase context summary\n    key_files: List of key file paths\n    project_root: Project root directory\n\nReturns:\n    Formatted prompt string asking for research findings only",
       "parameters": [
@@ -21287,7 +21279,7 @@
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 687,
+          "line": 683,
           "call_type": "function_call"
         },
         {
@@ -21316,12 +21308,6 @@
         }
       ],
       "calls": [
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 208,
-          "call_type": "method_call"
-        },
         {
           "name": "append",
           "file": "unknown",
@@ -21355,7 +21341,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 216,
+          "line": 214,
           "call_type": "method_call"
         },
         {
@@ -21367,13 +21353,13 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 219,
+          "line": 218,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 221,
+          "line": 220,
           "call_type": "method_call"
         },
         {
@@ -21385,7 +21371,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 225,
+          "line": 223,
           "call_type": "method_call"
         },
         {
@@ -21635,9 +21621,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 267,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 268,
+          "line": 269,
           "call_type": "method_call"
         }
       ],
@@ -21646,7 +21638,7 @@
     {
       "name": "compose_architecture_doc",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 271,
+      "line": 272,
       "language": "python",
       "docstring": "Compose ARCHITECTURE.md from research findings.\n\nArgs:\n    research_findings: Raw research output from AI consultation\n    project_name: Project name for header\n    version: Project version\n\nReturns:\n    Formatted ARCHITECTURE.md content",
       "parameters": [
@@ -21677,12 +21669,6 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 292,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
           "line": 293,
           "call_type": "method_call"
         },
@@ -21699,19 +21685,19 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 296,
+          "call_type": "method_call"
+        },
+        {
           "name": "strftime",
           "file": "unknown",
-          "line": 295,
+          "line": 296,
           "call_type": "method_call"
         },
         {
           "name": "now",
-          "file": "unknown",
-          "line": 295,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 296,
           "call_type": "method_call"
@@ -21731,7 +21717,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 301,
+          "line": 299,
           "call_type": "method_call"
         },
         {
@@ -21773,7 +21759,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 310,
+          "line": 308,
           "call_type": "method_call"
         },
         {
@@ -21797,7 +21783,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 316,
+          "line": 314,
           "call_type": "method_call"
         },
         {
@@ -21813,9 +21799,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 319,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 320,
+          "line": 321,
           "call_type": "method_call"
         }
       ]
@@ -21823,7 +21815,7 @@
     {
       "name": "compose_ai_context_doc",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 323,
+      "line": 324,
       "language": "python",
       "docstring": "Compose AI_CONTEXT.md from research findings.\n\nArgs:\n    research_findings: Raw research output from AI consultation\n    project_name: Project name for header\n    version: Project version\n\nReturns:\n    Formatted AI_CONTEXT.md content",
       "parameters": [
@@ -21854,12 +21846,6 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 344,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
           "line": 345,
           "call_type": "method_call"
         },
@@ -21876,19 +21862,19 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 348,
+          "call_type": "method_call"
+        },
+        {
           "name": "strftime",
           "file": "unknown",
-          "line": 347,
+          "line": 348,
           "call_type": "method_call"
         },
         {
           "name": "now",
-          "file": "unknown",
-          "line": 347,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 348,
           "call_type": "method_call"
@@ -21908,7 +21894,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 353,
+          "line": 351,
           "call_type": "method_call"
         },
         {
@@ -21956,7 +21942,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 363,
+          "line": 361,
           "call_type": "method_call"
         },
         {
@@ -21968,7 +21954,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 367,
+          "line": 365,
           "call_type": "method_call"
         },
         {
@@ -21984,9 +21970,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 370,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 371,
+          "line": 372,
           "call_type": "method_call"
         }
       ]
@@ -21994,7 +21986,7 @@
     {
       "name": "run_consultation",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 374,
+      "line": 375,
       "language": "python",
       "docstring": "Run consultation with an AI tool.\n\nArgs:\n    tool: Tool name (cursor-agent, gemini, codex)\n    prompt: Formatted prompt\n    dry_run: If True, show command without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output (falls back to print if None)\n\nReturns:\n    Tuple of (success: bool, output: str)",
       "parameters": [
@@ -22034,25 +22026,19 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 494,
-          "call_type": "function_call"
-        },
-        {
-          "name": "_run_tool_capture",
-          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 615,
+          "line": 495,
           "call_type": "function_call"
         },
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 657,
+          "line": 653,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 698,
+          "line": 694,
           "call_type": "function_call"
         },
         {
@@ -22094,51 +22080,45 @@
       ],
       "calls": [
         {
-          "name": "copy",
+          "name": "build_tool_command",
           "file": "unknown",
           "line": 397,
-          "call_type": "method_call"
+          "call_type": "function_call"
         },
         {
-          "name": "append",
+          "name": "str",
           "file": "unknown",
-          "line": 398,
-          "call_type": "method_call"
+          "line": 399,
+          "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 401,
+          "line": 402,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 401,
+          "line": 402,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 403,
+          "line": 404,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 405,
+          "line": 406,
           "call_type": "function_call"
         },
         {
           "name": "flush",
           "file": "unknown",
-          "line": 406,
-          "call_type": "method_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 422,
+          "line": 407,
           "call_type": "method_call"
         },
         {
@@ -22148,16 +22128,16 @@
           "call_type": "method_call"
         },
         {
-          "name": "info",
+          "name": "detail",
           "file": "unknown",
-          "line": 425,
+          "line": 424,
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "info",
           "file": "unknown",
-          "line": 427,
-          "call_type": "function_call"
+          "line": 426,
+          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -22168,28 +22148,34 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 430,
+          "line": 429,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 431,
           "call_type": "function_call"
         },
         {
           "name": "flush",
           "file": "unknown",
-          "line": 431,
+          "line": 432,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 434,
+          "line": 435,
           "call_type": "method_call"
         }
       ],
-      "call_count": 10
+      "call_count": 9
     },
     {
       "name": "consult_multi_agent",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 453,
+      "line": 454,
       "language": "python",
       "docstring": "Consult multiple AI tools in parallel and synthesize responses.\n\nArgs:\n    doc_type: Documentation type (architecture, ai_context)\n    prompt: Formatted prompt\n    pair: Which multi-agent pair to use\n    dry_run: If True, show what would run\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output (falls back to print if None)\n\nReturns:\n    Dictionary with synthesis results",
       "parameters": [
@@ -22225,7 +22211,7 @@
         }
       ],
       "return_type": "Dict[str, any]",
-      "complexity": 18,
+      "complexity": 17,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -22234,13 +22220,13 @@
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 649,
+          "line": 645,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 690,
+          "line": 686,
           "call_type": "function_call"
         },
         {
@@ -22254,13 +22240,7 @@
         {
           "name": "get_available_tools",
           "file": "unknown",
-          "line": 483,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 487,
+          "line": 484,
           "call_type": "function_call"
         },
         {
@@ -22272,80 +22252,74 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 492,
+          "line": 489,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 493,
           "call_type": "function_call"
         },
         {
           "name": "run_consultation",
           "file": "unknown",
-          "line": 494,
+          "line": 495,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 514,
+          "line": 515,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 514,
+          "line": 515,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 516,
+          "line": 517,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 518,
+          "line": 519,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 518,
+          "line": 519,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 520,
+          "line": 521,
           "call_type": "function_call"
         },
         {
           "name": "flush",
           "file": "unknown",
-          "line": 521,
+          "line": 522,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 533,
+          "line": 534,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 533,
+          "line": 534,
           "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 534,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 534,
-          "call_type": "method_call"
         },
         {
           "name": "detail",
@@ -22354,34 +22328,34 @@
           "call_type": "method_call"
         },
         {
+          "name": "join",
+          "file": "unknown",
+          "line": 535,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 536,
+          "call_type": "method_call"
+        },
+        {
           "name": "info",
           "file": "unknown",
-          "line": 537,
+          "line": 538,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 539,
+          "line": 540,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 539,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
           "line": 540,
           "call_type": "function_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 540,
-          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -22390,15 +22364,27 @@
           "call_type": "function_call"
         },
         {
+          "name": "join",
+          "file": "unknown",
+          "line": 541,
+          "call_type": "method_call"
+        },
+        {
           "name": "print",
           "file": "unknown",
-          "line": 543,
+          "line": 542,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "flush",
           "file": "unknown",
-          "line": 544,
+          "line": 545,
           "call_type": "method_call"
         },
         {
@@ -22408,136 +22394,54 @@
           "call_type": "method_call"
         },
         {
-          "name": "len",
+          "name": "execute_tools_parallel",
           "file": "unknown",
-          "line": 550,
-          "call_type": "function_call"
-        },
-        {
-          "name": "submit",
-          "file": "unknown",
-          "line": 552,
-          "call_type": "method_call"
-        },
-        {
-          "name": "as_completed",
-          "file": "unknown",
-          "line": 556,
-          "call_type": "function_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 559,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 560,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
-          "file": "unknown",
-          "line": 570,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 572,
-          "call_type": "function_call"
-        },
-        {
-          "name": "flush",
-          "file": "unknown",
-          "line": 573,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 575,
-          "call_type": "method_call"
-        },
-        {
-          "name": "str",
-          "file": "unknown",
-          "line": 579,
+          "line": 549,
           "call_type": "function_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 582,
+          "line": 553,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 561,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 563,
+          "call_type": "function_call"
+        },
+        {
+          "name": "flush",
+          "file": "unknown",
+          "line": 564,
           "call_type": "method_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 593,
+          "line": 588,
           "call_type": "function_call"
         },
         {
           "name": "keys",
           "file": "unknown",
-          "line": 593,
+          "line": 588,
           "call_type": "method_call"
         }
       ],
       "call_count": 3
     },
     {
-      "name": "_run_tool_capture",
-      "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 607,
-      "language": "python",
-      "docstring": "Run tool and capture output (internal helper for parallel execution).\n\nReturns:\n    Tuple of (success, output, duration)",
-      "parameters": [
-        {
-          "name": "tool",
-          "type": "str",
-          "default": null
-        },
-        {
-          "name": "prompt",
-          "type": "str",
-          "default": null
-        }
-      ],
-      "return_type": "Tuple[bool, str, float]",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": false,
-      "callers": [],
-      "calls": [
-        {
-          "name": "time",
-          "file": "unknown",
-          "line": 614,
-          "call_type": "method_call"
-        },
-        {
-          "name": "run_consultation",
-          "file": "unknown",
-          "line": 615,
-          "call_type": "function_call"
-        },
-        {
-          "name": "time",
-          "file": "unknown",
-          "line": 616,
-          "call_type": "method_call"
-        }
-      ]
-    },
-    {
       "name": "generate_architecture_docs",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 620,
+      "line": 616,
       "language": "python",
       "docstring": "Get architecture research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, result: Dict with responses_by_tool)",
       "parameters": [
@@ -22600,25 +22504,25 @@
         {
           "name": "format_architecture_research_prompt",
           "file": "unknown",
-          "line": 646,
+          "line": 642,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "unknown",
-          "line": 649,
+          "line": 645,
           "call_type": "function_call"
         },
         {
           "name": "get_best_tool",
           "file": "unknown",
-          "line": 653,
+          "line": 649,
           "call_type": "function_call"
         },
         {
           "name": "run_consultation",
           "file": "unknown",
-          "line": 657,
+          "line": 653,
           "call_type": "function_call"
         }
       ],
@@ -22627,7 +22531,7 @@
     {
       "name": "generate_ai_context_docs",
       "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-      "line": 661,
+      "line": 657,
       "language": "python",
       "docstring": "Get AI context research findings from AI consultation.\n\nArgs:\n    context_summary: Codebase context summary\n    key_files: List of key files\n    project_root: Project root directory\n    tool: Specific tool to use (\"auto\" for auto-selection)\n    use_multi_agent: Use multiple agents if available\n    dry_run: Show what would run without running\n    verbose: Enable verbose output\n    printer: Optional PrettyPrinter for consistent output\n\nReturns:\n    Tuple of (success: bool, result: Dict with responses_by_tool)",
       "parameters": [
@@ -22690,25 +22594,25 @@
         {
           "name": "format_ai_context_research_prompt",
           "file": "unknown",
-          "line": 687,
+          "line": 683,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "unknown",
-          "line": 690,
+          "line": 686,
           "call_type": "function_call"
         },
         {
           "name": "get_best_tool",
           "file": "unknown",
-          "line": 694,
+          "line": 690,
           "call_type": "function_call"
         },
         {
           "name": "run_consultation",
           "file": "unknown",
-          "line": 698,
+          "line": 694,
           "call_type": "function_call"
         }
       ],
@@ -26435,6 +26339,18 @@
           "file": "src/claude_skills/claude_skills/common/ai_config.py",
           "line": 231,
           "call_type": "function_call"
+        },
+        {
+          "name": "get_multi_agent_pairs",
+          "file": "src/claude_skills/claude_skills/common/ai_config.py",
+          "line": 285,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_routing_config",
+          "file": "src/claude_skills/claude_skills/common/ai_config.py",
+          "line": 341,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -26499,7 +26415,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 7
     },
     {
       "name": "get_enabled_tools",
@@ -26848,6 +26764,76 @@
       ]
     },
     {
+      "name": "get_multi_agent_pairs",
+      "file": "src/claude_skills/claude_skills/common/ai_config.py",
+      "line": 252,
+      "language": "python",
+      "docstring": "Get multi-agent pair configurations for consensus-based consultation.\n\nLoads agent pair definitions from the skill's config.yaml file under the\n'consensus.pairs' section. Each pair defines which agents should be consulted\ntogether for multi-agent analysis.\n\nArgs:\n    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')\n\nReturns:\n    Dict mapping pair name to list of agent names. For example:\n    {\n        \"default\": [\"gemini\", \"cursor-agent\"],\n        \"code-focus\": [\"codex\", \"gemini\"],\n        \"discovery-focus\": [\"cursor-agent\", \"gemini\"]\n    }\n\nExamples:\n    >>> pairs = get_multi_agent_pairs('run-tests')\n    >>> pairs['default']\n    ['cursor-agent', 'gemini']\n\n    >>> pairs = get_multi_agent_pairs('nonexistent-skill')\n    >>> pairs['default']  # Falls back to sensible defaults\n    ['gemini', 'cursor-agent']\n\nNotes:\n    - If config.yaml is missing or doesn't have a 'consensus.pairs' section,\n      returns sensible default pairs\n    - Each pair should contain exactly 2 agents for optimal consensus analysis\n    - Agent names must correspond to tools defined in the 'tools' section",
+      "parameters": [
+        {
+          "name": "skill_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, List[str]]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "load_skill_config",
+          "file": "unknown",
+          "line": 285,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "get_routing_config",
+      "file": "src/claude_skills/claude_skills/common/ai_config.py",
+      "line": 304,
+      "language": "python",
+      "docstring": "Get routing configuration that maps failure types to multi-agent pairs.\n\nLoads auto-trigger routing rules from the skill's config.yaml file under the\n'consensus.auto_trigger' section. These rules determine which agent pair should\nbe used for different types of test failures or analysis scenarios.\n\nArgs:\n    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')\n\nReturns:\n    Dict mapping failure/scenario type to pair name. For example:\n    {\n        \"default\": \"default\",\n        \"fixture\": \"code-focus\",\n        \"exception\": \"code-focus\",\n        \"timeout\": \"default\",\n        \"flaky\": \"default\",\n        \"multi-file\": \"discovery-focus\"\n    }\n\nExamples:\n    >>> routing = get_routing_config('run-tests')\n    >>> routing['fixture']\n    'code-focus'\n\n    >>> routing = get_routing_config('nonexistent-skill')\n    >>> routing['default']  # Falls back to sensible defaults\n    'default'\n\nNotes:\n    - If config.yaml is missing or doesn't have 'consensus.auto_trigger',\n      returns sensible default routing rules\n    - The pair names in routing values should correspond to keys in the\n      pairs configuration from get_multi_agent_pairs()\n    - The 'default' key is used as fallback when no specific rule matches",
+      "parameters": [
+        {
+          "name": "skill_name",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, str]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "load_skill_config",
+          "file": "unknown",
+          "line": 341,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 349,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
       "name": "check_tool_available",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
       "line": 250,
@@ -26923,6 +26909,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "get_available_tools",
+          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -26943,7 +26935,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "build_tool_command",
@@ -26970,6 +26962,12 @@
       "is_exported": false,
       "is_public": true,
       "callers": [
+        {
+          "name": "run_consultation",
+          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
+          "line": 397,
+          "call_type": "function_call"
+        },
         {
           "name": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
@@ -27003,7 +27001,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "execute_tool",
@@ -27153,7 +27151,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "consult_multi_agent",
+          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
+          "line": 549,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "time",
@@ -27251,7 +27256,8 @@
           "line": 613,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "check_spec_completion",
@@ -59935,13 +59941,13 @@
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 653,
+          "line": 649,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 694,
+          "line": 690,
           "call_type": "function_call"
         },
         {
@@ -60348,25 +60354,19 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 494,
-          "call_type": "function_call"
-        },
-        {
-          "name": "_run_tool_capture",
-          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 615,
+          "line": 495,
           "call_type": "function_call"
         },
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 657,
+          "line": 653,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 698,
+          "line": 694,
           "call_type": "function_call"
         },
         {
@@ -60594,7 +60594,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 10
+      "call_count": 9
     },
     {
       "name": "print_routing_matrix",
@@ -61470,13 +61470,13 @@
         {
           "name": "generate_architecture_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 649,
+          "line": 645,
           "call_type": "function_call"
         },
         {
           "name": "generate_ai_context_docs",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 690,
+          "line": 686,
           "call_type": "function_call"
         },
         {
@@ -63762,13 +63762,13 @@
         {
           "name": "get_best_tool",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 86,
+          "line": 87,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 483,
+          "line": 484,
           "call_type": "function_call"
         },
         {
@@ -74618,6 +74618,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "get_available_tools",
+          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -74644,7 +74650,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "call_tool",
@@ -109191,7 +109197,10 @@
       "typing.Tuple",
       "concurrent.futures.ThreadPoolExecutor",
       "concurrent.futures.as_completed",
-      "time"
+      "time",
+      "claude_skills.common.ai_tools.detect_available_tools",
+      "claude_skills.common.ai_tools.build_tool_command",
+      "claude_skills.common.ai_tools.execute_tools_parallel"
     ],
     "src/claude_skills/claude_skills/code_doc/ast_analysis.py": [
       "dataclasses.dataclass",

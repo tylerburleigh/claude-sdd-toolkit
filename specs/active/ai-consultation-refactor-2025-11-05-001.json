@@ -1,7 +1,7 @@
 {
   "spec_id": "ai-consultation-refactor-2025-11-05-001",
   "generated": "2025-11-05T00:00:00Z",
-  "last_updated": "2025-11-05T14:35:36.482361Z",
+  "last_updated": "2025-11-05T14:59:13.981306Z",
   "metadata": {
     "title": "AI Consultation Infrastructure Refactoring",
     "description": "Extract and consolidate duplicated AI consultation code from run-tests, sdd-plan-review, and code-doc into shared utilities, eliminating ~850 lines of duplication",
@@ -16,7 +16,7 @@
       "Provide proven infrastructure for future skills requiring AI consultation"
     ],
     "activated_date": "2025-11-05T13:18:30.300836Z",
-    "progress_percentage": 47,
+    "progress_percentage": 49,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -34,7 +34,7 @@
         "phase-6"
       ],
       "total_tasks": 51,
-      "completed_tasks": 24,
+      "completed_tasks": 25,
       "metadata": {}
     },
     "phase-1": {
@@ -920,7 +920,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Migrate sdd-plan-review skill to use shared utilities",
         "risk_level": "medium",
@@ -938,7 +938,7 @@
         "task-4-3"
       ],
       "total_tasks": 5,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -977,7 +977,7 @@
     "task-4-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4-files",
       "children": [
         "task-4-2-1",
@@ -994,7 +994,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
         "task_category": "refactoring",
@@ -1005,7 +1005,7 @@
     "task-4-2-1": {
       "type": "subtask",
       "title": "Replace check_tool_available() with shared version",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-2",
       "children": [],
       "dependencies": {
@@ -1014,9 +1014,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "refactoring"
+        "task_category": "refactoring",
+        "started_at": "2025-11-05T14:56:48.947906Z",
+        "completed_at": "2025-11-05T14:59:13.966266Z",
+        "needs_journaling": false,
+        "actual_hours": 0.04,
+        "journaled_at": "2025-11-05T14:59:13.978006Z"
       }
     },
     "task-4-2-2": {
@@ -2039,6 +2044,15 @@
       "content": "Analyzed sdd-plan-review reviewer.py (330+ lines). Migration strategy identified: Core infrastructure (check_tool_available, detect_available_tools, parallel execution with ThreadPoolExecutor) can migrate to shared utilities. Tool-specific command building in call_tool() has codex/gemini/cursor-agent specific flags but can use shared build_tool_command() with ai_config. Keep skill-specific: generate_review_prompt(), parse_response(), build_consensus(), and review_with_tools() orchestration. Similar pattern to code-doc migration.",
       "metadata": {},
       "task_id": "task-4-1"
+    },
+    {
+      "timestamp": "2025-11-05T14:59:13.977989Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Replace check_tool_available() with shared version",
+      "author": "claude-code",
+      "content": "Successfully replaced duplicate check_tool_available() implementation in sdd_plan_review/reviewer.py with shared version from common/ai_tools.py.\n\nChanges made:\n1. Removed duplicate function (lines 40-75) from reviewer.py\n2. Added import from claude_skills.common.ai_tools\n3. Updated usage in detect_available_tools() to include check_version=True parameter\n4. Modified __init__.py to re-export from shared location for backward compatibility\n\nVerification completed:\n- All 32 tests in test_ai_tools.py pass\n- Direct imports work correctly\n- Backward compatible imports through __init__.py work\n- detect_available_tools() function works and detected gemini and codex tools\n- Module structure integrity verified\n\nThe refactoring consolidates duplicate code, uses the more robust shared implementation (shutil.which instead of external which command), and maintains identical behavior.",
+      "metadata": {},
+      "task_id": "task-4-2-1"
     }
   ]
 }
