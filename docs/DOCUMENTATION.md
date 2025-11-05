@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 17:26:25
+**Generated:** 2025-11-05 17:29:15
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 73203
+- **Total Lines:** 73201
 - **Total Classes:** 278
 - **Total Functions:** 796
 - **Avg Complexity:** 5.6
@@ -6377,7 +6377,7 @@ Returns:
 
 ---
 
-### `_handle_fidelity_review(args) -> int`
+### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:30`
@@ -6395,19 +6395,21 @@ Orchestrates the fidelity review workflow:
 
 Args:
     args: Parsed command-line arguments
+    printer: Optional PrettyPrinter instance (for unified CLI compatibility)
 
 Returns:
     Exit code (0 for success, non-zero for error)
 
 **Parameters:**
 - `args`: argparse.Namespace
+- `printer`: None
 
 ---
 
-### `_handle_list_review_tools(args) -> int`
+### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:214`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:215`
 **Complexity:** 10
 
 **Description:**
@@ -6417,12 +6419,14 @@ Detects and displays available AI consultation tools with their status.
 
 Args:
     args: Parsed command-line arguments
+    printer: Optional PrettyPrinter instance (for unified CLI compatibility)
 
 Returns:
     Exit code (0 for success, non-zero for error)
 
 **Parameters:**
 - `args`: argparse.Namespace
+- `printer`: None
 
 ---
 
@@ -6599,7 +6603,7 @@ Args:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:202`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:203`
 **Complexity:** 1
 
 **Description:**
@@ -6617,7 +6621,7 @@ Args:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:179`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:180`
 **Complexity:** 5
 
 **Description:**
@@ -6635,7 +6639,7 @@ Args:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:144`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:145`
 **Complexity:** 7
 
 **Description:**
@@ -16274,7 +16278,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:433`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:431`
 **Complexity:** 3
 
 **Description:**
@@ -17179,7 +17183,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:411`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:413`
 **Complexity:** 1
 
 **Description:**
@@ -17193,10 +17197,7 @@ Args:
     parent_parser: Parent parser with global options to inherit (optional)
 
 Note:
-    Currently only registers fidelity-review command. The list-review-tools
-    command can be accessed via the standalone CLI until argparse conflict
-    is resolved:
-        python -m claude_skills.sdd_fidelity_review.cli list-review-tools
+    Registers both fidelity-review and list-review-tools commands.
 
 **Parameters:**
 - `subparsers`: argparse._SubParsersAction
@@ -17241,7 +17242,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:288`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:290`
 **Complexity:** 1
 
 **Description:**
@@ -17286,7 +17287,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:387`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:389`
 **Complexity:** 1
 
 **Description:**
