@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T15:29:00.320256Z",
+    "generated_at": "2025-11-05T15:31:23.642472Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 210,
-    "total_lines": 70844,
+    "total_lines": 70850,
     "total_classes": 267,
     "total_functions": 792,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 210,
-        "lines": 70844,
+        "lines": 70850,
         "classes": 267,
         "functions": 792,
         "avg_complexity": 5.57
@@ -2469,7 +2469,7 @@
       "name": "reviewer",
       "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
       "language": "python",
-      "docstring": "Multi-model review orchestration for sdd-plan-review.\n\nHandles parallel execution of AI CLI tools and response collection.",
+      "docstring": "Multi-model review orchestration for sdd-plan-review.\n\nOrchestrates parallel execution of AI CLI tools (gemini, codex, cursor-agent)\nfor specification review. Uses shared implementations from common.ai_tools for\ntool detection and execution, with response synthesis and consensus building.",
       "classes": [],
       "functions": [
         "detect_available_tools",
@@ -2493,7 +2493,7 @@
         "claude_skills.common.ai_tools.execute_tools_parallel"
       ],
       "exports": [],
-      "lines": 143
+      "lines": 149
     },
     {
       "name": "synthesis",
@@ -26865,7 +26865,7 @@
         {
           "name": "detect_available_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-          "line": 32,
+          "line": 36,
           "call_type": "function_call"
         }
       ],
@@ -27158,7 +27158,7 @@
         {
           "name": "review_with_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-          "line": 90,
+          "line": 96,
           "call_type": "function_call"
         }
       ],
@@ -73522,7 +73522,7 @@
         {
           "name": "review_with_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-          "line": 74,
+          "line": 80,
           "call_type": "function_call"
         }
       ],
@@ -74548,9 +74548,9 @@
     {
       "name": "detect_available_tools",
       "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-      "line": 20,
+      "line": 22,
       "language": "python",
-      "docstring": "Detect which AI CLI tools are installed and available.\n\nReturns:\n    List of available tool names",
+      "docstring": "Detect which AI CLI tools are installed and available.\n\nUses check_tool_available() from common.ai_tools for detection.\n\nReturns:\n    List of available tool names (gemini, codex, cursor-agent)",
       "parameters": [],
       "return_type": "List[str]",
       "complexity": 3,
@@ -74576,13 +74576,13 @@
         {
           "name": "check_tool_available",
           "file": "unknown",
-          "line": 32,
+          "line": 36,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 33,
+          "line": 37,
           "call_type": "method_call"
         }
       ],
@@ -74591,9 +74591,9 @@
     {
       "name": "review_with_tools",
       "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-      "line": 37,
+      "line": 41,
       "language": "python",
-      "docstring": "Review a spec using multiple AI tools with full synthesis.\n\nArgs:\n    spec_content: Specification content to review\n    tools: List of tool names to use\n    review_type: Type of review (quick, full, security, feasibility)\n    spec_id: Specification ID\n    spec_title: Specification title\n    parallel: Run tools in parallel (vs sequential)\n\nReturns:\n    Review results with parsed responses and consensus",
+      "docstring": "Review a spec using multiple AI tools with full synthesis.\n\nUses execute_tools_parallel() from common.ai_tools for parallel execution.\n\nArgs:\n    spec_content: Specification content to review\n    tools: List of tool names to use\n    review_type: Type of review (quick, full, security, feasibility)\n    spec_id: Specification ID\n    spec_title: Specification title\n    parallel: Deprecated - tools always run in parallel (kept for compatibility)\n\nReturns:\n    Review results with parsed responses and consensus",
       "parameters": [
         {
           "name": "spec_content",
@@ -74644,127 +74644,127 @@
         {
           "name": "time",
           "file": "unknown",
-          "line": 71,
+          "line": 77,
           "call_type": "method_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "unknown",
-          "line": 74,
+          "line": 80,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 84,
+          "line": 90,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 86,
+          "line": 92,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 86,
+          "line": 92,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 86,
+          "line": 92,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 87,
+          "line": 93,
           "call_type": "function_call"
         },
         {
           "name": "execute_tools_parallel",
           "file": "unknown",
-          "line": 90,
+          "line": 96,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 97,
+          "line": 103,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 107,
+          "line": 113,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 108,
+          "line": 114,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 110,
+          "line": 116,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 111,
+          "line": 117,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 115,
+          "line": 121,
           "call_type": "method_call"
         },
         {
           "name": "parse_response",
           "file": "unknown",
-          "line": 116,
+          "line": 122,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 118,
+          "line": 124,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 120,
+          "line": 126,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 123,
+          "line": 129,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 125,
+          "line": 131,
           "call_type": "method_call"
         },
         {
           "name": "build_consensus",
           "file": "unknown",
-          "line": 130,
+          "line": 136,
           "call_type": "function_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 141,
+          "line": 147,
           "call_type": "method_call"
         }
       ],
@@ -74798,7 +74798,7 @@
         {
           "name": "review_with_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-          "line": 116,
+          "line": 122,
           "call_type": "function_call"
         }
       ],
@@ -75017,7 +75017,7 @@
         {
           "name": "review_with_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
-          "line": 130,
+          "line": 136,
           "call_type": "function_call"
         }
       ],

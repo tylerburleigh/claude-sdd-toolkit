@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 10:29:00
+**Generated:** 2025-11-05 10:31:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70844
+- **Total Lines:** 70850
 - **Total Classes:** 267
 - **Total Functions:** 792
 - **Avg Complexity:** 5.57
@@ -10441,14 +10441,16 @@ Example:
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:20`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:22`
 **Complexity:** 3
 
 **Description:**
 > Detect which AI CLI tools are installed and available.
 
+Uses check_tool_available() from common.ai_tools for detection.
+
 Returns:
-    List of available tool names
+    List of available tool names (gemini, codex, cursor-agent)
 
 ---
 
@@ -17063,11 +17065,13 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:37`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:41`
 **Complexity:** 8
 
 **Description:**
 > Review a spec using multiple AI tools with full synthesis.
+
+Uses execute_tools_parallel() from common.ai_tools for parallel execution.
 
 Args:
     spec_content: Specification content to review
@@ -17075,7 +17079,7 @@ Args:
     review_type: Type of review (quick, full, security, feasibility)
     spec_id: Specification ID
     spec_title: Specification title
-    parallel: Run tools in parallel (vs sequential)
+    parallel: Deprecated - tools always run in parallel (kept for compatibility)
 
 Returns:
     Review results with parsed responses and consensus
