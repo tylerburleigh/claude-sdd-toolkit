@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T13:38:22.774857Z",
+    "generated_at": "2025-11-05T13:39:43.379141Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 210,
-    "total_lines": 70532,
+    "total_lines": 70624,
     "total_classes": 267,
-    "total_functions": 788,
-    "avg_complexity": 5.59,
+    "total_functions": 790,
+    "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 210,
-        "lines": 70532,
+        "lines": 70624,
         "classes": 267,
-        "functions": 788,
-        "avg_complexity": 5.59
+        "functions": 790,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -874,16 +874,21 @@
         "ToolResponse",
         "MultiToolResponse"
       ],
-      "functions": [],
+      "functions": [
+        "check_tool_available",
+        "detect_available_tools"
+      ],
       "imports": [
         "dataclasses.dataclass",
         "dataclasses.field",
         "typing.Optional",
         "datetime.datetime",
-        "enum.Enum"
+        "enum.Enum",
+        "shutil",
+        "subprocess"
       ],
       "exports": [],
-      "lines": 246
+      "lines": 338
     },
     {
       "name": "completion",
@@ -7240,7 +7245,7 @@
     {
       "name": "ToolStatus",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 17,
+      "line": 19,
       "language": "python",
       "docstring": "Status of AI tool execution.",
       "bases": [
@@ -7254,7 +7259,7 @@
         {
           "instantiator": "from_dict",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 115,
+          "line": 117,
           "context": [
             "ToolResponse",
             "from_dict"
@@ -7267,7 +7272,7 @@
     {
       "name": "ToolResponse",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 27,
+      "line": 29,
       "language": "python",
       "docstring": "Standardized response from AI tool consultation.\n\nThis is the core response type used throughout the toolkit for\nall AI tool interactions.\n\nAttributes:\n    tool: Name of the tool (gemini, codex, cursor-agent)\n    status: Execution status (success, timeout, error, etc.)\n    output: Raw output from the tool (stdout)\n    error: Error message if any (stderr or exception message)\n    duration: Execution time in seconds\n    timestamp: When the consultation started (ISO format)\n    model: Model used by the tool (if applicable)\n    prompt: The prompt sent to the tool (optional, for debugging)\n    exit_code: Process exit code (None if didn't run)\n    metadata: Additional tool-specific metadata\n\nExample:\n    >>> response = ToolResponse(\n    ...     tool=\"gemini\",\n    ...     status=ToolStatus.SUCCESS,\n    ...     output=\"Analysis complete\",\n    ...     duration=2.5\n    ... )\n    >>> response.success\n    True\n    >>> response.to_dict()\n    {...}",
       "bases": [],
@@ -7287,7 +7292,7 @@
     {
       "name": "MultiToolResponse",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 120,
+      "line": 122,
       "language": "python",
       "docstring": "Response from multiple tool consultations run in parallel.\n\nAttributes:\n    responses: Dictionary mapping tool names to their responses\n    synthesis: Optional synthesis/consensus from all responses\n    total_duration: Total wall-clock time (parallel execution)\n    max_duration: Longest individual tool duration\n    success_count: Number of successful tool calls\n    failure_count: Number of failed tool calls\n    timestamp: When the multi-tool consultation started\n    failure_type: Optional failure type that triggered consultation\n\nExample:\n    >>> responses = {\n    ...     \"gemini\": ToolResponse(tool=\"gemini\", status=ToolStatus.SUCCESS),\n    ...     \"codex\": ToolResponse(tool=\"codex\", status=ToolStatus.ERROR)\n    ... }\n    >>> multi = MultiToolResponse(\n    ...     responses=responses,\n    ...     success_count=1,\n    ...     failure_count=1\n    ... )\n    >>> multi.success\n    True\n    >>> successful = multi.get_successful_responses()\n    >>> len(successful)\n    1",
       "bases": [],
@@ -26759,6 +26764,104 @@
           "call_type": "method_call"
         }
       ]
+    },
+    {
+      "name": "check_tool_available",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 248,
+      "language": "python",
+      "docstring": "Check if a tool is available and optionally working.\n\nUses shutil.which() for fast PATH lookup. Optionally verifies tool\nresponds to --version flag.\n\nArgs:\n    tool: Tool name to check (e.g., \"gemini\", \"codex\", \"cursor-agent\")\n    check_version: If True, verify tool responds to --version\n    timeout: Timeout in seconds for version check (default 5)\n\nReturns:\n    True if tool is available (and working if check_version=True)\n\nExample:\n    >>> check_tool_available(\"gemini\")\n    True\n    >>> check_tool_available(\"nonexistent\")\n    False\n    >>> check_tool_available(\"gemini\", check_version=True)\n    True",
+      "parameters": [
+        {
+          "name": "tool",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "bool",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "detect_available_tools",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 325,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_list_tools",
+          "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+          "line": 194,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detect_available_tools",
+          "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
+          "line": 87,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "which",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "method_call"
+        },
+        {
+          "name": "run",
+          "file": "unknown",
+          "line": 283,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "detect_available_tools",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 296,
+      "language": "python",
+      "docstring": "Detect which AI tools are available in PATH.\n\nArgs:\n    tools: Optional list of tool names to check. If None, checks\n        default tools: [\"gemini\", \"codex\", \"cursor-agent\"]\n    check_version: If True, verify each tool responds to --version\n\nReturns:\n    List of available tool names (empty if none found)\n\nExample:\n    >>> detect_available_tools()\n    ['gemini', 'codex']\n    >>> detect_available_tools([\"gemini\", \"nonexistent\"])\n    ['gemini']\n    >>> detect_available_tools(check_version=True)\n    ['gemini']",
+      "parameters": [
+        {
+          "name": "tools",
+          "type": "Optional[list[str]]",
+          "default": null
+        }
+      ],
+      "return_type": "list[str]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "cmd_review",
+          "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+          "line": 50,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "check_tool_available",
+          "file": "unknown",
+          "line": 325,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 326,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
     },
     {
       "name": "check_spec_completion",
@@ -74070,6 +74173,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "detect_available_tools",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 325,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_list_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 194,
@@ -74102,7 +74211,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 3
     },
     {
       "name": "detect_available_tools",
@@ -108995,7 +109104,9 @@
       "dataclasses.field",
       "typing.Optional",
       "datetime.datetime",
-      "enum.Enum"
+      "enum.Enum",
+      "shutil",
+      "subprocess"
     ],
     "src/claude_skills/claude_skills/common/completion.py": [
       "typing.Dict",

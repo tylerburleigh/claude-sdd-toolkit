@@ -328,6 +328,61 @@ def detect_available_tools(
     return available
 
 
+def build_tool_command(
+    tool: str,
+    prompt: str,
+    *,
+    model: Optional[str] = None
+) -> list[str]:
+    """
+    Build command list for tool execution.
+
+    Handles tool-specific command patterns:
+    - gemini: uses -m for model, -p for prompt
+    - codex: uses -m for model, positional arg for prompt
+    - cursor-agent: uses --print flag, positional arg for prompt
+
+    Args:
+        tool: Tool name ("gemini", "codex", "cursor-agent")
+        prompt: The prompt to include in command
+        model: Optional model override
+
+    Returns:
+        Command as list of strings (shell-safe)
+
+    Raises:
+        ValueError: If tool is unknown
+
+    Example:
+        >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
+        ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']
+        >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
+        ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']
+        >>> build_tool_command("cursor-agent", "Review code")
+        ['cursor-agent', '--print', 'Review code']
+    """
+    if tool == "gemini":
+        cmd = ["gemini"]
+        if model:
+            cmd.extend(["-m", model])
+        cmd.extend(["-p", prompt])
+        return cmd
+
+    elif tool == "codex":
+        cmd = ["codex"]
+        if model:
+            cmd.extend(["-m", model])
+        cmd.append(prompt)
+        return cmd
+
+    elif tool == "cursor-agent":
+        # cursor-agent doesn't support model selection
+        return ["cursor-agent", "--print", prompt]
+
+    else:
+        raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent")
+
+
 # Export public API
 __all__ = [
     "ToolStatus",
@@ -335,4 +390,5 @@ __all__ = [
     "MultiToolResponse",
     "check_tool_available",
     "detect_available_tools",
+    "build_tool_command",
 ]

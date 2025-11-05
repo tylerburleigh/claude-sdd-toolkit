@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:38:22
+**Generated:** 2025-11-05 08:39:43
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70532
+- **Total Lines:** 70624
 - **Total Classes:** 267
-- **Total Functions:** 788
-- **Avg Complexity:** 5.59
+- **Total Functions:** 790
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -1246,7 +1246,7 @@ Example:
 ### `MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:120`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:122`
 
 **Description:**
 > Response from multiple tool consultations run in parallel.
@@ -5144,7 +5144,7 @@ Attributes:
 ### `ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:27`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:29`
 
 **Description:**
 > Standardized response from AI tool consultation.
@@ -5190,7 +5190,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:17`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:19`
 
 **Description:**
 > Status of AI tool execution.
@@ -8166,6 +8166,39 @@ Returns:
 
 ---
 
+### `check_tool_available(tool) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:248`
+**Complexity:** 4
+
+**Description:**
+> Check if a tool is available and optionally working.
+
+Uses shutil.which() for fast PATH lookup. Optionally verifies tool
+responds to --version flag.
+
+Args:
+    tool: Tool name to check (e.g., "gemini", "codex", "cursor-agent")
+    check_version: If True, verify tool responds to --version
+    timeout: Timeout in seconds for version check (default 5)
+
+Returns:
+    True if tool is available (and working if check_version=True)
+
+Example:
+    >>> check_tool_available("gemini")
+    True
+    >>> check_tool_available("nonexistent")
+    False
+    >>> check_tool_available("gemini", check_version=True)
+    True
+
+**Parameters:**
+- `tool`: str
+
+---
+
 ### `check_tool_available(tool_name) -> bool`
 
 **Language:** python
@@ -10395,6 +10428,36 @@ Returns:
 
 **Parameters:**
 - `tmp_path`: None
+
+---
+
+### `detect_available_tools(tools) -> list[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:296`
+**Complexity:** 4
+
+**Description:**
+> Detect which AI tools are available in PATH.
+
+Args:
+    tools: Optional list of tool names to check. If None, checks
+        default tools: ["gemini", "codex", "cursor-agent"]
+    check_version: If True, verify each tool responds to --version
+
+Returns:
+    List of available tool names (empty if none found)
+
+Example:
+    >>> detect_available_tools()
+    ['gemini', 'codex']
+    >>> detect_available_tools(["gemini", "nonexistent"])
+    ['gemini']
+    >>> detect_available_tools(check_version=True)
+    ['gemini']
+
+**Parameters:**
+- `tools`: Optional[list[str]]
 
 ---
 
@@ -20803,6 +20866,8 @@ Returns:
 - `dataclasses.field`
 - `datetime.datetime`
 - `enum.Enum`
+- `shutil`
+- `subprocess`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
