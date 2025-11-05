@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:46:42
+**Generated:** 2025-11-05 13:47:28
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 211
-- **Total Lines:** 70467
-- **Total Classes:** 267
+- **Total Files:** 212
+- **Total Lines:** 70571
+- **Total Classes:** 268
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
 - **Max Complexity:** 45
@@ -752,6 +752,26 @@ Example:
 - `get_available_agents()`
 - `generate_summary()`
 - `generate_summary_with_fallback()`
+
+---
+
+### `FidelityReviewer`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:11`
+
+**Description:**
+> Core class for performing fidelity reviews of implementations against specs.
+
+This class will be implemented in Phase 3 (Core Review Logic).
+
+**Methods:**
+- `__init__()`
+- `review_task()`
+- `review_phase()`
+- `review_full_spec()`
+- `review_files()`
+- `analyze_deviation()`
 
 ---
 
@@ -21283,6 +21303,14 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
+
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`

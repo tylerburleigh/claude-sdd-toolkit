@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:46:42.224690Z",
+    "generated_at": "2025-11-05T18:47:28.886211Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 211,
-    "total_lines": 70467,
-    "total_classes": 267,
+    "total_files": 212,
+    "total_lines": 70571,
+    "total_classes": 268,
     "total_functions": 781,
     "avg_complexity": 5.57,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 211,
-        "lines": 70467,
-        "classes": 267,
+        "files": 212,
+        "lines": 70571,
+        "classes": 268,
         "functions": 781,
         "avg_complexity": 5.57
       }
@@ -2065,6 +2065,25 @@
       ],
       "exports": [],
       "lines": 61
+    },
+    {
+      "name": "review",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+      "language": "python",
+      "docstring": "Implementation Fidelity Review Core Module\n\nCore functionality for comparing implementation against specifications.",
+      "classes": [
+        "FidelityReviewer"
+      ],
+      "functions": [],
+      "imports": [
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any"
+      ],
+      "exports": [],
+      "lines": 104
     },
     {
       "name": "__init__",
@@ -9305,6 +9324,27 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "FidelityReviewer",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+      "line": 11,
+      "language": "python",
+      "docstring": "Core class for performing fidelity reviews of implementations against specs.\n\nThis class will be implemented in Phase 3 (Core Review Logic).",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "review_task",
+        "review_phase",
+        "review_full_spec",
+        "review_files",
+        "analyze_deviation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "PromptTemplate",
@@ -108837,6 +108877,13 @@
     "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py": [
       "argparse",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "typing.Any"
     ],
     "src/claude_skills/claude_skills/sdd_next/__init__.py": [
       "discovery.get_next_task",
