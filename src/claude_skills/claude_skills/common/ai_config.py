@@ -247,3 +247,55 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
     if not tool_config:
         return False
     return tool_config.get('enabled', True)
+
+
+def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
+    """Get multi-agent pair configurations for consensus-based consultation.
+
+    Loads agent pair definitions from the skill's config.yaml file under the
+    'consensus.pairs' section. Each pair defines which agents should be consulted
+    together for multi-agent analysis.
+
+    Args:
+        skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+    Returns:
+        Dict mapping pair name to list of agent names. For example:
+        {
+            "default": ["gemini", "cursor-agent"],
+            "code-focus": ["codex", "gemini"],
+            "discovery-focus": ["cursor-agent", "gemini"]
+        }
+
+    Examples:
+        >>> pairs = get_multi_agent_pairs('run-tests')
+        >>> pairs['default']
+        ['cursor-agent', 'gemini']
+
+        >>> pairs = get_multi_agent_pairs('nonexistent-skill')
+        >>> pairs['default']  # Falls back to sensible defaults
+        ['gemini', 'cursor-agent']
+
+    Notes:
+        - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
+          returns sensible default pairs
+        - Each pair should contain exactly 2 agents for optimal consensus analysis
+        - Agent names must correspond to tools defined in the 'tools' section
+    """
+    config = load_skill_config(skill_name)
+
+    # Try to load from consensus section
+    if 'consensus' in config:
+        consensus_config = config['consensus']
+        if 'pairs' in consensus_config:
+            pairs = consensus_config['pairs']
+            # Validate that pairs is a dict and contains lists
+            if isinstance(pairs, dict):
+                return pairs
+
+    # Return sensible defaults if not found or malformed
+    return {
+        "default": ["gemini", "cursor-agent"],
+        "code-focus": ["codex", "gemini"],
+        "discovery-focus": ["cursor-agent", "gemini"]
+    }
