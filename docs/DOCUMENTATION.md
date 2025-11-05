@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:39:43
+**Generated:** 2025-11-05 08:41:06
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70624
+- **Total Lines:** 70680
 - **Total Classes:** 267
-- **Total Functions:** 790
+- **Total Functions:** 791
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -7434,6 +7434,45 @@ Returns:
 - `path`: Optional[str]
 - `pattern`: Optional[str]
 - `extra_args`: Optional[List[str]]
+
+---
+
+### `build_tool_command(tool, prompt) -> list[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:331`
+**Complexity:** 6
+
+**Description:**
+> Build command list for tool execution.
+
+Handles tool-specific command patterns:
+- gemini: uses -m for model, -p for prompt
+- codex: uses -m for model, positional arg for prompt
+- cursor-agent: uses --print flag, positional arg for prompt
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    prompt: The prompt to include in command
+    model: Optional model override
+
+Returns:
+    Command as list of strings (shell-safe)
+
+Raises:
+    ValueError: If tool is unknown
+
+Example:
+    >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
+    ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']
+    >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
+    ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']
+    >>> build_tool_command("cursor-agent", "Review code")
+    ['cursor-agent', '--print', 'Review code']
+
+**Parameters:**
+- `tool`: str
+- `prompt`: str
 
 ---
 

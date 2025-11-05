@@ -14,6 +14,7 @@ from datetime import datetime
 from enum import Enum
 import shutil
 import subprocess
+import time
 
 
 class ToolStatus(Enum):
@@ -383,6 +384,144 @@ def build_tool_command(
         raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent")
 
 
+# =============================================================================
+# TOOL EXECUTION FUNCTIONS
+# =============================================================================
+
+
+def execute_tool(
+    tool: str,
+    prompt: str,
+    *,
+    model: Optional[str] = None,
+    timeout: int = 90
+) -> ToolResponse:
+    """
+    Execute AI tool with a prompt and return structured response.
+
+    Handles all subprocess error modes: timeout, not found, invalid output,
+    and general errors. Always returns a ToolResponse with appropriate status.
+
+    Args:
+        tool: Tool name ("gemini", "codex", "cursor-agent")
+        prompt: The prompt to send to the tool
+        model: Optional model override
+        timeout: Timeout in seconds (default 90)
+
+    Returns:
+        ToolResponse with execution results and metadata
+
+    Example:
+        >>> response = execute_tool("gemini", "Analyze code", timeout=60)
+        >>> if response.success:
+        ...     print(response.output)
+        >>> else:
+        ...     print(f"Failed: {response.error}")
+    """
+    start_time = time.time()
+    timestamp = datetime.now().isoformat()
+
+    try:
+        # Build command
+        command = build_tool_command(tool, prompt, model=model)
+
+        # Execute with timeout
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False  # Don't raise on non-zero exit
+        )
+
+        duration = time.time() - start_time
+
+        # Check exit code
+        if result.returncode == 0:
+            return ToolResponse(
+                tool=tool,
+                status=ToolStatus.SUCCESS,
+                output=result.stdout.strip(),
+                error=None,
+                duration=duration,
+                timestamp=timestamp,
+                model=model,
+                prompt=prompt,
+                exit_code=0
+            )
+        else:
+            # Non-zero exit code
+            return ToolResponse(
+                tool=tool,
+                status=ToolStatus.ERROR,
+                output=result.stdout.strip(),
+                error=result.stderr.strip() or f"Tool exited with code {result.returncode}",
+                duration=duration,
+                timestamp=timestamp,
+                model=model,
+                prompt=prompt,
+                exit_code=result.returncode
+            )
+
+    except subprocess.TimeoutExpired:
+        duration = time.time() - start_time
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.TIMEOUT,
+            output="",
+            error=f"Tool timed out after {timeout}s",
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=None
+        )
+
+    except FileNotFoundError:
+        duration = time.time() - start_time
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.NOT_FOUND,
+            output="",
+            error=f"Tool '{tool}' not found in PATH",
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=None
+        )
+
+    except ValueError as e:
+        # Unknown tool from build_tool_command
+        duration = time.time() - start_time
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.ERROR,
+            output="",
+            error=str(e),
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=None
+        )
+
+    except Exception as e:
+        # Unexpected error
+        duration = time.time() - start_time
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.ERROR,
+            output="",
+            error=f"Unexpected error: {type(e).__name__}: {str(e)}",
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=None
+        )
+
+
 # Export public API
 __all__ = [
     "ToolStatus",
@@ -391,4 +530,5 @@ __all__ = [
     "check_tool_available",
     "detect_available_tools",
     "build_tool_command",
+    "execute_tool",
 ]

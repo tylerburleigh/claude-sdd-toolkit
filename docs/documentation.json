@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T13:39:43.379141Z",
+    "generated_at": "2025-11-05T13:41:06.475326Z",
     "languages": [
       "python"
     ],
@@ -10,9 +10,9 @@
   },
   "statistics": {
     "total_files": 210,
-    "total_lines": 70624,
+    "total_lines": 70680,
     "total_classes": 267,
-    "total_functions": 790,
+    "total_functions": 791,
     "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -25,9 +25,9 @@
     "by_language": {
       "python": {
         "files": 210,
-        "lines": 70624,
+        "lines": 70680,
         "classes": 267,
-        "functions": 790,
+        "functions": 791,
         "avg_complexity": 5.58
       }
     }
@@ -876,7 +876,8 @@
       ],
       "functions": [
         "check_tool_available",
-        "detect_available_tools"
+        "detect_available_tools",
+        "build_tool_command"
       ],
       "imports": [
         "dataclasses.dataclass",
@@ -888,7 +889,7 @@
         "subprocess"
       ],
       "exports": [],
-      "lines": 338
+      "lines": 394
     },
     {
       "name": "completion",
@@ -26862,6 +26863,58 @@
         }
       ],
       "call_count": 1
+    },
+    {
+      "name": "build_tool_command",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 331,
+      "language": "python",
+      "docstring": "Build command list for tool execution.\n\nHandles tool-specific command patterns:\n- gemini: uses -m for model, -p for prompt\n- codex: uses -m for model, positional arg for prompt\n- cursor-agent: uses --print flag, positional arg for prompt\n\nArgs:\n    tool: Tool name (\"gemini\", \"codex\", \"cursor-agent\")\n    prompt: The prompt to include in command\n    model: Optional model override\n\nReturns:\n    Command as list of strings (shell-safe)\n\nRaises:\n    ValueError: If tool is unknown\n\nExample:\n    >>> build_tool_command(\"gemini\", \"Analyze code\", model=\"gemini-exp-1114\")\n    ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']\n    >>> build_tool_command(\"codex\", \"Fix bug\", model=\"claude-3.7-sonnet\")\n    ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']\n    >>> build_tool_command(\"cursor-agent\", \"Review code\")\n    ['cursor-agent', '--print', 'Review code']",
+      "parameters": [
+        {
+          "name": "tool",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "list[str]",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 367,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 368,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 374,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 375,
+          "call_type": "method_call"
+        }
+      ]
     },
     {
       "name": "check_spec_completion",
