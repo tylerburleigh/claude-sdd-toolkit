@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:47:28
+**Generated:** 2025-11-05 13:48:16
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 212
-- **Total Lines:** 70571
-- **Total Classes:** 268
+- **Total Files:** 213
+- **Total Lines:** 70657
+- **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
 - **Max Complexity:** 45
@@ -752,6 +752,26 @@ Example:
 - `get_available_agents()`
 - `generate_summary()`
 - `generate_summary_with_fallback()`
+
+---
+
+### `FidelityReport`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:11`
+
+**Description:**
+> Generate structured reports from fidelity review results.
+
+This class will be implemented in Phase 4 (Report Generation).
+
+**Methods:**
+- `__init__()`
+- `generate_markdown()`
+- `generate_json()`
+- `save_to_file()`
+- `calculate_fidelity_score()`
+- `summarize_deviations()`
 
 ---
 
@@ -21303,6 +21323,13 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/report.py`
+
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`

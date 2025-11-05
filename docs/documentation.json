@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:47:28.886211Z",
+    "generated_at": "2025-11-05T18:48:16.758232Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 212,
-    "total_lines": 70571,
-    "total_classes": 268,
+    "total_files": 213,
+    "total_lines": 70657,
+    "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 212,
-        "lines": 70571,
-        "classes": 268,
+        "files": 213,
+        "lines": 70657,
+        "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
       }
@@ -2065,6 +2065,24 @@
       ],
       "exports": [],
       "lines": 61
+    },
+    {
+      "name": "report",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "language": "python",
+      "docstring": "Fidelity Review Report Generation Module\n\nGenerates structured reports from fidelity review results.",
+      "classes": [
+        "FidelityReport"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "pathlib.Path"
+      ],
+      "exports": [],
+      "lines": 86
     },
     {
       "name": "review",
@@ -9324,6 +9342,27 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "FidelityReport",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "line": 11,
+      "language": "python",
+      "docstring": "Generate structured reports from fidelity review results.\n\nThis class will be implemented in Phase 4 (Report Generation).",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "generate_markdown",
+        "generate_json",
+        "save_to_file",
+        "calculate_fidelity_score",
+        "summarize_deviations"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "FidelityReviewer",
@@ -108877,6 +108916,12 @@
     "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py": [
       "argparse",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/report.py": [
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "pathlib.Path"
     ],
     "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
       "pathlib.Path",
