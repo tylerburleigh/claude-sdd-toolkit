@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:07:52
+**Generated:** 2025-11-05 16:11:00
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72476
+- **Total Lines:** 72587
 - **Total Classes:** 277
-- **Total Functions:** 789
+- **Total Functions:** 790
 - **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -6344,6 +6344,28 @@ Returns:
 - `args`: argparse.Namespace
 - `printer`: PrettyPrinter
 - `exc`: Exception
+
+---
+
+### `_handle_fidelity_review(args) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:12`
+**Complexity:** 1
+
+**Description:**
+> Handle fidelity-review command execution.
+
+This function will be implemented in subsequent tasks.
+
+Args:
+    args: Parsed command-line arguments
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+**Parameters:**
+- `args`: argparse.Namespace
 
 ---
 
@@ -16141,7 +16163,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:29`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:140`
 **Complexity:** 2
 
 **Description:**
@@ -17046,7 +17068,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:12`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:29`
 **Complexity:** 1
 
 **Description:**
@@ -17057,9 +17079,6 @@ fidelity review commands as subcommands.
 
 Args:
     subparsers: The subparser object from the main argument parser
-
-Note:
-    Implementation will be added in Phase 5 (CLI Integration).
 
 **Parameters:**
 - `subparsers`: argparse._SubParsersAction

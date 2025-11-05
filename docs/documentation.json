@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:07:52.829947Z",
+    "generated_at": "2025-11-05T21:11:00.891744Z",
     "languages": [
       "python"
     ],
@@ -10,9 +10,9 @@
   },
   "statistics": {
     "total_files": 214,
-    "total_lines": 72476,
+    "total_lines": 72587,
     "total_classes": 277,
-    "total_functions": 789,
+    "total_functions": 790,
     "avg_complexity": 5.59,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -25,9 +25,9 @@
     "by_language": {
       "python": {
         "files": 214,
-        "lines": 72476,
+        "lines": 72587,
         "classes": 277,
-        "functions": 789,
+        "functions": 790,
         "avg_complexity": 5.59
       }
     }
@@ -2056,6 +2056,7 @@
       "docstring": "Implementation Fidelity Review CLI\n\nCommand-line interface for reviewing implementation fidelity against SDD specifications.",
       "classes": [],
       "functions": [
+        "_handle_fidelity_review",
         "register_commands",
         "main"
       ],
@@ -2064,7 +2065,7 @@
         "typing.Optional"
       ],
       "exports": [],
-      "lines": 61
+      "lines": 172
     },
     {
       "name": "consultation",
@@ -16707,7 +16708,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -44898,7 +44899,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -46080,7 +46081,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -47201,7 +47202,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -47672,7 +47673,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -53428,7 +53429,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -63838,11 +63839,46 @@
       "call_count": 1
     },
     {
-      "name": "register_commands",
+      "name": "_handle_fidelity_review",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
       "line": 12,
       "language": "python",
-      "docstring": "Register fidelity review commands with the main CLI parser.\n\nThis function will be called by the main SDD CLI to register\nfidelity review commands as subcommands.\n\nArgs:\n    subparsers: The subparser object from the main argument parser\n\nNote:\n    Implementation will be added in Phase 5 (CLI Integration).",
+      "docstring": "Handle fidelity-review command execution.\n\nThis function will be implemented in subsequent tasks.\n\nArgs:\n    args: Parsed command-line arguments\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": "argparse.Namespace",
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 24,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 25,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "register_commands",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 29,
+      "language": "python",
+      "docstring": "Register fidelity review commands with the main CLI parser.\n\nThis function will be called by the main SDD CLI to register\nfidelity review commands as subcommands.\n\nArgs:\n    subparsers: The subparser object from the main argument parser",
       "parameters": [
         {
           "name": "subparsers",
@@ -63857,12 +63893,115 @@
       "is_exported": false,
       "is_public": true,
       "callers": [],
-      "calls": []
+      "calls": [
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 40,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_mutually_exclusive_group",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 60,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 108,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 129,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 137,
+          "call_type": "method_call"
+        }
+      ]
     },
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 29,
+      "line": 140,
       "language": "python",
       "docstring": "Main entry point for standalone CLI execution.\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
       "parameters": [],
@@ -63924,7 +64063,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {
@@ -63962,31 +64101,31 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 36,
+          "line": 147,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 41,
+          "line": 152,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 48,
+          "line": 159,
           "call_type": "method_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 50,
+          "line": 161,
           "call_type": "method_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 53,
+          "line": 164,
           "call_type": "method_call"
         }
       ],
@@ -75988,7 +76127,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 61,
+          "line": 172,
           "call_type": "function_call"
         },
         {

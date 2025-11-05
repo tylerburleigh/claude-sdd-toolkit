@@ -6,14 +6,33 @@ Command-line interface for reviewing implementation fidelity against SDD specifi
 """
 
 import argparse
+import sys
+import json
 from typing import Optional
+from pathlib import Path
+
+from .review import FidelityReviewer
+from .consultation import (
+    consult_multiple_ai_on_fidelity,
+    parse_multiple_responses,
+    detect_consensus,
+    categorize_issues,
+    NoToolsAvailableError,
+    ConsultationTimeoutError,
+    ConsultationError
+)
 
 
 def _handle_fidelity_review(args: argparse.Namespace) -> int:
     """
     Handle fidelity-review command execution.
 
-    This function will be implemented in subsequent tasks.
+    Orchestrates the fidelity review workflow:
+    1. Load specification and extract requirements
+    2. Generate review prompt with implementation artifacts
+    3. Optionally consult AI tools for review
+    4. Parse and analyze responses
+    5. Generate and display report
 
     Args:
         args: Parsed command-line arguments
@@ -21,9 +40,171 @@ def _handle_fidelity_review(args: argparse.Namespace) -> int:
     Returns:
         Exit code (0 for success, non-zero for error)
     """
-    print(f"Fidelity review for spec: {args.spec_id}")
-    print("Handler implementation coming in next tasks...")
-    return 0
+    try:
+        # Step 1: Initialize FidelityReviewer
+        if args.verbose:
+            print(f"Loading specification: {args.spec_id}", file=sys.stderr)
+
+        reviewer = FidelityReviewer(args.spec_id)
+
+        if reviewer.spec_data is None:
+            print(f"Error: Failed to load specification {args.spec_id}", file=sys.stderr)
+            return 1
+
+        # Step 2: Generate review prompt
+        if args.verbose:
+            print("Generating review prompt...", file=sys.stderr)
+
+        task_id = args.task if hasattr(args, 'task') and args.task else None
+        phase_id = args.phase if hasattr(args, 'phase') and args.phase else None
+        file_paths = args.files if hasattr(args, 'files') and args.files else None
+
+        prompt = reviewer.generate_review_prompt(
+            task_id=task_id,
+            phase_id=phase_id,
+            file_paths=file_paths,
+            include_tests=not args.no_tests,
+            base_branch=args.base_branch
+        )
+
+        # If no-ai flag, just show prompt and exit
+        if args.no_ai:
+            print("\n" + "=" * 80)
+            print("REVIEW PROMPT (--no-ai mode)")
+            print("=" * 80)
+            print(prompt)
+            return 0
+
+        # Step 3: Consult AI tools
+        if args.verbose:
+            ai_tools = args.ai_tools if hasattr(args, 'ai_tools') and args.ai_tools else None
+            tool_list = ', '.join(ai_tools) if ai_tools else 'all available'
+            print(f"Consulting AI tools: {tool_list}", file=sys.stderr)
+
+        try:
+            responses = consult_multiple_ai_on_fidelity(
+                prompt=prompt,
+                tools=args.ai_tools if hasattr(args, 'ai_tools') else None,
+                model=args.model if hasattr(args, 'model') else None,
+                timeout=args.timeout
+            )
+        except NoToolsAvailableError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            print("Tip: Install AI consultation tools (gemini, codex, or cursor-agent)", file=sys.stderr)
+            return 1
+        except ConsultationTimeoutError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+        except ConsultationError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+
+        # Step 4: Parse responses
+        if args.verbose:
+            print(f"Parsing {len(responses)} AI responses...", file=sys.stderr)
+
+        parsed_responses = parse_multiple_responses(responses)
+
+        # Step 5: Detect consensus
+        consensus_threshold = args.consensus_threshold if hasattr(args, 'consensus_threshold') else 2
+        consensus = detect_consensus(parsed_responses, min_agreement=consensus_threshold)
+
+        # Step 6: Categorize issues
+        categorized_issues = categorize_issues(consensus.consensus_issues)
+
+        # Step 7: Generate output
+        output_format = args.format if hasattr(args, 'format') else 'text'
+
+        if output_format == 'json':
+            _output_json(args, reviewer, parsed_responses, consensus, categorized_issues)
+        elif output_format == 'markdown':
+            _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues)
+        else:  # text
+            _output_text(args, reviewer, parsed_responses, consensus, categorized_issues)
+
+        # If output file specified, write to file
+        if hasattr(args, 'output') and args.output:
+            if args.verbose:
+                print(f"\nResults saved to: {args.output}", file=sys.stderr)
+
+        return 0
+
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
+        if args.verbose:
+            import traceback
+            traceback.print_exc()
+        return 1
+
+
+def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues):
+    """Generate text output format."""
+    print("\n" + "=" * 80)
+    print("IMPLEMENTATION FIDELITY REVIEW")
+    print("=" * 80)
+    print(f"\nSpec: {reviewer.spec_id}")
+    print(f"Consulted {len(parsed_responses)} AI model(s)")
+    print(f"\nConsensus Verdict: {consensus.consensus_verdict.value.upper()}")
+    print(f"Agreement Rate: {consensus.agreement_rate:.1%}")
+
+    if categorized_issues:
+        print(f"\n{'-' * 80}")
+        print("ISSUES IDENTIFIED (Consensus):")
+        print(f"{'-' * 80}")
+        for cat_issue in categorized_issues:
+            print(f"\n[{cat_issue.severity.value.upper()}] {cat_issue.issue}")
+
+    if consensus.consensus_recommendations:
+        print(f"\n{'-' * 80}")
+        print("RECOMMENDATIONS:")
+        print(f"{'-' * 80}")
+        for rec in consensus.consensus_recommendations:
+            print(f"- {rec}")
+
+    if args.verbose:
+        print(f"\n{'-' * 80}")
+        print("INDIVIDUAL MODEL RESPONSES:")
+        print(f"{'-' * 80}")
+        for i, response in enumerate(parsed_responses, 1):
+            tool_name = parsed_responses[i-1]  # Get tool name from original responses
+            print(f"\nModel {i}: {response.verdict.value}")
+            print(f"Issues: {len(response.issues)}")
+            print(f"Recommendations: {len(response.recommendations)}")
+
+
+def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues):
+    """Generate markdown output format."""
+    output = []
+    output.append("# Implementation Fidelity Review\n")
+    output.append(f"**Spec:** {reviewer.spec_id}\n")
+    output.append(f"**Models Consulted:** {len(parsed_responses)}\n")
+    output.append(f"\n## Consensus Verdict: {consensus.consensus_verdict.value.upper()}\n")
+    output.append(f"**Agreement Rate:** {consensus.agreement_rate:.1%}\n")
+
+    if categorized_issues:
+        output.append("\n## Issues Identified (Consensus)\n")
+        for cat_issue in categorized_issues:
+            output.append(f"\n### [{cat_issue.severity.value.upper()}] {cat_issue.issue}\n")
+
+    if consensus.consensus_recommendations:
+        output.append("\n## Recommendations\n")
+        for rec in consensus.consensus_recommendations:
+            output.append(f"- {rec}\n")
+
+    result = "".join(output)
+    print(result)
+
+
+def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues):
+    """Generate JSON output format."""
+    result = {
+        "spec_id": reviewer.spec_id,
+        "models_consulted": len(parsed_responses),
+        "consensus": consensus.to_dict(),
+        "categorized_issues": [issue.to_dict() for issue in categorized_issues],
+        "individual_responses": [response.to_dict() for response in parsed_responses]
+    }
+    print(json.dumps(result, indent=2))
 
 
 def register_commands(subparsers: argparse._SubParsersAction) -> None:
