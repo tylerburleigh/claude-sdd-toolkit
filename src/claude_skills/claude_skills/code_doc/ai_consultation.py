@@ -14,6 +14,8 @@ from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
+from claude_skills.common.ai_tools import detect_available_tools
+
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
@@ -50,25 +52,12 @@ def get_available_tools() -> List[str]:
     """
     Check which AI CLI tools are available.
 
+    Delegates to shared utility function for consistency across skills.
+
     Returns:
         List of available tool names
     """
-    available = []
-
-    for tool, cmd in TOOL_COMMANDS.items():
-        try:
-            # Try to run tool with --version or --help
-            result = subprocess.run(
-                [cmd[0], "--version"],
-                capture_output=True,
-                timeout=5
-            )
-            if result.returncode == 0 or result.returncode == 1:  # Some tools return 1 for --version
-                available.append(tool)
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            pass
-
-    return available
+    return detect_available_tools()
 
 
 def get_best_tool(doc_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
