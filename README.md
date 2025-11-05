@@ -157,6 +157,7 @@ Best practice: Ask Claude to "Document this codebase" before creating specs to e
 | `sdd-validate` | Check spec validity | "Is my spec valid?" |
 | `sdd-render` | Render specs to markdown | Generate human-readable documentation with AI enhancement (3 modes: basic/summary/standard/full) |
 | `sdd-plan-review` | Multi-model review | "Review my spec" |
+| `sdd-fidelity-review` | Review implementation fidelity | "Did I implement what the spec actually said?" "Check implementation against task requirements" |
 | `code-doc` | Generate docs | "Document this codebase" |
 | `doc-query` | Query docs & analyze relationships | "What calls this function?" "Show call graph" "Find refactor candidates" |
 | `run-tests` | Run & debug tests | "Run tests and fix failures" |
@@ -239,6 +240,7 @@ User: Sees validation results
 
 - `sdd-validate` → Launches validation subagent for spec quality checks
 - `sdd-plan-review` → Launches review subagent for multi-model feedback
+- `sdd-fidelity-review` → Launches fidelity review subagent for implementation verification
 - `sdd-update` → Launches update subagent for progress tracking and journaling
 - `run-tests` → Launches testing subagent for test execution and debugging
 - `code-doc` → Launches documentation subagent for codebase analysis
