@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:04:02
+**Generated:** 2025-11-05 16:05:24
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 71959
-- **Total Classes:** 272
-- **Total Functions:** 784
+- **Total Lines:** 72149
+- **Total Classes:** 274
+- **Total Functions:** 786
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -355,7 +355,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:24`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:70`
 
 **Description:**
 > Base exception for consultation errors.
@@ -377,7 +377,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:34`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:80`
 
 **Description:**
 > Raised when consultation times out.
@@ -830,6 +830,17 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `get_journal_entries()`
 - `get_task_journals()`
 - `generate_review_prompt()`
+
+---
+
+### `FidelityVerdict`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:27`
+
+**Description:**
+> Overall fidelity verdict from AI review.
 
 ---
 
@@ -1452,7 +1463,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:29`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:75`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -1565,6 +1576,30 @@ Example:
 
 **Description:**
 > Represents a parsed phase.
+
+---
+
+### `ParsedReviewResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:36`
+
+**Description:**
+> Structured representation of AI review response.
+
+Extracted from free-form AI tool output to provide
+structured access to review findings.
+
+Attributes:
+    verdict: Overall pass/fail/partial verdict
+    issues: List of identified issues
+    recommendations: List of suggested improvements
+    summary: Brief summary of findings
+    raw_response: Original AI response text
+    confidence: Confidence level if extractable (0.0-1.0)
+
+**Methods:**
+- `to_dict()`
 
 ---
 
@@ -10012,7 +10047,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:39`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:85`
 **Complexity:** 8
 
 **Description:**
@@ -10123,7 +10158,7 @@ Returns:
 ### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:124`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:170`
 **Complexity:** 9
 
 **Description:**
@@ -14030,7 +14065,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:210`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:256`
 **Complexity:** 3
 
 **Description:**
@@ -16238,6 +16273,34 @@ Example:
 
 ---
 
+### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:436`
+**Complexity:** 1
+
+**Description:**
+> Parse multiple AI tool responses.
+
+Convenience function to parse a list of ToolResponse objects.
+
+Args:
+    responses: List of ToolResponse objects
+
+Returns:
+    List of ParsedReviewResponse objects
+
+Example:
+    >>> responses = consult_multiple_ai_on_fidelity(prompt)
+    >>> parsed_list = parse_multiple_responses(responses)
+    >>> for parsed in parsed_list:
+    ...     print(f"{parsed.verdict.value}: {len(parsed.issues)} issues")
+
+**Parameters:**
+- `responses`: List[ToolResponse]
+
+---
+
 ### `parse_response(tool_output, tool_name) -> Dict[str, Any]`
 
 **Language:** python
@@ -16260,6 +16323,36 @@ Returns:
 **Parameters:**
 - `tool_output`: str
 - `tool_name`: str
+
+---
+
+### `parse_review_response(response) -> ParsedReviewResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:315`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Parse AI tool response to extract structured review information.
+
+Extracts verdict, issues, recommendations from free-form AI response.
+Uses pattern matching and heuristics to identify key information.
+
+Args:
+    response: ToolResponse from AI consultation
+
+Returns:
+    ParsedReviewResponse with extracted information
+
+Example:
+    >>> tool_response = consult_ai_on_fidelity(prompt)
+    >>> parsed = parse_review_response(tool_response)
+    >>> print(f"Verdict: {parsed.verdict.value}")
+    >>> for issue in parsed.issues:
+    ...     print(f"- {issue}")
+
+**Parameters:**
+- `response`: ToolResponse
 
 ---
 
@@ -21505,7 +21598,11 @@ Returns:
 - `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.ai_tools.execute_tool`
 - `claude_skills.common.ai_tools.execute_tools_parallel`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
 - `logging`
+- `re`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`

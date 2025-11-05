@@ -454,3 +454,149 @@ def parse_multiple_responses(
         ...     print(f"{parsed.verdict.value}: {len(parsed.issues)} issues")
     """
     return [parse_review_response(response) for response in responses]
+
+
+@dataclass
+class ConsensusResult:
+    """
+    Consensus analysis across multiple AI review responses.
+
+    Identifies issues and recommendations where multiple models agree,
+    providing higher confidence in findings.
+
+    Attributes:
+        consensus_verdict: Majority verdict across all responses
+        consensus_issues: Issues mentioned by 2+ models
+        consensus_recommendations: Recommendations mentioned by 2+ models
+        all_issues: All unique issues across all models
+        all_recommendations: All unique recommendations across all models
+        verdict_distribution: Count of each verdict type
+        agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)
+        model_count: Total number of models consulted
+    """
+    consensus_verdict: FidelityVerdict
+    consensus_issues: List[str] = field(default_factory=list)
+    consensus_recommendations: List[str] = field(default_factory=list)
+    all_issues: List[str] = field(default_factory=list)
+    all_recommendations: List[str] = field(default_factory=list)
+    verdict_distribution: Dict[str, int] = field(default_factory=dict)
+    agreement_rate: float = 0.0
+    model_count: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "consensus_verdict": self.consensus_verdict.value,
+            "consensus_issues": self.consensus_issues,
+            "consensus_recommendations": self.consensus_recommendations,
+            "all_issues": self.all_issues,
+            "all_recommendations": self.all_recommendations,
+            "verdict_distribution": self.verdict_distribution,
+            "agreement_rate": self.agreement_rate,
+            "model_count": self.model_count
+        }
+
+
+def detect_consensus(
+    parsed_responses: List[ParsedReviewResponse],
+    min_agreement: int = 2,
+    similarity_threshold: float = 0.7
+) -> ConsensusResult:
+    """
+    Detect consensus across multiple AI review responses.
+
+    Identifies issues and recommendations where multiple models agree,
+    providing higher confidence findings.
+
+    Args:
+        parsed_responses: List of ParsedReviewResponse objects
+        min_agreement: Minimum number of models that must agree (default: 2)
+        similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)
+                            Not implemented in v1, uses exact matching
+
+    Returns:
+        ConsensusResult with consensus analysis
+
+    Algorithm:
+        1. Count verdict distribution and find majority verdict
+        2. Collect all issues/recommendations across models
+        3. Identify items mentioned by >= min_agreement models
+        4. Calculate agreement rate for verdict
+
+    Example:
+        >>> parsed = parse_multiple_responses(responses)
+        >>> consensus = detect_consensus(parsed, min_agreement=2)
+        >>> print(f"Consensus: {consensus.consensus_verdict.value}")
+        >>> print(f"Agreement: {consensus.agreement_rate:.1%}")
+        >>> for issue in consensus.consensus_issues:
+        ...     print(f"- {issue}")
+    """
+    if not parsed_responses:
+        return ConsensusResult(
+            consensus_verdict=FidelityVerdict.UNKNOWN,
+            model_count=0
+        )
+
+    model_count = len(parsed_responses)
+
+    # 1. Count verdict distribution
+    verdict_counts: Dict[FidelityVerdict, int] = {}
+    for response in parsed_responses:
+        verdict_counts[response.verdict] = verdict_counts.get(response.verdict, 0) + 1
+
+    # Find majority verdict
+    consensus_verdict = FidelityVerdict.UNKNOWN
+    max_count = 0
+    for verdict, count in verdict_counts.items():
+        if count > max_count:
+            max_count = count
+            consensus_verdict = verdict
+
+    # Calculate agreement rate (percentage agreeing on consensus verdict)
+    agreement_rate = max_count / model_count if model_count > 0 else 0.0
+
+    # Convert to string keys for JSON serialization
+    verdict_distribution = {v.value: c for v, c in verdict_counts.items()}
+
+    # 2. Collect all issues and count occurrences
+    issue_counts: Dict[str, int] = {}
+    for response in parsed_responses:
+        for issue in response.issues:
+            # Normalize: lowercase and strip whitespace
+            normalized_issue = issue.lower().strip()
+            issue_counts[normalized_issue] = issue_counts.get(normalized_issue, 0) + 1
+
+    # 3. Identify consensus issues (mentioned by >= min_agreement models)
+    consensus_issues = []
+    all_issues = []
+    for issue, count in issue_counts.items():
+        if count >= min_agreement:
+            consensus_issues.append(issue)
+        all_issues.append(issue)
+
+    # 4. Collect all recommendations and count occurrences
+    rec_counts: Dict[str, int] = {}
+    for response in parsed_responses:
+        for rec in response.recommendations:
+            # Normalize: lowercase and strip whitespace
+            normalized_rec = rec.lower().strip()
+            rec_counts[normalized_rec] = rec_counts.get(normalized_rec, 0) + 1
+
+    # 5. Identify consensus recommendations (mentioned by >= min_agreement models)
+    consensus_recommendations = []
+    all_recommendations = []
+    for rec, count in rec_counts.items():
+        if count >= min_agreement:
+            consensus_recommendations.append(rec)
+        all_recommendations.append(rec)
+
+    return ConsensusResult(
+        consensus_verdict=consensus_verdict,
+        consensus_issues=consensus_issues,
+        consensus_recommendations=consensus_recommendations,
+        all_issues=all_issues,
+        all_recommendations=all_recommendations,
+        verdict_distribution=verdict_distribution,
+        agreement_rate=agreement_rate,
+        model_count=model_count
+    )
