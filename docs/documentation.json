@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T16:05:25.215254Z",
+    "generated_at": "2025-11-05T16:07:25.795261Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 209,
-    "total_lines": 70383,
+    "total_lines": 70395,
     "total_classes": 267,
     "total_functions": 779,
     "avg_complexity": 5.58,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 209,
-        "lines": 70383,
+        "lines": 70395,
         "classes": 267,
         "functions": 779,
         "avg_complexity": 5.58
@@ -1909,9 +1909,7 @@
         "typing.Optional",
         "claude_skills.common.PrettyPrinter",
         "claude_skills.common.metrics.track_metrics",
-        "claude_skills.run_tests.tool_checking.print_tool_status",
-        "claude_skills.run_tests.tool_checking.get_tool_status_dict",
-        "claude_skills.run_tests.tool_checking.FAILURE_TYPES",
+        "claude_skills.common.ai_tools.detect_available_tools",
         "claude_skills.run_tests.consultation.consult_with_auto_routing",
         "claude_skills.run_tests.consultation.consult_multi_agent",
         "claude_skills.run_tests.consultation.run_consultation",
@@ -1920,7 +1918,6 @@
         "claude_skills.run_tests.consultation.get_consensus_pair_for_failure",
         "claude_skills.run_tests.consultation.FAILURE_TYPES",
         "claude_skills.run_tests.consultation.MULTI_AGENT_PAIRS",
-        "claude_skills.run_tests.consultation.get_available_tools",
         "claude_skills.run_tests.test_discovery.print_discovery_report",
         "claude_skills.run_tests.pytest_runner.run_pytest",
         "claude_skills.run_tests.pytest_runner.list_presets",
@@ -1928,7 +1925,7 @@
         "claude_skills.run_tests.pytest_runner.validate_preset"
       ],
       "exports": [],
-      "lines": 250
+      "lines": 262
     },
     {
       "name": "consultation",
@@ -20627,12 +20624,6 @@
           "file": "src/claude_skills/claude_skills/code_doc/cli.py",
           "line": 324,
           "call_type": "function_call"
-        },
-        {
-          "name": "cmd_consult",
-          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 75,
-          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -20643,7 +20634,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 3
     },
     {
       "name": "get_best_tool",
@@ -21934,7 +21925,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 83,
+          "line": 95,
           "call_type": "function_call"
         },
         {
@@ -22122,7 +22113,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 107,
+          "line": 119,
           "call_type": "function_call"
         }
       ],
@@ -23065,13 +23056,13 @@
         {
           "name": "_maybe_json",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 45,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_tools",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 62,
+          "line": 60,
           "call_type": "function_call"
         }
       ],
@@ -26787,6 +26778,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_check_tools",
+          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
+          "line": 52,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_consult",
+          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_best_tool",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 299,
@@ -26825,7 +26828,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 7
     },
     {
       "name": "build_tool_command",
@@ -47242,13 +47245,13 @@
         {
           "name": "_maybe_json",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 45,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_tools",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 62,
+          "line": 60,
           "call_type": "function_call"
         }
       ],
@@ -47506,25 +47509,25 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 77,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 86,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 92,
+          "line": 104,
           "call_type": "function_call"
         },
         {
           "name": "cmd_run",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 152,
+          "line": 164,
           "call_type": "function_call"
         }
       ],
@@ -58343,7 +58346,7 @@
     {
       "name": "_dump_json",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 38,
+      "line": 33,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -58393,13 +58396,13 @@
         {
           "name": "_maybe_json",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 45,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_tools",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 62,
+          "line": 60,
           "call_type": "function_call"
         }
       ],
@@ -58407,13 +58410,13 @@
         {
           "name": "dump",
           "file": "unknown",
-          "line": 39,
+          "line": 34,
           "call_type": "method_call"
         },
         {
           "name": "write",
           "file": "unknown",
-          "line": 40,
+          "line": 35,
           "call_type": "method_call"
         }
       ],
@@ -58422,7 +58425,7 @@
     {
       "name": "_maybe_json",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 43,
+      "line": 38,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -58657,25 +58660,25 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 77,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 86,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 92,
+          "line": 104,
           "call_type": "function_call"
         },
         {
           "name": "cmd_run",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 152,
+          "line": 164,
           "call_type": "function_call"
         }
       ],
@@ -58683,13 +58686,13 @@
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 44,
+          "line": 39,
           "call_type": "function_call"
         },
         {
           "name": "_dump_json",
           "file": "unknown",
-          "line": 45,
+          "line": 40,
           "call_type": "function_call"
         }
       ],
@@ -58698,9 +58701,9 @@
     {
       "name": "cmd_check_tools",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 55,
+      "line": 50,
       "language": "python",
-      "docstring": null,
+      "docstring": "Check availability of external AI tools.",
       "parameters": [
         {
           "name": "args",
@@ -58714,7 +58717,7 @@
         }
       ],
       "return_type": "int",
-      "complexity": 3,
+      "complexity": 4,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -58722,41 +58725,77 @@
       "callers": [],
       "calls": [
         {
-          "name": "getattr",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 56,
+          "line": 52,
           "call_type": "function_call"
         },
         {
-          "name": "get_tool_status_dict",
+          "name": "getattr",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
           "file": "unknown",
           "line": 57,
           "call_type": "function_call"
         },
         {
-          "name": "get_quick_routing",
-          "file": "unknown",
-          "line": 61,
-          "call_type": "function_call"
-        },
-        {
           "name": "_dump_json",
           "file": "unknown",
-          "line": 62,
+          "line": 60,
           "call_type": "function_call"
         },
         {
-          "name": "print_tool_status",
+          "name": "header",
           "file": "unknown",
           "line": 64,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 69,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 72,
           "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 74,
+          "call_type": "method_call"
         }
       ]
     },
     {
       "name": "cmd_consult",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 67,
+      "line": 79,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -58782,103 +58821,103 @@
         {
           "name": "print_routing_matrix",
           "file": "unknown",
-          "line": 69,
+          "line": 81,
           "call_type": "function_call"
         },
         {
-          "name": "get_available_tools",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 75,
+          "line": 87,
           "call_type": "function_call"
         },
         {
           "name": "_maybe_json",
           "file": "unknown",
-          "line": 77,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 79,
+          "line": 91,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 80,
+          "line": 92,
           "call_type": "method_call"
         },
         {
           "name": "run_consultation",
           "file": "unknown",
-          "line": 83,
+          "line": 95,
           "call_type": "function_call"
         },
         {
           "name": "_maybe_json",
           "file": "unknown",
-          "line": 86,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 88,
+          "line": 100,
           "call_type": "method_call"
         },
         {
           "name": "_maybe_json",
           "file": "unknown",
-          "line": 92,
+          "line": 104,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 94,
+          "line": 106,
           "call_type": "method_call"
         },
         {
           "name": "should_auto_trigger_consensus",
           "file": "unknown",
-          "line": 99,
+          "line": 111,
           "call_type": "function_call"
         },
         {
           "name": "get_consensus_pair_for_failure",
           "file": "unknown",
-          "line": 101,
+          "line": 113,
           "call_type": "function_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 102,
+          "line": 114,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 103,
+          "line": 115,
           "call_type": "method_call"
         },
         {
           "name": "blank",
           "file": "unknown",
-          "line": 104,
+          "line": 116,
           "call_type": "method_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "unknown",
-          "line": 107,
+          "line": 119,
           "call_type": "function_call"
         },
         {
           "name": "consult_with_auto_routing",
           "file": "unknown",
-          "line": 120,
+          "line": 132,
           "call_type": "function_call"
         }
       ]
@@ -58886,7 +58925,7 @@
     {
       "name": "cmd_discover",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 134,
+      "line": 146,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -58912,7 +58951,7 @@
         {
           "name": "print_discovery_report",
           "file": "unknown",
-          "line": 135,
+          "line": 147,
           "call_type": "function_call"
         }
       ]
@@ -58920,7 +58959,7 @@
     {
       "name": "cmd_run",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 146,
+      "line": 158,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -58946,37 +58985,37 @@
         {
           "name": "list_presets",
           "file": "unknown",
-          "line": 148,
+          "line": 160,
           "call_type": "function_call"
         },
         {
           "name": "validate_preset",
           "file": "unknown",
-          "line": 151,
+          "line": 163,
           "call_type": "function_call"
         },
         {
           "name": "_maybe_json",
           "file": "unknown",
-          "line": 152,
+          "line": 164,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 154,
+          "line": 166,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 155,
+          "line": 167,
           "call_type": "method_call"
         },
         {
           "name": "run_pytest",
           "file": "unknown",
-          "line": 158,
+          "line": 170,
           "call_type": "function_call"
         }
       ]
@@ -58984,7 +59023,7 @@
     {
       "name": "register_run_tests",
       "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-      "line": 172,
+      "line": 184,
       "language": "python",
       "docstring": null,
       "parameters": [
@@ -59017,97 +59056,25 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 173,
+          "line": 185,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 179,
+          "line": 191,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 180,
+          "line": 192,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 182,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 201,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 202,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 203,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 204,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 205,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 206,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 207,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 208,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 209,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 210,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 211,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 212,
+          "line": 194,
           "call_type": "method_call"
         },
         {
@@ -59117,27 +59084,51 @@
           "call_type": "method_call"
         },
         {
-          "name": "list",
-          "file": "unknown",
-          "line": 213,
-          "call_type": "function_call"
-        },
-        {
-          "name": "keys",
-          "file": "unknown",
-          "line": 213,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
+          "name": "add_argument",
           "file": "unknown",
           "line": 214,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 215,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
           "file": "unknown",
           "line": 216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 218,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 220,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 221,
           "call_type": "method_call"
         },
         {
@@ -59165,46 +59156,52 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "list",
           "file": "unknown",
-          "line": 226,
-          "call_type": "method_call"
+          "line": 225,
+          "call_type": "function_call"
         },
         {
-          "name": "add_argument",
+          "name": "keys",
           "file": "unknown",
-          "line": 227,
+          "line": 225,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 228,
+          "line": 226,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 230,
+          "line": 228,
           "call_type": "method_call"
         },
         {
-          "name": "add_mutually_exclusive_group",
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 234,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
           "file": "unknown",
           "line": 236,
           "call_type": "method_call"
         },
         {
-          "name": "items",
+          "name": "add_argument",
           "file": "unknown",
           "line": 237,
           "call_type": "method_call"
-        },
-        {
-          "name": "get_presets",
-          "file": "unknown",
-          "line": 237,
-          "call_type": "function_call"
         },
         {
           "name": "add_argument",
@@ -59215,31 +59212,73 @@
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 246,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 247,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 248,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 249,
+          "line": 239,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
+          "line": 240,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 242,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_mutually_exclusive_group",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 249,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_presets",
+          "file": "unknown",
+          "line": 249,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
           "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 258,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 260,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 261,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 262,
           "call_type": "method_call"
         }
       ],
@@ -59523,7 +59562,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 99,
+          "line": 111,
           "call_type": "function_call"
         }
       ],
@@ -59560,7 +59599,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 101,
+          "line": 113,
           "call_type": "function_call"
         }
       ],
@@ -60174,7 +60213,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 83,
+          "line": 95,
           "call_type": "function_call"
         },
         {
@@ -60409,7 +60448,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 69,
+          "line": 81,
           "call_type": "function_call"
         }
       ],
@@ -60515,7 +60554,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 120,
+          "line": 132,
           "call_type": "function_call"
         },
         {
@@ -61236,7 +61275,7 @@
         {
           "name": "cmd_consult",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 107,
+          "line": 119,
           "call_type": "function_call"
         }
       ],
@@ -61737,7 +61776,7 @@
         {
           "name": "cmd_run",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 158,
+          "line": 170,
           "call_type": "function_call"
         }
       ],
@@ -61828,7 +61867,7 @@
         {
           "name": "register_run_tests",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 237,
+          "line": 249,
           "call_type": "function_call"
         }
       ],
@@ -61865,7 +61904,7 @@
         {
           "name": "cmd_run",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 148,
+          "line": 160,
           "call_type": "function_call"
         }
       ],
@@ -61962,7 +62001,7 @@
         {
           "name": "cmd_run",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 151,
+          "line": 163,
           "call_type": "function_call"
         }
       ],
@@ -62744,7 +62783,7 @@
         {
           "name": "cmd_discover",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 135,
+          "line": 147,
           "call_type": "function_call"
         }
       ],
@@ -73459,6 +73498,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_check_tools",
+          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
+          "line": 52,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_consult",
+          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_best_tool",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 299,
@@ -73497,7 +73548,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 7
     },
     {
       "name": "review_with_tools",
@@ -108512,9 +108563,7 @@
       "typing.Optional",
       "claude_skills.common.PrettyPrinter",
       "claude_skills.common.metrics.track_metrics",
-      "claude_skills.run_tests.tool_checking.print_tool_status",
-      "claude_skills.run_tests.tool_checking.get_tool_status_dict",
-      "claude_skills.run_tests.tool_checking.FAILURE_TYPES",
+      "claude_skills.common.ai_tools.detect_available_tools",
       "claude_skills.run_tests.consultation.consult_with_auto_routing",
       "claude_skills.run_tests.consultation.consult_multi_agent",
       "claude_skills.run_tests.consultation.run_consultation",
@@ -108523,7 +108572,6 @@
       "claude_skills.run_tests.consultation.get_consensus_pair_for_failure",
       "claude_skills.run_tests.consultation.FAILURE_TYPES",
       "claude_skills.run_tests.consultation.MULTI_AGENT_PAIRS",
-      "claude_skills.run_tests.consultation.get_available_tools",
       "claude_skills.run_tests.test_discovery.print_discovery_report",
       "claude_skills.run_tests.pytest_runner.run_pytest",
       "claude_skills.run_tests.pytest_runner.list_presets",

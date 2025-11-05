@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 11:05:25
+**Generated:** 2025-11-05 11:07:25
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70383
+- **Total Lines:** 70395
 - **Total Classes:** 267
 - **Total Functions:** 779
 - **Avg Complexity:** 5.58
@@ -5834,7 +5834,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:38`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:33`
 **Complexity:** 1
 
 **Parameters:**
@@ -6270,7 +6270,7 @@ Args:
 ### `_maybe_json(args, payload) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:43`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:38`
 **Complexity:** 2
 
 **Parameters:**
@@ -8509,8 +8509,11 @@ Example:
 ### `cmd_check_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:55`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:50`
+**Complexity:** 4
+
+**Description:**
+> Check availability of external AI tools.
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -8563,7 +8566,7 @@ Example:
 ### `cmd_consult(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:67`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:79`
 ⚠️ **Complexity:** 15 (High)
 
 **Parameters:**
@@ -8706,7 +8709,7 @@ Returns:
 ### `cmd_discover(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:134`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:146`
 **Complexity:** 1
 
 **Parameters:**
@@ -9360,7 +9363,7 @@ Returns:
 ### `cmd_run(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:146`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:158`
 **Complexity:** 5
 
 **Parameters:**
@@ -16720,7 +16723,7 @@ Args:
 ### `register_run_tests(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:172`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:184`
 **Complexity:** 2
 
 **Parameters:**
@@ -21178,12 +21181,12 @@ Returns:
 - `__future__.annotations`
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.metrics.track_metrics`
 - `claude_skills.run_tests.consultation.FAILURE_TYPES`
 - `claude_skills.run_tests.consultation.MULTI_AGENT_PAIRS`
 - `claude_skills.run_tests.consultation.consult_multi_agent`
 - `claude_skills.run_tests.consultation.consult_with_auto_routing`
-- `claude_skills.run_tests.consultation.get_available_tools`
 - `claude_skills.run_tests.consultation.get_consensus_pair_for_failure`
 - `claude_skills.run_tests.consultation.print_routing_matrix`
 - `claude_skills.run_tests.consultation.run_consultation`
@@ -21193,9 +21196,6 @@ Returns:
 - `claude_skills.run_tests.pytest_runner.run_pytest`
 - `claude_skills.run_tests.pytest_runner.validate_preset`
 - `claude_skills.run_tests.test_discovery.print_discovery_report`
-- `claude_skills.run_tests.tool_checking.FAILURE_TYPES`
-- `claude_skills.run_tests.tool_checking.get_tool_status_dict`
-- `claude_skills.run_tests.tool_checking.print_tool_status`
 - `json`
 - `sys`
 - `typing.Any`
