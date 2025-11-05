@@ -5,7 +5,6 @@ Handles consultation with external CLI tools (Gemini, Codex, Cursor) for test
 debugging. Provides auto-routing based on failure type and prompt formatting.
 """
 
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, NamedTuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -14,7 +13,7 @@ import time
 # Add parent directory to path to import sdd_common
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.common.ai_tools import build_tool_command
+from claude_skills.common.ai_tools import build_tool_command, execute_tool, ToolResponse, ToolStatus
 from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools, get_config_path
 
 
@@ -522,12 +521,12 @@ def run_consultation(
         printer.error("Prompt cannot be empty")
         return 1
 
-    # Build command using shared implementation
+    # Get model for tool
     model = get_model_for_tool(tool, failure_type)
-    cmd = build_tool_command(tool, prompt, model=model)
 
     if dry_run:
         printer.info("Would run:")
+        cmd = build_tool_command(tool, prompt, model=model)
         print(" ".join(cmd[:4]))  # Don't print full prompt in dry run
         print(f"<prompt with {len(prompt)} characters>")
         return 0
@@ -536,33 +535,45 @@ def run_consultation(
     print("=" * 60)
     print()
 
+    # Use shared execute_tool() implementation
+    timeout = get_consultation_timeout()
+    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+
+    # Handle user interrupt (Ctrl+C) - execute_tool doesn't catch this
+    # so we need to keep the try/except here
     try:
-        timeout = get_consultation_timeout()
-        result = subprocess.run(cmd, check=False, timeout=timeout)
-        if result.returncode != 0:
-            printer.warning(f"\n{tool} exited with code {result.returncode}")
-        return result.returncode
-    except subprocess.TimeoutExpired:
-        printer.warning(f"\n{tool} timed out after {get_consultation_timeout()} seconds")
-        printer.info("The external tool may be unresponsive or processing a large request")
-        printer.info("Try again with a simpler prompt or check tool availability")
-        return 124
-    except FileNotFoundError:
-        printer.error(f"{tool} not found. Is it installed?")
-        printer.info(f"Install instructions:")
-        if tool == "gemini":
-            printer.info("  npm install -g @google/generative-ai-cli")
-        elif tool == "codex":
-            printer.info("  npm install -g @anthropic/codex")
-        elif tool == "cursor-agent":
-            printer.info("  Check cursor.com for installation instructions")
-        return 1
+        # Print output
+        if response.output:
+            print(response.output)
+
+        # Handle different status codes
+        if response.status == ToolStatus.SUCCESS:
+            return 0
+        elif response.status == ToolStatus.TIMEOUT:
+            printer.warning(f"\n{tool} timed out after {timeout} seconds")
+            printer.info("The external tool may be unresponsive or processing a large request")
+            printer.info("Try again with a simpler prompt or check tool availability")
+            return 124
+        elif response.status == ToolStatus.NOT_FOUND:
+            printer.error(f"{tool} not found. Is it installed?")
+            printer.info(f"Install instructions:")
+            if tool == "gemini":
+                printer.info("  npm install -g @google/generative-ai-cli")
+            elif tool == "codex":
+                printer.info("  npm install -g @anthropic/codex")
+            elif tool == "cursor-agent":
+                printer.info("  Check cursor.com for installation instructions")
+            return 1
+        else:  # ToolStatus.ERROR or other
+            if response.exit_code is not None:
+                printer.warning(f"\n{tool} exited with code {response.exit_code}")
+                return response.exit_code
+            else:
+                printer.error(f"Error running {tool}: {response.error}")
+                return 1
     except KeyboardInterrupt:
         printer.warning("\nConsultation interrupted by user")
         return 130
-    except Exception as e:
-        printer.error(f"Unexpected error running {tool}: {e}")
-        return 1
 
 
 def print_routing_matrix(printer: Optional[PrettyPrinter] = None) -> None:
@@ -697,63 +708,21 @@ def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None
     Returns:
         ConsultationResponse with results
     """
-    # Validate tool
-    known_tools = ["gemini", "codex", "cursor-agent"]
-    if tool not in known_tools:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"Unknown tool '{tool}'"
-        )
-
-    # Build command using shared implementation
+    # Get model for tool
     model = get_model_for_tool(tool, failure_type)
-    cmd = build_tool_command(tool, prompt, model=model)
+    timeout = get_consultation_timeout()
 
-    start_time = time.time()
+    # Use shared execute_tool() implementation
+    response = execute_tool(tool, prompt, model=model, timeout=timeout)
 
-    try:
-        timeout = get_consultation_timeout()
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=timeout
-        )
-        duration = time.time() - start_time
-
-        return ConsultationResponse(
-            tool=tool,
-            success=(result.returncode == 0),
-            output=result.stdout if result.stdout else result.stderr,
-            error=result.stderr if result.returncode != 0 else None,
-            duration=duration
-        )
-    except subprocess.TimeoutExpired:
-        duration = time.time() - start_time
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"{tool} timed out after {get_consultation_timeout()} seconds. Try again or check tool availability.",
-            duration=duration
-        )
-    except FileNotFoundError:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"{tool} not found. Is it installed?"
-        )
-    except Exception as e:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"Unexpected error: {e}"
-        )
+    # Convert ToolResponse to ConsultationResponse for backward compatibility
+    return ConsultationResponse(
+        tool=response.tool,
+        success=response.success,
+        output=response.output,
+        error=response.error,
+        duration=response.duration
+    )
 
 
 def analyze_response_similarity(response1: str, response2: str) -> List[str]:

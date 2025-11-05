@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 10:31:23
+**Generated:** 2025-11-05 10:57:04
 
 ---
 
@@ -5539,7 +5539,7 @@ missing it, even when the validation doesn't report it as an error (backward com
 ### `_build_tool_commands(failure_type) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:299`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:300`
 **Complexity:** 1
 
 **Description:**
@@ -12586,7 +12586,7 @@ Args:
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:363`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:364`
 **Complexity:** 6
 
 **Description:**
@@ -13717,7 +13717,7 @@ Returns:
 ### `get_best_tool(failure_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:330`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:331`
 **Complexity:** 8
 
 **Description:**
@@ -13881,7 +13881,7 @@ Returns:
 ### `get_consensus_pair_for_failure(failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:177`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:178`
 **Complexity:** 5
 
 **Description:**
@@ -13907,7 +13907,7 @@ Returns:
 ### `get_consensus_pairs() -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:214`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:215`
 **Complexity:** 3
 
 **Description:**
@@ -13923,7 +13923,7 @@ Returns:
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:232`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:233`
 **Complexity:** 5
 
 **Description:**
@@ -14022,7 +14022,7 @@ Returns:
 ### `get_flags_for_tool(tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:91`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:92`
 **Complexity:** 3
 
 **Description:**
@@ -14215,7 +14215,7 @@ Returns:
 ### `get_model_for_tool(tool, failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:53`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:54`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -15673,7 +15673,7 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:116`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:117`
 **Complexity:** 5
 
 **Description:**
@@ -15771,7 +15771,7 @@ Returns:
 ### `load_model_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:24`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:25`
 **Complexity:** 5
 
 **Description:**
@@ -16604,7 +16604,7 @@ Returns:
 ### `read_code_file(file_path) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:451`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:452`
 **Complexity:** 7
 
 **Description:**
@@ -17211,7 +17211,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, printer, failure_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:489`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:490`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -17703,7 +17703,7 @@ Returns:
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:143`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:144`
 **Complexity:** 5
 
 **Description:**
@@ -21412,6 +21412,7 @@ Returns:
 ### `src/claude_skills/claude_skills/run_tests/consultation.py`
 
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ai_tools.build_tool_command`
 - `claude_skills.run_tests.tool_checking.check_tool_availability`
 - `claude_skills.run_tests.tool_checking.get_available_tools`
 - `claude_skills.run_tests.tool_checking.get_config_path`
