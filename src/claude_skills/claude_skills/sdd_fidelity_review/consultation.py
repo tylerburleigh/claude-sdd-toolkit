@@ -341,7 +341,15 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         >>> for issue in parsed.issues:
         ...     print(f"- {issue}")
     """
-    output = response.output.strip()
+    # Handle both string input and ToolResponse objects
+    if isinstance(response, str):
+        output = response.strip()
+        success = True
+        error = None
+    else:
+        output = response.output.strip() if response.output else ""
+        success = response.success
+        error = response.error
 
     # Initialize with defaults
     verdict = FidelityVerdict.UNKNOWN
@@ -351,10 +359,10 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
     confidence = None
 
     # If response failed, return early with UNKNOWN verdict
-    if not response.success:
+    if not success:
         return ParsedReviewResponse(
             verdict=FidelityVerdict.UNKNOWN,
-            issues=[f"Tool execution failed: {response.error}"],
+            issues=[f"Tool execution failed: {error}"],
             recommendations=[],
             summary="Unable to complete review due to tool failure",
             raw_response=output,
@@ -374,10 +382,21 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             break
 
     # Heuristic: If "PASS" appears but also mentions issues/concerns, mark as PARTIAL
+    # But exclude phrases like "no issues", "no problems", etc.
     if verdict == FidelityVerdict.PASS:
-        concern_keywords = ['issue', 'problem', 'concern', 'warning', 'error']
-        if any(keyword in output.lower() for keyword in concern_keywords):
-            verdict = FidelityVerdict.PARTIAL
+        output_lower = output.lower()
+        # Check for negative patterns first (no issues, no problems, etc.)
+        negative_patterns = [
+            r'no\s+issue', r'no\s+problem', r'no\s+concern',
+            r'no\s+warning', r'no\s+error', r'0\s+issue', r'0\s+problem'
+        ]
+        has_negatives = any(re.search(pattern, output_lower) for pattern in negative_patterns)
+
+        # Only downgrade to PARTIAL if we find concerns AND don't have negatives
+        if not has_negatives:
+            concern_keywords = ['issue', 'problem', 'concern', 'warning', 'error']
+            if any(keyword in output_lower for keyword in concern_keywords):
+                verdict = FidelityVerdict.PARTIAL
 
     # Extract issues (look for common patterns)
     issue_patterns = [
