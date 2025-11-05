@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 11:03:16
+**Generated:** 2025-11-05 11:05:25
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 210
-- **Total Lines:** 70780
+- **Total Files:** 209
+- **Total Lines:** 70383
 - **Total Classes:** 267
-- **Total Functions:** 792
-- **Avg Complexity:** 5.55
+- **Total Functions:** 779
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -355,7 +355,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `NamedTuple`
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:648`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:647`
 
 **Description:**
 > Represents a response from a tool consultation.
@@ -5539,7 +5539,7 @@ missing it, even when the validation doesn't report it as an error (backward com
 ### `_build_tool_commands(failure_type) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:257`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:256`
 **Complexity:** 1
 
 **Description:**
@@ -7121,7 +7121,7 @@ Returns:
 ### `analyze_response_similarity(response1, response2) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:686`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:685`
 **Complexity:** 5
 
 **Description:**
@@ -8144,22 +8144,6 @@ Example:
 **Parameters:**
 - `spec_data`: Dict
 - `phase_id`: Optional[str]
-
----
-
-### `check_tool_availability() -> Dict[str, bool]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:111`
-**Complexity:** 2
-
-**Description:**
-> Check which external tools are installed and enabled.
-
-Only checks tools that are enabled in the configuration.
-
-Returns:
-    Dict mapping tool names to availability status
 
 ---
 
@@ -9966,7 +9950,7 @@ Returns:
 ### `consult_multi_agent(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, pair, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:897`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:896`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10004,7 +9988,7 @@ Returns:
 ### `consult_with_auto_routing(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, tool, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:554`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:553`
 **Complexity:** 10
 
 **Description:**
@@ -12586,7 +12570,7 @@ Args:
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:321`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:320`
 **Complexity:** 6
 
 **Description:**
@@ -12810,7 +12794,7 @@ Returns:
 ### `format_synthesis_output(synthesis, responses, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:807`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:806`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -13648,20 +13632,6 @@ Returns:
 
 ---
 
-### `get_auto_trigger_failures() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:358`
-**Complexity:** 3
-
-**Description:**
-> Get list of failure types that auto-trigger consensus.
-
-Returns:
-    List of failure type names
-
----
-
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
@@ -13675,20 +13645,6 @@ Delegates to shared utility function for consistency across skills.
 
 Returns:
     List of available tool names
-
----
-
-### `get_available_tools() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:130`
-**Complexity:** 1
-
-**Description:**
-> Get list of available external tools.
-
-Returns:
-    List of tool names that are installed
 
 ---
 
@@ -13717,7 +13673,7 @@ Returns:
 ### `get_best_tool(failure_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:288`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:287`
 **Complexity:** 8
 
 **Description:**
@@ -13850,38 +13806,10 @@ Returns:
 
 ---
 
-### `get_config_path() -> Path`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:37`
-**Complexity:** 1
-
-**Description:**
-> Get the path to the config.yaml file.
-
-Returns:
-    Path to config.yaml in the skill root directory
-
----
-
-### `get_consensus_info() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:378`
-**Complexity:** 2
-
-**Description:**
-> Get consensus configuration info (for display/debugging).
-
-Returns:
-    Dict with consensus pairs and auto-trigger info
-
----
-
 ### `get_consensus_pair_for_failure(failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:148`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:147`
 **Complexity:** 5
 
 **Description:**
@@ -13907,7 +13835,7 @@ Returns:
 ### `get_consensus_pairs() -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:185`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:184`
 **Complexity:** 3
 
 **Description:**
@@ -13923,7 +13851,7 @@ Returns:
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:203`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:202`
 **Complexity:** 1
 
 **Description:**
@@ -14005,24 +13933,10 @@ Returns:
 
 ---
 
-### `get_enabled_tools() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:96`
-**Complexity:** 1
-
-**Description:**
-> Get only the enabled tools from configuration.
-
-Returns:
-    Dict with only enabled tools
-
----
-
 ### `get_flags_for_tool(tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:78`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:77`
 **Complexity:** 3
 
 **Description:**
@@ -14198,24 +14112,10 @@ Returns:
 
 ---
 
-### `get_missing_tools() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:141`
-**Complexity:** 1
-
-**Description:**
-> Get list of missing external tools.
-
-Returns:
-    List of tool names that are not installed
-
----
-
 ### `get_model_for_tool(tool, failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:40`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:39`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -14482,28 +14382,6 @@ Example:
 
 ---
 
-### `get_quick_routing(failure_type, available_tools) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:211`
-**Complexity:** 7
-
-**Description:**
-> Get quick tool routing suggestion for a failure type.
-
-Args:
-    failure_type: Type of test failure (assertion, exception, etc.)
-    available_tools: List of available tools (auto-detected if None)
-
-Returns:
-    Routing suggestion string
-
-**Parameters:**
-- `failure_type`: str
-- `available_tools`: Optional[List[str]]
-
----
-
 ### `get_routing_config(skill_name) -> Dict[str, str]`
 
 **Language:** python
@@ -14549,26 +14427,6 @@ Notes:
 
 **Parameters:**
 - `skill_name`: str
-
----
-
-### `get_routing_suggestions(available_tools) -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:152`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Provide routing suggestions based on available tools.
-
-Args:
-    available_tools: List of tool names that are available
-
-Returns:
-    List of suggestion strings
-
-**Parameters:**
-- `available_tools`: List[str]
 
 ---
 
@@ -15048,20 +14906,6 @@ Returns:
 **Parameters:**
 - `skill_name`: str
 - `tool_name`: str
-
----
-
-### `get_tool_status_dict() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:303`
-**Complexity:** 1
-
-**Description:**
-> Get tool status as a dictionary (for JSON output).
-
-Returns:
-    Dict with 'available' and 'missing' keys
 
 ---
 
@@ -15673,7 +15517,7 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:103`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:102`
 **Complexity:** 1
 
 **Description:**
@@ -15681,20 +15525,6 @@ Returns:
 
 Returns:
     Dict with consensus configuration (pairs and auto_trigger)
-
----
-
-### `load_consensus_config() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:333`
-**Complexity:** 5
-
-**Description:**
-> Load consensus configuration from config.yaml.
-
-Returns:
-    Dict with consensus configuration
 
 ---
 
@@ -15771,7 +15601,7 @@ Returns:
 ### `load_model_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:27`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:26`
 **Complexity:** 1
 
 **Description:**
@@ -15827,20 +15657,6 @@ Returns:
 
 **Parameters:**
 - `skill_name`: str
-
----
-
-### `load_tool_config() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:49`
-**Complexity:** 7
-
-**Description:**
-> Load tool configuration from config.yaml with fallback to defaults.
-
-Returns:
-    Dict with tool configuration
 
 ---
 
@@ -16437,7 +16253,7 @@ Notes:
 ### `print_routing_matrix(printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:537`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:536`
 **Complexity:** 3
 
 **Description:**
@@ -16448,28 +16264,6 @@ Args:
 
 **Parameters:**
 - `printer`: Optional[PrettyPrinter]
-
----
-
-### `print_tool_status(printer, include_routing) -> int`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:256`
-**Complexity:** 6
-
-**Description:**
-> Print tool availability status to console.
-
-Args:
-    printer: PrettyPrinter instance (creates default if None)
-    include_routing: If provided, also show routing for this failure type
-
-Returns:
-    Exit code: 0 if any tools available, 1 if none
-
-**Parameters:**
-- `printer`: Optional[PrettyPrinter]
-- `include_routing`: Optional[str]
 
 ---
 
@@ -16604,7 +16398,7 @@ Returns:
 ### `read_code_file(file_path) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:409`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:408`
 **Complexity:** 7
 
 **Description:**
@@ -17211,7 +17005,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, printer, failure_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:447`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:446`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -17313,7 +17107,7 @@ This ensures tests work in different environments.
 ### `run_tool_parallel(tool, prompt, failure_type) -> ConsultationResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:657`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:656`
 **Complexity:** 1
 
 **Description:**
@@ -17703,7 +17497,7 @@ Returns:
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:114`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:113`
 **Complexity:** 5
 
 **Description:**
@@ -18223,7 +18017,7 @@ Returns:
 ### `synthesize_responses(responses) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:738`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:737`
 **Complexity:** 6
 
 **Description:**
@@ -21417,10 +21211,9 @@ Returns:
 - `claude_skills.common.ai_tools.ToolResponse`
 - `claude_skills.common.ai_tools.ToolStatus`
 - `claude_skills.common.ai_tools.build_tool_command`
+- `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.ai_tools.execute_tool`
 - `claude_skills.common.ai_tools.execute_tools_parallel`
-- `claude_skills.run_tests.tool_checking.check_tool_availability`
-- `claude_skills.run_tests.tool_checking.get_available_tools`
 - `pathlib.Path`
 - `time`
 - `typing.Dict`
@@ -21449,16 +21242,6 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `typing.Tuple`
-
-### `src/claude_skills/claude_skills/run_tests/tool_checking.py`
-
-- `claude_skills.common.PrettyPrinter`
-- `pathlib.Path`
-- `shutil`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `yaml`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`
 

@@ -10,11 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
-from claude_skills.run_tests.tool_checking import (
-    print_tool_status,
-    get_tool_status_dict,
-    FAILURE_TYPES as TOOL_CHECK_FAILURE_TYPES,
-)
+from claude_skills.common.ai_tools import detect_available_tools
 from claude_skills.run_tests.consultation import (
     consult_with_auto_routing,
     consult_multi_agent,
@@ -24,7 +20,6 @@ from claude_skills.run_tests.consultation import (
     get_consensus_pair_for_failure,
     FAILURE_TYPES as CONSULT_FAILURE_TYPES,
     MULTI_AGENT_PAIRS,
-    get_available_tools,
 )
 from claude_skills.run_tests.test_discovery import print_discovery_report
 from claude_skills.run_tests.pytest_runner import (
@@ -53,15 +48,32 @@ def _maybe_json(args: argparse.Namespace, payload: Any) -> bool:
 
 
 def cmd_check_tools(args: argparse.Namespace, printer: PrettyPrinter) -> int:
-    if getattr(args, 'json', False):
-        result = get_tool_status_dict()
-        if args.route:
-            from claude_skills.run_tests.tool_checking import get_quick_routing
+    """Check availability of external AI tools."""
+    available_tools = detect_available_tools()
 
-            result["routing"] = get_quick_routing(args.route)
+    if getattr(args, 'json', False):
+        result = {
+            "tools": {tool: True for tool in available_tools},
+            "available_count": len(available_tools),
+            "available_tools": available_tools
+        }
         _dump_json(result)
         return 0
-    return print_tool_status(printer, include_routing=args.route)
+
+    # Pretty print tool status
+    printer.header("External Tool Availability")
+    printer.blank()
+
+    if not available_tools:
+        printer.warning("No external tools found")
+        printer.info("Install at least one: gemini, codex, or cursor-agent")
+        return 1
+
+    printer.success(f"Found {len(available_tools)} tool(s):")
+    for tool in available_tools:
+        printer.info(f"  ✓ {tool}")
+
+    return 0
 
 
 def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
@@ -72,7 +84,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if args.prompt:
         tool = args.tool if args.tool != "auto" else None
         if tool is None:
-            available_tools = get_available_tools()
+            available_tools = detect_available_tools()
             if not available_tools:
                 if _maybe_json(args, {"status": "error", "message": "No external tools found"}):
                     return 1

@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T16:03:16.901344Z",
+    "generated_at": "2025-11-05T16:05:25.215254Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 210,
-    "total_lines": 70780,
+    "total_files": 209,
+    "total_lines": 70383,
     "total_classes": 267,
-    "total_functions": 792,
-    "avg_complexity": 5.55,
+    "total_functions": 779,
+    "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 210,
-        "lines": 70780,
+        "files": 209,
+        "lines": 70383,
         "classes": 267,
-        "functions": 792,
-        "avg_complexity": 5.55
+        "functions": 779,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -1975,12 +1975,11 @@
         "claude_skills.common.ai_tools.ToolResponse",
         "claude_skills.common.ai_tools.ToolStatus",
         "claude_skills.common.ai_tools.MultiToolResponse",
-        "claude_skills.common.ai_config",
-        "claude_skills.run_tests.tool_checking.check_tool_availability",
-        "claude_skills.run_tests.tool_checking.get_available_tools"
+        "claude_skills.common.ai_tools.detect_available_tools",
+        "claude_skills.common.ai_config"
       ],
       "exports": [],
-      "lines": 1048
+      "lines": 1047
     },
     {
       "name": "pytest_runner",
@@ -2041,39 +2040,6 @@
       ],
       "exports": [],
       "lines": 455
-    },
-    {
-      "name": "tool_checking",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "language": "python",
-      "docstring": "Tool Checking Operations\n\nChecks availability of external CLI tools (Gemini, Codex, Cursor) and provides\nrouting suggestions for test debugging workflows.",
-      "classes": [],
-      "functions": [
-        "get_config_path",
-        "load_tool_config",
-        "get_enabled_tools",
-        "check_tool_availability",
-        "get_available_tools",
-        "get_missing_tools",
-        "get_routing_suggestions",
-        "get_quick_routing",
-        "print_tool_status",
-        "get_tool_status_dict",
-        "load_consensus_config",
-        "get_auto_trigger_failures",
-        "get_consensus_info"
-      ],
-      "imports": [
-        "shutil",
-        "yaml",
-        "pathlib.Path",
-        "typing.Dict",
-        "typing.List",
-        "typing.Optional",
-        "claude_skills.common.PrettyPrinter"
-      ],
-      "exports": [],
-      "lines": 396
     },
     {
       "name": "__init__",
@@ -7498,7 +7464,7 @@
         {
           "instantiator": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 468,
+          "line": 467,
           "context": [
             "run_consultation"
           ]
@@ -7506,7 +7472,7 @@
         {
           "instantiator": "print_routing_matrix",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 545,
+          "line": 544,
           "context": [
             "print_routing_matrix"
           ]
@@ -7514,7 +7480,7 @@
         {
           "instantiator": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 585,
+          "line": 584,
           "context": [
             "consult_with_auto_routing"
           ]
@@ -7522,7 +7488,7 @@
         {
           "instantiator": "format_synthesis_output",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 821,
+          "line": 820,
           "context": [
             "format_synthesis_output"
           ]
@@ -7530,7 +7496,7 @@
         {
           "instantiator": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 928,
+          "line": 927,
           "context": [
             "consult_multi_agent"
           ]
@@ -7557,14 +7523,6 @@
           "line": 328,
           "context": [
             "print_discovery_report"
-          ]
-        },
-        {
-          "instantiator": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 271,
-          "context": [
-            "print_tool_status"
           ]
         },
         {
@@ -8173,7 +8131,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 83
+      "instantiation_count": 82
     },
     {
       "name": "EnhancedError",
@@ -9292,7 +9250,7 @@
     {
       "name": "ConsultationResponse",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 648,
+      "line": 647,
       "language": "python",
       "docstring": "Represents a response from a tool consultation.",
       "bases": [
@@ -9306,7 +9264,7 @@
         {
           "instantiator": "run_tool_parallel",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 677,
+          "line": 676,
           "context": [
             "run_tool_parallel"
           ]
@@ -9314,7 +9272,7 @@
         {
           "instantiator": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1031,
+          "line": 1030,
           "context": [
             "consult_multi_agent"
           ]
@@ -20675,42 +20633,6 @@
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
           "line": 75,
           "call_type": "function_call"
-        },
-        {
-          "name": "get_best_tool",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 300,
-          "call_type": "function_call"
-        },
-        {
-          "name": "consult_with_auto_routing",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 588,
-          "call_type": "function_call"
-        },
-        {
-          "name": "consult_multi_agent",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 941,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_quick_routing",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 223,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 273,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_tool_status_dict",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 310,
-          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -20721,7 +20643,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 10
+      "call_count": 4
     },
     {
       "name": "get_best_tool",
@@ -20763,7 +20685,7 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 597,
+          "line": 596,
           "call_type": "function_call"
         },
         {
@@ -22018,7 +21940,7 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 637,
+          "line": 636,
           "call_type": "function_call"
         },
         {
@@ -26216,18 +26138,6 @@
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
           "line": 143,
           "call_type": "function_call"
-        },
-        {
-          "name": "load_tool_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 56,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_consensus_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 340,
-          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -26238,7 +26148,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 3
     },
     {
       "name": "load_skill_config",
@@ -26305,13 +26215,13 @@
         {
           "name": "load_model_config",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 36,
+          "line": 35,
           "call_type": "method_call"
         },
         {
           "name": "load_consensus_config",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 110,
+          "line": 109,
           "call_type": "method_call"
         }
       ],
@@ -26400,12 +26310,6 @@
       "is_public": true,
       "callers": [
         {
-          "name": "check_tool_availability",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 120,
-          "call_type": "function_call"
-        },
-        {
           "name": "generate_summary_with_fallback",
           "file": "src/claude_skills/claude_skills/sdd_render/executive_summary.py",
           "line": 487,
@@ -26444,7 +26348,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 2
     },
     {
       "name": "get_agent_priority",
@@ -26593,7 +26497,7 @@
         {
           "name": "get_consultation_timeout",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 210,
+          "line": 209,
           "call_type": "method_call"
         },
         {
@@ -26883,6 +26787,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_best_tool",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 299,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_with_auto_routing",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 587,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multi_agent",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 940,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -26903,7 +26825,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 5
     },
     {
       "name": "build_tool_command",
@@ -26945,7 +26867,7 @@
         {
           "name": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 487,
+          "line": 486,
           "call_type": "function_call"
         }
       ],
@@ -27005,13 +26927,13 @@
         {
           "name": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 498,
+          "line": 497,
           "call_type": "function_call"
         },
         {
           "name": "run_tool_parallel",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 674,
+          "line": 673,
           "call_type": "function_call"
         }
       ],
@@ -27149,7 +27071,7 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1015,
+          "line": 1014,
           "call_type": "function_call"
         },
         {
@@ -30079,18 +30001,6 @@
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
           "line": 143,
           "call_type": "function_call"
-        },
-        {
-          "name": "load_tool_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 56,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_consensus_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 340,
-          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -30149,7 +30059,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 3
     },
     {
       "name": "_validate_git_config",
@@ -39643,18 +39553,6 @@
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
           "line": 143,
           "call_type": "function_call"
-        },
-        {
-          "name": "load_tool_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 56,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_consensus_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 340,
-          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -39713,7 +39611,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 3
     },
     {
       "name": "_validate_sdd_config",
@@ -59350,7 +59248,7 @@
     {
       "name": "load_model_config",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 27,
+      "line": 26,
       "language": "python",
       "docstring": "Load model configuration from config.yaml using shared ai_config module.\n\nReturns fallback to DEFAULT_MODELS if config not found or invalid.\n\nReturns:\n    Dict with model configuration including priorities and overrides",
       "parameters": [],
@@ -59364,13 +59262,13 @@
         {
           "name": "get_model_for_tool",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 54,
+          "line": 53,
           "call_type": "function_call"
         },
         {
           "name": "get_flags_for_tool",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 89,
+          "line": 88,
           "call_type": "function_call"
         }
       ],
@@ -59378,13 +59276,13 @@
         {
           "name": "load_skill_config",
           "file": "unknown",
-          "line": 36,
+          "line": 35,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 37,
+          "line": 36,
           "call_type": "method_call"
         }
       ],
@@ -59393,7 +59291,7 @@
     {
       "name": "get_model_for_tool",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 40,
+      "line": 39,
       "language": "python",
       "docstring": "Get the best model for a tool, considering priority and failure-type overrides.\n\nFalls back to hardcoded defaults if configuration not available.\n\nArgs:\n    tool: Tool name (gemini, codex, cursor-agent)\n    failure_type: Optional failure type for override lookup\n\nReturns:\n    Model name to use",
       "parameters": [
@@ -59418,37 +59316,37 @@
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 270,
+          "line": 269,
           "call_type": "function_call"
         },
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 275,
+          "line": 274,
           "call_type": "function_call"
         },
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 280,
+          "line": 279,
           "call_type": "function_call"
         },
         {
           "name": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 483,
+          "line": 482,
           "call_type": "function_call"
         },
         {
           "name": "run_tool_parallel",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 670,
+          "line": 669,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1011,
+          "line": 1010,
           "call_type": "function_call"
         }
       ],
@@ -59456,31 +59354,31 @@
         {
           "name": "load_model_config",
           "file": "unknown",
-          "line": 54,
+          "line": 53,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 58,
+          "line": 57,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 65,
+          "line": 64,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 71,
+          "line": 70,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 75,
+          "line": 74,
           "call_type": "method_call"
         }
       ],
@@ -59489,7 +59387,7 @@
     {
       "name": "get_flags_for_tool",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 78,
+      "line": 77,
       "language": "python",
       "docstring": "Get additional CLI flags for a tool from configuration.\n\nArgs:\n    tool: Tool name\n\nReturns:\n    List of additional flags",
       "parameters": [
@@ -59509,19 +59407,19 @@
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 271,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 276,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "_build_tool_commands",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 281,
+          "line": 280,
           "call_type": "function_call"
         }
       ],
@@ -59529,25 +59427,25 @@
         {
           "name": "load_model_config",
           "file": "unknown",
-          "line": 89,
+          "line": 88,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 93,
+          "line": 92,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 96,
+          "line": 95,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 96,
+          "line": 95,
           "call_type": "method_call"
         }
       ],
@@ -59556,7 +59454,7 @@
     {
       "name": "load_consensus_config",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 103,
+      "line": 102,
       "language": "python",
       "docstring": "Load consensus configuration from config.yaml using shared ai_config module.\n\nReturns:\n    Dict with consensus configuration (pairs and auto_trigger)",
       "parameters": [],
@@ -59570,31 +59468,19 @@
         {
           "name": "should_auto_trigger_consensus",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 129,
+          "line": 128,
           "call_type": "function_call"
         },
         {
           "name": "get_consensus_pair_for_failure",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 164,
+          "line": 163,
           "call_type": "function_call"
         },
         {
           "name": "get_consensus_pairs",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 194,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_auto_trigger_failures",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 365,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_consensus_info",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 385,
+          "line": 193,
           "call_type": "function_call"
         }
       ],
@@ -59602,22 +59488,22 @@
         {
           "name": "load_skill_config",
           "file": "unknown",
-          "line": 110,
+          "line": 109,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 111,
+          "line": 110,
           "call_type": "method_call"
         }
       ],
-      "call_count": 5
+      "call_count": 3
     },
     {
       "name": "should_auto_trigger_consensus",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 114,
+      "line": 113,
       "language": "python",
       "docstring": "Check if a failure type should automatically trigger multi-agent consensus.\n\nChecks in order:\n1. Explicit entry for failure_type\n2. Default setting for undefined types\n3. Fallback to False (single-agent)\n\nArgs:\n    failure_type: Type of test failure\n\nReturns:\n    True if consensus should be auto-triggered, False otherwise",
       "parameters": [
@@ -59645,7 +59531,7 @@
         {
           "name": "load_consensus_config",
           "file": "unknown",
-          "line": 129,
+          "line": 128,
           "call_type": "function_call"
         }
       ],
@@ -59654,7 +59540,7 @@
     {
       "name": "get_consensus_pair_for_failure",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 148,
+      "line": 147,
       "language": "python",
       "docstring": "Get the consensus pair to use for a specific failure type.\n\nChecks in order:\n1. Explicit entry for failure_type\n2. Default setting for undefined types\n3. Fallback to \"default\" pair\n\nArgs:\n    failure_type: Type of test failure\n\nReturns:\n    Pair name (e.g., 'default', 'code-focus', 'discovery-focus')\n    Returns 'default' if not configured",
       "parameters": [
@@ -59682,7 +59568,7 @@
         {
           "name": "load_consensus_config",
           "file": "unknown",
-          "line": 164,
+          "line": 163,
           "call_type": "function_call"
         }
       ],
@@ -59691,7 +59577,7 @@
     {
       "name": "get_consensus_pairs",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 185,
+      "line": 184,
       "language": "python",
       "docstring": "Get defined consensus pairs from configuration.\n\nFalls back to hardcoded MULTI_AGENT_PAIRS if not configured.\n\nReturns:\n    Dict mapping pair names to lists of tools",
       "parameters": [],
@@ -59705,7 +59591,7 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 931,
+          "line": 930,
           "call_type": "function_call"
         }
       ],
@@ -59713,7 +59599,7 @@
         {
           "name": "load_consensus_config",
           "file": "unknown",
-          "line": 194,
+          "line": 193,
           "call_type": "function_call"
         }
       ],
@@ -59722,7 +59608,7 @@
     {
       "name": "get_consultation_timeout",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 203,
+      "line": 202,
       "language": "python",
       "docstring": "Get consultation timeout from config using shared ai_config module.\n\nReturns:\n    Timeout in seconds (default: 90)",
       "parameters": [],
@@ -59736,19 +59622,19 @@
         {
           "name": "run_consultation",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 497,
+          "line": 496,
           "call_type": "function_call"
         },
         {
           "name": "run_tool_parallel",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 671,
+          "line": 670,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1012,
+          "line": 1011,
           "call_type": "function_call"
         }
       ],
@@ -59756,7 +59642,7 @@
         {
           "name": "get_timeout",
           "file": "unknown",
-          "line": 210,
+          "line": 209,
           "call_type": "method_call"
         }
       ],
@@ -59765,7 +59651,7 @@
     {
       "name": "_build_tool_commands",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 257,
+      "line": 256,
       "language": "python",
       "docstring": "Build tool command templates from configuration.\n\nArgs:\n    failure_type: Optional failure type for model override selection\n\nReturns:\n    Dict mapping tool names to command templates",
       "parameters": [
@@ -59785,7 +59671,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 285,
+          "line": 284,
           "call_type": "function_call"
         }
       ],
@@ -59793,37 +59679,37 @@
         {
           "name": "get_model_for_tool",
           "file": "unknown",
-          "line": 270,
+          "line": 269,
           "call_type": "function_call"
         },
         {
           "name": "get_flags_for_tool",
           "file": "unknown",
-          "line": 271,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "get_model_for_tool",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_flags_for_tool",
           "file": "unknown",
           "line": 275,
           "call_type": "function_call"
         },
         {
-          "name": "get_flags_for_tool",
-          "file": "unknown",
-          "line": 276,
-          "call_type": "function_call"
-        },
-        {
           "name": "get_model_for_tool",
           "file": "unknown",
-          "line": 280,
+          "line": 279,
           "call_type": "function_call"
         },
         {
           "name": "get_flags_for_tool",
           "file": "unknown",
-          "line": 281,
+          "line": 280,
           "call_type": "function_call"
         }
       ],
@@ -59832,7 +59718,7 @@
     {
       "name": "get_best_tool",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 288,
+      "line": 287,
       "language": "python",
       "docstring": "Get the best available tool for a given failure type.\n\nArgs:\n    failure_type: Type of test failure\n    available_tools: List of available tool names (auto-detected if None)\n\nReturns:\n    Tool name to use, or None if no tools available",
       "parameters": [
@@ -59869,7 +59755,7 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 597,
+          "line": 596,
           "call_type": "function_call"
         },
         {
@@ -59899,9 +59785,9 @@
       ],
       "calls": [
         {
-          "name": "get_available_tools",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 300,
+          "line": 299,
           "call_type": "function_call"
         }
       ],
@@ -59910,7 +59796,7 @@
     {
       "name": "format_prompt",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 321,
+      "line": 320,
       "language": "python",
       "docstring": "Format a prompt for external tool consultation.\n\nArgs:\n    failure_type: Type of test failure\n    error_message: The full error message from pytest\n    hypothesis: Your hypothesis about the root cause\n    test_code: Test code snippet (optional)\n    impl_code: Implementation code snippet (optional)\n    context: Additional context (optional)\n    question: Specific question to ask (optional)\n\nReturns:\n    Formatted prompt string",
       "parameters": [
@@ -59960,17 +59846,23 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 626,
+          "line": 625,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 986,
+          "line": 985,
           "call_type": "function_call"
         }
       ],
       "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 347,
+          "call_type": "method_call"
+        },
         {
           "name": "append",
           "file": "unknown",
@@ -59998,7 +59890,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 352,
+          "line": 355,
           "call_type": "method_call"
         },
         {
@@ -60028,7 +59920,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 360,
+          "line": 362,
           "call_type": "method_call"
         },
         {
@@ -60058,7 +59950,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 367,
+          "line": 370,
           "call_type": "method_call"
         },
         {
@@ -60076,7 +59968,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 373,
+          "line": 375,
           "call_type": "method_call"
         },
         {
@@ -60094,19 +59986,19 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 378,
+          "line": 380,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 381,
+          "line": 382,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 383,
+          "line": 385,
           "call_type": "method_call"
         },
         {
@@ -60136,19 +60028,13 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 390,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 404,
+          "line": 403,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 406,
+          "line": 405,
           "call_type": "method_call"
         }
       ],
@@ -60157,7 +60043,7 @@
     {
       "name": "read_code_file",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 409,
+      "line": 408,
       "language": "python",
       "docstring": "Read code from a file path.\n\nArgs:\n    file_path: Path to the file\n\nReturns:\n    File contents, or None if file doesn't exist or can't be read",
       "parameters": [
@@ -60177,25 +60063,25 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 614,
+          "line": 613,
           "call_type": "function_call"
         },
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 620,
+          "line": 619,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 976,
+          "line": 975,
           "call_type": "function_call"
         },
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 981,
+          "line": 980,
           "call_type": "function_call"
         }
       ],
@@ -60203,25 +60089,25 @@
         {
           "name": "exists",
           "file": "unknown",
-          "line": 423,
+          "line": 422,
           "call_type": "method_call"
         },
         {
           "name": "is_file",
           "file": "unknown",
-          "line": 427,
+          "line": 426,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "unknown",
-          "line": 431,
+          "line": 430,
           "call_type": "function_call"
         },
         {
           "name": "read",
           "file": "unknown",
-          "line": 432,
+          "line": 431,
           "call_type": "method_call"
         }
       ],
@@ -60230,7 +60116,7 @@
     {
       "name": "run_consultation",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 447,
+      "line": 446,
       "language": "python",
       "docstring": "Run the external tool consultation.\n\nArgs:\n    tool: Tool name (gemini, codex, cursor-agent)\n    prompt: Formatted prompt\n    dry_run: If True, just print the command without running\n    printer: PrettyPrinter instance (creates default if None)\n    failure_type: Optional failure type for model selection\n\nReturns:\n    Exit code from the tool",
       "parameters": [
@@ -60294,7 +60180,7 @@
         {
           "name": "consult_with_auto_routing",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 637,
+          "line": 636,
           "call_type": "function_call"
         },
         {
@@ -60326,80 +60212,86 @@
         {
           "name": "error",
           "file": "unknown",
-          "line": 473,
+          "line": 472,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 474,
+          "line": 473,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 474,
+          "line": 473,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 478,
+          "line": 477,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 479,
+          "line": 478,
           "call_type": "method_call"
         },
         {
           "name": "get_model_for_tool",
           "file": "unknown",
-          "line": 483,
+          "line": 482,
           "call_type": "function_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 486,
+          "line": 485,
           "call_type": "method_call"
         },
         {
           "name": "build_tool_command",
           "file": "unknown",
-          "line": 487,
+          "line": 486,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 488,
+          "line": 487,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 488,
+          "line": 487,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 489,
+          "line": 488,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 489,
+          "line": 488,
           "call_type": "function_call"
         },
         {
           "name": "action",
           "file": "unknown",
-          "line": 492,
+          "line": 491,
           "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 492,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -60408,31 +60300,31 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 494,
-          "call_type": "function_call"
-        },
-        {
           "name": "get_consultation_timeout",
           "file": "unknown",
-          "line": 497,
+          "line": 496,
           "call_type": "function_call"
         },
         {
           "name": "execute_tool",
           "file": "unknown",
-          "line": 498,
+          "line": 497,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 505,
+          "line": 504,
           "call_type": "function_call"
         },
         {
           "name": "warning",
+          "file": "unknown",
+          "line": 510,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
           "file": "unknown",
           "line": 511,
           "call_type": "method_call"
@@ -60444,13 +60336,13 @@
           "call_type": "method_call"
         },
         {
-          "name": "info",
+          "name": "error",
           "file": "unknown",
-          "line": 513,
+          "line": 515,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "info",
           "file": "unknown",
           "line": 516,
           "call_type": "method_call"
@@ -60458,43 +60350,37 @@
         {
           "name": "info",
           "file": "unknown",
-          "line": 517,
+          "line": 518,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 519,
+          "line": 520,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 521,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
-          "file": "unknown",
-          "line": 523,
+          "line": 522,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 527,
+          "line": 526,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 530,
+          "line": 529,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 533,
+          "line": 532,
           "call_type": "method_call"
         }
       ],
@@ -60503,7 +60389,7 @@
     {
       "name": "print_routing_matrix",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 537,
+      "line": 536,
       "language": "python",
       "docstring": "Print the routing matrix showing which tools to use for each failure type.\n\nArgs:\n    printer: PrettyPrinter instance (creates default if None)",
       "parameters": [
@@ -60531,31 +60417,31 @@
         {
           "name": "header",
           "file": "unknown",
-          "line": 547,
+          "line": 546,
           "call_type": "method_call"
         },
         {
           "name": "blank",
           "file": "unknown",
-          "line": 548,
+          "line": 547,
           "call_type": "method_call"
         },
         {
           "name": "sorted",
           "file": "unknown",
-          "line": 550,
+          "line": 549,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 550,
+          "line": 549,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 551,
+          "line": 550,
           "call_type": "function_call"
         }
       ],
@@ -60564,7 +60450,7 @@
     {
       "name": "consult_with_auto_routing",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 554,
+      "line": 553,
       "language": "python",
       "docstring": "High-level consultation function with auto-routing.\n\nArgs:\n    failure_type: Type of test failure\n    error_message: Error message from pytest\n    hypothesis: Your hypothesis about the root cause\n    test_code_path: Path to test code file (optional)\n    impl_code_path: Path to implementation code file (optional)\n    context: Additional context (optional)\n    question: Specific question (optional)\n    tool: Tool to use (\"auto\" for auto-selection)\n    dry_run: If True, show command without running\n    printer: PrettyPrinter instance (creates default if None)\n\nReturns:\n    Exit code from consultation",
       "parameters": [
@@ -60635,93 +60521,93 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 958,
+          "line": 957,
           "call_type": "function_call"
         }
       ],
       "calls": [
         {
-          "name": "get_available_tools",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 588,
+          "line": 587,
           "call_type": "function_call"
         },
         {
           "name": "error",
+          "file": "unknown",
+          "line": 590,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
           "file": "unknown",
           "line": 591,
           "call_type": "method_call"
         },
         {
-          "name": "info",
-          "file": "unknown",
-          "line": 592,
-          "call_type": "method_call"
-        },
-        {
           "name": "get_best_tool",
           "file": "unknown",
-          "line": 597,
+          "line": 596,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 599,
+          "line": 598,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 601,
+          "line": 600,
           "call_type": "method_call"
         },
         {
           "name": "blank",
           "file": "unknown",
-          "line": 602,
+          "line": 601,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 605,
+          "line": 604,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 606,
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 606,
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "read_code_file",
           "file": "unknown",
-          "line": 614,
+          "line": 613,
           "call_type": "function_call"
         },
         {
           "name": "read_code_file",
           "file": "unknown",
-          "line": 620,
+          "line": 619,
           "call_type": "function_call"
         },
         {
           "name": "format_prompt",
           "file": "unknown",
-          "line": 626,
+          "line": 625,
           "call_type": "function_call"
         },
         {
           "name": "run_consultation",
           "file": "unknown",
-          "line": 637,
+          "line": 636,
           "call_type": "function_call"
         }
       ],
@@ -60730,7 +60616,7 @@
     {
       "name": "run_tool_parallel",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 657,
+      "line": 656,
       "language": "python",
       "docstring": "Run a single tool consultation and capture output.\n\nArgs:\n    tool: Tool name (gemini, codex, cursor-agent)\n    prompt: Formatted prompt\n    failure_type: Optional failure type for model selection\n\nReturns:\n    ConsultationResponse with results",
       "parameters": [
@@ -60761,19 +60647,19 @@
         {
           "name": "get_model_for_tool",
           "file": "unknown",
-          "line": 670,
+          "line": 669,
           "call_type": "function_call"
         },
         {
           "name": "get_consultation_timeout",
           "file": "unknown",
-          "line": 671,
+          "line": 670,
           "call_type": "function_call"
         },
         {
           "name": "execute_tool",
           "file": "unknown",
-          "line": 674,
+          "line": 673,
           "call_type": "function_call"
         }
       ]
@@ -60781,7 +60667,7 @@
     {
       "name": "analyze_response_similarity",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 686,
+      "line": 685,
       "language": "python",
       "docstring": "Simple heuristic to find consensus points between two responses.\n\nArgs:\n    response1: First response text\n    response2: Second response text\n\nReturns:\n    List of consensus points (simplified)",
       "parameters": [
@@ -60806,7 +60692,7 @@
         {
           "name": "synthesize_responses",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 778,
+          "line": 777,
           "call_type": "function_call"
         }
       ],
@@ -60814,19 +60700,31 @@
         {
           "name": "lower",
           "file": "unknown",
-          "line": 718,
+          "line": 717,
           "call_type": "method_call"
         },
         {
           "name": "lower",
           "file": "unknown",
-          "line": 719,
+          "line": 718,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 723,
+          "line": 722,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 727,
+          "call_type": "function_call"
+        },
+        {
+          "name": "findall",
+          "file": "unknown",
+          "line": 727,
           "call_type": "method_call"
         },
         {
@@ -60839,42 +60737,30 @@
           "name": "findall",
           "file": "unknown",
           "line": 728,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set",
-          "file": "unknown",
-          "line": 729,
-          "call_type": "function_call"
-        },
-        {
-          "name": "findall",
-          "file": "unknown",
-          "line": 729,
           "call_type": "method_call"
         },
         {
           "name": "intersection",
           "file": "unknown",
-          "line": 730,
+          "line": 729,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 733,
+          "line": 732,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 733,
+          "line": 732,
           "call_type": "method_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 733,
+          "line": 732,
           "call_type": "function_call"
         }
       ],
@@ -60883,7 +60769,7 @@
     {
       "name": "synthesize_responses",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 738,
+      "line": 737,
       "language": "python",
       "docstring": "Synthesize multiple consultation responses into unified insights.\n\nArgs:\n    responses: List of ConsultationResponse objects\n\nReturns:\n    Dictionary with synthesis including consensus, unique insights, etc.",
       "parameters": [
@@ -60903,7 +60789,7 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1042,
+          "line": 1041,
           "call_type": "function_call"
         }
       ],
@@ -60911,73 +60797,73 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 764,
+          "line": 763,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 768,
+          "line": 767,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 772,
+          "line": 771,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 776,
+          "line": 775,
           "call_type": "function_call"
         },
         {
           "name": "analyze_response_similarity",
           "file": "unknown",
-          "line": 778,
+          "line": 777,
           "call_type": "function_call"
         },
         {
           "name": "split",
           "file": "unknown",
+          "line": 786,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
           "line": 787,
           "call_type": "method_call"
         },
         {
-          "name": "join",
-          "file": "unknown",
-          "line": 788,
-          "call_type": "method_call"
-        },
-        {
           "name": "len",
           "file": "unknown",
-          "line": 793,
+          "line": 792,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 793,
+          "line": 792,
           "call_type": "method_call"
         },
         {
           "name": "append",
+          "file": "unknown",
+          "line": 795,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
           "file": "unknown",
           "line": 796,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 797,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 800,
+          "line": 799,
           "call_type": "method_call"
         }
       ],
@@ -60986,7 +60872,7 @@
     {
       "name": "format_synthesis_output",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 807,
+      "line": 806,
       "language": "python",
       "docstring": "Format and print the synthesis output in a structured way.\n\nArgs:\n    synthesis: Synthesis dictionary from synthesize_responses()\n    responses: List of all ConsultationResponse objects\n    printer: PrettyPrinter instance (creates default if None)",
       "parameters": [
@@ -61016,11 +60902,17 @@
         {
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 1045,
+          "line": 1044,
           "call_type": "function_call"
         }
       ],
       "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 822,
+          "call_type": "function_call"
+        },
         {
           "name": "print",
           "file": "unknown",
@@ -61036,19 +60928,19 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 825,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 829,
+          "line": 828,
           "call_type": "function_call"
         },
         {
           "name": "next",
           "file": "unknown",
-          "line": 832,
+          "line": 831,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 833,
           "call_type": "function_call"
         },
         {
@@ -61060,13 +60952,13 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 835,
+          "line": 838,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 839,
+          "line": 840,
           "call_type": "function_call"
         },
         {
@@ -61078,13 +60970,13 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 842,
+          "line": 845,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 846,
+          "line": 847,
           "call_type": "function_call"
         },
         {
@@ -61094,58 +60986,58 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 849,
-          "call_type": "function_call"
-        },
-        {
           "name": "items",
           "file": "unknown",
-          "line": 853,
+          "line": 852,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 854,
+          "line": 853,
           "call_type": "function_call"
         },
         {
           "name": "upper",
           "file": "unknown",
-          "line": 854,
+          "line": 853,
           "call_type": "method_call"
         },
         {
           "name": "split",
           "file": "unknown",
-          "line": 856,
+          "line": 855,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 859,
+          "line": 858,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 859,
+          "line": 858,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 860,
+          "line": 859,
           "call_type": "function_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 863,
+          "line": 862,
           "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 863,
+          "call_type": "function_call"
         },
         {
           "name": "print",
@@ -61156,7 +61048,7 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 865,
+          "line": 868,
           "call_type": "function_call"
         },
         {
@@ -61174,13 +61066,13 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 871,
+          "line": 873,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 874,
+          "line": 875,
           "call_type": "function_call"
         },
         {
@@ -61192,7 +61084,7 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 877,
+          "line": 878,
           "call_type": "function_call"
         },
         {
@@ -61204,7 +61096,7 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 880,
+          "line": 884,
           "call_type": "function_call"
         },
         {
@@ -61228,23 +61120,23 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 888,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 891,
+          "line": 890,
           "call_type": "function_call"
         },
         {
           "name": "upper",
           "file": "unknown",
-          "line": 891,
+          "line": 890,
           "call_type": "method_call"
         },
         {
           "name": "len",
+          "file": "unknown",
+          "line": 890,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
           "file": "unknown",
           "line": 891,
           "call_type": "function_call"
@@ -61260,12 +61152,6 @@
           "file": "unknown",
           "line": 893,
           "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 894,
-          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -61273,7 +61159,7 @@
     {
       "name": "consult_multi_agent",
       "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "line": 897,
+      "line": 896,
       "language": "python",
       "docstring": "Consult multiple agents in parallel and synthesize their responses.\n\nArgs:\n    failure_type: Type of test failure\n    error_message: Error message from pytest\n    hypothesis: Your hypothesis about the root cause\n    test_code_path: Path to test code file (optional)\n    impl_code_path: Path to implementation code file (optional)\n    context: Additional context (optional)\n    question: Specific question (optional)\n    pair: Which multi-agent pair to use (default, code-focus, discovery-focus)\n    dry_run: If True, show what would be run without running\n    printer: PrettyPrinter instance (creates default if None)\n\nReturns:\n    Exit code (0 if at least one consultation succeeded)",
       "parameters": [
@@ -61358,38 +61244,50 @@
         {
           "name": "get_consensus_pairs",
           "file": "unknown",
-          "line": 931,
+          "line": 930,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 934,
+          "line": 933,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 935,
+          "line": 934,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 935,
+          "line": 934,
           "call_type": "method_call"
         },
         {
           "name": "keys",
           "file": "unknown",
-          "line": 935,
+          "line": 934,
           "call_type": "method_call"
         },
         {
-          "name": "get_available_tools",
+          "name": "detect_available_tools",
           "file": "unknown",
-          "line": 941,
+          "line": 940,
           "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 943,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 944,
+          "call_type": "method_call"
         },
         {
           "name": "len",
@@ -61398,25 +61296,25 @@
           "call_type": "function_call"
         },
         {
-          "name": "warning",
-          "file": "unknown",
-          "line": 945,
-          "call_type": "method_call"
-        },
-        {
           "name": "len",
           "file": "unknown",
           "line": 945,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 946,
           "call_type": "function_call"
         },
         {
           "name": "error",
+          "file": "unknown",
+          "line": 946,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 947,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
           "file": "unknown",
           "line": 947,
           "call_type": "method_call"
@@ -61434,75 +61332,69 @@
           "call_type": "method_call"
         },
         {
-          "name": "info",
-          "file": "unknown",
-          "line": 949,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 949,
-          "call_type": "method_call"
-        },
-        {
           "name": "len",
           "file": "unknown",
-          "line": 951,
+          "line": 950,
           "call_type": "function_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 954,
+          "line": 953,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 954,
+          "line": 953,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 956,
+          "line": 955,
           "call_type": "method_call"
         },
         {
           "name": "consult_with_auto_routing",
           "file": "unknown",
-          "line": 958,
+          "line": 957,
           "call_type": "function_call"
         },
         {
           "name": "read_code_file",
           "file": "unknown",
-          "line": 976,
+          "line": 975,
           "call_type": "function_call"
         },
         {
           "name": "read_code_file",
           "file": "unknown",
-          "line": 981,
+          "line": 980,
           "call_type": "function_call"
         },
         {
           "name": "format_prompt",
           "file": "unknown",
-          "line": 986,
+          "line": 985,
           "call_type": "function_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 997,
+          "line": 996,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 997,
+          "line": 996,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 998,
           "call_type": "function_call"
         },
         {
@@ -61518,40 +61410,40 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 1001,
-          "call_type": "function_call"
-        },
-        {
           "name": "len",
           "file": "unknown",
-          "line": 1001,
+          "line": 1000,
           "call_type": "function_call"
         },
         {
           "name": "action",
           "file": "unknown",
-          "line": 1005,
+          "line": 1004,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
+          "line": 1004,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
           "line": 1005,
           "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 1005,
+          "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
           "line": 1006,
           "call_type": "function_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 1006,
-          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -61560,63 +61452,57 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 1008,
-          "call_type": "function_call"
-        },
-        {
           "name": "get_model_for_tool",
           "file": "unknown",
-          "line": 1011,
+          "line": 1010,
           "call_type": "function_call"
         },
         {
           "name": "get_consultation_timeout",
           "file": "unknown",
-          "line": 1012,
+          "line": 1011,
           "call_type": "function_call"
         },
         {
           "name": "execute_tools_parallel",
           "file": "unknown",
-          "line": 1015,
+          "line": 1014,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 1023,
+          "line": 1022,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1025,
+          "line": 1024,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1027,
+          "line": 1026,
           "call_type": "function_call"
         },
         {
           "name": "values",
           "file": "unknown",
-          "line": 1038,
+          "line": 1037,
           "call_type": "method_call"
         },
         {
           "name": "synthesize_responses",
           "file": "unknown",
-          "line": 1042,
+          "line": 1041,
           "call_type": "function_call"
         },
         {
           "name": "format_synthesis_output",
           "file": "unknown",
-          "line": 1045,
+          "line": 1044,
           "call_type": "function_call"
         }
       ],
@@ -63333,828 +63219,6 @@
         }
       ],
       "call_count": 1
-    },
-    {
-      "name": "get_config_path",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 37,
-      "language": "python",
-      "docstring": "Get the path to the config.yaml file.\n\nReturns:\n    Path to config.yaml in the skill root directory",
-      "parameters": [],
-      "return_type": "Path",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "load_skill_config",
-          "file": "src/claude_skills/claude_skills/common/ai_config.py",
-          "line": 86,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_git_config",
-          "file": "src/claude_skills/claude_skills/common/git_config.py",
-          "line": 193,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_sdd_config",
-          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 143,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_tool_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 56,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load_consensus_config",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 340,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [],
-      "call_count": 5
-    },
-    {
-      "name": "load_tool_config",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 49,
-      "language": "python",
-      "docstring": "Load tool configuration from config.yaml with fallback to defaults.\n\nReturns:\n    Dict with tool configuration",
-      "parameters": [],
-      "return_type": "Dict",
-      "complexity": 7,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "get_enabled_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 103,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_routing_suggestions",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 171,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_config_path",
-          "file": "unknown",
-          "line": 56,
-          "call_type": "function_call"
-        },
-        {
-          "name": "exists",
-          "file": "unknown",
-          "line": 59,
-          "call_type": "method_call"
-        },
-        {
-          "name": "open",
-          "file": "unknown",
-          "line": 63,
-          "call_type": "function_call"
-        },
-        {
-          "name": "safe_load",
-          "file": "unknown",
-          "line": 64,
-          "call_type": "method_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 74,
-          "call_type": "method_call"
-        },
-        {
-          "name": "isinstance",
-          "file": "unknown",
-          "line": 75,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 79,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 80,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 81,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 2
-    },
-    {
-      "name": "get_enabled_tools",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 96,
-      "language": "python",
-      "docstring": "Get only the enabled tools from configuration.\n\nReturns:\n    Dict with only enabled tools",
-      "parameters": [],
-      "return_type": "Dict",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "check_tool_availability",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 120,
-          "call_type": "function_call"
-        },
-        {
-          "name": "generate_summary_with_fallback",
-          "file": "src/claude_skills/claude_skills/sdd_render/executive_summary.py",
-          "line": 487,
-          "call_type": "function_call"
-        },
-        {
-          "name": "_generate_narrative_ai",
-          "file": "src/claude_skills/claude_skills/sdd_render/narrative_enhancer.py",
-          "line": 378,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "load_tool_config",
-          "file": "unknown",
-          "line": 103,
-          "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 106,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 107,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 3
-    },
-    {
-      "name": "check_tool_availability",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 111,
-      "language": "python",
-      "docstring": "Check which external tools are installed and enabled.\n\nOnly checks tools that are enabled in the configuration.\n\nReturns:\n    Dict mapping tool names to availability status",
-      "parameters": [],
-      "return_type": "Dict[str, bool]",
-      "complexity": 2,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "get_available_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 137,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_missing_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 148,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_enabled_tools",
-          "file": "unknown",
-          "line": 120,
-          "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 123,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 124,
-          "call_type": "method_call"
-        },
-        {
-          "name": "which",
-          "file": "unknown",
-          "line": 125,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 2
-    },
-    {
-      "name": "get_available_tools",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 130,
-      "language": "python",
-      "docstring": "Get list of available external tools.\n\nReturns:\n    List of tool names that are installed",
-      "parameters": [],
-      "return_type": "List[str]",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "get_best_tool",
-          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 87,
-          "call_type": "function_call"
-        },
-        {
-          "name": "consult_multi_agent",
-          "file": "src/claude_skills/claude_skills/code_doc/ai_consultation.py",
-          "line": 484,
-          "call_type": "function_call"
-        },
-        {
-          "name": "cmd_analyze_with_ai",
-          "file": "src/claude_skills/claude_skills/code_doc/cli.py",
-          "line": 324,
-          "call_type": "function_call"
-        },
-        {
-          "name": "cmd_consult",
-          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 75,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_best_tool",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 300,
-          "call_type": "function_call"
-        },
-        {
-          "name": "consult_with_auto_routing",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 588,
-          "call_type": "function_call"
-        },
-        {
-          "name": "consult_multi_agent",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 941,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_quick_routing",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 223,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 273,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_tool_status_dict",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 310,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "check_tool_availability",
-          "file": "unknown",
-          "line": 137,
-          "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 138,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 10
-    },
-    {
-      "name": "get_missing_tools",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 141,
-      "language": "python",
-      "docstring": "Get list of missing external tools.\n\nReturns:\n    List of tool names that are not installed",
-      "parameters": [],
-      "return_type": "List[str]",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 274,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_tool_status_dict",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 311,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "check_tool_availability",
-          "file": "unknown",
-          "line": 148,
-          "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 149,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 2
-    },
-    {
-      "name": "get_routing_suggestions",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 152,
-      "language": "python",
-      "docstring": "Provide routing suggestions based on available tools.\n\nArgs:\n    available_tools: List of tool names that are available\n\nReturns:\n    List of suggestion strings",
-      "parameters": [
-        {
-          "name": "available_tools",
-          "type": "List[str]",
-          "default": null
-        }
-      ],
-      "return_type": "List[str]",
-      "complexity": 14,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 297,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "load_tool_config",
-          "file": "unknown",
-          "line": 171,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 178,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 179,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 181,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 184,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 188,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 192,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 198,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 204,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 1
-    },
-    {
-      "name": "get_quick_routing",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 211,
-      "language": "python",
-      "docstring": "Get quick tool routing suggestion for a failure type.\n\nArgs:\n    failure_type: Type of test failure (assertion, exception, etc.)\n    available_tools: List of available tools (auto-detected if None)\n\nReturns:\n    Routing suggestion string",
-      "parameters": [
-        {
-          "name": "failure_type",
-          "type": "str",
-          "default": null
-        },
-        {
-          "name": "available_tools",
-          "type": "Optional[List[str]]",
-          "default": null
-        }
-      ],
-      "return_type": "str",
-      "complexity": 7,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "cmd_check_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 61,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print_tool_status",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 292,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_available_tools",
-          "file": "unknown",
-          "line": 223,
-          "call_type": "function_call"
-        }
-      ],
-      "call_count": 2
-    },
-    {
-      "name": "print_tool_status",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 256,
-      "language": "python",
-      "docstring": "Print tool availability status to console.\n\nArgs:\n    printer: PrettyPrinter instance (creates default if None)\n    include_routing: If provided, also show routing for this failure type\n\nReturns:\n    Exit code: 0 if any tools available, 1 if none",
-      "parameters": [
-        {
-          "name": "printer",
-          "type": "Optional[PrettyPrinter]",
-          "default": null
-        },
-        {
-          "name": "include_routing",
-          "type": "Optional[str]",
-          "default": null
-        }
-      ],
-      "return_type": "int",
-      "complexity": 6,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "cmd_check_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 64,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_available_tools",
-          "file": "unknown",
-          "line": 273,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_missing_tools",
-          "file": "unknown",
-          "line": 274,
-          "call_type": "function_call"
-        },
-        {
-          "name": "header",
-          "file": "unknown",
-          "line": 276,
-          "call_type": "method_call"
-        },
-        {
-          "name": "blank",
-          "file": "unknown",
-          "line": 277,
-          "call_type": "method_call"
-        },
-        {
-          "name": "success",
-          "file": "unknown",
-          "line": 280,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 280,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 282,
-          "call_type": "method_call"
-        },
-        {
-          "name": "warning",
-          "file": "unknown",
-          "line": 285,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 285,
-          "call_type": "method_call"
-        },
-        {
-          "name": "blank",
-          "file": "unknown",
-          "line": 287,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
-          "file": "unknown",
-          "line": 291,
-          "call_type": "method_call"
-        },
-        {
-          "name": "item",
-          "file": "unknown",
-          "line": 292,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_quick_routing",
-          "file": "unknown",
-          "line": 292,
-          "call_type": "function_call"
-        },
-        {
-          "name": "blank",
-          "file": "unknown",
-          "line": 293,
-          "call_type": "method_call"
-        },
-        {
-          "name": "blank",
-          "file": "unknown",
-          "line": 296,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get_routing_suggestions",
-          "file": "unknown",
-          "line": 297,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 298,
-          "call_type": "function_call"
-        }
-      ],
-      "call_count": 1
-    },
-    {
-      "name": "get_tool_status_dict",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 303,
-      "language": "python",
-      "docstring": "Get tool status as a dictionary (for JSON output).\n\nReturns:\n    Dict with 'available' and 'missing' keys",
-      "parameters": [],
-      "return_type": "Dict",
-      "complexity": 1,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "cmd_check_tools",
-          "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 57,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_available_tools",
-          "file": "unknown",
-          "line": 310,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_missing_tools",
-          "file": "unknown",
-          "line": 311,
-          "call_type": "function_call"
-        }
-      ],
-      "call_count": 1
-    },
-    {
-      "name": "load_consensus_config",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 333,
-      "language": "python",
-      "docstring": "Load consensus configuration from config.yaml.\n\nReturns:\n    Dict with consensus configuration",
-      "parameters": [],
-      "return_type": "Dict",
-      "complexity": 5,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [
-        {
-          "name": "should_auto_trigger_consensus",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 129,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_consensus_pair_for_failure",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 164,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_consensus_pairs",
-          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
-          "line": 194,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_auto_trigger_failures",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 365,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get_consensus_info",
-          "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-          "line": 385,
-          "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "get_config_path",
-          "file": "unknown",
-          "line": 340,
-          "call_type": "function_call"
-        },
-        {
-          "name": "exists",
-          "file": "unknown",
-          "line": 343,
-          "call_type": "method_call"
-        },
-        {
-          "name": "open",
-          "file": "unknown",
-          "line": 346,
-          "call_type": "function_call"
-        },
-        {
-          "name": "safe_load",
-          "file": "unknown",
-          "line": 347,
-          "call_type": "method_call"
-        }
-      ],
-      "call_count": 5
-    },
-    {
-      "name": "get_auto_trigger_failures",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 358,
-      "language": "python",
-      "docstring": "Get list of failure types that auto-trigger consensus.\n\nReturns:\n    List of failure type names",
-      "parameters": [],
-      "return_type": "List[str]",
-      "complexity": 3,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [],
-      "calls": [
-        {
-          "name": "load_consensus_config",
-          "file": "unknown",
-          "line": 365,
-          "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 373,
-          "call_type": "method_call"
-        }
-      ]
-    },
-    {
-      "name": "get_consensus_info",
-      "file": "src/claude_skills/claude_skills/run_tests/tool_checking.py",
-      "line": 378,
-      "language": "python",
-      "docstring": "Get consensus configuration info (for display/debugging).\n\nReturns:\n    Dict with consensus pairs and auto-trigger info",
-      "parameters": [],
-      "return_type": "Dict",
-      "complexity": 2,
-      "decorators": [],
-      "is_async": false,
-      "is_exported": false,
-      "is_public": true,
-      "callers": [],
-      "calls": [
-        {
-          "name": "load_consensus_config",
-          "file": "unknown",
-          "line": 385,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 394,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 395,
-          "call_type": "method_call"
-        }
-      ]
     },
     {
       "name": "format_execution_plan",
@@ -74395,6 +73459,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_best_tool",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 299,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_with_auto_routing",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 587,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multi_agent",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 940,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -74415,7 +73497,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 5
     },
     {
       "name": "review_with_tools",
@@ -109463,9 +108545,8 @@
       "claude_skills.common.ai_tools.ToolResponse",
       "claude_skills.common.ai_tools.ToolStatus",
       "claude_skills.common.ai_tools.MultiToolResponse",
-      "claude_skills.common.ai_config",
-      "claude_skills.run_tests.tool_checking.check_tool_availability",
-      "claude_skills.run_tests.tool_checking.get_available_tools"
+      "claude_skills.common.ai_tools.detect_available_tools",
+      "claude_skills.common.ai_config"
     ],
     "src/claude_skills/claude_skills/run_tests/pytest_runner.py": [
       "subprocess",
@@ -109484,15 +108565,6 @@
       "typing.Optional",
       "typing.Set",
       "typing.Tuple",
-      "claude_skills.common.PrettyPrinter"
-    ],
-    "src/claude_skills/claude_skills/run_tests/tool_checking.py": [
-      "shutil",
-      "yaml",
-      "pathlib.Path",
-      "typing.Dict",
-      "typing.List",
-      "typing.Optional",
       "claude_skills.common.PrettyPrinter"
     ],
     "src/claude_skills/claude_skills/sdd_next/__init__.py": [
