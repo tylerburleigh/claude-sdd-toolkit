@@ -188,7 +188,6 @@ def register_run_tests(subparsers: argparse._SubParsersAction, parent_parser: ar
         help="Check availability of external CLI tools",
         description="Check which external AI CLI tools are available",
     )
-    check_parser.add_argument("--route", choices=TOOL_CHECK_FAILURE_TYPES, help="Get routing suggestion")
     check_parser.set_defaults(func=cmd_check_tools)
 
     consult_parser = subparsers.add_parser(
