@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:06:34
+**Generated:** 2025-11-05 16:07:52
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72295
-- **Total Classes:** 275
-- **Total Functions:** 787
+- **Total Lines:** 72476
+- **Total Classes:** 277
+- **Total Functions:** 789
 - **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -210,6 +210,24 @@ Example:
 
 ---
 
+### `CategorizedIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:615`
+
+**Description:**
+> Issue with assigned severity category.
+
+Attributes:
+    issue: The issue description
+    severity: Assigned severity level
+    keywords_matched: Keywords that triggered this severity
+
+**Methods:**
+- `to_dict()`
+
+---
+
 ### `CodebaseAnalyzer`
 
 **Language:** python
@@ -354,7 +372,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:460`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:469`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -381,7 +399,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:70`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:79`
 
 **Description:**
 > Base exception for consultation errors.
@@ -403,7 +421,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:80`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:89`
 
 **Description:**
 > Raised when consultation times out.
@@ -1165,6 +1183,17 @@ Example:
 
 ---
 
+### `IssueSeverity`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:35`
+
+**Description:**
+> Severity level for identified issues.
+
+---
+
 ### `JSONGenerator`
 
 **Language:** python
@@ -1489,7 +1518,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:75`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:84`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -1608,7 +1637,7 @@ Example:
 ### `ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:36`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:45`
 
 **Description:**
 > Structured representation of AI review response.
@@ -7864,6 +7893,75 @@ Args:
 
 ---
 
+### `categorize_issue_severity(issue) -> CategorizedIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:637`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Categorize issue severity based on keywords and patterns.
+
+Uses keyword matching to assign severity levels:
+- CRITICAL: Security vulnerabilities, data loss, crashes
+- HIGH: Incorrect behavior, spec violations, broken functionality
+- MEDIUM: Performance issues, missing tests, code quality
+- LOW: Style issues, documentation, minor improvements
+
+Args:
+    issue: Issue description text
+
+Returns:
+    CategorizedIssue with assigned severity
+
+Example:
+    >>> issue = "SQL injection vulnerability in login form"
+    >>> categorized = categorize_issue_severity(issue)
+    >>> categorized.severity
+    <IssueSeverity.CRITICAL: 'critical'>
+    >>> categorized.keywords_matched
+    ['sql injection', 'vulnerability']
+
+**Parameters:**
+- `issue`: str
+
+---
+
+### `categorize_issues(issues) -> List[CategorizedIssue]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:745`
+**Complexity:** 1
+
+**Description:**
+> Categorize severity for multiple issues.
+
+Convenience function to categorize a list of issues.
+
+Args:
+    issues: List of issue descriptions
+
+Returns:
+    List of CategorizedIssue objects, sorted by severity (critical first)
+
+Example:
+    >>> issues = [
+    ...     "SQL injection in login",
+    ...     "Missing tests for auth module",
+    ...     "Typo in README"
+    ... ]
+    >>> categorized = categorize_issues(issues)
+    >>> for cat in categorized:
+    ...     print(f"{cat.severity.value}: {cat.issue}")
+    critical: SQL injection in login
+    medium: Missing tests for auth module
+    low: Typo in README
+
+**Parameters:**
+- `issues`: List[str]
+
+---
+
 ### `categorize_missing_permissions(missing) -> dict`
 
 **Language:** python
@@ -10073,7 +10171,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:85`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:94`
 **Complexity:** 8
 
 **Description:**
@@ -10184,7 +10282,7 @@ Returns:
 ### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:170`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:179`
 **Complexity:** 9
 
 **Description:**
@@ -10681,7 +10779,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:500`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:509`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -14133,7 +14231,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:256`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:265`
 **Complexity:** 3
 
 **Description:**
@@ -16344,7 +16442,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:436`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:445`
 **Complexity:** 1
 
 **Description:**
@@ -16397,7 +16495,7 @@ Returns:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:315`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:324`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
