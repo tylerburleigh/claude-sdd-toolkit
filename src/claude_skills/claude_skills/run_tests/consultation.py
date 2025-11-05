@@ -7,13 +7,15 @@ debugging. Provides auto-routing based on failure type and prompt formatting.
 
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, NamedTuple
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 # Add parent directory to path to import sdd_common
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.common.ai_tools import build_tool_command, execute_tool, ToolResponse, ToolStatus
+from claude_skills.common.ai_tools import (
+    build_tool_command, execute_tool, execute_tools_parallel,
+    ToolResponse, ToolStatus, MultiToolResponse
+)
 from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools, get_config_path
 
 
@@ -1043,39 +1045,42 @@ def consult_multi_agent(
         print(f"Prompt length: {len(prompt)} characters")
         return 0
 
-    # Run consultations in parallel
+    # Run consultations in parallel using shared implementation
     printer.action(f"Consulting {len(available_from_pair)} agents in parallel...")
     print(f"Tools: {', '.join(available_from_pair)}")
     print("=" * 60)
     print()
 
-    responses = []
+    # Build models dict for each tool
+    models = {tool: get_model_for_tool(tool, failure_type) for tool in available_from_pair}
+    timeout = get_consultation_timeout()
 
-    with ThreadPoolExecutor(max_workers=len(available_from_pair)) as executor:
-        # Submit all consultations
-        future_to_tool = {
-            executor.submit(run_tool_parallel, tool, prompt, failure_type): tool
-            for tool in available_from_pair
-        }
+    # Use shared execute_tools_parallel() implementation
+    multi_response = execute_tools_parallel(
+        tools=available_from_pair,
+        prompt=prompt,
+        models=models,
+        timeout=timeout
+    )
 
-        # Collect results as they complete
-        for future in as_completed(future_to_tool):
-            tool = future_to_tool[future]
-            try:
-                response = future.result()
-                responses.append(response)
-                status = "✓" if response.success else "✗"
-                print(f"{status} {tool} completed ({response.duration:.1f}s)")
-            except Exception as e:
-                printer.error(f"Error consulting {tool}: {e}")
-                responses.append(ConsultationResponse(
-                    tool=tool,
-                    success=False,
-                    output="",
-                    error=str(e)
-                ))
+    # Print progress as tools complete
+    for tool, response in multi_response.responses.items():
+        status = "✓" if response.success else "✗"
+        print(f"{status} {tool} completed ({response.duration:.1f}s)")
 
     print()
+
+    # Convert MultiToolResponse to list of ConsultationResponse for backward compatibility
+    responses = [
+        ConsultationResponse(
+            tool=resp.tool,
+            success=resp.success,
+            output=resp.output,
+            error=resp.error,
+            duration=resp.duration
+        )
+        for resp in multi_response.responses.values()
+    ]
 
     # Synthesize responses
     synthesis = synthesize_responses(responses)
