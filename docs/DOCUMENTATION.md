@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:20:23
+**Generated:** 2025-11-05 16:22:32
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72877
+- **Total Lines:** 72951
 - **Total Classes:** 277
 - **Total Functions:** 794
 - **Avg Complexity:** 5.61
@@ -824,7 +824,7 @@ Example:
 ### `FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:11`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:13`
 
 **Description:**
 > Generate structured reports from fidelity review results.
@@ -833,6 +833,8 @@ This class will be implemented in Phase 4 (Report Generation).
 
 **Methods:**
 - `__init__()`
+- `_get_report_metadata()`
+- `_convert_to_dict()`
 - `generate_markdown()`
 - `generate_json()`
 - `save_to_file()`
@@ -21889,9 +21891,12 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/report.py`
 
+- `datetime.datetime`
+- `json`
 - `pathlib.Path`
 - `typing.Any`
 - `typing.Dict`
+- `typing.List`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`

@@ -82,12 +82,53 @@ class FidelityReport:
         Generate markdown-formatted report.
 
         Returns:
-            Markdown string containing the formatted report
+            Markdown string containing the formatted report with:
+            - Header with spec ID and models consulted
+            - Consensus verdict and agreement rate
+            - Issues identified (organized by severity)
+            - Recommendations from consensus
+            - Optional: Individual model responses section
 
-        Note:
-            Implementation will be added in Phase 4 (task-5-4).
+        Example:
+            >>> report = FidelityReport(review_results)
+            >>> markdown = report.generate_markdown()
+            >>> with open("report.md", "w") as f:
+            ...     f.write(markdown)
         """
-        raise NotImplementedError("Markdown generation will be implemented in Phase 4")
+        output = []
+
+        # Header section
+        output.append("# Implementation Fidelity Review\n")
+        output.append(f"**Spec:** {self.spec_id}\n")
+        output.append(f"**Models Consulted:** {self.models_consulted}\n")
+
+        # Get consensus data (handle both dict and object)
+        consensus_dict = self._convert_to_dict(self.consensus)
+        consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
+        agreement_rate = consensus_dict.get("agreement_rate", 0.0)
+        consensus_issues = consensus_dict.get("consensus_issues", [])
+        consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
+
+        # Consensus verdict section
+        output.append(f"\n## Consensus Verdict: {consensus_verdict.upper()}\n")
+        output.append(f"**Agreement Rate:** {agreement_rate:.1%}\n")
+
+        # Issues section (if any)
+        categorized_issues_list = self._convert_to_dict(self.categorized_issues)
+        if categorized_issues_list:
+            output.append("\n## Issues Identified (Consensus)\n")
+            for cat_issue in categorized_issues_list:
+                issue_text = cat_issue.get("issue", "")
+                severity = cat_issue.get("severity", "unknown")
+                output.append(f"\n### [{severity.upper()}] {issue_text}\n")
+
+        # Recommendations section (if any)
+        if consensus_recommendations:
+            output.append("\n## Recommendations\n")
+            for rec in consensus_recommendations:
+                output.append(f"- {rec}\n")
+
+        return "".join(output)
 
     def generate_json(self) -> Dict[str, Any]:
         """

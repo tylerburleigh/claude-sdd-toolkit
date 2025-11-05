@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:20:23.474924Z",
+    "generated_at": "2025-11-05T21:22:32.827108Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 214,
-    "total_lines": 72877,
+    "total_lines": 72951,
     "total_classes": 277,
     "total_functions": 794,
     "avg_complexity": 5.61,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 214,
-        "lines": 72877,
+        "lines": 72951,
         "classes": 277,
         "functions": 794,
         "avg_complexity": 5.61
@@ -2142,10 +2142,13 @@
         "typing.Dict",
         "typing.Any",
         "typing.Optional",
-        "pathlib.Path"
+        "typing.List",
+        "pathlib.Path",
+        "datetime.datetime",
+        "json"
       ],
       "exports": [],
-      "lines": 86
+      "lines": 160
     },
     {
       "name": "review",
@@ -9693,12 +9696,14 @@
     {
       "name": "FidelityReport",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-      "line": 11,
+      "line": 13,
       "language": "python",
       "docstring": "Generate structured reports from fidelity review results.\n\nThis class will be implemented in Phase 4 (Report Generation).",
       "bases": [],
       "methods": [
         "__init__",
+        "_get_report_metadata",
+        "_convert_to_dict",
         "generate_markdown",
         "generate_json",
         "save_to_file",
@@ -111207,7 +111212,10 @@
       "typing.Dict",
       "typing.Any",
       "typing.Optional",
-      "pathlib.Path"
+      "typing.List",
+      "pathlib.Path",
+      "datetime.datetime",
+      "json"
     ],
     "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
       "pathlib.Path",
