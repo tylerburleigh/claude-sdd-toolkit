@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 09:59:44
+**Generated:** 2025-11-05 10:03:54
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70995
+- **Total Lines:** 70889
 - **Total Classes:** 267
 - **Total Functions:** 793
-- **Avg Complexity:** 5.58
+- **Avg Complexity:** 5.57
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6669,6 +6669,26 @@ Returns:
 
 ---
 
+### `_tool_response_to_dict(response) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:21`
+**Complexity:** 1
+
+**Description:**
+> Convert ToolResponse to dict format for backward compatibility.
+
+Args:
+    response: ToolResponse from execute_tool()
+
+Returns:
+    Dict with success, tool, output, error, duration keys
+
+**Parameters:**
+- `response`: ToolResponse
+
+---
+
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
@@ -7685,30 +7705,6 @@ Examples:
 - `start_timestamp`: str
 - `end_timestamp`: str
 - `printer`: Optional[PrettyPrinter]
-
----
-
-### `call_tool(tool_name, prompt, timeout) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:55`
-**Complexity:** 8
-
-**Description:**
-> Call an AI CLI tool with a prompt.
-
-Args:
-    tool_name: Name of tool to call
-    prompt: Prompt to send
-    timeout: Optional timeout override
-
-Returns:
-    Result dictionary with success, output, error
-
-**Parameters:**
-- `tool_name`: str
-- `prompt`: str
-- `timeout`: Optional[int]
 
 ---
 
@@ -10465,7 +10461,7 @@ Example:
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:41`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
 **Complexity:** 3
 
 **Description:**
@@ -17087,7 +17083,7 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:165`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:57`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -21668,7 +21664,9 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py`
 
+- `claude_skills.common.ai_tools.ToolResponse`
 - `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.execute_tool`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
 - `claude_skills.sdd_plan_review.synthesis.parse_response`

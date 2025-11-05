@@ -11,30 +11,10 @@ import time
 import tempfile
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
-from concurrent.futures import ThreadPoolExecutor, as_completed, wait
 
 from claude_skills.sdd_plan_review.prompts import generate_review_prompt
 from claude_skills.sdd_plan_review.synthesis import parse_response, build_consensus
-from claude_skills.common.ai_tools import check_tool_available, execute_tool, ToolResponse
-
-
-def _tool_response_to_dict(response: ToolResponse) -> Dict[str, Any]:
-    """
-    Convert ToolResponse to dict format for backward compatibility.
-
-    Args:
-        response: ToolResponse from execute_tool()
-
-    Returns:
-        Dict with success, tool, output, error, duration keys
-    """
-    return {
-        "success": response.success,
-        "tool": response.tool,
-        "output": response.output if response.success else None,
-        "error": response.error if not response.success else None,
-        "duration": response.duration,
-    }
+from claude_skills.common.ai_tools import check_tool_available, execute_tools_parallel
 
 
 def detect_available_tools() -> List[str]:
@@ -106,54 +86,29 @@ def review_with_tools(
     print(f"\n   Sending {review_type} review to {len(tools)} external AI model(s): {', '.join(tools)}")
     print(f"   Evaluating: {dimensions}")
 
-    # Execute tools
-    if parallel and len(tools) > 1:
-        # Parallel execution
-        with ThreadPoolExecutor(max_workers=len(tools)) as executor:
-            futures = {
-                executor.submit(execute_tool, tool, prompt, timeout=600): tool
-                for tool in tools
-            }
+    # Execute tools in parallel using shared implementation
+    multi_response = execute_tools_parallel(
+        tools=tools,
+        prompt=prompt,
+        timeout=600
+    )
 
-            for future in as_completed(futures):
-                tool = futures[future]
-                try:
-                    response = future.result(timeout=150)
-                    result = _tool_response_to_dict(response)
-                    if result["success"]:
-                        results["raw_responses"].append(result)
-                        # Show progress as each tool completes
-                        duration = result.get("duration", 0)
-                        print(f"   ✓ {tool} completed ({duration:.1f}s)")
-                    else:
-                        results["failures"].append(result)
-                        # Show failure
-                        error = result.get("error", "unknown error")
-                        print(f"   ✗ {tool} failed: {error}")
-                except Exception as e:
-                    results["failures"].append({
-                        "success": False,
-                        "tool": tool,
-                        "error": str(e),
-                        "output": None,
-                        "duration": 0,
-                    })
-                    print(f"   ✗ {tool} exception: {str(e)}")
-    else:
-        # Sequential execution
-        for tool in tools:
-            response = execute_tool(tool, prompt, timeout=600)
-            result = _tool_response_to_dict(response)
-            if result["success"]:
-                results["raw_responses"].append(result)
-                # Show progress as each tool completes
-                duration = result.get("duration", 0)
-                print(f"   ✓ {tool} completed ({duration:.1f}s)")
-            else:
-                results["failures"].append(result)
-                # Show failure
-                error = result.get("error", "unknown error")
-                print(f"   ✗ {tool} failed: {error}")
+    # Process responses - convert to dict format for backward compatibility
+    for tool, response in multi_response.responses.items():
+        result = {
+            "success": response.success,
+            "tool": response.tool,
+            "output": response.output if response.success else None,
+            "error": response.error if not response.success else None,
+            "duration": response.duration,
+        }
+
+        if response.success:
+            results["raw_responses"].append(result)
+            print(f"   ✓ {tool} completed ({response.duration:.1f}s)")
+        else:
+            results["failures"].append(result)
+            print(f"   ✗ {tool} failed: {response.error or 'unknown error'}")
 
     # Parse responses using synthesis module
     for raw_response in results["raw_responses"]:
