@@ -8,6 +8,123 @@ from typing import Dict, Any, Optional, List
 from pathlib import Path
 from datetime import datetime
 import json
+import sys
+
+
+class PrettyPrinter:
+    """
+    Pretty printer for console output with optional color support.
+
+    Provides formatted console output with ANSI color codes for
+    better readability. Automatically detects terminal capabilities
+    and disables colors when not supported.
+    """
+
+    # ANSI color codes
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+
+    def __init__(self, use_colors: bool = True):
+        """
+        Initialize printer with color support detection.
+
+        Args:
+            use_colors: Enable color output (default: True).
+                       Colors automatically disabled if terminal doesn't support them.
+        """
+        # Check if terminal supports colors
+        self.use_colors = use_colors and self._supports_color()
+
+    def _supports_color(self) -> bool:
+        """
+        Check if terminal supports ANSI color codes.
+
+        Returns:
+            True if colors are supported, False otherwise
+        """
+        # Check if stdout is a terminal
+        if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
+            return False
+
+        # Check for common non-color terminals
+        import os
+        term = os.environ.get("TERM", "")
+        if term in ("dumb", "unknown"):
+            return False
+
+        return True
+
+    def color(self, text: str, color_code: str) -> str:
+        """
+        Apply color to text if colors enabled.
+
+        Args:
+            text: Text to colorize
+            color_code: ANSI color code constant
+
+        Returns:
+            Colorized text if colors enabled, plain text otherwise
+        """
+        if self.use_colors:
+            return f"{color_code}{text}{self.RESET}"
+        return text
+
+    def bold(self, text: str) -> str:
+        """Apply bold formatting."""
+        return self.color(text, self.BOLD)
+
+    def red(self, text: str) -> str:
+        """Apply red color."""
+        return self.color(text, self.RED)
+
+    def green(self, text: str) -> str:
+        """Apply green color."""
+        return self.color(text, self.GREEN)
+
+    def yellow(self, text: str) -> str:
+        """Apply yellow color."""
+        return self.color(text, self.YELLOW)
+
+    def blue(self, text: str) -> str:
+        """Apply blue color."""
+        return self.color(text, self.BLUE)
+
+    def magenta(self, text: str) -> str:
+        """Apply magenta color."""
+        return self.color(text, self.MAGENTA)
+
+    def cyan(self, text: str) -> str:
+        """Apply cyan color."""
+        return self.color(text, self.CYAN)
+
+    def severity_color(self, severity: str, text: str) -> str:
+        """
+        Apply color based on severity level.
+
+        Args:
+            severity: Severity level (critical, high, medium, low)
+            text: Text to colorize
+
+        Returns:
+            Colorized text based on severity
+        """
+        severity_lower = severity.lower()
+        if severity_lower == "critical":
+            return self.red(text)
+        elif severity_lower == "high":
+            return self.yellow(text)
+        elif severity_lower == "medium":
+            return self.blue(text)
+        elif severity_lower == "low":
+            return self.cyan(text)
+        else:
+            return text
 
 
 class FidelityReport:
@@ -162,6 +279,89 @@ class FidelityReport:
             "categorized_issues": categorized_issues_list,
             "individual_responses": individual_responses_list
         }
+
+    def print_console(self, use_colors: bool = True, verbose: bool = False) -> None:
+        """
+        Print formatted report to console with optional colors.
+
+        Displays a human-readable report with ANSI color codes for
+        severity levels and formatting. Colors automatically disabled
+        if terminal doesn't support them.
+
+        Args:
+            use_colors: Enable color output (default: True)
+            verbose: Include individual model responses (default: False)
+
+        Example:
+            >>> report = FidelityReport(review_results)
+            >>> report.print_console(use_colors=True, verbose=False)
+        """
+        printer = PrettyPrinter(use_colors=use_colors)
+
+        # Get consensus data (handle both dict and object)
+        consensus_dict = self._convert_to_dict(self.consensus)
+        consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
+        agreement_rate = consensus_dict.get("agreement_rate", 0.0)
+        consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
+
+        # Header
+        print("\n" + "=" * 80)
+        print(printer.bold("IMPLEMENTATION FIDELITY REVIEW"))
+        print("=" * 80)
+        print(f"\nSpec: {printer.cyan(self.spec_id)}")
+        print(f"Consulted {self.models_consulted} AI model(s)")
+
+        # Consensus verdict with color
+        verdict_upper = consensus_verdict.upper()
+        if consensus_verdict.lower() == "pass":
+            verdict_colored = printer.green(verdict_upper)
+        elif consensus_verdict.lower() == "fail":
+            verdict_colored = printer.red(verdict_upper)
+        elif consensus_verdict.lower() == "partial":
+            verdict_colored = printer.yellow(verdict_upper)
+        else:
+            verdict_colored = verdict_upper
+
+        print(f"\nConsensus Verdict: {verdict_colored}")
+        print(f"Agreement Rate: {agreement_rate:.1%}")
+
+        # Issues section (if any)
+        categorized_issues_list = self._convert_to_dict(self.categorized_issues)
+        if categorized_issues_list:
+            print(f"\n{'-' * 80}")
+            print(printer.bold("ISSUES IDENTIFIED (Consensus):"))
+            print(f"{'-' * 80}")
+            for cat_issue in categorized_issues_list:
+                issue_text = cat_issue.get("issue", "")
+                severity = cat_issue.get("severity", "unknown")
+                severity_upper = severity.upper()
+                severity_colored = printer.severity_color(severity, f"[{severity_upper}]")
+                print(f"\n{severity_colored} {issue_text}")
+
+        # Recommendations section (if any)
+        if consensus_recommendations:
+            print(f"\n{'-' * 80}")
+            print(printer.bold("RECOMMENDATIONS:"))
+            print(f"{'-' * 80}")
+            for rec in consensus_recommendations:
+                print(f"- {rec}")
+
+        # Individual responses (if verbose)
+        if verbose:
+            parsed_responses_list = self._convert_to_dict(self.parsed_responses)
+            if parsed_responses_list:
+                print(f"\n{'-' * 80}")
+                print(printer.bold("INDIVIDUAL MODEL RESPONSES:"))
+                print(f"{'-' * 80}")
+                for i, response in enumerate(parsed_responses_list, 1):
+                    verdict = response.get("verdict", "unknown")
+                    issues = response.get("issues", [])
+                    recommendations = response.get("recommendations", [])
+                    print(f"\nModel {i}: {verdict.upper()}")
+                    print(f"Issues: {len(issues)}")
+                    print(f"Recommendations: {len(recommendations)}")
+
+        print()  # Final newline
 
     def save_to_file(self, output_path: Path, format: str = "markdown") -> None:
         """
