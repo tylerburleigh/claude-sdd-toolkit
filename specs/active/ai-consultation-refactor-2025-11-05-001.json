@@ -1,7 +1,7 @@
 {
   "spec_id": "ai-consultation-refactor-2025-11-05-001",
   "generated": "2025-11-05T00:00:00Z",
-  "last_updated": "2025-11-05T15:50:25.182172Z",
+  "last_updated": "2025-11-05T15:53:54.767097Z",
   "metadata": {
     "title": "AI Consultation Infrastructure Refactoring",
     "description": "Extract and consolidate duplicated AI consultation code from run-tests, sdd-plan-review, and code-doc into shared utilities, eliminating ~850 lines of duplication",
@@ -16,7 +16,7 @@
       "Provide proven infrastructure for future skills requiring AI consultation"
     ],
     "activated_date": "2025-11-05T13:18:30.300836Z",
-    "progress_percentage": 60,
+    "progress_percentage": 62,
     "current_phase": "phase-5"
   },
   "hierarchy": {
@@ -34,7 +34,7 @@
         "phase-6"
       ],
       "total_tasks": 51,
-      "completed_tasks": 31,
+      "completed_tasks": 32,
       "metadata": {}
     },
     "phase-1": {
@@ -1193,7 +1193,7 @@
         "depends": []
       },
       "total_tasks": 9,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Migrate run-tests skill to use shared utilities (most complex due to existing config.yaml)",
         "risk_level": "high",
@@ -1212,7 +1212,7 @@
         "task-5-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1251,7 +1251,7 @@
     "task-5-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/run_tests/consultation.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-5-files",
       "children": [
         "task-5-2-1",
@@ -1269,7 +1269,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/run_tests/consultation.py",
         "task_category": "refactoring",
@@ -1280,7 +1280,7 @@
     "task-5-2-1": {
       "type": "subtask",
       "title": "Replace command building with build_tool_command()",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-2",
       "children": [],
       "dependencies": {
@@ -1289,9 +1289,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "refactoring"
+        "task_category": "refactoring",
+        "started_at": "2025-11-05T15:51:42.705447Z",
+        "completed_at": "2025-11-05T15:53:54.753018Z",
+        "needs_journaling": false,
+        "actual_hours": 0.037,
+        "journaled_at": "2025-11-05T15:53:54.763862Z"
       }
     },
     "task-5-2-2": {
@@ -2175,6 +2180,15 @@
       "content": "Successfully analyzed run-tests skill for migration complexity and created comprehensive migration plan.\n\nKey findings:\n1. **Duplication identified**: 40-50% of tool execution code duplicates common/ai_tools.py functionality\n   - consultation.py: ~90 lines of subprocess/threading/response handling\n   - tool_checking.py: ~10 lines of tool availability checking\n   \n2. **Migration complexity assessment**:\n   - Complexity: MEDIUM (straightforward refactoring)\n   - Effort: ~20 hours (~1 week)\n   - Risk: LOW-MEDIUM\n   - Breaking changes: NONE (fully backwards compatible)\n   \n3. **Code impact**:\n   - Remove: ~100-150 lines (custom subprocess, threading, error handling)\n   - Add: ~50-100 lines (imports, adapters)\n   - Net: ~50 line reduction with improved quality\n\n4. **What to migrate**:\n   - Tool availability checking \u2192 common.check_tool_available()\n   - Single tool execution \u2192 common.execute_tool()\n   - Parallel tool execution \u2192 common.execute_tools_parallel()\n   - Response handling \u2192 ToolResponse/MultiToolResponse\n\n5. **What to keep (domain-specific logic)**:\n   - Model configuration system (failure-type aware)\n   - Failure-type routing matrix (test-specific)\n   - Prompt formatting (test context specific)\n   - Response synthesis logic (test-specific heuristics)\n\n6. **Implementation phases identified**:\n   - Phase 1: Tool checking (2h, LOW RISK)\n   - Phase 2A: Single execution (4h, MEDIUM RISK)\n   - Phase 2B: Parallel execution (3h, MEDIUM RISK)\n   - Phase 3: Response synthesis (2h, LOW RISK)\n   - Phase 4: Testing (4h)\n\nRecommendation: Migration is WORTH DOING - removes code duplication, leverages tested implementations, improves maintainability, aligns with successfully migrated skills (sdd-plan-review, code-doc).\n\nAnalysis documents created for detailed planning of subsequent tasks.",
       "metadata": {},
       "task_id": "task-5-1"
+    },
+    {
+      "timestamp": "2025-11-05T15:53:54.763849Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Replace command building with build_tool_command()",
+      "author": "claude-code",
+      "content": "Successfully replaced custom command building with build_tool_command() from common/ai_tools in run-tests/consultation.py.\n\nChanges made:\n1. Added import for build_tool_command from common.ai_tools\n2. Updated run_consultation() function (lines 513-527):\n   - Replaced _build_tool_commands(failure_type) call and manual cmd.append(prompt)\n   - Now uses single call: build_tool_command(tool, prompt, model=get_model_for_tool(tool, failure_type))\n3. Updated run_tool_parallel() function (lines 700-712):\n   - Replaced _build_tool_commands(failure_type) call and manual cmd.append(prompt)\n   - Now uses single call: build_tool_command(tool, prompt, model=get_model_for_tool(tool, failure_type))\n4. Replaced tool_commands dict lookup with direct known_tools list\n\nBenefits achieved:\n- Eliminates 2-step command building pattern (template + append)\n- Uses correct, tested command patterns from shared implementation\n- Fixes incorrect patterns (codex 'exec', cursor-agent '--model')\n- Reduces code complexity and duplication\n- Maintains backward compatibility with model configuration system\n\nVerification completed:\n- Module imports successfully\n- build_tool_command() produces correct commands for gemini, codex, cursor-agent\n- Model parameter integration works correctly with get_model_for_tool()\n\nThe refactoring successfully delegates command building to shared implementation while preserving the unique model configuration and failure-type routing logic.",
+      "metadata": {},
+      "task_id": "task-5-2-1"
     }
   ]
 }

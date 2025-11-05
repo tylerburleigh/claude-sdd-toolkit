@@ -14,6 +14,7 @@ import time
 # Add parent directory to path to import sdd_common
 
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.ai_tools import build_tool_command
 from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools, get_config_path
 
 
@@ -509,13 +510,11 @@ def run_consultation(
     if printer is None:
         printer = PrettyPrinter()
 
-    # Build commands with failure-type-specific models
-    tool_commands = _build_tool_commands(failure_type)
-
     # Validate tool
-    if tool not in tool_commands:
+    known_tools = ["gemini", "codex", "cursor-agent"]
+    if tool not in known_tools:
         printer.error(f"Unknown tool '{tool}'")
-        printer.info(f"Available tools: {', '.join(tool_commands.keys())}")
+        printer.info(f"Available tools: {', '.join(known_tools)}")
         return 1
 
     # Validate prompt
@@ -523,8 +522,9 @@ def run_consultation(
         printer.error("Prompt cannot be empty")
         return 1
 
-    cmd = tool_commands[tool].copy()
-    cmd.append(prompt)
+    # Build command using shared implementation
+    model = get_model_for_tool(tool, failure_type)
+    cmd = build_tool_command(tool, prompt, model=model)
 
     if dry_run:
         printer.info("Would run:")
@@ -697,10 +697,9 @@ def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None
     Returns:
         ConsultationResponse with results
     """
-    # Build commands with failure-type-specific models
-    tool_commands = _build_tool_commands(failure_type)
-
-    if tool not in tool_commands:
+    # Validate tool
+    known_tools = ["gemini", "codex", "cursor-agent"]
+    if tool not in known_tools:
         return ConsultationResponse(
             tool=tool,
             success=False,
@@ -708,8 +707,9 @@ def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None
             error=f"Unknown tool '{tool}'"
         )
 
-    cmd = tool_commands[tool].copy()
-    cmd.append(prompt)
+    # Build command using shared implementation
+    model = get_model_for_tool(tool, failure_type)
+    cmd = build_tool_command(tool, prompt, model=model)
 
     start_time = time.time()
 
