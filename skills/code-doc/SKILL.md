@@ -1066,31 +1066,6 @@ pip install jsonschema  # For full schema validation
 
 ---
 
-## Technical Reference
-
-### AI Tool Integration
-
-This skill uses the standardized `ai_tools` module (`claude_skills.common.ai_tools`) for AI-enhanced documentation generation. The module provides:
-
-- **Unified API** - Consistent interface for cursor-agent, gemini, and codex CLI tools
-- **Type-safe responses** - Structured `ToolResponse` and `MultiToolResponse` dataclasses
-- **Parallel execution** - Run multiple AI models concurrently for comprehensive analysis
-- **Robust error handling** - Automatic timeout, retry, and fallback logic
-- **Tool availability detection** - Check which AI CLIs are installed before analysis
-
-**For detailed API documentation, see:** [AI Tools API Reference](../../docs/API_AI_TOOLS.md)
-
-**Key functions used by this skill:**
-- `execute_tools_parallel()` - Multi-agent consultation (runs 2 tools in parallel by default)
-- `detect_available_tools()` - Check which AI CLIs are available on the system
-- `check_tool_available()` - Verify a specific tool is installed
-- `ToolResponse.success` - Check if consultation succeeded
-- `MultiToolResponse.get_successful_responses()` - Filter successful consultations
-
-The `sdd doc analyze-with-ai` command internally uses these functions to coordinate parallel AI consultations for architecture and context documentation, returning separate research from each tool for the main agent to synthesize.
-
----
-
 ## Key Reminders
 
 1. **Standalone skill** - No SDD integration, works independently

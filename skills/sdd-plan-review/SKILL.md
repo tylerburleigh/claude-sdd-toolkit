@@ -971,29 +971,6 @@ sdd add-journal myspec --title "Deferred optimization concern" \
   --content "Codex flagged potential N+1 query in Phase 2. Decision: defer to Phase 3 performance optimization task. Reasoning: premature optimization, need working implementation first."
 ```
 
-## Technical Reference
-
-### AI Tool Integration
-
-This skill uses the standardized `ai_tools` module (`claude_skills.common.ai_tools`) for all multi-model consultation. The module provides:
-
-- **Unified API** - Consistent interface for gemini, codex, and cursor-agent CLI tools
-- **Type-safe responses** - Structured `ToolResponse` and `MultiToolResponse` dataclasses
-- **Parallel execution** - Run multiple AI models concurrently for comprehensive spec review
-- **Robust error handling** - Automatic timeout, retry, and fallback logic
-- **Tool availability detection** - Check which AI CLIs are installed before review
-
-**For detailed API documentation, see:** [AI Tools API Reference](../../docs/API_AI_TOOLS.md)
-
-**Key functions used by this skill:**
-- `execute_tools_parallel()` - Multi-model consultation (runs all tools in parallel)
-- `detect_available_tools()` - Check which AI CLIs are available on the system
-- `check_tool_available()` - Verify a specific tool is installed
-- `ToolResponse.to_dict()` - Serialize responses for JSON output
-- `MultiToolResponse.get_successful_responses()` - Filter successful consultations
-
-The `sdd review` command internally uses these functions to orchestrate parallel AI model consultations and aggregate their feedback into cohesive review reports.
-
 ## See Also
 
 **Skill(sdd-toolkit:sdd-plan)** - Use before this skill:
