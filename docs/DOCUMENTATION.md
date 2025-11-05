@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:00:10
+**Generated:** 2025-11-05 16:04:02
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 213
-- **Total Lines:** 71693
-- **Total Classes:** 269
-- **Total Functions:** 781
-- **Avg Complexity:** 5.57
+- **Total Files:** 214
+- **Total Lines:** 71959
+- **Total Classes:** 272
+- **Total Functions:** 784
+- **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -351,6 +351,17 @@ Example:
 
 ---
 
+### `ConsultationError`
+
+**Language:** python
+**Inherits from:** `Exception`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:24`
+
+**Description:**
+> Base exception for consultation errors.
+
+---
+
 ### `ConsultationResponse`
 
 **Language:** python
@@ -359,6 +370,17 @@ Example:
 
 **Description:**
 > Represents a response from a tool consultation.
+
+---
+
+### `ConsultationTimeoutError`
+
+**Language:** python
+**Inherits from:** `ConsultationError`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:34`
+
+**Description:**
+> Raised when consultation times out.
 
 ---
 
@@ -1423,6 +1445,17 @@ Example:
 - `_get_available_agents()`
 - `enhance_spec_narrative()`
 - `apply_narratives_to_markdown()`
+
+---
+
+### `NoToolsAvailableError`
+
+**Language:** python
+**Inherits from:** `ConsultationError`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:29`
+
+**Description:**
+> Raised when no AI tools are available for consultation.
 
 ---
 
@@ -9976,6 +10009,49 @@ Returns:
 
 ---
 
+### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:39`
+**Complexity:** 8
+
+**Description:**
+> Consult an AI tool for implementation fidelity review.
+
+Simplified wrapper around execute_tool() with fidelity-review defaults
+and comprehensive error handling.
+
+Args:
+    prompt: The review prompt to send to the AI tool
+    tool: Specific tool to use (gemini, codex, cursor-agent).
+          If None, uses first available tool.
+    model: Model to request (optional, tool-specific)
+    timeout: Timeout in seconds (default: 120)
+
+Returns:
+    ToolResponse object with consultation results
+
+Raises:
+    NoToolsAvailableError: If no AI tools are available
+    ConsultationTimeoutError: If consultation times out
+    ConsultationError: For other consultation failures
+
+Example:
+    >>> response = consult_ai_on_fidelity(
+    ...     prompt="Review this implementation...",
+    ...     tool="gemini"
+    ... )
+    >>> if response.success:
+    ...     print(response.output)
+
+**Parameters:**
+- `prompt`: str
+- `tool`: Optional[str]
+- `model`: Optional[str]
+- `timeout`: int
+
+---
+
 ### `consult_multi_agent(doc_type, prompt, pair, dry_run, verbose, printer) -> Dict[str, any]`
 
 **Language:** python
@@ -10041,6 +10117,50 @@ Returns:
 - `pair`: str
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success) -> List[ToolResponse]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:124`
+**Complexity:** 9
+
+**Description:**
+> Consult multiple AI tools in parallel for fidelity review.
+
+Wrapper around execute_tools_parallel() with fidelity-review defaults
+and comprehensive error handling.
+
+Args:
+    prompt: The review prompt to send to all AI tools
+    tools: List of tools to consult (gemini, codex, cursor-agent).
+           If None, uses all available tools.
+    model: Model to request (optional, tool-specific)
+    timeout: Timeout in seconds per tool (default: 120)
+    require_all_success: If True, raise exception if any tool fails
+
+Returns:
+    List of ToolResponse objects, one per tool
+
+Raises:
+    NoToolsAvailableError: If no AI tools are available
+    ConsultationError: If require_all_success=True and any tool fails
+
+Example:
+    >>> responses = consult_multiple_ai_on_fidelity(
+    ...     prompt="Review this implementation...",
+    ...     tools=["gemini", "codex"]
+    ... )
+    >>> for response in responses:
+    ...     print(f"{response.tool}: {response.status.value}")
+
+**Parameters:**
+- `prompt`: str
+- `tools`: Optional[List[str]]
+- `model`: Optional[str]
+- `timeout`: int
+- `require_all_success`: bool
 
 ---
 
@@ -13904,6 +14024,42 @@ Falls back to hardcoded MULTI_AGENT_PAIRS if not configured.
 
 Returns:
     Dict mapping pair names to lists of tools
+
+---
+
+### `get_consultation_summary(responses) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:210`
+**Complexity:** 3
+
+**Description:**
+> Generate summary statistics for multiple consultation responses.
+
+Useful for understanding overall consultation health and results.
+
+Args:
+    responses: List of ToolResponse objects
+
+Returns:
+    Dictionary with summary statistics:
+    {
+        "total": int,
+        "successful": int,
+        "failed": int,
+        "timed_out": int,
+        "total_duration": float,
+        "average_duration": float,
+        "tools_used": List[str],
+        "success_rate": float
+    }
+
+Example:
+    >>> summary = get_consultation_summary(responses)
+    >>> print(f"Success rate: {summary['success_rate']:.1%}")
+
+**Parameters:**
+- `responses`: List[ToolResponse]
 
 ---
 
@@ -21339,6 +21495,20 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py`
+
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tool`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
+- `logging`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/report.py`

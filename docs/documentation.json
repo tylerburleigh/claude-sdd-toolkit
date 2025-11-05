@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:00:10.450738Z",
+    "generated_at": "2025-11-05T21:04:02.306634Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 213,
-    "total_lines": 71693,
-    "total_classes": 269,
-    "total_functions": 781,
-    "avg_complexity": 5.57,
+    "total_files": 214,
+    "total_lines": 71959,
+    "total_classes": 272,
+    "total_functions": 784,
+    "avg_complexity": 5.58,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 213,
-        "lines": 71693,
-        "classes": 269,
-        "functions": 781,
-        "avg_complexity": 5.57
+        "files": 214,
+        "lines": 71959,
+        "classes": 272,
+        "functions": 784,
+        "avg_complexity": 5.58
       }
     }
   },
@@ -2065,6 +2065,37 @@
       ],
       "exports": [],
       "lines": 61
+    },
+    {
+      "name": "consultation",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "language": "python",
+      "docstring": "AI Consultation Wrapper for Fidelity Review\n\nLightweight wrapper around common/ai_tools.py specifically tailored for\nimplementation fidelity review use cases. Provides simplified API with\nfidelity-review-specific defaults and error handling.",
+      "classes": [
+        "ConsultationError",
+        "NoToolsAvailableError",
+        "ConsultationTimeoutError"
+      ],
+      "functions": [
+        "consult_ai_on_fidelity",
+        "consult_multiple_ai_on_fidelity",
+        "get_consultation_summary"
+      ],
+      "imports": [
+        "typing.List",
+        "typing.Optional",
+        "typing.Dict",
+        "typing.Any",
+        "logging",
+        "claude_skills.common.ai_tools.ToolResponse",
+        "claude_skills.common.ai_tools.ToolStatus",
+        "claude_skills.common.ai_tools.execute_tool",
+        "claude_skills.common.ai_tools.execute_tools_parallel",
+        "claude_skills.common.ai_tools.detect_available_tools",
+        "claude_skills.common.ai_tools.check_tool_available"
+      ],
+      "exports": [],
+      "lines": 266
     },
     {
       "name": "report",
@@ -9350,6 +9381,124 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "ConsultationError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 24,
+      "language": "python",
+      "docstring": "Base exception for consultation errors.",
+      "bases": [
+        "Exception"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 121,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 195,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 207,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 3
+    },
+    {
+      "name": "NoToolsAvailableError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 29,
+      "language": "python",
+      "docstring": "Raised when no AI tools are available for consultation.",
+      "bases": [
+        "ConsultationError"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 79,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 88,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 165,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 174,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 4
+    },
+    {
+      "name": "ConsultationTimeoutError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 34,
+      "language": "python",
+      "docstring": "Raised when consultation times out.",
+      "bases": [
+        "ConsultationError"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 103,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "FidelityReport",
@@ -26860,6 +27009,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_list_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 194,
@@ -26886,7 +27047,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 5
     },
     {
       "name": "detect_available_tools",
@@ -26945,6 +27106,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 163,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -26965,7 +27138,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 9
     },
     {
       "name": "build_tool_command",
@@ -27075,6 +27248,12 @@
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 673,
           "call_type": "function_call"
+        },
+        {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 94,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -27175,7 +27354,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 2
+      "call_count": 3
     },
     {
       "name": "execute_tools_parallel",
@@ -27212,6 +27391,12 @@
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 1014,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 183,
           "call_type": "function_call"
         },
         {
@@ -27319,7 +27504,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "check_spec_completion",
@@ -63636,6 +63821,260 @@
       "call_count": 14
     },
     {
+      "name": "consult_ai_on_fidelity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 39,
+      "language": "python",
+      "docstring": "Consult an AI tool for implementation fidelity review.\n\nSimplified wrapper around execute_tool() with fidelity-review defaults\nand comprehensive error handling.\n\nArgs:\n    prompt: The review prompt to send to the AI tool\n    tool: Specific tool to use (gemini, codex, cursor-agent).\n          If None, uses first available tool.\n    model: Model to request (optional, tool-specific)\n    timeout: Timeout in seconds (default: 120)\n\nReturns:\n    ToolResponse object with consultation results\n\nRaises:\n    NoToolsAvailableError: If no AI tools are available\n    ConsultationTimeoutError: If consultation times out\n    ConsultationError: For other consultation failures\n\nExample:\n    >>> response = consult_ai_on_fidelity(\n    ...     prompt=\"Review this implementation...\",\n    ...     tool=\"gemini\"\n    ... )\n    >>> if response.success:\n    ...     print(response.output)",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "tool",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        }
+      ],
+      "return_type": "ToolResponse",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "detect_available_tools",
+          "file": "unknown",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "check_tool_available",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "execute_tool",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 120,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "consult_multiple_ai_on_fidelity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 124,
+      "language": "python",
+      "docstring": "Consult multiple AI tools in parallel for fidelity review.\n\nWrapper around execute_tools_parallel() with fidelity-review defaults\nand comprehensive error handling.\n\nArgs:\n    prompt: The review prompt to send to all AI tools\n    tools: List of tools to consult (gemini, codex, cursor-agent).\n           If None, uses all available tools.\n    model: Model to request (optional, tool-specific)\n    timeout: Timeout in seconds per tool (default: 120)\n    require_all_success: If True, raise exception if any tool fails\n\nReturns:\n    List of ToolResponse objects, one per tool\n\nRaises:\n    NoToolsAvailableError: If no AI tools are available\n    ConsultationError: If require_all_success=True and any tool fails\n\nExample:\n    >>> responses = consult_multiple_ai_on_fidelity(\n    ...     prompt=\"Review this implementation...\",\n    ...     tools=[\"gemini\", \"codex\"]\n    ... )\n    >>> for response in responses:\n    ...     print(f\"{response.tool}: {response.status.value}\")",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "tools",
+          "type": "Optional[List[str]]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "require_all_success",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "List[ToolResponse]",
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "detect_available_tools",
+          "file": "unknown",
+          "line": 163,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 169,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 169,
+          "call_type": "method_call"
+        },
+        {
+          "name": "check_tool_available",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 178,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 178,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 180,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 180,
+          "call_type": "method_call"
+        },
+        {
+          "name": "execute_tools_parallel",
+          "file": "unknown",
+          "line": 183,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 196,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 206,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "get_consultation_summary",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 210,
+      "language": "python",
+      "docstring": "Generate summary statistics for multiple consultation responses.\n\nUseful for understanding overall consultation health and results.\n\nArgs:\n    responses: List of ToolResponse objects\n\nReturns:\n    Dictionary with summary statistics:\n    {\n        \"total\": int,\n        \"successful\": int,\n        \"failed\": int,\n        \"timed_out\": int,\n        \"total_duration\": float,\n        \"average_duration\": float,\n        \"tools_used\": List[str],\n        \"success_rate\": float\n    }\n\nExample:\n    >>> summary = get_consultation_summary(responses)\n    >>> print(f\"Success rate: {summary['success_rate']:.1%}\")",
+      "parameters": [
+        {
+          "name": "responses",
+          "type": "List[ToolResponse]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 236,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 249,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 250,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 251,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 252,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
       "name": "format_execution_plan",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
       "line": 60,
@@ -73910,6 +74349,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 163,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -73930,7 +74381,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 9
     },
     {
       "name": "review_with_tools",
@@ -109024,6 +109475,19 @@
     "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py": [
       "argparse",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py": [
+      "typing.List",
+      "typing.Optional",
+      "typing.Dict",
+      "typing.Any",
+      "logging",
+      "claude_skills.common.ai_tools.ToolResponse",
+      "claude_skills.common.ai_tools.ToolStatus",
+      "claude_skills.common.ai_tools.execute_tool",
+      "claude_skills.common.ai_tools.execute_tools_parallel",
+      "claude_skills.common.ai_tools.detect_available_tools",
+      "claude_skills.common.ai_tools.check_tool_available"
     ],
     "src/claude_skills/claude_skills/sdd_fidelity_review/report.py": [
       "typing.Dict",
