@@ -235,10 +235,12 @@ def consult_multiple_ai_on_fidelity(
             logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
 
         # Execute consultations in parallel
+        # Convert single model string to models dict if provided
+        models_dict = {tool: model for tool in available_tools} if model else None
         responses = execute_tools_parallel(
             tools=available_tools,
             prompt=prompt,
-            model=model,
+            models=models_dict,
             timeout=timeout
         )
 

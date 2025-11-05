@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 18:44:55
+**Generated:** 2025-11-05 18:50:56
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 73201
+- **Total Lines:** 73220
 - **Total Classes:** 278
 - **Total Functions:** 796
-- **Avg Complexity:** 5.6
+- **Avg Complexity:** 5.61
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -213,7 +213,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:615`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:634`
 
 **Description:**
 > Issue with assigned severity category.
@@ -372,7 +372,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:469`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:488`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -8033,7 +8033,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:637`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:656`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -8067,7 +8067,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:745`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:764`
 **Complexity:** 1
 
 **Description:**
@@ -10916,7 +10916,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:509`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:528`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -16579,7 +16579,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:445`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:464`
 **Complexity:** 1
 
 **Description:**
@@ -16633,7 +16633,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:324`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Parse AI tool response to extract structured review information.
