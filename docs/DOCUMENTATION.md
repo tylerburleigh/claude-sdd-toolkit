@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:48:16
+**Generated:** 2025-11-05 15:30:13
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 213
-- **Total Lines:** 70657
+- **Total Lines:** 70827
 - **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
@@ -778,7 +778,7 @@ This class will be implemented in Phase 4 (Report Generation).
 ### `FidelityReviewer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:11`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:15`
 
 **Description:**
 > Core class for performing fidelity reviews of implementations against specs.
@@ -792,6 +792,11 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `review_full_spec()`
 - `review_files()`
 - `analyze_deviation()`
+- `_load_spec()`
+- `get_task_requirements()`
+- `get_phase_tasks()`
+- `get_all_tasks()`
+- `_collect_task_ids_recursive()`
 
 ---
 
@@ -21334,7 +21339,11 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
 
+- `claude_skills.common.paths.find_specs_directory`
+- `claude_skills.common.spec.get_node`
+- `claude_skills.common.spec.load_json_spec`
 - `pathlib.Path`
+- `sys`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`

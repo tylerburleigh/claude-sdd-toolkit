@@ -7,9 +7,14 @@ Core functionality for comparing implementation against specifications.
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import sys
+import subprocess
+import logging
 
 from claude_skills.common.spec import load_json_spec, get_node
 from claude_skills.common.paths import find_specs_directory
+from claude_skills.common.git_metadata import find_git_root
+
+logger = logging.getLogger(__name__)
 
 
 class FidelityReviewer:
@@ -272,3 +277,234 @@ class FidelityReviewer:
                     task_ids.extend(self._collect_task_ids_recursive(node_id))
 
         return task_ids
+
+    def get_file_diff(
+        self,
+        file_path: str,
+        base_ref: str = "HEAD",
+        compare_ref: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Get git diff for a specific file.
+
+        Args:
+            file_path: Path to the file (relative to repo root or absolute)
+            base_ref: Base git reference to compare from (default: HEAD)
+            compare_ref: Git reference to compare to (default: working tree)
+
+        Returns:
+            Git diff output as string, or None if error occurs
+
+        Examples:
+            # Get unstaged changes for a file
+            diff = reviewer.get_file_diff("src/file.py")
+
+            # Get diff between HEAD and a specific commit
+            diff = reviewer.get_file_diff("src/file.py", base_ref="abc123")
+
+            # Get diff between two commits
+            diff = reviewer.get_file_diff("src/file.py", base_ref="abc123", compare_ref="def456")
+        """
+        # Find git repository root
+        repo_root = find_git_root()
+        if repo_root is None:
+            print("Error: Not in a git repository", file=sys.stderr)
+            return None
+
+        # Build git diff command
+        if compare_ref:
+            # Compare between two refs
+            cmd = ["git", "diff", base_ref, compare_ref, "--", file_path]
+        else:
+            # Compare against working tree
+            cmd = ["git", "diff", base_ref, "--", file_path]
+
+        try:
+            result = subprocess.run(
+                cmd,
+                cwd=repo_root,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=30
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Git diff failed for {file_path}: {result.stderr}")
+                return None
+
+            return result.stdout
+
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Git diff timed out for {file_path}")
+            return None
+        except Exception as e:
+            logger.warning(f"Failed to get git diff for {file_path}: {e}")
+            return None
+
+    def get_task_diffs(
+        self,
+        task_id: str,
+        base_ref: str = "HEAD",
+        compare_ref: Optional[str] = None
+    ) -> Dict[str, Optional[str]]:
+        """
+        Get git diffs for all files associated with a task.
+
+        Extracts file paths from task metadata and collects diffs for each file.
+
+        Args:
+            task_id: Task ID to get diffs for
+            base_ref: Base git reference to compare from (default: HEAD)
+            compare_ref: Git reference to compare to (default: working tree)
+
+        Returns:
+            Dictionary mapping file paths to their diff output.
+            Files that failed to diff will have None as value.
+
+        Example:
+            {
+                "src/file1.py": "diff --git a/src/file1.py...",
+                "src/file2.py": None,  # Failed to get diff
+                "tests/test_file.py": "diff --git a/tests/test_file.py..."
+            }
+        """
+        task_reqs = self.get_task_requirements(task_id)
+        if task_reqs is None:
+            return {}
+
+        # Collect file paths from task metadata
+        file_paths = []
+
+        # Get primary file path
+        primary_file = task_reqs.get("file_path")
+        if primary_file:
+            file_paths.append(primary_file)
+
+        # Get additional files from metadata
+        metadata = task_reqs.get("metadata", {})
+        additional_files = metadata.get("files", [])
+        if additional_files:
+            file_paths.extend(additional_files)
+
+        # Get verification files
+        verification_files = metadata.get("verification_files", [])
+        if verification_files:
+            file_paths.extend(verification_files)
+
+        # Collect diffs for all files
+        diffs = {}
+        for file_path in file_paths:
+            diff_output = self.get_file_diff(file_path, base_ref, compare_ref)
+            diffs[file_path] = diff_output
+
+        return diffs
+
+    def get_phase_diffs(
+        self,
+        phase_id: str,
+        base_ref: str = "HEAD",
+        compare_ref: Optional[str] = None
+    ) -> Dict[str, Dict[str, Optional[str]]]:
+        """
+        Get git diffs for all tasks in a phase.
+
+        Args:
+            phase_id: Phase ID to get diffs for
+            base_ref: Base git reference to compare from (default: HEAD)
+            compare_ref: Git reference to compare to (default: working tree)
+
+        Returns:
+            Dictionary mapping task IDs to their file diff dictionaries.
+
+        Example:
+            {
+                "task-1-1": {
+                    "src/file1.py": "diff --git...",
+                    "src/file2.py": "diff --git..."
+                },
+                "task-1-2": {
+                    "tests/test.py": "diff --git..."
+                }
+            }
+        """
+        phase_tasks = self.get_phase_tasks(phase_id)
+        if phase_tasks is None:
+            return {}
+
+        phase_diffs = {}
+        for task in phase_tasks:
+            task_id = task["task_id"]
+            task_diffs = self.get_task_diffs(task_id, base_ref, compare_ref)
+            if task_diffs:
+                phase_diffs[task_id] = task_diffs
+
+        return phase_diffs
+
+    def get_branch_diff(
+        self,
+        base_branch: str = "main",
+        max_size_kb: int = 100
+    ) -> str:
+        """
+        Get full git diff between current branch and base branch.
+
+        Similar to pr_context.get_spec_git_diffs but tailored for fidelity review.
+
+        Args:
+            base_branch: Base branch name to compare against (default: "main")
+            max_size_kb: Maximum diff size in KB (truncate if larger)
+
+        Returns:
+            Git diff output as string, or empty string if error occurs.
+            Large diffs (>max_size_kb) are truncated with a summary message.
+        """
+        repo_root = find_git_root()
+        if repo_root is None:
+            print("Error: Not in a git repository", file=sys.stderr)
+            return ""
+
+        try:
+            result = subprocess.run(
+                ['git', 'diff', f'{base_branch}...HEAD'],
+                cwd=repo_root,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=30
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Git diff failed: {result.stderr}")
+                return ""
+
+            diff_output = result.stdout
+
+            # Check size and truncate if necessary
+            diff_size_kb = len(diff_output.encode('utf-8')) / 1024
+            if diff_size_kb > max_size_kb:
+                logger.info(f"Diff size ({diff_size_kb:.1f}KB) exceeds limit ({max_size_kb}KB), truncating")
+                # Get file-level summary instead
+                result = subprocess.run(
+                    ['git', 'diff', '--stat', f'{base_branch}...HEAD'],
+                    cwd=repo_root,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=10
+                )
+
+                if result.returncode == 0:
+                    summary = result.stdout
+                    return f"[Diff too large ({diff_size_kb:.1f}KB), showing summary only]\n\n{summary}"
+                else:
+                    return f"[Diff too large ({diff_size_kb:.1f}KB), summary unavailable]"
+
+            return diff_output
+
+        except subprocess.TimeoutExpired:
+            logger.warning("Git diff timed out (>30s)")
+            return "[Git diff timed out]"
+        except Exception as e:
+            logger.warning(f"Failed to get git diff: {e}")
+            return ""

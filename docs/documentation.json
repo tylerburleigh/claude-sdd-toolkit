@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:48:16.758232Z",
+    "generated_at": "2025-11-05T20:30:13.939177Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 213,
-    "total_lines": 70657,
+    "total_lines": 70827,
     "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 213,
-        "lines": 70657,
+        "lines": 70827,
         "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
@@ -2098,10 +2098,14 @@
         "typing.Dict",
         "typing.List",
         "typing.Optional",
-        "typing.Any"
+        "typing.Any",
+        "sys",
+        "claude_skills.common.spec.load_json_spec",
+        "claude_skills.common.spec.get_node",
+        "claude_skills.common.paths.find_specs_directory"
       ],
       "exports": [],
-      "lines": 104
+      "lines": 274
     },
     {
       "name": "__init__",
@@ -9367,7 +9371,7 @@
     {
       "name": "FidelityReviewer",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-      "line": 11,
+      "line": 15,
       "language": "python",
       "docstring": "Core class for performing fidelity reviews of implementations against specs.\n\nThis class will be implemented in Phase 3 (Core Review Logic).",
       "bases": [],
@@ -9377,7 +9381,12 @@
         "review_phase",
         "review_full_spec",
         "review_files",
-        "analyze_deviation"
+        "analyze_deviation",
+        "_load_spec",
+        "get_task_requirements",
+        "get_phase_tasks",
+        "get_all_tasks",
+        "_collect_task_ids_recursive"
       ],
       "properties": [],
       "is_exported": false,
@@ -35216,6 +35225,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 121,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_find_specs",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 272,
@@ -35728,7 +35743,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 62
+      "call_count": 63
     },
     {
       "name": "find_spec_file",
@@ -40508,6 +40523,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 128,
+          "call_type": "function_call"
+        },
+        {
           "name": "format_execution_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 73,
@@ -41548,7 +41569,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 172
+      "call_count": 173
     },
     {
       "name": "save_json_spec",
@@ -42203,6 +42224,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_requirements",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 162,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_phase_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 204,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
           "line": 181,
@@ -42253,7 +42286,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 9
     },
     {
       "name": "update_node",
@@ -71011,6 +71044,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 121,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_find_specs",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 272,
@@ -71403,7 +71442,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 62
+      "call_count": 63
     },
     {
       "name": "suggest_documentation_generation",
@@ -108928,7 +108967,11 @@
       "typing.Dict",
       "typing.List",
       "typing.Optional",
-      "typing.Any"
+      "typing.Any",
+      "sys",
+      "claude_skills.common.spec.load_json_spec",
+      "claude_skills.common.spec.get_node",
+      "claude_skills.common.paths.find_specs_directory"
     ],
     "src/claude_skills/claude_skills/sdd_next/__init__.py": [
       "discovery.get_next_task",
