@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:30:13
+**Generated:** 2025-11-05 15:32:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 213
-- **Total Lines:** 70827
+- **Total Lines:** 71063
 - **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
@@ -778,7 +778,7 @@ This class will be implemented in Phase 4 (Report Generation).
 ### `FidelityReviewer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:15`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:20`
 
 **Description:**
 > Core class for performing fidelity reviews of implementations against specs.
@@ -797,6 +797,10 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `get_phase_tasks()`
 - `get_all_tasks()`
 - `_collect_task_ids_recursive()`
+- `get_file_diff()`
+- `get_task_diffs()`
+- `get_phase_diffs()`
+- `get_branch_diff()`
 
 ---
 
@@ -21339,10 +21343,13 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
 
+- `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.spec.get_node`
 - `claude_skills.common.spec.load_json_spec`
+- `logging`
 - `pathlib.Path`
+- `subprocess`
 - `sys`
 - `typing.Any`
 - `typing.Dict`
