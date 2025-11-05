@@ -87,7 +87,8 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Validated configuration dictionary
     """
-    validated = DEFAULT_SDD_CONFIG.copy()
+    import copy
+    validated = copy.deepcopy(DEFAULT_SDD_CONFIG)
 
     # Validate output section
     if "output" in config and isinstance(config["output"], dict):

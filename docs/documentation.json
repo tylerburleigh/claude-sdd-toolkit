@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T16:52:05.077173Z",
+    "generated_at": "2025-11-05T17:17:55.750466Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 209,
-    "total_lines": 70395,
+    "total_lines": 70394,
     "total_classes": 267,
     "total_functions": 779,
     "avg_complexity": 5.58,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 209,
-        "lines": 70395,
+        "lines": 70394,
         "classes": 267,
         "functions": 779,
         "avg_complexity": 5.58
@@ -1925,7 +1925,7 @@
         "claude_skills.run_tests.pytest_runner.validate_preset"
       ],
       "exports": [],
-      "lines": 262
+      "lines": 261
     },
     {
       "name": "consultation",
@@ -59060,21 +59060,21 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 191,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
+          "name": "add_parser",
           "file": "unknown",
-          "line": 192,
+          "line": 193,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
-          "line": 194,
+          "line": 212,
           "call_type": "method_call"
         },
         {
@@ -59150,33 +59150,33 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 225,
-          "call_type": "method_call"
-        },
-        {
           "name": "list",
           "file": "unknown",
-          "line": 225,
+          "line": 224,
           "call_type": "function_call"
         },
         {
           "name": "keys",
           "file": "unknown",
-          "line": 225,
+          "line": 224,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 226,
+          "line": 225,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 228,
+          "line": 227,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 233,
           "call_type": "method_call"
         },
         {
@@ -59210,45 +59210,45 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 239,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 240,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_parser",
           "file": "unknown",
-          "line": 242,
+          "line": 241,
           "call_type": "method_call"
         },
         {
           "name": "add_mutually_exclusive_group",
           "file": "unknown",
-          "line": 248,
+          "line": 247,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 249,
+          "line": 248,
           "call_type": "method_call"
         },
         {
           "name": "get_presets",
           "file": "unknown",
-          "line": 249,
+          "line": 248,
           "call_type": "function_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 250,
+          "line": 249,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 257,
           "call_type": "method_call"
         },
         {
@@ -59270,15 +59270,9 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 261,
-          "call_type": "method_call"
-        },
-        {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 262,
+          "line": 261,
           "call_type": "method_call"
         }
       ],
@@ -61867,7 +61861,7 @@
         {
           "name": "register_run_tests",
           "file": "src/claude_skills/claude_skills/run_tests/cli.py",
-          "line": 249,
+          "line": 248,
           "call_type": "function_call"
         }
       ],

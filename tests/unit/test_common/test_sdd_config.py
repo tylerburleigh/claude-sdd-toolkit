@@ -65,8 +65,8 @@ class TestConfigLoading:
         # compact falls back to default
         assert config['output']['compact'] is True
 
-    @patch('Path.exists')
-    @patch('Path.cwd')
+    @patch('pathlib.Path.exists')
+    @patch('pathlib.Path.cwd')
     def test_project_config_precedence_over_global(self, mock_cwd, mock_exists):
         """Test project config takes precedence over global config."""
         mock_cwd.return_value = Path('/project')
@@ -207,8 +207,8 @@ class TestGetSddSetting:
 class TestConfigPath:
     """Test configuration path resolution."""
 
-    @patch('Path.exists')
-    @patch('Path.cwd')
+    @patch('pathlib.Path.exists')
+    @patch('pathlib.Path.cwd')
     def test_finds_project_config_in_cwd(self, mock_cwd, mock_exists):
         """Test finding project config in current directory."""
         mock_cwd.return_value = Path('/project')
@@ -220,9 +220,9 @@ class TestConfigPath:
             config_path = get_config_path()
             assert config_path == Path('/project/.claude/sdd_config.json')
 
-    @patch('Path.exists')
-    @patch('Path.cwd')
-    @patch('Path.home')
+    @patch('pathlib.Path.exists')
+    @patch('pathlib.Path.cwd')
+    @patch('pathlib.Path.home')
     def test_finds_global_config_when_no_project(self, mock_home, mock_cwd, mock_exists):
         """Test finding global config when no project config exists."""
         mock_cwd.return_value = Path('/project')
@@ -235,7 +235,7 @@ class TestConfigPath:
             config_path = get_config_path()
             assert config_path == Path('/home/user/.claude/sdd_config.json')
 
-    @patch('Path.exists')
+    @patch('pathlib.Path.exists')
     def test_returns_none_when_no_config_found(self, mock_exists):
         """Test returns None when no config file exists."""
         mock_exists.return_value = False
