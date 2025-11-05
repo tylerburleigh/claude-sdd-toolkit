@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:17:46
+**Generated:** 2025-11-05 16:20:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72768
+- **Total Lines:** 72877
 - **Total Classes:** 277
-- **Total Functions:** 793
+- **Total Functions:** 794
 - **Avg Complexity:** 5.61
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -6350,7 +6350,7 @@ Returns:
 ### `_handle_fidelity_review(args) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:26`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:30`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -6362,6 +6362,28 @@ Orchestrates the fidelity review workflow:
 3. Optionally consult AI tools for review
 4. Parse and analyze responses
 5. Generate and display report
+
+Args:
+    args: Parsed command-line arguments
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+**Parameters:**
+- `args`: argparse.Namespace
+
+---
+
+### `_handle_list_review_tools(args) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:214`
+**Complexity:** 8
+
+**Description:**
+> Handle list-review-tools command execution.
+
+Detects and displays available AI consultation tools with their status.
 
 Args:
     args: Parsed command-line arguments
@@ -6547,7 +6569,7 @@ Args:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:198`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:202`
 **Complexity:** 1
 
 **Description:**
@@ -6565,7 +6587,7 @@ Args:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:175`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:179`
 **Complexity:** 5
 
 **Description:**
@@ -6583,7 +6605,7 @@ Args:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:140`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:144`
 **Complexity:** 7
 
 **Description:**
@@ -16222,8 +16244,8 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:321`
-**Complexity:** 2
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:424`
+**Complexity:** 3
 
 **Description:**
 > Main entry point for standalone CLI execution.
@@ -17127,7 +17149,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:210`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:288`
 **Complexity:** 1
 
 **Description:**
@@ -21832,6 +21854,8 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.detect_available_tools`
 - `consultation.ConsultationError`
 - `consultation.ConsultationTimeoutError`
 - `consultation.NoToolsAvailableError`
