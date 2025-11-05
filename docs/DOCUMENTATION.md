@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:46:42
+**Generated:** 2025-11-05 12:31:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70079
-- **Total Classes:** 264
-- **Total Functions:** 786
+- **Total Lines:** 70395
+- **Total Classes:** 267
+- **Total Functions:** 779
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -355,7 +355,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `NamedTuple`
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:679`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:647`
 
 **Description:**
 > Represents a response from a tool consultation.
@@ -1240,6 +1240,53 @@ Example:
 - `_parse_task()`
 - `_parse_verifications()`
 - `_parse_verification()`
+
+---
+
+### `MultiToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:124`
+
+**Description:**
+> Response from multiple tool consultations run in parallel.
+
+Attributes:
+    responses: Dictionary mapping tool names to their responses
+    synthesis: Optional synthesis/consensus from all responses
+    total_duration: Total wall-clock time (parallel execution)
+    max_duration: Longest individual tool duration
+    success_count: Number of successful tool calls
+    failure_count: Number of failed tool calls
+    timestamp: When the multi-tool consultation started
+    failure_type: Optional failure type that triggered consultation
+
+Example:
+    >>> responses = {
+    ...     "gemini": ToolResponse(tool="gemini", status=ToolStatus.SUCCESS),
+    ...     "codex": ToolResponse(tool="codex", status=ToolStatus.ERROR)
+    ... }
+    >>> multi = MultiToolResponse(
+    ...     responses=responses,
+    ...     success_count=1,
+    ...     failure_count=1
+    ... )
+    >>> multi.success
+    True
+    >>> successful = multi.get_successful_responses()
+    >>> len(successful)
+    1
+
+**Methods:**
+- `get_successful_responses()`
+- `get_failed_responses()`
+- `to_dict()`
+- `from_dict()`
+
+**Properties:**
+- `success`
+- `all_failed`
+- `all_succeeded`
 
 ---
 
@@ -5094,6 +5141,62 @@ Attributes:
 
 ---
 
+### `ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:31`
+
+**Description:**
+> Standardized response from AI tool consultation.
+
+This is the core response type used throughout the toolkit for
+all AI tool interactions.
+
+Attributes:
+    tool: Name of the tool (gemini, codex, cursor-agent)
+    status: Execution status (success, timeout, error, etc.)
+    output: Raw output from the tool (stdout)
+    error: Error message if any (stderr or exception message)
+    duration: Execution time in seconds
+    timestamp: When the consultation started (ISO format)
+    model: Model used by the tool (if applicable)
+    prompt: The prompt sent to the tool (optional, for debugging)
+    exit_code: Process exit code (None if didn't run)
+    metadata: Additional tool-specific metadata
+
+Example:
+    >>> response = ToolResponse(
+    ...     tool="gemini",
+    ...     status=ToolStatus.SUCCESS,
+    ...     output="Analysis complete",
+    ...     duration=2.5
+    ... )
+    >>> response.success
+    True
+    >>> response.to_dict()
+    {...}
+
+**Methods:**
+- `to_dict()`
+- `from_dict()`
+
+**Properties:**
+- `success`
+- `failed`
+
+---
+
+### `ToolStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:21`
+
+**Description:**
+> Status of AI tool execution.
+
+---
+
 ### `VisualizationBuilder`
 
 **Language:** python
@@ -5436,7 +5539,7 @@ missing it, even when the validation doesn't report it as an error (backward com
 ### `_build_tool_commands(failure_type) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:299`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:256`
 **Complexity:** 1
 
 **Description:**
@@ -5731,7 +5834,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:38`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:33`
 **Complexity:** 1
 
 **Parameters:**
@@ -6167,7 +6270,7 @@ Args:
 ### `_maybe_json(args, payload) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:43`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:38`
 **Complexity:** 2
 
 **Parameters:**
@@ -6444,24 +6547,6 @@ Returns:
 
 ---
 
-### `_run_tool_capture(tool, prompt) -> Tuple[bool, str, float]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:607`
-**Complexity:** 1
-
-**Description:**
-> Run tool and capture output (internal helper for parallel execution).
-
-Returns:
-    Tuple of (success, output, duration)
-
-**Parameters:**
-- `tool`: str
-- `prompt`: str
-
----
-
 ### `_serialize_fix_action(action) -> Dict[str, Any]`
 
 **Language:** python
@@ -6470,6 +6555,38 @@ Returns:
 
 **Parameters:**
 - `action`: None
+
+---
+
+### `_setup_interactive(args, printer, git_config_file) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:330`
+**Complexity:** 8
+
+**Description:**
+> Set up git config in interactive mode using wizard.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+- `git_config_file`: Path
+
+---
+
+### `_setup_non_interactive(args, printer, git_config_file) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:265`
+**Complexity:** 4
+
+**Description:**
+> Set up git config in non-interactive mode using CLI flags or defaults.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+- `git_config_file`: Path
 
 ---
 
@@ -6650,17 +6767,22 @@ Returns:
 
 ---
 
-### `add_global_options(parser) -> None`
+### `add_global_options(parser, config) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:20`
-**Complexity:** 1
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:23`
+**Complexity:** 2
 
 **Description:**
 > Add global options available to all commands.
 
+Args:
+    parser: ArgumentParser instance to add options to
+    config: Optional config dict with defaults (loaded from sdd_config.json)
+
 **Parameters:**
 - `parser`: None
+- `config`: None
 
 ---
 
@@ -6735,7 +6857,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:85`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:126`
 **Complexity:** 1
 
 **Description:**
@@ -6749,7 +6871,7 @@ Returns:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:93`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:134`
 **Complexity:** 1
 
 **Description:**
@@ -6999,7 +7121,7 @@ Returns:
 ### `analyze_response_similarity(response1, response2) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:759`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:685`
 **Complexity:** 5
 
 **Description:**
@@ -7086,11 +7208,14 @@ Returns:
 ### `ask_choice(question, choices, default) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:174`
-**Complexity:** 6
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:185`
+**Complexity:** 8
 
 **Description:**
 > Ask a multiple choice question.
+
+Raises:
+    EOFError: If input is not available (non-interactive context)
 
 **Parameters:**
 - `question`: str
@@ -7103,10 +7228,13 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:163`
-**Complexity:** 2
+**Complexity:** 4
 
 **Description:**
 > Ask a yes/no question and return boolean answer.
+
+Raises:
+    EOFError: If input is not available (non-interactive context)
 
 **Parameters:**
 - `question`: str
@@ -7288,6 +7416,45 @@ Returns:
 - `path`: Optional[str]
 - `pattern`: Optional[str]
 - `extra_args`: Optional[List[str]]
+
+---
+
+### `build_tool_command(tool, prompt) -> list[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:333`
+**Complexity:** 6
+
+**Description:**
+> Build command list for tool execution.
+
+Handles tool-specific command patterns:
+- gemini: uses -m for model, -p for prompt
+- codex: uses -m for model, positional arg for prompt
+- cursor-agent: uses --print flag, positional arg for prompt
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    prompt: The prompt to include in command
+    model: Optional model override
+
+Returns:
+    Command as list of strings (shell-safe)
+
+Raises:
+    ValueError: If tool is unknown
+
+Example:
+    >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
+    ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']
+    >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
+    ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']
+    >>> build_tool_command("cursor-agent", "Review code")
+    ['cursor-agent', '--print', 'Review code']
+
+**Parameters:**
+- `tool`: str
+- `prompt`: str
 
 ---
 
@@ -7518,30 +7685,6 @@ Examples:
 - `start_timestamp`: str
 - `end_timestamp`: str
 - `printer`: Optional[PrettyPrinter]
-
----
-
-### `call_tool(tool_name, prompt, timeout) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:92`
-**Complexity:** 8
-
-**Description:**
-> Call an AI CLI tool with a prompt.
-
-Args:
-    tool_name: Name of tool to call
-    prompt: Prompt to send
-    timeout: Optional timeout override
-
-Returns:
-    Result dictionary with success, output, error
-
-**Parameters:**
-- `tool_name`: str
-- `prompt`: str
-- `timeout`: Optional[int]
 
 ---
 
@@ -8004,39 +8147,36 @@ Example:
 
 ---
 
-### `check_tool_availability() -> Dict[str, bool]`
+### `check_tool_available(tool) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:111`
-**Complexity:** 2
-
-**Description:**
-> Check which external tools are installed and enabled.
-
-Only checks tools that are enabled in the configuration.
-
-Returns:
-    Dict mapping tool names to availability status
-
----
-
-### `check_tool_available(tool_name) -> bool`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:250`
 **Complexity:** 4
 
 **Description:**
-> Check if an AI CLI tool is available.
+> Check if a tool is available and optionally working.
+
+Uses shutil.which() for fast PATH lookup. Optionally verifies tool
+responds to --version flag.
 
 Args:
-    tool_name: Name of the tool (gemini, codex, cursor-agent)
+    tool: Tool name to check (e.g., "gemini", "codex", "cursor-agent")
+    check_version: If True, verify tool responds to --version
+    timeout: Timeout in seconds for version check (default 5)
 
 Returns:
-    True if tool is available, False otherwise
+    True if tool is available (and working if check_version=True)
+
+Example:
+    >>> check_tool_available("gemini")
+    True
+    >>> check_tool_available("nonexistent")
+    False
+    >>> check_tool_available("gemini", check_version=True)
+    True
 
 **Parameters:**
-- `tool_name`: str
+- `tool`: str
 
 ---
 
@@ -8369,8 +8509,11 @@ Example:
 ### `cmd_check_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:55`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:50`
+**Complexity:** 4
+
+**Description:**
+> Check availability of external AI tools.
 
 **Parameters:**
 - `args`: argparse.Namespace
@@ -8423,7 +8566,7 @@ Example:
 ### `cmd_consult(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:67`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:79`
 ⚠️ **Complexity:** 15 (High)
 
 **Parameters:**
@@ -8566,7 +8709,7 @@ Returns:
 ### `cmd_discover(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:134`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:146`
 **Complexity:** 1
 
 **Parameters:**
@@ -9220,7 +9363,7 @@ Returns:
 ### `cmd_run(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:146`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:158`
 **Complexity:** 5
 
 **Parameters:**
@@ -9266,11 +9409,13 @@ Args:
 ### `cmd_setup_git_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:197`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:219`
+**Complexity:** 8
 
 **Description:**
 > Interactive git configuration wizard.
+
+Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Parameters:**
 - `args`: None
@@ -9708,7 +9853,7 @@ Returns:
 ### `compose_ai_context_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:323`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:324`
 **Complexity:** 1
 
 **Description:**
@@ -9732,7 +9877,7 @@ Returns:
 ### `compose_architecture_doc(research_findings, project_name, version) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:271`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:272`
 **Complexity:** 1
 
 **Description:**
@@ -9778,8 +9923,8 @@ Returns:
 ### `consult_multi_agent(doc_type, prompt, pair, dry_run, verbose, printer) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:453`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:454`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Consult multiple AI tools in parallel and synthesize responses.
@@ -9808,8 +9953,8 @@ Returns:
 ### `consult_multi_agent(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, pair, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:970`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:896`
+⚠️ **Complexity:** 13 (High)
 
 **Description:**
 > Consult multiple agents in parallel and synthesize their responses.
@@ -9846,7 +9991,7 @@ Returns:
 ### `consult_with_auto_routing(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, tool, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:585`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:553`
 **Complexity:** 10
 
 **Description:**
@@ -10023,7 +10168,7 @@ Returns:
 
 ---
 
-### `create_global_parent_parser() -> None`
+### `create_global_parent_parser(config) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:5`
@@ -10035,8 +10180,14 @@ Returns:
 This allows global options like --verbose, --debug, etc. to work universally
 across all command levels, including nested subcommands.
 
+Args:
+    config: Optional config dict with defaults (loaded from sdd_config.json)
+
 Returns:
     ArgumentParser configured with global options and add_help=False
+
+**Parameters:**
+- `config`: None
 
 ---
 
@@ -10244,17 +10395,49 @@ Returns:
 
 ---
 
+### `detect_available_tools(tools) -> list[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:298`
+**Complexity:** 4
+
+**Description:**
+> Detect which AI tools are available in PATH.
+
+Args:
+    tools: Optional list of tool names to check. If None, checks
+        default tools: ["gemini", "codex", "cursor-agent"]
+    check_version: If True, verify each tool responds to --version
+
+Returns:
+    List of available tool names (empty if none found)
+
+Example:
+    >>> detect_available_tools()
+    ['gemini', 'codex']
+    >>> detect_available_tools(["gemini", "nonexistent"])
+    ['gemini']
+    >>> detect_available_tools(check_version=True)
+    ['gemini']
+
+**Parameters:**
+- `tools`: Optional[list[str]]
+
+---
+
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:78`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:22`
 **Complexity:** 3
 
 **Description:**
 > Detect which AI CLI tools are installed and available.
 
+Uses check_tool_available() from common.ai_tools for detection.
+
 Returns:
-    List of available tool names
+    List of available tool names (gemini, codex, cursor-agent)
 
 ---
 
@@ -10773,6 +10956,77 @@ Example:
 
 **Parameters:**
 - `specs_dir`: Path
+
+---
+
+### `execute_tool(tool, prompt) -> ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:393`
+**Complexity:** 7
+
+**Description:**
+> Execute AI tool with a prompt and return structured response.
+
+Handles all subprocess error modes: timeout, not found, invalid output,
+and general errors. Always returns a ToolResponse with appropriate status.
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    prompt: The prompt to send to the tool
+    model: Optional model override
+    timeout: Timeout in seconds (default 90)
+
+Returns:
+    ToolResponse with execution results and metadata
+
+Example:
+    >>> response = execute_tool("gemini", "Analyze code", timeout=60)
+    >>> if response.success:
+    ...     print(response.output)
+    >>> else:
+    ...     print(f"Failed: {response.error}")
+
+**Parameters:**
+- `tool`: str
+- `prompt`: str
+
+---
+
+### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:526`
+**Complexity:** 5
+
+**Description:**
+> Execute multiple AI tools in parallel with same prompt.
+
+Uses ThreadPoolExecutor to run tools concurrently. Returns as soon
+as each tool completes (doesn't wait for slowest).
+
+Args:
+    tools: List of tool names to execute
+    prompt: The prompt to send to all tools
+    models: Optional dict mapping tool names to models
+    timeout: Timeout per tool in seconds (default 90)
+
+Returns:
+    MultiToolResponse with all results and aggregated statistics
+
+Example:
+    >>> response = execute_tools_parallel(
+    ...     tools=["gemini", "codex"],
+    ...     prompt="Analyze code",
+    ...     models={"gemini": "gemini-exp-1114"}
+    ... )
+    >>> print(f"Success: {response.success_count}/{len(response.responses)}")
+    >>> for tool, resp in response.get_successful_responses().items():
+    ...     print(f"{tool}: {resp.output[:50]}...")
+
+**Parameters:**
+- `tools`: list[str]
+- `prompt`: str
 
 ---
 
@@ -11684,7 +11938,7 @@ Returns:
 ### `format_ai_context_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:190`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:191`
 **Complexity:** 2
 
 **Description:**
@@ -11708,7 +11962,7 @@ Returns:
 ### `format_architecture_research_prompt(context_summary, key_files, project_root) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:104`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:105`
 **Complexity:** 3
 
 **Description:**
@@ -12319,7 +12573,7 @@ Args:
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:363`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:320`
 **Complexity:** 6
 
 **Description:**
@@ -12543,7 +12797,7 @@ Returns:
 ### `format_synthesis_output(synthesis, responses, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:880`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:806`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -12803,7 +13057,7 @@ Raises:
 ### `generate_ai_context_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:661`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:657`
 **Complexity:** 4
 
 **Description:**
@@ -12837,7 +13091,7 @@ Returns:
 ### `generate_architecture_docs(context_summary, key_files, project_root, tool, use_multi_agent, dry_run, verbose, printer) -> Tuple[bool, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:620`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:616`
 **Complexity:** 4
 
 **Description:**
@@ -13381,52 +13635,26 @@ Returns:
 
 ---
 
-### `get_auto_trigger_failures() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:358`
-**Complexity:** 3
-
-**Description:**
-> Get list of failure types that auto-trigger consensus.
-
-Returns:
-    List of failure type names
-
----
-
 ### `get_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:49`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:63`
+**Complexity:** 1
 
 **Description:**
 > Check which AI CLI tools are available.
+
+Delegates to shared utility function for consistency across skills.
 
 Returns:
     List of available tool names
 
 ---
 
-### `get_available_tools() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:130`
-**Complexity:** 1
-
-**Description:**
-> Get list of available external tools.
-
-Returns:
-    List of tool names that are installed
-
----
-
 ### `get_best_tool(doc_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:74`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:75`
 **Complexity:** 6
 
 **Description:**
@@ -13448,7 +13676,7 @@ Returns:
 ### `get_best_tool(failure_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:330`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:287`
 **Complexity:** 8
 
 **Description:**
@@ -13581,38 +13809,10 @@ Returns:
 
 ---
 
-### `get_config_path() -> Path`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:37`
-**Complexity:** 1
-
-**Description:**
-> Get the path to the config.yaml file.
-
-Returns:
-    Path to config.yaml in the skill root directory
-
----
-
-### `get_consensus_info() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:378`
-**Complexity:** 2
-
-**Description:**
-> Get consensus configuration info (for display/debugging).
-
-Returns:
-    Dict with consensus pairs and auto-trigger info
-
----
-
 ### `get_consensus_pair_for_failure(failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:177`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:147`
 **Complexity:** 5
 
 **Description:**
@@ -13638,7 +13838,7 @@ Returns:
 ### `get_consensus_pairs() -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:214`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:184`
 **Complexity:** 3
 
 **Description:**
@@ -13654,14 +13854,14 @@ Returns:
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:232`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:202`
+**Complexity:** 1
 
 **Description:**
-> Get consultation timeout from config (default: 90 seconds).
+> Get consultation timeout from config using shared ai_config module.
 
 Returns:
-    Timeout in seconds
+    Timeout in seconds (default: 90)
 
 ---
 
@@ -13736,24 +13936,10 @@ Returns:
 
 ---
 
-### `get_enabled_tools() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:96`
-**Complexity:** 1
-
-**Description:**
-> Get only the enabled tools from configuration.
-
-Returns:
-    Dict with only enabled tools
-
----
-
 ### `get_flags_for_tool(tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:91`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:77`
 **Complexity:** 3
 
 **Description:**
@@ -13929,24 +14115,10 @@ Returns:
 
 ---
 
-### `get_missing_tools() -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:141`
-**Complexity:** 1
-
-**Description:**
-> Get list of missing external tools.
-
-Returns:
-    List of tool names that are not installed
-
----
-
 ### `get_model_for_tool(tool, failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:53`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:39`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -13964,6 +14136,50 @@ Returns:
 **Parameters:**
 - `tool`: str
 - `failure_type`: Optional[str]
+
+---
+
+### `get_multi_agent_pairs(skill_name) -> Dict[str, List[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:252`
+**Complexity:** 4
+
+**Description:**
+> Get multi-agent pair configurations for consensus-based consultation.
+
+Loads agent pair definitions from the skill's config.yaml file under the
+'consensus.pairs' section. Each pair defines which agents should be consulted
+together for multi-agent analysis.
+
+Args:
+    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+Returns:
+    Dict mapping pair name to list of agent names. For example:
+    {
+        "default": ["gemini", "cursor-agent"],
+        "code-focus": ["codex", "gemini"],
+        "discovery-focus": ["cursor-agent", "gemini"]
+    }
+
+Examples:
+    >>> pairs = get_multi_agent_pairs('run-tests')
+    >>> pairs['default']
+    ['cursor-agent', 'gemini']
+
+    >>> pairs = get_multi_agent_pairs('nonexistent-skill')
+    >>> pairs['default']  # Falls back to sensible defaults
+    ['gemini', 'cursor-agent']
+
+Notes:
+    - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
+      returns sensible default pairs
+    - Each pair should contain exactly 2 agents for optimal consensus analysis
+    - Agent names must correspond to tools defined in the 'tools' section
+
+**Parameters:**
+- `skill_name`: str
 
 ---
 
@@ -14169,52 +14385,58 @@ Example:
 
 ---
 
-### `get_quick_routing(failure_type, available_tools) -> str`
+### `get_routing_config(skill_name) -> Dict[str, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:211`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:304`
+**Complexity:** 4
 
 **Description:**
-> Get quick tool routing suggestion for a failure type.
+> Get routing configuration that maps failure types to multi-agent pairs.
+
+Loads auto-trigger routing rules from the skill's config.yaml file under the
+'consensus.auto_trigger' section. These rules determine which agent pair should
+be used for different types of test failures or analysis scenarios.
 
 Args:
-    failure_type: Type of test failure (assertion, exception, etc.)
-    available_tools: List of available tools (auto-detected if None)
+    skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
 
 Returns:
-    Routing suggestion string
+    Dict mapping failure/scenario type to pair name. For example:
+    {
+        "default": "default",
+        "fixture": "code-focus",
+        "exception": "code-focus",
+        "timeout": "default",
+        "flaky": "default",
+        "multi-file": "discovery-focus"
+    }
+
+Examples:
+    >>> routing = get_routing_config('run-tests')
+    >>> routing['fixture']
+    'code-focus'
+
+    >>> routing = get_routing_config('nonexistent-skill')
+    >>> routing['default']  # Falls back to sensible defaults
+    'default'
+
+Notes:
+    - If config.yaml is missing or doesn't have 'consensus.auto_trigger',
+      returns sensible default routing rules
+    - The pair names in routing values should correspond to keys in the
+      pairs configuration from get_multi_agent_pairs()
+    - The 'default' key is used as fallback when no specific rule matches
 
 **Parameters:**
-- `failure_type`: str
-- `available_tools`: Optional[List[str]]
-
----
-
-### `get_routing_suggestions(available_tools) -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:152`
-⚠️ **Complexity:** 14 (High)
-
-**Description:**
-> Provide routing suggestions based on available tools.
-
-Args:
-    available_tools: List of tool names that are available
-
-Returns:
-    List of suggestion strings
-
-**Parameters:**
-- `available_tools`: List[str]
+- `skill_name`: str
 
 ---
 
 ### `get_sdd_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:179`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:180`
 **Complexity:** 8
 
 **Description:**
@@ -14687,20 +14909,6 @@ Returns:
 **Parameters:**
 - `skill_name`: str
 - `tool_name`: str
-
----
-
-### `get_tool_status_dict() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:303`
-**Complexity:** 1
-
-**Description:**
-> Get tool status as a dictionary (for JSON output).
-
-Returns:
-    Dict with 'available' and 'missing' keys
 
 ---
 
@@ -15312,28 +15520,14 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:116`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:102`
+**Complexity:** 1
 
 **Description:**
-> Load consensus configuration from config.yaml.
+> Load consensus configuration from config.yaml using shared ai_config module.
 
 Returns:
     Dict with consensus configuration (pairs and auto_trigger)
-
----
-
-### `load_consensus_config() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:333`
-**Complexity:** 5
-
-**Description:**
-> Load consensus configuration from config.yaml.
-
-Returns:
-    Dict with consensus configuration
 
 ---
 
@@ -15410,11 +15604,11 @@ Returns:
 ### `load_model_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:24`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:26`
+**Complexity:** 1
 
 **Description:**
-> Load model configuration from config.yaml.
+> Load model configuration from config.yaml using shared ai_config module.
 
 Returns fallback to DEFAULT_MODELS if config not found or invalid.
 
@@ -15426,7 +15620,7 @@ Returns:
 ### `load_sdd_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:128`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:129`
 **Complexity:** 6
 
 **Description:**
@@ -15469,25 +15663,11 @@ Returns:
 
 ---
 
-### `load_tool_config() -> Dict`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:49`
-**Complexity:** 7
-
-**Description:**
-> Load tool configuration from config.yaml with fallback to defaults.
-
-Returns:
-    Dict with tool configuration
-
----
-
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:135`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:142`
+⚠️ **Complexity:** 20 (High)
 
 **Decorators:** `@track_metrics('sdd')`
 
@@ -16076,7 +16256,7 @@ Notes:
 ### `print_routing_matrix(printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:568`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:536`
 **Complexity:** 3
 
 **Description:**
@@ -16087,28 +16267,6 @@ Args:
 
 **Parameters:**
 - `printer`: Optional[PrettyPrinter]
-
----
-
-### `print_tool_status(printer, include_routing) -> int`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/tool_checking.py:256`
-**Complexity:** 6
-
-**Description:**
-> Print tool availability status to console.
-
-Args:
-    printer: PrettyPrinter instance (creates default if None)
-    include_routing: If provided, also show routing for this failure type
-
-Returns:
-    Exit code: 0 if any tools available, 1 if none
-
-**Parameters:**
-- `printer`: Optional[PrettyPrinter]
-- `include_routing`: Optional[str]
 
 ---
 
@@ -16243,7 +16401,7 @@ Returns:
 ### `read_code_file(file_path) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:451`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:408`
 **Complexity:** 7
 
 **Description:**
@@ -16452,7 +16610,7 @@ Args:
 ### `register_git_config_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:354`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:480`
 **Complexity:** 1
 
 **Description:**
@@ -16565,7 +16723,7 @@ Args:
 ### `register_run_tests(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:172`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:184`
 **Complexity:** 2
 
 **Parameters:**
@@ -16682,7 +16840,7 @@ Note:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:26`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Reorder command line arguments to support global options anywhere.
@@ -16704,11 +16862,13 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:202`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:41`
+**Complexity:** 8
 
 **Description:**
 > Review a spec using multiple AI tools with full synthesis.
+
+Uses execute_tools_parallel() from common.ai_tools for parallel execution.
 
 Args:
     spec_content: Specification content to review
@@ -16716,7 +16876,7 @@ Args:
     review_type: Type of review (quick, full, security, feasibility)
     spec_id: Specification ID
     spec_title: Specification title
-    parallel: Run tools in parallel (vs sequential)
+    parallel: Deprecated - tools always run in parallel (kept for compatibility)
 
 Returns:
     Review results with parsed responses and consensus
@@ -16820,7 +16980,7 @@ Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-col
 ### `run_consultation(tool, prompt, dry_run, verbose, printer) -> Tuple[bool, str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:374`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/ai_consultation.py:375`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -16848,8 +17008,8 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, printer, failure_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:489`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:446`
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
 > Run the external tool consultation.
@@ -16950,8 +17110,8 @@ This ensures tests work in different environments.
 ### `run_tool_parallel(tool, prompt, failure_type) -> ConsultationResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:688`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:656`
+**Complexity:** 1
 
 **Description:**
 > Run a single tool consultation and capture output.
@@ -17340,7 +17500,7 @@ Returns:
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:143`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:113`
 **Complexity:** 5
 
 **Description:**
@@ -17860,7 +18020,7 @@ Returns:
 ### `synthesize_responses(responses) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:811`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:737`
 **Complexity:** 6
 
 **Description:**
@@ -20318,6 +20478,9 @@ Returns:
 
 ### `src/claude_skills/claude_skills/code_doc/ai_consultation.py`
 
+- `claude_skills.common.ai_tools.build_tool_command`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
 - `concurrent.futures.ThreadPoolExecutor`
 - `concurrent.futures.as_completed`
 - `pathlib.Path`
@@ -20642,6 +20805,19 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `yaml`
+
+### `src/claude_skills/claude_skills/common/ai_tools.py`
+
+- `concurrent.futures.ThreadPoolExecutor`
+- `concurrent.futures.as_completed`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `enum.Enum`
+- `shutil`
+- `subprocess`
+- `time`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
 
@@ -21005,12 +21181,12 @@ Returns:
 - `__future__.annotations`
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.metrics.track_metrics`
 - `claude_skills.run_tests.consultation.FAILURE_TYPES`
 - `claude_skills.run_tests.consultation.MULTI_AGENT_PAIRS`
 - `claude_skills.run_tests.consultation.consult_multi_agent`
 - `claude_skills.run_tests.consultation.consult_with_auto_routing`
-- `claude_skills.run_tests.consultation.get_available_tools`
 - `claude_skills.run_tests.consultation.get_consensus_pair_for_failure`
 - `claude_skills.run_tests.consultation.print_routing_matrix`
 - `claude_skills.run_tests.consultation.run_consultation`
@@ -21020,9 +21196,6 @@ Returns:
 - `claude_skills.run_tests.pytest_runner.run_pytest`
 - `claude_skills.run_tests.pytest_runner.validate_preset`
 - `claude_skills.run_tests.test_discovery.print_discovery_report`
-- `claude_skills.run_tests.tool_checking.FAILURE_TYPES`
-- `claude_skills.run_tests.tool_checking.get_tool_status_dict`
-- `claude_skills.run_tests.tool_checking.print_tool_status`
 - `json`
 - `sys`
 - `typing.Any`
@@ -21033,13 +21206,15 @@ Returns:
 ### `src/claude_skills/claude_skills/run_tests/consultation.py`
 
 - `claude_skills.common.PrettyPrinter`
-- `claude_skills.run_tests.tool_checking.check_tool_availability`
-- `claude_skills.run_tests.tool_checking.get_available_tools`
-- `claude_skills.run_tests.tool_checking.get_config_path`
-- `concurrent.futures.ThreadPoolExecutor`
-- `concurrent.futures.as_completed`
+- `claude_skills.common.ai_config`
+- `claude_skills.common.ai_tools.MultiToolResponse`
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.ai_tools.build_tool_command`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tool`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
 - `pathlib.Path`
-- `subprocess`
 - `time`
 - `typing.Dict`
 - `typing.List`
@@ -21067,16 +21242,6 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `typing.Tuple`
-
-### `src/claude_skills/claude_skills/run_tests/tool_checking.py`
-
-- `claude_skills.common.PrettyPrinter`
-- `pathlib.Path`
-- `shutil`
-- `typing.Dict`
-- `typing.List`
-- `typing.Optional`
-- `yaml`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`
 
@@ -21228,10 +21393,10 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/__init__.py`
 
+- `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.reporting.generate_json_report`
 - `claude_skills.sdd_plan_review.reporting.generate_markdown_report`
-- `claude_skills.sdd_plan_review.reviewer.check_tool_available`
 - `claude_skills.sdd_plan_review.reviewer.detect_available_tools`
 - `claude_skills.sdd_plan_review.reviewer.review_with_tools`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
@@ -21269,12 +21434,11 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py`
 
+- `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
 - `claude_skills.sdd_plan_review.synthesis.parse_response`
-- `concurrent.futures.ThreadPoolExecutor`
-- `concurrent.futures.as_completed`
-- `concurrent.futures.wait`
 - `json`
 - `pathlib.Path`
 - `subprocess`

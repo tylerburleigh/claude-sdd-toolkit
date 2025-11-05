@@ -2,8 +2,8 @@
 
 __version__ = "1.0.0"
 
+from claude_skills.common.ai_tools import check_tool_available
 from claude_skills.sdd_plan_review.reviewer import (
-    check_tool_available,
     detect_available_tools,
     review_with_tools,
 )

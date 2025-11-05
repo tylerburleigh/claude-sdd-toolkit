@@ -247,3 +247,116 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
     if not tool_config:
         return False
     return tool_config.get('enabled', True)
+
+
+def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
+    """Get multi-agent pair configurations for consensus-based consultation.
+
+    Loads agent pair definitions from the skill's config.yaml file under the
+    'consensus.pairs' section. Each pair defines which agents should be consulted
+    together for multi-agent analysis.
+
+    Args:
+        skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+    Returns:
+        Dict mapping pair name to list of agent names. For example:
+        {
+            "default": ["gemini", "cursor-agent"],
+            "code-focus": ["codex", "gemini"],
+            "discovery-focus": ["cursor-agent", "gemini"]
+        }
+
+    Examples:
+        >>> pairs = get_multi_agent_pairs('run-tests')
+        >>> pairs['default']
+        ['cursor-agent', 'gemini']
+
+        >>> pairs = get_multi_agent_pairs('nonexistent-skill')
+        >>> pairs['default']  # Falls back to sensible defaults
+        ['gemini', 'cursor-agent']
+
+    Notes:
+        - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
+          returns sensible default pairs
+        - Each pair should contain exactly 2 agents for optimal consensus analysis
+        - Agent names must correspond to tools defined in the 'tools' section
+    """
+    config = load_skill_config(skill_name)
+
+    # Try to load from consensus section
+    if 'consensus' in config:
+        consensus_config = config['consensus']
+        if 'pairs' in consensus_config:
+            pairs = consensus_config['pairs']
+            # Validate that pairs is a dict and contains lists
+            if isinstance(pairs, dict):
+                return pairs
+
+    # Return sensible defaults if not found or malformed
+    return {
+        "default": ["gemini", "cursor-agent"],
+        "code-focus": ["codex", "gemini"],
+        "discovery-focus": ["cursor-agent", "gemini"]
+    }
+
+
+def get_routing_config(skill_name: str) -> Dict[str, str]:
+    """Get routing configuration that maps failure types to multi-agent pairs.
+
+    Loads auto-trigger routing rules from the skill's config.yaml file under the
+    'consensus.auto_trigger' section. These rules determine which agent pair should
+    be used for different types of test failures or analysis scenarios.
+
+    Args:
+        skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+
+    Returns:
+        Dict mapping failure/scenario type to pair name. For example:
+        {
+            "default": "default",
+            "fixture": "code-focus",
+            "exception": "code-focus",
+            "timeout": "default",
+            "flaky": "default",
+            "multi-file": "discovery-focus"
+        }
+
+    Examples:
+        >>> routing = get_routing_config('run-tests')
+        >>> routing['fixture']
+        'code-focus'
+
+        >>> routing = get_routing_config('nonexistent-skill')
+        >>> routing['default']  # Falls back to sensible defaults
+        'default'
+
+    Notes:
+        - If config.yaml is missing or doesn't have 'consensus.auto_trigger',
+          returns sensible default routing rules
+        - The pair names in routing values should correspond to keys in the
+          pairs configuration from get_multi_agent_pairs()
+        - The 'default' key is used as fallback when no specific rule matches
+    """
+    config = load_skill_config(skill_name)
+
+    # Try to load from consensus section
+    if 'consensus' in config:
+        consensus_config = config['consensus']
+        if 'auto_trigger' in consensus_config:
+            routing = consensus_config['auto_trigger']
+            # Validate that routing is a dict
+            if isinstance(routing, dict):
+                return routing
+
+    # Return sensible defaults if not found or malformed
+    return {
+        "default": "default",
+        "assertion": "code-focus",
+        "exception": "code-focus",
+        "fixture": "code-focus",
+        "import": "default",
+        "timeout": "default",
+        "flaky": "default",
+        "multi-file": "discovery-focus"
+    }

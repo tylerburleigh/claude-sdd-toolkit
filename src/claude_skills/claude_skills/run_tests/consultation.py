@@ -5,16 +5,18 @@ Handles consultation with external CLI tools (Gemini, Codex, Cursor) for test
 debugging. Provides auto-routing based on failure type and prompt formatting.
 """
 
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, NamedTuple
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 # Add parent directory to path to import sdd_common
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools, get_config_path
+from claude_skills.common.ai_tools import (
+    build_tool_command, execute_tool, execute_tools_parallel,
+    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools
+)
+from claude_skills.common import ai_config
 
 
 # =============================================================================
@@ -23,31 +25,15 @@ from claude_skills.run_tests.tool_checking import check_tool_availability, get_a
 
 def load_model_config() -> Dict:
     """
-    Load model configuration from config.yaml.
+    Load model configuration from config.yaml using shared ai_config module.
 
     Returns fallback to DEFAULT_MODELS if config not found or invalid.
 
     Returns:
         Dict with model configuration including priorities and overrides
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if not config_path.exists():
-            return {}
-
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
-
-        if not config_data or 'models' not in config_data:
-            return {}
-
-        return config_data['models']
-
-    except (yaml.YAMLError, IOError, KeyError) as e:
-        return {}
+    config = ai_config.load_skill_config('run-tests')
+    return config.get('models', {})
 
 
 def get_model_for_tool(tool: str, failure_type: Optional[str] = None) -> str:
@@ -115,29 +101,13 @@ def get_flags_for_tool(tool: str) -> List[str]:
 
 def load_consensus_config() -> Dict:
     """
-    Load consensus configuration from config.yaml.
+    Load consensus configuration from config.yaml using shared ai_config module.
 
     Returns:
         Dict with consensus configuration (pairs and auto_trigger)
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if not config_path.exists():
-            return {}
-
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
-
-        if not config_data or 'consensus' not in config_data:
-            return {}
-
-        return config_data['consensus']
-
-    except (yaml.YAMLError, IOError, KeyError) as e:
-        return {}
+    config = ai_config.load_skill_config('run-tests')
+    return config.get('consensus', {})
 
 
 def should_auto_trigger_consensus(failure_type: str) -> bool:
@@ -231,25 +201,12 @@ def get_consensus_pairs() -> Dict[str, List[str]]:
 
 def get_consultation_timeout() -> int:
     """
-    Get consultation timeout from config (default: 90 seconds).
+    Get consultation timeout from config using shared ai_config module.
 
     Returns:
-        Timeout in seconds
+        Timeout in seconds (default: 90)
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if config_path.exists():
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-                if config and 'consultation' in config:
-                    return config['consultation'].get('timeout_seconds', 90)
-    except (yaml.YAMLError, IOError, KeyError):
-        pass
-
-    return 90  # Default 90 seconds
+    return ai_config.get_timeout('run-tests', 'consultation')
 
 
 # =============================================================================
@@ -339,7 +296,7 @@ def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None
         Tool name to use, or None if no tools available
     """
     if available_tools is None:
-        available_tools = get_available_tools()
+        available_tools = detect_available_tools()
 
     if not available_tools:
         return None
@@ -509,13 +466,11 @@ def run_consultation(
     if printer is None:
         printer = PrettyPrinter()
 
-    # Build commands with failure-type-specific models
-    tool_commands = _build_tool_commands(failure_type)
-
     # Validate tool
-    if tool not in tool_commands:
+    known_tools = ["gemini", "codex", "cursor-agent"]
+    if tool not in known_tools:
         printer.error(f"Unknown tool '{tool}'")
-        printer.info(f"Available tools: {', '.join(tool_commands.keys())}")
+        printer.info(f"Available tools: {', '.join(known_tools)}")
         return 1
 
     # Validate prompt
@@ -523,11 +478,12 @@ def run_consultation(
         printer.error("Prompt cannot be empty")
         return 1
 
-    cmd = tool_commands[tool].copy()
-    cmd.append(prompt)
+    # Get model for tool
+    model = get_model_for_tool(tool, failure_type)
 
     if dry_run:
         printer.info("Would run:")
+        cmd = build_tool_command(tool, prompt, model=model)
         print(" ".join(cmd[:4]))  # Don't print full prompt in dry run
         print(f"<prompt with {len(prompt)} characters>")
         return 0
@@ -536,33 +492,45 @@ def run_consultation(
     print("=" * 60)
     print()
 
+    # Use shared execute_tool() implementation
+    timeout = get_consultation_timeout()
+    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+
+    # Handle user interrupt (Ctrl+C) - execute_tool doesn't catch this
+    # so we need to keep the try/except here
     try:
-        timeout = get_consultation_timeout()
-        result = subprocess.run(cmd, check=False, timeout=timeout)
-        if result.returncode != 0:
-            printer.warning(f"\n{tool} exited with code {result.returncode}")
-        return result.returncode
-    except subprocess.TimeoutExpired:
-        printer.warning(f"\n{tool} timed out after {get_consultation_timeout()} seconds")
-        printer.info("The external tool may be unresponsive or processing a large request")
-        printer.info("Try again with a simpler prompt or check tool availability")
-        return 124
-    except FileNotFoundError:
-        printer.error(f"{tool} not found. Is it installed?")
-        printer.info(f"Install instructions:")
-        if tool == "gemini":
-            printer.info("  npm install -g @google/generative-ai-cli")
-        elif tool == "codex":
-            printer.info("  npm install -g @anthropic/codex")
-        elif tool == "cursor-agent":
-            printer.info("  Check cursor.com for installation instructions")
-        return 1
+        # Print output
+        if response.output:
+            print(response.output)
+
+        # Handle different status codes
+        if response.status == ToolStatus.SUCCESS:
+            return 0
+        elif response.status == ToolStatus.TIMEOUT:
+            printer.warning(f"\n{tool} timed out after {timeout} seconds")
+            printer.info("The external tool may be unresponsive or processing a large request")
+            printer.info("Try again with a simpler prompt or check tool availability")
+            return 124
+        elif response.status == ToolStatus.NOT_FOUND:
+            printer.error(f"{tool} not found. Is it installed?")
+            printer.info(f"Install instructions:")
+            if tool == "gemini":
+                printer.info("  npm install -g @google/generative-ai-cli")
+            elif tool == "codex":
+                printer.info("  npm install -g @anthropic/codex")
+            elif tool == "cursor-agent":
+                printer.info("  Check cursor.com for installation instructions")
+            return 1
+        else:  # ToolStatus.ERROR or other
+            if response.exit_code is not None:
+                printer.warning(f"\n{tool} exited with code {response.exit_code}")
+                return response.exit_code
+            else:
+                printer.error(f"Error running {tool}: {response.error}")
+                return 1
     except KeyboardInterrupt:
         printer.warning("\nConsultation interrupted by user")
         return 130
-    except Exception as e:
-        printer.error(f"Unexpected error running {tool}: {e}")
-        return 1
 
 
 def print_routing_matrix(printer: Optional[PrettyPrinter] = None) -> None:
@@ -616,7 +584,7 @@ def consult_with_auto_routing(
         printer = PrettyPrinter()
 
     # Check tool availability
-    available_tools = get_available_tools()
+    available_tools = detect_available_tools()
 
     if not available_tools:
         printer.error("No external tools found")
@@ -697,63 +665,21 @@ def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None
     Returns:
         ConsultationResponse with results
     """
-    # Build commands with failure-type-specific models
-    tool_commands = _build_tool_commands(failure_type)
+    # Get model for tool
+    model = get_model_for_tool(tool, failure_type)
+    timeout = get_consultation_timeout()
 
-    if tool not in tool_commands:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"Unknown tool '{tool}'"
-        )
+    # Use shared execute_tool() implementation
+    response = execute_tool(tool, prompt, model=model, timeout=timeout)
 
-    cmd = tool_commands[tool].copy()
-    cmd.append(prompt)
-
-    start_time = time.time()
-
-    try:
-        timeout = get_consultation_timeout()
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=timeout
-        )
-        duration = time.time() - start_time
-
-        return ConsultationResponse(
-            tool=tool,
-            success=(result.returncode == 0),
-            output=result.stdout if result.stdout else result.stderr,
-            error=result.stderr if result.returncode != 0 else None,
-            duration=duration
-        )
-    except subprocess.TimeoutExpired:
-        duration = time.time() - start_time
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"{tool} timed out after {get_consultation_timeout()} seconds. Try again or check tool availability.",
-            duration=duration
-        )
-    except FileNotFoundError:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"{tool} not found. Is it installed?"
-        )
-    except Exception as e:
-        return ConsultationResponse(
-            tool=tool,
-            success=False,
-            output="",
-            error=f"Unexpected error: {e}"
-        )
+    # Convert ToolResponse to ConsultationResponse for backward compatibility
+    return ConsultationResponse(
+        tool=response.tool,
+        success=response.success,
+        output=response.output,
+        error=response.error,
+        duration=response.duration
+    )
 
 
 def analyze_response_similarity(response1: str, response2: str) -> List[str]:
@@ -1011,7 +937,7 @@ def consult_multi_agent(
     tools_to_use = consensus_pairs[pair]
 
     # Check which tools are available
-    available_tools = get_available_tools()
+    available_tools = detect_available_tools()
     available_from_pair = [t for t in tools_to_use if t in available_tools]
 
     if len(available_from_pair) < 2:
@@ -1074,39 +1000,42 @@ def consult_multi_agent(
         print(f"Prompt length: {len(prompt)} characters")
         return 0
 
-    # Run consultations in parallel
+    # Run consultations in parallel using shared implementation
     printer.action(f"Consulting {len(available_from_pair)} agents in parallel...")
     print(f"Tools: {', '.join(available_from_pair)}")
     print("=" * 60)
     print()
 
-    responses = []
+    # Build models dict for each tool
+    models = {tool: get_model_for_tool(tool, failure_type) for tool in available_from_pair}
+    timeout = get_consultation_timeout()
 
-    with ThreadPoolExecutor(max_workers=len(available_from_pair)) as executor:
-        # Submit all consultations
-        future_to_tool = {
-            executor.submit(run_tool_parallel, tool, prompt, failure_type): tool
-            for tool in available_from_pair
-        }
+    # Use shared execute_tools_parallel() implementation
+    multi_response = execute_tools_parallel(
+        tools=available_from_pair,
+        prompt=prompt,
+        models=models,
+        timeout=timeout
+    )
 
-        # Collect results as they complete
-        for future in as_completed(future_to_tool):
-            tool = future_to_tool[future]
-            try:
-                response = future.result()
-                responses.append(response)
-                status = "✓" if response.success else "✗"
-                print(f"{status} {tool} completed ({response.duration:.1f}s)")
-            except Exception as e:
-                printer.error(f"Error consulting {tool}: {e}")
-                responses.append(ConsultationResponse(
-                    tool=tool,
-                    success=False,
-                    output="",
-                    error=str(e)
-                ))
+    # Print progress as tools complete
+    for tool, response in multi_response.responses.items():
+        status = "✓" if response.success else "✗"
+        print(f"{status} {tool} completed ({response.duration:.1f}s)")
 
     print()
+
+    # Convert MultiToolResponse to list of ConsultationResponse for backward compatibility
+    responses = [
+        ConsultationResponse(
+            tool=resp.tool,
+            success=resp.success,
+            output=resp.output,
+            error=resp.error,
+            duration=resp.duration
+        )
+        for resp in multi_response.responses.values()
+    ]
 
     # Synthesize responses
     synthesis = synthesize_responses(responses)

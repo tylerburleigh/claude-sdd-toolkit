@@ -4,7 +4,15 @@ AI Consultation for Documentation Generation
 Shells out to external AI CLI tools (gemini, codex, cursor-agent) to generate
 contextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
 
-Based on run-tests/consultation.py pattern.
+Uses shared AI tool utilities from claude_skills.common.ai_tools:
+- detect_available_tools(): Check which AI tools are installed
+- build_tool_command(): Build command arrays for tool execution
+- execute_tools_parallel(): Run multiple tools concurrently
+
+This module provides documentation-specific functionality:
+- Prompt formatting for architecture and AI context research
+- Document composition with proper formatting
+- High-level orchestration for documentation generation workflows
 """
 
 import subprocess
@@ -13,6 +21,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+
+from claude_skills.common.ai_tools import (
+    detect_available_tools,
+    build_tool_command,
+    execute_tools_parallel
+)
 
 # =============================================================================
 # CONFIGURATION
@@ -50,25 +64,12 @@ def get_available_tools() -> List[str]:
     """
     Check which AI CLI tools are available.
 
+    Delegates to shared utility function for consistency across skills.
+
     Returns:
         List of available tool names
     """
-    available = []
-
-    for tool, cmd in TOOL_COMMANDS.items():
-        try:
-            # Try to run tool with --version or --help
-            result = subprocess.run(
-                [cmd[0], "--version"],
-                capture_output=True,
-                timeout=5
-            )
-            if result.returncode == 0 or result.returncode == 1:  # Some tools return 1 for --version
-                available.append(tool)
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            pass
-
-    return available
+    return detect_available_tools()
 
 
 def get_best_tool(doc_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
@@ -391,11 +392,11 @@ def run_consultation(
     Returns:
         Tuple of (success: bool, output: str)
     """
-    if tool not in TOOL_COMMANDS:
-        return False, f"Unknown tool: {tool}"
-
-    cmd = TOOL_COMMANDS[tool].copy()
-    cmd.append(prompt)
+    # Use shared utility to build command
+    try:
+        cmd = build_tool_command(tool, prompt)
+    except ValueError as e:
+        return False, str(e)
 
     if dry_run:
         msg = f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>"
@@ -543,50 +544,44 @@ def consult_multi_agent(
             print("=" * 60)
         sys.stdout.flush()
 
-    # Run consultations in parallel
-    responses = []
+    # Use shared utility for parallel execution
     start_time = time.time()
-
-    with ThreadPoolExecutor(max_workers=len(available_from_pair)) as executor:
-        future_to_tool = {
-            executor.submit(_run_tool_capture, tool, prompt): tool
-            for tool in available_from_pair
-        }
-
-        for future in as_completed(future_to_tool):
-            tool = future_to_tool[future]
-            try:
-                success, output, duration = future.result()
-                responses.append({
-                    "tool": tool,
-                    "success": success,
-                    "output": output,
-                    "duration": duration
-                })
-                if verbose:
-                    status = "✓" if success else "✗"
-                    msg = f"{status} {tool} completed ({duration:.1f}s)"
-                    if printer:
-                        printer.info(msg)
-                    else:
-                        print(msg)
-                        sys.stdout.flush()
-            except Exception as e:
-                responses.append({
-                    "tool": tool,
-                    "success": False,
-                    "output": "",
-                    "error": str(e)
-                })
-
+    multi_response = execute_tools_parallel(
+        tools=available_from_pair,
+        prompt=prompt
+    )
     total_duration = time.time() - start_time
 
-    # Return all successful responses keyed by tool name for main agent synthesis
-    successful = [r for r in responses if r["success"]]
+    # Print completion messages if verbose
+    if verbose:
+        for response in multi_response.responses:
+            status = "✓" if response.success else "✗"
+            msg = f"{status} {response.tool} completed ({response.duration:.1f}s)"
+            if printer:
+                printer.info(msg)
+            else:
+                print(msg)
+                sys.stdout.flush()
 
-    if successful:
-        # Create dict of responses keyed by tool name
-        responses_by_tool = {r["tool"]: r["output"] for r in successful}
+    # Convert to code-doc's expected format
+    if multi_response.success:
+        # Build responses_by_tool dict from successful responses
+        responses_by_tool = {
+            r.tool: r.output
+            for r in multi_response.responses
+            if r.success
+        }
+
+        # Convert responses to dict format for backwards compatibility
+        responses = [
+            {
+                "tool": r.tool,
+                "success": r.success,
+                "output": r.output,
+                "duration": r.duration
+            }
+            for r in multi_response.responses
+        ]
 
         return {
             "success": True,
@@ -596,6 +591,17 @@ def consult_multi_agent(
             "total_duration": total_duration
         }
     else:
+        # Convert failed responses to dict format
+        responses = [
+            {
+                "tool": r.tool,
+                "success": r.success,
+                "output": r.output,
+                "duration": r.duration
+            }
+            for r in multi_response.responses
+        ]
+
         return {
             "success": False,
             "error": "All consultations failed",
@@ -604,17 +610,7 @@ def consult_multi_agent(
         }
 
 
-def _run_tool_capture(tool: str, prompt: str) -> Tuple[bool, str, float]:
-    """
-    Run tool and capture output (internal helper for parallel execution).
-
-    Returns:
-        Tuple of (success, output, duration)
-    """
-    start_time = time.time()
-    success, output = run_consultation(tool, prompt, dry_run=False, verbose=False)
-    duration = time.time() - start_time
-    return success, output, duration
+# _run_tool_capture() removed - now using execute_tools_parallel() from ai_tools
 
 
 def generate_architecture_docs(
