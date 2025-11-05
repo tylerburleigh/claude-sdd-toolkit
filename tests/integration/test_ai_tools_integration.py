@@ -381,6 +381,148 @@ class TestParallelExecutionIntegration:
 
 
 # =============================================================================
+# Timeout Handling Tests
+# =============================================================================
+
+
+class TestTimeoutHandling:
+    """Integration tests for timeout handling in tool execution."""
+
+    def test_execute_tool_timeout_with_slow_mock(self, mock_tools_dir, monkeypatch):
+        """Test that slow-running tools timeout correctly."""
+        # Replace gemini mock with slow version
+        slow_gemini = mock_tools_dir / "gemini"
+        slow_gemini.write_text(
+            "#!/bin/bash\n"
+            "# Mock tool that takes too long\n"
+            "sleep 10\n"  # Sleep for 10 seconds
+            "echo 'output'\n"
+        )
+        slow_gemini.chmod(0o755)
+
+        # Add mock tool directory to PATH
+        original_path = os.environ.get("PATH", "")
+        new_path = f"{mock_tools_dir}:{original_path}"
+        monkeypatch.setenv("PATH", new_path)
+
+        # Execute with short timeout (1 second)
+        response = execute_tool("gemini", "test", timeout=1)
+
+        # Should timeout
+        assert response.status == ToolStatus.TIMEOUT
+        assert "timed out" in response.error
+        assert response.exit_code is None
+        assert response.output == ""
+
+    def test_parallel_execution_respects_per_tool_timeout(self, mock_tools_dir, path_with_mock_tools):
+        """Test that parallel execution applies timeout to each tool."""
+        # Replace codex with slow version
+        slow_codex = mock_tools_dir / "codex"
+        slow_codex.write_text(
+            "#!/bin/bash\n"
+            "sleep 5\n"  # Sleep for 5 seconds
+            "echo 'slow output'\n"
+        )
+        slow_codex.chmod(0o755)
+
+        # Execute with short timeout (1 second per tool)
+        response = execute_tools_parallel(
+            tools=["gemini", "codex"],
+            prompt="test",
+            timeout=1
+        )
+
+        # Gemini should succeed (fast)
+        # codex should timeout
+        assert response.responses["gemini"].success is True
+        assert response.responses["codex"].status == ToolStatus.TIMEOUT
+
+        # Should have partial success
+        assert response.success_count == 1
+        assert response.failure_count == 1
+
+    def test_timeout_doesnt_affect_fast_tools(self, path_with_mock_tools):
+        """Test that normal tools complete successfully with reasonable timeout."""
+        # Execute with generous timeout
+        response = execute_tool("gemini", "test", timeout=30)
+
+        # Should complete successfully
+        assert response.success is True
+        assert response.status == ToolStatus.SUCCESS
+        assert response.duration < 1.0  # Should be very fast
+
+    def test_parallel_execution_total_duration_with_timeout(self, mock_tools_dir, path_with_mock_tools):
+        """Test that parallel execution with timeouts doesn't block indefinitely."""
+        # Replace both codex and cursor-agent with slow versions
+        for tool_name in ["codex", "cursor-agent"]:
+            slow_tool = mock_tools_dir / tool_name
+            slow_tool.write_text(
+                "#!/bin/bash\n"
+                "sleep 10\n"  # Both take 10 seconds
+                "echo 'output'\n"
+            )
+            slow_tool.chmod(0o755)
+
+        # Execute in parallel with 1 second timeout each
+        response = execute_tools_parallel(
+            tools=["codex", "cursor-agent"],
+            prompt="test",
+            timeout=1
+        )
+
+        # Both should timeout
+        assert response.success_count == 0
+        assert response.failure_count == 2
+
+        # Total duration should be ~1 second (parallel timeout)
+        # not 2 seconds (sequential)
+        assert response.total_duration < 2.5  # Allow some overhead
+
+    def test_execute_tool_timeout_metadata(self, mock_tools_dir, monkeypatch):
+        """Test that timeout responses include correct metadata."""
+        # Replace gemini with slow version
+        slow_tool = mock_tools_dir / "gemini"
+        slow_tool.write_text("#!/bin/bash\nsleep 5\necho 'output'\n")
+        slow_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        # Execute with timeout
+        response = execute_tool(
+            "gemini",
+            "test prompt",
+            model="test-model",
+            timeout=1
+        )
+
+        # Check metadata is captured correctly even on timeout
+        assert response.tool == "gemini"
+        assert response.model == "test-model"
+        assert response.prompt == "test prompt"
+        assert response.timestamp  # Should have timestamp
+        assert response.duration >= 1.0  # At least timeout duration
+
+    def test_timeout_error_message_includes_duration(self, mock_tools_dir, monkeypatch):
+        """Test that timeout error message is descriptive."""
+        # Replace codex with slow version
+        slow_tool = mock_tools_dir / "codex"
+        slow_tool.write_text("#!/bin/bash\nsleep 10\n")
+        slow_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        # Execute with 2 second timeout
+        response = execute_tool("codex", "test", timeout=2)
+
+        # Error message should include timeout value
+        assert response.status == ToolStatus.TIMEOUT
+        assert "2" in response.error  # Should mention 2 seconds
+        assert "timed out" in response.error.lower()
+
+
+# =============================================================================
 # End-to-End Workflow Tests
 # =============================================================================
 
