@@ -15,6 +15,7 @@ from enum import Enum
 import shutil
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class ToolStatus(Enum):
@@ -522,6 +523,107 @@ def execute_tool(
         )
 
 
+def execute_tools_parallel(
+    tools: list[str],
+    prompt: str,
+    *,
+    models: Optional[dict[str, str]] = None,
+    timeout: int = 90
+) -> MultiToolResponse:
+    """
+    Execute multiple AI tools in parallel with same prompt.
+
+    Uses ThreadPoolExecutor to run tools concurrently. Returns as soon
+    as each tool completes (doesn't wait for slowest).
+
+    Args:
+        tools: List of tool names to execute
+        prompt: The prompt to send to all tools
+        models: Optional dict mapping tool names to models
+        timeout: Timeout per tool in seconds (default 90)
+
+    Returns:
+        MultiToolResponse with all results and aggregated statistics
+
+    Example:
+        >>> response = execute_tools_parallel(
+        ...     tools=["gemini", "codex"],
+        ...     prompt="Analyze code",
+        ...     models={"gemini": "gemini-exp-1114"}
+        ... )
+        >>> print(f"Success: {response.success_count}/{len(response.responses)}")
+        >>> for tool, resp in response.get_successful_responses().items():
+        ...     print(f"{tool}: {resp.output[:50]}...")
+    """
+    if not tools:
+        # No tools provided
+        return MultiToolResponse(
+            responses={},
+            success_count=0,
+            failure_count=0,
+            total_duration=0.0,
+            max_duration=0.0
+        )
+
+    start_time = time.time()
+    timestamp = datetime.now().isoformat()
+    models = models or {}
+
+    responses = {}
+
+    # Execute tools in parallel
+    with ThreadPoolExecutor(max_workers=len(tools)) as executor:
+        # Submit all tasks
+        future_to_tool = {
+            executor.submit(
+                execute_tool,
+                tool,
+                prompt,
+                model=models.get(tool),
+                timeout=timeout
+            ): tool
+            for tool in tools
+        }
+
+        # Collect results as they complete
+        for future in as_completed(future_to_tool):
+            tool = future_to_tool[future]
+            try:
+                response = future.result(timeout=timeout + 5)  # Small buffer
+                responses[tool] = response
+            except Exception as e:
+                # Shouldn't happen (execute_tool handles all errors)
+                # but handle it just in case
+                responses[tool] = ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.ERROR,
+                    output="",
+                    error=f"Parallel execution error: {str(e)}",
+                    duration=0.0,
+                    timestamp=timestamp,
+                    model=models.get(tool),
+                    prompt=prompt
+                )
+
+    total_duration = time.time() - start_time
+
+    # Calculate statistics
+    success_count = sum(1 for r in responses.values() if r.success)
+    failure_count = len(responses) - success_count
+    max_duration = max((r.duration for r in responses.values()), default=0.0)
+
+    return MultiToolResponse(
+        responses=responses,
+        synthesis=None,  # Synthesis is added by separate function
+        total_duration=total_duration,
+        max_duration=max_duration,
+        success_count=success_count,
+        failure_count=failure_count,
+        timestamp=timestamp,
+        failure_type=None
+    )
+
+
 # Export public API
 __all__ = [
     "ToolStatus",
@@ -531,4 +633,5 @@ __all__ = [
     "detect_available_tools",
     "build_tool_command",
     "execute_tool",
+    "execute_tools_parallel",
 ]

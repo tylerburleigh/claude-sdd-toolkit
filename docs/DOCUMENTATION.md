@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:41:06
+**Generated:** 2025-11-05 08:42:44
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70680
+- **Total Lines:** 70820
 - **Total Classes:** 267
-- **Total Functions:** 791
-- **Avg Complexity:** 5.58
+- **Total Functions:** 792
+- **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -1246,7 +1246,7 @@ Example:
 ### `MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:122`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:123`
 
 **Description:**
 > Response from multiple tool consultations run in parallel.
@@ -5144,7 +5144,7 @@ Attributes:
 ### `ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:29`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:30`
 
 **Description:**
 > Standardized response from AI tool consultation.
@@ -5190,7 +5190,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:19`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:20`
 
 **Description:**
 > Status of AI tool execution.
@@ -7440,7 +7440,7 @@ Returns:
 ### `build_tool_command(tool, prompt) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:331`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:332`
 **Complexity:** 6
 
 **Description:**
@@ -8208,7 +8208,7 @@ Returns:
 ### `check_tool_available(tool) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:248`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:249`
 **Complexity:** 4
 
 **Description:**
@@ -10473,7 +10473,7 @@ Returns:
 ### `detect_available_tools(tools) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:296`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:297`
 **Complexity:** 4
 
 **Description:**
@@ -11029,6 +11029,40 @@ Example:
 
 **Parameters:**
 - `specs_dir`: Path
+
+---
+
+### `execute_tool(tool, prompt) -> ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:392`
+**Complexity:** 7
+
+**Description:**
+> Execute AI tool with a prompt and return structured response.
+
+Handles all subprocess error modes: timeout, not found, invalid output,
+and general errors. Always returns a ToolResponse with appropriate status.
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    prompt: The prompt to send to the tool
+    model: Optional model override
+    timeout: Timeout in seconds (default 90)
+
+Returns:
+    ToolResponse with execution results and metadata
+
+Example:
+    >>> response = execute_tool("gemini", "Analyze code", timeout=60)
+    >>> if response.success:
+    ...     print(response.output)
+    >>> else:
+    ...     print(f"Failed: {response.error}")
+
+**Parameters:**
+- `tool`: str
+- `prompt`: str
 
 ---
 
@@ -20907,6 +20941,7 @@ Returns:
 - `enum.Enum`
 - `shutil`
 - `subprocess`
+- `time`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
