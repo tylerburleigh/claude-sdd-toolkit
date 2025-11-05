@@ -732,3 +732,66 @@ class FidelityReviewer:
                         all_results["tests"].update(results["tests"])
 
         return all_results
+
+    def get_journal_entries(
+        self,
+        task_id: Optional[str] = None,
+        include_internal: bool = False
+    ) -> List[Dict[str, Any]]:
+        """
+        Get journal entries from the spec, optionally filtered by task.
+
+        Args:
+            task_id: Optional task ID to filter entries (None = all entries)
+            include_internal: Include internal journal entries (default: False)
+
+        Returns:
+            List of journal entry dictionaries:
+            [
+                {
+                    "timestamp": str,
+                    "type": str,
+                    "title": str,
+                    "content": str,
+                    "task_id": Optional[str],
+                    "metadata": Dict
+                }
+            ]
+        """
+        if self.spec_data is None:
+            print("Error: Spec not loaded", file=sys.stderr)
+            return []
+
+        journals = self.spec_data.get("journals", [])
+        if not journals:
+            return []
+
+        # Filter journals
+        filtered = []
+        for entry in journals:
+            # Skip internal entries if not requested
+            if not include_internal and entry.get("type") == "internal":
+                continue
+
+            # Filter by task_id if specified
+            if task_id and entry.get("task_id") != task_id:
+                continue
+
+            filtered.append(entry)
+
+        # Sort by timestamp (newest first)
+        filtered.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+
+        return filtered
+
+    def get_task_journals(self, task_id: str) -> List[Dict[str, Any]]:
+        """
+        Get journal entries specifically related to a task.
+
+        Args:
+            task_id: Task ID to get journals for
+
+        Returns:
+            List of journal entries for this task
+        """
+        return self.get_journal_entries(task_id=task_id, include_internal=False)

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:32:27
+**Generated:** 2025-11-05 15:35:11
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 213
-- **Total Lines:** 71063
+- **Total Lines:** 71287
 - **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
@@ -778,7 +778,7 @@ This class will be implemented in Phase 4 (Report Generation).
 ### `FidelityReviewer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:20`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:21`
 
 **Description:**
 > Core class for performing fidelity reviews of implementations against specs.
@@ -801,6 +801,10 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `get_task_diffs()`
 - `get_phase_diffs()`
 - `get_branch_diff()`
+- `get_test_results()`
+- `_run_and_parse_tests()`
+- `_parse_junit_xml()`
+- `get_task_test_results()`
 
 ---
 
@@ -21355,6 +21359,7 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+- `xml.etree.ElementTree`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`
 

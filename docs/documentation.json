@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:32:27.549632Z",
+    "generated_at": "2025-11-05T20:35:11.042644Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 213,
-    "total_lines": 71063,
+    "total_lines": 71287,
     "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 213,
-        "lines": 71063,
+        "lines": 71287,
         "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
@@ -2102,13 +2102,14 @@
         "sys",
         "subprocess",
         "logging",
+        "xml.etree.ElementTree",
         "claude_skills.common.spec.load_json_spec",
         "claude_skills.common.spec.get_node",
         "claude_skills.common.paths.find_specs_directory",
         "claude_skills.common.git_metadata.find_git_root"
       ],
       "exports": [],
-      "lines": 510
+      "lines": 734
     },
     {
       "name": "__init__",
@@ -9374,7 +9375,7 @@
     {
       "name": "FidelityReviewer",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-      "line": 20,
+      "line": 21,
       "language": "python",
       "docstring": "Core class for performing fidelity reviews of implementations against specs.\n\nThis class will be implemented in Phase 3 (Core Review Logic).",
       "bases": [],
@@ -9393,7 +9394,11 @@
         "get_file_diff",
         "get_task_diffs",
         "get_phase_diffs",
-        "get_branch_diff"
+        "get_branch_diff",
+        "get_test_results",
+        "_run_and_parse_tests",
+        "_parse_junit_xml",
+        "get_task_test_results"
       ],
       "properties": [],
       "is_exported": false,
@@ -30638,13 +30643,13 @@
         {
           "name": "get_file_diff",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 309,
+          "line": 310,
           "call_type": "function_call"
         },
         {
           "name": "get_branch_diff",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 462,
+          "line": 463,
           "call_type": "function_call"
         },
         {
@@ -35246,7 +35251,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 126,
+          "line": 127,
           "call_type": "function_call"
         },
         {
@@ -40544,7 +40549,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 133,
+          "line": 134,
           "call_type": "function_call"
         },
         {
@@ -42245,13 +42250,13 @@
         {
           "name": "get_task_requirements",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 167,
+          "line": 168,
           "call_type": "function_call"
         },
         {
           "name": "get_phase_tasks",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 209,
+          "line": 210,
           "call_type": "function_call"
         },
         {
@@ -71065,7 +71070,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 126,
+          "line": 127,
           "call_type": "function_call"
         },
         {
@@ -108990,6 +108995,7 @@
       "sys",
       "subprocess",
       "logging",
+      "xml.etree.ElementTree",
       "claude_skills.common.spec.load_json_spec",
       "claude_skills.common.spec.get_node",
       "claude_skills.common.paths.find_specs_directory",
