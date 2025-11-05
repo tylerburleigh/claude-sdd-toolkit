@@ -529,18 +529,24 @@ sdd prepare-task {spec-id}
    - Create detailed execution plan internally (no user approval needed)
    - Include all standard plan components (prerequisites, steps, success criteria, etc.)
 
-5. **Execute task implementation:**
+5. **Mark task as in_progress:**
+```bash
+sdd update-status {spec-id} {task-id} in_progress
+```
+   This sets the `started_at` timestamp needed for automatic time tracking.
+
+6. **Execute task implementation:**
    - Implement according to the internal execution plan
    - Follow all implementation best practices
    - Perform any required testing or verification
 
-6. **Handle plan deviations:**
+7. **Handle plan deviations:**
    - If implementation deviates from plan: **STOP**, document deviation
    - Present deviation to user with AskUserQuestion
    - Options: revise plan, update spec, explain more, rollback
    - Exit autonomous mode, handle as normal deviation scenario
 
-7. **Mark task complete:**
+8. **Mark task complete:**
 ```bash
 # Use sdd-update subagent to mark complete (requires journal content)
 Task(
@@ -550,7 +556,7 @@ Task(
 )
 ```
 
-8. **Check context usage (REQUIRED):**
+9. **Check context usage (REQUIRED):**
 
 ⚠️ **CRITICAL: Use the two-step pattern documented in [Context Checking Pattern](#context-checking-pattern).**
 
@@ -571,7 +577,7 @@ sdd context --session-marker "SESSION_MARKER_<hash>" --json
    - If context ≥75%: **STOP**, exit loop, go to Step 3 (Summary)
    - If context <75%: Continue to next iteration
 
-9. **Check phase completion:**
+10. **Check phase completion:**
    - If current phase is complete: Exit loop, go to Step 3 (Summary)
    - Otherwise: Return to step 1 (prepare next task)
 
@@ -1214,7 +1220,13 @@ AskUserQuestion(
 
 **Step 4: Handle user response**
 
-- **Approve & Start:** Begin implementation according to plan
+- **Approve & Start:**
+  1. Mark task as in_progress using the CLI:
+     ```bash
+     sdd update-status {spec-id} {task-id} in_progress
+     ```
+     This sets the `started_at` timestamp needed for automatic time tracking.
+  2. Begin implementation according to plan
 - **Request Changes:** Ask for specifics, revise plan, re-present with AskUserQuestion
 - **More Details:** Provide requested details, then re-ask with AskUserQuestion
 - **Defer:** Save plan details and exit gracefully
