@@ -14,7 +14,11 @@ from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
-from claude_skills.common.ai_tools import detect_available_tools, build_tool_command
+from claude_skills.common.ai_tools import (
+    detect_available_tools,
+    build_tool_command,
+    execute_tools_parallel
+)
 
 # =============================================================================
 # CONFIGURATION
@@ -532,50 +536,44 @@ def consult_multi_agent(
             print("=" * 60)
         sys.stdout.flush()
 
-    # Run consultations in parallel
-    responses = []
+    # Use shared utility for parallel execution
     start_time = time.time()
-
-    with ThreadPoolExecutor(max_workers=len(available_from_pair)) as executor:
-        future_to_tool = {
-            executor.submit(_run_tool_capture, tool, prompt): tool
-            for tool in available_from_pair
-        }
-
-        for future in as_completed(future_to_tool):
-            tool = future_to_tool[future]
-            try:
-                success, output, duration = future.result()
-                responses.append({
-                    "tool": tool,
-                    "success": success,
-                    "output": output,
-                    "duration": duration
-                })
-                if verbose:
-                    status = "✓" if success else "✗"
-                    msg = f"{status} {tool} completed ({duration:.1f}s)"
-                    if printer:
-                        printer.info(msg)
-                    else:
-                        print(msg)
-                        sys.stdout.flush()
-            except Exception as e:
-                responses.append({
-                    "tool": tool,
-                    "success": False,
-                    "output": "",
-                    "error": str(e)
-                })
-
+    multi_response = execute_tools_parallel(
+        tools=available_from_pair,
+        prompt=prompt
+    )
     total_duration = time.time() - start_time
 
-    # Return all successful responses keyed by tool name for main agent synthesis
-    successful = [r for r in responses if r["success"]]
+    # Print completion messages if verbose
+    if verbose:
+        for response in multi_response.responses:
+            status = "✓" if response.success else "✗"
+            msg = f"{status} {response.tool} completed ({response.duration:.1f}s)"
+            if printer:
+                printer.info(msg)
+            else:
+                print(msg)
+                sys.stdout.flush()
 
-    if successful:
-        # Create dict of responses keyed by tool name
-        responses_by_tool = {r["tool"]: r["output"] for r in successful}
+    # Convert to code-doc's expected format
+    if multi_response.success:
+        # Build responses_by_tool dict from successful responses
+        responses_by_tool = {
+            r.tool: r.output
+            for r in multi_response.responses
+            if r.success
+        }
+
+        # Convert responses to dict format for backwards compatibility
+        responses = [
+            {
+                "tool": r.tool,
+                "success": r.success,
+                "output": r.output,
+                "duration": r.duration
+            }
+            for r in multi_response.responses
+        ]
 
         return {
             "success": True,
@@ -585,6 +583,17 @@ def consult_multi_agent(
             "total_duration": total_duration
         }
     else:
+        # Convert failed responses to dict format
+        responses = [
+            {
+                "tool": r.tool,
+                "success": r.success,
+                "output": r.output,
+                "duration": r.duration
+            }
+            for r in multi_response.responses
+        ]
+
         return {
             "success": False,
             "error": "All consultations failed",
@@ -593,17 +602,7 @@ def consult_multi_agent(
         }
 
 
-def _run_tool_capture(tool: str, prompt: str) -> Tuple[bool, str, float]:
-    """
-    Run tool and capture output (internal helper for parallel execution).
-
-    Returns:
-        Tuple of (success, output, duration)
-    """
-    start_time = time.time()
-    success, output = run_consultation(tool, prompt, dry_run=False, verbose=False)
-    duration = time.time() - start_time
-    return success, output, duration
+# _run_tool_capture() removed - now using execute_tools_parallel() from ai_tools
 
 
 def generate_architecture_docs(
