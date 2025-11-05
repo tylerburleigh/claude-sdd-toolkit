@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 10:03:54
+**Generated:** 2025-11-05 10:29:00
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70889
+- **Total Lines:** 70844
 - **Total Classes:** 267
-- **Total Functions:** 793
+- **Total Functions:** 792
 - **Avg Complexity:** 5.57
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -6669,26 +6669,6 @@ Returns:
 
 ---
 
-### `_tool_response_to_dict(response) -> Dict[str, Any]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:21`
-**Complexity:** 1
-
-**Description:**
-> Convert ToolResponse to dict format for backward compatibility.
-
-Args:
-    response: ToolResponse from execute_tool()
-
-Returns:
-    Dict with success, tool, output, error, duration keys
-
-**Parameters:**
-- `response`: ToolResponse
-
----
-
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
@@ -10461,7 +10441,7 @@ Example:
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:20`
 **Complexity:** 3
 
 **Description:**
@@ -17083,8 +17063,8 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:57`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:37`
+**Complexity:** 8
 
 **Description:**
 > Review a spec using multiple AI tools with full synthesis.
@@ -21664,15 +21644,11 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py`
 
-- `claude_skills.common.ai_tools.ToolResponse`
 - `claude_skills.common.ai_tools.check_tool_available`
-- `claude_skills.common.ai_tools.execute_tool`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
 - `claude_skills.sdd_plan_review.synthesis.parse_response`
-- `concurrent.futures.ThreadPoolExecutor`
-- `concurrent.futures.as_completed`
-- `concurrent.futures.wait`
 - `json`
 - `pathlib.Path`
 - `subprocess`

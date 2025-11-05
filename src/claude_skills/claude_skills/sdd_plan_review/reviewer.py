@@ -2,7 +2,9 @@
 """
 Multi-model review orchestration for sdd-plan-review.
 
-Handles parallel execution of AI CLI tools and response collection.
+Orchestrates parallel execution of AI CLI tools (gemini, codex, cursor-agent)
+for specification review. Uses shared implementations from common.ai_tools for
+tool detection and execution, with response synthesis and consensus building.
 """
 
 import subprocess
@@ -21,8 +23,10 @@ def detect_available_tools() -> List[str]:
     """
     Detect which AI CLI tools are installed and available.
 
+    Uses check_tool_available() from common.ai_tools for detection.
+
     Returns:
-        List of available tool names
+        List of available tool names (gemini, codex, cursor-agent)
     """
     # Known AI CLI tools for spec review
     known_tools = ["gemini", "codex", "cursor-agent"]
@@ -45,13 +49,15 @@ def review_with_tools(
     """
     Review a spec using multiple AI tools with full synthesis.
 
+    Uses execute_tools_parallel() from common.ai_tools for parallel execution.
+
     Args:
         spec_content: Specification content to review
         tools: List of tool names to use
         review_type: Type of review (quick, full, security, feasibility)
         spec_id: Specification ID
         spec_title: Specification title
-        parallel: Run tools in parallel (vs sequential)
+        parallel: Deprecated - tools always run in parallel (kept for compatibility)
 
     Returns:
         Review results with parsed responses and consensus
