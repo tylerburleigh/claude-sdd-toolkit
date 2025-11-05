@@ -4,7 +4,15 @@ AI Consultation for Documentation Generation
 Shells out to external AI CLI tools (gemini, codex, cursor-agent) to generate
 contextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
 
-Based on run-tests/consultation.py pattern.
+Uses shared AI tool utilities from claude_skills.common.ai_tools:
+- detect_available_tools(): Check which AI tools are installed
+- build_tool_command(): Build command arrays for tool execution
+- execute_tools_parallel(): Run multiple tools concurrently
+
+This module provides documentation-specific functionality:
+- Prompt formatting for architecture and AI context research
+- Document composition with proper formatting
+- High-level orchestration for documentation generation workflows
 """
 
 import subprocess
