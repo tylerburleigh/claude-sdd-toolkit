@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Any
 import sys
 import subprocess
 import logging
+import xml.etree.ElementTree as ET
 
 from claude_skills.common.spec import load_json_spec, get_node
 from claude_skills.common.paths import find_specs_directory
@@ -508,3 +509,226 @@ class FidelityReviewer:
         except Exception as e:
             logger.warning(f"Failed to get git diff: {e}")
             return ""
+
+    def get_test_results(
+        self,
+        test_file: Optional[str] = None,
+        junit_xml_path: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Extract test results from pytest execution or JUnit XML file.
+
+        Args:
+            test_file: Optional specific test file to run (if running tests)
+            junit_xml_path: Optional path to existing JUnit XML file to parse
+
+        Returns:
+            Dictionary containing test results:
+            {
+                "total": int,
+                "passed": int,
+                "failed": int,
+                "errors": int,
+                "skipped": int,
+                "duration": float,
+                "tests": {
+                    "test_name": {
+                        "status": "passed"|"failed"|"error"|"skipped",
+                        "message": str,
+                        "duration": float,
+                        "traceback": Optional[str]
+                    }
+                }
+            }
+
+        Note:
+            If neither test_file nor junit_xml_path is provided, returns None.
+            If test_file is provided, runs pytest and parses the results.
+            If junit_xml_path is provided, parses the existing XML file.
+        """
+        if junit_xml_path:
+            # Parse existing JUnit XML file
+            return self._parse_junit_xml(junit_xml_path)
+        elif test_file:
+            # Run pytest and parse results
+            return self._run_and_parse_tests(test_file)
+        else:
+            logger.warning("No test file or junit_xml_path provided")
+            return None
+
+    def _run_and_parse_tests(self, test_file: str) -> Optional[Dict[str, Any]]:
+        """
+        Run pytest on a test file and parse the results.
+
+        Args:
+            test_file: Path to test file to run
+
+        Returns:
+            Test results dictionary or None if execution fails
+        """
+        # Create temporary XML file for results
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as tmp:
+            xml_path = tmp.name
+
+        try:
+            # Run pytest with JUnit XML output
+            result = subprocess.run(
+                ['pytest', test_file, f'--junit-xml={xml_path}', '-v'],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=300  # 5 minute timeout
+            )
+
+            # Parse the generated XML
+            if Path(xml_path).exists():
+                test_results = self._parse_junit_xml(xml_path)
+                Path(xml_path).unlink()  # Clean up temp file
+                return test_results
+            else:
+                logger.warning(f"JUnit XML file not created for {test_file}")
+                return None
+
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Test execution timed out for {test_file}")
+            return None
+        except Exception as e:
+            logger.warning(f"Failed to run tests for {test_file}: {e}")
+            return None
+        finally:
+            # Ensure temp file is cleaned up
+            if Path(xml_path).exists():
+                Path(xml_path).unlink()
+
+    def _parse_junit_xml(self, xml_path: str) -> Optional[Dict[str, Any]]:
+        """
+        Parse JUnit XML test results.
+
+        Args:
+            xml_path: Path to JUnit XML file
+
+        Returns:
+            Test results dictionary or None if parsing fails
+        """
+        try:
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+
+            # Initialize results structure
+            results = {
+                "total": 0,
+                "passed": 0,
+                "failed": 0,
+                "errors": 0,
+                "skipped": 0,
+                "duration": 0.0,
+                "tests": {}
+            }
+
+            # Parse testsuite attributes
+            testsuite = root.find('testsuite')
+            if testsuite is None:
+                testsuite = root  # Root might be testsuite itself
+
+            results["total"] = int(testsuite.get('tests', 0))
+            results["failed"] = int(testsuite.get('failures', 0))
+            results["errors"] = int(testsuite.get('errors', 0))
+            results["skipped"] = int(testsuite.get('skipped', 0))
+            results["passed"] = results["total"] - results["failed"] - results["errors"] - results["skipped"]
+            results["duration"] = float(testsuite.get('time', 0))
+
+            # Parse individual test cases
+            for testcase in root.iter('testcase'):
+                test_name = testcase.get('name', 'unknown')
+                classname = testcase.get('classname', '')
+                duration = float(testcase.get('time', 0))
+
+                # Determine test status
+                failure = testcase.find('failure')
+                error = testcase.find('error')
+                skipped = testcase.find('skipped')
+
+                if failure is not None:
+                    status = "failed"
+                    message = failure.get('message', '')
+                    traceback = failure.text or ''
+                elif error is not None:
+                    status = "error"
+                    message = error.get('message', '')
+                    traceback = error.text or ''
+                elif skipped is not None:
+                    status = "skipped"
+                    message = skipped.get('message', '')
+                    traceback = None
+                else:
+                    status = "passed"
+                    message = ''
+                    traceback = None
+
+                # Store test result
+                full_test_name = f"{classname}::{test_name}" if classname else test_name
+                results["tests"][full_test_name] = {
+                    "status": status,
+                    "message": message,
+                    "duration": duration,
+                    "traceback": traceback
+                }
+
+            return results
+
+        except ET.ParseError as e:
+            logger.warning(f"Failed to parse JUnit XML {xml_path}: {e}")
+            return None
+        except Exception as e:
+            logger.warning(f"Error parsing test results from {xml_path}: {e}")
+            return None
+
+    def get_task_test_results(self, task_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get test results for a specific task.
+
+        Looks for test files associated with the task and attempts to extract results.
+
+        Args:
+            task_id: Task ID to get test results for
+
+        Returns:
+            Test results dictionary or None if no test results available
+        """
+        task_reqs = self.get_task_requirements(task_id)
+        if task_reqs is None:
+            return None
+
+        # Look for test files in task metadata
+        metadata = task_reqs.get("metadata", {})
+        test_files = metadata.get("verification_files", [])
+
+        if not test_files:
+            # Try to infer test file from main file path
+            file_path = task_reqs.get("file_path")
+            if file_path and file_path.startswith("src/"):
+                # Convert src/module/file.py to tests/test_module/test_file.py
+                test_path = file_path.replace("src/", "tests/test_", 1)
+                test_path = test_path.replace(".py", ".py").replace("/", "/test_", 1)
+                test_files = [test_path]
+
+        # Try to get results from each test file
+        all_results = None
+        for test_file in test_files:
+            if Path(test_file).exists():
+                results = self._run_and_parse_tests(test_file)
+                if results:
+                    if all_results is None:
+                        all_results = results
+                    else:
+                        # Merge results from multiple test files
+                        all_results["total"] += results["total"]
+                        all_results["passed"] += results["passed"]
+                        all_results["failed"] += results["failed"]
+                        all_results["errors"] += results["errors"]
+                        all_results["skipped"] += results["skipped"]
+                        all_results["duration"] += results["duration"]
+                        all_results["tests"].update(results["tests"])
+
+        return all_results
