@@ -2,15 +2,15 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T18:37:36.205436Z",
+    "generated_at": "2025-11-05T18:45:40.483618Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 209,
-    "total_lines": 70395,
+    "total_files": 210,
+    "total_lines": 70406,
     "total_classes": 267,
     "total_functions": 779,
     "avg_complexity": 5.58,
@@ -24,8 +24,8 @@
     ],
     "by_language": {
       "python": {
-        "files": 209,
-        "lines": 70395,
+        "files": 210,
+        "lines": 70406,
         "classes": 267,
         "functions": 779,
         "avg_complexity": 5.58
@@ -2037,6 +2037,17 @@
       ],
       "exports": [],
       "lines": 455
+    },
+    {
+      "name": "__init__",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/__init__.py",
+      "language": "python",
+      "docstring": "SDD Fidelity Review Operations\n\nImplementation fidelity review functionality for comparing actual code against\nSDD specification requirements. Identifies deviations and generates compliance reports.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 11
     },
     {
       "name": "__init__",
