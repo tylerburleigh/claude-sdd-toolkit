@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 12:17:55
+**Generated:** 2025-11-05 12:31:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70394
+- **Total Lines:** 70395
 - **Total Classes:** 267
 - **Total Functions:** 779
 - **Avg Complexity:** 5.58
@@ -14436,7 +14436,7 @@ Notes:
 ### `get_sdd_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:179`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:180`
 **Complexity:** 8
 
 **Description:**
@@ -15620,7 +15620,7 @@ Returns:
 ### `load_sdd_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:128`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:129`
 **Complexity:** 6
 
 **Description:**
