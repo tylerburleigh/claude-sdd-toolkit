@@ -16,7 +16,8 @@ from claude_skills.common.ai_tools import (
     build_tool_command, execute_tool, execute_tools_parallel,
     ToolResponse, ToolStatus, MultiToolResponse
 )
-from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools, get_config_path
+from claude_skills.common import ai_config
+from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools
 
 
 # =============================================================================
@@ -25,31 +26,15 @@ from claude_skills.run_tests.tool_checking import check_tool_availability, get_a
 
 def load_model_config() -> Dict:
     """
-    Load model configuration from config.yaml.
+    Load model configuration from config.yaml using shared ai_config module.
 
     Returns fallback to DEFAULT_MODELS if config not found or invalid.
 
     Returns:
         Dict with model configuration including priorities and overrides
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if not config_path.exists():
-            return {}
-
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
-
-        if not config_data or 'models' not in config_data:
-            return {}
-
-        return config_data['models']
-
-    except (yaml.YAMLError, IOError, KeyError) as e:
-        return {}
+    config = ai_config.load_skill_config('run-tests')
+    return config.get('models', {})
 
 
 def get_model_for_tool(tool: str, failure_type: Optional[str] = None) -> str:
@@ -117,29 +102,13 @@ def get_flags_for_tool(tool: str) -> List[str]:
 
 def load_consensus_config() -> Dict:
     """
-    Load consensus configuration from config.yaml.
+    Load consensus configuration from config.yaml using shared ai_config module.
 
     Returns:
         Dict with consensus configuration (pairs and auto_trigger)
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if not config_path.exists():
-            return {}
-
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
-
-        if not config_data or 'consensus' not in config_data:
-            return {}
-
-        return config_data['consensus']
-
-    except (yaml.YAMLError, IOError, KeyError) as e:
-        return {}
+    config = ai_config.load_skill_config('run-tests')
+    return config.get('consensus', {})
 
 
 def should_auto_trigger_consensus(failure_type: str) -> bool:
@@ -233,25 +202,12 @@ def get_consensus_pairs() -> Dict[str, List[str]]:
 
 def get_consultation_timeout() -> int:
     """
-    Get consultation timeout from config (default: 90 seconds).
+    Get consultation timeout from config using shared ai_config module.
 
     Returns:
-        Timeout in seconds
+        Timeout in seconds (default: 90)
     """
-    import yaml
-
-    config_path = get_config_path()
-
-    try:
-        if config_path.exists():
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-                if config and 'consultation' in config:
-                    return config['consultation'].get('timeout_seconds', 90)
-    except (yaml.YAMLError, IOError, KeyError):
-        pass
-
-    return 90  # Default 90 seconds
+    return ai_config.get_timeout('run-tests', 'consultation')
 
 
 # =============================================================================
