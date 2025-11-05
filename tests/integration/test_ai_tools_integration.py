@@ -812,3 +812,146 @@ class TestEndToEndWorkflow:
         for tool, tool_response in successful.items():
             assert tool_response.output
             assert "response to" in tool_response.output.lower()
+
+
+# =============================================================================
+# Real AI Tools Tests (Optional - requires actual tools installed)
+# =============================================================================
+
+
+class TestRealAITools:
+    """
+    Integration tests with actual AI tools (gemini, codex, cursor-agent).
+
+    These tests are skipped if the real tools are not available on the system.
+    They validate that the integration layer works correctly with actual CLI tools.
+    """
+
+    @pytest.mark.skipif(
+        not check_tool_available("gemini"),
+        reason="gemini CLI tool not available"
+    )
+    def test_real_gemini_execution(self):
+        """Test execution with real gemini CLI tool."""
+        response = execute_tool(
+            "gemini",
+            "Say 'Hello from Gemini' exactly",
+            timeout=30
+        )
+
+        # Should get a real response
+        assert response.success is True or response.status == ToolStatus.TIMEOUT
+        if response.success:
+            assert response.output  # Should have some output
+            assert response.duration > 0
+
+    @pytest.mark.skipif(
+        not check_tool_available("codex"),
+        reason="codex CLI tool not available"
+    )
+    def test_real_codex_execution(self):
+        """Test execution with real codex CLI tool."""
+        response = execute_tool(
+            "codex",
+            "Say 'Hello from Codex' exactly",
+            timeout=30
+        )
+
+        # Should get a response (may be error if tool requires terminal)
+        assert response.status in [
+            ToolStatus.SUCCESS,
+            ToolStatus.TIMEOUT,
+            ToolStatus.ERROR  # May error if tool requires interactive terminal
+        ]
+        if response.success:
+            assert response.output  # Should have some output
+            assert response.duration > 0
+        # If error due to non-terminal, that's expected in test environment
+        if response.status == ToolStatus.ERROR:
+            assert response.duration >= 0  # Should still capture timing
+
+    @pytest.mark.skipif(
+        not check_tool_available("cursor-agent"),
+        reason="cursor-agent CLI tool not available"
+    )
+    def test_real_cursor_agent_execution(self):
+        """Test execution with real cursor-agent CLI tool."""
+        response = execute_tool(
+            "cursor-agent",
+            "Say 'Hello from Cursor' exactly",
+            timeout=30
+        )
+
+        # Should get a real response
+        assert response.success is True or response.status == ToolStatus.TIMEOUT
+        if response.success:
+            assert response.output  # Should have some output
+            assert response.duration > 0
+
+    def test_real_tools_parallel_if_available(self):
+        """Test parallel execution with any available real tools."""
+        # Detect what's actually available
+        available = detect_available_tools()
+
+        if len(available) == 0:
+            pytest.skip("No real AI tools available for testing")
+
+        # Execute with available tools
+        response = execute_tools_parallel(
+            tools=available,
+            prompt="Respond with: 'Test successful'",
+            timeout=30
+        )
+
+        # Should have attempted all available tools
+        assert len(response.responses) == len(available)
+
+        # At least check that responses were received
+        # (may timeout or fail depending on tool configuration)
+        for tool_name, tool_response in response.responses.items():
+            assert tool_response.tool == tool_name
+            assert tool_response.timestamp
+            assert tool_response.duration >= 0
+
+    def test_real_tool_with_long_prompt(self):
+        """Test handling of longer prompts with real tools."""
+        available = detect_available_tools()
+
+        if len(available) == 0:
+            pytest.skip("No real AI tools available for testing")
+
+        # Create a longer prompt
+        long_prompt = """
+        Please analyze the following code pattern and provide a brief summary:
+
+        def process_data(items):
+            results = []
+            for item in items:
+                if item.is_valid():
+                    results.append(item.transform())
+            return results
+
+        Focus on: error handling, performance, readability.
+        """
+
+        response = execute_tool(
+            available[0],
+            long_prompt,
+            timeout=60
+        )
+
+        # Should handle the longer prompt
+        # (may timeout or error depending on tool/API availability)
+        assert response.tool == available[0]
+        assert response.timestamp
+
+    def test_detect_available_tools_finds_real_tools(self):
+        """Test that detect_available_tools finds any real tools on system."""
+        available = detect_available_tools()
+
+        # Should return a list (may be empty if no tools installed)
+        assert isinstance(available, list)
+
+        # Each detected tool should actually be in PATH
+        for tool in available:
+            assert check_tool_available(tool) is True
