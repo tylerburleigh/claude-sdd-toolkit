@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 11:01:28
+**Generated:** 2025-11-05 11:03:16
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70824
+- **Total Lines:** 70780
 - **Total Classes:** 267
 - **Total Functions:** 792
-- **Avg Complexity:** 5.57
+- **Avg Complexity:** 5.55
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -355,7 +355,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `NamedTuple`
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:692`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:648`
 
 **Description:**
 > Represents a response from a tool consultation.
@@ -5539,7 +5539,7 @@ missing it, even when the validation doesn't report it as an error (backward com
 ### `_build_tool_commands(failure_type) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:301`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:257`
 **Complexity:** 1
 
 **Description:**
@@ -7121,7 +7121,7 @@ Returns:
 ### `analyze_response_similarity(response1, response2) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:730`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:686`
 **Complexity:** 5
 
 **Description:**
@@ -9966,7 +9966,7 @@ Returns:
 ### `consult_multi_agent(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, pair, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:941`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:897`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10004,7 +10004,7 @@ Returns:
 ### `consult_with_auto_routing(failure_type, error_message, hypothesis, test_code_path, impl_code_path, context, question, tool, dry_run, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:598`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:554`
 **Complexity:** 10
 
 **Description:**
@@ -12586,7 +12586,7 @@ Args:
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:365`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:321`
 **Complexity:** 6
 
 **Description:**
@@ -12810,7 +12810,7 @@ Returns:
 ### `format_synthesis_output(synthesis, responses, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:851`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:807`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -13717,7 +13717,7 @@ Returns:
 ### `get_best_tool(failure_type, available_tools) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:332`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:288`
 **Complexity:** 8
 
 **Description:**
@@ -13881,7 +13881,7 @@ Returns:
 ### `get_consensus_pair_for_failure(failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:179`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:148`
 **Complexity:** 5
 
 **Description:**
@@ -13907,7 +13907,7 @@ Returns:
 ### `get_consensus_pairs() -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:216`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:185`
 **Complexity:** 3
 
 **Description:**
@@ -13923,14 +13923,14 @@ Returns:
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:234`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:203`
+**Complexity:** 1
 
 **Description:**
-> Get consultation timeout from config (default: 90 seconds).
+> Get consultation timeout from config using shared ai_config module.
 
 Returns:
-    Timeout in seconds
+    Timeout in seconds (default: 90)
 
 ---
 
@@ -14022,7 +14022,7 @@ Returns:
 ### `get_flags_for_tool(tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:93`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:78`
 **Complexity:** 3
 
 **Description:**
@@ -14215,7 +14215,7 @@ Returns:
 ### `get_model_for_tool(tool, failure_type) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:55`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:40`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -15673,11 +15673,11 @@ Returns:
 ### `load_consensus_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:118`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:103`
+**Complexity:** 1
 
 **Description:**
-> Load consensus configuration from config.yaml.
+> Load consensus configuration from config.yaml using shared ai_config module.
 
 Returns:
     Dict with consensus configuration (pairs and auto_trigger)
@@ -15771,11 +15771,11 @@ Returns:
 ### `load_model_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:26`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:27`
+**Complexity:** 1
 
 **Description:**
-> Load model configuration from config.yaml.
+> Load model configuration from config.yaml using shared ai_config module.
 
 Returns fallback to DEFAULT_MODELS if config not found or invalid.
 
@@ -16437,7 +16437,7 @@ Notes:
 ### `print_routing_matrix(printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:581`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:537`
 **Complexity:** 3
 
 **Description:**
@@ -16604,7 +16604,7 @@ Returns:
 ### `read_code_file(file_path) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:453`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:409`
 **Complexity:** 7
 
 **Description:**
@@ -17211,7 +17211,7 @@ Returns:
 ### `run_consultation(tool, prompt, dry_run, printer, failure_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:491`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:447`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -17313,7 +17313,7 @@ This ensures tests work in different environments.
 ### `run_tool_parallel(tool, prompt, failure_type) -> ConsultationResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:701`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:657`
 **Complexity:** 1
 
 **Description:**
@@ -17703,7 +17703,7 @@ Returns:
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:145`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:114`
 **Complexity:** 5
 
 **Description:**
@@ -18223,7 +18223,7 @@ Returns:
 ### `synthesize_responses(responses) -> Dict[str, any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:782`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/consultation.py:738`
 **Complexity:** 6
 
 **Description:**
@@ -21412,6 +21412,7 @@ Returns:
 ### `src/claude_skills/claude_skills/run_tests/consultation.py`
 
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.ai_config`
 - `claude_skills.common.ai_tools.MultiToolResponse`
 - `claude_skills.common.ai_tools.ToolResponse`
 - `claude_skills.common.ai_tools.ToolStatus`
@@ -21420,7 +21421,6 @@ Returns:
 - `claude_skills.common.ai_tools.execute_tools_parallel`
 - `claude_skills.run_tests.tool_checking.check_tool_availability`
 - `claude_skills.run_tests.tool_checking.get_available_tools`
-- `claude_skills.run_tests.tool_checking.get_config_path`
 - `pathlib.Path`
 - `time`
 - `typing.Dict`

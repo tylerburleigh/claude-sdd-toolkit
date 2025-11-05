@@ -14,10 +14,9 @@ import time
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.ai_tools import (
     build_tool_command, execute_tool, execute_tools_parallel,
-    ToolResponse, ToolStatus, MultiToolResponse
+    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools
 )
 from claude_skills.common import ai_config
-from claude_skills.run_tests.tool_checking import check_tool_availability, get_available_tools
 
 
 # =============================================================================
@@ -297,7 +296,7 @@ def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None
         Tool name to use, or None if no tools available
     """
     if available_tools is None:
-        available_tools = get_available_tools()
+        available_tools = detect_available_tools()
 
     if not available_tools:
         return None
@@ -585,7 +584,7 @@ def consult_with_auto_routing(
         printer = PrettyPrinter()
 
     # Check tool availability
-    available_tools = get_available_tools()
+    available_tools = detect_available_tools()
 
     if not available_tools:
         printer.error("No external tools found")
@@ -938,7 +937,7 @@ def consult_multi_agent(
     tools_to_use = consensus_pairs[pair]
 
     # Check which tools are available
-    available_tools = get_available_tools()
+    available_tools = detect_available_tools()
     available_from_pair = [t for t in tools_to_use if t in available_tools]
 
     if len(available_from_pair) < 2:
