@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:42:44
+**Generated:** 2025-11-05 08:44:32
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 70820
+- **Total Lines:** 70923
 - **Total Classes:** 267
-- **Total Functions:** 792
+- **Total Functions:** 793
 - **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -1246,7 +1246,7 @@ Example:
 ### `MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:123`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:124`
 
 **Description:**
 > Response from multiple tool consultations run in parallel.
@@ -5144,7 +5144,7 @@ Attributes:
 ### `ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:30`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:31`
 
 **Description:**
 > Standardized response from AI tool consultation.
@@ -5190,7 +5190,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:20`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:21`
 
 **Description:**
 > Status of AI tool execution.
@@ -7440,7 +7440,7 @@ Returns:
 ### `build_tool_command(tool, prompt) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:332`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:333`
 **Complexity:** 6
 
 **Description:**
@@ -8208,7 +8208,7 @@ Returns:
 ### `check_tool_available(tool) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:249`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:250`
 **Complexity:** 4
 
 **Description:**
@@ -10473,7 +10473,7 @@ Returns:
 ### `detect_available_tools(tools) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:297`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:298`
 **Complexity:** 4
 
 **Description:**
@@ -11035,7 +11035,7 @@ Example:
 ### `execute_tool(tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:392`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:393`
 **Complexity:** 7
 
 **Description:**
@@ -11062,6 +11062,43 @@ Example:
 
 **Parameters:**
 - `tool`: str
+- `prompt`: str
+
+---
+
+### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:526`
+**Complexity:** 5
+
+**Description:**
+> Execute multiple AI tools in parallel with same prompt.
+
+Uses ThreadPoolExecutor to run tools concurrently. Returns as soon
+as each tool completes (doesn't wait for slowest).
+
+Args:
+    tools: List of tool names to execute
+    prompt: The prompt to send to all tools
+    models: Optional dict mapping tool names to models
+    timeout: Timeout per tool in seconds (default 90)
+
+Returns:
+    MultiToolResponse with all results and aggregated statistics
+
+Example:
+    >>> response = execute_tools_parallel(
+    ...     tools=["gemini", "codex"],
+    ...     prompt="Analyze code",
+    ...     models={"gemini": "gemini-exp-1114"}
+    ... )
+    >>> print(f"Success: {response.success_count}/{len(response.responses)}")
+    >>> for tool, resp in response.get_successful_responses().items():
+    ...     print(f"{tool}: {resp.output[:50]}...")
+
+**Parameters:**
+- `tools`: list[str]
 - `prompt`: str
 
 ---
@@ -20935,6 +20972,8 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/ai_tools.py`
 
+- `concurrent.futures.ThreadPoolExecutor`
+- `concurrent.futures.as_completed`
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `datetime.datetime`

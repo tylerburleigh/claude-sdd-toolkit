@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T13:42:44.279433Z",
+    "generated_at": "2025-11-05T13:44:32.835105Z",
     "languages": [
       "python"
     ],
@@ -10,9 +10,9 @@
   },
   "statistics": {
     "total_files": 210,
-    "total_lines": 70820,
+    "total_lines": 70923,
     "total_classes": 267,
-    "total_functions": 792,
+    "total_functions": 793,
     "avg_complexity": 5.59,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -25,9 +25,9 @@
     "by_language": {
       "python": {
         "files": 210,
-        "lines": 70820,
+        "lines": 70923,
         "classes": 267,
-        "functions": 792,
+        "functions": 793,
         "avg_complexity": 5.59
       }
     }
@@ -878,7 +878,8 @@
         "check_tool_available",
         "detect_available_tools",
         "build_tool_command",
-        "execute_tool"
+        "execute_tool",
+        "execute_tools_parallel"
       ],
       "imports": [
         "dataclasses.dataclass",
@@ -888,10 +889,12 @@
         "enum.Enum",
         "shutil",
         "subprocess",
-        "time"
+        "time",
+        "concurrent.futures.ThreadPoolExecutor",
+        "concurrent.futures.as_completed"
       ],
       "exports": [],
-      "lines": 534
+      "lines": 637
     },
     {
       "name": "completion",
@@ -7248,7 +7251,7 @@
     {
       "name": "ToolStatus",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 20,
+      "line": 21,
       "language": "python",
       "docstring": "Status of AI tool execution.",
       "bases": [
@@ -7262,7 +7265,7 @@
         {
           "instantiator": "from_dict",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 118,
+          "line": 119,
           "context": [
             "ToolResponse",
             "from_dict"
@@ -7275,7 +7278,7 @@
     {
       "name": "ToolResponse",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 30,
+      "line": 31,
       "language": "python",
       "docstring": "Standardized response from AI tool consultation.\n\nThis is the core response type used throughout the toolkit for\nall AI tool interactions.\n\nAttributes:\n    tool: Name of the tool (gemini, codex, cursor-agent)\n    status: Execution status (success, timeout, error, etc.)\n    output: Raw output from the tool (stdout)\n    error: Error message if any (stderr or exception message)\n    duration: Execution time in seconds\n    timestamp: When the consultation started (ISO format)\n    model: Model used by the tool (if applicable)\n    prompt: The prompt sent to the tool (optional, for debugging)\n    exit_code: Process exit code (None if didn't run)\n    metadata: Additional tool-specific metadata\n\nExample:\n    >>> response = ToolResponse(\n    ...     tool=\"gemini\",\n    ...     status=ToolStatus.SUCCESS,\n    ...     output=\"Analysis complete\",\n    ...     duration=2.5\n    ... )\n    >>> response.success\n    True\n    >>> response.to_dict()\n    {...}",
       "bases": [],
@@ -7293,7 +7296,7 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 441,
+          "line": 442,
           "context": [
             "execute_tool"
           ]
@@ -7301,7 +7304,7 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 454,
+          "line": 455,
           "context": [
             "execute_tool"
           ]
@@ -7309,7 +7312,7 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 468,
+          "line": 469,
           "context": [
             "execute_tool"
           ]
@@ -7317,7 +7320,7 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 482,
+          "line": 483,
           "context": [
             "execute_tool"
           ]
@@ -7325,7 +7328,7 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 497,
+          "line": 498,
           "context": [
             "execute_tool"
           ]
@@ -7333,19 +7336,27 @@
         {
           "instantiator": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 512,
+          "line": 513,
           "context": [
             "execute_tool"
+          ]
+        },
+        {
+          "instantiator": "execute_tools_parallel",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 597,
+          "context": [
+            "execute_tools_parallel"
           ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 6
+      "instantiation_count": 7
     },
     {
       "name": "MultiToolResponse",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 123,
+      "line": 124,
       "language": "python",
       "docstring": "Response from multiple tool consultations run in parallel.\n\nAttributes:\n    responses: Dictionary mapping tool names to their responses\n    synthesis: Optional synthesis/consensus from all responses\n    total_duration: Total wall-clock time (parallel execution)\n    max_duration: Longest individual tool duration\n    success_count: Number of successful tool calls\n    failure_count: Number of failed tool calls\n    timestamp: When the multi-tool consultation started\n    failure_type: Optional failure type that triggered consultation\n\nExample:\n    >>> responses = {\n    ...     \"gemini\": ToolResponse(tool=\"gemini\", status=ToolStatus.SUCCESS),\n    ...     \"codex\": ToolResponse(tool=\"codex\", status=ToolStatus.ERROR)\n    ... }\n    >>> multi = MultiToolResponse(\n    ...     responses=responses,\n    ...     success_count=1,\n    ...     failure_count=1\n    ... )\n    >>> multi.success\n    True\n    >>> successful = multi.get_successful_responses()\n    >>> len(successful)\n    1",
       "bases": [],
@@ -7362,8 +7373,26 @@
       ],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "execute_tools_parallel",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 560,
+          "context": [
+            "execute_tools_parallel"
+          ]
+        },
+        {
+          "instantiator": "execute_tools_parallel",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 615,
+          "context": [
+            "execute_tools_parallel"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
     },
     {
       "name": "DependencyAnalysis",
@@ -26821,7 +26850,7 @@
     {
       "name": "check_tool_available",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 249,
+      "line": 250,
       "language": "python",
       "docstring": "Check if a tool is available and optionally working.\n\nUses shutil.which() for fast PATH lookup. Optionally verifies tool\nresponds to --version flag.\n\nArgs:\n    tool: Tool name to check (e.g., \"gemini\", \"codex\", \"cursor-agent\")\n    check_version: If True, verify tool responds to --version\n    timeout: Timeout in seconds for version check (default 5)\n\nReturns:\n    True if tool is available (and working if check_version=True)\n\nExample:\n    >>> check_tool_available(\"gemini\")\n    True\n    >>> check_tool_available(\"nonexistent\")\n    False\n    >>> check_tool_available(\"gemini\", check_version=True)\n    True",
       "parameters": [
@@ -26841,7 +26870,7 @@
         {
           "name": "detect_available_tools",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 326,
+          "line": 327,
           "call_type": "function_call"
         },
         {
@@ -26861,13 +26890,13 @@
         {
           "name": "which",
           "file": "unknown",
-          "line": 278,
+          "line": 279,
           "call_type": "method_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 284,
+          "line": 285,
           "call_type": "method_call"
         }
       ],
@@ -26876,7 +26905,7 @@
     {
       "name": "detect_available_tools",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 297,
+      "line": 298,
       "language": "python",
       "docstring": "Detect which AI tools are available in PATH.\n\nArgs:\n    tools: Optional list of tool names to check. If None, checks\n        default tools: [\"gemini\", \"codex\", \"cursor-agent\"]\n    check_version: If True, verify each tool responds to --version\n\nReturns:\n    List of available tool names (empty if none found)\n\nExample:\n    >>> detect_available_tools()\n    ['gemini', 'codex']\n    >>> detect_available_tools([\"gemini\", \"nonexistent\"])\n    ['gemini']\n    >>> detect_available_tools(check_version=True)\n    ['gemini']",
       "parameters": [
@@ -26904,13 +26933,13 @@
         {
           "name": "check_tool_available",
           "file": "unknown",
-          "line": 326,
+          "line": 327,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 327,
+          "line": 328,
           "call_type": "method_call"
         }
       ],
@@ -26919,7 +26948,7 @@
     {
       "name": "build_tool_command",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 332,
+      "line": 333,
       "language": "python",
       "docstring": "Build command list for tool execution.\n\nHandles tool-specific command patterns:\n- gemini: uses -m for model, -p for prompt\n- codex: uses -m for model, positional arg for prompt\n- cursor-agent: uses --print flag, positional arg for prompt\n\nArgs:\n    tool: Tool name (\"gemini\", \"codex\", \"cursor-agent\")\n    prompt: The prompt to include in command\n    model: Optional model override\n\nReturns:\n    Command as list of strings (shell-safe)\n\nRaises:\n    ValueError: If tool is unknown\n\nExample:\n    >>> build_tool_command(\"gemini\", \"Analyze code\", model=\"gemini-exp-1114\")\n    ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']\n    >>> build_tool_command(\"codex\", \"Fix bug\", model=\"claude-3.7-sonnet\")\n    ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']\n    >>> build_tool_command(\"cursor-agent\", \"Review code\")\n    ['cursor-agent', '--print', 'Review code']",
       "parameters": [
@@ -26944,17 +26973,11 @@
         {
           "name": "execute_tool",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         }
       ],
       "calls": [
-        {
-          "name": "extend",
-          "file": "unknown",
-          "line": 368,
-          "call_type": "method_call"
-        },
         {
           "name": "extend",
           "file": "unknown",
@@ -26964,13 +26987,19 @@
         {
           "name": "extend",
           "file": "unknown",
-          "line": 375,
+          "line": 370,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 376,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 376,
+          "line": 377,
           "call_type": "method_call"
         }
       ],
@@ -26979,7 +27008,7 @@
     {
       "name": "execute_tool",
       "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-      "line": 392,
+      "line": 393,
       "language": "python",
       "docstring": "Execute AI tool with a prompt and return structured response.\n\nHandles all subprocess error modes: timeout, not found, invalid output,\nand general errors. Always returns a ToolResponse with appropriate status.\n\nArgs:\n    tool: Tool name (\"gemini\", \"codex\", \"cursor-agent\")\n    prompt: The prompt to send to the tool\n    model: Optional model override\n    timeout: Timeout in seconds (default 90)\n\nReturns:\n    ToolResponse with execution results and metadata\n\nExample:\n    >>> response = execute_tool(\"gemini\", \"Analyze code\", timeout=60)\n    >>> if response.success:\n    ...     print(response.output)\n    >>> else:\n    ...     print(f\"Failed: {response.error}\")",
       "parameters": [
@@ -27005,49 +27034,43 @@
         {
           "name": "time",
           "file": "unknown",
-          "line": 421,
+          "line": 422,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 422,
+          "line": 423,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 422,
+          "line": 423,
           "call_type": "method_call"
         },
         {
           "name": "build_tool_command",
           "file": "unknown",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "run",
           "file": "unknown",
-          "line": 429,
+          "line": 430,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 437,
+          "line": 438,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 444,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
-          "file": "unknown",
-          "line": 457,
+          "line": 445,
           "call_type": "method_call"
         },
         {
@@ -27057,46 +27080,176 @@
           "call_type": "method_call"
         },
         {
-          "name": "time",
+          "name": "strip",
           "file": "unknown",
-          "line": 467,
+          "line": 459,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 481,
+          "line": 468,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 496,
+          "line": 482,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 497,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 501,
+          "line": 502,
           "call_type": "function_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 511,
+          "line": 512,
           "call_type": "method_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 516,
+          "line": 517,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 516,
+          "line": 517,
           "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "execute_tools_parallel",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 526,
+      "language": "python",
+      "docstring": "Execute multiple AI tools in parallel with same prompt.\n\nUses ThreadPoolExecutor to run tools concurrently. Returns as soon\nas each tool completes (doesn't wait for slowest).\n\nArgs:\n    tools: List of tool names to execute\n    prompt: The prompt to send to all tools\n    models: Optional dict mapping tool names to models\n    timeout: Timeout per tool in seconds (default 90)\n\nReturns:\n    MultiToolResponse with all results and aggregated statistics\n\nExample:\n    >>> response = execute_tools_parallel(\n    ...     tools=[\"gemini\", \"codex\"],\n    ...     prompt=\"Analyze code\",\n    ...     models={\"gemini\": \"gemini-exp-1114\"}\n    ... )\n    >>> print(f\"Success: {response.success_count}/{len(response.responses)}\")\n    >>> for tool, resp in response.get_successful_responses().items():\n    ...     print(f\"{tool}: {resp.output[:50]}...\")",
+      "parameters": [
+        {
+          "name": "tools",
+          "type": "list[str]",
+          "default": null
+        },
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "MultiToolResponse",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 568,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isoformat",
+          "file": "unknown",
+          "line": 569,
+          "call_type": "method_call"
+        },
+        {
+          "name": "now",
+          "file": "unknown",
+          "line": 569,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 575,
+          "call_type": "function_call"
+        },
+        {
+          "name": "submit",
+          "file": "unknown",
+          "line": 578,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 582,
+          "call_type": "method_call"
+        },
+        {
+          "name": "as_completed",
+          "file": "unknown",
+          "line": 589,
+          "call_type": "function_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 592,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 601,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 604,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 608,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 611,
+          "call_type": "function_call"
+        },
+        {
+          "name": "values",
+          "file": "unknown",
+          "line": 611,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 612,
+          "call_type": "function_call"
+        },
+        {
+          "name": "max",
+          "file": "unknown",
+          "line": 613,
+          "call_type": "function_call"
+        },
+        {
+          "name": "values",
+          "file": "unknown",
+          "line": 613,
+          "call_type": "method_call"
         }
       ]
     },
@@ -74412,7 +74565,7 @@
         {
           "name": "detect_available_tools",
           "file": "src/claude_skills/claude_skills/common/ai_tools.py",
-          "line": 326,
+          "line": 327,
           "call_type": "function_call"
         },
         {
@@ -109344,7 +109497,9 @@
       "enum.Enum",
       "shutil",
       "subprocess",
-      "time"
+      "time",
+      "concurrent.futures.ThreadPoolExecutor",
+      "concurrent.futures.as_completed"
     ],
     "src/claude_skills/claude_skills/common/completion.py": [
       "typing.Dict",
