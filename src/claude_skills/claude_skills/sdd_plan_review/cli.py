@@ -277,8 +277,8 @@ def register_plan_review(subparsers, parent_parser):
 
     # list-tools command
     parser_list = subparsers.add_parser(
-        'list-review-tools',
+        'list-plan-review-tools',
         parents=[parent_parser],
-        help='List available AI CLI tools for reviews'
+        help='List available AI CLI tools for plan reviews'
     )
     parser_list.set_defaults(func=cmd_list_tools)

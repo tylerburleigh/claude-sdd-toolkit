@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:26:17
+**Generated:** 2025-11-05 17:26:25
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 73192
+- **Total Lines:** 73203
 - **Total Classes:** 278
-- **Total Functions:** 794
-- **Avg Complexity:** 5.61
+- **Total Functions:** 796
+- **Avg Complexity:** 5.6
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6408,7 +6408,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:214`
-**Complexity:** 8
+**Complexity:** 10
 
 **Description:**
 > Handle list-review-tools command execution.
@@ -6745,7 +6745,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:59`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:61`
 **Complexity:** 1
 
 **Description:**
@@ -6760,7 +6760,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:97`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:99`
 **Complexity:** 1
 
 **Description:**
@@ -6775,7 +6775,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:79`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:81`
 **Complexity:** 1
 
 **Description:**
@@ -16274,7 +16274,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:424`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:433`
 **Complexity:** 3
 
 **Description:**
@@ -17176,23 +17176,31 @@ Provides development utilities for maintaining the claude_skills package.
 
 ---
 
-### `register_commands(subparsers) -> None`
+### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:288`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:411`
 **Complexity:** 1
 
 **Description:**
-> Register fidelity review commands with the main CLI parser.
+> Register all fidelity review commands with the main CLI parser.
 
 This function will be called by the main SDD CLI to register
 fidelity review commands as subcommands.
 
 Args:
     subparsers: The subparser object from the main argument parser
+    parent_parser: Parent parser with global options to inherit (optional)
+
+Note:
+    Currently only registers fidelity-review command. The list-review-tools
+    command can be accessed via the standalone CLI until argparse conflict
+    is resolved:
+        python -m claude_skills.sdd_fidelity_review.cli list-review-tools
 
 **Parameters:**
 - `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
 
 ---
 
@@ -17230,6 +17238,21 @@ Args:
 
 ---
 
+### `register_fidelity_review_command(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:288`
+**Complexity:** 1
+
+**Description:**
+> Register the fidelity-review command.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
+
+---
+
 ### `register_gendocs(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -17257,6 +17280,21 @@ Args:
 **Parameters:**
 - `subparsers`: None
 - `parent_parser`: None
+
+---
+
+### `register_list_review_tools_command(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:387`
+**Complexity:** 1
+
+**Description:**
+> Register the list-review-tools command.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
 
 ---
 

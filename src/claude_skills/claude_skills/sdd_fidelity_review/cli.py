@@ -27,7 +27,7 @@ from claude_skills.common.ai_tools import (
 )
 
 
-def _handle_fidelity_review(args: argparse.Namespace) -> int:
+def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
     """
     Handle fidelity-review command execution.
 
@@ -40,6 +40,7 @@ def _handle_fidelity_review(args: argparse.Namespace) -> int:
 
     Args:
         args: Parsed command-line arguments
+        printer: Optional PrettyPrinter instance (for unified CLI compatibility)
 
     Returns:
         Exit code (0 for success, non-zero for error)
@@ -211,7 +212,7 @@ def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues
     print(json.dumps(result, indent=2))
 
 
-def _handle_list_review_tools(args: argparse.Namespace) -> int:
+def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
     """
     Handle list-review-tools command execution.
 
@@ -219,6 +220,7 @@ def _handle_list_review_tools(args: argparse.Namespace) -> int:
 
     Args:
         args: Parsed command-line arguments
+        printer: Optional PrettyPrinter instance (for unified CLI compatibility)
 
     Returns:
         Exit code (0 for success, non-zero for error)
@@ -420,14 +422,10 @@ def register_commands(subparsers: argparse._SubParsersAction, parent_parser: Opt
         parent_parser: Parent parser with global options to inherit (optional)
 
     Note:
-        Currently only registers fidelity-review command. The list-review-tools
-        command can be accessed via the standalone CLI until argparse conflict
-        is resolved:
-            python -m claude_skills.sdd_fidelity_review.cli list-review-tools
+        Registers both fidelity-review and list-review-tools commands.
     """
     register_fidelity_review_command(subparsers, parent_parser)
-    # TODO: Re-enable after resolving argparse conflict with parent_parser
-    # register_list_review_tools_command(subparsers, parent_parser)
+    register_list_review_tools_command(subparsers, parent_parser)
 
 
 def main() -> int:
