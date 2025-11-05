@@ -32,6 +32,15 @@ class FidelityVerdict(Enum):
     UNKNOWN = "unknown"
 
 
+class IssueSeverity(Enum):
+    """Severity level for identified issues."""
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    UNKNOWN = "unknown"
+
+
 @dataclass
 class ParsedReviewResponse:
     """
@@ -600,3 +609,175 @@ def detect_consensus(
         agreement_rate=agreement_rate,
         model_count=model_count
     )
+
+
+@dataclass
+class CategorizedIssue:
+    """
+    Issue with assigned severity category.
+
+    Attributes:
+        issue: The issue description
+        severity: Assigned severity level
+        keywords_matched: Keywords that triggered this severity
+    """
+    issue: str
+    severity: IssueSeverity
+    keywords_matched: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "issue": self.issue,
+            "severity": self.severity.value,
+            "keywords_matched": self.keywords_matched
+        }
+
+
+def categorize_issue_severity(issue: str) -> CategorizedIssue:
+    """
+    Categorize issue severity based on keywords and patterns.
+
+    Uses keyword matching to assign severity levels:
+    - CRITICAL: Security vulnerabilities, data loss, crashes
+    - HIGH: Incorrect behavior, spec violations, broken functionality
+    - MEDIUM: Performance issues, missing tests, code quality
+    - LOW: Style issues, documentation, minor improvements
+
+    Args:
+        issue: Issue description text
+
+    Returns:
+        CategorizedIssue with assigned severity
+
+    Example:
+        >>> issue = "SQL injection vulnerability in login form"
+        >>> categorized = categorize_issue_severity(issue)
+        >>> categorized.severity
+        <IssueSeverity.CRITICAL: 'critical'>
+        >>> categorized.keywords_matched
+        ['sql injection', 'vulnerability']
+    """
+    issue_lower = issue.lower()
+
+    # CRITICAL severity keywords
+    critical_keywords = [
+        'security', 'vulnerability', 'injection', 'xss', 'csrf',
+        'authentication bypass', 'unauthorized access', 'data loss',
+        'crash', 'segfault', 'memory leak', 'remote code execution',
+        'privilege escalation', 'buffer overflow'
+    ]
+
+    # HIGH severity keywords
+    high_keywords = [
+        'incorrect', 'wrong', 'broken', 'fails', 'failure',
+        'spec violation', 'requirement not met', 'does not match',
+        'missing required', 'critical bug', 'data corruption',
+        'logic error', 'incorrect behavior'
+    ]
+
+    # MEDIUM severity keywords
+    medium_keywords = [
+        'performance', 'slow', 'inefficient', 'optimization',
+        'missing test', 'no tests', 'untested', 'test coverage',
+        'code quality', 'maintainability', 'complexity',
+        'duplication', 'refactor', 'improvement needed'
+    ]
+
+    # LOW severity keywords
+    low_keywords = [
+        'style', 'formatting', 'naming', 'documentation',
+        'comment', 'typo', 'whitespace', 'minor',
+        'suggestion', 'consider', 'could be better'
+    ]
+
+    # Check keywords in order of severity (highest first)
+    matched_keywords = []
+
+    for keyword in critical_keywords:
+        if keyword in issue_lower:
+            matched_keywords.append(keyword)
+    if matched_keywords:
+        return CategorizedIssue(
+            issue=issue,
+            severity=IssueSeverity.CRITICAL,
+            keywords_matched=matched_keywords
+        )
+
+    for keyword in high_keywords:
+        if keyword in issue_lower:
+            matched_keywords.append(keyword)
+    if matched_keywords:
+        return CategorizedIssue(
+            issue=issue,
+            severity=IssueSeverity.HIGH,
+            keywords_matched=matched_keywords
+        )
+
+    for keyword in medium_keywords:
+        if keyword in issue_lower:
+            matched_keywords.append(keyword)
+    if matched_keywords:
+        return CategorizedIssue(
+            issue=issue,
+            severity=IssueSeverity.MEDIUM,
+            keywords_matched=matched_keywords
+        )
+
+    for keyword in low_keywords:
+        if keyword in issue_lower:
+            matched_keywords.append(keyword)
+    if matched_keywords:
+        return CategorizedIssue(
+            issue=issue,
+            severity=IssueSeverity.LOW,
+            keywords_matched=matched_keywords
+        )
+
+    # Default to MEDIUM if no keywords matched
+    return CategorizedIssue(
+        issue=issue,
+        severity=IssueSeverity.MEDIUM,
+        keywords_matched=[]
+    )
+
+
+def categorize_issues(issues: List[str]) -> List[CategorizedIssue]:
+    """
+    Categorize severity for multiple issues.
+
+    Convenience function to categorize a list of issues.
+
+    Args:
+        issues: List of issue descriptions
+
+    Returns:
+        List of CategorizedIssue objects, sorted by severity (critical first)
+
+    Example:
+        >>> issues = [
+        ...     "SQL injection in login",
+        ...     "Missing tests for auth module",
+        ...     "Typo in README"
+        ... ]
+        >>> categorized = categorize_issues(issues)
+        >>> for cat in categorized:
+        ...     print(f"{cat.severity.value}: {cat.issue}")
+        critical: SQL injection in login
+        medium: Missing tests for auth module
+        low: Typo in README
+    """
+    categorized = [categorize_issue_severity(issue) for issue in issues]
+
+    # Sort by severity (critical -> high -> medium -> low -> unknown)
+    severity_order = {
+        IssueSeverity.CRITICAL: 0,
+        IssueSeverity.HIGH: 1,
+        IssueSeverity.MEDIUM: 2,
+        IssueSeverity.LOW: 3,
+        IssueSeverity.UNKNOWN: 4
+    }
+
+    categorized.sort(key=lambda x: severity_order.get(x.severity, 99))
+
+    return categorized

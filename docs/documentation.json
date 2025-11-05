@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T21:05:24.938469Z",
+    "generated_at": "2025-11-05T21:06:34.877678Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 214,
-    "total_lines": 72149,
-    "total_classes": 274,
-    "total_functions": 786,
-    "avg_complexity": 5.58,
+    "total_lines": 72295,
+    "total_classes": 275,
+    "total_functions": 787,
+    "avg_complexity": 5.59,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 214,
-        "lines": 72149,
-        "classes": 274,
-        "functions": 786,
-        "avg_complexity": 5.58
+        "lines": 72295,
+        "classes": 275,
+        "functions": 787,
+        "avg_complexity": 5.59
       }
     }
   },
@@ -2076,14 +2076,16 @@
         "ParsedReviewResponse",
         "ConsultationError",
         "NoToolsAvailableError",
-        "ConsultationTimeoutError"
+        "ConsultationTimeoutError",
+        "ConsensusResult"
       ],
       "functions": [
         "consult_ai_on_fidelity",
         "consult_multiple_ai_on_fidelity",
         "get_consultation_summary",
         "parse_review_response",
-        "parse_multiple_responses"
+        "parse_multiple_responses",
+        "detect_consensus"
       ],
       "imports": [
         "typing.List",
@@ -2103,7 +2105,7 @@
         "claude_skills.common.ai_tools.check_tool_available"
       ],
       "exports": [],
-      "lines": 456
+      "lines": 602
     },
     {
       "name": "report",
@@ -9557,6 +9559,40 @@
       ],
       "imported_by": [],
       "instantiation_count": 1
+    },
+    {
+      "name": "ConsensusResult",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 460,
+      "language": "python",
+      "docstring": "Consensus analysis across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence in findings.\n\nAttributes:\n    consensus_verdict: Majority verdict across all responses\n    consensus_issues: Issues mentioned by 2+ models\n    consensus_recommendations: Recommendations mentioned by 2+ models\n    all_issues: All unique issues across all models\n    all_recommendations: All unique recommendations across all models\n    verdict_distribution: Count of each verdict type\n    agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)\n    model_count: Total number of models consulted",
+      "bases": [],
+      "methods": [
+        "to_dict"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "detect_consensus",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 535,
+          "context": [
+            "detect_consensus"
+          ]
+        },
+        {
+          "instantiator": "detect_consensus",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 593,
+          "context": [
+            "detect_consensus"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
     },
     {
       "name": "FidelityReport",
@@ -64345,6 +64381,135 @@
           "file": "unknown",
           "line": 456,
           "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "detect_consensus",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 500,
+      "language": "python",
+      "docstring": "Detect consensus across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence findings.\n\nArgs:\n    parsed_responses: List of ParsedReviewResponse objects\n    min_agreement: Minimum number of models that must agree (default: 2)\n    similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)\n                        Not implemented in v1, uses exact matching\n\nReturns:\n    ConsensusResult with consensus analysis\n\nAlgorithm:\n    1. Count verdict distribution and find majority verdict\n    2. Collect all issues/recommendations across models\n    3. Identify items mentioned by >= min_agreement models\n    4. Calculate agreement rate for verdict\n\nExample:\n    >>> parsed = parse_multiple_responses(responses)\n    >>> consensus = detect_consensus(parsed, min_agreement=2)\n    >>> print(f\"Consensus: {consensus.consensus_verdict.value}\")\n    >>> print(f\"Agreement: {consensus.agreement_rate:.1%}\")\n    >>> for issue in consensus.consensus_issues:\n    ...     print(f\"- {issue}\")",
+      "parameters": [
+        {
+          "name": "parsed_responses",
+          "type": "List[ParsedReviewResponse]",
+          "default": null
+        },
+        {
+          "name": "min_agreement",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "similarity_threshold",
+          "type": "float",
+          "default": null
+        }
+      ],
+      "return_type": "ConsensusResult",
+      "complexity": 13,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 540,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 545,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 550,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 559,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 566,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 566,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 567,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 572,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 574,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 575,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 582,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 582,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 583,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 588,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 590,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 591,
+          "call_type": "method_call"
         }
       ]
     },

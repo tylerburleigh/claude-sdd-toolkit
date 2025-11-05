@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:05:24
+**Generated:** 2025-11-05 16:06:34
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72149
-- **Total Classes:** 274
-- **Total Functions:** 786
-- **Avg Complexity:** 5.58
+- **Total Lines:** 72295
+- **Total Classes:** 275
+- **Total Functions:** 787
+- **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -348,6 +348,32 @@ Example:
 - `score_all_tasks()`
 - `get_high_complexity_tasks()`
 - `get_complexity_stats()`
+
+---
+
+### `ConsensusResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:460`
+
+**Description:**
+> Consensus analysis across multiple AI review responses.
+
+Identifies issues and recommendations where multiple models agree,
+providing higher confidence in findings.
+
+Attributes:
+    consensus_verdict: Majority verdict across all responses
+    consensus_issues: Issues mentioned by 2+ models
+    consensus_recommendations: Recommendations mentioned by 2+ models
+    all_issues: All unique issues across all models
+    all_recommendations: All unique recommendations across all models
+    verdict_distribution: Count of each verdict type
+    agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)
+    model_count: Total number of models consulted
+
+**Methods:**
+- `to_dict()`
 
 ---
 
@@ -10649,6 +10675,48 @@ Uses check_tool_available() from common.ai_tools for detection.
 
 Returns:
     List of available tool names (gemini, codex, cursor-agent)
+
+---
+
+### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:500`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Detect consensus across multiple AI review responses.
+
+Identifies issues and recommendations where multiple models agree,
+providing higher confidence findings.
+
+Args:
+    parsed_responses: List of ParsedReviewResponse objects
+    min_agreement: Minimum number of models that must agree (default: 2)
+    similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)
+                        Not implemented in v1, uses exact matching
+
+Returns:
+    ConsensusResult with consensus analysis
+
+Algorithm:
+    1. Count verdict distribution and find majority verdict
+    2. Collect all issues/recommendations across models
+    3. Identify items mentioned by >= min_agreement models
+    4. Calculate agreement rate for verdict
+
+Example:
+    >>> parsed = parse_multiple_responses(responses)
+    >>> consensus = detect_consensus(parsed, min_agreement=2)
+    >>> print(f"Consensus: {consensus.consensus_verdict.value}")
+    >>> print(f"Agreement: {consensus.agreement_rate:.1%}")
+    >>> for issue in consensus.consensus_issues:
+    ...     print(f"- {issue}")
+
+**Parameters:**
+- `parsed_responses`: List[ParsedReviewResponse]
+- `min_agreement`: int
+- `similarity_threshold`: float
 
 ---
 
