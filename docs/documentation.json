@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T13:18:47.065754Z",
+    "generated_at": "2025-11-05T13:38:22.774857Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 209,
-    "total_lines": 70286,
-    "total_classes": 264,
+    "total_files": 210,
+    "total_lines": 70532,
+    "total_classes": 267,
     "total_functions": 788,
     "avg_complexity": 5.59,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 209,
-        "lines": 70286,
-        "classes": 264,
+        "files": 210,
+        "lines": 70532,
+        "classes": 267,
         "functions": 788,
         "avg_complexity": 5.59
       }
@@ -863,6 +863,27 @@
       ],
       "exports": [],
       "lines": 249
+    },
+    {
+      "name": "ai_tools",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "language": "python",
+      "docstring": "AI Tool Consultation Interfaces\n\nStandardized interfaces for interacting with external AI CLI tools (gemini, codex,\ncursor-agent). Provides type-safe dataclasses, unified API, and comprehensive\nerror handling.\n\nSee docs/AI_TOOL_INTERFACES_DESIGN.md for complete design documentation.",
+      "classes": [
+        "ToolStatus",
+        "ToolResponse",
+        "MultiToolResponse"
+      ],
+      "functions": [],
+      "imports": [
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "typing.Optional",
+        "datetime.datetime",
+        "enum.Enum"
+      ],
+      "exports": [],
+      "lines": 246
     },
     {
       "name": "completion",
@@ -7215,6 +7236,76 @@
       ],
       "imported_by": [],
       "instantiation_count": 12
+    },
+    {
+      "name": "ToolStatus",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 17,
+      "language": "python",
+      "docstring": "Status of AI tool execution.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "from_dict",
+          "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+          "line": 115,
+          "context": [
+            "ToolResponse",
+            "from_dict"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ToolResponse",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Standardized response from AI tool consultation.\n\nThis is the core response type used throughout the toolkit for\nall AI tool interactions.\n\nAttributes:\n    tool: Name of the tool (gemini, codex, cursor-agent)\n    status: Execution status (success, timeout, error, etc.)\n    output: Raw output from the tool (stdout)\n    error: Error message if any (stderr or exception message)\n    duration: Execution time in seconds\n    timestamp: When the consultation started (ISO format)\n    model: Model used by the tool (if applicable)\n    prompt: The prompt sent to the tool (optional, for debugging)\n    exit_code: Process exit code (None if didn't run)\n    metadata: Additional tool-specific metadata\n\nExample:\n    >>> response = ToolResponse(\n    ...     tool=\"gemini\",\n    ...     status=ToolStatus.SUCCESS,\n    ...     output=\"Analysis complete\",\n    ...     duration=2.5\n    ... )\n    >>> response.success\n    True\n    >>> response.to_dict()\n    {...}",
+      "bases": [],
+      "methods": [
+        "to_dict",
+        "from_dict"
+      ],
+      "properties": [
+        "success",
+        "failed"
+      ],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "MultiToolResponse",
+      "file": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "line": 120,
+      "language": "python",
+      "docstring": "Response from multiple tool consultations run in parallel.\n\nAttributes:\n    responses: Dictionary mapping tool names to their responses\n    synthesis: Optional synthesis/consensus from all responses\n    total_duration: Total wall-clock time (parallel execution)\n    max_duration: Longest individual tool duration\n    success_count: Number of successful tool calls\n    failure_count: Number of failed tool calls\n    timestamp: When the multi-tool consultation started\n    failure_type: Optional failure type that triggered consultation\n\nExample:\n    >>> responses = {\n    ...     \"gemini\": ToolResponse(tool=\"gemini\", status=ToolStatus.SUCCESS),\n    ...     \"codex\": ToolResponse(tool=\"codex\", status=ToolStatus.ERROR)\n    ... }\n    >>> multi = MultiToolResponse(\n    ...     responses=responses,\n    ...     success_count=1,\n    ...     failure_count=1\n    ... )\n    >>> multi.success\n    True\n    >>> successful = multi.get_successful_responses()\n    >>> len(successful)\n    1",
+      "bases": [],
+      "methods": [
+        "get_successful_responses",
+        "get_failed_responses",
+        "to_dict",
+        "from_dict"
+      ],
+      "properties": [
+        "success",
+        "all_failed",
+        "all_succeeded"
+      ],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "DependencyAnalysis",
@@ -108898,6 +108989,13 @@
       "typing.Dict",
       "typing.List",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/common/ai_tools.py": [
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "typing.Optional",
+      "datetime.datetime",
+      "enum.Enum"
     ],
     "src/claude_skills/claude_skills/common/completion.py": [
       "typing.Dict",

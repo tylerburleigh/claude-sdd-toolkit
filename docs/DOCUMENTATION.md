@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 08:18:47
+**Generated:** 2025-11-05 08:38:22
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 209
-- **Total Lines:** 70286
-- **Total Classes:** 264
+- **Total Files:** 210
+- **Total Lines:** 70532
+- **Total Classes:** 267
 - **Total Functions:** 788
 - **Avg Complexity:** 5.59
 - **Max Complexity:** 45
@@ -1240,6 +1240,53 @@ Example:
 - `_parse_task()`
 - `_parse_verifications()`
 - `_parse_verification()`
+
+---
+
+### `MultiToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:120`
+
+**Description:**
+> Response from multiple tool consultations run in parallel.
+
+Attributes:
+    responses: Dictionary mapping tool names to their responses
+    synthesis: Optional synthesis/consensus from all responses
+    total_duration: Total wall-clock time (parallel execution)
+    max_duration: Longest individual tool duration
+    success_count: Number of successful tool calls
+    failure_count: Number of failed tool calls
+    timestamp: When the multi-tool consultation started
+    failure_type: Optional failure type that triggered consultation
+
+Example:
+    >>> responses = {
+    ...     "gemini": ToolResponse(tool="gemini", status=ToolStatus.SUCCESS),
+    ...     "codex": ToolResponse(tool="codex", status=ToolStatus.ERROR)
+    ... }
+    >>> multi = MultiToolResponse(
+    ...     responses=responses,
+    ...     success_count=1,
+    ...     failure_count=1
+    ... )
+    >>> multi.success
+    True
+    >>> successful = multi.get_successful_responses()
+    >>> len(successful)
+    1
+
+**Methods:**
+- `get_successful_responses()`
+- `get_failed_responses()`
+- `to_dict()`
+- `from_dict()`
+
+**Properties:**
+- `success`
+- `all_failed`
+- `all_succeeded`
 
 ---
 
@@ -5091,6 +5138,62 @@ Attributes:
 
 **Properties:**
 - `context_percentage`
+
+---
+
+### `ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:27`
+
+**Description:**
+> Standardized response from AI tool consultation.
+
+This is the core response type used throughout the toolkit for
+all AI tool interactions.
+
+Attributes:
+    tool: Name of the tool (gemini, codex, cursor-agent)
+    status: Execution status (success, timeout, error, etc.)
+    output: Raw output from the tool (stdout)
+    error: Error message if any (stderr or exception message)
+    duration: Execution time in seconds
+    timestamp: When the consultation started (ISO format)
+    model: Model used by the tool (if applicable)
+    prompt: The prompt sent to the tool (optional, for debugging)
+    exit_code: Process exit code (None if didn't run)
+    metadata: Additional tool-specific metadata
+
+Example:
+    >>> response = ToolResponse(
+    ...     tool="gemini",
+    ...     status=ToolStatus.SUCCESS,
+    ...     output="Analysis complete",
+    ...     duration=2.5
+    ... )
+    >>> response.success
+    True
+    >>> response.to_dict()
+    {...}
+
+**Methods:**
+- `to_dict()`
+- `from_dict()`
+
+**Properties:**
+- `success`
+- `failed`
+
+---
+
+### `ToolStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:17`
+
+**Description:**
+> Status of AI tool execution.
 
 ---
 
@@ -20693,6 +20796,14 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `yaml`
+
+### `src/claude_skills/claude_skills/common/ai_tools.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `enum.Enum`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
 

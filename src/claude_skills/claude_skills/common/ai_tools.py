@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
 from enum import Enum
+import shutil
+import subprocess
 
 
 class ToolStatus(Enum):
@@ -238,9 +240,99 @@ class MultiToolResponse:
         return cls(**data)
 
 
+# =============================================================================
+# TOOL AVAILABILITY FUNCTIONS
+# =============================================================================
+
+
+def check_tool_available(
+    tool: str,
+    *,
+    check_version: bool = False,
+    timeout: int = 5
+) -> bool:
+    """
+    Check if a tool is available and optionally working.
+
+    Uses shutil.which() for fast PATH lookup. Optionally verifies tool
+    responds to --version flag.
+
+    Args:
+        tool: Tool name to check (e.g., "gemini", "codex", "cursor-agent")
+        check_version: If True, verify tool responds to --version
+        timeout: Timeout in seconds for version check (default 5)
+
+    Returns:
+        True if tool is available (and working if check_version=True)
+
+    Example:
+        >>> check_tool_available("gemini")
+        True
+        >>> check_tool_available("nonexistent")
+        False
+        >>> check_tool_available("gemini", check_version=True)
+        True
+    """
+    # Quick PATH check
+    if not shutil.which(tool):
+        return False
+
+    # Optional version check
+    if check_version:
+        try:
+            result = subprocess.run(
+                [tool, "--version"],
+                capture_output=True,
+                timeout=timeout,
+                check=False
+            )
+            return result.returncode == 0
+        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+            return False
+
+    return True
+
+
+def detect_available_tools(
+    tools: Optional[list[str]] = None,
+    *,
+    check_version: bool = False
+) -> list[str]:
+    """
+    Detect which AI tools are available in PATH.
+
+    Args:
+        tools: Optional list of tool names to check. If None, checks
+            default tools: ["gemini", "codex", "cursor-agent"]
+        check_version: If True, verify each tool responds to --version
+
+    Returns:
+        List of available tool names (empty if none found)
+
+    Example:
+        >>> detect_available_tools()
+        ['gemini', 'codex']
+        >>> detect_available_tools(["gemini", "nonexistent"])
+        ['gemini']
+        >>> detect_available_tools(check_version=True)
+        ['gemini']
+    """
+    if tools is None:
+        tools = ["gemini", "codex", "cursor-agent"]
+
+    available = []
+    for tool in tools:
+        if check_tool_available(tool, check_version=check_version):
+            available.append(tool)
+
+    return available
+
+
 # Export public API
 __all__ = [
     "ToolStatus",
     "ToolResponse",
     "MultiToolResponse",
+    "check_tool_available",
+    "detect_available_tools",
 ]
