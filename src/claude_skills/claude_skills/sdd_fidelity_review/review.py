@@ -795,3 +795,123 @@ class FidelityReviewer:
             List of journal entries for this task
         """
         return self.get_journal_entries(task_id=task_id, include_internal=False)
+
+    def generate_review_prompt(
+        self,
+        task_id: Optional[str] = None,
+        phase_id: Optional[str] = None,
+        file_paths: Optional[List[str]] = None,
+        include_tests: bool = True,
+        base_branch: str = "main"
+    ) -> str:
+        """
+        Generate AI review prompt comparing implementation against specification.
+
+        This method will be implemented in task-3-7 according to the template
+        structure defined below.
+
+        Args:
+            task_id: Optional task ID to review
+            phase_id: Optional phase ID to review
+            file_paths: Optional list of specific files to review
+            include_tests: Include test results in prompt (default: True)
+            base_branch: Base branch for git diff (default: "main")
+
+        Returns:
+            Formatted prompt string ready for AI reviewer
+
+        Template Structure:
+        ------------------
+
+        The prompt follows this structure with clear sections:
+
+        1. CONTEXT SECTION
+           - Spec overview (spec_id, title, description)
+           - Review scope (task/phase/files)
+           - Success criteria from spec
+
+        2. SPECIFICATION REQUIREMENTS
+           - Task/phase requirements from spec JSON
+           - Expected behavior and outcomes
+           - Verification steps defined in spec
+           - Dependencies and constraints
+
+        3. IMPLEMENTATION ARTIFACTS
+           - Git diffs showing actual changes
+           - File paths and modifications
+           - Code snippets (if needed)
+
+        4. TEST RESULTS (if include_tests=True)
+           - Test execution summary (passed/failed/skipped)
+           - Failed test details with tracebacks
+           - Coverage information (if available)
+
+        5. JOURNAL ENTRIES
+           - Relevant journal entries for context
+           - Decisions and deviations documented
+           - Implementation notes from developer
+
+        6. REVIEW QUESTIONS
+           - Does implementation match spec requirements?
+           - Are all verification steps satisfied?
+           - Are there any deviations? If so, are they justified?
+           - Are tests comprehensive and passing?
+           - Are there any quality or maintainability concerns?
+
+        Data Flow:
+        ----------
+        - Spec requirements: get_task_requirements() / get_phase_tasks()
+        - Git diffs: get_task_diffs() / get_branch_diff()
+        - Test results: get_task_test_results() / get_test_results()
+        - Journal entries: get_task_journals() / get_journal_entries()
+
+        Format Notes:
+        -------------
+        - Use markdown formatting for readability
+        - Include code blocks with syntax highlighting
+        - Separate sections with clear headers
+        - Keep diffs focused (truncate if too large)
+        - Highlight critical information (failures, deviations)
+
+        Example Output Structure:
+        -------------------------
+
+        # Implementation Fidelity Review
+
+        ## Context
+        **Spec:** {spec_id} - {title}
+        **Scope:** Task {task_id} - {task_title}
+        **File:** {file_path}
+
+        ## Specification Requirements
+        **Objective:** {description}
+        **Success Criteria:**
+        - {verification_step_1}
+        - {verification_step_2}
+
+        ## Implementation Artifacts
+        ### Git Diff
+        ```diff
+        {git_diff_output}
+        ```
+
+        ## Test Results
+        **Status:** {passed}/{total} tests passed
+        **Failed Tests:**
+        - {test_name}: {failure_message}
+
+        ## Journal Entries
+        - {timestamp} - {title}: {content}
+
+        ## Review Questions
+        1. Does the implementation match spec requirements?
+        2. Are all verification steps satisfied?
+        3. Are there any deviations from the spec?
+        4. Are tests comprehensive and passing?
+        5. Are there quality or maintainability concerns?
+
+        ---
+
+        Note: Implementation for this method will be added in task-3-7.
+        """
+        raise NotImplementedError("Prompt generation will be implemented in task-3-7")

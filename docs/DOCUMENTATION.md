@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:35:11
+**Generated:** 2025-11-05 15:57:00
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 213
-- **Total Lines:** 71287
+- **Total Lines:** 71350
 - **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
@@ -805,6 +805,8 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `_run_and_parse_tests()`
 - `_parse_junit_xml()`
 - `get_task_test_results()`
+- `get_journal_entries()`
+- `get_task_journals()`
 
 ---
 

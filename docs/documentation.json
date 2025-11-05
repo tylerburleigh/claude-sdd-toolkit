@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:35:11.042644Z",
+    "generated_at": "2025-11-05T20:57:00.263508Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 213,
-    "total_lines": 71287,
+    "total_lines": 71350,
     "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 213,
-        "lines": 71287,
+        "lines": 71350,
         "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
@@ -2109,7 +2109,7 @@
         "claude_skills.common.git_metadata.find_git_root"
       ],
       "exports": [],
-      "lines": 734
+      "lines": 797
     },
     {
       "name": "__init__",
@@ -9398,7 +9398,9 @@
         "get_test_results",
         "_run_and_parse_tests",
         "_parse_junit_xml",
-        "get_task_test_results"
+        "get_task_test_results",
+        "get_journal_entries",
+        "get_task_journals"
       ],
       "properties": [],
       "is_exported": false,
@@ -38887,6 +38889,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_journals",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 797,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -39105,7 +39113,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 8
+      "call_count": 9
     },
     {
       "name": "get_task_journal",
@@ -75211,6 +75219,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_journals",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 797,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -75273,7 +75287,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 8
+      "call_count": 9
     },
     {
       "name": "get_completed_tasks",
