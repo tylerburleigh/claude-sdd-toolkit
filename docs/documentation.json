@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:57:00.263508Z",
+    "generated_at": "2025-11-05T20:58:34.033269Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 213,
-    "total_lines": 71350,
+    "total_lines": 71470,
     "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 213,
-        "lines": 71350,
+        "lines": 71470,
         "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
@@ -2109,7 +2109,7 @@
         "claude_skills.common.git_metadata.find_git_root"
       ],
       "exports": [],
-      "lines": 797
+      "lines": 917
     },
     {
       "name": "__init__",
@@ -9400,7 +9400,8 @@
         "_parse_junit_xml",
         "get_task_test_results",
         "get_journal_entries",
-        "get_task_journals"
+        "get_task_journals",
+        "generate_review_prompt"
       ],
       "properties": [],
       "is_exported": false,

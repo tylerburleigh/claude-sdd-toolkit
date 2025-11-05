@@ -914,4 +914,227 @@ class FidelityReviewer:
 
         Note: Implementation for this method will be added in task-3-7.
         """
-        raise NotImplementedError("Prompt generation will be implemented in task-3-7")
+        if self.spec_data is None:
+            return "Error: Specification not loaded"
+
+        # Determine review scope
+        scope_description = ""
+        requirements_list = []
+
+        if task_id:
+            # Single task review
+            task_reqs = self.get_task_requirements(task_id)
+            if not task_reqs:
+                return f"Error: Task {task_id} not found"
+            requirements_list = [task_reqs]
+            scope_description = f"Task {task_id} - {task_reqs['title']}"
+        elif phase_id:
+            # Phase review
+            phase_tasks = self.get_phase_tasks(phase_id)
+            if not phase_tasks:
+                return f"Error: Phase {phase_id} not found"
+            requirements_list = phase_tasks
+            phase_node = get_node(self.spec_data, phase_id)
+            phase_title = phase_node.get("title", "") if phase_node else ""
+            scope_description = f"Phase {phase_id} - {phase_title}"
+        elif file_paths:
+            # File-based review
+            scope_description = f"Files: {', '.join(file_paths)}"
+            # Note: File-based review doesn't have specific task requirements
+        else:
+            # Full spec review
+            requirements_list = self.get_all_tasks() or []
+            scope_description = "Full Specification"
+
+        # Build prompt sections
+        prompt_parts = []
+
+        # 1. CONTEXT SECTION
+        prompt_parts.append("# Implementation Fidelity Review\n")
+        prompt_parts.append("## Context\n")
+        prompt_parts.append(f"**Spec ID:** {self.spec_id}\n")
+
+        spec_title = self.spec_data.get("title", "Untitled")
+        prompt_parts.append(f"**Spec Title:** {spec_title}\n")
+
+        spec_description = self.spec_data.get("description", "")
+        if spec_description:
+            prompt_parts.append(f"**Description:** {spec_description}\n")
+
+        prompt_parts.append(f"**Review Scope:** {scope_description}\n\n")
+
+        # 2. SPECIFICATION REQUIREMENTS
+        if requirements_list:
+            prompt_parts.append("## Specification Requirements\n\n")
+
+            for req in requirements_list:
+                prompt_parts.append(f"### {req['task_id']}: {req['title']}\n\n")
+
+                if req.get('description'):
+                    prompt_parts.append(f"**Objective:** {req['description']}\n\n")
+
+                if req.get('file_path'):
+                    prompt_parts.append(f"**File:** `{req['file_path']}`\n\n")
+
+                verification_steps = req.get('verification_steps', [])
+                if verification_steps:
+                    prompt_parts.append("**Success Criteria:**\n")
+                    for step in verification_steps:
+                        prompt_parts.append(f"- {step}\n")
+                    prompt_parts.append("\n")
+
+                dependencies = req.get('dependencies', {})
+                blocked_by = dependencies.get('blocked_by', [])
+                if blocked_by:
+                    prompt_parts.append(f"**Dependencies:** {', '.join(blocked_by)}\n\n")
+
+        # 3. IMPLEMENTATION ARTIFACTS
+        prompt_parts.append("## Implementation Artifacts\n\n")
+
+        if task_id:
+            # Get diffs for specific task
+            task_diffs = self.get_task_diffs(task_id)
+            if task_diffs:
+                for file_path, diff_content in task_diffs.items():
+                    if diff_content:
+                        prompt_parts.append(f"### File: `{file_path}`\n\n")
+                        prompt_parts.append("```diff\n")
+                        prompt_parts.append(diff_content)
+                        prompt_parts.append("\n```\n\n")
+                    else:
+                        prompt_parts.append(f"### File: `{file_path}`\n\n")
+                        prompt_parts.append("*No changes detected*\n\n")
+            else:
+                prompt_parts.append("*No git diff available*\n\n")
+        elif phase_id:
+            # Get diffs for entire phase
+            phase_diffs = self.get_phase_diffs(phase_id)
+            if phase_diffs:
+                for tid, file_diffs in phase_diffs.items():
+                    prompt_parts.append(f"### Task: {tid}\n\n")
+                    for file_path, diff_content in file_diffs.items():
+                        if diff_content:
+                            prompt_parts.append(f"**File:** `{file_path}`\n\n")
+                            prompt_parts.append("```diff\n")
+                            # Truncate large diffs
+                            if len(diff_content) > 5000:
+                                prompt_parts.append(diff_content[:5000])
+                                prompt_parts.append("\n... (truncated)\n")
+                            else:
+                                prompt_parts.append(diff_content)
+                            prompt_parts.append("\n```\n\n")
+            else:
+                prompt_parts.append("*No git diffs available*\n\n")
+        elif file_paths:
+            # Get diffs for specific files
+            for file_path in file_paths:
+                diff_content = self.get_file_diff(file_path)
+                if diff_content:
+                    prompt_parts.append(f"### File: `{file_path}`\n\n")
+                    prompt_parts.append("```diff\n")
+                    prompt_parts.append(diff_content)
+                    prompt_parts.append("\n```\n\n")
+                else:
+                    prompt_parts.append(f"### File: `{file_path}`\n\n")
+                    prompt_parts.append("*No changes detected*\n\n")
+        else:
+            # Full spec - get branch diff
+            branch_diff = self.get_branch_diff(base_branch)
+            if branch_diff:
+                prompt_parts.append("### Full Branch Diff\n\n")
+                prompt_parts.append("```diff\n")
+                prompt_parts.append(branch_diff)
+                prompt_parts.append("\n```\n\n")
+            else:
+                prompt_parts.append("*No git diff available*\n\n")
+
+        # 4. TEST RESULTS
+        if include_tests:
+            prompt_parts.append("## Test Results\n\n")
+
+            test_results = None
+            if task_id:
+                test_results = self.get_task_test_results(task_id)
+
+            if test_results:
+                total = test_results.get('total', 0)
+                passed = test_results.get('passed', 0)
+                failed = test_results.get('failed', 0)
+                errors = test_results.get('errors', 0)
+                skipped = test_results.get('skipped', 0)
+                duration = test_results.get('duration', 0.0)
+
+                prompt_parts.append(f"**Status:** {passed}/{total} tests passed\n")
+                prompt_parts.append(f"**Duration:** {duration:.2f}s\n")
+
+                if failed > 0 or errors > 0:
+                    prompt_parts.append(f"**Failed:** {failed}, **Errors:** {errors}\n\n")
+
+                    # Show failed test details
+                    prompt_parts.append("**Failed Tests:**\n")
+                    tests = test_results.get('tests', {})
+                    for test_name, test_data in tests.items():
+                        if test_data['status'] in ['failed', 'error']:
+                            prompt_parts.append(f"\n- **{test_name}**\n")
+                            message = test_data.get('message', '')
+                            if message:
+                                prompt_parts.append(f"  - Message: {message}\n")
+                            traceback = test_data.get('traceback')
+                            if traceback:
+                                prompt_parts.append(f"  - Traceback:\n```\n{traceback}\n```\n")
+                else:
+                    prompt_parts.append("\n*All tests passed!*\n")
+
+                if skipped > 0:
+                    prompt_parts.append(f"\n**Skipped:** {skipped} tests\n")
+
+                prompt_parts.append("\n")
+            else:
+                prompt_parts.append("*No test results available*\n\n")
+
+        # 5. JOURNAL ENTRIES
+        prompt_parts.append("## Journal Entries\n\n")
+
+        journal_entries = []
+        if task_id:
+            journal_entries = self.get_task_journals(task_id)
+        elif phase_id:
+            # Get all journals, filter by phase tasks later if needed
+            journal_entries = self.get_journal_entries()
+        else:
+            journal_entries = self.get_journal_entries()
+
+        if journal_entries:
+            for entry in journal_entries:
+                timestamp = entry.get('timestamp', '')
+                title = entry.get('title', '')
+                content = entry.get('content', '')
+                entry_task_id = entry.get('task_id', '')
+
+                if entry_task_id:
+                    prompt_parts.append(f"**[{timestamp}] {title}** (Task: {entry_task_id})\n")
+                else:
+                    prompt_parts.append(f"**[{timestamp}] {title}**\n")
+
+                if content:
+                    prompt_parts.append(f"{content}\n\n")
+        else:
+            prompt_parts.append("*No journal entries found*\n\n")
+
+        # 6. REVIEW QUESTIONS
+        prompt_parts.append("## Review Questions\n\n")
+        prompt_parts.append("Please evaluate the implementation against the specification:\n\n")
+        prompt_parts.append("1. **Requirement Alignment:** Does the implementation match the spec requirements?\n")
+        prompt_parts.append("2. **Success Criteria:** Are all verification steps satisfied?\n")
+        prompt_parts.append("3. **Deviations:** Are there any deviations from the spec? If so, are they justified?\n")
+
+        if include_tests:
+            prompt_parts.append("4. **Test Coverage:** Are tests comprehensive and passing?\n")
+
+        prompt_parts.append("5. **Code Quality:** Are there any quality, maintainability, or security concerns?\n")
+        prompt_parts.append("6. **Documentation:** Is the implementation properly documented?\n\n")
+
+        prompt_parts.append("---\n")
+        prompt_parts.append("\n*Please provide a detailed review addressing each question above.*\n")
+
+        return "".join(prompt_parts)

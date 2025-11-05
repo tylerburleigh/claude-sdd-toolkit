@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 15:57:00
+**Generated:** 2025-11-05 15:58:34
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 213
-- **Total Lines:** 71350
+- **Total Lines:** 71470
 - **Total Classes:** 269
 - **Total Functions:** 781
 - **Avg Complexity:** 5.57
@@ -807,6 +807,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `get_task_test_results()`
 - `get_journal_entries()`
 - `get_task_journals()`
+- `generate_review_prompt()`
 
 ---
 
