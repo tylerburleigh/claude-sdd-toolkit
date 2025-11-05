@@ -14,7 +14,7 @@ from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
-from claude_skills.common.ai_tools import detect_available_tools
+from claude_skills.common.ai_tools import detect_available_tools, build_tool_command
 
 # =============================================================================
 # CONFIGURATION
@@ -380,11 +380,11 @@ def run_consultation(
     Returns:
         Tuple of (success: bool, output: str)
     """
-    if tool not in TOOL_COMMANDS:
-        return False, f"Unknown tool: {tool}"
-
-    cmd = TOOL_COMMANDS[tool].copy()
-    cmd.append(prompt)
+    # Use shared utility to build command
+    try:
+        cmd = build_tool_command(tool, prompt)
+    except ValueError as e:
+        return False, str(e)
 
     if dry_run:
         msg = f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>"
