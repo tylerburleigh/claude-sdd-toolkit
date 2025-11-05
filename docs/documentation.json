@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T20:58:34.033269Z",
+    "generated_at": "2025-11-05T21:00:10.450738Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 213,
-    "total_lines": 71470,
+    "total_lines": 71693,
     "total_classes": 269,
     "total_functions": 781,
     "avg_complexity": 5.57,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 213,
-        "lines": 71470,
+        "lines": 71693,
         "classes": 269,
         "functions": 781,
         "avg_complexity": 5.57
@@ -2109,7 +2109,7 @@
         "claude_skills.common.git_metadata.find_git_root"
       ],
       "exports": [],
-      "lines": 917
+      "lines": 1140
     },
     {
       "name": "__init__",
@@ -38896,6 +38896,18 @@
           "call_type": "method_call"
         },
         {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1105,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -39114,7 +39126,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 9
+      "call_count": 11
     },
     {
       "name": "get_task_journal",
@@ -42269,6 +42281,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 937,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
           "line": 181,
@@ -42319,7 +42337,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 9
+      "call_count": 10
     },
     {
       "name": "update_node",
@@ -75226,6 +75244,18 @@
           "call_type": "method_call"
         },
         {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1105,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -75288,7 +75318,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 9
+      "call_count": 11
     },
     {
       "name": "get_completed_tasks",
