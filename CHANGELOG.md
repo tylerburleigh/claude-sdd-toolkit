@@ -4,6 +4,54 @@ All notable changes to the SDD Toolkit will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
 
+## [0.4.5] - 2025-11-05
+
+### Added
+- **AI Tools Infrastructure** - Unified `ai_tools` module for consistent AI CLI interactions
+  - `execute_tool()` - Single AI tool consultation with structured responses
+  - `execute_tools_parallel()` - Multi-agent parallel execution using ThreadPoolExecutor
+  - `check_tool_available()` / `detect_available_tools()` - Tool availability detection
+  - `build_tool_command()` - Tool-specific command construction
+  - `ToolResponse` / `MultiToolResponse` - Immutable response dataclasses with type safety
+- **AI Configuration Module** - Centralized `ai_config` module for tool detection and configuration
+- **Comprehensive API Documentation** - `docs/API_AI_TOOLS.md` (1,038 lines) with complete API reference
+- **Integration Tests** - 44 new tests for AI tools with mock CLI tools
+- **Unit Tests** - 27 new tests for core AI tools functions
+- **End-to-End Tests** - 21 tests for run-tests AI consultation workflow
+- **sdd-plan-review Tests** - 15 integration tests for multi-model review
+
+### Changed
+- **run-tests skill** - Migrated to use shared `ai_tools` infrastructure
+  - Replaced custom tool checking with `check_tool_available()`
+  - Migrated `run_consultation()` to `execute_tool()`
+  - Migrated `consult_multi_agent()` to `execute_tools_parallel()`
+- **sdd-plan-review skill** - Refactored to use `execute_tools_parallel()` for parallel reviews
+- **code-doc skill** - Updated AI consultation to use shared infrastructure
+
+### Removed
+- **tool_checking.py** - Removed 396 lines of duplicated tool checking code from run-tests
+- **Obsolete test files** - Removed 4 outdated test files (422 lines) for old module structures
+
+### Fixed
+- **Test isolation** - Fixed shallow copy bug in `sdd_config.py` causing test pollution
+- **Test mocking** - Fixed incorrect patch decorators in `test_sdd_config.py`
+
+### Performance
+- **Parallel execution** - Tools run concurrently (time = slowest tool, not sum)
+- **Proper timeout handling** - 90s default with configurable timeouts
+- **Efficient resource management** - ThreadPoolExecutor with proper cleanup
+
+### Documentation
+- Created comprehensive API documentation at `docs/API_AI_TOOLS.md`
+- Documented all functions, dataclasses, and usage patterns
+- Included error handling guidance and best practices
+
+### Notes
+- All 139 tests passing (5 skipped)
+- No performance regressions detected
+- Backwards compatible - no breaking changes to existing skill CLIs
+- Net change: +6,154 insertions, -4,173 deletions across 24 files
+
 ## [0.4.2] - 2025-11-04
 
 ### Added
