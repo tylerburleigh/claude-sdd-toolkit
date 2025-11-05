@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 13:45:40
+**Generated:** 2025-11-05 13:46:42
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 210
-- **Total Lines:** 70406
+- **Total Files:** 211
+- **Total Lines:** 70467
 - **Total Classes:** 267
-- **Total Functions:** 779
-- **Avg Complexity:** 5.58
+- **Total Functions:** 781
+- **Avg Complexity:** 5.57
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -15725,6 +15725,20 @@ Returns:
 
 ---
 
+### `main() -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:29`
+**Complexity:** 2
+
+**Description:**
+> Main entry point for standalone CLI execution.
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+---
+
 ### `main() -> None`
 
 **Language:** python
@@ -16555,6 +16569,29 @@ Provides development utilities for maintaining the claude_skills package.
 **Parameters:**
 - `subparsers`: argparse._SubParsersAction
 - `parent_parser`: argparse.ArgumentParser
+
+---
+
+### `register_commands(subparsers) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:12`
+**Complexity:** 1
+
+**Description:**
+> Register fidelity review commands with the main CLI parser.
+
+This function will be called by the main SDD CLI to register
+fidelity review commands as subcommands.
+
+Args:
+    subparsers: The subparser object from the main argument parser
+
+Note:
+    Implementation will be added in Phase 5 (CLI Integration).
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
 
 ---
 
@@ -21242,6 +21279,11 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
+
+- `argparse`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`
 
