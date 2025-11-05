@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-04 07:46:42
+**Generated:** 2025-11-05 08:18:47
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 209
-- **Total Lines:** 70079
+- **Total Lines:** 70286
 - **Total Classes:** 264
-- **Total Functions:** 786
-- **Avg Complexity:** 5.58
+- **Total Functions:** 788
+- **Avg Complexity:** 5.59
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6473,6 +6473,38 @@ Returns:
 
 ---
 
+### `_setup_interactive(args, printer, git_config_file) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:330`
+**Complexity:** 8
+
+**Description:**
+> Set up git config in interactive mode using wizard.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+- `git_config_file`: Path
+
+---
+
+### `_setup_non_interactive(args, printer, git_config_file) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:265`
+**Complexity:** 4
+
+**Description:**
+> Set up git config in non-interactive mode using CLI flags or defaults.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+- `git_config_file`: Path
+
+---
+
 ### `_should_exclude_path(file_path, exclude_patterns) -> bool`
 
 **Language:** python
@@ -6650,17 +6682,22 @@ Returns:
 
 ---
 
-### `add_global_options(parser) -> None`
+### `add_global_options(parser, config) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:20`
-**Complexity:** 1
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:23`
+**Complexity:** 2
 
 **Description:**
 > Add global options available to all commands.
 
+Args:
+    parser: ArgumentParser instance to add options to
+    config: Optional config dict with defaults (loaded from sdd_config.json)
+
 **Parameters:**
 - `parser`: None
+- `config`: None
 
 ---
 
@@ -6735,7 +6772,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:85`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:126`
 **Complexity:** 1
 
 **Description:**
@@ -6749,7 +6786,7 @@ Returns:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:93`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:134`
 **Complexity:** 1
 
 **Description:**
@@ -7086,11 +7123,14 @@ Returns:
 ### `ask_choice(question, choices, default) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:174`
-**Complexity:** 6
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:185`
+**Complexity:** 8
 
 **Description:**
 > Ask a multiple choice question.
+
+Raises:
+    EOFError: If input is not available (non-interactive context)
 
 **Parameters:**
 - `question`: str
@@ -7103,10 +7143,13 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:163`
-**Complexity:** 2
+**Complexity:** 4
 
 **Description:**
 > Ask a yes/no question and return boolean answer.
+
+Raises:
+    EOFError: If input is not available (non-interactive context)
 
 **Parameters:**
 - `question`: str
@@ -9266,11 +9309,13 @@ Args:
 ### `cmd_setup_git_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:197`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:219`
+**Complexity:** 8
 
 **Description:**
 > Interactive git configuration wizard.
+
+Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Parameters:**
 - `args`: None
@@ -10023,7 +10068,7 @@ Returns:
 
 ---
 
-### `create_global_parent_parser() -> None`
+### `create_global_parent_parser(config) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:5`
@@ -10035,8 +10080,14 @@ Returns:
 This allows global options like --verbose, --debug, etc. to work universally
 across all command levels, including nested subcommands.
 
+Args:
+    config: Optional config dict with defaults (loaded from sdd_config.json)
+
 Returns:
     ArgumentParser configured with global options and add_help=False
+
+**Parameters:**
+- `config`: None
 
 ---
 
@@ -15486,8 +15537,8 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:135`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:142`
+⚠️ **Complexity:** 20 (High)
 
 **Decorators:** `@track_metrics('sdd')`
 
@@ -16452,7 +16503,7 @@ Args:
 ### `register_git_config_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:354`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:480`
 **Complexity:** 1
 
 **Description:**
@@ -16682,7 +16733,7 @@ Note:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:26`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Reorder command line arguments to support global options anywhere.
