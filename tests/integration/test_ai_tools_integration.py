@@ -523,6 +523,224 @@ class TestTimeoutHandling:
 
 
 # =============================================================================
+# Edge Cases and Error Handling Tests
+# =============================================================================
+
+
+class TestEdgeCasesAndErrorHandling:
+    """Integration tests for edge cases and error scenarios."""
+
+    def test_tool_with_empty_output(self, mock_tools_dir, monkeypatch):
+        """Test handling of tools that return no output."""
+        # Create tool that returns empty output
+        empty_tool = mock_tools_dir / "gemini"
+        empty_tool.write_text(
+            "#!/bin/bash\n"
+            "# Tool that returns nothing\n"
+            "exit 0\n"
+        )
+        empty_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("gemini", "test")
+
+        # Should succeed but with empty output
+        assert response.success is True
+        assert response.output == ""
+        assert response.exit_code == 0
+
+    def test_tool_with_stderr_only(self, mock_tools_dir, monkeypatch):
+        """Test handling of tools that only write to stderr."""
+        # Create tool that writes to stderr but exits successfully
+        stderr_tool = mock_tools_dir / "codex"
+        stderr_tool.write_text(
+            "#!/bin/bash\n"
+            "echo 'warning message' >&2\n"
+            "exit 0\n"
+        )
+        stderr_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("codex", "test")
+
+        # Should still succeed (exit 0) even with stderr
+        assert response.success is True
+        assert response.exit_code == 0
+
+    def test_tool_with_both_stdout_and_stderr(self, mock_tools_dir, monkeypatch):
+        """Test handling of tools that write to both stdout and stderr."""
+        # Create tool that writes to both streams
+        both_tool = mock_tools_dir / "gemini"
+        both_tool.write_text(
+            "#!/bin/bash\n"
+            "echo 'output'\n"
+            "echo 'warning' >&2\n"
+            "exit 0\n"
+        )
+        both_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("gemini", "test")
+
+        # Should capture both
+        assert response.success is True
+        assert "output" in response.output
+        # stderr is only captured on error (exit code != 0)
+
+    def test_tool_with_non_zero_exit_and_stderr(self, mock_tools_dir, monkeypatch):
+        """Test error handling when tool fails with stderr message."""
+        # Create tool that fails with error message
+        error_tool = mock_tools_dir / "cursor-agent"
+        error_tool.write_text(
+            "#!/bin/bash\n"
+            "echo 'Error: API key invalid' >&2\n"
+            "exit 1\n"
+        )
+        error_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("cursor-agent", "test")
+
+        # Should capture error
+        assert response.failed is True
+        assert response.status == ToolStatus.ERROR
+        assert "API key invalid" in response.error
+        assert response.exit_code == 1
+
+    def test_tool_with_very_long_output(self, mock_tools_dir, monkeypatch):
+        """Test handling of tools with large output."""
+        # Create tool that outputs 1000 lines
+        large_output_tool = mock_tools_dir / "gemini"
+        large_output_tool.write_text(
+            "#!/bin/bash\n"
+            "for i in {1..1000}; do\n"
+            "  echo 'Line '$i\n"
+            "done\n"
+        )
+        large_output_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("gemini", "test", timeout=5)
+
+        # Should handle large output
+        assert response.success is True
+        assert len(response.output.split('\n')) == 1000
+
+    def test_tool_with_special_characters_in_output(self, mock_tools_dir, monkeypatch):
+        """Test handling of output with special characters."""
+        # Create tool that outputs special characters
+        special_tool = mock_tools_dir / "codex"
+        special_tool.write_text(
+            "#!/bin/bash\n"
+            "echo 'Output with $pecial ch@rs: <>&\"\\'\n"
+        )
+        special_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("codex", "test")
+
+        # Should preserve special characters
+        assert response.success is True
+        assert "$pecial" in response.output
+        assert "<>&" in response.output
+
+    def test_tool_with_unicode_output(self, mock_tools_dir, monkeypatch):
+        """Test handling of Unicode characters in output."""
+        # Create tool that outputs Unicode
+        unicode_tool = mock_tools_dir / "gemini"
+        unicode_tool.write_text(
+            "#!/bin/bash\n"
+            "echo '日本語 Français Español 🚀'\n"
+        )
+        unicode_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("gemini", "test")
+
+        # Should handle Unicode correctly
+        assert response.success is True
+        assert "日本語" in response.output
+        assert "🚀" in response.output
+
+    def test_parallel_execution_with_all_failures(self, mock_tools_dir, path_with_mock_tools):
+        """Test parallel execution when all tools fail."""
+        # Make all tools fail
+        for tool_name in ["gemini", "codex", "cursor-agent"]:
+            fail_tool = mock_tools_dir / tool_name
+            fail_tool.write_text(
+                "#!/bin/bash\n"
+                "echo 'error' >&2\n"
+                "exit 1\n"
+            )
+            fail_tool.chmod(0o755)
+
+        response = execute_tools_parallel(
+            tools=["gemini", "codex", "cursor-agent"],
+            prompt="test"
+        )
+
+        # All should fail
+        assert response.success_count == 0
+        assert response.failure_count == 3
+        assert response.all_failed is True
+        assert response.success is False  # No successes
+
+    def test_parallel_execution_with_empty_tool_list(self):
+        """Test parallel execution with empty tool list."""
+        response = execute_tools_parallel(
+            tools=[],
+            prompt="test"
+        )
+
+        # Should handle gracefully
+        assert len(response.responses) == 0
+        assert response.success_count == 0
+        assert response.failure_count == 0
+
+    def test_execute_tool_with_unknown_tool_name(self):
+        """Test error handling for unknown tool names."""
+        response = execute_tool("unknown-tool", "test")
+
+        # Should return error status
+        assert response.status == ToolStatus.ERROR
+        assert "Unknown tool" in response.error
+
+    def test_tool_crash_during_execution(self, mock_tools_dir, monkeypatch):
+        """Test handling of tools that crash (segfault simulation)."""
+        # Create tool that exits with unusual code
+        crash_tool = mock_tools_dir / "gemini"
+        crash_tool.write_text(
+            "#!/bin/bash\n"
+            "exit 139\n"  # 139 = 128 + 11 (SIGSEGV)
+        )
+        crash_tool.chmod(0o755)
+
+        original_path = os.environ.get("PATH", "")
+        monkeypatch.setenv("PATH", f"{mock_tools_dir}:{original_path}")
+
+        response = execute_tool("gemini", "test")
+
+        # Should capture as error
+        assert response.failed is True
+        assert response.status == ToolStatus.ERROR
+        assert response.exit_code == 139
+
+
+# =============================================================================
 # End-to-End Workflow Tests
 # =============================================================================
 
