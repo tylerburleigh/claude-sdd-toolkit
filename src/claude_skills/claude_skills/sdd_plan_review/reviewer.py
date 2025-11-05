@@ -15,27 +15,26 @@ from concurrent.futures import ThreadPoolExecutor, as_completed, wait
 
 from claude_skills.sdd_plan_review.prompts import generate_review_prompt
 from claude_skills.sdd_plan_review.synthesis import parse_response, build_consensus
-from claude_skills.common.ai_tools import check_tool_available
+from claude_skills.common.ai_tools import check_tool_available, execute_tool, ToolResponse
 
 
-# Available AI CLI tools
-AVAILABLE_TOOLS = {
-    "gemini": {
-        "command": "gemini",
-        "version_flag": "--version",
-        "timeout": 600,
-    },
-    "codex": {
-        "command": "codex",
-        "version_flag": "--version",
-        "timeout": 600,
-    },
-    "cursor-agent": {
-        "command": "cursor-agent",
-        "version_flag": "--help",
-        "timeout": 600,
-    },
-}
+def _tool_response_to_dict(response: ToolResponse) -> Dict[str, Any]:
+    """
+    Convert ToolResponse to dict format for backward compatibility.
+
+    Args:
+        response: ToolResponse from execute_tool()
+
+    Returns:
+        Dict with success, tool, output, error, duration keys
+    """
+    return {
+        "success": response.success,
+        "tool": response.tool,
+        "output": response.output if response.success else None,
+        "error": response.error if not response.success else None,
+        "duration": response.duration,
+    }
 
 
 def detect_available_tools() -> List[str]:
@@ -45,121 +44,14 @@ def detect_available_tools() -> List[str]:
     Returns:
         List of available tool names
     """
+    # Known AI CLI tools for spec review
+    known_tools = ["gemini", "codex", "cursor-agent"]
+
     available = []
-    for tool_name in AVAILABLE_TOOLS.keys():
+    for tool_name in known_tools:
         if check_tool_available(tool_name, check_version=True):
             available.append(tool_name)
     return available
-
-
-def call_tool(
-    tool_name: str,
-    prompt: str,
-    timeout: Optional[int] = None
-) -> Dict[str, Any]:
-    """
-    Call an AI CLI tool with a prompt.
-
-    Args:
-        tool_name: Name of tool to call
-        prompt: Prompt to send
-        timeout: Optional timeout override
-
-    Returns:
-        Result dictionary with success, output, error
-    """
-    tool_config = AVAILABLE_TOOLS.get(tool_name)
-    if not tool_config:
-        return {
-            "success": False,
-            "tool": tool_name,
-            "error": f"Unknown tool: {tool_name}",
-            "output": None,
-            "duration": 0,
-        }
-
-    timeout = timeout or tool_config["timeout"]
-    start_time = time.time()
-
-    try:
-        # Build command based on tool-specific CLI interface
-        # Each tool has different requirements for non-interactive use
-
-        if tool_name == "codex":
-            # Codex: Use exec subcommand for non-interactive mode
-            # Note: Don't use --json as it outputs JSONL stream; let it output markdown
-            cmd = [
-                tool_config["command"],
-                "exec",                    # Non-interactive subcommand
-                "--color", "never",        # No color codes in captured output
-                prompt                     # Prompt as positional argument
-            ]
-            stdin_input = None
-
-        elif tool_name == "gemini":
-            # Gemini: Use plain text output (AI synthesis doesn't need JSON)
-            cmd = [
-                tool_config["command"],
-                "-m", "gemini-2.5-pro",  # Model specification
-                "--telemetry", "false",   # Disable telemetry for cleaner output
-                "-p", prompt              # Prompt argument
-            ]
-            stdin_input = None
-
-        elif tool_name == "cursor-agent":
-            # Cursor Agent: Use --print for non-interactive mode with JSON output
-            cmd = [
-                tool_config["command"],
-                "--print",                    # Non-interactive mode with all tools
-                "--output-format", "json",    # JSON output for parsing
-                prompt                         # Positional prompt argument
-            ]
-            stdin_input = None
-
-        else:
-            # Generic approach: pass prompt via stdin
-            cmd = [tool_config["command"]]
-            stdin_input = prompt
-
-        # Execute the command
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            input=stdin_input
-        )
-
-        duration = time.time() - start_time
-
-        # Return structured response
-        return {
-            "success": result.returncode == 0,
-            "tool": tool_name,
-            "output": result.stdout if result.returncode == 0 else None,
-            "error": result.stderr if result.returncode != 0 else None,
-            "duration": duration,
-        }
-
-    except subprocess.TimeoutExpired:
-        duration = time.time() - start_time
-        return {
-            "success": False,
-            "tool": tool_name,
-            "error": f"Timeout after {timeout}s",
-            "output": None,
-            "duration": duration,
-        }
-
-    except Exception as e:
-        duration = time.time() - start_time
-        return {
-            "success": False,
-            "tool": tool_name,
-            "error": str(e),
-            "output": None,
-            "duration": duration,
-        }
 
 
 def review_with_tools(
@@ -219,14 +111,15 @@ def review_with_tools(
         # Parallel execution
         with ThreadPoolExecutor(max_workers=len(tools)) as executor:
             futures = {
-                executor.submit(call_tool, tool, prompt): tool
+                executor.submit(execute_tool, tool, prompt, timeout=600): tool
                 for tool in tools
             }
 
             for future in as_completed(futures):
                 tool = futures[future]
                 try:
-                    result = future.result(timeout=150)
+                    response = future.result(timeout=150)
+                    result = _tool_response_to_dict(response)
                     if result["success"]:
                         results["raw_responses"].append(result)
                         # Show progress as each tool completes
@@ -249,7 +142,8 @@ def review_with_tools(
     else:
         # Sequential execution
         for tool in tools:
-            result = call_tool(tool, prompt)
+            response = execute_tool(tool, prompt, timeout=600)
+            result = _tool_response_to_dict(response)
             if result["success"]:
                 results["raw_responses"].append(result)
                 # Show progress as each tool completes

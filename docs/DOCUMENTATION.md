@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 09:54:35
+**Generated:** 2025-11-05 09:59:44
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 210
-- **Total Lines:** 71032
+- **Total Lines:** 70995
 - **Total Classes:** 267
-- **Total Functions:** 794
+- **Total Functions:** 793
 - **Avg Complexity:** 5.58
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -7691,7 +7691,7 @@ Examples:
 ### `call_tool(tool_name, prompt, timeout) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:92`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:55`
 **Complexity:** 8
 
 **Description:**
@@ -8217,26 +8217,6 @@ Example:
 
 **Parameters:**
 - `tool`: str
-
----
-
-### `check_tool_available(tool_name) -> bool`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:40`
-**Complexity:** 4
-
-**Description:**
-> Check if an AI CLI tool is available.
-
-Args:
-    tool_name: Name of the tool (gemini, codex, cursor-agent)
-
-Returns:
-    True if tool is available, False otherwise
-
-**Parameters:**
-- `tool_name`: str
 
 ---
 
@@ -10485,7 +10465,7 @@ Example:
 ### `detect_available_tools() -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:78`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:41`
 **Complexity:** 3
 
 **Description:**
@@ -17107,7 +17087,7 @@ Returns:
 ### `review_with_tools(spec_content, tools, review_type, spec_id, spec_title, parallel) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:202`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py:165`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -21647,10 +21627,10 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/__init__.py`
 
+- `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.reporting.generate_json_report`
 - `claude_skills.sdd_plan_review.reporting.generate_markdown_report`
-- `claude_skills.sdd_plan_review.reviewer.check_tool_available`
 - `claude_skills.sdd_plan_review.reviewer.detect_available_tools`
 - `claude_skills.sdd_plan_review.reviewer.review_with_tools`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
@@ -21688,6 +21668,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_plan_review/reviewer.py`
 
+- `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.sdd_plan_review.prompts.generate_review_prompt`
 - `claude_skills.sdd_plan_review.synthesis.build_consensus`
 - `claude_skills.sdd_plan_review.synthesis.parse_response`
