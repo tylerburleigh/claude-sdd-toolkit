@@ -21,6 +21,10 @@ from .consultation import (
     ConsultationTimeoutError,
     ConsultationError
 )
+from claude_skills.common.ai_tools import (
+    detect_available_tools,
+    check_tool_available
+)
 
 
 def _handle_fidelity_review(args: argparse.Namespace) -> int:
@@ -207,6 +211,80 @@ def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues
     print(json.dumps(result, indent=2))
 
 
+def _handle_list_review_tools(args: argparse.Namespace) -> int:
+    """
+    Handle list-review-tools command execution.
+
+    Detects and displays available AI consultation tools with their status.
+
+    Args:
+        args: Parsed command-line arguments
+
+    Returns:
+        Exit code (0 for success, non-zero for error)
+    """
+    try:
+        # Detect all available tools
+        available_tools = detect_available_tools()
+        all_tools = ["gemini", "codex", "cursor-agent"]
+
+        # Build tool status information
+        tool_status = []
+        for tool in all_tools:
+            is_available = tool in available_tools
+            status = "available" if is_available else "not found"
+            tool_status.append({
+                "tool": tool,
+                "available": is_available,
+                "status": status
+            })
+
+        # Output in requested format
+        output_format = args.format if hasattr(args, 'format') else 'text'
+
+        if output_format == 'json':
+            result = {
+                "tools": tool_status,
+                "available_count": len(available_tools),
+                "total_count": len(all_tools)
+            }
+            print(json.dumps(result, indent=2))
+        else:  # text format
+            print("\n" + "=" * 60)
+            print("AI CONSULTATION TOOLS STATUS")
+            print("=" * 60)
+            print()
+
+            for status_info in tool_status:
+                tool_name = status_info["tool"]
+                available = status_info["available"]
+                status_symbol = "✓" if available else "✗"
+                status_text = "Available" if available else "Not Found"
+
+                print(f"  {status_symbol} {tool_name:<15} {status_text}")
+
+            print()
+            print(f"Available: {len(available_tools)}/{len(all_tools)}")
+            print()
+
+            if len(available_tools) == 0:
+                print("No AI consultation tools found.")
+                print("Install at least one: gemini, codex, or cursor-agent")
+            elif args.verbose:
+                print("\nUsage:")
+                print("  Use --ai-tools to specify which tools to consult")
+                print("  Example: sdd fidelity-review SPEC_ID --ai-tools gemini codex")
+
+        return 0
+
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        if args.verbose:
+            import traceback
+            traceback.print_exc()
+        return 1
+
+
 def register_commands(subparsers: argparse._SubParsersAction) -> None:
     """
     Register fidelity review commands with the main CLI parser.
@@ -314,8 +392,33 @@ def register_commands(subparsers: argparse._SubParsersAction) -> None:
         help="Show detailed output"
     )
 
-    # Set handler function (to be implemented)
+    # Set handler function
     parser.set_defaults(func=_handle_fidelity_review)
+
+    # Add 'list-review-tools' subcommand
+    list_tools_parser = subparsers.add_parser(
+        "list-review-tools",
+        help="List available AI consultation tools",
+        description="Show which AI tools (gemini, codex, cursor-agent) are available for fidelity review",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    # Output options
+    list_tools_parser.add_argument(
+        "--format",
+        choices=["text", "json"],
+        default="text",
+        help="Output format (default: text)"
+    )
+    list_tools_parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed output including usage tips"
+    )
+
+    # Set handler function
+    list_tools_parser.set_defaults(func=_handle_list_review_tools)
 
 
 def main() -> int:
@@ -336,8 +439,9 @@ def main() -> int:
         version="sdd-fidelity-review 0.1.0"
     )
 
-    # Placeholder for subcommands - to be implemented in Phase 5
+    # Register subcommands using the same registration function
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    register_commands(subparsers)
 
     args = parser.parse_args()
 
@@ -345,7 +449,12 @@ def main() -> int:
         parser.print_help()
         return 1
 
-    return 0
+    # Execute the command handler
+    if hasattr(args, 'func'):
+        return args.func(args)
+    else:
+        parser.print_help()
+        return 1
 
 
 if __name__ == "__main__":

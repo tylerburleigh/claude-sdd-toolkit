@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 16:11:00
+**Generated:** 2025-11-05 16:17:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 72587
+- **Total Lines:** 72768
 - **Total Classes:** 277
-- **Total Functions:** 790
-- **Avg Complexity:** 5.59
+- **Total Functions:** 793
+- **Avg Complexity:** 5.61
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6350,13 +6350,18 @@ Returns:
 ### `_handle_fidelity_review(args) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:12`
-**Complexity:** 1
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:26`
+⚠️ **Complexity:** 21 (High)
 
 **Description:**
 > Handle fidelity-review command execution.
 
-This function will be implemented in subsequent tasks.
+Orchestrates the fidelity review workflow:
+1. Load specification and extract requirements
+2. Generate review prompt with implementation artifacts
+3. Optionally consult AI tools for review
+4. Parse and analyze responses
+5. Generate and display report
 
 Args:
     args: Parsed command-line arguments
@@ -6536,6 +6541,60 @@ Args:
 
 **Parameters:**
 - `normalized`: NormalizedValidationResult
+
+---
+
+### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:198`
+**Complexity:** 1
+
+**Description:**
+> Generate JSON output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
+
+---
+
+### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:175`
+**Complexity:** 5
+
+**Description:**
+> Generate markdown output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
+
+---
+
+### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:140`
+**Complexity:** 7
+
+**Description:**
+> Generate text output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
 
 ---
 
@@ -16163,7 +16222,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:140`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:321`
 **Complexity:** 2
 
 **Description:**
@@ -17068,7 +17127,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:29`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:210`
 **Complexity:** 1
 
 **Description:**
@@ -21773,6 +21832,17 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `consultation.ConsultationError`
+- `consultation.ConsultationTimeoutError`
+- `consultation.NoToolsAvailableError`
+- `consultation.categorize_issues`
+- `consultation.consult_multiple_ai_on_fidelity`
+- `consultation.detect_consensus`
+- `consultation.parse_multiple_responses`
+- `json`
+- `pathlib.Path`
+- `review.FidelityReviewer`
+- `sys`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py`
