@@ -1623,6 +1623,100 @@ See sdd-fidelity-review SKILL.md for details.
 
 ---
 
+#### Orchestrating Spec Modifications via sdd-modify-subagent
+
+After review verification tasks complete, sdd-next can orchestrate systematic spec modifications using the `sdd-modify-subagent`.
+
+**Important:** Review skills (sdd-fidelity-review, sdd-plan-review) generate reports but do NOT modify specs. **sdd-next** orchestrates modifications when review findings warrant spec updates.
+
+##### When to Call sdd-modify-subagent
+
+**After Fidelity Review:**
+- Review identifies vague task descriptions, missing verifications, or spec/implementation drift
+- Present option to user: apply feedback systematically vs. manual review
+
+**After Plan Review (Pre-Implementation):**
+- Multi-model consensus identifies spec improvements before work begins
+- Present option to user: apply consensus recommendations vs. proceed as-is
+
+**During Task Execution:**
+- Developer discovers spec is wrong/unclear during implementation
+- Present option to user: update spec now vs. journal deviation vs. revise code
+
+##### What sdd-modify-subagent Needs
+
+**Required Information:**
+1. **Spec ID** - Which spec to modify
+2. **Either:**
+   - Review report path (e.g., `reports/{spec-id}-fidelity-review.md`) for automatic extraction
+   - OR specific modification instructions (task ID, field, new value)
+
+**Optional:**
+- Preview before applying (`--dry-run`)
+- Rationale for modifications
+- Consensus threshold (for plan reviews)
+
+##### How to Invoke
+
+**Basic Invocation Pattern:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-modify-subagent",
+  prompt: "Parse review report at {review-path} and apply modifications to spec {spec-id}. Preview changes, validate, and report results.",
+  description: "Apply review feedback to spec"
+)
+```
+
+**Example: After Fidelity Review**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-modify-subagent",
+  prompt: "Parse fidelity review report at reports/my-spec-001-fidelity-review.md and apply modifications to spec my-spec-001. Show preview, apply with validation, report results.",
+  description: "Apply fidelity review feedback"
+)
+```
+
+**Example: Specific Update**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-modify-subagent",
+  prompt: "Update task-2-3 description in spec my-spec-001 to 'Implement OAuth 2.0 authentication with PKCE flow, JWT tokens, and refresh rotation'. Validate and report.",
+  description: "Update task description"
+)
+```
+
+##### Handling Response
+
+After sdd-modify-subagent completes, it returns:
+- Summary of modifications applied
+- Validation status (passed/failed)
+- Backup file location (if created)
+- Any errors encountered
+
+**Then sdd-next should:**
+1. Report results to user
+2. Document changes in journal (if appropriate)
+3. Offer re-verification (if review-triggered)
+4. Continue workflow
+
+##### Integration Pattern
+
+```
+1. Verification/Review completes → sdd-next receives report
+2. Analyze findings for systematic improvements
+3. Present options to user (AskUserQuestion)
+4. If approved → Task(sdd-modify-subagent)
+5. Handle response and continue workflow
+```
+
+##### See Also
+
+- **Skill(sdd-toolkit:sdd-modify)** - Complete workflows, examples, CLI commands
+- **agents/sdd-modify.md** - Subagent contract with detailed operation specs
+- **skills/sdd-modify/examples/** - Full walkthrough examples
+
+---
+
 #### Manual Review (`verification_type: "manual"`)
 
 **Metadata:**

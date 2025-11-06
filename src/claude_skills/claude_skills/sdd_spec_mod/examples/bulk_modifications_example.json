@@ -1,0 +1,59 @@
+{
+  "modifications": [
+    {
+      "operation": "add_node",
+      "parent_id": "phase-1",
+      "node_data": {
+        "node_id": "task-1-new",
+        "type": "task",
+        "title": "Implement user authentication",
+        "description": "Add JWT-based authentication to the API",
+        "status": "pending",
+        "metadata": {
+          "estimated_hours": 5,
+          "priority": "high",
+          "tags": ["auth", "security"]
+        },
+        "dependencies": {
+          "blocks": [],
+          "blocked_by": [],
+          "depends": []
+        }
+      },
+      "position": 0
+    },
+    {
+      "operation": "update_node_field",
+      "node_id": "task-1-1",
+      "field": "description",
+      "value": "Updated description: Implement core database models with migrations"
+    },
+    {
+      "operation": "update_node_field",
+      "node_id": "task-1-2",
+      "field": "metadata",
+      "value": {
+        "estimated_hours": 3,
+        "complexity": "medium",
+        "assignee": "dev-team"
+      }
+    },
+    {
+      "operation": "move_node",
+      "node_id": "task-2-5",
+      "new_parent_id": "phase-3",
+      "position": 1
+    },
+    {
+      "operation": "remove_node",
+      "node_id": "task-obsolete-1",
+      "cascade": false
+    },
+    {
+      "operation": "update_node_field",
+      "node_id": "phase-2",
+      "field": "title",
+      "value": "Phase 2: API Development & Integration"
+    }
+  ]
+}

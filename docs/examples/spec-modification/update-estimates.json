@@ -1,0 +1,193 @@
+{
+  "description": "Example: Updating task estimates based on actual implementation experience",
+  "scenario": "After completing several tasks, you realize that certain estimates were significantly off. This example shows how to update estimates and add risk notes for future planning.",
+  "original_spec_excerpt": {
+    "task-3-1": {
+      "id": "task-3-1",
+      "title": "Implement caching layer",
+      "description": "Add Redis caching for API responses",
+      "type": "task",
+      "status": "completed",
+      "metadata": {
+        "file_path": "src/cache/redis.ts",
+        "estimated_hours": 2,
+        "actual_hours": 6.5
+      }
+    },
+    "task-3-2": {
+      "id": "task-3-2",
+      "title": "Add cache invalidation logic",
+      "description": "Invalidate cache on data updates",
+      "type": "task",
+      "status": "pending",
+      "dependencies": {
+        "blocked_by": ["task-3-1"]
+      },
+      "metadata": {
+        "file_path": "src/cache/invalidation.ts",
+        "estimated_hours": 1.5
+      }
+    },
+    "task-3-3": {
+      "id": "task-3-3",
+      "title": "Configure cache TTL",
+      "description": "Set time-to-live for cached entries",
+      "type": "task",
+      "status": "pending",
+      "dependencies": {
+        "blocked_by": ["task-3-1"]
+      },
+      "metadata": {
+        "file_path": "src/config/cache.ts",
+        "estimated_hours": 0.5
+      }
+    }
+  },
+  "analysis": {
+    "task-3-1_variance": {
+      "estimated": 2,
+      "actual": 6.5,
+      "variance_hours": 4.5,
+      "variance_percent": "225%",
+      "reasons": [
+        "Redis connection pooling more complex than expected",
+        "Had to implement retry logic for connection failures",
+        "Serialization issues with complex objects took time to debug",
+        "Added monitoring and metrics not in original scope"
+      ]
+    },
+    "implications_for_remaining_tasks": {
+      "task-3-2": "Cache invalidation likely also underestimated - needs to handle edge cases",
+      "task-3-3": "May need to configure TTL per entity type, not global"
+    }
+  },
+  "modification_steps": [
+    {
+      "step": 1,
+      "action": "Add risk notes to completed task explaining variance",
+      "reasoning": "Document lessons learned for future similar tasks"
+    },
+    {
+      "step": 2,
+      "action": "Update estimates for remaining tasks",
+      "reasoning": "Based on actual complexity discovered"
+    },
+    {
+      "step": 3,
+      "action": "Add verification steps",
+      "reasoning": "Prevent issues that caused delays in task-3-1"
+    }
+  ],
+  "modified_spec_excerpt": {
+    "task-3-1": {
+      "id": "task-3-1",
+      "title": "Implement caching layer",
+      "description": "Add Redis caching for API responses",
+      "type": "task",
+      "status": "completed",
+      "metadata": {
+        "file_path": "src/cache/redis.ts",
+        "estimated_hours": 2,
+        "actual_hours": 6.5,
+        "risk_notes": [
+          "Original estimate significantly underestimated complexity",
+          "Connection pooling and retry logic added 3+ hours",
+          "Object serialization edge cases took 1.5 hours to resolve",
+          "Added monitoring/metrics beyond original scope (+1 hour)"
+        ]
+      }
+    },
+    "task-3-2": {
+      "id": "task-3-2",
+      "title": "Add cache invalidation logic",
+      "description": "Invalidate cache on data updates with proper error handling",
+      "type": "task",
+      "status": "pending",
+      "dependencies": {
+        "blocked_by": ["task-3-1"]
+      },
+      "metadata": {
+        "file_path": "src/cache/invalidation.ts",
+        "estimated_hours": 4,
+        "risk_notes": [
+          "Increased from 1.5h based on task-3-1 complexity",
+          "Must handle partial failures and race conditions",
+          "Need to test with concurrent updates"
+        ]
+      },
+      "verification": {
+        "steps": [
+          "Test concurrent update scenarios",
+          "Verify partial failure handling",
+          "Check race condition edge cases",
+          "Measure performance impact"
+        ]
+      }
+    },
+    "task-3-3": {
+      "id": "task-3-3",
+      "title": "Configure cache TTL per entity type",
+      "description": "Set entity-specific time-to-live for cached entries",
+      "type": "task",
+      "status": "pending",
+      "dependencies": {
+        "blocked_by": ["task-3-1"]
+      },
+      "metadata": {
+        "file_path": "src/config/cache.ts",
+        "estimated_hours": 2,
+        "risk_notes": [
+          "Increased from 0.5h - need per-entity configuration",
+          "Must validate TTL values and handle edge cases",
+          "Configuration schema needs to be extensible"
+        ]
+      },
+      "verification": {
+        "steps": [
+          "Verify each entity type has appropriate TTL",
+          "Test TTL expiration works correctly",
+          "Document TTL configuration patterns"
+        ]
+      }
+    }
+  },
+  "journal_entry": {
+    "command": "Task(subagent_type: 'sdd-toolkit:sdd-update-subagent', prompt: 'Add journal entry to phase phase-3 in caching-feature-001. Entry: Updated estimates for tasks 3-2 and 3-3 based on task-3-1 actual time (6.5h vs 2h estimated). Redis integration more complex than planned due to connection pooling, retry logic, and serialization issues. Increased estimates to 4h and 2h respectively. Added verification steps to prevent similar delays.', description: 'Document estimate updates')",
+    "entry_content": "Updated estimates for tasks 3-2 and 3-3 based on task-3-1 actual time (6.5h vs 2h estimated). Redis integration more complex than planned due to connection pooling, retry logic, and serialization issues. Increased estimates to 4h and 2h respectively. Added verification steps to prevent similar delays."
+  },
+  "validation_command": "Task(subagent_type: 'sdd-toolkit:sdd-validate-subagent', prompt: 'Validate specs/active/caching-feature-001.json after updating estimates and adding risk notes', description: 'Validate spec')",
+  "key_points": [
+    "Risk notes added to explain variance between estimated and actual hours",
+    "Future task estimates adjusted based on actual complexity discovered",
+    "Verification steps added to prevent issues that caused delays",
+    "Task descriptions updated to reflect actual scope (e.g., 'per entity type')",
+    "Journal entry documents the reasoning for estimate changes"
+  ],
+  "best_practices": [
+    {
+      "practice": "Update estimates immediately after completing tasks",
+      "benefit": "Fresh memory of what caused variance, better accuracy"
+    },
+    {
+      "practice": "Add risk notes explaining significant variances",
+      "benefit": "Helps with future project planning and estimation"
+    },
+    {
+      "practice": "Review remaining tasks when actuals differ greatly",
+      "benefit": "Prevents cascade of underestimated tasks"
+    },
+    {
+      "practice": "Add verification steps learned from challenges",
+      "benefit": "Prevents similar issues in dependent tasks"
+    }
+  ],
+  "reporting": {
+    "command": "sdd progress caching-feature-001",
+    "updated_metrics": {
+      "phase-3": {
+        "estimated_total_hours": "3.5 → 8 hours",
+        "completion_percentage": "Will be more accurate for remaining tasks"
+      }
+    }
+  }
+}

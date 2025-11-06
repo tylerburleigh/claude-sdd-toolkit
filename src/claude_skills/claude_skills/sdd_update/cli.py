@@ -45,6 +45,9 @@ from claude_skills.sdd_update.query import (
     phase_time,
     list_blockers,
 )
+from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
+from claude_skills.sdd_spec_mod.estimates import update_task_estimate
+from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
 
 
 def cmd_execute_verify(args, printer):
@@ -265,6 +268,273 @@ def cmd_add_revision(args, printer):
     )
 
     return 0 if success else 1
+
+
+def cmd_add_assumption(args, printer):
+    """Add assumption to spec metadata."""
+    printer.action("Adding assumption...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Add assumption
+    try:
+        result = add_assumption(
+            spec_data=spec_data,
+            text=args.text,
+            assumption_type=args.type,
+            added_by=getattr(args, 'author', 'claude-code')
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would add assumption:")
+            printer.detail(f"  ID: {result['assumption_id']}")
+            printer.detail(f"  Type: {args.type}")
+            printer.detail(f"  Text: {args.text}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+        printer.info(f"Assumption ID: {result['assumption_id']}")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to add assumption: {e}")
+        return 1
+
+
+def cmd_list_assumptions(args, printer):
+    """List assumptions from spec metadata."""
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Get assumptions
+    try:
+        assumption_type = getattr(args, 'type', None)
+        assumptions = list_assumptions(spec_data, assumption_type=assumption_type)
+    except (KeyError, TypeError, ValueError) as e:
+        printer.error(f"Failed to list assumptions: {e}")
+        return 1
+
+    if not assumptions:
+        if assumption_type:
+            printer.info(f"No {assumption_type} assumptions found")
+        else:
+            printer.info("No assumptions found")
+        return 0
+
+    # Display assumptions
+    if assumption_type:
+        printer.success(f"Found {len(assumptions)} {assumption_type} assumption(s):")
+    else:
+        printer.success(f"Found {len(assumptions)} assumption(s):")
+
+    # Check if JSON output is enabled (either via flag or config default)
+    # When json arg is None, the main CLI will apply config defaults
+    use_json = getattr(args, 'json', None)
+    if use_json is None:
+        # No explicit --json or --no-json flag, check config
+        try:
+            from claude_skills.common.sdd_config import load_sdd_config
+            config = load_sdd_config()
+            use_json = config.get('output', {}).get('json', False)
+        except Exception:
+            use_json = False
+
+    if use_json:
+        # JSON output
+        print(json.dumps(assumptions, indent=2))
+    else:
+        # Pretty print for human readability
+        for i, assumption in enumerate(assumptions, 1):
+            # Handle both legacy string format and new structured format
+            if isinstance(assumption, str):
+                # Legacy format: just a string
+                print(f"\n{i}. {assumption}")
+            elif isinstance(assumption, dict):
+                # New structured format
+                print(f"\n{assumption.get('id', f'assumption-{i}')}:")
+                printer.detail(f"Type: {assumption.get('type', 'unknown')}")
+                printer.detail(f"Text: {assumption.get('text', '')}")
+                printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
+                printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
+                if 'updated_at' in assumption:
+                    printer.detail(f"Updated at: {assumption['updated_at']}")
+            else:
+                printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
+
+    return 0
+
+
+def cmd_update_estimate(args, printer):
+    """Update task estimate (hours and/or complexity)."""
+    printer.action(f"Updating estimate for task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Update estimate
+    try:
+        result = update_task_estimate(
+            spec_data=spec_data,
+            task_id=args.task_id,
+            estimated_hours=args.hours if hasattr(args, 'hours') and args.hours is not None else None,
+            complexity=args.complexity if hasattr(args, 'complexity') and args.complexity else None
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would update estimate:")
+            printer.detail(f"  Task: {result['task_id']} - {result['task_title']}")
+            for key, value in result['updates'].items():
+                printer.detail(f"  {key}: {value}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to update estimate: {e}")
+        return 1
+
+
+def cmd_add_task(args, printer):
+    """Add a new task to the spec hierarchy."""
+    printer.action(f"Adding task to {args.parent}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Add task
+    try:
+        result = add_task(
+            spec_data=spec_data,
+            parent_id=args.parent,
+            title=args.title,
+            description=args.description if hasattr(args, 'description') and args.description else None,
+            position=args.position if hasattr(args, 'position') and args.position is not None else None,
+            task_type=args.type if hasattr(args, 'type') and args.type else "task",
+            estimated_hours=args.hours if hasattr(args, 'hours') and args.hours is not None else None
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would add task:")
+            printer.detail(f"  ID: {result['task_id']}")
+            printer.detail(f"  Title: {result['task_title']}")
+            printer.detail(f"  Parent: {result['parent_id']}")
+            if args.description:
+                printer.detail(f"  Description: {args.description[:50]}...")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+        printer.info(f"Task ID: {result['task_id']}")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to add task: {e}")
+        return 1
+
+
+def cmd_remove_task(args, printer):
+    """Remove a task from the spec hierarchy."""
+    printer.action(f"Removing task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Remove task
+    try:
+        result = remove_task(
+            spec_data=spec_data,
+            task_id=args.task_id,
+            cascade=args.cascade if hasattr(args, 'cascade') and args.cascade else False
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would remove task:")
+            printer.detail(f"  ID: {result['task_id']}")
+            printer.detail(f"  Title: {result['task_title']}")
+            printer.detail(f"  Removed count: {result['removed_count']}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+        if result['removed_count'] > 1:
+            printer.info(f"Removed {result['removed_count']} task(s) total (including children)")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to remove task: {e}")
+        return 1
 
 
 def cmd_update_frontmatter(args, printer):
@@ -1151,6 +1421,50 @@ def register_update(subparsers, parent_parser):
     p_revision.add_argument("--author", default="claude-code", help="Revision author")
     p_revision.add_argument("--dry-run", action="store_true", help="Preview revision without saving")
     p_revision.set_defaults(func=cmd_add_revision)
+
+    # add-assumption command
+    p_assumption = subparsers.add_parser("add-assumption", help="Add assumption to spec metadata", parents=[parent_parser])
+    p_assumption.add_argument("spec_id", help="Specification ID")
+    p_assumption.add_argument("text", help="Assumption text/description")
+    p_assumption.add_argument("--type", default="requirement", choices=["constraint", "requirement"], help="Assumption type")
+    p_assumption.add_argument("--author", default="claude-code", help="Author who added the assumption")
+    p_assumption.add_argument("--dry-run", action="store_true", help="Preview assumption without saving")
+    p_assumption.set_defaults(func=cmd_add_assumption)
+
+    # list-assumptions command
+    p_list_assumptions = subparsers.add_parser("list-assumptions", help="List assumptions from spec metadata", parents=[parent_parser])
+    p_list_assumptions.add_argument("spec_id", help="Specification ID")
+    p_list_assumptions.add_argument("--type", choices=["constraint", "requirement"], help="Filter by assumption type")
+    p_list_assumptions.set_defaults(func=cmd_list_assumptions)
+
+    # update-estimate command
+    p_estimate = subparsers.add_parser("update-estimate", help="Update task estimate (hours and/or complexity)", parents=[parent_parser])
+    p_estimate.add_argument("spec_id", help="Specification ID")
+    p_estimate.add_argument("task_id", help="Task ID to update")
+    p_estimate.add_argument("--hours", type=float, help="Estimated hours (float)")
+    p_estimate.add_argument("--complexity", choices=["low", "medium", "high"], help="Complexity level")
+    p_estimate.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_estimate.set_defaults(func=cmd_update_estimate)
+
+    # add-task command
+    p_add_task = subparsers.add_parser("add-task", help="Add a new task to the spec hierarchy", parents=[parent_parser])
+    p_add_task.add_argument("spec_id", help="Specification ID")
+    p_add_task.add_argument("--parent", required=True, help="Parent node ID (e.g., phase-1, task-2-1)")
+    p_add_task.add_argument("--title", required=True, help="Task title")
+    p_add_task.add_argument("--description", help="Task description")
+    p_add_task.add_argument("--type", default="task", choices=["task", "subtask", "verify"], help="Task type")
+    p_add_task.add_argument("--hours", type=float, help="Estimated hours")
+    p_add_task.add_argument("--position", type=int, help="Position in parent's children list (0-based)")
+    p_add_task.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_add_task.set_defaults(func=cmd_add_task)
+
+    # remove-task command
+    p_remove_task = subparsers.add_parser("remove-task", help="Remove a task from the spec hierarchy", parents=[parent_parser])
+    p_remove_task.add_argument("spec_id", help="Specification ID")
+    p_remove_task.add_argument("task_id", help="Task ID to remove")
+    p_remove_task.add_argument("--cascade", action="store_true", help="Also remove all child tasks recursively")
+    p_remove_task.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_remove_task.set_defaults(func=cmd_remove_task)
 
     # bulk-journal command
     p_bulk_journal = subparsers.add_parser("bulk-journal", help="Bulk journal completed tasks", parents=[parent_parser])

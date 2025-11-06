@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:12:09
+**Generated:** 2025-11-06 13:36:44
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 214
-- **Total Lines:** 73222
-- **Total Classes:** 278
-- **Total Functions:** 796
-- **Avg Complexity:** 5.61
+- **Total Files:** 229
+- **Total Lines:** 80064
+- **Total Classes:** 299
+- **Total Functions:** 851
+- **Avg Complexity:** 5.8
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -2143,6 +2143,24 @@ Attributes:
 
 ---
 
+### `TestAddAssumptionCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:74`
+
+**Description:**
+> Tests for add-assumption command.
+
+**Methods:**
+- `test_add_assumption_basic()`
+- `test_add_assumption_different_types()`
+- `test_add_assumption_with_author()`
+- `test_add_assumption_json_output()`
+- `test_add_assumption_dry_run()`
+- `test_add_assumption_invalid_spec()`
+
+---
+
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -2174,6 +2192,25 @@ Attributes:
 - `test_add_revision_entry_custom_author()`
 - `test_add_revision_entry_multiple()`
 - `test_add_revision_entry_dry_run()`
+
+---
+
+### `TestAddTaskCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:441`
+
+**Description:**
+> Tests for add-task command.
+
+**Methods:**
+- `test_add_task_basic()`
+- `test_add_task_with_description()`
+- `test_add_task_with_estimate()`
+- `test_add_task_with_position()`
+- `test_add_task_json_output()`
+- `test_add_task_dry_run()`
+- `test_add_task_invalid_parent()`
 
 ---
 
@@ -2295,6 +2332,45 @@ Attributes:
 - `test_build_prompt_with_context()`
 - `test_build_prompt_without_context()`
 - `test_build_prompt_none_skill_name()`
+
+---
+
+### `TestBulkModificationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py:19`
+
+**Description:**
+> Integration tests for the complete modification workflow.
+
+**Methods:**
+- `sample_spec()`
+- `markdown_review()`
+- `test_complete_workflow_markdown_to_modifications()`
+- `test_parse_json_review_format()`
+- `test_empty_review_produces_no_suggestions()`
+- `test_malformed_suggestions_handled_gracefully()`
+- `test_review_to_verification_node_creation()`
+
+---
+
+### `TestBumpVersion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:19`
+
+**Description:**
+> Tests for _bump_version() helper function.
+
+**Methods:**
+- `test_increment_minor_version()`
+- `test_increment_from_1_9_to_2_0()`
+- `test_increment_from_2_9_to_3_0()`
+- `test_increment_mid_range()`
+- `test_handle_single_digit_version()`
+- `test_empty_version_defaults_to_1_0()`
+- `test_invalid_version_raises_error()`
+- `test_invalid_version_with_letters_raises_error()`
 
 ---
 
@@ -2649,6 +2725,49 @@ Attributes:
 
 ---
 
+### `TestCmdApplyModifications`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py:12`
+
+**Description:**
+> Test the cmd_apply_modifications CLI command.
+
+**Methods:**
+- `mock_printer()`
+- `sample_spec()`
+- `sample_modifications()`
+- `test_specs_directory_not_found()`
+- `test_spec_file_not_found()`
+- `test_modifications_file_not_found()`
+- `test_dry_run_mode()`
+- `test_successful_application()`
+- `test_partial_failure()`
+
+---
+
+### `TestCmdParseReview`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py:12`
+
+**Description:**
+> Test the cmd_parse_review CLI command.
+
+**Methods:**
+- `mock_printer()`
+- `sample_review_result()`
+- `test_review_file_not_found()`
+- `test_parse_failure()`
+- `test_show_mode()`
+- `test_save_suggestions()`
+- `test_custom_output_path()`
+- `test_no_suggestions()`
+- `test_displays_metadata()`
+- `test_displays_issues_summary()`
+
+---
+
 ### `TestColdStartPerformance`
 
 **Language:** python
@@ -2829,6 +2948,28 @@ Attributes:
 **Methods:**
 - `test_create_factory_defaults()`
 - `test_create_factory_with_options()`
+
+---
+
+### `TestCreateRevision`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:84`
+
+**Description:**
+> Tests for create_revision() function.
+
+**Methods:**
+- `test_create_first_revision()`
+- `test_create_multiple_revisions()`
+- `test_revision_entry_structure()`
+- `test_revision_history_prepends_new_entries()`
+- `test_initialize_revision_history_if_missing()`
+- `test_default_version_if_missing()`
+- `test_empty_changelog_fails()`
+- `test_empty_modified_by_fails()`
+- `test_invalid_spec_fails()`
+- `test_invalid_version_format_fails()`
 
 ---
 
@@ -3016,6 +3157,23 @@ Attributes:
 - `test_auto_generate_failure()`
 - `test_auto_generate_timeout()`
 - `test_prompt_user_mode()`
+
+---
+
+### `TestErrorHandling`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py:305`
+
+**Description:**
+> Test error handling in the workflow.
+
+**Methods:**
+- `test_nonexistent_review_file()`
+- `test_invalid_json_review()`
+- `test_unsupported_file_format()`
+- `test_modifications_file_not_found()`
+- `sample_spec()`
 
 ---
 
@@ -3423,6 +3581,23 @@ Attributes:
 
 ---
 
+### `TestGetRevisionHistory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:193`
+
+**Description:**
+> Tests for get_revision_history() function.
+
+**Methods:**
+- `test_get_populated_history()`
+- `test_get_empty_history()`
+- `test_get_history_from_invalid_spec()`
+- `test_get_history_from_none_spec()`
+- `test_history_entries_have_required_fields()`
+
+---
+
 ### `TestGetSessionInfo`
 
 **Language:** python
@@ -3694,6 +3869,34 @@ Attributes:
 
 ---
 
+### `TestIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:331`
+
+**Description:**
+> Integration tests for full revision workflow.
+
+**Methods:**
+- `test_full_revision_lifecycle()`
+- `test_revision_timestamps_are_iso8601()`
+
+---
+
+### `TestIntegrationScenarios`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:216`
+
+**Description:**
+> Integration tests for realistic review scenarios.
+
+**Methods:**
+- `test_full_review_with_multiple_issue_types()`
+- `test_handles_malformed_issue_gracefully()`
+
+---
+
 ### `TestIntegrationWithGetSessionState`
 
 **Language:** python
@@ -3828,6 +4031,22 @@ Attributes:
 - `test_detect_middleware_layer()`
 - `test_detect_config_layer()`
 - `test_detect_tests_layer()`
+
+---
+
+### `TestListAssumptionsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:203`
+
+**Description:**
+> Tests for list-assumptions command.
+
+**Methods:**
+- `test_list_assumptions_basic()`
+- `test_list_assumptions_by_type()`
+- `test_list_assumptions_json_output()`
+- `test_list_assumptions_empty()`
 
 ---
 
@@ -4605,6 +4824,23 @@ Attributes:
 
 ---
 
+### `TestRemoveTaskCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:616`
+
+**Description:**
+> Tests for remove-task command.
+
+**Methods:**
+- `test_remove_task_basic()`
+- `test_remove_task_with_cascade()`
+- `test_remove_task_json_output()`
+- `test_remove_task_dry_run()`
+- `test_remove_task_invalid()`
+
+---
+
 ### `TestRenderEdgeCases`
 
 **Language:** python
@@ -4649,6 +4885,25 @@ Attributes:
 - `test_report_with_dependencies()`
 - `test_report_json_stdout()`
 - `test_report_with_bottleneck_threshold()`
+
+---
+
+### `TestRollbackToVersion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:238`
+
+**Description:**
+> Tests for rollback_to_version() function.
+
+**Methods:**
+- `test_rollback_to_previous_version()`
+- `test_rollback_trims_newer_revisions()`
+- `test_rollback_to_nonexistent_version_fails()`
+- `test_rollback_with_no_history_fails()`
+- `test_rollback_with_invalid_spec_fails()`
+- `test_rollback_with_empty_version_fails()`
+- `test_rollback_preserves_target_and_older()`
 
 ---
 
@@ -4832,6 +5087,20 @@ Attributes:
 
 ---
 
+### `TestSpecModificationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:804`
+
+**Description:**
+> End-to-end workflow tests combining multiple commands.
+
+**Methods:**
+- `test_complete_workflow()`
+- `test_multiple_assumptions_workflow()`
+
+---
+
 ### `TestSpecStats`
 
 **Language:** python
@@ -4877,6 +5146,45 @@ Attributes:
 - `test_non_interactive_behavior()`
 - `test_command_hint_displayed()`
 - `test_incomplete_spec_no_completion_message()`
+
+---
+
+### `TestSuggestForIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:70`
+
+**Description:**
+> Test the _suggest_for_issue helper function.
+
+**Methods:**
+- `test_missing_description_generates_update()`
+- `test_unclear_description_generates_update()`
+- `test_missing_dependency_generates_update()`
+- `test_incorrect_estimate_generates_metadata_update()`
+- `test_missing_verification_generates_add_node()`
+- `test_missing_task_generates_add_node()`
+- `test_task_ordering_generates_note()`
+- `test_generic_update_generates_review_note()`
+- `test_no_node_id_returns_empty_list()`
+- `test_unmatched_pattern_returns_empty_list()`
+- `test_reason_field_includes_severity_and_title()`
+
+---
+
+### `TestSuggestModifications`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:9`
+
+**Description:**
+> Test the suggest_modifications function.
+
+**Methods:**
+- `test_empty_issues_returns_empty_list()`
+- `test_processes_critical_issues_first()`
+- `test_handles_missing_severity_keys()`
+- `test_processes_multiple_issues()`
 
 ---
 
@@ -5016,6 +5324,24 @@ Attributes:
 **Methods:**
 - `test_status_report_help()`
 - `test_update_command_exists()`
+
+---
+
+### `TestUpdateEstimateCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:309`
+
+**Description:**
+> Tests for update-estimate command.
+
+**Methods:**
+- `test_update_estimate_hours_only()`
+- `test_update_estimate_complexity_only()`
+- `test_update_estimate_both()`
+- `test_update_estimate_json_output()`
+- `test_update_estimate_dry_run()`
+- `test_update_estimate_invalid_task()`
 
 ---
 
@@ -5274,6 +5600,23 @@ Attributes:
 
 ---
 
+### `TestValidateSpecMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:57`
+
+**Description:**
+> Tests for _validate_spec_metadata() helper function.
+
+**Methods:**
+- `test_valid_spec_with_metadata()`
+- `test_missing_metadata_key()`
+- `test_metadata_not_dict()`
+- `test_none_spec()`
+- `test_non_dict_spec()`
+
+---
+
 ### `TestValidateStructure`
 
 **Language:** python
@@ -5321,6 +5664,53 @@ Attributes:
 - `test_validate_timestamp_pair_negative_disallowed()`
 - `test_validate_timestamp_pair_negative_allowed()`
 - `test_validate_timestamp_pair_with_printer()`
+
+---
+
+### `TestValidationEdgeCases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py:521`
+
+**Description:**
+> Edge case tests for validation and rollback.
+
+**Methods:**
+- `minimal_spec()`
+- `test_add_node_with_invalid_dependencies_structure()`
+- `test_update_metadata_with_invalid_type()`
+- `test_remove_spec_root()`
+- `test_move_spec_root()`
+
+---
+
+### `TestValidationRollback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py:25`
+
+**Description:**
+> Integration tests for validation and rollback mechanisms.
+
+**Methods:**
+- `sample_spec()`
+- `test_transaction_rollback_on_exception()`
+- `test_add_node_with_invalid_type()`
+- `test_add_node_with_empty_title()`
+- `test_add_node_with_duplicate_id()`
+- `test_add_node_with_nonexistent_parent()`
+- `test_remove_node_with_children_no_cascade()`
+- `test_remove_node_nonexistent()`
+- `test_update_field_invalid_status()`
+- `test_update_field_protected_field()`
+- `test_move_node_creates_circular_dependency()`
+- `test_move_node_to_nonexistent_parent()`
+- `test_transactional_modify_with_validation()`
+- `test_apply_modifications_with_validation()`
+- `test_apply_modifications_with_missing_fields()`
+- `test_apply_modifications_with_invalid_json()`
+- `test_apply_modifications_with_nonexistent_file()`
+- `test_complex_rollback_scenario()`
 
 ---
 
@@ -5780,6 +6170,31 @@ Returns:
 
 ---
 
+### `_bump_version(current_version) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:13`
+**Complexity:** 6
+
+**Description:**
+> Increment the version number.
+
+Supports simple X.Y format (e.g., "1.0" -> "1.1", "1.9" -> "2.0").
+
+Args:
+    current_version: Current version string (e.g., "1.0", "2.5")
+
+Returns:
+    Bumped version string
+
+Raises:
+    ValueError: If version format is invalid
+
+**Parameters:**
+- `current_version`: str
+
+---
+
 ### `_bump_version(current_version, bump) -> Optional[str]`
 
 **Language:** python
@@ -5835,6 +6250,25 @@ Returns:
 
 ---
 
+### `_cleanup_dependencies(spec_data, removed_nodes) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:363`
+**Complexity:** 7
+
+**Description:**
+> Remove references to removed nodes from all dependency lists.
+
+Args:
+    spec_data: The full spec data dictionary
+    removed_nodes: List of node IDs being removed
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `removed_nodes`: List[str]
+
+---
+
 ### `_coerce_scalar(value) -> Any`
 
 **Language:** python
@@ -5843,6 +6277,27 @@ Returns:
 
 **Parameters:**
 - `value`: str
+
+---
+
+### `_collect_descendants(spec_data, node_id, result) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:338`
+**Complexity:** 3
+
+**Description:**
+> Recursively collect all descendants of a node.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID
+    result: List to append descendant IDs to (modified in place)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `result`: List[str]
 
 ---
 
@@ -5906,7 +6361,7 @@ Returns:
 ### `_create_config_file(project_path, config, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:136`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:150`
 **Complexity:** 3
 
 **Description:**
@@ -6099,6 +6554,22 @@ Returns:
 
 ---
 
+### `_extract_issues_from_markdown(content) -> Dict[str, List[Dict[str, Any]]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:203`
+**Complexity:** 4
+
+**Description:**
+> Extract issues by severity from markdown content.
+
+Returns dict with keys: critical, high, medium, low
+
+**Parameters:**
+- `content`: str
+
+---
+
 ### `_extract_json_frontmatter(path) -> Dict[str, Any]`
 
 **Language:** python
@@ -6132,6 +6603,42 @@ Returns:
 
 **Parameters:**
 - `path`: Path
+
+---
+
+### `_extract_metadata_from_markdown(content) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:157`
+**Complexity:** 6
+
+**Description:**
+> Extract metadata fields from markdown report header.
+
+**Parameters:**
+- `content`: str
+
+---
+
+### `_extract_section(content, header_pattern) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:236`
+**Complexity:** 3
+
+**Description:**
+> Extract content between a header and the next header of equal or higher level.
+
+Args:
+    content: Full markdown content
+    header_pattern: Regex pattern for the section header
+
+Returns:
+    Section content (excluding header) or None if not found
+
+**Parameters:**
+- `content`: str
+- `header_pattern`: str
 
 ---
 
@@ -6300,6 +6807,34 @@ Returns:
 
 ---
 
+### `_generate_task_id(hierarchy, parent_id, parent_node) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py:126`
+**Complexity:** 4
+
+**Description:**
+> Generate a unique task ID based on parent structure.
+
+For phase parents: task-1-1, task-1-2, etc.
+For task parents: task-1-1-1, task-1-1-2, etc. (subtasks)
+For group parents: Similar nesting
+
+Args:
+    hierarchy: Spec hierarchy
+    parent_id: Parent node ID
+    parent_node: Parent node data
+
+Returns:
+    Generated task ID
+
+**Parameters:**
+- `hierarchy`: Dict[str, Any]
+- `parent_id`: str
+- `parent_node`: Dict[str, Any]
+
+---
+
 ### `_get_presets() -> Dict[str, Dict]`
 
 **Language:** python
@@ -6361,6 +6896,21 @@ Returns:
 
 **Description:**
 > Get package version from metadata.
+
+---
+
+### `_handle_add_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1214`
+**Complexity:** 2
+
+**Description:**
+> Handle add_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
 
 ---
 
@@ -6430,6 +6980,51 @@ Returns:
 
 ---
 
+### `_handle_move_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1262`
+**Complexity:** 2
+
+**Description:**
+> Handle move_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
+### `_handle_remove_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1231`
+**Complexity:** 2
+
+**Description:**
+> Handle remove_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
+### `_handle_update_node_field(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1245`
+**Complexity:** 2
+
+**Description:**
+> Handle update_node_field operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
 ### `_interactive_select_fixes(actions, printer) -> None`
 
 **Language:** python
@@ -6442,6 +7037,32 @@ Returns:
 **Parameters:**
 - `actions`: None
 - `printer`: None
+
+---
+
+### `_is_ancestor(spec_data, ancestor_id, descendant_id) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:732`
+**Complexity:** 5
+
+**Description:**
+> Check if ancestor_id is an ancestor of descendant_id.
+
+This is used to prevent circular dependencies when moving nodes.
+
+Args:
+    spec_data: The full spec data dictionary
+    ancestor_id: Potential ancestor node ID
+    descendant_id: Potential descendant node ID
+
+Returns:
+    True if ancestor_id is an ancestor of descendant_id, False otherwise
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `ancestor_id`: str
+- `descendant_id`: str
 
 ---
 
@@ -6654,6 +7275,103 @@ Args:
 
 ---
 
+### `_parse_issue_list(section_content, severity) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:265`
+**Complexity:** 3
+
+**Description:**
+> Parse a list of issues from a section.
+
+Expected format:
+- Issue title - flagged by: [model names]
+  - Impact: ...
+  - Recommended fix: ...
+  - Details: ...
+
+Or simpler format:
+- Issue title - flagged by: [model names]
+
+Args:
+    section_content: Content of the issues section
+    severity: Severity level (for metadata)
+
+Returns:
+    List of issue dicts
+
+**Parameters:**
+- `section_content`: str
+- `severity`: str
+
+---
+
+### `_parse_json_report(report_file) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:73`
+**Complexity:** 3
+
+**Description:**
+> Parse JSON format review report.
+
+JSON reports are expected to have the structure:
+{
+    "consensus": {
+        "overall_score": X.X,
+        "recommendation": "...",
+        "consensus_level": "...",
+        "synthesis_text": "..."
+    },
+    "metadata": {...}
+}
+
+**Parameters:**
+- `report_file`: Path
+
+---
+
+### `_parse_markdown_report(report_file) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:125`
+**Complexity:** 2
+
+**Description:**
+> Parse markdown format review report.
+
+Extracts issues from sections:
+- ### Critical Issues (Must Fix)
+- ### High Priority Issues
+- ### Medium/Low Priority
+
+**Parameters:**
+- `report_file`: Path
+
+---
+
+### `_parse_single_issue(issue_text, severity) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:300`
+**Complexity:** 9
+
+**Description:**
+> Parse a single issue block into structured data.
+
+Args:
+    issue_text: Text of the issue block
+    severity: Severity level
+
+Returns:
+    Issue dict or None if parsing fails
+
+**Parameters:**
+- `issue_text`: str
+- `severity`: str
+
+---
+
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
@@ -6710,7 +7428,7 @@ Args:
 ### `_prompt_for_config(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:80`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:94`
 **Complexity:** 8
 
 **Description:**
@@ -6721,6 +7439,131 @@ Returns:
 
 **Parameters:**
 - `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_git_permissions(printer) -> list`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:187`
+**Complexity:** 7
+
+**Description:**
+> Prompt user about adding git/GitHub permissions.
+
+Returns:
+    List of git permissions to add (may include read-only, write, or both)
+
+**Parameters:**
+- `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_git_permissions() -> list`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:87`
+**Complexity:** 7
+
+**Description:**
+> Prompt user about adding git/GitHub permissions.
+
+Returns:
+    List of git permissions to add (may include read-only, write, or both)
+
+---
+
+### `_propagate_task_count_decrease(spec_data, node_id, total_decrease, completed_decrease) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:394`
+**Complexity:** 9
+
+**Description:**
+> Propagate task count decreases up the hierarchy tree.
+
+This is called when nodes are removed from the hierarchy.
+It updates total_tasks and/or completed_tasks for all ancestors.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID (typically the parent of removed nodes)
+    total_decrease: Amount to decrease total_tasks by (default: 0)
+    completed_decrease: Amount to decrease completed_tasks by (default: 0)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `total_decrease`: int
+- `completed_decrease`: int
+
+---
+
+### `_propagate_task_count_decrease(hierarchy, node_id, decrease) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py:269`
+**Complexity:** 4
+
+**Description:**
+> Propagate task count decrease up the hierarchy.
+
+Args:
+    hierarchy: Spec hierarchy
+    node_id: Starting node ID
+    decrease: Amount to decrease (default: 1)
+
+**Parameters:**
+- `hierarchy`: Dict[str, Any]
+- `node_id`: str
+- `decrease`: int
+
+---
+
+### `_propagate_task_count_increase(spec_data, node_id, total_increase, completed_increase) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:188`
+**Complexity:** 9
+
+**Description:**
+> Propagate task count increases up the hierarchy tree.
+
+This is called when a new leaf task is added or a task is completed.
+It updates total_tasks and/or completed_tasks for all ancestors.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID (typically the parent of the added/completed task)
+    total_increase: Amount to increase total_tasks by (default: 0)
+    completed_increase: Amount to increase completed_tasks by (default: 0)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `total_increase`: int
+- `completed_increase`: int
+
+---
+
+### `_propagate_task_count_increase(hierarchy, node_id, increase) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py:162`
+**Complexity:** 3
+
+**Description:**
+> Propagate task count increase up the hierarchy.
+
+Args:
+    hierarchy: Spec hierarchy
+    node_id: Starting node ID
+    increase: Amount to increase (default: 1)
+
+**Parameters:**
+- `hierarchy`: Dict[str, Any]
+- `node_id`: str
+- `increase`: int
 
 ---
 
@@ -6749,7 +7592,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:61`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:63`
 **Complexity:** 1
 
 **Description:**
@@ -6764,7 +7607,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:99`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:101`
 **Complexity:** 1
 
 **Description:**
@@ -6779,7 +7622,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:81`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:83`
 **Complexity:** 1
 
 **Description:**
@@ -6985,6 +7828,28 @@ Returns:
 
 ---
 
+### `_suggest_for_issue(issue, severity) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:433`
+⚠️ **Complexity:** 22 (High)
+
+**Description:**
+> Generate modification suggestions for a single issue.
+
+Args:
+    issue: Issue dict with title, description, impact, fix, severity
+    severity: Severity level (critical, high, medium, low)
+
+Returns:
+    List of modification operation dicts
+
+**Parameters:**
+- `issue`: Dict[str, Any]
+- `severity`: str
+
+---
+
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
@@ -7028,6 +7893,58 @@ Returns:
 
 **Parameters:**
 - `config`: Dict[str, Any]
+
+---
+
+### `_validate_spec_integrity(spec_data) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:863`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Validate the integrity of a spec after modifications.
+
+Checks for common integrity issues:
+- All parent references point to existing nodes
+- All child references point to existing nodes
+- No orphaned nodes (except spec-root)
+- Parent-child relationships are bidirectional
+- Task counts are consistent
+
+Args:
+    spec_data: The full spec data dictionary
+
+Returns:
+    Dict with validation result:
+    {
+        "valid": True|False,
+        "message": "Description of validation result",
+        "errors": [...] (list of specific errors if validation failed)
+    }
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
+### `_validate_spec_metadata(spec_data) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:58`
+**Complexity:** 4
+
+**Description:**
+> Validate that spec data has required metadata structure.
+
+Args:
+    spec_data: The spec data dictionary to validate
+
+Returns:
+    True if valid, False otherwise
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -7080,6 +7997,43 @@ Returns:
 - `specs_dir`: Path
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `add_assumption(spec_data, text, assumption_type, added_by) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py:12`
+**Complexity:** 10
+
+**Description:**
+> Add an assumption to the spec metadata.
+
+Creates the assumptions array if it doesn't exist. Assumptions are appended
+to the end of the list (chronological order).
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    text: Description of the assumption
+    assumption_type: Type of assumption ("constraint", "requirement", etc.)
+    added_by: Identifier for who added the assumption
+
+Returns:
+    Dict with success status and assumption ID:
+    {
+        "success": True,
+        "assumption_id": "assumption-1",
+        "message": "Added assumption: <text>"
+    }
+
+Raises:
+    ValueError: If spec data is invalid or text is empty
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `text`: str
+- `assumption_type`: str
+- `added_by`: str
 
 ---
 
@@ -7138,6 +8092,53 @@ Returns:
 
 ---
 
+### `add_node(spec_data, parent_id, node_data, position) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:16`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Add a new task/subtask/phase to the spec hierarchy at a specified position.
+
+This function creates a new node in the specification hierarchy, ensuring that
+all required fields are present and that the hierarchy remains valid.
+
+Args:
+    spec_data: The full spec data dictionary (must include 'hierarchy' key)
+    parent_id: ID of the parent node to add the child to
+    node_data: Dictionary containing the new node's data. Must include:
+        - node_id: Unique identifier for the new node
+        - type: Node type (phase, task, subtask, verify, group)
+        - title: Human-readable title
+        Optional fields:
+        - description: Detailed description
+        - status: Node status (default: 'pending')
+        - metadata: Additional metadata dict
+        - dependencies: Dependencies dict with blocks/blocked_by/depends
+    position: Optional position in parent's children list (0-indexed).
+             If None, appends to end. If negative, counts from end.
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "node_id": "ID of created node" (only if success=True)
+    }
+
+Raises:
+    ValueError: If required fields are missing or invalid
+    KeyError: If parent_id doesn't exist in hierarchy
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `parent_id`: str
+- `node_data`: Dict[str, Any]
+- `position`: Optional[int]
+
+---
+
 ### `add_revision_entry(spec_id, version, changes, author, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -7181,6 +8182,47 @@ Returns:
 
 **Parameters:**
 - `parser`: None
+
+---
+
+### `add_task(spec_data, parent_id, title, description, position, task_type, estimated_hours) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py:11`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Add a new task to the spec hierarchy.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    parent_id: Parent node ID (e.g., "phase-1", "task-1")
+    title: Task title
+    description: Optional task description
+    position: Optional position index (0-based, appends if None)
+    task_type: Task type ("task", "subtask", "verify")
+    estimated_hours: Optional time estimate
+
+Returns:
+    Dict with success status and details:
+    {
+        "success": True,
+        "task_id": "task-3-5",
+        "message": "Added task: <title>",
+        "parent_id": "phase-3"
+    }
+
+Raises:
+    ValueError: If spec data is invalid, parent not found, or invalid values
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `parent_id`: str
+- `title`: str
+- `description`: Optional[str]
+- `position`: Optional[int]
+- `task_type`: str
+- `estimated_hours`: Optional[float]
 
 ---
 
@@ -7518,6 +8560,94 @@ Returns:
 **Parameters:**
 - `actions`: Iterable[FixAction]
 - `spec_path`: str
+
+---
+
+### `apply_modifications(spec_data, modifications_file, validate_after_each) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:963`
+⚠️ **Complexity:** 22 (High)
+
+**Description:**
+> Apply a batch of modifications from a JSON file to a spec.
+
+Reads a JSON file containing an array of modification operations and
+applies them sequentially to the spec. Each operation is atomic - if
+one fails, previous successful operations are kept but remaining ones
+are skipped.
+
+Args:
+    spec_data: The full spec data dictionary to modify
+    modifications_file: Path to JSON file containing modifications array
+    validate_after_each: If True, validates spec after each modification
+                       and rolls back if validation fails (default: False)
+                       Set to True for strict validation with rollback
+
+Returns:
+    Dict with overall status and per-operation results:
+    {
+        "success": True|False,
+        "message": "Overall summary",
+        "total_operations": N,
+        "successful": N,
+        "failed": N,
+        "results": [
+            {
+                "operation": {...},
+                "success": True|False,
+                "message": "...",
+                "error": "..." (only if failed),
+                "validation_error": "..." (if validation failed)
+            },
+            ...
+        ]
+    }
+
+Modification File Format:
+    {
+        "modifications": [
+            {
+                "operation": "add_node",
+                "parent_id": "phase-1",
+                "node_data": {
+                    "node_id": "task-1-5",
+                    "type": "task",
+                    "title": "New task",
+                    "description": "...",
+                    "status": "pending"
+                },
+                "position": 2
+            },
+            {
+                "operation": "update_node_field",
+                "node_id": "task-1-1",
+                "field": "title",
+                "value": "Updated title"
+            },
+            {
+                "operation": "remove_node",
+                "node_id": "task-2-3",
+                "cascade": true
+            },
+            {
+                "operation": "move_node",
+                "node_id": "task-1-3",
+                "new_parent_id": "phase-2",
+                "position": 0
+            }
+        ]
+    }
+
+Raises:
+    FileNotFoundError: If modifications_file doesn't exist
+    json.JSONDecodeError: If file is not valid JSON
+    ValueError: If file format is invalid
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `modifications_file`: str
+- `validate_after_each`: bool
 
 ---
 
@@ -8102,7 +9232,7 @@ Example:
 ### `categorize_missing_permissions(missing) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:254`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:348`
 **Complexity:** 6
 
 **Description:**
@@ -8418,7 +9548,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:133`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:224`
 **Complexity:** 2
 
 **Description:**
@@ -8600,7 +9730,7 @@ Example:
 ### `cmd_activate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:368`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:638`
 **Complexity:** 4
 
 **Description:**
@@ -8612,10 +9742,25 @@ Example:
 
 ---
 
+### `cmd_add_assumption(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:273`
+**Complexity:** 7
+
+**Description:**
+> Add assumption to spec metadata.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_add_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:224`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:227`
 **Complexity:** 3
 
 **Description:**
@@ -8630,7 +9775,7 @@ Example:
 ### `cmd_add_revision(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:248`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:251`
 **Complexity:** 3
 
 **Description:**
@@ -8642,10 +9787,25 @@ Example:
 
 ---
 
+### `cmd_add_task(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:439`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Add a new task to the spec hierarchy.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_add_verification(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:294`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:564`
 **Complexity:** 3
 
 **Description:**
@@ -8696,10 +9856,38 @@ Example:
 
 ---
 
+### `cmd_apply_modifications(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:14`
+⚠️ **Complexity:** 27 (High)
+
+**Description:**
+> Apply batch modifications from a JSON file to a spec.
+
+Command: sdd apply-modifications <spec> --from <file.json>
+
+Args:
+    args: Parsed command-line arguments
+        - spec_id: Spec ID to modify
+        - from_file: Path to modifications JSON file
+        - dry_run: If True, show what would be modified without applying
+        - output: Optional output path for modified spec
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_audit_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:460`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:730`
 **Complexity:** 5
 
 **Description:**
@@ -8714,7 +9902,7 @@ Example:
 ### `cmd_bulk_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:719`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:989`
 **Complexity:** 4
 
 **Description:**
@@ -8774,7 +9962,7 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:276`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:370`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -8789,7 +9977,7 @@ Example:
 ### `cmd_check_complete(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:591`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:861`
 **Complexity:** 5
 
 **Description:**
@@ -8864,7 +10052,7 @@ Example:
 ### `cmd_check_journaling(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:679`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:949`
 **Complexity:** 8
 
 **Description:**
@@ -8909,7 +10097,7 @@ Example:
 ### `cmd_complete_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:390`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:660`
 **Complexity:** 3
 
 **Description:**
@@ -8924,7 +10112,7 @@ Example:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:820`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1090`
 **Complexity:** 6
 
 **Description:**
@@ -9040,7 +10228,7 @@ Returns:
 ### `cmd_create_task_commit(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:746`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1016`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9106,7 +10294,7 @@ Returns:
 ### `cmd_execute_verify(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:50`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:53`
 ⚠️ **Complexity:** 29 (High)
 
 **Description:**
@@ -9292,7 +10480,7 @@ Returns:
 ### `cmd_format_verification_summary(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:319`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:589`
 **Complexity:** 6
 
 **Description:**
@@ -9334,7 +10522,7 @@ Returns:
 ### `cmd_get_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:540`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:810`
 **Complexity:** 7
 
 **Description:**
@@ -9364,7 +10552,7 @@ Returns:
 ### `cmd_get_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:516`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:786`
 **Complexity:** 6
 
 **Description:**
@@ -9406,10 +10594,25 @@ Returns:
 
 ---
 
+### `cmd_list_assumptions(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:321`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> List assumptions from spec metadata.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_list_blockers(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:638`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:908`
 **Complexity:** 6
 
 **Description:**
@@ -9460,7 +10663,7 @@ Returns:
 ### `cmd_list_phases(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:569`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:839`
 **Complexity:** 6
 
 **Description:**
@@ -9475,7 +10678,7 @@ Returns:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:853`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1123`
 **Complexity:** 3
 
 **Description:**
@@ -9505,7 +10708,7 @@ Returns:
 ### `cmd_mark_blocked(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:180`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:183`
 **Complexity:** 3
 
 **Description:**
@@ -9535,7 +10738,7 @@ Returns:
 ### `cmd_move_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:352`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:622`
 **Complexity:** 1
 
 **Description:**
@@ -9562,10 +10765,38 @@ Returns:
 
 ---
 
+### `cmd_parse_review(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:157`
+⚠️ **Complexity:** 24 (High)
+
+**Description:**
+> Parse a review report and generate modification suggestions.
+
+Command: sdd parse-review <spec> --review <report.md> [--output suggestions.json]
+
+Args:
+    args: Parsed command-line arguments
+        - spec_id: Spec ID being reviewed
+        - review: Path to review report file (markdown or JSON)
+        - output: Optional output path for suggestions JSON
+        - show: If True, display suggestions instead of saving
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_phase_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:615`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:885`
 **Complexity:** 6
 
 **Description:**
@@ -9647,7 +10878,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_query_tasks(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:482`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:752`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9662,7 +10893,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_reconcile_state(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:660`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:930`
 **Complexity:** 3
 
 **Description:**
@@ -9686,6 +10917,21 @@ The completion_info dict structure (from should_prompt_completion):
 **Parameters:**
 - `args`: argparse.Namespace
 - `printer`: PrettyPrinter
+
+---
+
+### `cmd_remove_task(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:492`
+**Complexity:** 9
+
+**Description:**
+> Remove a task from the spec hierarchy.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
 
 ---
 
@@ -9853,7 +11099,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_status_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:438`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:708`
 **Complexity:** 6
 
 **Description:**
@@ -9868,7 +11114,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:871`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1141`
 **Complexity:** 3
 
 **Description:**
@@ -9913,7 +11159,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_time_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:414`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:684`
 **Complexity:** 6
 
 **Description:**
@@ -9958,7 +11204,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_unblock_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:203`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:206`
 **Complexity:** 3
 
 **Description:**
@@ -9973,8 +11219,8 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:173`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:256`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
@@ -9985,10 +11231,25 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 ---
 
+### `cmd_update_estimate(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:392`
+**Complexity:** 10
+
+**Description:**
+> Update task estimate (hours and/or complexity).
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
 ### `cmd_update_frontmatter(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:270`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:540`
 **Complexity:** 1
 
 **Description:**
@@ -10003,7 +11264,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_status(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:157`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:160`
 **Complexity:** 3
 
 **Description:**
@@ -10018,7 +11279,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:890`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1160`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -10756,6 +12017,50 @@ Returns:
 - `title`: str
 - `body`: str
 - `base_branch`: str
+
+---
+
+### `create_revision(spec_data, changelog, modified_by) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:80`
+**Complexity:** 8
+
+**Description:**
+> Create a new revision entry for the spec.
+
+Increments the version number and adds a revision entry to
+metadata.revision_history[]. Creates the history array if it
+doesn't exist. The new revision is prepended to the history
+(most recent first).
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    changelog: Description of changes in this revision
+    modified_by: Identifier for who made the changes (e.g., email, username)
+
+Returns:
+    Dict with success status and new version:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "version": "X.Y" (new version number, only if success=True)
+    }
+
+Example:
+    >>> spec = {"metadata": {"version": "1.0"}}
+    >>> result = create_revision(spec, "Added new task", "user@example.com")
+    >>> result
+    {"success": True, "message": "...", "version": "1.1"}
+    >>> spec["metadata"]["version"]
+    "1.1"
+    >>> len(spec["metadata"]["revision_history"])
+    1
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `changelog`: str
+- `modified_by`: str
 
 ---
 
@@ -14935,6 +16240,44 @@ Example:
 
 ---
 
+### `get_revision_history(spec_data) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:174`
+**Complexity:** 2
+
+**Description:**
+> Get the revision history for a spec.
+
+Returns the list of all revisions with details, ordered from most
+recent to oldest.
+
+Args:
+    spec_data: The full spec data dictionary
+
+Returns:
+    List of revision entries, or empty list if no history exists.
+    Each entry contains:
+    {
+        "version": "X.Y",
+        "date": "ISO 8601 timestamp",
+        "modified_by": "identifier",
+        "changelog": "description of changes"
+    }
+
+Example:
+    >>> spec = {"metadata": {"revision_history": [...]}}
+    >>> history = get_revision_history(spec)
+    >>> len(history)
+    3
+    >>> history[0]["version"]  # Most recent
+    "1.2"
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `get_routing_config(skill_name) -> Dict[str, str]`
 
 **Language:** python
@@ -15303,6 +16646,37 @@ Returns:
 
 **Parameters:**
 - `spec_data`: Dict
+
+---
+
+### `get_task_estimate(spec_data, task_id) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/estimates.py:106`
+**Complexity:** 5
+
+**Description:**
+> Get estimate information for a task.
+
+Args:
+    spec_data: The full spec data dictionary
+    task_id: Task ID to query
+
+Returns:
+    Dict with estimate information:
+    {
+        "task_id": "task-2-1",
+        "estimated_hours": 3.5,
+        "complexity": "medium",
+        "actual_hours": 4.2  # if available
+    }
+
+Raises:
+    ValueError: If task not found
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `task_id`: str
 
 ---
 
@@ -15947,6 +17321,30 @@ Returns:
 
 ---
 
+### `list_assumptions(spec_data, assumption_type) -> List[Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py:89`
+**Complexity:** 5
+
+**Description:**
+> List all assumptions from the spec metadata.
+
+Supports both legacy string format and new structured dict format.
+
+Args:
+    spec_data: The full spec data dictionary
+    assumption_type: Optional filter by assumption type (only works with structured format)
+
+Returns:
+    List of assumption entries (can be strings or dicts depending on format)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `assumption_type`: Optional[str]
+
+---
+
 ### `list_blockers(spec_id, specs_dir, printer) -> Optional[List[Dict]]`
 
 **Language:** python
@@ -16259,7 +17657,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:174`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:265`
 **Complexity:** 3
 
 ---
@@ -16423,6 +17821,47 @@ Returns:
 
 **Parameters:**
 - `monkeypatch`: None
+
+---
+
+### `move_node(spec_data, node_id, new_parent_id, position) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:569`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Move a node to a different parent in the hierarchy.
+
+This function moves a node (and its descendants) to a new location in the
+hierarchy. It updates parent-child relationships and recalculates task counts
+for all affected ancestors.
+
+Args:
+    spec_data: The full spec data dictionary (must include 'hierarchy' key)
+    node_id: ID of the node to move
+    new_parent_id: ID of the new parent node
+    position: Optional position in new parent's children list (0-indexed).
+             If None, appends to end. If negative, counts from end.
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "old_parent_id": "Previous parent ID" (only if success=True),
+        "new_parent_id": "New parent ID" (only if success=True)
+    }
+
+Raises:
+    ValueError: If spec_data is invalid or trying to move spec-root
+    KeyError: If node_id or new_parent_id doesn't exist in hierarchy
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `new_parent_id`: str
+- `position`: Optional[int]
 
 ---
 
@@ -16626,6 +18065,60 @@ Returns:
 **Parameters:**
 - `tool_output`: str
 - `tool_name`: str
+
+---
+
+### `parse_review_report(report_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:13`
+**Complexity:** 4
+
+**Description:**
+> Parse a review report file and extract issues by severity.
+
+Supports both markdown (from sdd-plan-review) and JSON formats.
+Extracts issues grouped by severity: critical, high, medium, low.
+
+Args:
+    report_path: Path to the review report file (.md or .json)
+
+Returns:
+    Dict with parsed issues:
+    {
+        "success": True|False,
+        "format": "markdown"|"json",
+        "issues": {
+            "critical": [
+                {
+                    "title": "Issue title",
+                    "description": "Full description",
+                    "flagged_by": ["model1", "model2"],
+                    "impact": "Impact description",
+                    "fix": "Recommended fix"
+                },
+                ...
+            ],
+            "high": [...],
+            "medium": [...],
+            "low": [...]
+        },
+        "metadata": {
+            "spec_id": "...",
+            "spec_title": "...",
+            "overall_score": X.X,
+            "recommendation": "APPROVE|REVISE|REJECT",
+            "consensus_level": "...",
+            "models_consulted": [...]
+        },
+        "error": "Error message" (only if success=False)
+    }
+
+Raises:
+    FileNotFoundError: If report file doesn't exist
+
+**Parameters:**
+- `report_path`: str
 
 ---
 
@@ -17431,11 +18924,30 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:385`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:479`
 **Complexity:** 1
 
 **Description:**
 > Register setup-permissions subcommands.
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
+### `register_spec_mod(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:283`
+**Complexity:** 1
+
+**Description:**
+> Register spec modification commands.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
 
 **Parameters:**
 - `subparsers`: None
@@ -17461,7 +18973,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:970`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1240`
 **Complexity:** 1
 
 **Description:**
@@ -17496,6 +19008,106 @@ Note:
 **Parameters:**
 - `subparsers`: None
 - `parent_parser`: None
+
+---
+
+### `remove_assumption(spec_data, assumption_id) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py:119`
+**Complexity:** 5
+
+**Description:**
+> Remove an assumption from the spec metadata.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    assumption_id: ID of the assumption to remove
+
+Returns:
+    Dict with success status:
+    {
+        "success": True,
+        "message": "Removed assumption: assumption-1"
+    }
+
+Raises:
+    ValueError: If spec data is invalid or assumption not found
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `assumption_id`: str
+
+---
+
+### `remove_node(spec_data, node_id, cascade) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:233`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Remove a node from the spec hierarchy.
+
+This function removes a node and optionally its descendants (cascade mode).
+It also updates parent-child relationships, cleans up dependencies, and
+propagates task count decreases up the hierarchy.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to remove
+    cascade: If True, recursively removes all descendants (default: False)
+            If False and node has children, operation fails
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "removed_nodes": [...] (only if success=True)
+    }
+
+Raises:
+    KeyError: If node_id doesn't exist in hierarchy
+    ValueError: If trying to remove spec-root
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `cascade`: bool
+
+---
+
+### `remove_task(spec_data, task_id, cascade) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py:185`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Remove a task from the spec hierarchy.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    task_id: Task ID to remove
+    cascade: If True, also remove all child tasks recursively
+
+Returns:
+    Dict with success status and details:
+    {
+        "success": True,
+        "task_id": "task-3-5",
+        "message": "Removed task: <title>",
+        "removed_count": 1
+    }
+
+Raises:
+    ValueError: If spec data is invalid, task not found, or has children without cascade
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `task_id`: str
+- `cascade`: bool
 
 ---
 
@@ -17568,6 +19180,58 @@ Returns:
 
 ---
 
+### `rollback_to_version(spec_data, target_version) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:209`
+**Complexity:** 8
+
+**Description:**
+> Revert spec to a previous version.
+
+Note: This implementation removes revisions newer than the target version
+from the history but does NOT restore the actual spec content from that
+version. Full snapshot-based rollback would require storing complete spec
+state at each revision, which is not implemented yet.
+
+This function is a placeholder for future enhancement where snapshots
+would be stored alongside revision entries.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    target_version: Version to rollback to (e.g., "1.3")
+
+Returns:
+    Dict with success status and information:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "version": "X.Y" (version after rollback, only if success=True)
+    }
+
+Example:
+    >>> spec = {
+    ...     "metadata": {
+    ...         "version": "1.5",
+    ...         "revision_history": [
+    ...             {"version": "1.5", ...},
+    ...             {"version": "1.4", ...},
+    ...             {"version": "1.3", ...}
+    ...         ]
+    ...     }
+    ... }
+    >>> result = rollback_to_version(spec, "1.3")
+    >>> result["success"]
+    True
+    >>> spec["metadata"]["version"]
+    "1.3"
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `target_version`: str
+
+---
+
 ### `run_cli() -> None`
 
 **Language:** python
@@ -17637,6 +19301,20 @@ Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-col
 
 **Description:**
 > Helper to run sdd CLI with unified command (sdd-validate commands).
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:25`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
 
 ---
 
@@ -18446,6 +20124,41 @@ Args:
 
 ---
 
+### `spec_transaction(spec_data) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:770`
+**Complexity:** 2
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager that provides transaction support for spec modifications.
+
+Creates a deep copy of the spec before yielding. If the context exits
+normally, changes are kept. If an exception is raised, the spec is
+rolled back to its original state.
+
+Usage:
+    with spec_transaction(spec_data):
+        add_node(spec_data, "phase-1", {"node_id": "task-1", ...})
+        # If any error occurs, changes are rolled back
+
+Args:
+    spec_data: The full spec data dictionary to protect
+
+Yields:
+    The original spec_data dict (modifications happen in-place)
+
+Note:
+    This creates a deep copy of the spec, which can be expensive for
+    large specs. Use judiciously for critical operations.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `spec_with_all_categories() -> None`
 
 **Language:** python
@@ -18637,6 +20350,53 @@ Returns:
 **Parameters:**
 - `task_description`: str
 - `docs_path`: Optional[str]
+
+---
+
+### `suggest_modifications(issues) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:371`
+**Complexity:** 5
+
+**Description:**
+> Generate modification suggestions from parsed review issues.
+
+Takes the issues dict from parse_review_report and generates actionable
+modification suggestions that can be applied using apply_modifications.
+
+Args:
+    issues: Dict of issues grouped by severity:
+        {
+            "critical": [...],
+            "high": [...],
+            "medium": [...],
+            "low": [...]
+        }
+
+Returns:
+    List of modification operation dicts in the format expected by
+    apply_modifications:
+    [
+        {
+            "operation": "update_node_field",
+            "node_id": "task-1-1",
+            "field": "description",
+            "value": "Updated description",
+            "reason": "Critical issue: Missing context"
+        },
+        ...
+    ]
+
+Common mappings from issues to modifications:
+    - Missing dependencies -> add_node with dependency
+    - Incorrect estimates -> update_node_field for metadata.estimated_hours
+    - Missing tasks -> add_node for new task
+    - Unclear descriptions -> update_node_field for description
+    - Missing verification -> add_node with type=verify
+
+**Parameters:**
+- `issues`: Dict[str, List[Dict[str, Any]]]
 
 ---
 
@@ -20377,6 +22137,45 @@ Returns:
 
 ---
 
+### `transactional_modify(spec_data, operation, validate) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:804`
+**Complexity:** 5
+
+**Description:**
+> Execute a modification operation with transaction support and optional validation.
+
+This function wraps a modification operation in a transaction, optionally
+validates the spec after the modification, and rolls back if validation fails.
+
+Args:
+    spec_data: The full spec data dictionary
+    operation: A callable that performs the modification. It receives spec_data
+              and should return a result dict with "success" and "message" keys.
+    validate: If True, validates the spec after modification (default: True)
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "operation_result": {...} (result from the operation if successful)
+    }
+
+Example:
+    def my_operation(spec):
+        return add_node(spec, "phase-1", {"node_id": "task-1", ...})
+
+    result = transactional_modify(spec_data, my_operation, validate=True)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `operation`: Callable[[Dict[str, Any]], Dict[str, Any]]
+- `validate`: bool
+
+---
+
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -20404,6 +22203,35 @@ Returns:
 - `specs_dir`: Path
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `update_assumption(spec_data, assumption_id, text, assumption_type) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py:157`
+**Complexity:** 8
+
+**Description:**
+> Update an existing assumption's text or type.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    assumption_id: ID of the assumption to update
+    text: New text (if provided)
+    assumption_type: New type (if provided)
+
+Returns:
+    Dict with success status
+
+Raises:
+    ValueError: If spec data is invalid or assumption not found
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `assumption_id`: str
+- `text`: Optional[str]
+- `assumption_type`: Optional[str]
 
 ---
 
@@ -20464,6 +22292,44 @@ Returns:
 
 ---
 
+### `update_node_field(spec_data, node_id, field, value) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:438`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Update a specific field on a node in the spec hierarchy.
+
+This function provides a safe way to update node fields with validation.
+For metadata updates, it merges with existing metadata rather than replacing it.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to update
+    field: Name of the field to update (e.g., 'title', 'description', 'status', 'metadata')
+    value: New value for the field
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "old_value": previous_value (only if success=True)
+    }
+
+Raises:
+    KeyError: If node_id doesn't exist in hierarchy
+    ValueError: If attempting to update protected fields
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `field`: str
+- `value`: Any
+
+---
+
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
@@ -20513,14 +22379,74 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:72`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:153`
+**Complexity:** 9
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
 
 **Parameters:**
 - `project_root`: None
+
+---
+
+### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:942`
+**Complexity:** 1
+
+**Description:**
+> Recalculate and update task counts for a node and its ancestors.
+
+This function recursively calculates total_tasks and completed_tasks
+for a node based on its descendants, then propagates the counts upward.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to recalculate (typically after modifications)
+
+Returns:
+    Dict with success status and updated counts
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+
+---
+
+### `update_task_estimate(spec_data, task_id, estimated_hours, complexity) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/estimates.py:10`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Update estimated_hours and/or complexity for a task.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    task_id: Task ID to update (e.g., "task-2-1", "phase-1")
+    estimated_hours: New estimated hours value (if provided)
+    complexity: New complexity level (if provided): "low", "medium", "high"
+
+Returns:
+    Dict with success status and details:
+    {
+        "success": True,
+        "task_id": "task-2-1",
+        "message": "Updated estimate for task-2-1",
+        "updates": {"estimated_hours": 3.5, "complexity": "medium"}
+    }
+
+Raises:
+    ValueError: If spec data is invalid, task not found, or invalid values
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `task_id`: str
+- `estimated_hours`: Optional[float]
+- `complexity`: Optional[str]
 
 ---
 
@@ -20696,7 +22622,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:546`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 20 (High)
 
 **Description:**
 > Validate type-specific metadata requirements.
@@ -20914,7 +22840,7 @@ Example:
 ### `validate_spec_hierarchy(spec_data) -> JsonSpecValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:618`
+**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:630`
 **Complexity:** 3
 
 **Description:**
@@ -21389,6 +23315,13 @@ Returns:
 - `ai_config.get_tool_config`
 - `ai_config.is_tool_enabled`
 - `ai_config.load_skill_config`
+- `claude_skills.sdd_spec_mod.modification.add_node`
+- `claude_skills.sdd_spec_mod.modification.move_node`
+- `claude_skills.sdd_spec_mod.modification.remove_node`
+- `claude_skills.sdd_spec_mod.modification.spec_transaction`
+- `claude_skills.sdd_spec_mod.modification.transactional_modify`
+- `claude_skills.sdd_spec_mod.modification.update_node_field`
+- `claude_skills.sdd_spec_mod.modification.update_task_counts`
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
@@ -22455,6 +24388,94 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
+### `src/claude_skills/claude_skills/sdd_spec_mod/__init__.py`
+
+- `modification.add_node`
+- `modification.apply_modifications`
+- `modification.move_node`
+- `modification.remove_node`
+- `modification.spec_transaction`
+- `modification.transactional_modify`
+- `modification.update_node_field`
+- `modification.update_task_counts`
+- `review_parser.parse_review_report`
+- `review_parser.suggest_modifications`
+- `revision.create_revision`
+- `revision.get_revision_history`
+- `revision.rollback_to_version`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/cli.py`
+
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.find_spec_file`
+- `claude_skills.common.find_specs_directory`
+- `claude_skills.common.load_json_spec`
+- `claude_skills.sdd_spec_mod.apply_modifications`
+- `claude_skills.sdd_spec_mod.parse_review_report`
+- `claude_skills.sdd_spec_mod.suggest_modifications`
+- `json`
+- `pathlib.Path`
+- `sys`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/estimates.py`
+
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/modification.py`
+
+- `claude_skills.common.spec.get_node`
+- `claude_skills.common.spec.update_node`
+- `contextlib.contextmanager`
+- `copy`
+- `datetime.datetime`
+- `datetime.timezone`
+- `sys`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py`
+
+- `json`
+- `pathlib.Path`
+- `re`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/revision.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/task_operations.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/sdd_update/__init__.py`
 
 - `journal.add_journal_entry`
@@ -22486,6 +24507,11 @@ Returns:
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.spec.save_json_spec`
 - `claude_skills.common.spec.update_node`
+- `claude_skills.sdd_spec_mod.assumptions.add_assumption`
+- `claude_skills.sdd_spec_mod.assumptions.list_assumptions`
+- `claude_skills.sdd_spec_mod.estimates.update_task_estimate`
+- `claude_skills.sdd_spec_mod.task_operations.add_task`
+- `claude_skills.sdd_spec_mod.task_operations.remove_task`
 - `claude_skills.sdd_update.journal.add_journal_entry`
 - `claude_skills.sdd_update.journal.add_revision_entry`
 - `claude_skills.sdd_update.journal.bulk_journal_tasks`
@@ -22811,6 +24837,16 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py`
+
+- `claude_skills.sdd_spec_mod.apply_modifications`
+- `claude_skills.sdd_spec_mod.parse_review_report`
+- `claude_skills.sdd_spec_mod.suggest_modifications`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+
 ### `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py`
 
 - `__future__.annotations`
@@ -22818,6 +24854,21 @@ Returns:
 - `pathlib.Path`
 - `subprocess`
 - `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py`
+
+- `claude_skills.sdd_spec_mod.modification.add_node`
+- `claude_skills.sdd_spec_mod.modification.apply_modifications`
+- `claude_skills.sdd_spec_mod.modification.move_node`
+- `claude_skills.sdd_spec_mod.modification.remove_node`
+- `claude_skills.sdd_spec_mod.modification.spec_transaction`
+- `claude_skills.sdd_spec_mod.modification.transactional_modify`
+- `claude_skills.sdd_spec_mod.modification.update_node_field`
+- `copy.deepcopy`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
 
 ### `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py`
 
@@ -22906,6 +24957,15 @@ Returns:
 - `subprocess`
 - `sys`
 
+### `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
+- `subprocess`
+- `sys`
+
 ### `src/claude_skills/claude_skills/tests/integration/test_status_report.py`
 
 - `json`
@@ -22941,6 +25001,16 @@ Returns:
 - `shutil`
 - `subprocess`
 - `sys`
+
+### `src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py`
+
+- `claude_skills.sdd_spec_mod.cli.cmd_apply_modifications`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.Mock`
+- `unittest.mock.mock_open`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py`
 
@@ -23043,6 +25113,26 @@ Returns:
 ### `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py`
 
 - `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py`
+
+- `claude_skills.sdd_spec_mod.cli.cmd_parse_review`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.Mock`
+- `unittest.mock.mock_open`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
+
+- `claude_skills.sdd_spec_mod.revision._bump_version`
+- `claude_skills.sdd_spec_mod.revision._validate_spec_metadata`
+- `claude_skills.sdd_spec_mod.revision.create_revision`
+- `claude_skills.sdd_spec_mod.revision.get_revision_history`
+- `claude_skills.sdd_spec_mod.revision.rollback_to_version`
+- `datetime.datetime`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`
@@ -23406,4 +25496,10 @@ Returns:
 - `claude_skills.sdd_validate.stats.calculate_statistics`
 - `claude_skills.sdd_validate.stats.render_statistics`
 - `json`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py`
+
+- `claude_skills.sdd_spec_mod.review_parser._suggest_for_issue`
+- `claude_skills.sdd_spec_mod.review_parser.suggest_modifications`
 - `pytest`

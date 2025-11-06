@@ -971,6 +971,20 @@ sdd add-journal myspec --title "Deferred optimization concern" \
   --content "Codex flagged potential N+1 query in Phase 2. Decision: defer to Phase 3 performance optimization task. Reasoning: premature optimization, need working implementation first."
 ```
 
+## Spec Modification Handoff
+
+After plan review identifies consensus improvements, **sdd-next** orchestrates spec modifications before implementation begins.
+
+**Pattern:**
+1. Plan review generates multi-model report with consensus recommendations
+2. Report analyzed for 2-3 model agreement on improvements
+3. When ready to begin implementation, **sdd-next** presents modification options to user
+4. If approved, sdd-next invokes `sdd-modify-subagent` to apply consensus changes
+
+**Note:** This skill generates review reports identifying spec improvements through multi-model consensus. The review skill does NOT modify specs directly. Instead, **sdd-next** decides when and how to apply modifications based on review consensus before starting implementation.
+
+**For complete workflow:** See `Skill(sdd-toolkit:sdd-next)` documentation on orchestrating pre-implementation spec modifications via sdd-modify based on plan review consensus.
+
 ## See Also
 
 **Skill(sdd-toolkit:sdd-plan)** - Use before this skill:

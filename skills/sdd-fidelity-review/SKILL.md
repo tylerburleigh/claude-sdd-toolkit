@@ -332,6 +332,20 @@ Create structured report with:
 - **From sdd-next:** Triggered during verification tasks
 - **To run-tests:** Verify functional correctness after finding deviations
 
+### Spec Modification Handoff
+
+After fidelity review completes, **sdd-next** orchestrates spec modifications when review findings indicate updates are needed.
+
+**Pattern:**
+1. Fidelity review generates detailed report
+2. Report returned to **sdd-next** (orchestrator)
+3. sdd-next analyzes findings and presents options to user
+4. If approved, sdd-next invokes `sdd-modify-subagent` to apply changes systematically
+
+**Note:** This skill generates review reports identifying spec improvements. The review skill does NOT modify specs directly. Instead, **sdd-next** decides when and how to apply modifications based on review findings.
+
+**For complete workflow:** See `Skill(sdd-toolkit:sdd-next)` documentation on orchestrating spec modifications via sdd-modify after verification tasks complete.
+
 ## Fidelity Assessment
 
 ### Exact Match (✅)

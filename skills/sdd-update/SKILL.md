@@ -13,12 +13,13 @@ Use `Skill(sdd-toolkit:sdd-update)` to:
 - Document decisions and deviations in journal entries
 - Add verification results to specs
 - Move specs between lifecycle folders (e.g., pending => active, active => completed)
-- Update spec metadata fields
+- Update spec metadata fields (progress tracking, status)
 
 **Do NOT use for:**
 - Creating specifications
 - Finding what to work on next
 - Writing code or running tests
+- **Structural spec modifications** (use `Skill(sdd-toolkit:sdd-modify)` instead - see below)
 
 ## Core Philosophy
 
@@ -37,7 +38,39 @@ Use `Skill(sdd-toolkit:sdd-update)` to:
 ## Skill Family
 
 This skill is part of the **Spec-Driven Development** workflow:
-- **sdd-plan** - Creates specifications → **sdd-next** - Finds next task → **Implementation** → **sdd-update** (this skill) - Updates progress
+- **sdd-plan** - Creates specifications → **sdd-plan-review** / **sdd-fidelity-review** - Reviews specs → **sdd-modify** - Applies review feedback → **sdd-next** - Finds next task → **Implementation** → **sdd-update** (this skill) - Updates progress
+
+## Relationship to sdd-modify
+
+**When to use sdd-update vs sdd-modify:**
+
+| Operation | Use sdd-update | Use sdd-modify |
+|-----------|---------------|----------------|
+| Mark task completed | ✅ Yes | ❌ No |
+| Update task status (in_progress, blocked) | ✅ Yes | ❌ No |
+| Add journal entries | ✅ Yes | ❌ No |
+| Move spec between folders | ✅ Yes | ❌ No |
+| **Update task descriptions** | ❌ No | ✅ Yes |
+| **Add/remove tasks** | ❌ No | ✅ Yes |
+| **Add verification steps** | ❌ No | ✅ Yes |
+| **Apply review feedback systematically** | ❌ No | ✅ Yes |
+| **Bulk structural modifications** | ❌ No | ✅ Yes |
+
+**Key Distinction:**
+- **sdd-update** = Lightweight metadata updates (status, progress, journal entries)
+- **sdd-modify** = Heavyweight structural changes (task descriptions, adding tasks/verifications, review feedback)
+
+**Example - When to use sdd-modify:**
+
+If you need to:
+- Apply feedback from sdd-fidelity-review or sdd-plan-review
+- Update multiple task descriptions for clarity
+- Add verification steps discovered during implementation
+- Make bulk modifications to spec structure
+
+Then use: `Skill(sdd-toolkit:sdd-modify)`
+
+See **Systematic Spec Modification** section below for details.
 
 ## Workflow 1: Starting a Task
 
@@ -1199,3 +1232,77 @@ sdd query-tasks {spec-id} --status pending
 - `--dry-run` - Preview changes without saving
 - `--json` - Output as JSON for scripting
 - `--verify` - Auto-run verify tasks on completion
+
+## Systematic Spec Modification
+
+For **structural modifications** to specs (not progress tracking), use `Skill(sdd-toolkit:sdd-modify)`.
+
+### What is Systematic Spec Modification?
+
+Systematic modification applies structured changes to specs with:
+- Automatic backup before changes
+- Validation after changes
+- Transaction support with rollback
+- Preview before applying (dry-run mode)
+
+### Common Use Cases
+
+**1. Apply Review Feedback**
+
+After running sdd-fidelity-review or sdd-plan-review:
+
+```bash
+# Parse review feedback into structured modifications
+sdd parse-review my-spec-001 --review reports/review.md --output suggestions.json
+
+# Preview modifications
+sdd apply-modifications my-spec-001 --from suggestions.json --dry-run
+
+# Apply modifications
+sdd apply-modifications my-spec-001 --from suggestions.json
+```
+
+**2. Bulk Modifications**
+
+Apply multiple structural changes at once:
+
+```bash
+# Create modifications.json with desired changes
+# (update task descriptions, add verifications, correct metadata)
+
+# Apply bulk modifications
+sdd apply-modifications my-spec-001 --from modifications.json
+```
+
+**3. Update Task Descriptions**
+
+Make task descriptions more specific based on implementation learnings:
+
+```json
+{
+  "modifications": [
+    {
+      "operation": "update_task",
+      "task_id": "task-2-1",
+      "field": "description",
+      "value": "Implement OAuth 2.0 authentication with PKCE flow and JWT tokens"
+    }
+  ]
+}
+```
+
+### When to Use sdd-modify
+
+Use `Skill(sdd-toolkit:sdd-modify)` when you need to:
+- Apply review feedback from sdd-fidelity-review or sdd-plan-review
+- Update task descriptions for clarity (beyond just journaling)
+- Add verification steps discovered during implementation
+- Make multiple structural changes at once
+- Ensure changes are validated and safely applied
+
+### See Also
+
+- **Skill(sdd-toolkit:sdd-modify)** - Full documentation on systematic spec modification
+- **skills/sdd-modify/examples/** - Detailed workflow examples
+- **sdd parse-review --help** - Parse review reports into modification format
+- **sdd apply-modifications --help** - Apply modifications with validation
