@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:12:13
+**Generated:** 2025-11-06 11:39:45
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 216
-- **Total Lines:** 74426
+- **Total Files:** 217
+- **Total Lines:** 74732
 - **Total Classes:** 278
-- **Total Functions:** 811
+- **Total Functions:** 816
 - **Avg Complexity:** 5.69
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -5780,6 +5780,31 @@ Returns:
 
 ---
 
+### `_bump_version(current_version) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:13`
+**Complexity:** 6
+
+**Description:**
+> Increment the version number.
+
+Supports simple X.Y format (e.g., "1.0" -> "1.1", "1.9" -> "2.0").
+
+Args:
+    current_version: Current version string (e.g., "1.0", "2.5")
+
+Returns:
+    Bumped version string
+
+Raises:
+    ValueError: If version format is invalid
+
+**Parameters:**
+- `current_version`: str
+
+---
+
 ### `_bump_version(current_version, bump) -> Optional[str]`
 
 **Language:** python
@@ -7206,6 +7231,26 @@ Returns:
         "message": "Description of validation result",
         "errors": [...] (list of specific errors if validation failed)
     }
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
+### `_validate_spec_metadata(spec_data) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:58`
+**Complexity:** 4
+
+**Description:**
+> Validate that spec data has required metadata structure.
+
+Args:
+    spec_data: The spec data dictionary to validate
+
+Returns:
+    True if valid, False otherwise
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
@@ -10984,6 +11029,50 @@ Returns:
 - `title`: str
 - `body`: str
 - `base_branch`: str
+
+---
+
+### `create_revision(spec_data, changelog, modified_by) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:80`
+**Complexity:** 8
+
+**Description:**
+> Create a new revision entry for the spec.
+
+Increments the version number and adds a revision entry to
+metadata.revision_history[]. Creates the history array if it
+doesn't exist. The new revision is prepended to the history
+(most recent first).
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    changelog: Description of changes in this revision
+    modified_by: Identifier for who made the changes (e.g., email, username)
+
+Returns:
+    Dict with success status and new version:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "version": "X.Y" (new version number, only if success=True)
+    }
+
+Example:
+    >>> spec = {"metadata": {"version": "1.0"}}
+    >>> result = create_revision(spec, "Added new task", "user@example.com")
+    >>> result
+    {"success": True, "message": "...", "version": "1.1"}
+    >>> spec["metadata"]["version"]
+    "1.1"
+    >>> len(spec["metadata"]["revision_history"])
+    1
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `changelog`: str
+- `modified_by`: str
 
 ---
 
@@ -15163,6 +15252,44 @@ Example:
 
 ---
 
+### `get_revision_history(spec_data) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:174`
+**Complexity:** 2
+
+**Description:**
+> Get the revision history for a spec.
+
+Returns the list of all revisions with details, ordered from most
+recent to oldest.
+
+Args:
+    spec_data: The full spec data dictionary
+
+Returns:
+    List of revision entries, or empty list if no history exists.
+    Each entry contains:
+    {
+        "version": "X.Y",
+        "timestamp": "ISO 8601 timestamp",
+        "modified_by": "identifier",
+        "changelog": "description of changes"
+    }
+
+Example:
+    >>> spec = {"metadata": {"revision_history": [...]}}
+    >>> history = get_revision_history(spec)
+    >>> len(history)
+    3
+    >>> history[0]["version"]  # Most recent
+    "1.2"
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `get_routing_config(skill_name) -> Dict[str, str]`
 
 **Language:** python
@@ -17872,6 +17999,58 @@ Returns:
 - `spec_id`: str
 - `spec_title`: str
 - `parallel`: bool
+
+---
+
+### `rollback_to_version(spec_data, target_version) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/revision.py:209`
+**Complexity:** 8
+
+**Description:**
+> Revert spec to a previous version.
+
+Note: This implementation removes revisions newer than the target version
+from the history but does NOT restore the actual spec content from that
+version. Full snapshot-based rollback would require storing complete spec
+state at each revision, which is not implemented yet.
+
+This function is a placeholder for future enhancement where snapshots
+would be stored alongside revision entries.
+
+Args:
+    spec_data: The full spec data dictionary (modified in-place)
+    target_version: Version to rollback to (e.g., "1.3")
+
+Returns:
+    Dict with success status and information:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "version": "X.Y" (version after rollback, only if success=True)
+    }
+
+Example:
+    >>> spec = {
+    ...     "metadata": {
+    ...         "version": "1.5",
+    ...         "revision_history": [
+    ...             {"version": "1.5", ...},
+    ...             {"version": "1.4", ...},
+    ...             {"version": "1.3", ...}
+    ...         ]
+    ...     }
+    ... }
+    >>> result = rollback_to_version(spec, "1.3")
+    >>> result["success"]
+    True
+    >>> spec["metadata"]["version"]
+    "1.3"
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `target_version`: str
 
 ---
 
@@ -22915,6 +23094,9 @@ Returns:
 - `modification.transactional_modify`
 - `modification.update_node_field`
 - `modification.update_task_counts`
+- `revision.create_revision`
+- `revision.get_revision_history`
+- `revision.rollback_to_version`
 
 ### `src/claude_skills/claude_skills/sdd_spec_mod/modification.py`
 
@@ -22927,6 +23109,16 @@ Returns:
 - `sys`
 - `typing.Any`
 - `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/revision.py`
+
+- `datetime.datetime`
+- `datetime.timezone`
+- `sys`
+- `typing.Any`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`

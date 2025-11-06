@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T16:12:13.566032Z",
+    "generated_at": "2025-11-06T16:39:45.924765Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 216,
-    "total_lines": 74426,
+    "total_files": 217,
+    "total_lines": 74732,
     "total_classes": 278,
-    "total_functions": 811,
+    "total_functions": 816,
     "avg_complexity": 5.69,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 216,
-        "lines": 74426,
+        "files": 217,
+        "lines": 74732,
         "classes": 278,
-        "functions": 811,
+        "functions": 816,
         "avg_complexity": 5.69
       }
     }
@@ -3169,10 +3169,13 @@
         "modification.update_node_field",
         "modification.update_task_counts",
         "modification.spec_transaction",
-        "modification.transactional_modify"
+        "modification.transactional_modify",
+        "revision.create_revision",
+        "revision.get_revision_history",
+        "revision.rollback_to_version"
       ],
       "exports": [],
-      "lines": 27
+      "lines": 36
     },
     {
       "name": "modification",
@@ -3211,6 +3214,31 @@
       ],
       "exports": [],
       "lines": 960
+    },
+    {
+      "name": "revision",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "language": "python",
+      "docstring": "Revision tracking for SDD specifications.\n\nProvides functions for tracking spec versions, creating revision history entries,\nand managing spec modifications over time.",
+      "classes": [],
+      "functions": [
+        "_bump_version",
+        "_validate_spec_metadata",
+        "create_revision",
+        "get_revision_history",
+        "rollback_to_version"
+      ],
+      "imports": [
+        "sys",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.List",
+        "datetime.datetime",
+        "datetime.timezone"
+      ],
+      "exports": [],
+      "lines": 297
     },
     {
       "name": "__init__",
@@ -81867,6 +81895,302 @@
       "calls": []
     },
     {
+      "name": "_bump_version",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Increment the version number.\n\nSupports simple X.Y format (e.g., \"1.0\" -> \"1.1\", \"1.9\" -> \"2.0\").\n\nArgs:\n    current_version: Current version string (e.g., \"1.0\", \"2.5\")\n\nReturns:\n    Bumped version string\n\nRaises:\n    ValueError: If version format is invalid",
+      "parameters": [
+        {
+          "name": "current_version",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "create_revision",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
+          "name": "complete_task_workflow",
+          "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+          "line": 370,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 32,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 33,
+          "call_type": "function_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 36,
+          "call_type": "function_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 42,
+          "call_type": "function_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 43,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "_validate_spec_metadata",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "line": 58,
+      "language": "python",
+      "docstring": "Validate that spec data has required metadata structure.\n\nArgs:\n    spec_data: The spec data dictionary to validate\n\nReturns:\n    True if valid, False otherwise",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "bool",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "create_revision",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+          "line": 117,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_revision_history",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+          "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "rollback_to_version",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+          "line": 253,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 74,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "create_revision",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "line": 80,
+      "language": "python",
+      "docstring": "Create a new revision entry for the spec.\n\nIncrements the version number and adds a revision entry to\nmetadata.revision_history[]. Creates the history array if it\ndoesn't exist. The new revision is prepended to the history\n(most recent first).\n\nArgs:\n    spec_data: The full spec data dictionary (modified in-place)\n    changelog: Description of changes in this revision\n    modified_by: Identifier for who made the changes (e.g., email, username)\n\nReturns:\n    Dict with success status and new version:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"version\": \"X.Y\" (new version number, only if success=True)\n    }\n\nExample:\n    >>> spec = {\"metadata\": {\"version\": \"1.0\"}}\n    >>> result = create_revision(spec, \"Added new task\", \"user@example.com\")\n    >>> result\n    {\"success\": True, \"message\": \"...\", \"version\": \"1.1\"}\n    >>> spec[\"metadata\"][\"version\"]\n    \"1.1\"\n    >>> len(spec[\"metadata\"][\"revision_history\"])\n    1",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "changelog",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "modified_by",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "_validate_spec_metadata",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 129,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_bump_version",
+          "file": "unknown",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isoformat",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        },
+        {
+          "name": "now",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        },
+        {
+          "name": "insert",
+          "file": "unknown",
+          "line": 162,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "get_revision_history",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "line": 174,
+      "language": "python",
+      "docstring": "Get the revision history for a spec.\n\nReturns the list of all revisions with details, ordered from most\nrecent to oldest.\n\nArgs:\n    spec_data: The full spec data dictionary\n\nReturns:\n    List of revision entries, or empty list if no history exists.\n    Each entry contains:\n    {\n        \"version\": \"X.Y\",\n        \"timestamp\": \"ISO 8601 timestamp\",\n        \"modified_by\": \"identifier\",\n        \"changelog\": \"description of changes\"\n    }\n\nExample:\n    >>> spec = {\"metadata\": {\"revision_history\": [...]}}\n    >>> history = get_revision_history(spec)\n    >>> len(history)\n    3\n    >>> history[0][\"version\"]  # Most recent\n    \"1.2\"",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "List[Dict[str, Any]]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "_validate_spec_metadata",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 206,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "rollback_to_version",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+      "line": 209,
+      "language": "python",
+      "docstring": "Revert spec to a previous version.\n\nNote: This implementation removes revisions newer than the target version\nfrom the history but does NOT restore the actual spec content from that\nversion. Full snapshot-based rollback would require storing complete spec\nstate at each revision, which is not implemented yet.\n\nThis function is a placeholder for future enhancement where snapshots\nwould be stored alongside revision entries.\n\nArgs:\n    spec_data: The full spec data dictionary (modified in-place)\n    target_version: Version to rollback to (e.g., \"1.3\")\n\nReturns:\n    Dict with success status and information:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"version\": \"X.Y\" (version after rollback, only if success=True)\n    }\n\nExample:\n    >>> spec = {\n    ...     \"metadata\": {\n    ...         \"version\": \"1.5\",\n    ...         \"revision_history\": [\n    ...             {\"version\": \"1.5\", ...},\n    ...             {\"version\": \"1.4\", ...},\n    ...             {\"version\": \"1.3\", ...}\n    ...         ]\n    ...     }\n    ... }\n    >>> result = rollback_to_version(spec, \"1.3\")\n    >>> result[\"success\"]\n    True\n    >>> spec[\"metadata\"][\"version\"]\n    \"1.3\"",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "target_version",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "_validate_spec_metadata",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 276,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
       "name": "cmd_execute_verify",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
       "line": 50,
@@ -93608,6 +93932,12 @@
       "is_public": false,
       "callers": [
         {
+          "name": "create_revision",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
           "name": "complete_task_workflow",
           "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
           "line": 370,
@@ -93646,7 +93976,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "_simulate_workflow",
@@ -114605,7 +114935,10 @@
       "modification.update_node_field",
       "modification.update_task_counts",
       "modification.spec_transaction",
-      "modification.transactional_modify"
+      "modification.transactional_modify",
+      "revision.create_revision",
+      "revision.get_revision_history",
+      "revision.rollback_to_version"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/modification.py": [
       "sys",
@@ -114620,6 +114953,15 @@
       "contextlib.contextmanager",
       "claude_skills.common.spec.get_node",
       "claude_skills.common.spec.update_node"
+    ],
+    "src/claude_skills/claude_skills/sdd_spec_mod/revision.py": [
+      "sys",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "typing.List",
+      "datetime.datetime",
+      "datetime.timezone"
     ],
     "src/claude_skills/claude_skills/sdd_update/__init__.py": [
       "status.update_task_status",

@@ -146,10 +146,10 @@ def create_revision(
         }
 
     # Create revision entry
-    timestamp = datetime.now(timezone.utc).isoformat()
+    date = datetime.now(timezone.utc).isoformat()
     revision_entry = {
         "version": new_version,
-        "timestamp": timestamp,
+        "date": date,
         "modified_by": modified_by,
         "changelog": changelog
     }
@@ -186,7 +186,7 @@ def get_revision_history(spec_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         Each entry contains:
         {
             "version": "X.Y",
-            "timestamp": "ISO 8601 timestamp",
+            "date": "ISO 8601 timestamp",
             "modified_by": "identifier",
             "changelog": "description of changes"
         }
