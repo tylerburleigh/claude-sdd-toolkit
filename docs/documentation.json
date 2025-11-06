@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T17:58:32.625937Z",
+    "generated_at": "2025-11-06T18:01:51.486684Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 222,
-    "total_lines": 77005,
+    "total_lines": 77273,
     "total_classes": 290,
-    "total_functions": 833,
-    "avg_complexity": 5.75,
+    "total_functions": 838,
+    "avg_complexity": 5.74,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 222,
-        "lines": 77005,
+        "lines": 77273,
         "classes": 290,
-        "functions": 833,
-        "avg_complexity": 5.75
+        "functions": 838,
+        "avg_complexity": 5.74
       }
     }
   },
@@ -3170,12 +3170,13 @@
         "modification.update_task_counts",
         "modification.spec_transaction",
         "modification.transactional_modify",
+        "modification.apply_modifications",
         "revision.create_revision",
         "revision.get_revision_history",
         "revision.rollback_to_version"
       ],
       "exports": [],
-      "lines": 36
+      "lines": 38
     },
     {
       "name": "assumptions",
@@ -3237,7 +3238,12 @@
         "spec_transaction",
         "transactional_modify",
         "_validate_spec_integrity",
-        "update_task_counts"
+        "update_task_counts",
+        "apply_modifications",
+        "_handle_add_node",
+        "_handle_remove_node",
+        "_handle_update_node_field",
+        "_handle_move_node"
       ],
       "imports": [
         "sys",
@@ -3254,7 +3260,7 @@
         "claude_skills.common.spec.update_node"
       ],
       "exports": [],
-      "lines": 960
+      "lines": 1226
     },
     {
       "name": "revision",
@@ -81791,7 +81797,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "_handle_add_node",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1178,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "isinstance",
@@ -81907,7 +81920,8 @@
           "line": 179,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "_propagate_task_count_increase",
@@ -82044,7 +82058,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "_handle_remove_node",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1192,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "isinstance",
@@ -82160,7 +82181,8 @@
           "line": 333,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "_collect_descendants",
@@ -82475,7 +82497,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "_handle_update_node_field",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1209,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "isinstance",
@@ -82555,7 +82584,8 @@
           "line": 553,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "move_node",
@@ -82591,7 +82621,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "_handle_move_node",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1226,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "isinstance",
@@ -82731,7 +82768,8 @@
           "line": 722,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "_is_ancestor",
@@ -83059,6 +83097,362 @@
       "is_public": true,
       "callers": [],
       "calls": []
+    },
+    {
+      "name": "apply_modifications",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 963,
+      "language": "python",
+      "docstring": "Apply a batch of modifications from a JSON file to a spec.\n\nReads a JSON file containing an array of modification operations and\napplies them sequentially to the spec. Each operation is atomic - if\none fails, previous successful operations are kept but remaining ones\nare skipped.\n\nArgs:\n    spec_data: The full spec data dictionary to modify\n    modifications_file: Path to JSON file containing modifications array\n\nReturns:\n    Dict with overall status and per-operation results:\n    {\n        \"success\": True|False,\n        \"message\": \"Overall summary\",\n        \"total_operations\": N,\n        \"successful\": N,\n        \"failed\": N,\n        \"results\": [\n            {\n                \"operation\": {...},\n                \"success\": True|False,\n                \"message\": \"...\",\n                \"error\": \"...\" (only if failed)\n            },\n            ...\n        ]\n    }\n\nModification File Format:\n    {\n        \"modifications\": [\n            {\n                \"operation\": \"add_node\",\n                \"parent_id\": \"phase-1\",\n                \"node_data\": {\n                    \"node_id\": \"task-1-5\",\n                    \"type\": \"task\",\n                    \"title\": \"New task\",\n                    \"description\": \"...\",\n                    \"status\": \"pending\"\n                },\n                \"position\": 2\n            },\n            {\n                \"operation\": \"update_node_field\",\n                \"node_id\": \"task-1-1\",\n                \"field\": \"title\",\n                \"value\": \"Updated title\"\n            },\n            {\n                \"operation\": \"remove_node\",\n                \"node_id\": \"task-2-3\",\n                \"cascade\": true\n            },\n            {\n                \"operation\": \"move_node\",\n                \"node_id\": \"task-1-3\",\n                \"new_parent_id\": \"phase-2\",\n                \"position\": 0\n            }\n        ]\n    }\n\nRaises:\n    FileNotFoundError: If modifications_file doesn't exist\n    json.JSONDecodeError: If file is not valid JSON\n    ValueError: If file format is invalid",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "modifications_file",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 14,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 1043,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 1048,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
+          "file": "unknown",
+          "line": 1049,
+          "call_type": "method_call"
+        },
+        {
+          "name": "JSONDecodeError",
+          "file": "unknown",
+          "line": 1051,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1052,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 1058,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 1065,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 1082,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 1083,
+          "call_type": "function_call"
+        },
+        {
+          "name": "type",
+          "file": "unknown",
+          "line": 1088,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1090,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1094,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 1111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 1111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1113,
+          "call_type": "method_call"
+        },
+        {
+          "name": "handler",
+          "file": "unknown",
+          "line": 1120,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1123,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1124,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1132,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1136,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1138,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1144,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1145,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1147,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 1151,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_handle_add_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 1164,
+      "language": "python",
+      "docstring": "Handle add_node operation from modifications file.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "mod",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 1171,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1176,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_node",
+          "file": "unknown",
+          "line": 1178,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_handle_remove_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 1181,
+      "language": "python",
+      "docstring": "Handle remove_node operation from modifications file.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "mod",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1190,
+          "call_type": "method_call"
+        },
+        {
+          "name": "remove_node",
+          "file": "unknown",
+          "line": 1192,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_handle_update_node_field",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 1195,
+      "language": "python",
+      "docstring": "Handle update_node_field operation from modifications file.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "mod",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 1202,
+          "call_type": "method_call"
+        },
+        {
+          "name": "update_node_field",
+          "file": "unknown",
+          "line": 1209,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_handle_move_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 1212,
+      "language": "python",
+      "docstring": "Handle move_node operation from modifications file.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "mod",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 1219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1224,
+          "call_type": "method_call"
+        },
+        {
+          "name": "move_node",
+          "file": "unknown",
+          "line": 1226,
+          "call_type": "function_call"
+        }
+      ]
     },
     {
       "name": "_bump_version",
@@ -121088,6 +121482,7 @@
       "modification.update_task_counts",
       "modification.spec_transaction",
       "modification.transactional_modify",
+      "modification.apply_modifications",
       "revision.create_revision",
       "revision.get_revision_history",
       "revision.rollback_to_version"

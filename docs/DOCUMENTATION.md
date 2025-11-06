@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:58:32
+**Generated:** 2025-11-06 13:01:51
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 222
-- **Total Lines:** 77005
+- **Total Lines:** 77273
 - **Total Classes:** 290
-- **Total Functions:** 833
-- **Avg Complexity:** 5.75
+- **Total Functions:** 838
+- **Avg Complexity:** 5.74
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6668,6 +6668,21 @@ Returns:
 
 ---
 
+### `_handle_add_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1164`
+**Complexity:** 2
+
+**Description:**
+> Handle add_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
 ### `_handle_error(args, printer, exc) -> int`
 
 **Language:** python
@@ -6731,6 +6746,51 @@ Returns:
 **Parameters:**
 - `args`: argparse.Namespace
 - `printer`: None
+
+---
+
+### `_handle_move_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1212`
+**Complexity:** 2
+
+**Description:**
+> Handle move_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
+### `_handle_remove_node(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1181`
+**Complexity:** 2
+
+**Description:**
+> Handle remove_node operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
+
+---
+
+### `_handle_update_node_field(spec_data, mod) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1195`
+**Complexity:** 2
+
+**Description:**
+> Handle update_node_field operation from modifications file.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `mod`: Dict[str, Any]
 
 ---
 
@@ -8150,6 +8210,89 @@ Returns:
 **Parameters:**
 - `actions`: Iterable[FixAction]
 - `spec_path`: str
+
+---
+
+### `apply_modifications(spec_data, modifications_file) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:963`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Apply a batch of modifications from a JSON file to a spec.
+
+Reads a JSON file containing an array of modification operations and
+applies them sequentially to the spec. Each operation is atomic - if
+one fails, previous successful operations are kept but remaining ones
+are skipped.
+
+Args:
+    spec_data: The full spec data dictionary to modify
+    modifications_file: Path to JSON file containing modifications array
+
+Returns:
+    Dict with overall status and per-operation results:
+    {
+        "success": True|False,
+        "message": "Overall summary",
+        "total_operations": N,
+        "successful": N,
+        "failed": N,
+        "results": [
+            {
+                "operation": {...},
+                "success": True|False,
+                "message": "...",
+                "error": "..." (only if failed)
+            },
+            ...
+        ]
+    }
+
+Modification File Format:
+    {
+        "modifications": [
+            {
+                "operation": "add_node",
+                "parent_id": "phase-1",
+                "node_data": {
+                    "node_id": "task-1-5",
+                    "type": "task",
+                    "title": "New task",
+                    "description": "...",
+                    "status": "pending"
+                },
+                "position": 2
+            },
+            {
+                "operation": "update_node_field",
+                "node_id": "task-1-1",
+                "field": "title",
+                "value": "Updated title"
+            },
+            {
+                "operation": "remove_node",
+                "node_id": "task-2-3",
+                "cascade": true
+            },
+            {
+                "operation": "move_node",
+                "node_id": "task-1-3",
+                "new_parent_id": "phase-2",
+                "position": 0
+            }
+        ]
+    }
+
+Raises:
+    FileNotFoundError: If modifications_file doesn't exist
+    json.JSONDecodeError: If file is not valid JSON
+    ValueError: If file format is invalid
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `modifications_file`: str
 
 ---
 
@@ -23717,6 +23860,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_spec_mod/__init__.py`
 
 - `modification.add_node`
+- `modification.apply_modifications`
 - `modification.move_node`
 - `modification.remove_node`
 - `modification.spec_transaction`

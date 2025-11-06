@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/anthropics/claude-sdd-toolkit/schemas/modifications.json",
+  "title": "SDD Spec Modifications File",
+  "description": "Schema for batch modification operations on SDD specification files",
+  "type": "object",
+  "required": ["modifications"],
+  "properties": {
+    "modifications": {
+      "type": "array",
+      "description": "Array of modification operations to apply sequentially",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/definitions/AddNodeOperation" },
+          { "$ref": "#/definitions/RemoveNodeOperation" },
+          { "$ref": "#/definitions/UpdateNodeFieldOperation" },
+          { "$ref": "#/definitions/MoveNodeOperation" }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AddNodeOperation": {
+      "type": "object",
+      "description": "Add a new node to the spec hierarchy",
+      "required": ["operation", "parent_id", "node_data"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "add_node"
+        },
+        "parent_id": {
+          "type": "string",
+          "description": "ID of the parent node to add the child to"
+        },
+        "node_data": {
+          "type": "object",
+          "description": "Data for the new node",
+          "required": ["node_id", "type", "title"],
+          "properties": {
+            "node_id": {
+              "type": "string",
+              "description": "Unique identifier for the new node"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["phase", "task", "subtask", "verify", "group"],
+              "description": "Type of node to create"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Human-readable title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Optional detailed description"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in_progress", "completed", "blocked"],
+              "default": "pending",
+              "description": "Initial status of the node"
+            },
+            "metadata": {
+              "type": "object",
+              "description": "Additional metadata for the node"
+            },
+            "dependencies": {
+              "type": "object",
+              "description": "Task dependencies",
+              "properties": {
+                "blocks": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "IDs of tasks this node blocks"
+                },
+                "blocked_by": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "IDs of tasks blocking this node"
+                },
+                "depends": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "IDs of tasks this node depends on"
+                }
+              }
+            }
+          }
+        },
+        "position": {
+          "type": "integer",
+          "description": "Optional position in parent's children list (0-indexed). If omitted, appends to end."
+        }
+      }
+    },
+    "RemoveNodeOperation": {
+      "type": "object",
+      "description": "Remove a node from the spec hierarchy",
+      "required": ["operation", "node_id"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "remove_node"
+        },
+        "node_id": {
+          "type": "string",
+          "description": "ID of the node to remove"
+        },
+        "cascade": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, recursively removes all descendants. If false and node has children, operation fails."
+        }
+      }
+    },
+    "UpdateNodeFieldOperation": {
+      "type": "object",
+      "description": "Update a specific field on a node",
+      "required": ["operation", "node_id", "field", "value"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "update_node_field"
+        },
+        "node_id": {
+          "type": "string",
+          "description": "ID of the node to update"
+        },
+        "field": {
+          "type": "string",
+          "description": "Name of the field to update (e.g., 'title', 'description', 'status', 'metadata')",
+          "not": {
+            "enum": ["parent", "children", "total_tasks", "completed_tasks"]
+          }
+        },
+        "value": {
+          "description": "New value for the field (type depends on field)"
+        }
+      }
+    },
+    "MoveNodeOperation": {
+      "type": "object",
+      "description": "Move a node to a different parent in the hierarchy",
+      "required": ["operation", "node_id", "new_parent_id"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "const": "move_node"
+        },
+        "node_id": {
+          "type": "string",
+          "description": "ID of the node to move"
+        },
+        "new_parent_id": {
+          "type": "string",
+          "description": "ID of the new parent node"
+        },
+        "position": {
+          "type": "integer",
+          "description": "Optional position in new parent's children list (0-indexed). If omitted, appends to end."
+        }
+      }
+    }
+  }
+}
