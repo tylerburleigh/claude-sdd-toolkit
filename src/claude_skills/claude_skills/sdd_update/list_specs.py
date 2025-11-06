@@ -10,6 +10,37 @@ from rich.console import Console
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
 
 
+def _create_progress_bar(percentage: int, width: int = 10) -> str:
+    """
+    Create a visual progress bar using block characters.
+
+    Args:
+        percentage: Completion percentage (0-100)
+        width: Width of the progress bar in characters
+
+    Returns:
+        Rich markup string with colored progress bar
+    """
+    # Calculate filled and empty portions
+    filled = int((percentage / 100) * width)
+    empty = width - filled
+
+    # Create bar with color coding based on progress
+    if percentage >= 75:
+        color = "green"
+    elif percentage >= 50:
+        color = "yellow"
+    elif percentage >= 25:
+        color = "orange1"
+    else:
+        color = "red"
+
+    # Build the bar using block characters
+    bar = f"[{color}]{'█' * filled}[/{color}]{'░' * empty}"
+
+    return bar
+
+
 def list_specs(
     *,
     status: Optional[str] = None,
@@ -140,9 +171,12 @@ def _print_specs_text(
 
     # Add rows for each spec
     for spec in specs_info:
-        # Format progress with percentage
+        # Format progress with visual progress bar
         if spec['total_tasks'] > 0:
-            progress = f"{spec['completed_tasks']}/{spec['total_tasks']} ({spec['progress_percentage']}%)"
+            # Create visual progress bar
+            progress_bar = _create_progress_bar(spec['progress_percentage'], width=10)
+            # Combine bar with text
+            progress = f"{progress_bar} {spec['progress_percentage']}%\n{spec['completed_tasks']}/{spec['total_tasks']} tasks"
         else:
             progress = "No tasks"
 

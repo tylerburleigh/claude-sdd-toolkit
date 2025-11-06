@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 18:16:20
+**Generated:** 2025-11-06 18:25:17
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 237
-- **Total Lines:** 83517
+- **Total Lines:** 83552
 - **Total Classes:** 338
 - **Total Functions:** 859
 - **Avg Complexity:** 5.77
@@ -8122,11 +8122,11 @@ Returns:
 ### `_print_specs_text(specs_info, verbose, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:107`
-⚠️ **Complexity:** 16 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:110`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
-> Print specs in human-readable text format.
+> Print specs using Rich.Table for structured output.
 
 **Parameters:**
 - `specs_info`: List[Dict[str, Any]]
@@ -18343,7 +18343,7 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:10`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:13`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -25677,6 +25677,8 @@ Returns:
 - `claude_skills.common.load_json_spec`
 - `json`
 - `pathlib.Path`
+- `rich.console.Console`
+- `rich.table.Table`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
