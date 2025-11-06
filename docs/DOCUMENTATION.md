@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:15:43
+**Generated:** 2025-11-06 13:18:08
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 226
-- **Total Lines:** 78580
-- **Total Classes:** 294
-- **Total Functions:** 850
-- **Avg Complexity:** 5.77
+- **Total Files:** 227
+- **Total Lines:** 79030
+- **Total Classes:** 295
+- **Total Functions:** 851
+- **Avg Complexity:** 5.79
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -2724,6 +2724,28 @@ Attributes:
 - `test_dry_run_mode()`
 - `test_successful_application()`
 - `test_partial_failure()`
+
+---
+
+### `TestCmdParseReview`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py:12`
+
+**Description:**
+> Test the cmd_parse_review CLI command.
+
+**Methods:**
+- `mock_printer()`
+- `sample_review_result()`
+- `test_review_file_not_found()`
+- `test_parse_failure()`
+- `test_show_mode()`
+- `test_save_suggestions()`
+- `test_custom_output_path()`
+- `test_no_suggestions()`
+- `test_displays_metadata()`
+- `test_displays_issues_summary()`
 
 ---
 
@@ -10648,6 +10670,34 @@ Returns:
 
 **Description:**
 > Find next actionable task.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
+### `cmd_parse_review(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:157`
+⚠️ **Complexity:** 24 (High)
+
+**Description:**
+> Parse a review report and generate modification suggestions.
+
+Command: sdd parse-review <spec> --review <report.md> [--output suggestions.json]
+
+Args:
+    args: Parsed command-line arguments
+        - spec_id: Spec ID being reviewed
+        - review: Path to review report file (markdown or JSON)
+        - output: Optional output path for suggestions JSON
+        - show: If True, display suggestions instead of saving
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
 
 **Parameters:**
 - `args`: None
@@ -18801,7 +18851,7 @@ Args:
 ### `register_spec_mod(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:157`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:283`
 **Complexity:** 1
 
 **Description:**
@@ -24283,6 +24333,8 @@ Returns:
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.sdd_spec_mod.apply_modifications`
+- `claude_skills.sdd_spec_mod.parse_review_report`
+- `claude_skills.sdd_spec_mod.suggest_modifications`
 - `json`
 - `pathlib.Path`
 - `sys`
@@ -24949,6 +25001,16 @@ Returns:
 
 - `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
 - `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py`
+
+- `claude_skills.sdd_spec_mod.cli.cmd_parse_review`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.Mock`
+- `unittest.mock.mock_open`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
 

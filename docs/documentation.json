@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:15:43.242423Z",
+    "generated_at": "2025-11-06T18:18:08.668494Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 226,
-    "total_lines": 78580,
-    "total_classes": 294,
-    "total_functions": 850,
-    "avg_complexity": 5.77,
+    "total_files": 227,
+    "total_lines": 79030,
+    "total_classes": 295,
+    "total_functions": 851,
+    "avg_complexity": 5.79,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 226,
-        "lines": 78580,
-        "classes": 294,
-        "functions": 850,
-        "avg_complexity": 5.77
+        "files": 227,
+        "lines": 79030,
+        "classes": 295,
+        "functions": 851,
+        "avg_complexity": 5.79
       }
     }
   },
@@ -3211,6 +3211,7 @@
       "classes": [],
       "functions": [
         "cmd_apply_modifications",
+        "cmd_parse_review",
         "register_spec_mod"
       ],
       "imports": [
@@ -3222,10 +3223,12 @@
         "claude_skills.common.find_spec_file",
         "claude_skills.common.find_specs_directory",
         "claude_skills.common.load_json_spec",
-        "claude_skills.sdd_spec_mod.apply_modifications"
+        "claude_skills.sdd_spec_mod.apply_modifications",
+        "claude_skills.sdd_spec_mod.parse_review_report",
+        "claude_skills.sdd_spec_mod.suggest_modifications"
       ],
       "exports": [],
-      "lines": 190
+      "lines": 342
     },
     {
       "name": "estimates",
@@ -4920,6 +4923,27 @@
       ],
       "exports": [],
       "lines": 939
+    },
+    {
+      "name": "test_parse_review_cli",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+      "language": "python",
+      "docstring": "Unit tests for parse-review CLI command.",
+      "classes": [
+        "TestCmdParseReview"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "pathlib.Path",
+        "unittest.mock.Mock",
+        "unittest.mock.patch",
+        "unittest.mock.mock_open",
+        "claude_skills.sdd_spec_mod.cli.cmd_parse_review"
+      ],
+      "exports": [],
+      "lines": 298
     },
     {
       "name": "test_revision",
@@ -15476,6 +15500,31 @@
       "methods": [
         "test_get_session_state_called_with_correct_path",
         "test_multiple_in_progress_tasks_display"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCmdParseReview",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Test the cmd_parse_review CLI command.",
+      "bases": [],
+      "methods": [
+        "mock_printer",
+        "sample_review_result",
+        "test_review_file_not_found",
+        "test_parse_failure",
+        "test_show_mode",
+        "test_save_suggestions",
+        "test_custom_output_path",
+        "test_no_suggestions",
+        "test_displays_metadata",
+        "test_displays_issues_summary"
       ],
       "properties": [],
       "is_exported": false,
@@ -82310,9 +82359,489 @@
       "call_count": 6
     },
     {
-      "name": "register_spec_mod",
+      "name": "cmd_parse_review",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
       "line": 157,
+      "language": "python",
+      "docstring": "Parse a review report and generate modification suggestions.\n\nCommand: sdd parse-review <spec> --review <report.md> [--output suggestions.json]\n\nArgs:\n    args: Parsed command-line arguments\n        - spec_id: Spec ID being reviewed\n        - review: Path to review report file (markdown or JSON)\n        - output: Optional output path for suggestions JSON\n        - show: If True, display suggestions instead of saving\n    printer: PrettyPrinter instance for formatted output\n\nReturns:\n    Exit code (0 for success, 1 for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 24,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_review_file_not_found",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_parse_failure",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 104,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_show_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 140,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_save_suggestions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 181,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_custom_output_path",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 209,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_no_suggestions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 239,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_displays_metadata",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 266,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_displays_issues_summary",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py",
+          "line": 293,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 180,
+          "call_type": "method_call"
+        },
+        {
+          "name": "parse_review_report",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 189,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 189,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 192,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 193,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 193,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 197,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 199,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 200,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 201,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 203,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 204,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 206,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 209,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 211,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 213,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 221,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 221,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 223,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 225,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 227,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 232,
+          "call_type": "method_call"
+        },
+        {
+          "name": "suggest_modifications",
+          "file": "unknown",
+          "line": 233,
+          "call_type": "function_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "function_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 241,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 242,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 243,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 243,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 243,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 244,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 245,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 246,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 247,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 249,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 251,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "method_call"
+        },
+        {
+          "name": "with_suffix",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 260,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 261,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dump",
+          "file": "unknown",
+          "line": 267,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 271,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 272,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 273,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 8
+    },
+    {
+      "name": "register_spec_mod",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+      "line": 283,
       "language": "python",
       "docstring": "Register spec modification commands.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -82345,37 +82874,73 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 166,
+          "line": 292,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 171,
+          "line": 297,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 175,
+          "line": 301,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 181,
+          "line": 307,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 186,
+          "line": 312,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 190,
+          "line": 316,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 319,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 324,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 328,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 333,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 342,
           "call_type": "method_call"
         }
       ],
@@ -84269,7 +84834,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "cmd_parse_review",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 184,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "exists",
@@ -84301,7 +84873,8 @@
           "line": 65,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "_parse_json_report",
@@ -85000,6 +85573,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "cmd_parse_review",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 233,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_empty_issues_returns_empty_list",
           "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
           "line": 15,
@@ -85110,7 +85689,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 6
+      "call_count": 7
     },
     {
       "name": "_suggest_for_issue",
@@ -123602,7 +124181,9 @@
       "claude_skills.common.find_spec_file",
       "claude_skills.common.find_specs_directory",
       "claude_skills.common.load_json_spec",
-      "claude_skills.sdd_spec_mod.apply_modifications"
+      "claude_skills.sdd_spec_mod.apply_modifications",
+      "claude_skills.sdd_spec_mod.parse_review_report",
+      "claude_skills.sdd_spec_mod.suggest_modifications"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/estimates.py": [
       "typing.Dict",
@@ -124211,6 +124792,15 @@
     "src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py": [
       "pytest",
       "claude_skills.doc_query.doc_query_lib.DocumentationQuery"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_parse_review_cli.py": [
+      "json",
+      "pytest",
+      "pathlib.Path",
+      "unittest.mock.Mock",
+      "unittest.mock.patch",
+      "unittest.mock.mock_open",
+      "claude_skills.sdd_spec_mod.cli.cmd_parse_review"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_revision.py": [
       "pytest",
