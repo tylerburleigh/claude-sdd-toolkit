@@ -515,23 +515,27 @@ def _check_all_task_deps(spec_data, args, printer):
         printer.result("Ready to start", str(len(ready)))
         printer.result("Blocked", str(len(blocked)))
         printer.result("With soft dependencies", str(len(has_soft_deps)))
+        print()  # Blank line for spacing
+
+        # Use Rich Console for colored output
+        console = Console()
 
         if ready:
-            print("\n✓ Ready to start:")
+            console.print("\n✅ [bold green]Ready to start:[/bold green]")
             for dep in ready:
-                printer.detail(f"• {dep['task_id']}", indent=1)
+                console.print(f"  • [green]{dep['task_id']}[/green]")
 
         if blocked:
-            print("\n✗ Blocked:")
+            console.print("\n🚫 [bold red]Blocked:[/bold red]")
             for dep in blocked:
                 blockers = ", ".join([b['id'] for b in dep['blocked_by']])
-                printer.detail(f"• {dep['task_id']} (blocked by: {blockers})", indent=1)
+                console.print(f"  • [red]{dep['task_id']}[/red] [dim](blocked by: {blockers})[/dim]")
 
         if has_soft_deps:
-            print("\n⚠️  With soft dependencies:")
+            console.print("\n⚠️  [bold yellow]With soft dependencies:[/bold yellow]")
             for dep in has_soft_deps:
                 soft = ", ".join([s['id'] for s in dep['soft_depends']])
-                printer.detail(f"• {dep['task_id']} (depends on: {soft})", indent=1)
+                console.print(f"  • [yellow]{dep['task_id']}[/yellow] [dim](depends on: {soft})[/dim]")
 
     return 0
 

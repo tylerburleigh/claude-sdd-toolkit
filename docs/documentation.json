@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T23:45:05.904239Z",
+    "generated_at": "2025-11-06T23:52:53.458429Z",
     "languages": [
       "python"
     ],
@@ -10,9 +10,9 @@
   },
   "statistics": {
     "total_files": 239,
-    "total_lines": 84007,
+    "total_lines": 84056,
     "total_classes": 338,
-    "total_functions": 865,
+    "total_functions": 866,
     "avg_complexity": 5.79,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -25,9 +25,9 @@
     "by_language": {
       "python": {
         "files": 239,
-        "lines": 84007,
+        "lines": 84056,
         "classes": 338,
-        "functions": 865,
+        "functions": 866,
         "avg_complexity": 5.79
       }
     }
@@ -2365,6 +2365,7 @@
         "cmd_find_specs",
         "cmd_next_task",
         "cmd_task_info",
+        "_build_dependency_tree",
         "cmd_check_deps",
         "_check_all_task_deps",
         "cmd_progress",
@@ -2388,7 +2389,11 @@
         "argparse",
         "pathlib.Path",
         "typing.List",
+        "typing.Dict",
+        "typing.Any",
         "os",
+        "rich.tree.Tree",
+        "rich.console.Console",
         "claude_skills.common.find_specs_directory",
         "claude_skills.common.load_json_spec",
         "claude_skills.common.get_progress_summary",
@@ -2416,7 +2421,7 @@
         "claude_skills.sdd_next.workflow.find_pattern"
       ],
       "exports": [],
-      "lines": 1191
+      "lines": 1240
     },
     {
       "name": "discovery",
@@ -32255,7 +32260,7 @@
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 685,
+          "line": 734,
           "call_type": "function_call"
         },
         {
@@ -34144,7 +34149,7 @@
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 615,
+          "line": 664,
           "call_type": "function_call"
         },
         {
@@ -39107,43 +39112,43 @@
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 330,
+          "line": 333,
           "call_type": "function_call"
         },
         {
           "name": "cmd_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 369,
+          "line": 372,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 415,
+          "line": 477,
           "call_type": "function_call"
         },
         {
           "name": "_check_all_task_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 457,
+          "line": 506,
           "call_type": "function_call"
         },
         {
           "name": "cmd_progress",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 507,
+          "line": 556,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 670,
+          "line": 719,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 717,
+          "line": 766,
           "call_type": "function_call"
         }
       ],
@@ -39584,49 +39589,49 @@
         {
           "name": "cmd_find_specs",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 302,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "cmd_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 353,
+          "line": 356,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 391,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "cmd_progress",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 495,
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 592,
+          "line": 641,
           "call_type": "function_call"
         },
         {
           "name": "cmd_format_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 749,
+          "line": 798,
           "call_type": "function_call"
         },
         {
           "name": "cmd_find_circular_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 943,
+          "line": 992,
           "call_type": "function_call"
         },
         {
@@ -40178,7 +40183,7 @@
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 313,
+          "line": 316,
           "call_type": "function_call"
         },
         {
@@ -40758,7 +40763,7 @@
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 598,
+          "line": 647,
           "call_type": "function_call"
         },
         {
@@ -41604,13 +41609,13 @@
         {
           "name": "format_execution_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 86,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "cmd_progress",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 504,
+          "line": 553,
           "call_type": "function_call"
         },
         {
@@ -44948,43 +44953,43 @@
         {
           "name": "format_execution_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 73,
+          "line": 76,
           "call_type": "function_call"
         },
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 307,
+          "line": 310,
           "call_type": "function_call"
         },
         {
           "name": "cmd_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 358,
+          "line": 361,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 396,
+          "line": 458,
           "call_type": "function_call"
         },
         {
           "name": "cmd_progress",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 500,
+          "line": 549,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 682,
+          "line": 731,
           "call_type": "function_call"
         },
         {
           "name": "cmd_find_circular_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 948,
+          "line": 997,
           "call_type": "function_call"
         },
         {
@@ -71009,7 +71014,7 @@
     {
       "name": "format_execution_plan",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 60,
+      "line": 63,
       "language": "python",
       "docstring": "Format an execution plan for a task with proper newlines and structure.\n\nArgs:\n    spec_id: Specification ID\n    task_id: Task ID to format\n    specs_dir: Path to specs directory\n\nReturns:\n    Formatted execution plan string ready for display",
       "parameters": [
@@ -71039,7 +71044,7 @@
         {
           "name": "cmd_format_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 754,
+          "line": 803,
           "call_type": "function_call"
         }
       ],
@@ -71047,67 +71052,61 @@
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 73,
+          "line": 76,
           "call_type": "function_call"
         },
         {
           "name": "prepare_task",
           "file": "unknown",
-          "line": 78,
+          "line": 81,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 79,
+          "line": 82,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 80,
+          "line": 83,
           "call_type": "method_call"
         },
         {
           "name": "get_progress_summary",
           "file": "unknown",
-          "line": 86,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 89,
+          "line": 92,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 90,
+          "line": 93,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 91,
+          "line": 94,
           "call_type": "method_call"
         },
         {
           "name": "startswith",
           "file": "unknown",
-          "line": 92,
+          "line": 95,
           "call_type": "method_call"
         },
         {
           "name": "replace",
           "file": "unknown",
-          "line": 92,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 98,
+          "line": 95,
           "call_type": "method_call"
         },
         {
@@ -71117,21 +71116,15 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
-          "file": "unknown",
-          "line": 103,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 103,
-          "call_type": "method_call"
-        },
-        {
           "name": "append",
           "file": "unknown",
           "line": 104,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 106,
           "call_type": "method_call"
         },
         {
@@ -71149,23 +71142,17 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 114,
+          "line": 109,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 110,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 115,
-          "call_type": "method_call"
-        },
-        {
-          "name": "int",
-          "file": "unknown",
-          "line": 116,
-          "call_type": "function_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 117,
           "call_type": "method_call"
@@ -71173,25 +71160,37 @@
         {
           "name": "get",
           "file": "unknown",
+          "line": 118,
+          "call_type": "method_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
           "line": 119,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 120,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 119,
+          "line": 122,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 122,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 121,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 123,
+          "line": 124,
           "call_type": "method_call"
         },
         {
@@ -71201,27 +71200,21 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
           "line": 129,
           "call_type": "method_call"
         },
         {
-          "name": "append",
-          "file": "unknown",
-          "line": 130,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 132,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
-          "line": 134,
+          "line": 133,
           "call_type": "method_call"
         },
         {
@@ -71231,13 +71224,13 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
-          "line": 136,
+          "line": 137,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
           "line": 138,
           "call_type": "method_call"
@@ -71261,13 +71254,13 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
-          "line": 143,
+          "line": 144,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
           "line": 145,
           "call_type": "method_call"
@@ -71281,17 +71274,23 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 146,
+          "line": 148,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 148,
+          "line": 149,
           "call_type": "method_call"
         },
         {
           "name": "get",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 151,
           "call_type": "method_call"
@@ -71299,29 +71298,23 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 152,
+          "line": 154,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 152,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 153,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 155,
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
           "file": "unknown",
           "line": 156,
           "call_type": "method_call"
@@ -71329,61 +71322,67 @@
         {
           "name": "append",
           "file": "unknown",
+          "line": 158,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
           "line": 159,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 162,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 159,
+          "line": 162,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 160,
+          "line": 163,
           "call_type": "method_call"
         },
         {
           "name": "set",
           "file": "unknown",
-          "line": 171,
+          "line": 174,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 174,
+          "line": 177,
           "call_type": "method_call"
         },
         {
           "name": "add",
           "file": "unknown",
-          "line": 175,
+          "line": 178,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 178,
+          "line": 181,
           "call_type": "method_call"
         },
         {
           "name": "title",
           "file": "unknown",
-          "line": 181,
+          "line": 184,
           "call_type": "method_call"
         },
         {
           "name": "replace",
           "file": "unknown",
-          "line": 181,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 182,
+          "line": 184,
           "call_type": "method_call"
         },
         {
@@ -71395,19 +71394,7 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 186,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 187,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
-          "file": "unknown",
-          "line": 187,
+          "line": 188,
           "call_type": "method_call"
         },
         {
@@ -71419,25 +71406,31 @@
         {
           "name": "append",
           "file": "unknown",
+          "line": 190,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 190,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
           "line": 192,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 193,
+          "line": 195,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 194,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 195,
+          "line": 196,
           "call_type": "method_call"
         },
         {
@@ -71447,7 +71440,7 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 198,
           "call_type": "method_call"
@@ -71465,18 +71458,6 @@
           "call_type": "method_call"
         },
         {
-          "name": "lower",
-          "file": "unknown",
-          "line": 202,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 202,
-          "call_type": "method_call"
-        },
-        {
           "name": "append",
           "file": "unknown",
           "line": 203,
@@ -71489,19 +71470,31 @@
           "call_type": "method_call"
         },
         {
+          "name": "lower",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
           "name": "get",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 206,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 207,
           "call_type": "method_call"
         },
         {
-          "name": "append",
-          "file": "unknown",
-          "line": 208,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 210,
           "call_type": "method_call"
@@ -71513,27 +71506,21 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
+          "file": "unknown",
+          "line": 213,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 214,
           "call_type": "method_call"
         },
         {
-          "name": "append",
-          "file": "unknown",
-          "line": 216,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 217,
-          "call_type": "method_call"
-        },
-        {
           "name": "get",
           "file": "unknown",
-          "line": 218,
+          "line": 217,
           "call_type": "method_call"
         },
         {
@@ -71551,6 +71538,12 @@
         {
           "name": "get",
           "file": "unknown",
+          "line": 221,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
           "line": 222,
           "call_type": "method_call"
         },
@@ -71561,28 +71554,16 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 225,
           "call_type": "method_call"
         },
         {
-          "name": "len",
-          "file": "unknown",
-          "line": 226,
-          "call_type": "function_call"
-        },
-        {
           "name": "append",
           "file": "unknown",
-          "line": 227,
+          "line": 226,
           "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 227,
-          "call_type": "function_call"
         },
         {
           "name": "append",
@@ -71591,10 +71572,22 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "len",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 230,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 230,
+          "call_type": "function_call"
         },
         {
           "name": "append",
@@ -71603,7 +71596,7 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 233,
           "call_type": "method_call"
@@ -71615,21 +71608,21 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
+          "file": "unknown",
+          "line": 236,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 237,
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
-          "line": 238,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 239,
+          "line": 240,
           "call_type": "method_call"
         },
         {
@@ -71645,9 +71638,21 @@
           "call_type": "method_call"
         },
         {
+          "name": "append",
+          "file": "unknown",
+          "line": 244,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 245,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 247,
+          "line": 250,
           "call_type": "method_call"
         }
       ],
@@ -71656,7 +71661,7 @@
     {
       "name": "cmd_verify_tools",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 250,
+      "line": 253,
       "language": "python",
       "docstring": "Verify required tools are available.",
       "parameters": [
@@ -71682,29 +71687,17 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 252,
-          "call_type": "method_call"
-        },
-        {
-          "name": "success",
-          "file": "unknown",
           "line": 255,
           "call_type": "method_call"
         },
         {
-          "name": "system",
-          "file": "unknown",
-          "line": 260,
-          "call_type": "method_call"
-        },
-        {
           "name": "success",
           "file": "unknown",
-          "line": 261,
+          "line": 258,
           "call_type": "method_call"
         },
         {
-          "name": "warning",
+          "name": "system",
           "file": "unknown",
           "line": 263,
           "call_type": "method_call"
@@ -71712,7 +71705,19 @@
         {
           "name": "success",
           "file": "unknown",
-          "line": 265,
+          "line": 264,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 268,
           "call_type": "method_call"
         }
       ]
@@ -71720,7 +71725,7 @@
     {
       "name": "cmd_find_specs",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 269,
+      "line": 272,
       "language": "python",
       "docstring": "Find specs directories.",
       "parameters": [
@@ -71746,85 +71751,85 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 271,
+          "line": 274,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 275,
+          "line": 278,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 278,
+          "line": 281,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 279,
+          "line": 282,
           "call_type": "function_call"
         },
         {
           "name": "is_dir",
           "file": "unknown",
-          "line": 286,
+          "line": 289,
           "call_type": "method_call"
         },
         {
           "name": "extend",
           "file": "unknown",
-          "line": 287,
+          "line": 290,
           "call_type": "method_call"
         },
         {
           "name": "glob",
           "file": "unknown",
-          "line": 287,
+          "line": 290,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 290,
+          "line": 293,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 290,
+          "line": 293,
           "call_type": "function_call"
         },
         {
           "name": "sorted",
           "file": "unknown",
-          "line": 291,
+          "line": 294,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 292,
+          "line": 295,
           "call_type": "method_call"
         }
       ]
@@ -71832,7 +71837,7 @@
     {
       "name": "cmd_next_task",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 297,
+      "line": 300,
       "language": "python",
       "docstring": "Find next actionable task.",
       "parameters": [
@@ -71858,145 +71863,121 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 300,
+          "line": 303,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 302,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 302,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 302,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 304,
+          "line": 307,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 307,
+          "line": 310,
           "call_type": "function_call"
         },
         {
           "name": "find_spec_file",
           "file": "unknown",
-          "line": 313,
+          "line": 316,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 314,
+          "line": 317,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 315,
+          "line": 318,
           "call_type": "method_call"
         },
         {
           "name": "get_next_task",
           "file": "unknown",
-          "line": 321,
+          "line": 324,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 324,
+          "line": 327,
           "call_type": "method_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 330,
+          "line": 333,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 332,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 333,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 334,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 334,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 335,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 335,
+          "line": 336,
           "call_type": "method_call"
         },
         {
-          "name": "success",
+          "name": "get",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 337,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
           "file": "unknown",
           "line": 338,
           "call_type": "method_call"
         },
         {
-          "name": "result",
-          "file": "unknown",
-          "line": 339,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 340,
-          "call_type": "method_call"
-        },
-        {
           "name": "get",
           "file": "unknown",
-          "line": 340,
+          "line": 338,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "success",
           "file": "unknown",
           "line": 341,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "result",
           "file": "unknown",
-          "line": 341,
+          "line": 342,
           "call_type": "method_call"
         },
         {
@@ -72004,13 +71985,37 @@
           "file": "unknown",
           "line": 343,
           "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 343,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 344,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 344,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 346,
+          "call_type": "method_call"
         }
       ]
     },
     {
       "name": "cmd_task_info",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 348,
+      "line": 351,
       "language": "python",
       "docstring": "Get detailed task information.",
       "parameters": [
@@ -72036,101 +72041,65 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 351,
+          "line": 354,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 353,
+          "line": 356,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 353,
+          "line": 356,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 353,
+          "line": 356,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 355,
+          "line": 358,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 358,
+          "line": 361,
           "call_type": "function_call"
         },
         {
           "name": "get_task_info",
           "file": "unknown",
-          "line": 362,
+          "line": 365,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 365,
+          "line": 368,
           "call_type": "method_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 369,
+          "line": 372,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 371,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 372,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 373,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 373,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 374,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 374,
           "call_type": "method_call"
         },
         {
           "name": "result",
-          "file": "unknown",
-          "line": 375,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 375,
           "call_type": "method_call"
@@ -72148,7 +72117,19 @@
           "call_type": "method_call"
         },
         {
+          "name": "result",
+          "file": "unknown",
+          "line": 377,
+          "call_type": "method_call"
+        },
+        {
           "name": "get",
+          "file": "unknown",
+          "line": 377,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
           "file": "unknown",
           "line": 378,
           "call_type": "method_call"
@@ -72162,33 +72143,243 @@
         {
           "name": "result",
           "file": "unknown",
-          "line": 380,
+          "line": 379,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 382,
+          "line": 379,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 382,
+          "line": 381,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 381,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 384,
+          "line": 383,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 385,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 385,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 387,
           "call_type": "method_call"
         }
       ]
     },
     {
+      "name": "_build_dependency_tree",
+      "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "line": 392,
+      "language": "python",
+      "docstring": "Build a Rich Tree visualization for task dependencies.\n\nArgs:\n    deps: Dependency information dictionary from check_dependencies()\n    task_id: The task ID being analyzed\n\nReturns:\n    Rich Tree object representing the dependency structure",
+      "parameters": [
+        {
+          "name": "deps",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "task_id",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Tree",
+      "complexity": 13,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "cmd_check_deps",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 483,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 404,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 408,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 409,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 411,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 412,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 413,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 415,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 417,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 420,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 421,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 423,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 424,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 425,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 429,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 434,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 435,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 437,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 438,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 440,
+          "call_type": "function_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 442,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 445,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 445,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 445,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add",
+          "file": "unknown",
+          "line": 446,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
       "name": "cmd_check_deps",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 389,
+      "line": 451,
       "language": "python",
       "docstring": "Check task dependencies.",
       "parameters": [
@@ -72204,7 +72395,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 14,
+      "complexity": 8,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -72214,115 +72405,85 @@
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 391,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 391,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 391,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 393,
+          "line": 455,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 396,
+          "line": 458,
           "call_type": "function_call"
         },
         {
           "name": "_check_all_task_deps",
           "file": "unknown",
-          "line": 402,
+          "line": 464,
           "call_type": "function_call"
         },
         {
           "name": "action",
           "file": "unknown",
-          "line": 406,
+          "line": 468,
           "call_type": "method_call"
         },
         {
           "name": "check_dependencies",
           "file": "unknown",
-          "line": 408,
+          "line": 470,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 411,
+          "line": 473,
           "call_type": "method_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 415,
+          "line": 477,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 417,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 418,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 420,
+          "line": 479,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 423,
+          "line": 480,
           "call_type": "function_call"
         },
         {
-          "name": "detail",
+          "name": "_build_dependency_tree",
           "file": "unknown",
-          "line": 425,
-          "call_type": "method_call"
+          "line": 483,
+          "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 428,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 431,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 434,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 436,
+          "line": 485,
           "call_type": "method_call"
         }
       ]
@@ -72330,7 +72491,7 @@
     {
       "name": "_check_all_task_deps",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 441,
+      "line": 490,
       "language": "python",
       "docstring": "Check dependencies for all tasks in the spec.",
       "parameters": [
@@ -72360,7 +72521,7 @@
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 402,
+          "line": 464,
           "call_type": "function_call"
         }
       ],
@@ -72368,169 +72529,169 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 444,
+          "line": 493,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 446,
+          "line": 495,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 450,
+          "line": 499,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 451,
+          "line": 500,
           "call_type": "method_call"
         },
         {
           "name": "check_dependencies",
           "file": "unknown",
-          "line": 452,
+          "line": 501,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 454,
+          "line": 503,
           "call_type": "method_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 457,
+          "line": 506,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 464,
+          "line": 513,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 465,
+          "line": 514,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 465,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 465,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 466,
+          "line": 515,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 466,
+          "line": 515,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 466,
+          "line": 515,
           "call_type": "function_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 467,
+          "line": 516,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 467,
+          "line": 516,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 467,
+          "line": 516,
           "call_type": "function_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 468,
+          "line": 517,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 468,
+          "line": 517,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 468,
+          "line": 517,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 471,
+          "line": 520,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 473,
+          "line": 522,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 476,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 478,
+          "line": 527,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 479,
+          "line": 528,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 482,
+          "line": 531,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 484,
+          "line": 533,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 485,
+          "line": 534,
           "call_type": "method_call"
         }
       ],
@@ -72539,7 +72700,7 @@
     {
       "name": "cmd_progress",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 490,
+      "line": 539,
       "language": "python",
       "docstring": "Show overall progress.",
       "parameters": [
@@ -72565,79 +72726,79 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 493,
+          "line": 542,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 495,
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 495,
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 495,
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 497,
+          "line": 546,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 500,
+          "line": 549,
           "call_type": "function_call"
         },
         {
           "name": "get_progress_summary",
           "file": "unknown",
-          "line": 504,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 507,
+          "line": 556,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 509,
+          "line": 558,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 510,
+          "line": 559,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 511,
+          "line": 560,
           "call_type": "method_call"
         },
         {
           "name": "int",
           "file": "unknown",
-          "line": 515,
+          "line": 564,
           "call_type": "function_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 516,
+          "line": 565,
           "call_type": "method_call"
         }
       ]
@@ -72645,7 +72806,7 @@
     {
       "name": "cmd_init_env",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 523,
+      "line": 572,
       "language": "python",
       "docstring": "Initialize development environment.",
       "parameters": [
@@ -72671,61 +72832,61 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 526,
+          "line": 575,
           "call_type": "method_call"
         },
         {
           "name": "init_environment",
           "file": "unknown",
-          "line": 528,
+          "line": 577,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 531,
+          "line": 580,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 535,
+          "line": 584,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 535,
+          "line": 584,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 538,
+          "line": 587,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 539,
+          "line": 588,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 541,
+          "line": 590,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 542,
+          "line": 591,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 543,
+          "line": 592,
           "call_type": "method_call"
         }
       ]
@@ -72733,7 +72894,7 @@
     {
       "name": "cmd_prepare_task",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 548,
+      "line": 597,
       "language": "python",
       "docstring": "Prepare task for implementation.\n\nThis command integrates with the automatic completion detection system.\nIt calls prepare_task() from discovery.py which returns completion signals\nwhen all tasks in a spec are finished.\n\nCompletion Signal Handling (from prepare_task() in discovery.py):\n----------------------------------------------------------------\nprepare_task() performs completion detection and returns different signals\nbased on the spec's state:\n\nScenario 1: No Actionable Tasks Available\n    - Returned when: No pending/unblocked tasks found\n    - Signal: success=False, spec_complete=False\n    - completion_info present if tasks are blocked\n    - Indicates: Tasks exist but are blocked by dependencies\n\nScenario 2: Spec/Phase Complete\n    - Returned when: All tasks completed, no blocked tasks\n    - Signal: success=True, spec_complete=True\n    - completion_info contains should_prompt=True\n    - Indicates: Ready to finalize and move to completed/\n\nScenario 3: Normal Task Found\n    - Returned when: Found actionable task to work on\n    - Signal: success=True, task_id set, spec_complete=False\n    - Indicates: Continue normal workflow with returned task\n\nThe completion_info dict structure (from should_prompt_completion):\n    {\n        \"should_prompt\": bool,      # True if ready to complete\n        \"reason\": str,               # Human-readable explanation\n        \"is_complete\": bool,         # All tasks done\n        \"blocked_count\": int,        # Number of blocked tasks\n        \"blocked_tasks\": List[str],  # IDs of blocked tasks\n        \"node_id\": str,              # Node that was checked\n        \"error\": Optional[str]       # Error if check failed\n    }",
       "parameters": [
@@ -72759,188 +72920,98 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 590,
+          "line": 639,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 592,
+          "line": 641,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 592,
+          "line": 641,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 592,
+          "line": 641,
           "call_type": "function_call"
         },
         {
           "name": "error",
-          "file": "unknown",
-          "line": 594,
-          "call_type": "method_call"
-        },
-        {
-          "name": "ensure_reports_directory",
-          "file": "unknown",
-          "line": 598,
-          "call_type": "function_call"
-        },
-        {
-          "name": "prepare_task",
-          "file": "unknown",
-          "line": 602,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 609,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 612,
-          "call_type": "method_call"
-        },
-        {
-          "name": "prompt_for_generation",
-          "file": "unknown",
-          "line": 615,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 617,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 618,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 619,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 622,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 634,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 637,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 638,
-          "call_type": "method_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 640,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 643,
           "call_type": "method_call"
         },
         {
-          "name": "detail",
+          "name": "ensure_reports_directory",
           "file": "unknown",
-          "line": 645,
+          "line": 647,
+          "call_type": "function_call"
+        },
+        {
+          "name": "prepare_task",
+          "file": "unknown",
+          "line": 651,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 658,
           "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 661,
+          "call_type": "method_call"
+        },
+        {
+          "name": "prompt_for_generation",
+          "file": "unknown",
+          "line": 664,
+          "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 646,
+          "line": 666,
           "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 667,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 668,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 671,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 683,
+          "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 650,
+          "line": 686,
           "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 666,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 667,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print_json_output",
-          "file": "unknown",
-          "line": 670,
-          "call_type": "function_call"
-        },
-        {
-          "name": "success",
-          "file": "unknown",
-          "line": 673,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 674,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 676,
-          "call_type": "method_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 678,
-          "call_type": "method_call"
-        },
-        {
-          "name": "load_json_spec",
-          "file": "unknown",
-          "line": 682,
-          "call_type": "function_call"
-        },
-        {
-          "name": "format_completion_prompt",
-          "file": "unknown",
-          "line": 685,
-          "call_type": "function_call"
         },
         {
           "name": "get",
@@ -72949,121 +73020,97 @@
           "call_type": "method_call"
         },
         {
-          "name": "warning",
+          "name": "detail",
           "file": "unknown",
           "line": 689,
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "get",
           "file": "unknown",
-          "line": 690,
-          "call_type": "function_call"
+          "line": 692,
+          "call_type": "method_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 693,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
+          "name": "detail",
           "file": "unknown",
           "line": 694,
-          "call_type": "function_call"
+          "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 697,
+          "line": 695,
           "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 699,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 715,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 716,
+          "call_type": "method_call"
         },
         {
           "name": "print_json_output",
           "file": "unknown",
-          "line": 717,
+          "line": 719,
           "call_type": "function_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 719,
+          "line": 722,
           "call_type": "method_call"
         },
         {
           "name": "result",
-          "file": "unknown",
-          "line": 720,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 720,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
-          "file": "unknown",
-          "line": 721,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 721,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 723,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 723,
-          "call_type": "method_call"
-        },
-        {
-          "name": "result",
           "file": "unknown",
           "line": 725,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "detail",
           "file": "unknown",
-          "line": 729,
+          "line": 727,
           "call_type": "method_call"
         },
         {
-          "name": "result",
+          "name": "load_json_spec",
           "file": "unknown",
           "line": 731,
-          "call_type": "method_call"
+          "call_type": "function_call"
         },
         {
-          "name": "get",
-          "file": "unknown",
-          "line": 733,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
+          "name": "format_completion_prompt",
           "file": "unknown",
           "line": 734,
           "call_type": "function_call"
         },
         {
-          "name": "detail",
+          "name": "get",
           "file": "unknown",
           "line": 736,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "warning",
           "file": "unknown",
           "line": 738,
           "call_type": "method_call"
@@ -73075,9 +73122,123 @@
           "call_type": "function_call"
         },
         {
-          "name": "detail",
+          "name": "print",
           "file": "unknown",
           "line": 742,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 743,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 746,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print_json_output",
+          "file": "unknown",
+          "line": 766,
+          "call_type": "function_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 768,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 769,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 769,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 770,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 770,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 772,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 772,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 774,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 778,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 780,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 782,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 783,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 785,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 787,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 788,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 791,
           "call_type": "method_call"
         }
       ]
@@ -73085,7 +73246,7 @@
     {
       "name": "cmd_format_plan",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 747,
+      "line": 796,
       "language": "python",
       "docstring": "Format execution plan for display.",
       "parameters": [
@@ -73111,49 +73272,49 @@
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 749,
+          "line": 798,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 749,
+          "line": 798,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 749,
+          "line": 798,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 751,
+          "line": 800,
           "call_type": "method_call"
         },
         {
           "name": "format_execution_plan",
           "file": "unknown",
-          "line": 754,
+          "line": 803,
           "call_type": "function_call"
         },
         {
           "name": "startswith",
           "file": "unknown",
-          "line": 757,
+          "line": 806,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 758,
+          "line": 807,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 762,
+          "line": 811,
           "call_type": "function_call"
         }
       ]
@@ -73161,7 +73322,7 @@
     {
       "name": "cmd_validate_spec",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 766,
+      "line": 815,
       "language": "python",
       "docstring": "Validate spec file.",
       "parameters": [
@@ -73187,97 +73348,97 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 769,
+          "line": 818,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 771,
+          "line": 820,
           "call_type": "method_call"
         },
         {
           "name": "validate_spec",
           "file": "unknown",
-          "line": 772,
+          "line": 821,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 775,
+          "line": 824,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 775,
+          "line": 824,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 777,
+          "line": 826,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 780,
+          "line": 829,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 783,
+          "line": 832,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 786,
+          "line": 835,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 786,
+          "line": 835,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 788,
+          "line": 837,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 791,
+          "line": 840,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 791,
+          "line": 840,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 793,
+          "line": 842,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 796,
+          "line": 845,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 798,
+          "line": 847,
           "call_type": "method_call"
         }
       ]
@@ -73285,7 +73446,7 @@
     {
       "name": "cmd_find_pattern",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 803,
+      "line": 852,
       "language": "python",
       "docstring": "Find files matching a pattern.",
       "parameters": [
@@ -73311,55 +73472,55 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 806,
+          "line": 855,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 808,
+          "line": 857,
           "call_type": "method_call"
         },
         {
           "name": "find_pattern",
           "file": "unknown",
-          "line": 809,
+          "line": 858,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 812,
+          "line": 861,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 812,
+          "line": 861,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 815,
+          "line": 864,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 815,
+          "line": 864,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 817,
+          "line": 866,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 819,
+          "line": 868,
           "call_type": "method_call"
         }
       ]
@@ -73367,7 +73528,7 @@
     {
       "name": "cmd_detect_project",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 824,
+      "line": 873,
       "language": "python",
       "docstring": "Detect project type and dependencies.",
       "parameters": [
@@ -73393,157 +73554,157 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 827,
+          "line": 876,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 829,
+          "line": 878,
           "call_type": "method_call"
         },
         {
           "name": "detect_project",
           "file": "unknown",
-          "line": 830,
+          "line": 879,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 833,
+          "line": 882,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 833,
+          "line": 882,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 835,
+          "line": 884,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 836,
+          "line": 885,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 839,
+          "line": 888,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 842,
+          "line": 891,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 844,
+          "line": 893,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 847,
+          "line": 896,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 847,
+          "line": 896,
           "call_type": "function_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 848,
+          "line": 897,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 848,
+          "line": 897,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 849,
+          "line": 898,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 850,
+          "line": 899,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 851,
+          "line": 900,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 851,
+          "line": 900,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 854,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 854,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 855,
+          "line": 904,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 855,
+          "line": 904,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 856,
+          "line": 905,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 857,
+          "line": 906,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 858,
+          "line": 907,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 858,
+          "line": 907,
           "call_type": "function_call"
         }
       ]
@@ -73551,7 +73712,7 @@
     {
       "name": "cmd_find_tests",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 863,
+      "line": 912,
       "language": "python",
       "docstring": "Find test files and patterns.",
       "parameters": [
@@ -73577,97 +73738,97 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 866,
+          "line": 915,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 868,
+          "line": 917,
           "call_type": "method_call"
         },
         {
           "name": "find_tests",
           "file": "unknown",
-          "line": 869,
+          "line": 918,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 872,
+          "line": 921,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 872,
+          "line": 921,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 875,
+          "line": 924,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 876,
+          "line": 925,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 878,
+          "line": 927,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 881,
+          "line": 930,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 884,
+          "line": 933,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 884,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 886,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 887,
+          "line": 933,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 888,
+          "line": 935,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 888,
+          "line": 936,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 937,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 937,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 890,
+          "line": 939,
           "call_type": "method_call"
         }
       ]
@@ -73675,7 +73836,7 @@
     {
       "name": "cmd_check_environment",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 895,
+      "line": 944,
       "language": "python",
       "docstring": "Check environmental requirements.",
       "parameters": [
@@ -73701,133 +73862,133 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 898,
+          "line": 947,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 900,
+          "line": 949,
           "call_type": "method_call"
         },
         {
           "name": "split",
           "file": "unknown",
-          "line": 901,
+          "line": 950,
           "call_type": "method_call"
         },
         {
           "name": "check_environment",
           "file": "unknown",
-          "line": 903,
+          "line": 952,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 906,
+          "line": 955,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 906,
+          "line": 955,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 909,
+          "line": 958,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 911,
+          "line": 960,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 914,
+          "line": 963,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 916,
+          "line": 965,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 919,
+          "line": 968,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 919,
+          "line": 968,
           "call_type": "function_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 920,
+          "line": 969,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 920,
+          "line": 969,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 921,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 922,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 923,
+          "line": 970,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 923,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 926,
+          "line": 971,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 928,
+          "line": 972,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 972,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 975,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 977,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 931,
+          "line": 980,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 933,
+          "line": 982,
           "call_type": "method_call"
         }
       ]
@@ -73835,7 +73996,7 @@
     {
       "name": "cmd_find_circular_deps",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 938,
+      "line": 987,
       "language": "python",
       "docstring": "Find circular dependencies in JSON spec.",
       "parameters": [
@@ -73861,127 +74022,127 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 941,
+          "line": 990,
           "call_type": "method_call"
         },
         {
           "name": "find_specs_directory",
           "file": "unknown",
-          "line": 943,
+          "line": 992,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 943,
+          "line": 992,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 943,
+          "line": 992,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 945,
+          "line": 994,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 948,
+          "line": 997,
           "call_type": "function_call"
         },
         {
           "name": "find_circular_deps",
           "file": "unknown",
-          "line": 952,
+          "line": 1001,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 955,
+          "line": 1004,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 955,
+          "line": 1004,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 958,
+          "line": 1007,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 959,
+          "line": 1008,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 959,
+          "line": 1008,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 961,
+          "line": 1010,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 961,
+          "line": 1010,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 963,
+          "line": 1012,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 966,
+          "line": 1015,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 966,
+          "line": 1015,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 968,
+          "line": 1017,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 971,
+          "line": 1020,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 971,
+          "line": 1020,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 973,
+          "line": 1022,
           "call_type": "method_call"
         }
       ]
@@ -73989,7 +74150,7 @@
     {
       "name": "cmd_find_related_files",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 978,
+      "line": 1027,
       "language": "python",
       "docstring": "Find files related to a source file.",
       "parameters": [
@@ -74015,127 +74176,127 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 981,
+          "line": 1030,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 983,
+          "line": 1032,
           "call_type": "method_call"
         },
         {
           "name": "find_related_files",
           "file": "unknown",
-          "line": 984,
+          "line": 1033,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 987,
+          "line": 1036,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 987,
+          "line": 1036,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 989,
+          "line": 1038,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 990,
+          "line": 1039,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 993,
+          "line": 1042,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 995,
+          "line": 1044,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 998,
+          "line": 1047,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 998,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 1000,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 1001,
+          "line": 1047,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1002,
+          "line": 1049,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1002,
+          "line": 1050,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 1051,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 1051,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1005,
+          "line": 1054,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1005,
-          "call_type": "function_call"
-        },
-        {
-          "name": "detail",
-          "file": "unknown",
-          "line": 1007,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 1008,
+          "line": 1054,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1009,
+          "line": 1056,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1009,
+          "line": 1057,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 1058,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 1058,
           "call_type": "function_call"
         }
       ]
@@ -74143,7 +74304,7 @@
     {
       "name": "cmd_validate_paths",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 1014,
+      "line": 1063,
       "language": "python",
       "docstring": "Validate and normalize paths.",
       "parameters": [
@@ -74169,79 +74330,79 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 1017,
+          "line": 1066,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 1020,
+          "line": 1069,
           "call_type": "method_call"
         },
         {
           "name": "validate_paths",
           "file": "unknown",
-          "line": 1021,
+          "line": 1070,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1024,
+          "line": 1073,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 1024,
+          "line": 1073,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 1027,
+          "line": 1076,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1027,
+          "line": 1076,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1029,
+          "line": 1078,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1030,
+          "line": 1079,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1033,
+          "line": 1082,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1033,
+          "line": 1082,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1035,
+          "line": 1084,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1036,
+          "line": 1085,
           "call_type": "method_call"
         }
       ]
@@ -74249,7 +74410,7 @@
     {
       "name": "cmd_spec_stats",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 1041,
+      "line": 1090,
       "language": "python",
       "docstring": "Show spec file statistics.",
       "parameters": [
@@ -74275,163 +74436,163 @@
         {
           "name": "action",
           "file": "unknown",
-          "line": 1044,
+          "line": 1093,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 1046,
+          "line": 1095,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 1047,
+          "line": 1096,
           "call_type": "method_call"
         },
         {
           "name": "spec_stats",
           "file": "unknown",
-          "line": 1048,
+          "line": 1097,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1051,
+          "line": 1100,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 1051,
+          "line": 1100,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 1054,
+          "line": 1103,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 1056,
+          "line": 1105,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 1058,
+          "line": 1107,
           "call_type": "method_call"
         },
         {
           "name": "result",
           "file": "unknown",
-          "line": 1059,
+          "line": 1108,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1062,
+          "line": 1111,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1063,
+          "line": 1112,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1064,
+          "line": 1113,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1065,
+          "line": 1114,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1066,
+          "line": 1115,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1067,
+          "line": 1116,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1070,
+          "line": 1119,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 1071,
+          "line": 1120,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 1072,
+          "line": 1121,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 1072,
+          "line": 1121,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1073,
+          "line": 1122,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 1073,
+          "line": 1122,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1075,
+          "line": 1124,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 1078,
+          "line": 1127,
           "call_type": "function_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1079,
+          "line": 1128,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1080,
+          "line": 1129,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1081,
+          "line": 1130,
           "call_type": "method_call"
         }
       ]
@@ -74439,7 +74600,7 @@
     {
       "name": "register_next",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "line": 1088,
+      "line": 1137,
       "language": "python",
       "docstring": "Register 'next' subcommands for unified CLI.",
       "parameters": [
@@ -74472,379 +74633,379 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1093,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1094,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1097,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1098,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1101,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1102,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1103,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1106,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1107,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1108,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1109,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1112,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1113,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1114,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1115,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1118,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1119,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1120,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1124,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1125,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1126,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1127,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1130,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1131,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1132,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1133,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1136,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1137,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1138,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1139,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
-          "file": "unknown",
           "line": 1142,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1143,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
+          "name": "add_parser",
           "file": "unknown",
-          "line": 1144,
+          "line": 1146,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1147,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1148,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1149,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
+          "name": "add_parser",
           "file": "unknown",
           "line": 1150,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1153,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1154,
+          "line": 1151,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
+          "file": "unknown",
+          "line": 1152,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
           "file": "unknown",
           "line": 1155,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1156,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1157,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1158,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1159,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1160,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
+          "name": "add_parser",
           "file": "unknown",
           "line": 1161,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1162,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1163,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1164,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1165,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1166,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
+          "name": "add_parser",
           "file": "unknown",
           "line": 1167,
           "call_type": "method_call"
         },
         {
-          "name": "add_parser",
-          "file": "unknown",
-          "line": 1170,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1171,
+          "line": 1168,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 1172,
+          "line": 1169,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
+          "file": "unknown",
+          "line": 1173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1174,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
           "file": "unknown",
           "line": 1175,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1176,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1179,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1177,
+          "line": 1180,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1178,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1181,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1182,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1185,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1183,
+          "line": 1186,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1184,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1187,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1188,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1191,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1189,
+          "line": 1192,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 1190,
+          "line": 1193,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1196,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1197,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1198,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1199,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1202,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1203,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1204,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1207,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1209,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1210,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1213,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1214,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1215,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1220,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1221,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1224,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1225,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1226,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1227,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1230,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1231,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1232,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1233,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1236,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1237,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1238,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 1239,
           "call_type": "method_call"
         }
       ],
@@ -75063,7 +75224,7 @@
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 321,
+          "line": 324,
           "call_type": "function_call"
         },
         {
@@ -75291,7 +75452,7 @@
         {
           "name": "cmd_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 362,
+          "line": 365,
           "call_type": "function_call"
         },
         {
@@ -75369,13 +75530,13 @@
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 408,
+          "line": 470,
           "call_type": "function_call"
         },
         {
           "name": "_check_all_task_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 452,
+          "line": 501,
           "call_type": "function_call"
         },
         {
@@ -75608,13 +75769,13 @@
         {
           "name": "format_execution_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 78,
+          "line": 81,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 602,
+          "line": 651,
           "call_type": "function_call"
         },
         {
@@ -75891,7 +76052,7 @@
         {
           "name": "cmd_detect_project",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 830,
+          "line": 879,
           "call_type": "function_call"
         },
         {
@@ -76221,7 +76382,7 @@
         {
           "name": "cmd_find_tests",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 869,
+          "line": 918,
           "call_type": "function_call"
         },
         {
@@ -76455,7 +76616,7 @@
         {
           "name": "cmd_check_environment",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 903,
+          "line": 952,
           "call_type": "function_call"
         },
         {
@@ -76629,7 +76790,7 @@
         {
           "name": "cmd_find_related_files",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 984,
+          "line": 1033,
           "call_type": "function_call"
         },
         {
@@ -76899,7 +77060,7 @@
         {
           "name": "cmd_validate_spec",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 772,
+          "line": 821,
           "call_type": "function_call"
         },
         {
@@ -77008,7 +77169,7 @@
         {
           "name": "cmd_find_circular_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 952,
+          "line": 1001,
           "call_type": "function_call"
         },
         {
@@ -77074,7 +77235,7 @@
         {
           "name": "cmd_validate_paths",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 1021,
+          "line": 1070,
           "call_type": "function_call"
         },
         {
@@ -77134,7 +77295,7 @@
         {
           "name": "cmd_spec_stats",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 1048,
+          "line": 1097,
           "call_type": "function_call"
         },
         {
@@ -77429,7 +77590,7 @@
         {
           "name": "cmd_init_env",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 528,
+          "line": 577,
           "call_type": "function_call"
         },
         {
@@ -77513,7 +77674,7 @@
         {
           "name": "cmd_find_pattern",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 809,
+          "line": 858,
           "call_type": "function_call"
         },
         {
@@ -78474,49 +78635,49 @@
         {
           "name": "cmd_find_specs",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "cmd_next_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 302,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "cmd_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 353,
+          "line": 356,
           "call_type": "function_call"
         },
         {
           "name": "cmd_check_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 391,
+          "line": 453,
           "call_type": "function_call"
         },
         {
           "name": "cmd_progress",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 495,
+          "line": 544,
           "call_type": "function_call"
         },
         {
           "name": "cmd_prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 592,
+          "line": 641,
           "call_type": "function_call"
         },
         {
           "name": "cmd_format_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 749,
+          "line": 798,
           "call_type": "function_call"
         },
         {
           "name": "cmd_find_circular_deps",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 943,
+          "line": 992,
           "call_type": "function_call"
         },
         {
@@ -102298,7 +102459,7 @@
         {
           "name": "cmd_validate_spec",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
-          "line": 772,
+          "line": 821,
           "call_type": "function_call"
         },
         {
@@ -127634,7 +127795,11 @@
       "argparse",
       "pathlib.Path",
       "typing.List",
+      "typing.Dict",
+      "typing.Any",
       "os",
+      "rich.tree.Tree",
+      "rich.console.Console",
       "claude_skills.common.find_specs_directory",
       "claude_skills.common.load_json_spec",
       "claude_skills.common.get_progress_summary",
