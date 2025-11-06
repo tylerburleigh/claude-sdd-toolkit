@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:09:18
+**Generated:** 2025-11-06 11:12:13
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 216
-- **Total Lines:** 74406
+- **Total Lines:** 74426
 - **Total Classes:** 278
 - **Total Functions:** 811
 - **Avg Complexity:** 5.69
@@ -21833,6 +21833,13 @@ Returns:
 - `ai_config.get_tool_config`
 - `ai_config.is_tool_enabled`
 - `ai_config.load_skill_config`
+- `claude_skills.sdd_spec_mod.modification.add_node`
+- `claude_skills.sdd_spec_mod.modification.move_node`
+- `claude_skills.sdd_spec_mod.modification.remove_node`
+- `claude_skills.sdd_spec_mod.modification.spec_transaction`
+- `claude_skills.sdd_spec_mod.modification.transactional_modify`
+- `claude_skills.sdd_spec_mod.modification.update_node_field`
+- `claude_skills.sdd_spec_mod.modification.update_task_counts`
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
