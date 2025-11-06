@@ -201,7 +201,11 @@ sdd fidelity-review spec-id --output review.md --format markdown
 
 **Systematic Modification Workflow:**
 
-After reviews identify issues, apply fixes systematically:
+After reviews identify issues, apply fixes systematically.
+
+**When using sdd-next:** Modifications are orchestrated by sdd-next after verification tasks complete. sdd-next presents options to the user and invokes `sdd-modify-subagent` when approved.
+
+**For manual workflows or direct CLI use:**
 
 ```bash
 # Parse review feedback into structured modifications
@@ -214,7 +218,7 @@ sdd apply-modifications spec-id --from suggestions.json --dry-run
 sdd apply-modifications spec-id --from suggestions.json
 ```
 
-**Complete Closed-Loop:**
+**Complete Closed-Loop (Manual):**
 
 ```bash
 # 1. Review implementation
@@ -231,6 +235,17 @@ sdd apply-modifications spec-id --from spec-id-suggestions.json
 
 # 5. Re-review to confirm fixes
 sdd fidelity-review spec-id
+```
+
+**Complete Closed-Loop (via sdd-next):**
+
+```
+1. sdd-next triggers fidelity review verification
+2. Review identifies spec improvements
+3. sdd-next presents options: Apply/Manual/Defer
+4. If Apply: sdd-next invokes sdd-modify-subagent
+5. sdd-modify applies changes with backup & validation
+6. sdd-next documents and offers re-verification
 ```
 
 **Key Capabilities:**

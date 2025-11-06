@@ -186,11 +186,22 @@ Task(
 
 For applying review feedback or making bulk structural changes, use the `sdd-modify` skill which provides a systematic, safe workflow.
 
+**Orchestration Note:** When using sdd-next for task execution, spec modifications are typically **orchestrated by sdd-next** after reviews complete. sdd-next calls the `sdd-modify-subagent` programmatically when review findings warrant spec updates. The CLI commands shown below can also be used directly for manual workflows.
+
 ### When to Use sdd-modify
 
-Use `Skill(sdd-toolkit:sdd-modify)` when:
+**For users (direct invocation):** Use `Skill(sdd-toolkit:sdd-modify)` when:
+- ✅ Manually applying review feedback to specs
+- ✅ Making bulk modifications you've planned
+- ✅ Direct interaction via Claude Code conversation
+
+**For automation (programmatic):** Other skills call `sdd-modify-subagent` via `Task()` when:
+- ✅ sdd-next orchestrates applying review feedback after verification
+- ✅ Automated workflows need to modify specs systematically
+- ✅ Batch processing multiple specs
+
+**Common use cases:**
 - ✅ Applying feedback from sdd-fidelity-review or sdd-plan-review
-- ✅ Making multiple related changes at once (bulk modifications)
 - ✅ Updating task descriptions based on implementation learnings
 - ✅ Adding verification steps discovered during implementation
 - ✅ Needing automatic backup, validation, and rollback

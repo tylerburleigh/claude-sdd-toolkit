@@ -702,7 +702,9 @@ sdd fidelity-review spec-id --ai-tools codex cursor-agent
 
 ## Systematic Feedback Application with sdd-modify
 
-After reviews identify spec/implementation mismatches, use `sdd-modify` to systematically apply fixes to the spec.
+After reviews identify spec/implementation mismatches, **sdd-next** orchestrates systematic application of fixes using the `sdd-modify-subagent`.
+
+**Important:** Review skills (sdd-fidelity-review, sdd-plan-review) generate reports but do NOT modify specs directly. **sdd-next** is the orchestrator that decides when and how to apply modifications based on review findings.
 
 ### Why Systematic Application?
 
@@ -719,38 +721,39 @@ After reviews identify spec/implementation mismatches, use `sdd-modify` to syste
 - ✅ Automatic backup and rollback
 - ✅ Validation after every change
 - ✅ 70-80% faster than manual editing
+- ✅ **Orchestrated by sdd-next** for proper workflow integration
 
 ### Complete Closed-Loop Workflow
 
 ```
 1. Implementation Complete
         ↓
-2. Run Fidelity Review
-   sdd fidelity-review spec-id --output review.md
+2. sdd-next triggers fidelity review verification task
+   → Invokes Skill(sdd-toolkit:sdd-fidelity-review)
         ↓
-3. Review Identifies Issues
-   - Vague task descriptions
-   - Missing verification steps
-   - Metadata inconsistencies
+3. Review Report Generated
+   → Identifies vague descriptions, missing verifications, etc.
         ↓
-4. Parse Review Report
-   sdd parse-review spec-id --review review.md
-   → Generates structured modifications.json
+4. sdd-next receives review report
+   → Analyzes findings
         ↓
-5. Preview Modifications
-   sdd apply-modifications spec-id --from suggestions.json --dry-run
-   → Shows exactly what will change
+5. sdd-next presents options to user (AskUserQuestion)
+   → "Apply Systematically" | "Review Manually" | "Defer Updates"
         ↓
-6. Apply Modifications
-   sdd apply-modifications spec-id --from suggestions.json
-   → Automatic backup, validation, rollback
+6. If user selects "Apply Systematically":
+   → sdd-next invokes sdd-modify-subagent
         ↓
-7. Document Changes
-   sdd add-journal spec-id --title "Applied review feedback"
+7. sdd-modify-subagent executes workflow:
+   a) Parse review report (sdd parse-review)
+   b) Preview modifications (--dry-run)
+   c) Apply modifications with backup & validation
+   d) Report results back to sdd-next
         ↓
-8. Re-Review to Confirm
-   sdd fidelity-review spec-id
-   → Should show: "Previous issues resolved"
+8. sdd-next documents changes
+   → sdd add-journal spec-id --title "Applied review feedback"
+        ↓
+9. sdd-next offers re-verification
+   → User can confirm fixes resolved issues
 ```
 
 ### Step-by-Step Example
