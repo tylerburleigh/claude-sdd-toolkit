@@ -573,20 +573,195 @@ def move_node(
     """
     Move a node to a different parent in the hierarchy.
 
+    This function moves a node (and its descendants) to a new location in the
+    hierarchy. It updates parent-child relationships and recalculates task counts
+    for all affected ancestors.
+
     Args:
-        spec_data: The full spec data dictionary
+        spec_data: The full spec data dictionary (must include 'hierarchy' key)
         node_id: ID of the node to move
         new_parent_id: ID of the new parent node
-        position: Optional position in new parent's children list
+        position: Optional position in new parent's children list (0-indexed).
+                 If None, appends to end. If negative, counts from end.
 
     Returns:
-        Dict with success status and message
+        Dict with success status and message:
+        {
+            "success": True|False,
+            "message": "Description of result",
+            "old_parent_id": "Previous parent ID" (only if success=True),
+            "new_parent_id": "New parent ID" (only if success=True)
+        }
+
+    Raises:
+        ValueError: If spec_data is invalid or trying to move spec-root
+        KeyError: If node_id or new_parent_id doesn't exist in hierarchy
     """
-    # Placeholder implementation
+    # Validate spec_data structure
+    if not isinstance(spec_data, dict):
+        raise ValueError("spec_data must be a dictionary")
+
+    if "hierarchy" not in spec_data:
+        raise ValueError("spec_data must contain 'hierarchy' key")
+
+    hierarchy = spec_data["hierarchy"]
+    if not isinstance(hierarchy, dict):
+        raise ValueError("spec_data['hierarchy'] must be a dictionary")
+
+    # Prevent moving spec-root
+    if node_id == "spec-root":
+        raise ValueError("Cannot move spec-root node")
+
+    # Check if node exists
+    node = get_node(spec_data, node_id)
+    if node is None:
+        raise KeyError(f"Node '{node_id}' not found in hierarchy")
+
+    # Check if new parent exists
+    new_parent = get_node(spec_data, new_parent_id)
+    if new_parent is None:
+        raise KeyError(f"New parent node '{new_parent_id}' not found in hierarchy")
+
+    # Get current parent
+    old_parent_id = node.get("parent")
+    if old_parent_id is None:
+        return {
+            "success": False,
+            "message": f"Node '{node_id}' has no parent (cannot move root node)"
+        }
+
+    # Check if already under this parent
+    if old_parent_id == new_parent_id:
+        # Just reposition within same parent if position is specified
+        if position is not None:
+            old_parent = hierarchy[old_parent_id]
+            parent_children = old_parent.get("children", [])
+
+            # Remove from current position
+            if node_id in parent_children:
+                parent_children.remove(node_id)
+
+                # Insert at new position
+                try:
+                    parent_children.insert(position, node_id)
+                except (IndexError, TypeError) as e:
+                    # Roll back
+                    parent_children.append(node_id)
+                    return {
+                        "success": False,
+                        "message": f"Invalid position {position}: {str(e)}"
+                    }
+
+            return {
+                "success": True,
+                "message": f"Successfully repositioned node '{node_id}' within parent '{old_parent_id}'",
+                "old_parent_id": old_parent_id,
+                "new_parent_id": new_parent_id
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Node '{node_id}' is already a child of '{new_parent_id}'"
+            }
+
+    # Check for circular dependency (can't move node under itself or its descendants)
+    if _is_ancestor(spec_data, node_id, new_parent_id):
+        return {
+            "success": False,
+            "message": f"Cannot move node '{node_id}' under its descendant '{new_parent_id}' (would create circular dependency)"
+        }
+
+    # Calculate task counts for the subtree being moved
+    # Use the total_tasks/completed_tasks from the root of the moved subtree
+    # (it already has the aggregated counts for all its descendants)
+    total_tasks_moving = node.get("total_tasks", 0)
+    completed_tasks_moving = node.get("completed_tasks", 0)
+
+    # Remove node from old parent's children list
+    if old_parent_id in hierarchy:
+        old_parent = hierarchy[old_parent_id]
+        old_parent_children = old_parent.get("children", [])
+        if node_id in old_parent_children:
+            old_parent_children.remove(node_id)
+
+    # Add node to new parent's children list
+    new_parent_children = new_parent.get("children", [])
+    if not isinstance(new_parent_children, list):
+        new_parent_children = []
+        new_parent["children"] = new_parent_children
+
+    # Insert at specified position
+    if position is None:
+        # Append to end
+        new_parent_children.append(node_id)
+    else:
+        # Insert at specified position (handles negative indices)
+        try:
+            new_parent_children.insert(position, node_id)
+        except (IndexError, TypeError) as e:
+            # Roll back: add back to old parent
+            if old_parent_id in hierarchy:
+                hierarchy[old_parent_id]["children"].append(node_id)
+            return {
+                "success": False,
+                "message": f"Invalid position {position}: {str(e)}"
+            }
+
+    # Update node's parent field
+    node["parent"] = new_parent_id
+
+    # Update task counts: decrease old parent lineage, increase new parent lineage
+    if total_tasks_moving > 0:
+        # Decrease counts in old parent lineage
+        if old_parent_id:
+            _propagate_task_count_decrease(spec_data, old_parent_id, total_tasks_moving, completed_tasks_moving)
+
+        # Increase counts in new parent lineage
+        _propagate_task_count_increase(spec_data, new_parent_id, total_tasks_moving, completed_tasks_moving)
+
     return {
-        "success": False,
-        "message": "move_node not yet implemented"
+        "success": True,
+        "message": f"Successfully moved node '{node_id}' from '{old_parent_id}' to '{new_parent_id}'",
+        "old_parent_id": old_parent_id,
+        "new_parent_id": new_parent_id
     }
+
+
+def _is_ancestor(
+    spec_data: Dict[str, Any],
+    ancestor_id: str,
+    descendant_id: str
+) -> bool:
+    """
+    Check if ancestor_id is an ancestor of descendant_id.
+
+    This is used to prevent circular dependencies when moving nodes.
+
+    Args:
+        spec_data: The full spec data dictionary
+        ancestor_id: Potential ancestor node ID
+        descendant_id: Potential descendant node ID
+
+    Returns:
+        True if ancestor_id is an ancestor of descendant_id, False otherwise
+    """
+    hierarchy = spec_data.get("hierarchy", {})
+
+    current_id = descendant_id
+    visited = set()  # Prevent infinite loops in case of corrupted data
+
+    while current_id and current_id not in visited:
+        if current_id == ancestor_id:
+            return True
+
+        visited.add(current_id)
+        current_node = hierarchy.get(current_id)
+        if current_node is None:
+            break
+
+        current_id = current_node.get("parent")
+
+    return False
 
 
 def update_task_counts(spec_data: Dict[str, Any], node_id: str) -> Dict[str, Any]:

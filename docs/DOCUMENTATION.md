@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 10:35:08
+**Generated:** 2025-11-06 10:41:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 216
-- **Total Lines:** 73914
+- **Total Lines:** 74046
 - **Total Classes:** 278
-- **Total Functions:** 806
-- **Avg Complexity:** 5.65
+- **Total Functions:** 807
+- **Avg Complexity:** 5.67
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -16599,7 +16599,7 @@ Returns:
 ### `move_node(spec_data, node_id, new_parent_id, position) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:436`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:567`
 **Complexity:** 1
 
 **Description:**
@@ -20698,6 +20698,44 @@ Returns:
 
 ---
 
+### `update_node_field(spec_data, node_id, field, value) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:436`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Update a specific field on a node in the spec hierarchy.
+
+This function provides a safe way to update node fields with validation.
+For metadata updates, it merges with existing metadata rather than replacing it.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to update
+    field: Name of the field to update (e.g., 'title', 'description', 'status', 'metadata')
+    value: New value for the field
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "old_value": previous_value (only if success=True)
+    }
+
+Raises:
+    KeyError: If node_id doesn't exist in hierarchy
+    ValueError: If attempting to update protected fields
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `field`: str
+- `value`: Any
+
+---
+
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
@@ -20761,7 +20799,7 @@ Returns:
 ### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:461`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:592`
 **Complexity:** 1
 
 **Description:**
@@ -22719,6 +22757,7 @@ Returns:
 - `modification.add_node`
 - `modification.move_node`
 - `modification.remove_node`
+- `modification.update_node_field`
 - `modification.update_task_counts`
 
 ### `src/claude_skills/claude_skills/sdd_spec_mod/modification.py`
