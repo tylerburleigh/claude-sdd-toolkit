@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 17:13:21
+**Generated:** 2025-11-06 17:26:26
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 230
-- **Total Lines:** 80329
-- **Total Classes:** 302
+- **Total Files:** 231
+- **Total Lines:** 80957
+- **Total Classes:** 304
 - **Total Functions:** 851
 - **Avg Complexity:** 5.8
 - **Max Complexity:** 45
@@ -1886,6 +1886,23 @@ Attributes:
 
 ---
 
+### `ProgressTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/rich_ui.py:592`
+
+**Description:**
+> Wrapper for Rich Progress task with simplified API.
+
+Provides a simple update() method for advancing progress.
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `set_description()`
+
+---
+
 ### `PromptTemplate`
 
 **Language:** python
@@ -1945,6 +1962,43 @@ Attributes:
 
 **Description:**
 > Types of cross-references that can be tracked.
+
+---
+
+### `RichUi`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/rich_ui.py:45`
+
+**Description:**
+> Rich-powered TUI backend for interactive terminals.
+
+Provides full Rich functionality including tables, trees, progress bars,
+panels, and styled output. Designed for TTY environments where rich
+formatting is available and beneficial.
+
+This implementation uses Rich Console as the core output mechanism,
+providing advanced formatting capabilities for AI-agent workflows.
+
+Attributes:
+    console: Rich Console instance for output
+    _messages: Collection of structured messages (when collecting)
+    _collecting: Whether to collect messages instead of immediate rendering
+    _context_stack: Stack of context dictionaries for message tagging
+
+**Methods:**
+- `__init__()`
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
+- `_add_message()`
+- `get_messages()`
+- `render_all()`
+- `clear_messages()`
+- `context()`
 
 ---
 
@@ -23469,6 +23523,7 @@ Returns:
 - `reporting.generate_combined_report`
 - `reporting.generate_json_spec_report`
 - `reporting.generate_spec_report`
+- `rich_ui.RichUi`
 - `sdd_config.DEFAULT_SDD_CONFIG`
 - `sdd_config.get_sdd_setting`
 - `sdd_config.load_sdd_config`
@@ -23666,6 +23721,31 @@ Returns:
 - `datetime.datetime`
 - `pathlib.Path`
 - `typing.List`
+
+### `src/claude_skills/claude_skills/common/rich_ui.py`
+
+- `contextlib.contextmanager`
+- `difflib`
+- `io.StringIO`
+- `rich.console.Console`
+- `rich.panel.Panel`
+- `rich.progress.BarColumn`
+- `rich.progress.Progress`
+- `rich.progress.SpinnerColumn`
+- `rich.progress.TaskProgressColumn`
+- `rich.progress.TextColumn`
+- `rich.syntax.Syntax`
+- `rich.table.Table`
+- `rich.text.Text`
+- `rich.tree.Tree`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Iterator`
+- `typing.List`
+- `typing.Optional`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 
 ### `src/claude_skills/claude_skills/common/sdd_config.py`
 

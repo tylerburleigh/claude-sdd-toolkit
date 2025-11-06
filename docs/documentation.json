@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T22:13:21.978093Z",
+    "generated_at": "2025-11-06T22:26:26.649796Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 230,
-    "total_lines": 80329,
-    "total_classes": 302,
+    "total_files": 231,
+    "total_lines": 80957,
+    "total_classes": 304,
     "total_functions": 851,
     "avg_complexity": 5.8,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 230,
-        "lines": 80329,
-        "classes": 302,
+        "files": 231,
+        "lines": 80957,
+        "classes": 304,
         "functions": 851,
         "avg_complexity": 5.8
       }
@@ -785,6 +785,7 @@
         "ui_protocol.Ui",
         "ui_protocol.Message",
         "ui_protocol.MessageLevel",
+        "rich_ui.RichUi",
         "validation.EnhancedError",
         "validation.SpecValidationResult",
         "validation.JsonSpecValidationResult",
@@ -849,7 +850,7 @@
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 297
+      "lines": 299
     },
     {
       "name": "ai_config",
@@ -1329,6 +1330,43 @@
       ],
       "exports": [],
       "lines": 190
+    },
+    {
+      "name": "rich_ui",
+      "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+      "language": "python",
+      "docstring": "Rich-powered terminal user interface backend.\n\nThis module implements the RichUi backend - a full-featured TUI implementation\nusing the Rich library for interactive terminal environments (TTY).\n\nKey Features:\n- Rich Table for formatted data display\n- Rich Tree for hierarchical structures\n- Rich Progress for progress bars and spinners\n- Rich Panel for bordered content\n- Rich Console for styled output\n- Syntax highlighting for diffs\n\nUsage:\n    from claude_skills.common.rich_ui import RichUi\n    from claude_skills.common.ui_protocol import MessageLevel\n\n    ui = RichUi()\n    ui.print_table([{\"task\": \"task-1-1\", \"status\": \"completed\"}], title=\"Tasks\")\n    ui.print_status(\"Processing...\", level=MessageLevel.ACTION)\n\n    with ui.progress(\"Loading files...\", total=100) as progress:\n        for i in range(100):\n            process_file(i)\n            progress.update(1)",
+      "classes": [
+        "RichUi",
+        "ProgressTask"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Optional",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Iterator",
+        "contextlib.contextmanager",
+        "io.StringIO",
+        "difflib",
+        "rich.console.Console",
+        "rich.table.Table",
+        "rich.tree.Tree",
+        "rich.panel.Panel",
+        "rich.progress.Progress",
+        "rich.progress.SpinnerColumn",
+        "rich.progress.TextColumn",
+        "rich.progress.BarColumn",
+        "rich.progress.TaskProgressColumn",
+        "rich.syntax.Syntax",
+        "rich.text.Text",
+        "ui_protocol.Ui",
+        "ui_protocol.MessageLevel",
+        "ui_protocol.Message"
+      ],
+      "exports": [],
+      "lines": 626
     },
     {
       "name": "sdd_config",
@@ -8710,6 +8748,62 @@
       "instantiation_count": 83
     },
     {
+      "name": "RichUi",
+      "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+      "line": 45,
+      "language": "python",
+      "docstring": "Rich-powered TUI backend for interactive terminals.\n\nProvides full Rich functionality including tables, trees, progress bars,\npanels, and styled output. Designed for TTY environments where rich\nformatting is available and beneficial.\n\nThis implementation uses Rich Console as the core output mechanism,\nproviding advanced formatting capabilities for AI-agent workflows.\n\nAttributes:\n    console: Rich Console instance for output\n    _messages: Collection of structured messages (when collecting)\n    _collecting: Whether to collect messages instead of immediate rendering\n    _context_stack: Stack of context dictionaries for message tagging",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "print_table",
+        "print_tree",
+        "print_diff",
+        "progress",
+        "print_panel",
+        "print_status",
+        "_add_message",
+        "get_messages",
+        "render_all",
+        "clear_messages",
+        "context"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ProgressTask",
+      "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+      "line": 592,
+      "language": "python",
+      "docstring": "Wrapper for Rich Progress task with simplified API.\n\nProvides a simple update() method for advancing progress.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "update",
+        "set_description"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "progress",
+          "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+          "line": 345,
+          "context": [
+            "RichUi",
+            "progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
       "name": "MessageLevel",
       "file": "src/claude_skills/claude_skills/common/ui_protocol.py",
       "line": 22,
@@ -8736,8 +8830,19 @@
       "properties": [],
       "is_exported": false,
       "is_public": true,
-      "instantiated_by": [],
-      "imported_by": []
+      "instantiated_by": [
+        {
+          "instantiator": "_add_message",
+          "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+          "line": 494,
+          "context": [
+            "RichUi",
+            "_add_message"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "Ui",
@@ -87401,6 +87506,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "progress",
+          "file": "src/claude_skills/claude_skills/common/rich_ui.py",
+          "line": 344,
+          "call_type": "method_call"
+        },
+        {
           "name": "cmd_add_task",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 456,
@@ -87499,7 +87610,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "_generate_task_id",
@@ -123731,6 +123842,7 @@
       "ui_protocol.Ui",
       "ui_protocol.Message",
       "ui_protocol.MessageLevel",
+      "rich_ui.RichUi",
       "validation.EnhancedError",
       "validation.SpecValidationResult",
       "validation.JsonSpecValidationResult",
@@ -123952,6 +124064,30 @@
       "typing.List",
       "claude_skills.common.SpecValidationResult",
       "claude_skills.common.JsonSpecValidationResult"
+    ],
+    "src/claude_skills/claude_skills/common/rich_ui.py": [
+      "typing.Optional",
+      "typing.List",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Iterator",
+      "contextlib.contextmanager",
+      "io.StringIO",
+      "difflib",
+      "rich.console.Console",
+      "rich.table.Table",
+      "rich.tree.Tree",
+      "rich.panel.Panel",
+      "rich.progress.Progress",
+      "rich.progress.SpinnerColumn",
+      "rich.progress.TextColumn",
+      "rich.progress.BarColumn",
+      "rich.progress.TaskProgressColumn",
+      "rich.syntax.Syntax",
+      "rich.text.Text",
+      "ui_protocol.Ui",
+      "ui_protocol.MessageLevel",
+      "ui_protocol.Message"
     ],
     "src/claude_skills/claude_skills/common/sdd_config.py": [
       "json",
