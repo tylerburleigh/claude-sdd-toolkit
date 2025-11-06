@@ -45,6 +45,7 @@ from claude_skills.sdd_update.query import (
     phase_time,
     list_blockers,
 )
+from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 
 
 def cmd_execute_verify(args, printer):
@@ -265,6 +266,54 @@ def cmd_add_revision(args, printer):
     )
 
     return 0 if success else 1
+
+
+def cmd_add_assumption(args, printer):
+    """Add assumption to spec metadata."""
+    printer.action("Adding assumption...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Add assumption
+    try:
+        result = add_assumption(
+            spec_data=spec_data,
+            text=args.text,
+            assumption_type=args.type,
+            added_by=getattr(args, 'author', 'claude-code')
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would add assumption:")
+            printer.detail(f"  ID: {result['assumption_id']}")
+            printer.detail(f"  Type: {args.type}")
+            printer.detail(f"  Text: {args.text}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, spec_data, specs_dir)
+
+        printer.success(result['message'])
+        printer.info(f"Assumption ID: {result['assumption_id']}")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to add assumption: {e}")
+        return 1
 
 
 def cmd_update_frontmatter(args, printer):
@@ -1151,6 +1200,15 @@ def register_update(subparsers, parent_parser):
     p_revision.add_argument("--author", default="claude-code", help="Revision author")
     p_revision.add_argument("--dry-run", action="store_true", help="Preview revision without saving")
     p_revision.set_defaults(func=cmd_add_revision)
+
+    # add-assumption command
+    p_assumption = subparsers.add_parser("add-assumption", help="Add assumption to spec metadata", parents=[parent_parser])
+    p_assumption.add_argument("spec_id", help="Specification ID")
+    p_assumption.add_argument("text", help="Assumption text/description")
+    p_assumption.add_argument("--type", default="requirement", choices=["constraint", "requirement"], help="Assumption type")
+    p_assumption.add_argument("--author", default="claude-code", help="Author who added the assumption")
+    p_assumption.add_argument("--dry-run", action="store_true", help="Preview assumption without saving")
+    p_assumption.set_defaults(func=cmd_add_assumption)
 
     # bulk-journal command
     p_bulk_journal = subparsers.add_parser("bulk-journal", help="Bulk journal completed tasks", parents=[parent_parser])
