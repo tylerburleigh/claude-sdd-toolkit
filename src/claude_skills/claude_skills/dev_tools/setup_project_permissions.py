@@ -47,17 +47,8 @@ SDD_PERMISSIONS = [
     "Bash(gemini:*)",
     "Bash(codex:*)",
 
-    # Git/GitHub CLI permissions (specific allowlist, no wildcards for security)
-    "Bash(git checkout -b *)",
-    "Bash(git add *)",
-    "Bash(git commit *)",
-    "Bash(git push *)",
-    "Bash(git status *)",
-    "Bash(git branch --show-current)",
-    "Bash(git log *)",
-    "Bash(git rev-parse HEAD)",
-    "Bash(gh pr create *)",
-    "Bash(gh pr view *)",
+    # Note: Git/GitHub CLI permissions can be optionally configured during setup.
+    # See GIT_READ_PERMISSIONS and GIT_WRITE_PERMISSIONS below for available options.
 
     # File access permissions
     "Write(//**/specs/active/**)",
@@ -67,6 +58,96 @@ SDD_PERMISSIONS = [
     "Edit(//**/specs/active/**)",
     "Edit(//**/specs/pending/**)"
 ]
+
+# Git read-only permissions (safe operations)
+# These allow Claude to inspect repository state without making changes
+GIT_READ_PERMISSIONS = [
+    "Bash(git status:*)",
+    "Bash(git log:*)",
+    "Bash(git branch:*)",
+    "Bash(git diff:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git show:*)",
+    "Bash(git describe:*)",
+    "Bash(gh pr view:*)",
+]
+
+# Git write permissions (potentially destructive operations)
+# ⚠️ These allow Claude to modify repository state and push changes
+GIT_WRITE_PERMISSIONS = [
+    "Bash(git checkout:*)",
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(git push:*)",
+    "Bash(git rm:*)",
+    "Bash(gh pr create:*)",
+]
+
+
+def _prompt_for_git_permissions() -> list:
+    """Prompt user about adding git/GitHub permissions.
+
+    Returns:
+        List of git permissions to add (may include read-only, write, or both)
+    """
+    permissions_to_add = []
+
+    print("\n🔧 Git Integration Setup\n", file=sys.stderr)
+    print("Git integration allows Claude to:", file=sys.stderr)
+    print("  • View repository status and history", file=sys.stderr)
+    print("  • Create branches and commits", file=sys.stderr)
+    print("  • Push changes and create pull requests", file=sys.stderr)
+    print("", file=sys.stderr)
+
+    # Prompt 1: Enable git integration at all?
+    while True:
+        response = input("Enable git integration? (y/n): ").strip().lower()
+        if response in ['y', 'yes']:
+            # Add read-only permissions automatically
+            print("", file=sys.stderr)
+            print("✓ Adding read-only git permissions (status, log, diff, etc.)", file=sys.stderr)
+            permissions_to_add.extend(GIT_READ_PERMISSIONS)
+            break
+        elif response in ['n', 'no']:
+            print("", file=sys.stderr)
+            print("⊘ Skipping git integration setup", file=sys.stderr)
+            print("  You can manually add git permissions to .claude/settings.json later", file=sys.stderr)
+            print("", file=sys.stderr)
+            return permissions_to_add
+        else:
+            print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
+
+    # Prompt 2: Enable write operations?
+    print("", file=sys.stderr)
+    print("⚠️  Git Write Operations\n", file=sys.stderr)
+    print("Write operations allow Claude to:", file=sys.stderr)
+    print("  • Switch branches (git checkout)", file=sys.stderr)
+    print("  • Stage changes (git add)", file=sys.stderr)
+    print("  • Create commits (git commit)", file=sys.stderr)
+    print("  • Push to remote (git push)", file=sys.stderr)
+    print("  • Create pull requests (gh pr create)", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("RISK: These operations can modify your repository and push changes.", file=sys.stderr)
+    print("Always review Claude's proposed changes before approval.", file=sys.stderr)
+    print("", file=sys.stderr)
+
+    while True:
+        response = input("Enable git write operations? (y/n): ").strip().lower()
+        if response in ['y', 'yes']:
+            print("", file=sys.stderr)
+            print("✓ Adding git write permissions", file=sys.stderr)
+            permissions_to_add.extend(GIT_WRITE_PERMISSIONS)
+            break
+        elif response in ['n', 'no']:
+            print("", file=sys.stderr)
+            print("✓ Git integration enabled (read-only)", file=sys.stderr)
+            print("  You can manually add write permissions later if needed", file=sys.stderr)
+            break
+        else:
+            print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
+
+    print("", file=sys.stderr)
+    return permissions_to_add
 
 
 def update_permissions(project_root):
@@ -105,6 +186,16 @@ def update_permissions(project_root):
         if perm not in existing_permissions:
             new_permissions.append(perm)
             settings["permissions"]["allow"].append(perm)
+
+    # Prompt for git permissions (interactive setup)
+    git_permissions = _prompt_for_git_permissions()
+
+    # Add git permissions (avoid duplicates)
+    for perm in git_permissions:
+        if perm not in existing_permissions:
+            new_permissions.append(perm)
+            settings["permissions"]["allow"].append(perm)
+            existing_permissions.add(perm)
 
     # Write updated settings
     with open(settings_file, 'w') as f:

@@ -10,7 +10,9 @@ This command performs first-time setup for the SDD (Spec-Driven Development) too
 ## What This Does
 
 1. Configures `.claude/settings.json` with the necessary permissions for SDD skills and tools
-2. Optionally configures `.claude/git_config.json` for git integration features (branches, commits, AI-powered PRs)
+2. **Interactively prompts for git/GitHub CLI permissions** with clear risk warnings
+3. Optionally configures `.claude/git_config.json` for git integration features (branches, commits, AI-powered PRs)
+4. Creates `.claude/sdd_config.json` for SDD CLI output formatting preferences (if missing)
 
 ## Workflow
 
@@ -30,18 +32,16 @@ The script will return JSON with a `configured` field indicating whether permiss
 
 Display message and proceed to Step 3:
 ```
-✅ SDD permissions are fully configured! (41/41)
+✅ SDD permissions are fully configured!
 ```
 
 **If `configured: false` AND `status: "partially_configured"`:**
 
 Display warning with details:
 ```
-⚠️  SDD permissions are partially configured (35/41 present)
+⚠️  SDD permissions are partially configured
 
-Missing 6 permissions:
-  • 2 skill permissions
-  • 4 bash/git permissions
+Missing permissions detected.
 ```
 
 Use AskUserQuestion tool:
@@ -81,8 +81,42 @@ sdd skills-dev setup-permissions update .
 
 This will:
 - Create `.claude/settings.json` if it doesn't exist
-- Add all 41 required SDD permissions to the `allow` list
+- Prompt for SDD CLI output preferences (if not already configured)
+- Add all required SDD permissions to the `allow` list
+- **Interactively prompt for git integration permissions** (see Git Permission Prompts below)
 - Preserve any existing permissions
+
+#### Git Permission Prompts
+
+During permission setup, you'll be prompted about git integration:
+
+**Prompt 1: Enable git integration?**
+- If **Yes**: Automatically adds safe read-only permissions:
+  - `git status`, `git log`, `git branch`, `git diff`, `git show`, etc.
+  - `gh pr view` (GitHub CLI read operations)
+- If **No**: Skips all git permissions (can be added manually later)
+
+**Prompt 2: Enable git write operations?** (only if Prompt 1 = Yes)
+- Shows risk warning about repository modifications
+- If **Yes**: Adds write permissions:
+  - `git checkout`, `git add`, `git commit`, `git push`, `git rm`
+  - `gh pr create` (GitHub CLI PR creation)
+- If **No**: Keeps read-only git access only
+
+**Risk Warning Displayed:**
+```
+⚠️  Git Write Operations
+
+Write operations allow Claude to:
+  • Switch branches (git checkout)
+  • Stage changes (git add)
+  • Create commits (git commit)
+  • Push to remote (git push)
+  • Create pull requests (gh pr create)
+
+RISK: These operations can modify your repository and push changes.
+Always review Claude's proposed changes before approval.
+```
 
 ### Step 3: Check Git Configuration
 
@@ -258,7 +292,51 @@ Display message and proceed to Step 5:
    sdd skills-dev start-helper setup-git-config .
 ```
 
-### Step 5: Show Success & Next Steps
+### Step 5: Configure SDD CLI Output Settings
+
+Check if `.claude/sdd_config.json` exists and create it if missing.
+
+**Check for existing config:**
+
+```bash
+test -f .claude/sdd_config.json && echo "exists" || echo "missing"
+```
+
+**If file is missing:**
+
+Create `.claude/sdd_config.json` with recommended defaults:
+
+```json
+{
+  "output": {
+    "json": true,
+    "compact": true
+  }
+}
+```
+
+This can be done by copying the template:
+```bash
+cp /Users/tylerburleigh/Documents/claude-sdd-toolkit/docs/sdd_config.json.template .claude/sdd_config.json
+```
+
+Or creating it directly with Write tool.
+
+Display:
+```
+✅ Created .claude/sdd_config.json with recommended settings
+   (json: true, compact: true for ~30% token savings)
+```
+
+**If file already exists:**
+
+Display:
+```
+✅ SDD output config already exists at .claude/sdd_config.json
+   (Modify manually or see docs/SDD_CONFIG_README.md for details)
+```
+
+### Step 6: Show Success & Next Steps
 
 After successful configuration, display a summary:
 
@@ -270,6 +348,8 @@ After successful configuration, display a summary:
 ✅ Permissions: Configured
 
 ✅ Git Integration: [Status]
+
+✅ SDD CLI Config: [Status]
 ```
 
 **If git was configured in this session**, show settings:
@@ -297,6 +377,20 @@ After successful configuration, display a summary:
 ```
 ✅ Git Integration: Disabled
    (Enable later with: sdd skills-dev setup-git-config . --force)
+```
+
+**For SDD CLI Config status:**
+
+**If sdd_config.json was created in this session**, show:
+```
+✅ SDD CLI Config: Created
+   (json: true, compact: true for ~30% token savings)
+```
+
+**If sdd_config.json already existed**, show:
+```
+✅ SDD CLI Config: Already configured
+   (See docs/SDD_CONFIG_README.md to modify settings)
 ```
 
 Then show next steps:
@@ -330,6 +424,9 @@ The setup adds these permissions:
 
 **CLI Tools:**
 - Bash(sdd:*) - Unified CLI for all sdd commands (doc, test, skills-dev, etc.)
+- Bash(cursor-agent:*)
+- Bash(gemini:*)
+- Bash(codex:*)
 
 **File Access:**
 - Read(//Users/tylerburleigh/.claude/skills/**)
@@ -340,6 +437,24 @@ The setup adds these permissions:
 - Write(//**/specs/archived/**)
 - Edit(//**/specs/pending/**)
 - Edit(//**/specs/active/**)
+
+**Git/GitHub Permissions (Prompted During Setup):**
+
+During the interactive setup, you'll be prompted to enable git integration permissions. Based on your choices:
+
+**If you enable git integration + write operations:**
+- Read permissions: `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`
+- Write permissions: `git checkout`, `git add`, `git commit`, `git push`, `git rm`
+- GitHub CLI: `gh pr view`, `gh pr create`
+
+**If you enable git integration (read-only):**
+- Read permissions: `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`
+- GitHub CLI: `gh pr view`
+
+**If you skip git setup:**
+- No git permissions added (you can manually add them to `.claude/settings.json` later)
+
+All git permissions are added to the `allow` list for automated workflows. If you prefer to be prompted before each git operation, manually edit `.claude/settings.json` and move the permissions from `allow` to `ask`.
 
 ### Git Integration (`.claude/git_config.json`)
 
@@ -383,6 +498,37 @@ Example configuration:
 }
 ```
 
+### SDD CLI Output Configuration (`.claude/sdd_config.json`)
+
+The setup creates a configuration file for SDD CLI output formatting:
+
+**Output Settings:**
+- `output.json` - Output JSON format (default: `true`)
+- `output.compact` - Use compact JSON formatting (default: `true`)
+
+**Benefits:**
+- ~30% token savings with compact JSON output
+- Consistent output formatting across all SDD commands
+- Can be overridden with CLI flags (`--json`, `--compact`, etc.)
+
+**Default configuration:**
+```json
+{
+  "output": {
+    "json": true,
+    "compact": true
+  }
+}
+```
+
+**Configuration precedence:**
+1. Built-in defaults (`json: true`, `compact: true`)
+2. Global config (`~/.claude/sdd_config.json`)
+3. Project config (`./.claude/sdd_config.json`)
+4. CLI arguments (highest priority)
+
+For detailed information, see `docs/SDD_CONFIG_README.md` in the toolkit.
+
 ## Important Notes
 
 **Permissions:**
@@ -396,9 +542,16 @@ Example configuration:
 - All git features are opt-in with safe defaults (auto_push and auto_pr default to false)
 - Configuration is stored in `.claude/git_config.json`
 
+**SDD CLI Output Configuration:**
+- Setup creates `.claude/sdd_config.json` automatically if missing
+- Uses safe defaults (`json: true`, `compact: true`)
+- Non-destructive - won't overwrite existing configuration
+- Can be modified manually or via CLI flags on individual commands
+
 **Frequency:**
 - You only need to run this once per project
 - Run again to reconfigure git settings or if permissions need updating
+- sdd_config.json is created automatically but can be edited anytime
 
 ## Error Handling
 

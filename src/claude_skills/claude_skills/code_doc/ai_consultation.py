@@ -554,7 +554,7 @@ def consult_multi_agent(
 
     # Print completion messages if verbose
     if verbose:
-        for response in multi_response.responses:
+        for tool, response in multi_response.responses.items():
             status = "✓" if response.success else "✗"
             msg = f"{status} {response.tool} completed ({response.duration:.1f}s)"
             if printer:
@@ -568,7 +568,7 @@ def consult_multi_agent(
         # Build responses_by_tool dict from successful responses
         responses_by_tool = {
             r.tool: r.output
-            for r in multi_response.responses
+            for r in multi_response.responses.values()
             if r.success
         }
 
@@ -580,7 +580,7 @@ def consult_multi_agent(
                 "output": r.output,
                 "duration": r.duration
             }
-            for r in multi_response.responses
+            for r in multi_response.responses.values()
         ]
 
         return {
@@ -599,7 +599,7 @@ def consult_multi_agent(
                 "output": r.output,
                 "duration": r.duration
             }
-            for r in multi_response.responses
+            for r in multi_response.responses.values()
         ]
 
         return {

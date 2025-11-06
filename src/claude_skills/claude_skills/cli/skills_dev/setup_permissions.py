@@ -54,26 +54,40 @@ SDD_PERMISSIONS = [
     "Bash(gemini:*)",
     "Bash(codex:*)",
 
-    # Git/GitHub CLI permissions (specific allowlist, no wildcards for security)
-    "Bash(git checkout -b *)",
-    "Bash(git add *)",
-    "Bash(git commit *)",
-    "Bash(git push *)",
-    "Bash(git status *)",
-    "Bash(git branch --show-current)",
-    "Bash(git log *)",
-    "Bash(git rev-parse HEAD)",
-    "Bash(gh pr create *)",
-    "Bash(gh pr view *)",
+    # Note: Git/GitHub CLI permissions can be optionally configured during setup.
+    # See GIT_READ_PERMISSIONS and GIT_WRITE_PERMISSIONS below for available options.
 
     # File access permissions
-    "Read(//Users/tylerburleigh/.claude/skills/**)",
     "Write(//**/specs/active/**)",
     "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
     "Write(//**/specs/archived/**)",
     "Edit(//**/specs/active/**)",
     "Edit(//**/specs/pending/**)",
+]
+
+# Git read-only permissions (safe operations)
+# These allow Claude to inspect repository state without making changes
+GIT_READ_PERMISSIONS = [
+    "Bash(git status:*)",
+    "Bash(git log:*)",
+    "Bash(git branch:*)",
+    "Bash(git diff:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git show:*)",
+    "Bash(git describe:*)",
+    "Bash(gh pr view:*)",
+]
+
+# Git write permissions (potentially destructive operations)
+# ⚠️ These allow Claude to modify repository state and push changes
+GIT_WRITE_PERMISSIONS = [
+    "Bash(git checkout:*)",
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(git push:*)",
+    "Bash(git rm:*)",
+    "Bash(gh pr create:*)",
 ]
 
 
@@ -170,6 +184,75 @@ def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter
         return False
 
 
+def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
+    """Prompt user about adding git/GitHub permissions.
+
+    Returns:
+        List of git permissions to add (may include read-only, write, or both)
+    """
+    permissions_to_add = []
+
+    printer.info("")
+    printer.info("🔧 Git Integration Setup")
+    printer.info("")
+    printer.info("Git integration allows Claude to:")
+    printer.info("  • View repository status and history")
+    printer.info("  • Create branches and commits")
+    printer.info("  • Push changes and create pull requests")
+    printer.info("")
+
+    # Prompt 1: Enable git integration at all?
+    while True:
+        response = input("Enable git integration? (y/n): ").strip().lower()
+        if response in ['y', 'yes']:
+            # Add read-only permissions automatically
+            printer.info("")
+            printer.info("✓ Adding read-only git permissions (status, log, diff, etc.)")
+            permissions_to_add.extend(GIT_READ_PERMISSIONS)
+            break
+        elif response in ['n', 'no']:
+            printer.info("")
+            printer.info("⊘ Skipping git integration setup")
+            printer.info("  You can manually add git permissions to .claude/settings.json later")
+            printer.info("")
+            return permissions_to_add
+        else:
+            printer.warning("Please enter 'y' for yes or 'n' for no")
+
+    # Prompt 2: Enable write operations?
+    printer.info("")
+    printer.info("⚠️  Git Write Operations")
+    printer.info("")
+    printer.info("Write operations allow Claude to:")
+    printer.info("  • Switch branches (git checkout)")
+    printer.info("  • Stage changes (git add)")
+    printer.info("  • Create commits (git commit)")
+    printer.info("  • Push to remote (git push)")
+    printer.info("  • Create pull requests (gh pr create)")
+    printer.info("")
+    printer.warning("RISK: These operations can modify your repository and push changes.")
+    printer.warning("Always review Claude's proposed changes before approval.")
+    printer.info("")
+
+    while True:
+        response = input("Enable git write operations? (y/n): ").strip().lower()
+        if response in ['y', 'yes']:
+            printer.info("")
+            printer.info("✓ Adding git write permissions")
+            permissions_to_add.extend(GIT_WRITE_PERMISSIONS)
+            break
+        elif response in ['n', 'no']:
+            printer.info("")
+            printer.info("✓ Git integration enabled (read-only)")
+            printer.info("  You can manually add write permissions later if needed")
+            break
+        else:
+            printer.warning("Please enter 'y' for yes or 'n' for no")
+
+    printer.info("")
+    return permissions_to_add
+
+
 def cmd_update(args, printer: PrettyPrinter) -> int:
     """Update .claude/settings.json with SDD permissions."""
     project_path = Path(args.project_root).resolve()
@@ -226,6 +309,17 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         if len(new_permissions) > 5:
             printer.info(f"  ... and {len(new_permissions) - 5} more")
         printer.info("")
+
+    # Prompt for git permissions (if not in JSON mode)
+    if not args.json:
+        git_permissions = _prompt_for_git_permissions(printer)
+
+        # Add git permissions (avoid duplicates)
+        for perm in git_permissions:
+            if perm not in existing_permissions:
+                new_permissions.append(perm)
+                settings["permissions"]["allow"].append(perm)
+                existing_permissions.add(perm)
 
     # Write updated settings
     with open(settings_file, 'w') as f:
