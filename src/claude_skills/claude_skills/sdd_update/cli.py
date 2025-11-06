@@ -46,6 +46,7 @@ from claude_skills.sdd_update.query import (
     list_blockers,
 )
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
+from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 
 
 def cmd_execute_verify(args, printer):
@@ -300,7 +301,7 @@ def cmd_add_assumption(args, printer):
             return 0
 
         # Save spec
-        save_json_spec(args.spec_id, spec_data, specs_dir)
+        save_json_spec(args.spec_id, specs_dir, spec_data)
 
         printer.success(result['message'])
         printer.info(f"Assumption ID: {result['assumption_id']}")
@@ -313,6 +314,53 @@ def cmd_add_assumption(args, printer):
 
     except ValueError as e:
         printer.error(f"Failed to add assumption: {e}")
+        return 1
+
+
+def cmd_update_estimate(args, printer):
+    """Update task estimate (hours and/or complexity)."""
+    printer.action(f"Updating estimate for task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Update estimate
+    try:
+        result = update_task_estimate(
+            spec_data=spec_data,
+            task_id=args.task_id,
+            estimated_hours=args.hours if hasattr(args, 'hours') and args.hours is not None else None,
+            complexity=args.complexity if hasattr(args, 'complexity') and args.complexity else None
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would update estimate:")
+            printer.detail(f"  Task: {result['task_id']} - {result['task_title']}")
+            for key, value in result['updates'].items():
+                printer.detail(f"  {key}: {value}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to update estimate: {e}")
         return 1
 
 
@@ -1209,6 +1257,15 @@ def register_update(subparsers, parent_parser):
     p_assumption.add_argument("--author", default="claude-code", help="Author who added the assumption")
     p_assumption.add_argument("--dry-run", action="store_true", help="Preview assumption without saving")
     p_assumption.set_defaults(func=cmd_add_assumption)
+
+    # update-estimate command
+    p_estimate = subparsers.add_parser("update-estimate", help="Update task estimate (hours and/or complexity)", parents=[parent_parser])
+    p_estimate.add_argument("spec_id", help="Specification ID")
+    p_estimate.add_argument("task_id", help="Task ID to update")
+    p_estimate.add_argument("--hours", type=float, help="Estimated hours (float)")
+    p_estimate.add_argument("--complexity", choices=["low", "medium", "high"], help="Complexity level")
+    p_estimate.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_estimate.set_defaults(func=cmd_update_estimate)
 
     # bulk-journal command
     p_bulk_journal = subparsers.add_parser("bulk-journal", help="Bulk journal completed tasks", parents=[parent_parser])
