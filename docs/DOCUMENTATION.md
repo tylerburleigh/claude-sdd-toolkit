@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 10:41:02
+**Generated:** 2025-11-06 10:45:28
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 216
-- **Total Lines:** 74046
+- **Total Lines:** 74221
 - **Total Classes:** 278
-- **Total Functions:** 807
-- **Avg Complexity:** 5.67
+- **Total Functions:** 808
+- **Avg Complexity:** 5.69
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6482,6 +6482,32 @@ Returns:
 **Parameters:**
 - `actions`: None
 - `printer`: None
+
+---
+
+### `_is_ancestor(spec_data, ancestor_id, descendant_id) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:730`
+**Complexity:** 5
+
+**Description:**
+> Check if ancestor_id is an ancestor of descendant_id.
+
+This is used to prevent circular dependencies when moving nodes.
+
+Args:
+    spec_data: The full spec data dictionary
+    ancestor_id: Potential ancestor node ID
+    descendant_id: Potential descendant node ID
+
+Returns:
+    True if ancestor_id is an ancestor of descendant_id, False otherwise
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `ancestor_id`: str
+- `descendant_id`: str
 
 ---
 
@@ -16600,19 +16626,34 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:567`
-**Complexity:** 1
+⚠️ **Complexity:** 21 (High)
 
 **Description:**
 > Move a node to a different parent in the hierarchy.
 
+This function moves a node (and its descendants) to a new location in the
+hierarchy. It updates parent-child relationships and recalculates task counts
+for all affected ancestors.
+
 Args:
-    spec_data: The full spec data dictionary
+    spec_data: The full spec data dictionary (must include 'hierarchy' key)
     node_id: ID of the node to move
     new_parent_id: ID of the new parent node
-    position: Optional position in new parent's children list
+    position: Optional position in new parent's children list (0-indexed).
+             If None, appends to end. If negative, counts from end.
 
 Returns:
-    Dict with success status and message
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "old_parent_id": "Previous parent ID" (only if success=True),
+        "new_parent_id": "New parent ID" (only if success=True)
+    }
+
+Raises:
+    ValueError: If spec_data is invalid or trying to move spec-root
+    KeyError: If node_id or new_parent_id doesn't exist in hierarchy
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
@@ -20799,7 +20840,7 @@ Returns:
 ### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:592`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:767`
 **Complexity:** 1
 
 **Description:**

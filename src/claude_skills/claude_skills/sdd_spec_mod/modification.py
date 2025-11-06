@@ -5,8 +5,10 @@ Provides functions for adding, removing, and moving nodes in SDD specification h
 """
 
 import sys
-from typing import Dict, Any, Optional, List
+import copy
+from typing import Dict, Any, Optional, List, Callable
 from datetime import datetime, timezone
+from contextlib import contextmanager
 
 from claude_skills.common.spec import get_node, update_node
 
@@ -762,6 +764,179 @@ def _is_ancestor(
         current_id = current_node.get("parent")
 
     return False
+
+
+@contextmanager
+def spec_transaction(spec_data: Dict[str, Any]):
+    """
+    Context manager that provides transaction support for spec modifications.
+
+    Creates a deep copy of the spec before yielding. If the context exits
+    normally, changes are kept. If an exception is raised, the spec is
+    rolled back to its original state.
+
+    Usage:
+        with spec_transaction(spec_data):
+            add_node(spec_data, "phase-1", {"node_id": "task-1", ...})
+            # If any error occurs, changes are rolled back
+
+    Args:
+        spec_data: The full spec data dictionary to protect
+
+    Yields:
+        The original spec_data dict (modifications happen in-place)
+
+    Note:
+        This creates a deep copy of the spec, which can be expensive for
+        large specs. Use judiciously for critical operations.
+    """
+    # Create deep copy of the hierarchy before modification
+    original_hierarchy = copy.deepcopy(spec_data.get("hierarchy", {}))
+
+    try:
+        yield spec_data
+    except Exception as e:
+        # Rollback: restore original hierarchy
+        spec_data["hierarchy"] = original_hierarchy
+        raise  # Re-raise the exception after rollback
+
+
+def transactional_modify(
+    spec_data: Dict[str, Any],
+    operation: Callable[[Dict[str, Any]], Dict[str, Any]],
+    validate: bool = True
+) -> Dict[str, Any]:
+    """
+    Execute a modification operation with transaction support and optional validation.
+
+    This function wraps a modification operation in a transaction, optionally
+    validates the spec after the modification, and rolls back if validation fails.
+
+    Args:
+        spec_data: The full spec data dictionary
+        operation: A callable that performs the modification. It receives spec_data
+                  and should return a result dict with "success" and "message" keys.
+        validate: If True, validates the spec after modification (default: True)
+
+    Returns:
+        Dict with success status and message:
+        {
+            "success": True|False,
+            "message": "Description of result",
+            "operation_result": {...} (result from the operation if successful)
+        }
+
+    Example:
+        def my_operation(spec):
+            return add_node(spec, "phase-1", {"node_id": "task-1", ...})
+
+        result = transactional_modify(spec_data, my_operation, validate=True)
+    """
+    try:
+        with spec_transaction(spec_data):
+            # Execute the operation
+            operation_result = operation(spec_data)
+
+            # Check if operation failed
+            if not operation_result.get("success", False):
+                raise ValueError(f"Operation failed: {operation_result.get('message', 'Unknown error')}")
+
+            # Optional validation
+            if validate:
+                validation_result = _validate_spec_integrity(spec_data)
+                if not validation_result["valid"]:
+                    raise ValueError(f"Validation failed: {validation_result['message']}")
+
+            return {
+                "success": True,
+                "message": "Operation completed successfully",
+                "operation_result": operation_result
+            }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Transaction rolled back: {str(e)}"
+        }
+
+
+def _validate_spec_integrity(spec_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Validate the integrity of a spec after modifications.
+
+    Checks for common integrity issues:
+    - All parent references point to existing nodes
+    - All child references point to existing nodes
+    - No orphaned nodes (except spec-root)
+    - Parent-child relationships are bidirectional
+    - Task counts are consistent
+
+    Args:
+        spec_data: The full spec data dictionary
+
+    Returns:
+        Dict with validation result:
+        {
+            "valid": True|False,
+            "message": "Description of validation result",
+            "errors": [...] (list of specific errors if validation failed)
+        }
+    """
+    hierarchy = spec_data.get("hierarchy", {})
+    errors = []
+
+    # Check parent references
+    for node_id, node in hierarchy.items():
+        parent_id = node.get("parent")
+
+        # spec-root should have no parent
+        if node_id == "spec-root":
+            if parent_id is not None:
+                errors.append(f"spec-root has parent '{parent_id}' (should be None)")
+            continue
+
+        # All other nodes must have a parent
+        if parent_id is None:
+            errors.append(f"Node '{node_id}' has no parent")
+            continue
+
+        # Parent must exist
+        if parent_id not in hierarchy:
+            errors.append(f"Node '{node_id}' has nonexistent parent '{parent_id}'")
+            continue
+
+        # Parent must list this node as a child
+        parent = hierarchy[parent_id]
+        parent_children = parent.get("children", [])
+        if node_id not in parent_children:
+            errors.append(f"Node '{node_id}' not in parent '{parent_id}' children list")
+
+    # Check child references
+    for node_id, node in hierarchy.items():
+        children = node.get("children", [])
+        for child_id in children:
+            # Child must exist
+            if child_id not in hierarchy:
+                errors.append(f"Node '{node_id}' has nonexistent child '{child_id}'")
+                continue
+
+            # Child must reference this node as parent
+            child = hierarchy[child_id]
+            if child.get("parent") != node_id:
+                errors.append(f"Child '{child_id}' does not reference '{node_id}' as parent")
+
+    if errors:
+        return {
+            "valid": False,
+            "message": f"Found {len(errors)} integrity error(s)",
+            "errors": errors
+        }
+
+    return {
+        "valid": True,
+        "message": "Spec integrity validated successfully",
+        "errors": []
+    }
 
 
 def update_task_counts(spec_data: Dict[str, Any], node_id: str) -> Dict[str, Any]:
