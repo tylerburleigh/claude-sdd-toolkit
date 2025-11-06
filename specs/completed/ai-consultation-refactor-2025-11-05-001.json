@@ -1,7 +1,7 @@
 {
   "spec_id": "ai-consultation-refactor-2025-11-05-001",
   "generated": "2025-11-05T00:00:00Z",
-  "last_updated": "2025-11-05T17:33:21.010285Z",
+  "last_updated": "2025-11-05T18:31:31.816742Z",
   "metadata": {
     "title": "AI Consultation Infrastructure Refactoring",
     "description": "Extract and consolidate duplicated AI consultation code from run-tests, sdd-plan-review, and code-doc into shared utilities, eliminating ~850 lines of duplication",
@@ -17,7 +17,9 @@
     ],
     "activated_date": "2025-11-05T13:18:30.300836Z",
     "progress_percentage": 100,
-    "current_phase": "phase-6"
+    "current_phase": "phase-6",
+    "completed_date": "2025-11-05T18:31:31.815335Z",
+    "actual_hours": 0.722
   },
   "hierarchy": {
     "spec-root": {

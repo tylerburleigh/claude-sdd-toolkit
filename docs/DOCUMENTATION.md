@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 12:31:23
+**Generated:** 2025-11-05 19:12:09
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 209
-- **Total Lines:** 70395
-- **Total Classes:** 267
-- **Total Functions:** 779
-- **Avg Complexity:** 5.58
+- **Total Files:** 214
+- **Total Lines:** 73222
+- **Total Classes:** 278
+- **Total Functions:** 796
+- **Avg Complexity:** 5.61
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -210,6 +210,24 @@ Example:
 
 ---
 
+### `CategorizedIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:636`
+
+**Description:**
+> Issue with assigned severity category.
+
+Attributes:
+    issue: The issue description
+    severity: Assigned severity level
+    keywords_matched: Keywords that triggered this severity
+
+**Methods:**
+- `to_dict()`
+
+---
+
 ### `CodebaseAnalyzer`
 
 **Language:** python
@@ -351,6 +369,43 @@ Example:
 
 ---
 
+### `ConsensusResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:490`
+
+**Description:**
+> Consensus analysis across multiple AI review responses.
+
+Identifies issues and recommendations where multiple models agree,
+providing higher confidence in findings.
+
+Attributes:
+    consensus_verdict: Majority verdict across all responses
+    consensus_issues: Issues mentioned by 2+ models
+    consensus_recommendations: Recommendations mentioned by 2+ models
+    all_issues: All unique issues across all models
+    all_recommendations: All unique recommendations across all models
+    verdict_distribution: Count of each verdict type
+    agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)
+    model_count: Total number of models consulted
+
+**Methods:**
+- `to_dict()`
+
+---
+
+### `ConsultationError`
+
+**Language:** python
+**Inherits from:** `Exception`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:79`
+
+**Description:**
+> Base exception for consultation errors.
+
+---
+
 ### `ConsultationResponse`
 
 **Language:** python
@@ -359,6 +414,17 @@ Example:
 
 **Description:**
 > Represents a response from a tool consultation.
+
+---
+
+### `ConsultationTimeoutError`
+
+**Language:** python
+**Inherits from:** `ConsultationError`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:89`
+
+**Description:**
+> Raised when consultation times out.
 
 ---
 
@@ -755,6 +821,76 @@ Example:
 
 ---
 
+### `FidelityReport`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:130`
+
+**Description:**
+> Generate structured reports from fidelity review results.
+
+This class will be implemented in Phase 4 (Report Generation).
+
+**Methods:**
+- `__init__()`
+- `_get_report_metadata()`
+- `_convert_to_dict()`
+- `generate_markdown()`
+- `generate_json()`
+- `print_console()`
+- `save_to_file()`
+- `calculate_fidelity_score()`
+- `summarize_deviations()`
+
+---
+
+### `FidelityReviewer`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:21`
+
+**Description:**
+> Core class for performing fidelity reviews of implementations against specs.
+
+This class will be implemented in Phase 3 (Core Review Logic).
+
+**Methods:**
+- `__init__()`
+- `review_task()`
+- `review_phase()`
+- `review_full_spec()`
+- `review_files()`
+- `analyze_deviation()`
+- `_load_spec()`
+- `get_task_requirements()`
+- `get_phase_tasks()`
+- `get_all_tasks()`
+- `_collect_task_ids_recursive()`
+- `get_file_diff()`
+- `get_task_diffs()`
+- `get_phase_diffs()`
+- `get_branch_diff()`
+- `get_test_results()`
+- `_run_and_parse_tests()`
+- `_parse_junit_xml()`
+- `get_task_test_results()`
+- `get_journal_entries()`
+- `get_task_journals()`
+- `generate_review_prompt()`
+
+---
+
+### `FidelityVerdict`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:27`
+
+**Description:**
+> Overall fidelity verdict from AI review.
+
+---
+
 ### `FieldChange`
 
 **Language:** python
@@ -1047,6 +1183,17 @@ Example:
 
 **Description:**
 > Represents a location where a class is instantiated.
+
+---
+
+### `IssueSeverity`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:35`
+
+**Description:**
+> Severity level for identified issues.
 
 ---
 
@@ -1370,6 +1517,17 @@ Example:
 
 ---
 
+### `NoToolsAvailableError`
+
+**Language:** python
+**Inherits from:** `ConsultationError`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:84`
+
+**Description:**
+> Raised when no AI tools are available for consultation.
+
+---
+
 ### `NodeShape`
 
 **Language:** python
@@ -1479,6 +1637,30 @@ Example:
 
 ---
 
+### `ParsedReviewResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:45`
+
+**Description:**
+> Structured representation of AI review response.
+
+Extracted from free-form AI tool output to provide
+structured access to review findings.
+
+Attributes:
+    verdict: Overall pass/fail/partial verdict
+    issues: List of identified issues
+    recommendations: List of suggested improvements
+    summary: Brief summary of findings
+    raw_response: Original AI response text
+    confidence: Confidence level if extractable (0.0-1.0)
+
+**Methods:**
+- `to_dict()`
+
+---
+
 ### `ParsedSpec`
 
 **Language:** python
@@ -1554,6 +1736,33 @@ parsing across multiple languages.
 - `result()`
 - `blank()`
 - `item()`
+
+---
+
+### `PrettyPrinter`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:14`
+
+**Description:**
+> Pretty printer for console output with optional color support.
+
+Provides formatted console output with ANSI color codes for
+better readability. Automatically detects terminal capabilities
+and disables colors when not supported.
+
+**Methods:**
+- `__init__()`
+- `_supports_color()`
+- `color()`
+- `bold()`
+- `red()`
+- `green()`
+- `yellow()`
+- `blue()`
+- `magenta()`
+- `cyan()`
+- `severity_color()`
 
 ---
 
@@ -6168,6 +6377,59 @@ Returns:
 
 ---
 
+### `_handle_fidelity_review(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:30`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Handle fidelity-review command execution.
+
+Orchestrates the fidelity review workflow:
+1. Load specification and extract requirements
+2. Generate review prompt with implementation artifacts
+3. Optionally consult AI tools for review
+4. Parse and analyze responses
+5. Generate and display report
+
+Args:
+    args: Parsed command-line arguments
+    printer: Optional PrettyPrinter instance (for unified CLI compatibility)
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: None
+
+---
+
+### `_handle_list_review_tools(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:215`
+**Complexity:** 10
+
+**Description:**
+> Handle list-review-tools command execution.
+
+Detects and displays available AI consultation tools with their status.
+
+Args:
+    args: Parsed command-line arguments
+    printer: Optional PrettyPrinter instance (for unified CLI compatibility)
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+**Parameters:**
+- `args`: argparse.Namespace
+- `printer`: None
+
+---
+
 ### `_interactive_select_fixes(actions, printer) -> None`
 
 **Language:** python
@@ -6338,6 +6600,60 @@ Args:
 
 ---
 
+### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:203`
+**Complexity:** 1
+
+**Description:**
+> Generate JSON output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
+
+---
+
+### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:180`
+**Complexity:** 5
+
+**Description:**
+> Generate markdown output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
+
+---
+
+### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:145`
+**Complexity:** 7
+
+**Description:**
+> Generate text output format.
+
+**Parameters:**
+- `args`: None
+- `reviewer`: None
+- `parsed_responses`: None
+- `consensus`: None
+- `categorized_issues`: None
+
+---
+
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
@@ -6433,7 +6749,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:59`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:61`
 **Complexity:** 1
 
 **Description:**
@@ -6448,7 +6764,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:97`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:99`
 **Complexity:** 1
 
 **Description:**
@@ -6463,7 +6779,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:79`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:81`
 **Complexity:** 1
 
 **Description:**
@@ -7711,6 +8027,75 @@ Args:
 **Parameters:**
 - `skill`: str
 - `command`: str
+
+---
+
+### `categorize_issue_severity(issue) -> CategorizedIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:658`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Categorize issue severity based on keywords and patterns.
+
+Uses keyword matching to assign severity levels:
+- CRITICAL: Security vulnerabilities, data loss, crashes
+- HIGH: Incorrect behavior, spec violations, broken functionality
+- MEDIUM: Performance issues, missing tests, code quality
+- LOW: Style issues, documentation, minor improvements
+
+Args:
+    issue: Issue description text
+
+Returns:
+    CategorizedIssue with assigned severity
+
+Example:
+    >>> issue = "SQL injection vulnerability in login form"
+    >>> categorized = categorize_issue_severity(issue)
+    >>> categorized.severity
+    <IssueSeverity.CRITICAL: 'critical'>
+    >>> categorized.keywords_matched
+    ['sql injection', 'vulnerability']
+
+**Parameters:**
+- `issue`: str
+
+---
+
+### `categorize_issues(issues) -> List[CategorizedIssue]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:766`
+**Complexity:** 1
+
+**Description:**
+> Categorize severity for multiple issues.
+
+Convenience function to categorize a list of issues.
+
+Args:
+    issues: List of issue descriptions
+
+Returns:
+    List of CategorizedIssue objects, sorted by severity (critical first)
+
+Example:
+    >>> issues = [
+    ...     "SQL injection in login",
+    ...     "Missing tests for auth module",
+    ...     "Typo in README"
+    ... ]
+    >>> categorized = categorize_issues(issues)
+    >>> for cat in categorized:
+    ...     print(f"{cat.severity.value}: {cat.issue}")
+    critical: SQL injection in login
+    medium: Missing tests for auth module
+    low: Typo in README
+
+**Parameters:**
+- `issues`: List[str]
 
 ---
 
@@ -9920,6 +10305,49 @@ Returns:
 
 ---
 
+### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:94`
+**Complexity:** 8
+
+**Description:**
+> Consult an AI tool for implementation fidelity review.
+
+Simplified wrapper around execute_tool() with fidelity-review defaults
+and comprehensive error handling.
+
+Args:
+    prompt: The review prompt to send to the AI tool
+    tool: Specific tool to use (gemini, codex, cursor-agent).
+          If None, uses first available tool.
+    model: Model to request (optional, tool-specific)
+    timeout: Timeout in seconds (default: 120)
+
+Returns:
+    ToolResponse object with consultation results
+
+Raises:
+    NoToolsAvailableError: If no AI tools are available
+    ConsultationTimeoutError: If consultation times out
+    ConsultationError: For other consultation failures
+
+Example:
+    >>> response = consult_ai_on_fidelity(
+    ...     prompt="Review this implementation...",
+    ...     tool="gemini"
+    ... )
+    >>> if response.success:
+    ...     print(response.output)
+
+**Parameters:**
+- `prompt`: str
+- `tool`: Optional[str]
+- `model`: Optional[str]
+- `timeout`: int
+
+---
+
 ### `consult_multi_agent(doc_type, prompt, pair, dry_run, verbose, printer) -> Dict[str, any]`
 
 **Language:** python
@@ -9985,6 +10413,50 @@ Returns:
 - `pair`: str
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success) -> List[ToolResponse]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:179`
+**Complexity:** 9
+
+**Description:**
+> Consult multiple AI tools in parallel for fidelity review.
+
+Wrapper around execute_tools_parallel() with fidelity-review defaults
+and comprehensive error handling.
+
+Args:
+    prompt: The review prompt to send to all AI tools
+    tools: List of tools to consult (gemini, codex, cursor-agent).
+           If None, uses all available tools.
+    model: Model to request (optional, tool-specific)
+    timeout: Timeout in seconds per tool (default: 120)
+    require_all_success: If True, raise exception if any tool fails
+
+Returns:
+    List of ToolResponse objects, one per tool
+
+Raises:
+    NoToolsAvailableError: If no AI tools are available
+    ConsultationError: If require_all_success=True and any tool fails
+
+Example:
+    >>> responses = consult_multiple_ai_on_fidelity(
+    ...     prompt="Review this implementation...",
+    ...     tools=["gemini", "codex"]
+    ... )
+    >>> for response in responses:
+    ...     print(f"{response.tool}: {response.status.value}")
+
+**Parameters:**
+- `prompt`: str
+- `tools`: Optional[List[str]]
+- `model`: Optional[str]
+- `timeout`: int
+- `require_all_success`: bool
 
 ---
 
@@ -10438,6 +10910,48 @@ Uses check_tool_available() from common.ai_tools for detection.
 
 Returns:
     List of available tool names (gemini, codex, cursor-agent)
+
+---
+
+### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:530`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Detect consensus across multiple AI review responses.
+
+Identifies issues and recommendations where multiple models agree,
+providing higher confidence findings.
+
+Args:
+    parsed_responses: List of ParsedReviewResponse objects
+    min_agreement: Minimum number of models that must agree (default: 2)
+    similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)
+                        Not implemented in v1, uses exact matching
+
+Returns:
+    ConsensusResult with consensus analysis
+
+Algorithm:
+    1. Count verdict distribution and find majority verdict
+    2. Collect all issues/recommendations across models
+    3. Identify items mentioned by >= min_agreement models
+    4. Calculate agreement rate for verdict
+
+Example:
+    >>> parsed = parse_multiple_responses(responses)
+    >>> consensus = detect_consensus(parsed, min_agreement=2)
+    >>> print(f"Consensus: {consensus.consensus_verdict.value}")
+    >>> print(f"Agreement: {consensus.agreement_rate:.1%}")
+    >>> for issue in consensus.consensus_issues:
+    ...     print(f"- {issue}")
+
+**Parameters:**
+- `parsed_responses`: List[ParsedReviewResponse]
+- `min_agreement`: int
+- `similarity_threshold`: float
 
 ---
 
@@ -13851,6 +14365,42 @@ Returns:
 
 ---
 
+### `get_consultation_summary(responses) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:267`
+**Complexity:** 3
+
+**Description:**
+> Generate summary statistics for multiple consultation responses.
+
+Useful for understanding overall consultation health and results.
+
+Args:
+    responses: List of ToolResponse objects
+
+Returns:
+    Dictionary with summary statistics:
+    {
+        "total": int,
+        "successful": int,
+        "failed": int,
+        "timed_out": int,
+        "total_duration": float,
+        "average_duration": float,
+        "tools_used": List[str],
+        "success_rate": float
+    }
+
+Example:
+    >>> summary = get_consultation_summary(responses)
+    >>> print(f"Success rate: {summary['success_rate']:.1%}")
+
+**Parameters:**
+- `responses`: List[ToolResponse]
+
+---
+
 ### `get_consultation_timeout() -> int`
 
 **Language:** python
@@ -15725,6 +16275,20 @@ Returns:
 
 ---
 
+### `main() -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:431`
+**Complexity:** 3
+
+**Description:**
+> Main entry point for standalone CLI execution.
+
+Returns:
+    Exit code (0 for success, non-zero for error)
+
+---
+
 ### `main() -> None`
 
 **Language:** python
@@ -16012,6 +16576,34 @@ Example:
 
 ---
 
+### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:466`
+**Complexity:** 1
+
+**Description:**
+> Parse multiple AI tool responses.
+
+Convenience function to parse a list of ToolResponse objects.
+
+Args:
+    responses: List of ToolResponse objects
+
+Returns:
+    List of ParsedReviewResponse objects
+
+Example:
+    >>> responses = consult_multiple_ai_on_fidelity(prompt)
+    >>> parsed_list = parse_multiple_responses(responses)
+    >>> for parsed in parsed_list:
+    ...     print(f"{parsed.verdict.value}: {len(parsed.issues)} issues")
+
+**Parameters:**
+- `responses`: List[ToolResponse]
+
+---
+
 ### `parse_response(tool_output, tool_name) -> Dict[str, Any]`
 
 **Language:** python
@@ -16034,6 +16626,36 @@ Returns:
 **Parameters:**
 - `tool_output`: str
 - `tool_name`: str
+
+---
+
+### `parse_review_response(response) -> ParsedReviewResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:326`
+⚠️ **Complexity:** 16 (High)
+
+**Description:**
+> Parse AI tool response to extract structured review information.
+
+Extracts verdict, issues, recommendations from free-form AI response.
+Uses pattern matching and heuristics to identify key information.
+
+Args:
+    response: ToolResponse from AI consultation
+
+Returns:
+    ParsedReviewResponse with extracted information
+
+Example:
+    >>> tool_response = consult_ai_on_fidelity(prompt)
+    >>> parsed = parse_review_response(tool_response)
+    >>> print(f"Verdict: {parsed.verdict.value}")
+    >>> for issue in parsed.issues:
+    ...     print(f"- {issue}")
+
+**Parameters:**
+- `response`: ToolResponse
 
 ---
 
@@ -16558,6 +17180,31 @@ Provides development utilities for maintaining the claude_skills package.
 
 ---
 
+### `register_commands(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:413`
+**Complexity:** 1
+
+**Description:**
+> Register all fidelity review commands with the main CLI parser.
+
+This function will be called by the main SDD CLI to register
+fidelity review commands as subcommands.
+
+Args:
+    subparsers: The subparser object from the main argument parser
+    parent_parser: Parent parser with global options to inherit (optional)
+
+Note:
+    Registers both fidelity-review and list-review-tools commands.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
+
+---
+
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -16592,6 +17239,21 @@ Args:
 
 ---
 
+### `register_fidelity_review_command(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:290`
+**Complexity:** 1
+
+**Description:**
+> Register the fidelity-review command.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
+
+---
+
 ### `register_gendocs(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -16619,6 +17281,21 @@ Args:
 **Parameters:**
 - `subparsers`: None
 - `parent_parser`: None
+
+---
+
+### `register_list_review_tools_command(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:389`
+**Complexity:** 1
+
+**Description:**
+> Register the list-review-tools command.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: Optional[argparse.ArgumentParser]
 
 ---
 
@@ -21242,6 +21919,69 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
+
+- `argparse`
+- `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `consultation.ConsultationError`
+- `consultation.ConsultationTimeoutError`
+- `consultation.NoToolsAvailableError`
+- `consultation.categorize_issues`
+- `consultation.consult_multiple_ai_on_fidelity`
+- `consultation.detect_consensus`
+- `consultation.parse_multiple_responses`
+- `json`
+- `pathlib.Path`
+- `review.FidelityReviewer`
+- `sys`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py`
+
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.ai_tools.check_tool_available`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tool`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `logging`
+- `re`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/report.py`
+
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
+
+- `claude_skills.common.git_metadata.find_git_root`
+- `claude_skills.common.paths.find_specs_directory`
+- `claude_skills.common.spec.get_node`
+- `claude_skills.common.spec.load_json_spec`
+- `logging`
+- `pathlib.Path`
+- `subprocess`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `xml.etree.ElementTree`
 
 ### `src/claude_skills/claude_skills/sdd_next/__init__.py`
 

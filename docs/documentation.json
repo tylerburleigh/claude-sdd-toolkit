@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T17:31:23.972005Z",
+    "generated_at": "2025-11-06T00:12:09.378982Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 209,
-    "total_lines": 70395,
-    "total_classes": 267,
-    "total_functions": 779,
-    "avg_complexity": 5.58,
+    "total_files": 214,
+    "total_lines": 73222,
+    "total_classes": 278,
+    "total_functions": 796,
+    "avg_complexity": 5.61,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 209,
-        "lines": 70395,
-        "classes": 267,
-        "functions": 779,
-        "avg_complexity": 5.58
+        "files": 214,
+        "lines": 73222,
+        "classes": 278,
+        "functions": 796,
+        "avg_complexity": 5.61
       }
     }
   },
@@ -121,7 +121,7 @@
         "logging"
       ],
       "exports": [],
-      "lines": 112
+      "lines": 114
     },
     {
       "name": "gendocs",
@@ -2037,6 +2037,149 @@
       ],
       "exports": [],
       "lines": 455
+    },
+    {
+      "name": "__init__",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/__init__.py",
+      "language": "python",
+      "docstring": "SDD Fidelity Review Operations\n\nImplementation fidelity review functionality for comparing actual code against\nSDD specification requirements. Identifies deviations and generates compliance reports.",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": [],
+      "lines": 11
+    },
+    {
+      "name": "cli",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "language": "python",
+      "docstring": "Implementation Fidelity Review CLI\n\nCommand-line interface for reviewing implementation fidelity against SDD specifications.",
+      "classes": [],
+      "functions": [
+        "_handle_fidelity_review",
+        "_output_text",
+        "_output_markdown",
+        "_output_json",
+        "_handle_list_review_tools",
+        "register_fidelity_review_command",
+        "register_list_review_tools_command",
+        "register_commands",
+        "main"
+      ],
+      "imports": [
+        "argparse",
+        "sys",
+        "json",
+        "typing.Optional",
+        "pathlib.Path",
+        "review.FidelityReviewer",
+        "consultation.consult_multiple_ai_on_fidelity",
+        "consultation.parse_multiple_responses",
+        "consultation.detect_consensus",
+        "consultation.categorize_issues",
+        "consultation.NoToolsAvailableError",
+        "consultation.ConsultationTimeoutError",
+        "consultation.ConsultationError",
+        "claude_skills.common.ai_tools.detect_available_tools",
+        "claude_skills.common.ai_tools.check_tool_available"
+      ],
+      "exports": [],
+      "lines": 469
+    },
+    {
+      "name": "consultation",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "language": "python",
+      "docstring": "AI Consultation Wrapper for Fidelity Review\n\nLightweight wrapper around common/ai_tools.py specifically tailored for\nimplementation fidelity review use cases. Provides simplified API with\nfidelity-review-specific defaults and error handling.",
+      "classes": [
+        "FidelityVerdict",
+        "IssueSeverity",
+        "ParsedReviewResponse",
+        "ConsultationError",
+        "NoToolsAvailableError",
+        "ConsultationTimeoutError",
+        "ConsensusResult",
+        "CategorizedIssue"
+      ],
+      "functions": [
+        "consult_ai_on_fidelity",
+        "consult_multiple_ai_on_fidelity",
+        "get_consultation_summary",
+        "parse_review_response",
+        "parse_multiple_responses",
+        "detect_consensus",
+        "categorize_issue_severity",
+        "categorize_issues"
+      ],
+      "imports": [
+        "typing.List",
+        "typing.Optional",
+        "typing.Dict",
+        "typing.Any",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "enum.Enum",
+        "logging",
+        "re",
+        "claude_skills.common.ai_tools.ToolResponse",
+        "claude_skills.common.ai_tools.ToolStatus",
+        "claude_skills.common.ai_tools.execute_tool",
+        "claude_skills.common.ai_tools.execute_tools_parallel",
+        "claude_skills.common.ai_tools.detect_available_tools",
+        "claude_skills.common.ai_tools.check_tool_available"
+      ],
+      "exports": [],
+      "lines": 804
+    },
+    {
+      "name": "report",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "language": "python",
+      "docstring": "Fidelity Review Report Generation Module\n\nGenerates structured reports from fidelity review results.",
+      "classes": [
+        "PrettyPrinter",
+        "FidelityReport"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.List",
+        "pathlib.Path",
+        "datetime.datetime",
+        "json",
+        "sys"
+      ],
+      "exports": [],
+      "lines": 401
+    },
+    {
+      "name": "review",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+      "language": "python",
+      "docstring": "Implementation Fidelity Review Core Module\n\nCore functionality for comparing implementation against specifications.",
+      "classes": [
+        "FidelityReviewer"
+      ],
+      "functions": [],
+      "imports": [
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Any",
+        "sys",
+        "subprocess",
+        "logging",
+        "xml.etree.ElementTree",
+        "claude_skills.common.spec.load_json_spec",
+        "claude_skills.common.spec.get_node",
+        "claude_skills.common.paths.find_specs_directory",
+        "claude_skills.common.git_metadata.find_git_root"
+      ],
+      "exports": [],
+      "lines": 1140
     },
     {
       "name": "__init__",
@@ -7523,6 +7666,15 @@
           ]
         },
         {
+          "instantiator": "print_console",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+          "line": 299,
+          "context": [
+            "FidelityReport",
+            "print_console"
+          ]
+        },
+        {
           "instantiator": "main",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 241,
@@ -8128,7 +8280,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 82
+      "instantiation_count": 83
     },
     {
       "name": "EnhancedError",
@@ -9277,6 +9429,1090 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "FidelityVerdict",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 27,
+      "language": "python",
+      "docstring": "Overall fidelity verdict from AI review.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "IssueSeverity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 35,
+      "language": "python",
+      "docstring": "Severity level for identified issues.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ParsedReviewResponse",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 45,
+      "language": "python",
+      "docstring": "Structured representation of AI review response.\n\nExtracted from free-form AI tool output to provide\nstructured access to review findings.\n\nAttributes:\n    verdict: Overall pass/fail/partial verdict\n    issues: List of identified issues\n    recommendations: List of suggested improvements\n    summary: Brief summary of findings\n    raw_response: Original AI response text\n    confidence: Confidence level if extractable (0.0-1.0)",
+      "bases": [],
+      "methods": [
+        "to_dict"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "parse_review_response",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 365,
+          "context": [
+            "parse_review_response"
+          ]
+        },
+        {
+          "instantiator": "parse_review_response",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 456,
+          "context": [
+            "parse_review_response"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "ConsultationError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 79,
+      "language": "python",
+      "docstring": "Base exception for consultation errors.",
+      "bases": [
+        "Exception"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 176,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 252,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 264,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 3
+    },
+    {
+      "name": "NoToolsAvailableError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 84,
+      "language": "python",
+      "docstring": "Raised when no AI tools are available for consultation.",
+      "bases": [
+        "ConsultationError"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 134,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 143,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 220,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        },
+        {
+          "instantiator": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 229,
+          "context": [
+            "consult_multiple_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 4
+    },
+    {
+      "name": "ConsultationTimeoutError",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 89,
+      "language": "python",
+      "docstring": "Raised when consultation times out.",
+      "bases": [
+        "ConsultationError"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 158,
+          "context": [
+            "consult_ai_on_fidelity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ConsensusResult",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 490,
+      "language": "python",
+      "docstring": "Consensus analysis across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence in findings.\n\nAttributes:\n    consensus_verdict: Majority verdict across all responses\n    consensus_issues: Issues mentioned by 2+ models\n    consensus_recommendations: Recommendations mentioned by 2+ models\n    all_issues: All unique issues across all models\n    all_recommendations: All unique recommendations across all models\n    verdict_distribution: Count of each verdict type\n    agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)\n    model_count: Total number of models consulted",
+      "bases": [],
+      "methods": [
+        "to_dict"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "detect_consensus",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 565,
+          "context": [
+            "detect_consensus"
+          ]
+        },
+        {
+          "instantiator": "detect_consensus",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 623,
+          "context": [
+            "detect_consensus"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "CategorizedIssue",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 636,
+      "language": "python",
+      "docstring": "Issue with assigned severity category.\n\nAttributes:\n    issue: The issue description\n    severity: Assigned severity level\n    keywords_matched: Keywords that triggered this severity",
+      "bases": [],
+      "methods": [
+        "to_dict"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "categorize_issue_severity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 722,
+          "context": [
+            "categorize_issue_severity"
+          ]
+        },
+        {
+          "instantiator": "categorize_issue_severity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 732,
+          "context": [
+            "categorize_issue_severity"
+          ]
+        },
+        {
+          "instantiator": "categorize_issue_severity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 742,
+          "context": [
+            "categorize_issue_severity"
+          ]
+        },
+        {
+          "instantiator": "categorize_issue_severity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 752,
+          "context": [
+            "categorize_issue_severity"
+          ]
+        },
+        {
+          "instantiator": "categorize_issue_severity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 759,
+          "context": [
+            "categorize_issue_severity"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 5
+    },
+    {
+      "name": "PrettyPrinter",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "line": 14,
+      "language": "python",
+      "docstring": "Pretty printer for console output with optional color support.\n\nProvides formatted console output with ANSI color codes for\nbetter readability. Automatically detects terminal capabilities\nand disables colors when not supported.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_supports_color",
+        "color",
+        "bold",
+        "red",
+        "green",
+        "yellow",
+        "blue",
+        "magenta",
+        "cyan",
+        "severity_color"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "main",
+          "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+          "line": 226,
+          "context": [
+            "main"
+          ]
+        },
+        {
+          "instantiator": "show_commit_preview",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 257,
+          "context": [
+            "show_commit_preview"
+          ]
+        },
+        {
+          "instantiator": "show_commit_preview_and_wait",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 432,
+          "context": [
+            "show_commit_preview_and_wait"
+          ]
+        },
+        {
+          "instantiator": "create_commit_from_staging",
+          "file": "src/claude_skills/claude_skills/common/git_metadata.py",
+          "line": 489,
+          "context": [
+            "create_commit_from_staging"
+          ]
+        },
+        {
+          "instantiator": "run_consultation",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 467,
+          "context": [
+            "run_consultation"
+          ]
+        },
+        {
+          "instantiator": "print_routing_matrix",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 544,
+          "context": [
+            "print_routing_matrix"
+          ]
+        },
+        {
+          "instantiator": "consult_with_auto_routing",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 584,
+          "context": [
+            "consult_with_auto_routing"
+          ]
+        },
+        {
+          "instantiator": "format_synthesis_output",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 820,
+          "context": [
+            "format_synthesis_output"
+          ]
+        },
+        {
+          "instantiator": "consult_multi_agent",
+          "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
+          "line": 927,
+          "context": [
+            "consult_multi_agent"
+          ]
+        },
+        {
+          "instantiator": "run_pytest",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_runner.py",
+          "line": 189,
+          "context": [
+            "run_pytest"
+          ]
+        },
+        {
+          "instantiator": "list_presets",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_runner.py",
+          "line": 239,
+          "context": [
+            "list_presets"
+          ]
+        },
+        {
+          "instantiator": "print_discovery_report",
+          "file": "src/claude_skills/claude_skills/run_tests/test_discovery.py",
+          "line": 328,
+          "context": [
+            "print_discovery_report"
+          ]
+        },
+        {
+          "instantiator": "print_console",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+          "line": 299,
+          "context": [
+            "FidelityReport",
+            "print_console"
+          ]
+        },
+        {
+          "instantiator": "main",
+          "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
+          "line": 241,
+          "context": [
+            "main"
+          ]
+        },
+        {
+          "instantiator": "mark_task_journaled",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 48,
+          "context": [
+            "mark_task_journaled"
+          ]
+        },
+        {
+          "instantiator": "add_journal_entry",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 149,
+          "context": [
+            "add_journal_entry"
+          ]
+        },
+        {
+          "instantiator": "update_metadata",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 233,
+          "context": [
+            "update_metadata"
+          ]
+        },
+        {
+          "instantiator": "add_revision_entry",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 306,
+          "context": [
+            "add_revision_entry"
+          ]
+        },
+        {
+          "instantiator": "bulk_journal_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 415,
+          "context": [
+            "bulk_journal_tasks"
+          ]
+        },
+        {
+          "instantiator": "sync_metadata_from_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/journal.py",
+          "line": 562,
+          "context": [
+            "sync_metadata_from_state"
+          ]
+        },
+        {
+          "instantiator": "move_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 48,
+          "context": [
+            "move_spec"
+          ]
+        },
+        {
+          "instantiator": "activate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 116,
+          "context": [
+            "activate_spec"
+          ]
+        },
+        {
+          "instantiator": "complete_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
+          "line": 268,
+          "context": [
+            "complete_spec"
+          ]
+        },
+        {
+          "instantiator": "list_specs",
+          "file": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+          "line": 32,
+          "context": [
+            "list_specs"
+          ]
+        },
+        {
+          "instantiator": "update_task_status",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 80,
+          "context": [
+            "update_task_status"
+          ]
+        },
+        {
+          "instantiator": "mark_task_blocked",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 327,
+          "context": [
+            "mark_task_blocked"
+          ]
+        },
+        {
+          "instantiator": "unblock_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/status.py",
+          "line": 417,
+          "context": [
+            "unblock_task"
+          ]
+        },
+        {
+          "instantiator": "validate_timestamp_pair",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 35,
+          "context": [
+            "validate_timestamp_pair"
+          ]
+        },
+        {
+          "instantiator": "calculate_time_from_timestamps",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 78,
+          "context": [
+            "calculate_time_from_timestamps"
+          ]
+        },
+        {
+          "instantiator": "track_time",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 134,
+          "context": [
+            "track_time"
+          ]
+        },
+        {
+          "instantiator": "generate_time_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 197,
+          "context": [
+            "generate_time_report"
+          ]
+        },
+        {
+          "instantiator": "aggregate_task_times",
+          "file": "src/claude_skills/claude_skills/sdd_update/time_tracking.py",
+          "line": 289,
+          "context": [
+            "aggregate_task_times"
+          ]
+        },
+        {
+          "instantiator": "validate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 42,
+          "context": [
+            "validate_spec"
+          ]
+        },
+        {
+          "instantiator": "get_status_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 91,
+          "context": [
+            "get_status_report"
+          ]
+        },
+        {
+          "instantiator": "audit_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 188,
+          "context": [
+            "audit_spec"
+          ]
+        },
+        {
+          "instantiator": "reconcile_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 270,
+          "context": [
+            "reconcile_state"
+          ]
+        },
+        {
+          "instantiator": "detect_unjournaled_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
+          "line": 366,
+          "context": [
+            "detect_unjournaled_tasks"
+          ]
+        },
+        {
+          "instantiator": "add_verification_result",
+          "file": "src/claude_skills/claude_skills/sdd_update/verification.py",
+          "line": 48,
+          "context": [
+            "add_verification_result"
+          ]
+        },
+        {
+          "instantiator": "complete_task_workflow",
+          "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
+          "line": 349,
+          "context": [
+            "complete_task_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_no_changes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 402,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_no_changes"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_staged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 419,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_staged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_unstaged_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 435,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_unstaged_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_both_modified",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 450,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_both_modified"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_added_files",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 465,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_added_files"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_staged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 480,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_staged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_deleted_unstaged",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 495,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_deleted_unstaged"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_untracked",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 510,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_untracked"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_renamed",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 525,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_renamed"
+          ]
+        },
+        {
+          "instantiator": "test_show_commit_preview_mixed_statuses",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_git_metadata.py",
+          "line": 544,
+          "context": [
+            "TestShowCommitPreview",
+            "test_show_commit_preview_mixed_statuses"
+          ]
+        },
+        {
+          "instantiator": "test_printer_default_initialization",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 17,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_default_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_no_color",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 26,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_no_color"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_verbose",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 32,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_verbose"
+          ]
+        },
+        {
+          "instantiator": "test_printer_with_quiet",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 38,
+          "context": [
+            "TestPrettyPrinterInit",
+            "test_printer_with_quiet"
+          ]
+        },
+        {
+          "instantiator": "test_printer_success_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 48,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_success_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_error_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 56,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_error_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_warning_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 64,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_warning_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_info_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 72,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_info_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_action_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 80,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_action_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_result_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 88,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_result_message"
+          ]
+        },
+        {
+          "instantiator": "test_printer_detail_message",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 96,
+          "context": [
+            "TestPrettyPrinterMethods",
+            "test_printer_detail_message"
+          ]
+        },
+        {
+          "instantiator": "test_colored_output_contains_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 108,
+          "context": [
+            "TestPrettyPrinterColorMode",
+            "test_colored_output_contains_ansi_codes"
+          ]
+        },
+        {
+          "instantiator": "test_no_color_output_lacks_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 120,
+          "context": [
+            "TestPrettyPrinterColorMode",
+            "test_no_color_output_lacks_ansi_codes"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_minimal_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 133,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_quiet_mode_minimal_output"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_shows_errors",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 146,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_quiet_mode_shows_errors"
+          ]
+        },
+        {
+          "instantiator": "test_verbose_mode_shows_details",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 156,
+          "context": [
+            "TestPrettyPrinterVerbosity",
+            "test_verbose_mode_shows_details"
+          ]
+        },
+        {
+          "instantiator": "test_result_formatting_aligns_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 170,
+          "context": [
+            "TestPrettyPrinterFormatting",
+            "test_result_formatting_aligns_output"
+          ]
+        },
+        {
+          "instantiator": "test_detail_with_indentation",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 187,
+          "context": [
+            "TestPrettyPrinterFormatting",
+            "test_detail_with_indentation"
+          ]
+        },
+        {
+          "instantiator": "test_printer_combined_output_flow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 202,
+          "context": [
+            "TestPrettyPrinterIntegration",
+            "test_printer_combined_output_flow"
+          ]
+        },
+        {
+          "instantiator": "test_printer_error_warning_flow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 219,
+          "context": [
+            "TestPrettyPrinterIntegration",
+            "test_printer_error_warning_flow"
+          ]
+        },
+        {
+          "instantiator": "test_started_at_resets_on_each_in_progress_transition",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 70,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_started_at_resets_on_each_in_progress_transition"
+          ]
+        },
+        {
+          "instantiator": "test_started_at_set_on_first_in_progress",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 180,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_started_at_set_on_first_in_progress"
+          ]
+        },
+        {
+          "instantiator": "test_completed_at_set_on_completion",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_status.py",
+          "line": 245,
+          "context": [
+            "TestUpdateTaskStatus",
+            "test_completed_at_set_on_completion"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_none_input",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 183,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_none_input"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_invalid_format",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 193,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_invalid_format"
+          ]
+        },
+        {
+          "instantiator": "test_calculate_time_with_printer_negative_duration",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 203,
+          "context": [
+            "TestCalculateTimeFromTimestamps",
+            "test_calculate_time_with_printer_negative_duration"
+          ]
+        },
+        {
+          "instantiator": "test_validate_timestamp_pair_with_printer",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 283,
+          "context": [
+            "TestValidateTimestampPair",
+            "test_validate_timestamp_pair_with_printer"
+          ]
+        },
+        {
+          "instantiator": "test_aggregate_task_times_with_printer",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_time_tracking.py",
+          "line": 518,
+          "context": [
+            "TestAggregateTaskTimes",
+            "test_aggregate_task_times_with_printer"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_auto_calculates_time",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 77,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_auto_calculates_time"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_manual_hours_not_overridden",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 160,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_manual_hours_not_overridden"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_no_started_at_no_calculation",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 226,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_no_started_at_no_calculation"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_journals_parent_nodes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 306,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_journals_parent_nodes"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_journals_multiple_parent_levels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 404,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_journals_multiple_parent_levels"
+          ]
+        },
+        {
+          "instantiator": "test_complete_task_workflow_does_not_journal_already_completed_parents",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_workflow.py",
+          "line": 521,
+          "context": [
+            "TestCompleteTaskWorkflow",
+            "test_complete_task_workflow_does_not_journal_already_completed_parents"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 83
+    },
+    {
+      "name": "FidelityReport",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "line": 130,
+      "language": "python",
+      "docstring": "Generate structured reports from fidelity review results.\n\nThis class will be implemented in Phase 4 (Report Generation).",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_get_report_metadata",
+        "_convert_to_dict",
+        "generate_markdown",
+        "generate_json",
+        "print_console",
+        "save_to_file",
+        "calculate_fidelity_score",
+        "summarize_deviations"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "FidelityReviewer",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+      "line": 21,
+      "language": "python",
+      "docstring": "Core class for performing fidelity reviews of implementations against specs.\n\nThis class will be implemented in Phase 3 (Core Review Logic).",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "review_task",
+        "review_phase",
+        "review_full_spec",
+        "review_files",
+        "analyze_deviation",
+        "_load_spec",
+        "get_task_requirements",
+        "get_phase_tasks",
+        "get_all_tasks",
+        "_collect_task_ids_recursive",
+        "get_file_diff",
+        "get_task_diffs",
+        "get_phase_diffs",
+        "get_branch_diff",
+        "get_test_results",
+        "_run_and_parse_tests",
+        "_parse_junit_xml",
+        "get_task_test_results",
+        "get_journal_entries",
+        "get_task_journals",
+        "generate_review_prompt"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 53,
+          "context": [
+            "_handle_fidelity_review"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
     },
     {
       "name": "PromptTemplate",
@@ -16254,6 +17490,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -16489,7 +17731,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "create_global_parent_parser",
@@ -16790,91 +18032,97 @@
         {
           "name": "register_next",
           "file": "unknown",
-          "line": 33,
+          "line": 34,
           "call_type": "function_call"
         },
         {
           "name": "register_update",
           "file": "unknown",
-          "line": 34,
+          "line": 35,
           "call_type": "function_call"
         },
         {
           "name": "register_validate",
           "file": "unknown",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         },
         {
           "name": "register_plan",
           "file": "unknown",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         },
         {
           "name": "register_plan_review",
           "file": "unknown",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         },
         {
           "name": "register_render",
           "file": "unknown",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         },
         {
           "name": "register_pr",
           "file": "unknown",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "register_context",
           "file": "unknown",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         },
         {
           "name": "register_session_marker",
           "file": "unknown",
-          "line": 41,
+          "line": 42,
+          "call_type": "function_call"
+        },
+        {
+          "name": "register_fidelity_review",
+          "file": "unknown",
+          "line": 43,
           "call_type": "function_call"
         },
         {
           "name": "_register_doc_cli",
           "file": "unknown",
-          "line": 44,
+          "line": 46,
           "call_type": "function_call"
         },
         {
           "name": "_register_test_cli",
           "file": "unknown",
-          "line": 45,
+          "line": 47,
           "call_type": "function_call"
         },
         {
           "name": "_register_skills_dev_cli",
           "file": "unknown",
-          "line": 46,
+          "line": 48,
           "call_type": "function_call"
         },
         {
           "name": "register_workflow",
           "file": "unknown",
-          "line": 51,
+          "line": 53,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 52,
+          "line": 54,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 54,
+          "line": 56,
           "call_type": "method_call"
         }
       ],
@@ -16883,7 +18131,7 @@
     {
       "name": "_register_doc_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 59,
+      "line": 61,
       "language": "python",
       "docstring": "Register the doc CLI as an SDD subcommand.",
       "parameters": [
@@ -16908,7 +18156,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 44,
+          "line": 46,
           "call_type": "function_call"
         }
       ],
@@ -16916,25 +18164,25 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 64,
+          "line": 66,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 70,
+          "line": 72,
           "call_type": "method_call"
         },
         {
           "name": "register_code_doc",
           "file": "unknown",
-          "line": 75,
+          "line": 77,
           "call_type": "function_call"
         },
         {
           "name": "register_doc_query",
           "file": "unknown",
-          "line": 76,
+          "line": 78,
           "call_type": "function_call"
         }
       ],
@@ -16943,7 +18191,7 @@
     {
       "name": "_register_test_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 79,
+      "line": 81,
       "language": "python",
       "docstring": "Register the test CLI as an SDD subcommand.",
       "parameters": [
@@ -16968,7 +18216,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 45,
+          "line": 47,
           "call_type": "function_call"
         }
       ],
@@ -16976,19 +18224,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 83,
+          "line": 85,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 89,
+          "line": 91,
           "call_type": "method_call"
         },
         {
           "name": "register_run_tests",
           "file": "unknown",
-          "line": 94,
+          "line": 96,
           "call_type": "function_call"
         }
       ],
@@ -16997,7 +18245,7 @@
     {
       "name": "_register_skills_dev_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 97,
+      "line": 99,
       "language": "python",
       "docstring": "Register the skills-dev CLI as an SDD subcommand.",
       "parameters": [
@@ -17022,7 +18270,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 46,
+          "line": 48,
           "call_type": "function_call"
         }
       ],
@@ -17030,19 +18278,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 101,
+          "line": 103,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 107,
+          "line": 109,
           "call_type": "method_call"
         },
         {
           "name": "register_skills_dev_subcommands",
           "file": "unknown",
-          "line": 112,
+          "line": 114,
           "call_type": "function_call"
         }
       ],
@@ -24337,7 +25585,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 75,
+          "line": 77,
           "call_type": "function_call"
         }
       ],
@@ -26723,6 +27971,18 @@
           "call_type": "function_call"
         },
         {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 142,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 227,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_list_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 194,
@@ -26749,7 +28009,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 5
     },
     {
       "name": "detect_available_tools",
@@ -26808,6 +28068,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "_handle_list_review_tools",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 230,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 132,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 218,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -26828,7 +28106,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 10
     },
     {
       "name": "build_tool_command",
@@ -26938,6 +28216,12 @@
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 673,
           "call_type": "function_call"
+        },
+        {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 149,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -27038,7 +28322,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 2
+      "call_count": 3
     },
     {
       "name": "execute_tools_parallel",
@@ -27075,6 +28359,12 @@
           "name": "consult_multi_agent",
           "file": "src/claude_skills/claude_skills/run_tests/consultation.py",
           "line": 1014,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 240,
           "call_type": "function_call"
         },
         {
@@ -27182,7 +28472,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "check_spec_completion",
@@ -30507,6 +31797,18 @@
       "is_public": true,
       "callers": [
         {
+          "name": "get_file_diff",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 310,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_branch_diff",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 463,
+          "call_type": "function_call"
+        },
+        {
           "name": "prepare_task",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
           "line": 338,
@@ -30593,7 +31895,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 9
+      "call_count": 11
     },
     {
       "name": "check_dirty_tree",
@@ -35103,6 +36405,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 127,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_find_specs",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 272,
@@ -35615,7 +36923,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 62
+      "call_count": 63
     },
     {
       "name": "find_spec_file",
@@ -38735,6 +40043,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_journals",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 797,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1105,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -38953,7 +40279,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 8
+      "call_count": 11
     },
     {
       "name": "get_task_journal",
@@ -40395,6 +41721,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
           "name": "format_execution_plan",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 73,
@@ -41435,7 +42767,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 172
+      "call_count": 173
     },
     {
       "name": "save_json_spec",
@@ -42090,6 +43422,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_requirements",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 168,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_phase_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 937,
+          "call_type": "function_call"
+        },
+        {
           "name": "get_task_info",
           "file": "src/claude_skills/claude_skills/sdd_next/discovery.py",
           "line": 181,
@@ -42140,7 +43490,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 10
     },
     {
       "name": "update_node",
@@ -44193,7 +45543,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         }
       ],
@@ -44241,7 +45591,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         }
       ],
@@ -44339,6 +45689,12 @@
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
           "line": 452,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
           "call_type": "function_call"
         },
         {
@@ -44542,7 +45898,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "is_clear_command",
@@ -45519,6 +46875,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -45640,7 +47002,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "check_permissions",
@@ -46634,6 +47996,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -46761,7 +48129,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "update_permissions",
@@ -47099,6 +48467,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -47190,7 +48564,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "_dump_json",
@@ -51295,7 +52669,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 76,
+          "line": 78,
           "call_type": "function_call"
         }
       ],
@@ -52849,6 +54223,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -53132,7 +54512,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "analyze_impact",
@@ -59048,7 +60428,7 @@
         {
           "name": "_register_test_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 94,
+          "line": 96,
           "call_type": "function_call"
         }
       ],
@@ -63254,6 +64634,2017 @@
       "call_count": 1
     },
     {
+      "name": "_handle_fidelity_review",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 30,
+      "language": "python",
+      "docstring": "Handle fidelity-review command execution.\n\nOrchestrates the fidelity review workflow:\n1. Load specification and extract requirements\n2. Generate review prompt with implementation artifacts\n3. Optionally consult AI tools for review\n4. Parse and analyze responses\n5. Generate and display report\n\nArgs:\n    args: Parsed command-line arguments\n    printer: Optional PrettyPrinter instance (for unified CLI compatibility)\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": "argparse.Namespace",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 21,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 56,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 61,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 64,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 79,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 86,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 101,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "function_call"
+        },
+        {
+          "name": "parse_multiple_responses",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detect_consensus",
+          "file": "unknown",
+          "line": 115,
+          "call_type": "function_call"
+        },
+        {
+          "name": "categorize_issues",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 121,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_output_json",
+          "file": "unknown",
+          "line": 124,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_output_markdown",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_output_text",
+          "file": "unknown",
+          "line": 128,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 131,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 133,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print_exc",
+          "file": "unknown",
+          "line": 141,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "_output_text",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 145,
+      "language": "python",
+      "docstring": "Generate text output format.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "reviewer",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parsed_responses",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "consensus",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "categorized_issues",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 7,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 128,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 147,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 150,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "function_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 153,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 158,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 160,
+          "call_type": "function_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 160,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 163,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 164,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 167,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 170,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 171,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_output_markdown",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 180,
+      "language": "python",
+      "docstring": "Generate markdown output format.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "reviewer",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parsed_responses",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "consensus",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "categorized_issues",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 126,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 183,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 187,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 190,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 192,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 192,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 195,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 197,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 199,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 200,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_output_json",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 203,
+      "language": "python",
+      "docstring": "Generate JSON output format.",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "reviewer",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parsed_responses",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "consensus",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "categorized_issues",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 124,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 207,
+          "call_type": "function_call"
+        },
+        {
+          "name": "to_dict",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "to_dict",
+          "file": "unknown",
+          "line": 209,
+          "call_type": "method_call"
+        },
+        {
+          "name": "to_dict",
+          "file": "unknown",
+          "line": 210,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 212,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 212,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_handle_list_review_tools",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 215,
+      "language": "python",
+      "docstring": "Handle list-review-tools command execution.\n\nDetects and displays available AI consultation tools with their status.\n\nArgs:\n    args: Parsed command-line arguments\n    printer: Optional PrettyPrinter instance (for unified CLI compatibility)\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": "argparse.Namespace",
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": "int",
+      "complexity": 10,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [],
+      "calls": [
+        {
+          "name": "detect_available_tools",
+          "file": "unknown",
+          "line": 230,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 238,
+          "call_type": "method_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 245,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 250,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 251,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 255,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 257,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 258,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 266,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 268,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 270,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 272,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 273,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 275,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 276,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 278,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 283,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 284,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print_exc",
+          "file": "unknown",
+          "line": 286,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "register_fidelity_review_command",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 290,
+      "language": "python",
+      "docstring": "Register the fidelity-review command.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": "argparse._SubParsersAction",
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": "Optional[argparse.ArgumentParser]",
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "register_commands",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 427,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 302,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_mutually_exclusive_group",
+          "file": "unknown",
+          "line": 308,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 309,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 314,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 319,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 327,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 334,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 339,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 343,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 352,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 357,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 362,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 371,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 377,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 386,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "register_list_review_tools_command",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 389,
+      "language": "python",
+      "docstring": "Register the list-review-tools command.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": "argparse._SubParsersAction",
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": "Optional[argparse.ArgumentParser]",
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "register_commands",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 428,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 392,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 401,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 410,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "register_commands",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 413,
+      "language": "python",
+      "docstring": "Register all fidelity review commands with the main CLI parser.\n\nThis function will be called by the main SDD CLI to register\nfidelity review commands as subcommands.\n\nArgs:\n    subparsers: The subparser object from the main argument parser\n    parent_parser: Parent parser with global options to inherit (optional)\n\nNote:\n    Registers both fidelity-review and list-review-tools commands.",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": "argparse._SubParsersAction",
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": "Optional[argparse.ArgumentParser]",
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "main",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 451,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "register_fidelity_review_command",
+          "file": "unknown",
+          "line": 427,
+          "call_type": "function_call"
+        },
+        {
+          "name": "register_list_review_tools_command",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "main",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "line": 431,
+      "language": "python",
+      "docstring": "Main entry point for standalone CLI execution.\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
+      "parameters": [],
+      "return_type": "int",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+          "line": 249,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_gendocs",
+          "file": "src/claude_skills/claude_skills/cli/skills_dev/gendocs.py",
+          "line": 31,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
+          "line": 534,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_parser_from_module",
+          "file": "src/claude_skills/claude_skills/dev_tools/generate_docs.py",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/dev_tools/generate_docs.py",
+          "line": 365,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py",
+          "line": 363,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
+          "line": 198,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/doc_query/sdd_integration.py",
+          "line": 452,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
+          "line": 254,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py",
+          "line": 245,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_sdd_plan_doc_integration.py",
+          "line": 358,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_sdd_validate_new_features.py",
+          "line": 206,
+          "call_type": "method_call"
+        },
+        {
+          "name": "<module>",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_task_category_workflow.py",
+          "line": 657,
+          "call_type": "method_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "ArgumentParser",
+          "file": "unknown",
+          "line": 438,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 443,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_subparsers",
+          "file": "unknown",
+          "line": 450,
+          "call_type": "method_call"
+        },
+        {
+          "name": "register_commands",
+          "file": "unknown",
+          "line": 451,
+          "call_type": "function_call"
+        },
+        {
+          "name": "parse_args",
+          "file": "unknown",
+          "line": 453,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print_help",
+          "file": "unknown",
+          "line": 456,
+          "call_type": "method_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 460,
+          "call_type": "function_call"
+        },
+        {
+          "name": "func",
+          "file": "unknown",
+          "line": 461,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print_help",
+          "file": "unknown",
+          "line": 463,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 14
+    },
+    {
+      "name": "consult_ai_on_fidelity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 94,
+      "language": "python",
+      "docstring": "Consult an AI tool for implementation fidelity review.\n\nSimplified wrapper around execute_tool() with fidelity-review defaults\nand comprehensive error handling.\n\nArgs:\n    prompt: The review prompt to send to the AI tool\n    tool: Specific tool to use (gemini, codex, cursor-agent).\n          If None, uses first available tool.\n    model: Model to request (optional, tool-specific)\n    timeout: Timeout in seconds (default: 120)\n\nReturns:\n    ToolResponse object with consultation results\n\nRaises:\n    NoToolsAvailableError: If no AI tools are available\n    ConsultationTimeoutError: If consultation times out\n    ConsultationError: For other consultation failures\n\nExample:\n    >>> response = consult_ai_on_fidelity(\n    ...     prompt=\"Review this implementation...\",\n    ...     tool=\"gemini\"\n    ... )\n    >>> if response.success:\n    ...     print(response.output)",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "tool",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        }
+      ],
+      "return_type": "ToolResponse",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "detect_available_tools",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 139,
+          "call_type": "method_call"
+        },
+        {
+          "name": "check_tool_available",
+          "file": "unknown",
+          "line": 142,
+          "call_type": "function_call"
+        },
+        {
+          "name": "execute_tool",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 164,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "consult_multiple_ai_on_fidelity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 179,
+      "language": "python",
+      "docstring": "Consult multiple AI tools in parallel for fidelity review.\n\nWrapper around execute_tools_parallel() with fidelity-review defaults\nand comprehensive error handling.\n\nArgs:\n    prompt: The review prompt to send to all AI tools\n    tools: List of tools to consult (gemini, codex, cursor-agent).\n           If None, uses all available tools.\n    model: Model to request (optional, tool-specific)\n    timeout: Timeout in seconds per tool (default: 120)\n    require_all_success: If True, raise exception if any tool fails\n\nReturns:\n    List of ToolResponse objects, one per tool\n\nRaises:\n    NoToolsAvailableError: If no AI tools are available\n    ConsultationError: If require_all_success=True and any tool fails\n\nExample:\n    >>> responses = consult_multiple_ai_on_fidelity(\n    ...     prompt=\"Review this implementation...\",\n    ...     tools=[\"gemini\", \"codex\"]\n    ... )\n    >>> for response in responses:\n    ...     print(f\"{response.tool}: {response.status.value}\")",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "tools",
+          "type": "Optional[List[str]]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "require_all_success",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "List[ToolResponse]",
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 90,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "detect_available_tools",
+          "file": "unknown",
+          "line": 218,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 224,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 224,
+          "call_type": "method_call"
+        },
+        {
+          "name": "check_tool_available",
+          "file": "unknown",
+          "line": 227,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 230,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 233,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 233,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 234,
+          "call_type": "function_call"
+        },
+        {
+          "name": "set",
+          "file": "unknown",
+          "line": 234,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 235,
+          "call_type": "method_call"
+        },
+        {
+          "name": "execute_tools_parallel",
+          "file": "unknown",
+          "line": 240,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 263,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "get_consultation_summary",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 267,
+      "language": "python",
+      "docstring": "Generate summary statistics for multiple consultation responses.\n\nUseful for understanding overall consultation health and results.\n\nArgs:\n    responses: List of ToolResponse objects\n\nReturns:\n    Dictionary with summary statistics:\n    {\n        \"total\": int,\n        \"successful\": int,\n        \"failed\": int,\n        \"timed_out\": int,\n        \"total_duration\": float,\n        \"average_duration\": float,\n        \"tools_used\": List[str],\n        \"success_rate\": float\n    }\n\nExample:\n    >>> summary = get_consultation_summary(responses)\n    >>> print(f\"Success rate: {summary['success_rate']:.1%}\")",
+      "parameters": [
+        {
+          "name": "responses",
+          "type": "List[ToolResponse]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 306,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 307,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 308,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 309,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "parse_review_response",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 326,
+      "language": "python",
+      "docstring": "Parse AI tool response to extract structured review information.\n\nExtracts verdict, issues, recommendations from free-form AI response.\nUses pattern matching and heuristics to identify key information.\n\nArgs:\n    response: ToolResponse from AI consultation\n\nReturns:\n    ParsedReviewResponse with extracted information\n\nExample:\n    >>> tool_response = consult_ai_on_fidelity(prompt)\n    >>> parsed = parse_review_response(tool_response)\n    >>> print(f\"Verdict: {parsed.verdict.value}\")\n    >>> for issue in parsed.issues:\n    ...     print(f\"- {issue}\")",
+      "parameters": [
+        {
+          "name": "response",
+          "type": "ToolResponse",
+          "default": null
+        }
+      ],
+      "return_type": "ParsedReviewResponse",
+      "complexity": 16,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "parse_multiple_responses",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 486,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 347,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 348,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 352,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 382,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 389,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 395,
+          "call_type": "function_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 395,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 400,
+          "call_type": "function_call"
+        },
+        {
+          "name": "finditer",
+          "file": "unknown",
+          "line": 411,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 413,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 413,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 415,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 416,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 416,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 416,
+          "call_type": "method_call"
+        },
+        {
+          "name": "finditer",
+          "file": "unknown",
+          "line": 426,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 430,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "match",
+          "file": "unknown",
+          "line": 434,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 436,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 436,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 437,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 440,
+          "call_type": "function_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 443,
+          "call_type": "method_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 449,
+          "call_type": "function_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 449,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "parse_multiple_responses",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 466,
+      "language": "python",
+      "docstring": "Parse multiple AI tool responses.\n\nConvenience function to parse a list of ToolResponse objects.\n\nArgs:\n    responses: List of ToolResponse objects\n\nReturns:\n    List of ParsedReviewResponse objects\n\nExample:\n    >>> responses = consult_multiple_ai_on_fidelity(prompt)\n    >>> parsed_list = parse_multiple_responses(responses)\n    >>> for parsed in parsed_list:\n    ...     print(f\"{parsed.verdict.value}: {len(parsed.issues)} issues\")",
+      "parameters": [
+        {
+          "name": "responses",
+          "type": "List[ToolResponse]",
+          "default": null
+        }
+      ],
+      "return_type": "List[ParsedReviewResponse]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 111,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "parse_review_response",
+          "file": "unknown",
+          "line": 486,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "detect_consensus",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 530,
+      "language": "python",
+      "docstring": "Detect consensus across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence findings.\n\nArgs:\n    parsed_responses: List of ParsedReviewResponse objects\n    min_agreement: Minimum number of models that must agree (default: 2)\n    similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)\n                        Not implemented in v1, uses exact matching\n\nReturns:\n    ConsensusResult with consensus analysis\n\nAlgorithm:\n    1. Count verdict distribution and find majority verdict\n    2. Collect all issues/recommendations across models\n    3. Identify items mentioned by >= min_agreement models\n    4. Calculate agreement rate for verdict\n\nExample:\n    >>> parsed = parse_multiple_responses(responses)\n    >>> consensus = detect_consensus(parsed, min_agreement=2)\n    >>> print(f\"Consensus: {consensus.consensus_verdict.value}\")\n    >>> print(f\"Agreement: {consensus.agreement_rate:.1%}\")\n    >>> for issue in consensus.consensus_issues:\n    ...     print(f\"- {issue}\")",
+      "parameters": [
+        {
+          "name": "parsed_responses",
+          "type": "List[ParsedReviewResponse]",
+          "default": null
+        },
+        {
+          "name": "min_agreement",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "similarity_threshold",
+          "type": "float",
+          "default": null
+        }
+      ],
+      "return_type": "ConsensusResult",
+      "complexity": 13,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 115,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 570,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 575,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 580,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 589,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 596,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 596,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 597,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 602,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 604,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 605,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 612,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 612,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 613,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 618,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 620,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 621,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "categorize_issue_severity",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 658,
+      "language": "python",
+      "docstring": "Categorize issue severity based on keywords and patterns.\n\nUses keyword matching to assign severity levels:\n- CRITICAL: Security vulnerabilities, data loss, crashes\n- HIGH: Incorrect behavior, spec violations, broken functionality\n- MEDIUM: Performance issues, missing tests, code quality\n- LOW: Style issues, documentation, minor improvements\n\nArgs:\n    issue: Issue description text\n\nReturns:\n    CategorizedIssue with assigned severity\n\nExample:\n    >>> issue = \"SQL injection vulnerability in login form\"\n    >>> categorized = categorize_issue_severity(issue)\n    >>> categorized.severity\n    <IssueSeverity.CRITICAL: 'critical'>\n    >>> categorized.keywords_matched\n    ['sql injection', 'vulnerability']",
+      "parameters": [
+        {
+          "name": "issue",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "CategorizedIssue",
+      "complexity": 13,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "categorize_issues",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 791,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 682,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 720,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 730,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 740,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 750,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "categorize_issues",
+      "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+      "line": 766,
+      "language": "python",
+      "docstring": "Categorize severity for multiple issues.\n\nConvenience function to categorize a list of issues.\n\nArgs:\n    issues: List of issue descriptions\n\nReturns:\n    List of CategorizedIssue objects, sorted by severity (critical first)\n\nExample:\n    >>> issues = [\n    ...     \"SQL injection in login\",\n    ...     \"Missing tests for auth module\",\n    ...     \"Typo in README\"\n    ... ]\n    >>> categorized = categorize_issues(issues)\n    >>> for cat in categorized:\n    ...     print(f\"{cat.severity.value}: {cat.issue}\")\n    critical: SQL injection in login\n    medium: Missing tests for auth module\n    low: Typo in README",
+      "parameters": [
+        {
+          "name": "issues",
+          "type": "List[str]",
+          "default": null
+        }
+      ],
+      "return_type": "List[CategorizedIssue]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 118,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "categorize_issue_severity",
+          "file": "unknown",
+          "line": 791,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sort",
+          "file": "unknown",
+          "line": 802,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 802,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
       "name": "format_execution_plan",
       "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
       "line": 60,
@@ -66711,7 +70102,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 33,
+          "line": 34,
           "call_type": "function_call"
         }
       ],
@@ -70390,7 +73781,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         }
       ],
@@ -70710,6 +74101,12 @@
           "name": "get_session_state",
           "file": "src/claude_skills/claude_skills/common/integrations.py",
           "line": 425,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_load_spec",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 127,
           "call_type": "function_call"
         },
         {
@@ -71105,7 +74502,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 62
+      "call_count": 63
     },
     {
       "name": "suggest_documentation_generation",
@@ -72342,7 +75739,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         }
       ],
@@ -72446,6 +75843,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "_handle_fidelity_review",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
           "name": "review_with_tools",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/reviewer.py",
           "line": 80,
@@ -72478,7 +75881,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "_generate_full_review_prompt",
@@ -73522,6 +76925,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "_handle_list_review_tools",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 230,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 132,
+          "call_type": "function_call"
+        },
+        {
+          "name": "consult_multiple_ai_on_fidelity",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
+          "line": 218,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_review",
           "file": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
           "line": 50,
@@ -73542,7 +76963,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 10
     },
     {
       "name": "review_with_tools",
@@ -74397,7 +77818,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         },
         {
@@ -74529,6 +77950,12 @@
         },
         {
           "name": "<module>",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 469,
+          "call_type": "function_call"
+        },
+        {
+          "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_pr/cli.py",
           "line": 254,
           "call_type": "function_call"
@@ -74626,7 +78053,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "get_spec_git_diffs",
@@ -74844,6 +78271,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "get_task_journals",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 797,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "generate_review_prompt",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 1105,
+          "call_type": "method_call"
+        },
+        {
           "name": "gather_pr_context",
           "file": "src/claude_skills/claude_skills/sdd_pr/pr_context.py",
           "line": 326,
@@ -74906,7 +78351,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 8
+      "call_count": 11
     },
     {
       "name": "get_completed_tasks",
@@ -76293,7 +79738,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         }
       ],
@@ -79142,7 +82587,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 34,
+          "line": 35,
           "call_type": "function_call"
         }
       ],
@@ -90692,7 +94137,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         }
       ],
@@ -108608,6 +112053,65 @@
       "typing.Set",
       "typing.Tuple",
       "claude_skills.common.PrettyPrinter"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py": [
+      "argparse",
+      "sys",
+      "json",
+      "typing.Optional",
+      "pathlib.Path",
+      "review.FidelityReviewer",
+      "consultation.consult_multiple_ai_on_fidelity",
+      "consultation.parse_multiple_responses",
+      "consultation.detect_consensus",
+      "consultation.categorize_issues",
+      "consultation.NoToolsAvailableError",
+      "consultation.ConsultationTimeoutError",
+      "consultation.ConsultationError",
+      "claude_skills.common.ai_tools.detect_available_tools",
+      "claude_skills.common.ai_tools.check_tool_available"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py": [
+      "typing.List",
+      "typing.Optional",
+      "typing.Dict",
+      "typing.Any",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "enum.Enum",
+      "logging",
+      "re",
+      "claude_skills.common.ai_tools.ToolResponse",
+      "claude_skills.common.ai_tools.ToolStatus",
+      "claude_skills.common.ai_tools.execute_tool",
+      "claude_skills.common.ai_tools.execute_tools_parallel",
+      "claude_skills.common.ai_tools.detect_available_tools",
+      "claude_skills.common.ai_tools.check_tool_available"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/report.py": [
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "typing.List",
+      "pathlib.Path",
+      "datetime.datetime",
+      "json",
+      "sys"
+    ],
+    "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "typing.Any",
+      "sys",
+      "subprocess",
+      "logging",
+      "xml.etree.ElementTree",
+      "claude_skills.common.spec.load_json_spec",
+      "claude_skills.common.spec.get_node",
+      "claude_skills.common.paths.find_specs_directory",
+      "claude_skills.common.git_metadata.find_git_root"
     ],
     "src/claude_skills/claude_skills/sdd_next/__init__.py": [
       "discovery.get_next_task",
