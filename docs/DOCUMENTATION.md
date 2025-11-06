@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:01:51
+**Generated:** 2025-11-06 13:08:21
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 222
-- **Total Lines:** 77273
+- **Total Files:** 223
+- **Total Lines:** 77646
 - **Total Classes:** 290
-- **Total Functions:** 838
-- **Avg Complexity:** 5.74
+- **Total Functions:** 846
+- **Avg Complexity:** 5.73
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6375,6 +6375,22 @@ Returns:
 
 ---
 
+### `_extract_issues_from_markdown(content) -> Dict[str, List[Dict[str, Any]]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:203`
+**Complexity:** 4
+
+**Description:**
+> Extract issues by severity from markdown content.
+
+Returns dict with keys: critical, high, medium, low
+
+**Parameters:**
+- `content`: str
+
+---
+
 ### `_extract_json_frontmatter(path) -> Dict[str, Any]`
 
 **Language:** python
@@ -6408,6 +6424,42 @@ Returns:
 
 **Parameters:**
 - `path`: Path
+
+---
+
+### `_extract_metadata_from_markdown(content) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:157`
+**Complexity:** 6
+
+**Description:**
+> Extract metadata fields from markdown report header.
+
+**Parameters:**
+- `content`: str
+
+---
+
+### `_extract_section(content, header_pattern) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:236`
+**Complexity:** 3
+
+**Description:**
+> Extract content between a header and the next header of equal or higher level.
+
+Args:
+    content: Full markdown content
+    header_pattern: Regex pattern for the section header
+
+Returns:
+    Section content (excluding header) or None if not found
+
+**Parameters:**
+- `content`: str
+- `header_pattern`: str
 
 ---
 
@@ -7041,6 +7093,103 @@ Args:
 - `parsed_responses`: None
 - `consensus`: None
 - `categorized_issues`: None
+
+---
+
+### `_parse_issue_list(section_content, severity) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:265`
+**Complexity:** 3
+
+**Description:**
+> Parse a list of issues from a section.
+
+Expected format:
+- Issue title - flagged by: [model names]
+  - Impact: ...
+  - Recommended fix: ...
+  - Details: ...
+
+Or simpler format:
+- Issue title - flagged by: [model names]
+
+Args:
+    section_content: Content of the issues section
+    severity: Severity level (for metadata)
+
+Returns:
+    List of issue dicts
+
+**Parameters:**
+- `section_content`: str
+- `severity`: str
+
+---
+
+### `_parse_json_report(report_file) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:73`
+**Complexity:** 3
+
+**Description:**
+> Parse JSON format review report.
+
+JSON reports are expected to have the structure:
+{
+    "consensus": {
+        "overall_score": X.X,
+        "recommendation": "...",
+        "consensus_level": "...",
+        "synthesis_text": "..."
+    },
+    "metadata": {...}
+}
+
+**Parameters:**
+- `report_file`: Path
+
+---
+
+### `_parse_markdown_report(report_file) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:125`
+**Complexity:** 2
+
+**Description:**
+> Parse markdown format review report.
+
+Extracts issues from sections:
+- ### Critical Issues (Must Fix)
+- ### High Priority Issues
+- ### Medium/Low Priority
+
+**Parameters:**
+- `report_file`: Path
+
+---
+
+### `_parse_single_issue(issue_text, severity) -> Optional[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:300`
+**Complexity:** 9
+
+**Description:**
+> Parse a single issue block into structured data.
+
+Args:
+    issue_text: Text of the issue block
+    severity: Severity level
+
+Returns:
+    Issue dict or None if parsing fails
+
+**Parameters:**
+- `issue_text`: str
+- `severity`: str
 
 ---
 
@@ -17657,6 +17806,60 @@ Returns:
 
 ---
 
+### `parse_review_report(report_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:13`
+**Complexity:** 4
+
+**Description:**
+> Parse a review report file and extract issues by severity.
+
+Supports both markdown (from sdd-plan-review) and JSON formats.
+Extracts issues grouped by severity: critical, high, medium, low.
+
+Args:
+    report_path: Path to the review report file (.md or .json)
+
+Returns:
+    Dict with parsed issues:
+    {
+        "success": True|False,
+        "format": "markdown"|"json",
+        "issues": {
+            "critical": [
+                {
+                    "title": "Issue title",
+                    "description": "Full description",
+                    "flagged_by": ["model1", "model2"],
+                    "impact": "Impact description",
+                    "fix": "Recommended fix"
+                },
+                ...
+            ],
+            "high": [...],
+            "medium": [...],
+            "low": [...]
+        },
+        "metadata": {
+            "spec_id": "...",
+            "spec_title": "...",
+            "overall_score": X.X,
+            "recommendation": "APPROVE|REVISE|REJECT",
+            "consensus_level": "...",
+            "models_consulted": [...]
+        },
+        "error": "Error message" (only if success=False)
+    }
+
+Raises:
+    FileNotFoundError: If report file doesn't exist
+
+**Parameters:**
+- `report_path`: str
+
+---
+
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
@@ -23867,6 +24070,7 @@ Returns:
 - `modification.transactional_modify`
 - `modification.update_node_field`
 - `modification.update_task_counts`
+- `review_parser.parse_review_report`
 - `revision.create_revision`
 - `revision.get_revision_history`
 - `revision.rollback_to_version`
@@ -23897,6 +24101,16 @@ Returns:
 - `sys`
 - `typing.Any`
 - `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py`
+
+- `json`
+- `pathlib.Path`
+- `re`
+- `typing.Any`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`

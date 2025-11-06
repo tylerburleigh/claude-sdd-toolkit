@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:01:51.486684Z",
+    "generated_at": "2025-11-06T18:08:21.106470Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 222,
-    "total_lines": 77273,
+    "total_files": 223,
+    "total_lines": 77646,
     "total_classes": 290,
-    "total_functions": 838,
-    "avg_complexity": 5.74,
+    "total_functions": 846,
+    "avg_complexity": 5.73,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 222,
-        "lines": 77273,
+        "files": 223,
+        "lines": 77646,
         "classes": 290,
-        "functions": 838,
-        "avg_complexity": 5.74
+        "functions": 846,
+        "avg_complexity": 5.73
       }
     }
   },
@@ -3173,10 +3173,11 @@
         "modification.apply_modifications",
         "revision.create_revision",
         "revision.get_revision_history",
-        "revision.rollback_to_version"
+        "revision.rollback_to_version",
+        "review_parser.parse_review_report"
       ],
       "exports": [],
-      "lines": 38
+      "lines": 43
     },
     {
       "name": "assumptions",
@@ -3261,6 +3262,34 @@
       ],
       "exports": [],
       "lines": 1226
+    },
+    {
+      "name": "review_parser",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "language": "python",
+      "docstring": "Review report parsing for apply-review workflow.\n\nExtracts structured issue data from sdd-plan-review markdown or JSON reports.",
+      "classes": [],
+      "functions": [
+        "parse_review_report",
+        "_parse_json_report",
+        "_parse_markdown_report",
+        "_extract_metadata_from_markdown",
+        "_extract_issues_from_markdown",
+        "_extract_section",
+        "_parse_issue_list",
+        "_parse_single_issue"
+      ],
+      "imports": [
+        "json",
+        "re",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Any",
+        "typing.List",
+        "typing.Optional"
+      ],
+      "exports": [],
+      "lines": 368
     },
     {
       "name": "revision",
@@ -83455,6 +83484,735 @@
       ]
     },
     {
+      "name": "parse_review_report",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Parse a review report file and extract issues by severity.\n\nSupports both markdown (from sdd-plan-review) and JSON formats.\nExtracts issues grouped by severity: critical, high, medium, low.\n\nArgs:\n    report_path: Path to the review report file (.md or .json)\n\nReturns:\n    Dict with parsed issues:\n    {\n        \"success\": True|False,\n        \"format\": \"markdown\"|\"json\",\n        \"issues\": {\n            \"critical\": [\n                {\n                    \"title\": \"Issue title\",\n                    \"description\": \"Full description\",\n                    \"flagged_by\": [\"model1\", \"model2\"],\n                    \"impact\": \"Impact description\",\n                    \"fix\": \"Recommended fix\"\n                },\n                ...\n            ],\n            \"high\": [...],\n            \"medium\": [...],\n            \"low\": [...]\n        },\n        \"metadata\": {\n            \"spec_id\": \"...\",\n            \"spec_title\": \"...\",\n            \"overall_score\": X.X,\n            \"recommendation\": \"APPROVE|REVISE|REJECT\",\n            \"consensus_level\": \"...\",\n            \"models_consulted\": [...]\n        },\n        \"error\": \"Error message\" (only if success=False)\n    }\n\nRaises:\n    FileNotFoundError: If report file doesn't exist",
+      "parameters": [
+        {
+          "name": "report_path",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 58,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_parse_json_report",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "function_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 64,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_parse_markdown_report",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_parse_json_report",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 73,
+      "language": "python",
+      "docstring": "Parse JSON format review report.\n\nJSON reports are expected to have the structure:\n{\n    \"consensus\": {\n        \"overall_score\": X.X,\n        \"recommendation\": \"...\",\n        \"consensus_level\": \"...\",\n        \"synthesis_text\": \"...\"\n    },\n    \"metadata\": {...}\n}",
+      "parameters": [
+        {
+          "name": "report_file",
+          "type": "Path",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "parse_review_report",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 63,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 99,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 105,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 106,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "unknown",
+          "line": 113,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_parse_markdown_report",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 125,
+      "language": "python",
+      "docstring": "Parse markdown format review report.\n\nExtracts issues from sections:\n- ### Critical Issues (Must Fix)\n- ### High Priority Issues\n- ### Medium/Low Priority",
+      "parameters": [
+        {
+          "name": "report_file",
+          "type": "Path",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "parse_review_report",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 65,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 135,
+          "call_type": "function_call"
+        },
+        {
+          "name": "read",
+          "file": "unknown",
+          "line": 136,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_extract_metadata_from_markdown",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "unknown",
+          "line": 147,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_extract_metadata_from_markdown",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 157,
+      "language": "python",
+      "docstring": "Extract metadata fields from markdown report header.",
+      "parameters": [
+        {
+          "name": "content",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_parse_markdown_report",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 144,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 170,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "method_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "function_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 179,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 183,
+          "call_type": "method_call"
+        },
+        {
+          "name": "upper",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 185,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 189,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 191,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 195,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 197,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 198,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 198,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "_extract_issues_from_markdown",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 203,
+      "language": "python",
+      "docstring": "Extract issues by severity from markdown content.\n\nReturns dict with keys: critical, high, medium, low",
+      "parameters": [
+        {
+          "name": "content",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, List[Dict[str, Any]]]",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_parse_json_report",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 113,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_parse_markdown_report",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 147,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "_extract_section",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_parse_issue_list",
+          "file": "unknown",
+          "line": 219,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_section",
+          "file": "unknown",
+          "line": 222,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_parse_issue_list",
+          "file": "unknown",
+          "line": 224,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_section",
+          "file": "unknown",
+          "line": 227,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_parse_issue_list",
+          "file": "unknown",
+          "line": 230,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "_extract_section",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 236,
+      "language": "python",
+      "docstring": "Extract content between a header and the next header of equal or higher level.\n\nArgs:\n    content: Full markdown content\n    header_pattern: Regex pattern for the section header\n\nReturns:\n    Section content (excluding header) or None if not found",
+      "parameters": [
+        {
+          "name": "content",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "header_pattern",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[str]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 222,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 227,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "method_call"
+        },
+        {
+          "name": "end",
+          "file": "unknown",
+          "line": 252,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 256,
+          "call_type": "method_call"
+        },
+        {
+          "name": "start",
+          "file": "unknown",
+          "line": 258,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 262,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "_parse_issue_list",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 265,
+      "language": "python",
+      "docstring": "Parse a list of issues from a section.\n\nExpected format:\n- Issue title - flagged by: [model names]\n  - Impact: ...\n  - Recommended fix: ...\n  - Details: ...\n\nOr simpler format:\n- Issue title - flagged by: [model names]\n\nArgs:\n    section_content: Content of the issues section\n    severity: Severity level (for metadata)\n\nReturns:\n    List of issue dicts",
+      "parameters": [
+        {
+          "name": "section_content",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "severity",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "List[Dict[str, Any]]",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 219,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 224,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_extract_issues_from_markdown",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 230,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "findall",
+          "file": "unknown",
+          "line": 290,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_parse_single_issue",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 293,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 295,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "_parse_single_issue",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 300,
+      "language": "python",
+      "docstring": "Parse a single issue block into structured data.\n\nArgs:\n    issue_text: Text of the issue block\n    severity: Severity level\n\nReturns:\n    Issue dict or None if parsing fails",
+      "parameters": [
+        {
+          "name": "issue_text",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "severity",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[Dict[str, Any]]",
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "_parse_issue_list",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 293,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 311,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 316,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 320,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 323,
+          "call_type": "method_call"
+        },
+        {
+          "name": "start",
+          "file": "unknown",
+          "line": 323,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 324,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 325,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 325,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 328,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 345,
+          "call_type": "method_call"
+        },
+        {
+          "name": "match",
+          "file": "unknown",
+          "line": 350,
+          "call_type": "method_call"
+        },
+        {
+          "name": "match",
+          "file": "unknown",
+          "line": 351,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 356,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 356,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sub",
+          "file": "unknown",
+          "line": 360,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 362,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 366,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
       "name": "_bump_version",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
       "line": 13,
@@ -121485,7 +122243,8 @@
       "modification.apply_modifications",
       "revision.create_revision",
       "revision.get_revision_history",
-      "revision.rollback_to_version"
+      "revision.rollback_to_version",
+      "review_parser.parse_review_report"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py": [
       "typing.Dict",
@@ -121513,6 +122272,15 @@
       "contextlib.contextmanager",
       "claude_skills.common.spec.get_node",
       "claude_skills.common.spec.update_node"
+    ],
+    "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py": [
+      "json",
+      "re",
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.Any",
+      "typing.List",
+      "typing.Optional"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/revision.py": [
       "sys",

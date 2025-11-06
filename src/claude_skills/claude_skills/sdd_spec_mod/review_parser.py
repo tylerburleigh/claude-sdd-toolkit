@@ -366,3 +366,207 @@ def _parse_single_issue(issue_text: str, severity: str) -> Optional[Dict[str, An
         issue["description"] = ' '.join(description_parts)
 
     return issue
+
+
+def suggest_modifications(issues: Dict[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
+    """
+    Generate modification suggestions from parsed review issues.
+
+    Takes the issues dict from parse_review_report and generates actionable
+    modification suggestions that can be applied using apply_modifications.
+
+    Args:
+        issues: Dict of issues grouped by severity:
+            {
+                "critical": [...],
+                "high": [...],
+                "medium": [...],
+                "low": [...]
+            }
+
+    Returns:
+        List of modification operation dicts in the format expected by
+        apply_modifications:
+        [
+            {
+                "operation": "update_node_field",
+                "node_id": "task-1-1",
+                "field": "description",
+                "value": "Updated description",
+                "reason": "Critical issue: Missing context"
+            },
+            ...
+        ]
+
+    Common mappings from issues to modifications:
+        - Missing dependencies -> add_node with dependency
+        - Incorrect estimates -> update_node_field for metadata.estimated_hours
+        - Missing tasks -> add_node for new task
+        - Unclear descriptions -> update_node_field for description
+        - Missing verification -> add_node with type=verify
+    """
+    modifications = []
+
+    # Process critical issues first (highest priority)
+    for issue in issues.get("critical", []):
+        mods = _suggest_for_issue(issue, severity="critical")
+        modifications.extend(mods)
+
+    # Process high priority issues
+    for issue in issues.get("high", []):
+        mods = _suggest_for_issue(issue, severity="high")
+        modifications.extend(mods)
+
+    # Process medium priority issues
+    for issue in issues.get("medium", []):
+        mods = _suggest_for_issue(issue, severity="medium")
+        modifications.extend(mods)
+
+    # Process low priority issues (optional)
+    for issue in issues.get("low", []):
+        mods = _suggest_for_issue(issue, severity="low")
+        modifications.extend(mods)
+
+    return modifications
+
+
+def _suggest_for_issue(issue: Dict[str, Any], severity: str) -> List[Dict[str, Any]]:
+    """
+    Generate modification suggestions for a single issue.
+
+    Args:
+        issue: Issue dict with title, description, impact, fix, severity
+        severity: Severity level (critical, high, medium, low)
+
+    Returns:
+        List of modification operation dicts
+    """
+    modifications = []
+
+    # Guard against None or invalid issues
+    if not issue or not isinstance(issue, dict):
+        return modifications
+
+    title = issue.get("title", "").lower()
+    fix = issue.get("fix", "").lower()
+    description = issue.get("description", "")
+
+    # Pattern matching for common issue types
+    # Extract task/phase IDs from issue title or description
+    node_id_match = re.search(r'(task-\d+-\d+|phase-\d+|task-\d+)', title + " " + description)
+    node_id = node_id_match.group(1) if node_id_match else None
+
+    # Pattern 1: Missing or unclear description
+    if any(keyword in title for keyword in ["missing description", "unclear", "vague", "needs clarification"]):
+        if node_id:
+            modifications.append({
+                "operation": "update_node_field",
+                "node_id": node_id,
+                "field": "description",
+                "value": f"[UPDATE REQUIRED] {description}",
+                "reason": f"{severity.capitalize()}: {issue.get('title', 'Missing description')}"
+            })
+
+    # Pattern 2: Missing dependencies
+    elif any(keyword in title for keyword in ["missing dependency", "missing prerequisite", "requires"]):
+        if node_id and "add dependency" in fix:
+            # Extract dependency ID if mentioned
+            dep_match = re.search(r'(task-\d+-\d+|phase-\d+)', fix)
+            if dep_match:
+                dep_id = dep_match.group(1)
+                # Note: This would require updating dependencies field
+                # For now, add a note to the description
+                modifications.append({
+                    "operation": "update_node_field",
+                    "node_id": node_id,
+                    "field": "description",
+                    "value": f"[DEPENDENCY: {dep_id}] {description}",
+                    "reason": f"{severity.capitalize()}: {issue.get('title', 'Missing dependency')}"
+                })
+
+    # Pattern 3: Incorrect or missing estimates
+    elif any(keyword in title for keyword in ["estimate", "hours", "duration", "effort"]):
+        if node_id:
+            # Extract suggested hours if mentioned
+            hours_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)', fix + " " + description)
+            if hours_match:
+                hours = float(hours_match.group(1))
+                modifications.append({
+                    "operation": "update_node_field",
+                    "node_id": node_id,
+                    "field": "metadata",
+                    "value": {"estimated_hours": hours},
+                    "reason": f"{severity.capitalize()}: {issue.get('title', 'Incorrect estimate')}"
+                })
+
+    # Pattern 4: Missing verification steps
+    elif any(keyword in title for keyword in ["missing verification", "no tests", "testing", "validation"]):
+        if node_id:
+            # Extract parent from node_id (e.g., task-1-1 -> phase-1 or task-1)
+            parent_match = re.match(r'(task-\d+|phase-\d+)', node_id)
+            if parent_match:
+                parent_id = parent_match.group(1)
+                verify_id = f"{node_id}-verify"
+                modifications.append({
+                    "operation": "add_node",
+                    "parent_id": parent_id,
+                    "node_data": {
+                        "node_id": verify_id,
+                        "type": "verify",
+                        "title": f"Verify {node_id}",
+                        "description": f"Verification for {node_id}: {issue.get('fix', 'Add verification steps')}",
+                        "status": "pending"
+                    },
+                    "reason": f"{severity.capitalize()}: {issue.get('title', 'Missing verification')}"
+                })
+
+    # Pattern 5: Missing task
+    elif any(keyword in title for keyword in ["missing task", "should include", "add task", "needs task"]):
+        # Try to extract suggested task title from fix or description
+        parent_match = re.search(r'(?:in |to |under )(phase-\d+|task-\d+)', fix + " " + description)
+        if parent_match:
+            parent_id = parent_match.group(1)
+            # Generate a task ID (this is approximate)
+            task_id = f"{parent_id}-new-{len(modifications)}"
+            task_title = issue.get("fix", "").replace("Add task: ", "").replace("add ", "").strip()
+            if not task_title:
+                task_title = "New task (review required)"
+
+            modifications.append({
+                "operation": "add_node",
+                "parent_id": parent_id,
+                "node_data": {
+                    "node_id": task_id,
+                    "type": "task",
+                    "title": task_title,
+                    "description": description,
+                    "status": "pending"
+                },
+                "reason": f"{severity.capitalize()}: {issue.get('title', 'Missing task')}"
+            })
+
+    # Pattern 6: Task ordering or dependencies
+    elif any(keyword in title for keyword in ["should be before", "should come after", "wrong order", "sequence"]):
+        if node_id:
+            # This would require move_node operation
+            # For now, add a note
+            modifications.append({
+                "operation": "update_node_field",
+                "node_id": node_id,
+                "field": "description",
+                "value": f"[ORDER: {issue.get('fix', 'Review task order')}] {description}",
+                "reason": f"{severity.capitalize()}: {issue.get('title', 'Task ordering issue')}"
+            })
+
+    # Pattern 7: Generic update needed
+    elif any(keyword in title for keyword in ["update", "revise", "improve", "clarify"]):
+        if node_id:
+            modifications.append({
+                "operation": "update_node_field",
+                "node_id": node_id,
+                "field": "description",
+                "value": f"[REVIEW: {issue.get('fix', 'Needs update')}] {description}",
+                "reason": f"{severity.capitalize()}: {issue.get('title', 'Update needed')}"
+            })
+
+    return modifications

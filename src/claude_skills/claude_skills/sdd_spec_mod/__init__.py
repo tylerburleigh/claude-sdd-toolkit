@@ -25,6 +25,7 @@ from .revision import (
 
 from .review_parser import (
     parse_review_report,
+    suggest_modifications,
 )
 
 __all__ = [
@@ -37,6 +38,7 @@ __all__ = [
     "remove_node",
     "rollback_to_version",
     "spec_transaction",
+    "suggest_modifications",
     "transactional_modify",
     "update_node_field",
     "update_task_counts",
