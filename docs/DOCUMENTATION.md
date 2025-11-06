@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-05 19:12:09
+**Generated:** 2025-11-06 10:27:48
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 214
-- **Total Lines:** 73222
+- **Total Lines:** 73419
 - **Total Classes:** 278
-- **Total Functions:** 796
-- **Avg Complexity:** 5.61
+- **Total Functions:** 798
+- **Avg Complexity:** 5.62
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -5906,7 +5906,7 @@ Returns:
 ### `_create_config_file(project_path, config, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:136`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:150`
 **Complexity:** 3
 
 **Description:**
@@ -6710,7 +6710,7 @@ Args:
 ### `_prompt_for_config(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:80`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:94`
 **Complexity:** 8
 
 **Description:**
@@ -6721,6 +6721,37 @@ Returns:
 
 **Parameters:**
 - `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_git_permissions(printer) -> list`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:187`
+**Complexity:** 7
+
+**Description:**
+> Prompt user about adding git/GitHub permissions.
+
+Returns:
+    List of git permissions to add (may include read-only, write, or both)
+
+**Parameters:**
+- `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_git_permissions() -> list`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:87`
+**Complexity:** 7
+
+**Description:**
+> Prompt user about adding git/GitHub permissions.
+
+Returns:
+    List of git permissions to add (may include read-only, write, or both)
 
 ---
 
@@ -8102,7 +8133,7 @@ Example:
 ### `categorize_missing_permissions(missing) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:254`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:348`
 **Complexity:** 6
 
 **Description:**
@@ -8418,7 +8449,7 @@ Returns:
 ### `check_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:133`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:224`
 **Complexity:** 2
 
 **Description:**
@@ -8774,7 +8805,7 @@ Example:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:276`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:370`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -9973,8 +10004,8 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:173`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:256`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
@@ -16259,7 +16290,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:174`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:265`
 **Complexity:** 3
 
 ---
@@ -17431,7 +17462,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:385`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:479`
 **Complexity:** 1
 
 **Description:**
@@ -20513,8 +20544,8 @@ Returns:
 ### `update_permissions(project_root) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:72`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:153`
+**Complexity:** 9
 
 **Description:**
 > Update .claude/settings.json with SDD permissions.
@@ -20696,7 +20727,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:546`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 20 (High)
 
 **Description:**
 > Validate type-specific metadata requirements.
@@ -20914,7 +20945,7 @@ Example:
 ### `validate_spec_hierarchy(spec_data) -> JsonSpecValidationResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:618`
+**Defined in:** `src/claude_skills/claude_skills/common/hierarchy_validation.py:630`
 **Complexity:** 3
 
 **Description:**
