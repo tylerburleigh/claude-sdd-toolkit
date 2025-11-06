@@ -962,7 +962,8 @@ def update_task_counts(spec_data: Dict[str, Any], node_id: str) -> Dict[str, Any
 
 def apply_modifications(
     spec_data: Dict[str, Any],
-    modifications_file: str
+    modifications_file: str,
+    validate_after_each: bool = False
 ) -> Dict[str, Any]:
     """
     Apply a batch of modifications from a JSON file to a spec.
@@ -975,6 +976,9 @@ def apply_modifications(
     Args:
         spec_data: The full spec data dictionary to modify
         modifications_file: Path to JSON file containing modifications array
+        validate_after_each: If True, validates spec after each modification
+                           and rolls back if validation fails (default: False)
+                           Set to True for strict validation with rollback
 
     Returns:
         Dict with overall status and per-operation results:
@@ -989,7 +993,8 @@ def apply_modifications(
                     "operation": {...},
                     "success": True|False,
                     "message": "...",
-                    "error": "..." (only if failed)
+                    "error": "..." (only if failed),
+                    "validation_error": "..." (if validation failed)
                 },
                 ...
             ]
@@ -1038,6 +1043,13 @@ def apply_modifications(
     import json
     from pathlib import Path
 
+    # Import validation function
+    try:
+        from claude_skills.common import validate_spec_hierarchy
+    except ImportError:
+        # Fallback to internal validation if common module not available
+        validate_spec_hierarchy = None
+
     # Validate modifications file exists
     mod_file_path = Path(modifications_file)
     if not mod_file_path.exists():
@@ -1078,7 +1090,7 @@ def apply_modifications(
         "move_node": _handle_move_node,
     }
 
-    # Apply each modification sequentially
+    # Apply each modification sequentially with per-operation validation
     for i, mod in enumerate(modifications):
         if not isinstance(mod, dict):
             result = {
@@ -1114,13 +1126,50 @@ def apply_modifications(
             failed += 1
             continue
 
-        # Execute operation
+        # Execute operation with transaction support
         handler = operation_handlers[operation_type]
         try:
-            op_result = handler(spec_data, mod)
+            # Use transaction context for rollback capability
+            with spec_transaction(spec_data):
+                op_result = handler(spec_data, mod)
+
+                # Check if operation succeeded
+                if not op_result.get("success", False):
+                    # Operation failed - transaction will rollback
+                    raise ValueError(op_result.get("message", "Operation failed"))
+
+                # Validate spec after modification if requested
+                if validate_after_each and validate_spec_hierarchy:
+                    validation_result = validate_spec_hierarchy(spec_data)
+
+                    # Check if validation passed (no errors)
+                    if not validation_result.is_valid():
+                        error_count, warning_count = validation_result.count_all_issues()
+                        error_msg = f"Validation failed with {error_count} error(s)"
+
+                        # Collect first error message for reporting
+                        first_error = None
+                        for errors_list in [
+                            validation_result.structure_errors,
+                            validation_result.hierarchy_errors,
+                            validation_result.node_errors,
+                            validation_result.count_errors,
+                            validation_result.dependency_errors,
+                            validation_result.metadata_errors
+                        ]:
+                            if errors_list:
+                                first_error = errors_list[0]
+                                break
+
+                        if first_error:
+                            error_msg = f"{error_msg}: {first_error}"
+
+                        raise ValueError(error_msg)
+
+            # If we reach here, operation succeeded and validation passed
             result = {
                 "operation": mod,
-                "success": op_result.get("success", False),
+                "success": True,
                 "message": op_result.get("message", "Operation completed"),
             }
 
@@ -1129,21 +1178,22 @@ def apply_modifications(
                 if key in op_result:
                     result[key] = op_result[key]
 
-            if op_result.get("success", False):
-                successful += 1
-            else:
-                failed += 1
-                result["error"] = op_result.get("message", "Operation failed")
-
+            successful += 1
             results.append(result)
 
         except Exception as e:
+            # Transaction rolled back - operation failed
             result = {
                 "operation": mod,
                 "success": False,
-                "message": f"Operation failed with exception: {str(e)}",
+                "message": f"Operation failed: {str(e)}",
                 "error": str(e)
             }
+
+            # Check if this was a validation error
+            if "Validation failed" in str(e):
+                result["validation_error"] = str(e)
+
             results.append(result)
             failed += 1
 

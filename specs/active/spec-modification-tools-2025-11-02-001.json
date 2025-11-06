@@ -1,7 +1,7 @@
 {
   "spec_id": "spec-modification-tools-2025-11-02-001",
   "generated": "2025-11-02T22:30:00Z",
-  "last_updated": "2025-11-06T18:25:29.112075Z",
+  "last_updated": "2025-11-06T18:29:43.379740Z",
   "metadata": {
     "title": "SDD Spec Modification & Review Enhancement Tools",
     "description": "Non-interactive CLI tools for modifying existing specs, tracking revisions, and applying review feedback. Enables programmatic spec updates without manual JSON editing.",
@@ -31,8 +31,8 @@
         "added_at": "2025-11-06T17:50:44.589803+00:00"
       }
     ],
-    "progress_percentage": 76,
-    "current_phase": "phase-4",
+    "progress_percentage": 78,
+    "current_phase": "phase-5",
     "activated_date": "2025-11-06T15:04:57.308241Z"
   },
   "hierarchy": {
@@ -50,7 +50,7 @@
         "phase-6"
       ],
       "total_tasks": 47,
-      "completed_tasks": 36,
+      "completed_tasks": 37,
       "metadata": {}
     },
     "phase-1": {
@@ -1527,7 +1527,7 @@
       "type": "phase",
       "title": "Validation Integration",
       "description": "Auto-validate after modifications, prevent corruption",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-5-files",
@@ -1546,7 +1546,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "estimated_hours": 5,
         "risk_level": "low",
@@ -1556,14 +1556,14 @@
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-5",
       "children": [
         "task-5-1",
         "task-5-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1575,7 +1575,7 @@
       "type": "task",
       "title": "Add validation hooks to spec_modifier.py",
       "description": "Auto-validate after every modification, rollback on failure",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5-files",
       "children": [
         "task-5-1-1"
@@ -1588,7 +1588,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_modify/spec_modifier.py",
         "estimated_hours": 2,
@@ -1599,7 +1599,7 @@
       "type": "subtask",
       "title": "Integrate sdd-validate after save",
       "description": "Call validate_spec() after every modification, rollback if fails",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-1",
       "children": [],
       "dependencies": {
@@ -1608,9 +1608,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "estimated_hours": 1.5
+        "estimated_hours": 1.5,
+        "started_at": "2025-11-06T18:26:01.547463Z",
+        "completed_at": "2025-11-06T18:29:43.351276Z",
+        "needs_journaling": false,
+        "actual_hours": 0.062,
+        "journaled_at": "2025-11-06T18:29:43.372672Z"
       }
     },
     "task-5-2": {
@@ -2378,6 +2383,15 @@
       "content": "All child tasks in phase phase-4 have been completed.",
       "metadata": {},
       "task_id": "phase-4"
+    },
+    {
+      "timestamp": "2025-11-06T18:29:43.372643Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Integrate sdd-validate after save",
+      "author": "claude-code",
+      "content": "Successfully integrated sdd-validate after save operations in apply_modifications function. Added validate_after_each parameter (default: False) with transaction rollback on validation failure. Implementation includes: (1) Import of validate_spec_hierarchy from common module with graceful fallback, (2) Per-operation validation using spec_transaction context manager for automatic rollback, (3) Proper handling of JsonSpecValidationResult dataclass using is_valid() method and count_all_issues(), (4) Clear error reporting with first error message extracted from validation result, (5) Backward compatibility with existing tests (validation off by default, can be enabled with validate_after_each=True). All 9 integration tests pass successfully. Modified file: src/claude_skills/claude_skills/sdd_spec_mod/modification.py (lines 963-1192).",
+      "metadata": {},
+      "task_id": "task-5-1-1"
     }
   ]
 }
