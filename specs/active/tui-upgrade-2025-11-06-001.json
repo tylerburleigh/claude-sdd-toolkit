@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-06T23:21:57.382443Z",
+  "last_updated": "2025-11-06T23:24:08.591428Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,8 +31,8 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 15,
-    "current_phase": "phase-1"
+    "progress_percentage": 17,
+    "current_phase": "phase-2"
   },
   "hierarchy": {
     "spec-root": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -660,7 +660,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Structured Output (List Commands)",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -686,7 +686,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -704,13 +704,13 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -725,7 +725,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
         "task_category": "implementation",
@@ -737,7 +737,7 @@
     "task-2-1-1": {
       "type": "subtask",
       "title": "Create Rich.Table with columns: ID, Title, Progress, Status, Phase, Updated",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -746,9 +746,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-06T23:22:47.638538Z",
+        "completed_at": "2025-11-06T23:24:08.574651Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-06T23:24:08.587122Z"
       }
     },
     "task-2-1-2": {
@@ -2958,6 +2963,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-06T23:24:08.587104Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create Rich.Table with columns: ID, Title, Progress, Status, Phase, Updated",
+      "author": "claude-code",
+      "content": "Successfully created Rich.Table for list_specs command with all required columns (ID, Title, Progress, Status, Phase, Updated).\n\nImplementation details:\n- Added Rich imports (Table, Console) to list_specs.py\n- Updated _print_specs_text() to use Rich.Table instead of plain text\n- Created table with proper column configuration (min_width settings for optimal layout)\n- Added status emojis for visual distinction (\u26a1 Active, \u2705 Complete, \u23f8\ufe0f Pending, \ud83d\udce6 Archived)\n- Formatted progress as 'X/Y (Z%)' for clarity\n- Truncated timestamps to date-only for brevity\n- Preserved verbose mode with Rich markup\n- Table displays properly in both TTY and piped outputs\n\nTested with active specs and confirmed all 6 columns display correctly with proper formatting and styling.",
+      "metadata": {},
+      "task_id": "task-2-1-1"
     }
   ]
 }

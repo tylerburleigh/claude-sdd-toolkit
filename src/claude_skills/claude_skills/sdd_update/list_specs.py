@@ -4,6 +4,9 @@ import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
+from rich.table import Table
+from rich.console import Console
+
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
 
 
@@ -109,55 +112,87 @@ def _print_specs_text(
     verbose: bool,
     printer: PrettyPrinter,
 ) -> None:
-    """Print specs in human-readable text format."""
+    """Print specs using Rich.Table for structured output."""
 
     if not specs_info:
         printer.info("No specifications found.")
         return
 
-    # Group by status
-    by_status: Dict[str, List[Dict[str, Any]]] = {}
+    # Create Rich console
+    console = Console()
+
+    # Create Rich.Table with specified columns
+    table = Table(
+        title="📋 Specifications",
+        show_header=True,
+        header_style="bold cyan",
+        border_style="blue",
+        title_style="bold magenta",
+    )
+
+    # Add columns: ID, Title, Progress, Status, Phase, Updated
+    table.add_column("ID", style="cyan", no_wrap=True, min_width=30)
+    table.add_column("Title", style="white", min_width=25)
+    table.add_column("Progress", justify="right", style="yellow", min_width=12)
+    table.add_column("Status", justify="center", style="green", min_width=10)
+    table.add_column("Phase", style="blue", min_width=10)
+    table.add_column("Updated", style="dim", min_width=10)
+
+    # Add rows for each spec
     for spec in specs_info:
-        status = spec["status"]
-        if status not in by_status:
-            by_status[status] = []
-        by_status[status].append(spec)
+        # Format progress with percentage
+        if spec['total_tasks'] > 0:
+            progress = f"{spec['completed_tasks']}/{spec['total_tasks']} ({spec['progress_percentage']}%)"
+        else:
+            progress = "No tasks"
 
-    # Print each status group
-    for status in ["active", "pending", "completed", "archived"]:
-        if status not in by_status:
-            continue
+        # Format status with color/emoji
+        status = spec['status']
+        if status == "active":
+            status_display = "⚡ Active"
+        elif status == "completed":
+            status_display = "✅ Complete"
+        elif status == "pending":
+            status_display = "⏸️  Pending"
+        elif status == "archived":
+            status_display = "📦 Archived"
+        else:
+            status_display = status.title()
 
-        specs = by_status[status]
-        status_label = status.title()
+        # Format phase
+        phase = spec.get('current_phase', '-')
 
-        printer.success(f"\n{status_label} Specifications ({len(specs)}):")
+        # Format updated timestamp
+        updated = spec.get('updated_at', '-')
+        if updated and updated != '-':
+            # Truncate to date only for brevity
+            updated = updated.split('T')[0] if 'T' in updated else updated
 
-        for spec in specs:
-            print(f"  {spec['spec_id']}")
-            print(f"    Title: {spec['title']}")
+        # Add row to table
+        table.add_row(
+            spec['spec_id'],
+            spec['title'],
+            progress,
+            status_display,
+            phase,
+            updated
+        )
 
-            if spec['total_tasks'] > 0:
-                progress_str = f"{spec['completed_tasks']}/{spec['total_tasks']} tasks ({spec['progress_percentage']}%)"
-                print(f"    Progress: {progress_str}")
-            else:
-                print("    Progress: No tasks defined")
+    # Print table
+    console.print(table)
 
-            if spec.get('current_phase'):
-                print(f"    Phase: {spec['current_phase']}")
-
-            if verbose:
-                if spec.get('version'):
-                    print(f"    Version: {spec['version']}")
-                if spec.get('description'):
-                    print(f"    Description: {spec['description']}")
-                if spec.get('author'):
-                    print(f"    Author: {spec['author']}")
-                if spec.get('created_at'):
-                    print(f"    Created: {spec['created_at']}")
-                if spec.get('updated_at'):
-                    print(f"    Updated: {spec['updated_at']}")
-                if spec.get('file_path'):
-                    print(f"    File: {spec['file_path']}")
-
-            print()  # Blank line between specs
+    # Print verbose details if requested
+    if verbose:
+        console.print("\n[bold]Verbose Details:[/bold]")
+        for spec in specs_info:
+            console.print(f"\n[cyan]{spec['spec_id']}[/cyan]:")
+            if spec.get('version'):
+                console.print(f"  Version: {spec['version']}")
+            if spec.get('description'):
+                console.print(f"  Description: {spec['description']}")
+            if spec.get('author'):
+                console.print(f"  Author: {spec['author']}")
+            if spec.get('created_at'):
+                console.print(f"  Created: {spec['created_at']}")
+            if spec.get('file_path'):
+                console.print(f"  File: {spec['file_path']}")
