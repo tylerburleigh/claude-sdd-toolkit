@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 17:31:52
+**Generated:** 2025-11-06 17:54:52
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 233
-- **Total Lines:** 81950
+- **Total Lines:** 82134
 - **Total Classes:** 306
 - **Total Functions:** 859
 - **Avg Complexity:** 5.77
@@ -1811,10 +1811,27 @@ Attributes:
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/printer.py:8`
+**Defined in:** `src/claude_skills/claude_skills/common/printer.py:27`
 
 **Description:**
 > Utility for consistent, pretty console output optimized for Claude Code.
+
+This class maintains backward compatibility with the original PrettyPrinter
+implementation while internally delegating to the new Ui backend system.
+
+The Ui backend (RichUi or PlainUi) is automatically selected based on:
+- TTY availability (sys.stdout.isatty())
+- CI environment detection
+- Force flags or environment variables
+
+All original methods are preserved with identical signatures, ensuring
+100% backward compatibility with existing code.
+
+Attributes:
+    use_color: Whether to use ANSI color codes (auto-disabled if not TTY)
+    verbose: Whether to show detailed info messages
+    quiet: Whether to suppress non-error output
+    _ui: Internal Ui backend (RichUi or PlainUi)
 
 **Methods:**
 - `__init__()`
@@ -24049,6 +24066,10 @@ Returns:
 ### `src/claude_skills/claude_skills/common/printer.py`
 
 - `sys`
+- `typing.Optional`
+- `ui_factory.create_ui`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 
 ### `src/claude_skills/claude_skills/common/progress.py`
 

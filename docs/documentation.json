@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T22:31:52.702905Z",
+    "generated_at": "2025-11-06T22:54:52.034587Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 233,
-    "total_lines": 81950,
+    "total_lines": 82134,
     "total_classes": 306,
     "total_functions": 859,
     "avg_complexity": 5.77,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 233,
-        "lines": 81950,
+        "lines": 82134,
         "classes": 306,
         "functions": 859,
         "avg_complexity": 5.77
@@ -1284,16 +1284,20 @@
       "name": "printer",
       "file": "src/claude_skills/claude_skills/common/printer.py",
       "language": "python",
-      "docstring": "Pretty printer utility for consistent console output across SDD tools.",
+      "docstring": "Pretty printer utility for consistent console output across SDD tools.\n\nThis module provides the PrettyPrinter class - a backward-compatible wrapper\naround the new Ui backend system. It maintains the original API while internally\ndelegating to RichUi or PlainUi based on environment detection.\n\nKey Features:\n- 100% backward compatible with existing code\n- Automatically uses RichUi or PlainUi backend\n- All original methods preserved with identical signatures\n- No breaking changes to existing usage\n\nMigration Path:\n- Existing code continues to work unchanged\n- New code can use Ui protocol directly via create_ui()\n- PrettyPrinter wraps Ui for legacy compatibility",
       "classes": [
         "PrettyPrinter"
       ],
       "functions": [],
       "imports": [
-        "sys"
+        "sys",
+        "typing.Optional",
+        "ui_factory.create_ui",
+        "ui_protocol.Ui",
+        "ui_protocol.MessageLevel"
       ],
       "exports": [],
-      "lines": 84
+      "lines": 268
     },
     {
       "name": "progress",
@@ -8144,9 +8148,9 @@
     {
       "name": "PrettyPrinter",
       "file": "src/claude_skills/claude_skills/common/printer.py",
-      "line": 8,
+      "line": 27,
       "language": "python",
-      "docstring": "Utility for consistent, pretty console output optimized for Claude Code.",
+      "docstring": "Utility for consistent, pretty console output optimized for Claude Code.\n\nThis class maintains backward compatibility with the original PrettyPrinter\nimplementation while internally delegating to the new Ui backend system.\n\nThe Ui backend (RichUi or PlainUi) is automatically selected based on:\n- TTY availability (sys.stdout.isatty())\n- CI environment detection\n- Force flags or environment variables\n\nAll original methods are preserved with identical signatures, ensuring\n100% backward compatibility with existing code.\n\nAttributes:\n    use_color: Whether to use ANSI color codes (auto-disabled if not TTY)\n    verbose: Whether to show detailed info messages\n    quiet: Whether to suppress non-error output\n    _ui: Internal Ui backend (RichUi or PlainUi)",
       "bases": [],
       "methods": [
         "__init__",
@@ -46283,6 +46287,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "__init__",
+          "file": "src/claude_skills/claude_skills/common/printer.py",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
           "name": "create_ui_from_args",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
           "line": 246,
@@ -46303,7 +46313,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 2
+      "call_count": 3
     },
     {
       "name": "create_ui_from_args",
@@ -124562,7 +124572,11 @@
       "ui_protocol.Message"
     ],
     "src/claude_skills/claude_skills/common/printer.py": [
-      "sys"
+      "sys",
+      "typing.Optional",
+      "ui_factory.create_ui",
+      "ui_protocol.Ui",
+      "ui_protocol.MessageLevel"
     ],
     "src/claude_skills/claude_skills/common/progress.py": [
       "datetime.datetime",
