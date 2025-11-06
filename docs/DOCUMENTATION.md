@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:43:22
+**Generated:** 2025-11-06 11:52:54
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 217
-- **Total Lines:** 74732
-- **Total Classes:** 278
+- **Total Files:** 218
+- **Total Lines:** 75108
+- **Total Classes:** 284
 - **Total Functions:** 816
 - **Avg Complexity:** 5.69
 - **Max Complexity:** 45
@@ -2298,6 +2298,26 @@ Attributes:
 
 ---
 
+### `TestBumpVersion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:19`
+
+**Description:**
+> Tests for _bump_version() helper function.
+
+**Methods:**
+- `test_increment_minor_version()`
+- `test_increment_from_1_9_to_2_0()`
+- `test_increment_from_2_9_to_3_0()`
+- `test_increment_mid_range()`
+- `test_handle_single_digit_version()`
+- `test_empty_version_defaults_to_1_0()`
+- `test_invalid_version_raises_error()`
+- `test_invalid_version_with_letters_raises_error()`
+
+---
+
 ### `TestCLIBasics`
 
 **Language:** python
@@ -2829,6 +2849,28 @@ Attributes:
 **Methods:**
 - `test_create_factory_defaults()`
 - `test_create_factory_with_options()`
+
+---
+
+### `TestCreateRevision`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:84`
+
+**Description:**
+> Tests for create_revision() function.
+
+**Methods:**
+- `test_create_first_revision()`
+- `test_create_multiple_revisions()`
+- `test_revision_entry_structure()`
+- `test_revision_history_prepends_new_entries()`
+- `test_initialize_revision_history_if_missing()`
+- `test_default_version_if_missing()`
+- `test_empty_changelog_fails()`
+- `test_empty_modified_by_fails()`
+- `test_invalid_spec_fails()`
+- `test_invalid_version_format_fails()`
 
 ---
 
@@ -3423,6 +3465,23 @@ Attributes:
 
 ---
 
+### `TestGetRevisionHistory`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:193`
+
+**Description:**
+> Tests for get_revision_history() function.
+
+**Methods:**
+- `test_get_populated_history()`
+- `test_get_empty_history()`
+- `test_get_history_from_invalid_spec()`
+- `test_get_history_from_none_spec()`
+- `test_history_entries_have_required_fields()`
+
+---
+
 ### `TestGetSessionInfo`
 
 **Language:** python
@@ -3691,6 +3750,20 @@ Attributes:
 **Methods:**
 - `test_init_environment_from_specs_dir()`
 - `test_init_environment_creates_directories()`
+
+---
+
+### `TestIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:331`
+
+**Description:**
+> Integration tests for full revision workflow.
+
+**Methods:**
+- `test_full_revision_lifecycle()`
+- `test_revision_timestamps_are_iso8601()`
 
 ---
 
@@ -4652,6 +4725,25 @@ Attributes:
 
 ---
 
+### `TestRollbackToVersion`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:238`
+
+**Description:**
+> Tests for rollback_to_version() function.
+
+**Methods:**
+- `test_rollback_to_previous_version()`
+- `test_rollback_trims_newer_revisions()`
+- `test_rollback_to_nonexistent_version_fails()`
+- `test_rollback_with_no_history_fails()`
+- `test_rollback_with_invalid_spec_fails()`
+- `test_rollback_with_empty_version_fails()`
+- `test_rollback_preserves_target_and_older()`
+
+---
+
 ### `TestRoutingMatrix`
 
 **Language:** python
@@ -5271,6 +5363,23 @@ Attributes:
 - `test_file_not_found()`
 - `test_invalid_json()`
 - `test_autofix_detection()`
+
+---
+
+### `TestValidateSpecMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_revision.py:57`
+
+**Description:**
+> Tests for _validate_spec_metadata() helper function.
+
+**Methods:**
+- `test_valid_spec_with_metadata()`
+- `test_missing_metadata_key()`
+- `test_metadata_not_dict()`
+- `test_none_spec()`
+- `test_non_dict_spec()`
 
 ---
 
@@ -23711,6 +23820,16 @@ Returns:
 ### `src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py`
 
 - `claude_skills.doc_query.doc_query_lib.DocumentationQuery`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
+
+- `claude_skills.sdd_spec_mod.revision._bump_version`
+- `claude_skills.sdd_spec_mod.revision._validate_spec_metadata`
+- `claude_skills.sdd_spec_mod.revision.create_revision`
+- `claude_skills.sdd_spec_mod.revision.get_revision_history`
+- `claude_skills.sdd_spec_mod.revision.rollback_to_version`
+- `datetime.datetime`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`

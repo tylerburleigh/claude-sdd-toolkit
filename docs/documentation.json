@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T16:43:22.093227Z",
+    "generated_at": "2025-11-06T16:52:54.020519Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 217,
-    "total_lines": 74732,
-    "total_classes": 278,
+    "total_files": 218,
+    "total_lines": 75108,
+    "total_classes": 284,
     "total_functions": 816,
     "avg_complexity": 5.69,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 217,
-        "lines": 74732,
-        "classes": 278,
+        "files": 218,
+        "lines": 75108,
+        "classes": 284,
         "functions": 816,
         "avg_complexity": 5.69
       }
@@ -4736,6 +4736,32 @@
       ],
       "exports": [],
       "lines": 939
+    },
+    {
+      "name": "test_revision",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "language": "python",
+      "docstring": "Unit tests for revision tracking module.\n\nTests create_revision(), get_revision_history(), and rollback_to_version()\nfunctions from claude_skills.sdd_spec_mod.revision module.",
+      "classes": [
+        "TestBumpVersion",
+        "TestValidateSpecMetadata",
+        "TestCreateRevision",
+        "TestGetRevisionHistory",
+        "TestRollbackToVersion",
+        "TestIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "datetime.datetime",
+        "claude_skills.sdd_spec_mod.revision.create_revision",
+        "claude_skills.sdd_spec_mod.revision.get_revision_history",
+        "claude_skills.sdd_spec_mod.revision.rollback_to_version",
+        "claude_skills.sdd_spec_mod.revision._bump_version",
+        "claude_skills.sdd_spec_mod.revision._validate_spec_metadata"
+      ],
+      "exports": [],
+      "lines": 376
     },
     {
       "name": "__init__",
@@ -15103,6 +15129,133 @@
       "methods": [
         "test_get_session_state_called_with_correct_path",
         "test_multiple_in_progress_tasks_display"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestBumpVersion",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Tests for _bump_version() helper function.",
+      "bases": [],
+      "methods": [
+        "test_increment_minor_version",
+        "test_increment_from_1_9_to_2_0",
+        "test_increment_from_2_9_to_3_0",
+        "test_increment_mid_range",
+        "test_handle_single_digit_version",
+        "test_empty_version_defaults_to_1_0",
+        "test_invalid_version_raises_error",
+        "test_invalid_version_with_letters_raises_error"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestValidateSpecMetadata",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 57,
+      "language": "python",
+      "docstring": "Tests for _validate_spec_metadata() helper function.",
+      "bases": [],
+      "methods": [
+        "test_valid_spec_with_metadata",
+        "test_missing_metadata_key",
+        "test_metadata_not_dict",
+        "test_none_spec",
+        "test_non_dict_spec"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCreateRevision",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 84,
+      "language": "python",
+      "docstring": "Tests for create_revision() function.",
+      "bases": [],
+      "methods": [
+        "test_create_first_revision",
+        "test_create_multiple_revisions",
+        "test_revision_entry_structure",
+        "test_revision_history_prepends_new_entries",
+        "test_initialize_revision_history_if_missing",
+        "test_default_version_if_missing",
+        "test_empty_changelog_fails",
+        "test_empty_modified_by_fails",
+        "test_invalid_spec_fails",
+        "test_invalid_version_format_fails"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestGetRevisionHistory",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 193,
+      "language": "python",
+      "docstring": "Tests for get_revision_history() function.",
+      "bases": [],
+      "methods": [
+        "test_get_populated_history",
+        "test_get_empty_history",
+        "test_get_history_from_invalid_spec",
+        "test_get_history_from_none_spec",
+        "test_history_entries_have_required_fields"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRollbackToVersion",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 238,
+      "language": "python",
+      "docstring": "Tests for rollback_to_version() function.",
+      "bases": [],
+      "methods": [
+        "test_rollback_to_previous_version",
+        "test_rollback_trims_newer_revisions",
+        "test_rollback_to_nonexistent_version_fails",
+        "test_rollback_with_no_history_fails",
+        "test_rollback_with_invalid_spec_fails",
+        "test_rollback_with_empty_version_fails",
+        "test_rollback_preserves_target_and_older"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestIntegration",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+      "line": 331,
+      "language": "python",
+      "docstring": "Integration tests for full revision workflow.",
+      "bases": [],
+      "methods": [
+        "test_full_revision_lifecycle",
+        "test_revision_timestamps_are_iso8601"
       ],
       "properties": [],
       "is_exported": false,
@@ -81925,6 +82078,54 @@
           "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
           "line": 370,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_minor_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 24,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_from_1_9_to_2_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 28,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_from_2_9_to_3_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_mid_range",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 36,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_handle_single_digit_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 40,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_version_defaults_to_1_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 44,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_version_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 49,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_version_with_letters_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 54,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -81959,7 +82160,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 2
+      "call_count": 10
     },
     {
       "name": "_validate_spec_metadata",
@@ -81998,6 +82199,36 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
           "line": 253,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_valid_spec_with_metadata",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 63,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_missing_metadata_key",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 68,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_metadata_not_dict",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 73,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_none_spec",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_non_dict_spec",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 81,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -82014,7 +82245,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 8
     },
     {
       "name": "create_revision",
@@ -82045,7 +82276,206 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_create_first_revision",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_multiple_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 102,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_multiple_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 106,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_multiple_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 110,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_entry_structure",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 118,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_history_prepends_new_entries",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 133,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_history_prepends_new_entries",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_history_prepends_new_entries",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 135,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_initialize_revision_history_if_missing",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 147,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_default_version_if_missing",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_changelog_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 163,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_modified_by_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 171,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_spec_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 179,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_version_format_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 187,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_populated_history",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 199,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_populated_history",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 200,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_history_entries_have_required_fields",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 227,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_to_previous_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 246,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_to_previous_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 247,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_to_previous_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 248,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_trims_newer_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 261,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_trims_newer_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 262,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_trims_newer_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 263,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_to_nonexistent_version_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 278,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_preserves_target_and_older",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 314,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_preserves_target_and_older",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 315,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_preserves_target_and_older",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 316,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_preserves_target_and_older",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 317,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 340,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 341,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 342,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 358,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_timestamps_are_iso8601",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 369,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "_validate_spec_metadata",
@@ -82095,7 +82525,8 @@
           "line": 162,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 33
     },
     {
       "name": "get_revision_history",
@@ -82116,7 +82547,62 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_get_populated_history",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 202,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_empty_history",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_history_from_invalid_spec",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 216,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_history_from_none_spec",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 221,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_history_entries_have_required_fields",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 229,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 346,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 354,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 362,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_revision_timestamps_are_iso8601",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 371,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "_validate_spec_metadata",
@@ -82130,7 +82616,8 @@
           "line": 206,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 9
     },
     {
       "name": "rollback_to_version",
@@ -82156,7 +82643,56 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_rollback_to_previous_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 251,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_trims_newer_revisions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_to_nonexistent_version_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 280,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_with_no_history_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 289,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_with_invalid_spec_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 296,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_with_empty_version_fails",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 305,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rollback_preserves_target_and_older",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 320,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_revision_lifecycle",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 350,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "_validate_spec_metadata",
@@ -82188,7 +82724,8 @@
           "line": 277,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 8
     },
     {
       "name": "cmd_execute_verify",
@@ -93942,6 +94479,54 @@
           "file": "src/claude_skills/claude_skills/sdd_update/workflow.py",
           "line": 370,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_minor_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 24,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_from_1_9_to_2_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 28,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_from_2_9_to_3_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_increment_mid_range",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 36,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_handle_single_digit_version",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 40,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_version_defaults_to_1_0",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 44,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_version_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 49,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_version_with_letters_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_revision.py",
+          "line": 54,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -93976,7 +94561,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 10
     },
     {
       "name": "_simulate_workflow",
@@ -115504,6 +116089,15 @@
     "src/claude_skills/claude_skills/tests/unit/test_doc_query/test_lib.py": [
       "pytest",
       "claude_skills.doc_query.doc_query_lib.DocumentationQuery"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_revision.py": [
+      "pytest",
+      "datetime.datetime",
+      "claude_skills.sdd_spec_mod.revision.create_revision",
+      "claude_skills.sdd_spec_mod.revision.get_revision_history",
+      "claude_skills.sdd_spec_mod.revision.rollback_to_version",
+      "claude_skills.sdd_spec_mod.revision._bump_version",
+      "claude_skills.sdd_spec_mod.revision._validate_spec_metadata"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py": [
       "pytest",
