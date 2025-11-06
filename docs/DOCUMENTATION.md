@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 10:45:28
+**Generated:** 2025-11-06 10:48:49
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 216
-- **Total Lines:** 74221
+- **Total Lines:** 74406
 - **Total Classes:** 278
-- **Total Functions:** 808
+- **Total Functions:** 811
 - **Avg Complexity:** 5.69
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -5838,7 +5838,7 @@ Returns:
 ### `_cleanup_dependencies(spec_data, removed_nodes) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:361`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:363`
 **Complexity:** 7
 
 **Description:**
@@ -5868,7 +5868,7 @@ Args:
 ### `_collect_descendants(spec_data, node_id, result) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:336`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:338`
 **Complexity:** 3
 
 **Description:**
@@ -6488,7 +6488,7 @@ Returns:
 ### `_is_ancestor(spec_data, ancestor_id, descendant_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:730`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:732`
 **Complexity:** 5
 
 **Description:**
@@ -6824,7 +6824,7 @@ Returns:
 ### `_propagate_task_count_decrease(spec_data, node_id, total_decrease, completed_decrease) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:392`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:394`
 **Complexity:** 9
 
 **Description:**
@@ -6850,7 +6850,7 @@ Args:
 ### `_propagate_task_count_increase(spec_data, node_id, total_increase, completed_increase) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:186`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:188`
 **Complexity:** 9
 
 **Description:**
@@ -7180,6 +7180,38 @@ Returns:
 
 ---
 
+### `_validate_spec_integrity(spec_data) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:863`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Validate the integrity of a spec after modifications.
+
+Checks for common integrity issues:
+- All parent references point to existing nodes
+- All child references point to existing nodes
+- No orphaned nodes (except spec-root)
+- Parent-child relationships are bidirectional
+- Task counts are consistent
+
+Args:
+    spec_data: The full spec data dictionary
+
+Returns:
+    Dict with validation result:
+    {
+        "valid": True|False,
+        "message": "Description of validation result",
+        "errors": [...] (list of specific errors if validation failed)
+    }
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `_validate_spec_structure(spec_data) -> bool`
 
 **Language:** python
@@ -7290,7 +7322,7 @@ Returns:
 ### `add_node(spec_data, parent_id, node_data, position) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:14`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:16`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -16625,7 +16657,7 @@ Returns:
 ### `move_node(spec_data, node_id, new_parent_id, position) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:567`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:569`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -17739,7 +17771,7 @@ Note:
 ### `remove_node(spec_data, node_id, cascade) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:231`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:233`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -18718,6 +18750,41 @@ Args:
 **Parameters:**
 - `spec_file`: Path
 - `json_spec_file`: Optional[Path]
+
+---
+
+### `spec_transaction(spec_data) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:770`
+**Complexity:** 2
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager that provides transaction support for spec modifications.
+
+Creates a deep copy of the spec before yielding. If the context exits
+normally, changes are kept. If an exception is raised, the spec is
+rolled back to its original state.
+
+Usage:
+    with spec_transaction(spec_data):
+        add_node(spec_data, "phase-1", {"node_id": "task-1", ...})
+        # If any error occurs, changes are rolled back
+
+Args:
+    spec_data: The full spec data dictionary to protect
+
+Yields:
+    The original spec_data dict (modifications happen in-place)
+
+Note:
+    This creates a deep copy of the spec, which can be expensive for
+    large specs. Use judiciously for critical operations.
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -20652,6 +20719,45 @@ Returns:
 
 ---
 
+### `transactional_modify(spec_data, operation, validate) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:804`
+**Complexity:** 5
+
+**Description:**
+> Execute a modification operation with transaction support and optional validation.
+
+This function wraps a modification operation in a transaction, optionally
+validates the spec after the modification, and rolls back if validation fails.
+
+Args:
+    spec_data: The full spec data dictionary
+    operation: A callable that performs the modification. It receives spec_data
+              and should return a result dict with "success" and "message" keys.
+    validate: If True, validates the spec after modification (default: True)
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "operation_result": {...} (result from the operation if successful)
+    }
+
+Example:
+    def my_operation(spec):
+        return add_node(spec, "phase-1", {"node_id": "task-1", ...})
+
+    result = transactional_modify(spec_data, my_operation, validate=True)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `operation`: Callable[[Dict[str, Any]], Dict[str, Any]]
+- `validate`: bool
+
+---
+
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -20742,7 +20848,7 @@ Returns:
 ### `update_node_field(spec_data, node_id, field, value) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:436`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:438`
 ⚠️ **Complexity:** 21 (High)
 
 **Description:**
@@ -20840,7 +20946,7 @@ Returns:
 ### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:767`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:942`
 **Complexity:** 1
 
 **Description:**
@@ -22798,6 +22904,8 @@ Returns:
 - `modification.add_node`
 - `modification.move_node`
 - `modification.remove_node`
+- `modification.spec_transaction`
+- `modification.transactional_modify`
 - `modification.update_node_field`
 - `modification.update_task_counts`
 
@@ -22805,10 +22913,13 @@ Returns:
 
 - `claude_skills.common.spec.get_node`
 - `claude_skills.common.spec.update_node`
+- `contextlib.contextmanager`
+- `copy`
 - `datetime.datetime`
 - `datetime.timezone`
 - `sys`
 - `typing.Any`
+- `typing.Callable`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`

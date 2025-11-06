@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T15:45:28.188752Z",
+    "generated_at": "2025-11-06T15:48:49.267744Z",
     "languages": [
       "python"
     ],
@@ -10,9 +10,9 @@
   },
   "statistics": {
     "total_files": 216,
-    "total_lines": 74221,
+    "total_lines": 74406,
     "total_classes": 278,
-    "total_functions": 808,
+    "total_functions": 811,
     "avg_complexity": 5.69,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -25,9 +25,9 @@
     "by_language": {
       "python": {
         "files": 216,
-        "lines": 74221,
+        "lines": 74406,
         "classes": 278,
-        "functions": 808,
+        "functions": 811,
         "avg_complexity": 5.69
       }
     }
@@ -3160,10 +3160,12 @@
         "modification.remove_node",
         "modification.move_node",
         "modification.update_node_field",
-        "modification.update_task_counts"
+        "modification.update_task_counts",
+        "modification.spec_transaction",
+        "modification.transactional_modify"
       ],
       "exports": [],
-      "lines": 17
+      "lines": 27
     },
     {
       "name": "modification",
@@ -3181,21 +3183,27 @@
         "update_node_field",
         "move_node",
         "_is_ancestor",
+        "spec_transaction",
+        "transactional_modify",
+        "_validate_spec_integrity",
         "update_task_counts"
       ],
       "imports": [
         "sys",
+        "copy",
         "typing.Dict",
         "typing.Any",
         "typing.Optional",
         "typing.List",
+        "typing.Callable",
         "datetime.datetime",
         "datetime.timezone",
+        "contextlib.contextmanager",
         "claude_skills.common.spec.get_node",
         "claude_skills.common.spec.update_node"
       ],
       "exports": [],
-      "lines": 785
+      "lines": 960
     },
     {
       "name": "__init__",
@@ -43866,31 +43874,31 @@
         {
           "name": "add_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 100,
+          "line": 102,
           "call_type": "function_call"
         },
         {
           "name": "remove_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 275,
+          "line": 277,
           "call_type": "function_call"
         },
         {
           "name": "update_node_field",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 474,
+          "line": 476,
           "call_type": "function_call"
         },
         {
           "name": "move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 616,
+          "line": 618,
           "call_type": "function_call"
         },
         {
           "name": "move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 621,
+          "line": 623,
           "call_type": "function_call"
         },
         {
@@ -43973,7 +43981,7 @@
         {
           "name": "update_node_field",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 498,
+          "line": 500,
           "call_type": "function_call"
         },
         {
@@ -80575,7 +80583,7 @@
     {
       "name": "add_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 14,
+      "line": 16,
       "language": "python",
       "docstring": "Add a new task/subtask/phase to the spec hierarchy at a specified position.\n\nThis function creates a new node in the specification hierarchy, ensuring that\nall required fields are present and that the hierarchy remains valid.\n\nArgs:\n    spec_data: The full spec data dictionary (must include 'hierarchy' key)\n    parent_id: ID of the parent node to add the child to\n    node_data: Dictionary containing the new node's data. Must include:\n        - node_id: Unique identifier for the new node\n        - type: Node type (phase, task, subtask, verify, group)\n        - title: Human-readable title\n        Optional fields:\n        - description: Detailed description\n        - status: Node status (default: 'pending')\n        - metadata: Additional metadata dict\n        - dependencies: Dependencies dict with blocks/blocked_by/depends\n    position: Optional position in parent's children list (0-indexed).\n             If None, appends to end. If negative, counts from end.\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"node_id\": \"ID of created node\" (only if success=True)\n    }\n\nRaises:\n    ValueError: If required fields are missing or invalid\n    KeyError: If parent_id doesn't exist in hierarchy",
       "parameters": [
@@ -80611,59 +80619,47 @@
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 54,
+          "line": 56,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 61,
+          "line": 63,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 65,
+          "line": 67,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 71,
+          "line": 73,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 89,
+          "line": 91,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 93,
+          "line": 95,
           "call_type": "method_call"
         },
         {
           "name": "get_node",
           "file": "unknown",
-          "line": 100,
+          "line": 102,
           "call_type": "function_call"
         },
         {
           "name": "strip",
-          "file": "unknown",
-          "line": 107,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 108,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 109,
           "call_type": "method_call"
@@ -80671,55 +80667,67 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 114,
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 111,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 116,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 129,
+          "line": 131,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 138,
+          "line": 140,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 154,
+          "line": 156,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 155,
+          "line": 157,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 162,
+          "line": 164,
           "call_type": "method_call"
         },
         {
           "name": "insert",
           "file": "unknown",
-          "line": 166,
+          "line": 168,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 172,
+          "line": 174,
           "call_type": "function_call"
         },
         {
           "name": "_propagate_task_count_increase",
           "file": "unknown",
-          "line": 177,
+          "line": 179,
           "call_type": "function_call"
         }
       ]
@@ -80727,7 +80735,7 @@
     {
       "name": "_propagate_task_count_increase",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 186,
+      "line": 188,
       "language": "python",
       "docstring": "Propagate task count increases up the hierarchy tree.\n\nThis is called when a new leaf task is added or a task is completed.\nIt updates total_tasks and/or completed_tasks for all ancestors.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: Starting node ID (typically the parent of the added/completed task)\n    total_increase: Amount to increase total_tasks by (default: 0)\n    completed_increase: Amount to increase completed_tasks by (default: 0)",
       "parameters": [
@@ -80762,13 +80770,13 @@
         {
           "name": "add_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 177,
+          "line": 179,
           "call_type": "function_call"
         },
         {
           "name": "move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 720,
+          "line": 722,
           "call_type": "function_call"
         }
       ],
@@ -80776,19 +80784,13 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 204,
+          "line": 206,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 208,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 215,
+          "line": 210,
           "call_type": "method_call"
         },
         {
@@ -80800,19 +80802,25 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 220,
+          "line": 219,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 226,
+          "line": 222,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
           "line": 228,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 230,
           "call_type": "method_call"
         }
       ],
@@ -80821,7 +80829,7 @@
     {
       "name": "remove_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 231,
+      "line": 233,
       "language": "python",
       "docstring": "Remove a node from the spec hierarchy.\n\nThis function removes a node and optionally its descendants (cascade mode).\nIt also updates parent-child relationships, cleans up dependencies, and\npropagates task count decreases up the hierarchy.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to remove\n    cascade: If True, recursively removes all descendants (default: False)\n            If False and node has children, operation fails\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"removed_nodes\": [...] (only if success=True)\n    }\n\nRaises:\n    KeyError: If node_id doesn't exist in hierarchy\n    ValueError: If trying to remove spec-root",
       "parameters": [
@@ -80852,44 +80860,38 @@
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 262,
+          "line": 264,
           "call_type": "function_call"
         },
         {
           "name": "get_node",
           "file": "unknown",
-          "line": 275,
+          "line": 277,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 280,
+          "line": 282,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 284,
+          "line": 286,
           "call_type": "function_call"
         },
         {
           "name": "_collect_descendants",
           "file": "unknown",
-          "line": 291,
+          "line": 293,
           "call_type": "function_call"
         },
         {
           "name": "sum",
           "file": "unknown",
-          "line": 298,
+          "line": 300,
           "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 299,
-          "call_type": "method_call"
         },
         {
           "name": "get",
@@ -80899,68 +80901,74 @@
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 301,
-          "call_type": "method_call"
-        },
-        {
-          "name": "sum",
           "file": "unknown",
           "line": 303,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 303,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 304,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 306,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 306,
+          "line": 308,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 310,
+          "line": 308,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 313,
+          "line": 312,
           "call_type": "method_call"
         },
         {
-          "name": "remove",
+          "name": "get",
           "file": "unknown",
           "line": 315,
           "call_type": "method_call"
         },
         {
+          "name": "remove",
+          "file": "unknown",
+          "line": 317,
+          "call_type": "method_call"
+        },
+        {
           "name": "_cleanup_dependencies",
           "file": "unknown",
-          "line": 318,
+          "line": 320,
           "call_type": "function_call"
         },
         {
           "name": "_propagate_task_count_decrease",
           "file": "unknown",
-          "line": 327,
+          "line": 329,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 331,
+          "line": 333,
           "call_type": "function_call"
         }
       ]
@@ -80968,7 +80976,7 @@
     {
       "name": "_collect_descendants",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 336,
+      "line": 338,
       "language": "python",
       "docstring": "Recursively collect all descendants of a node.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: Starting node ID\n    result: List to append descendant IDs to (modified in place)",
       "parameters": [
@@ -80998,13 +81006,13 @@
         {
           "name": "remove_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 291,
+          "line": 293,
           "call_type": "function_call"
         },
         {
           "name": "_collect_descendants",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 358,
+          "line": 360,
           "call_type": "function_call"
         }
       ],
@@ -81012,31 +81020,31 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 349,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 351,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 352,
+          "line": 353,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 356,
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 358,
           "call_type": "method_call"
         },
         {
           "name": "_collect_descendants",
           "file": "unknown",
-          "line": 358,
+          "line": 360,
           "call_type": "function_call"
         }
       ],
@@ -81045,7 +81053,7 @@
     {
       "name": "_cleanup_dependencies",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 361,
+      "line": 363,
       "language": "python",
       "docstring": "Remove references to removed nodes from all dependency lists.\n\nArgs:\n    spec_data: The full spec data dictionary\n    removed_nodes: List of node IDs being removed",
       "parameters": [
@@ -81070,7 +81078,7 @@
         {
           "name": "remove_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 318,
+          "line": 320,
           "call_type": "function_call"
         }
       ],
@@ -81078,37 +81086,37 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 372,
+          "line": 374,
           "call_type": "method_call"
         },
         {
           "name": "set",
           "file": "unknown",
-          "line": 373,
+          "line": 375,
           "call_type": "function_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 375,
+          "line": 377,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 379,
+          "line": 381,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 380,
+          "line": 382,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 385,
+          "line": 387,
           "call_type": "function_call"
         }
       ],
@@ -81117,7 +81125,7 @@
     {
       "name": "_propagate_task_count_decrease",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 392,
+      "line": 394,
       "language": "python",
       "docstring": "Propagate task count decreases up the hierarchy tree.\n\nThis is called when nodes are removed from the hierarchy.\nIt updates total_tasks and/or completed_tasks for all ancestors.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: Starting node ID (typically the parent of removed nodes)\n    total_decrease: Amount to decrease total_tasks by (default: 0)\n    completed_decrease: Amount to decrease completed_tasks by (default: 0)",
       "parameters": [
@@ -81152,13 +81160,13 @@
         {
           "name": "remove_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 327,
+          "line": 329,
           "call_type": "function_call"
         },
         {
           "name": "move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 717,
+          "line": 719,
           "call_type": "function_call"
         }
       ],
@@ -81166,25 +81174,13 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 410,
+          "line": 412,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 414,
-          "call_type": "method_call"
-        },
-        {
-          "name": "max",
-          "file": "unknown",
-          "line": 420,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 420,
+          "line": 416,
           "call_type": "method_call"
         },
         {
@@ -81200,21 +81196,21 @@
           "call_type": "method_call"
         },
         {
-          "name": "get",
-          "file": "unknown",
-          "line": 425,
-          "call_type": "method_call"
-        },
-        {
           "name": "max",
           "file": "unknown",
-          "line": 431,
+          "line": 424,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 431,
+          "line": 424,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 427,
           "call_type": "method_call"
         },
         {
@@ -81227,6 +81223,18 @@
           "name": "get",
           "file": "unknown",
           "line": 433,
+          "call_type": "method_call"
+        },
+        {
+          "name": "max",
+          "file": "unknown",
+          "line": 435,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 435,
           "call_type": "method_call"
         }
       ],
@@ -81235,7 +81243,7 @@
     {
       "name": "update_node_field",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 436,
+      "line": 438,
       "language": "python",
       "docstring": "Update a specific field on a node in the spec hierarchy.\n\nThis function provides a safe way to update node fields with validation.\nFor metadata updates, it merges with existing metadata rather than replacing it.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to update\n    field: Name of the field to update (e.g., 'title', 'description', 'status', 'metadata')\n    value: New value for the field\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"old_value\": previous_value (only if success=True)\n    }\n\nRaises:\n    KeyError: If node_id doesn't exist in hierarchy\n    ValueError: If attempting to update protected fields",
       "parameters": [
@@ -81271,79 +81279,79 @@
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 467,
+          "line": 469,
           "call_type": "function_call"
         },
         {
           "name": "get_node",
           "file": "unknown",
-          "line": 474,
+          "line": 476,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 487,
+          "line": 489,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 491,
+          "line": 493,
           "call_type": "function_call"
         },
         {
           "name": "update_node",
           "file": "unknown",
-          "line": 498,
+          "line": 500,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 517,
+          "line": 519,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 526,
+          "line": 528,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 531,
+          "line": 533,
           "call_type": "function_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 531,
+          "line": 533,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 537,
+          "line": 539,
           "call_type": "function_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 537,
+          "line": 539,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 541,
+          "line": 543,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 551,
+          "line": 553,
           "call_type": "function_call"
         }
       ]
@@ -81351,7 +81359,7 @@
     {
       "name": "move_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 567,
+      "line": 569,
       "language": "python",
       "docstring": "Move a node to a different parent in the hierarchy.\n\nThis function moves a node (and its descendants) to a new location in the\nhierarchy. It updates parent-child relationships and recalculates task counts\nfor all affected ancestors.\n\nArgs:\n    spec_data: The full spec data dictionary (must include 'hierarchy' key)\n    node_id: ID of the node to move\n    new_parent_id: ID of the new parent node\n    position: Optional position in new parent's children list (0-indexed).\n             If None, appends to end. If negative, counts from end.\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"old_parent_id\": \"Previous parent ID\" (only if success=True),\n        \"new_parent_id\": \"New parent ID\" (only if success=True)\n    }\n\nRaises:\n    ValueError: If spec_data is invalid or trying to move spec-root\n    KeyError: If node_id or new_parent_id doesn't exist in hierarchy",
       "parameters": [
@@ -81387,139 +81395,139 @@
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 601,
+          "line": 603,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 608,
+          "line": 610,
           "call_type": "function_call"
         },
         {
           "name": "get_node",
           "file": "unknown",
-          "line": 616,
+          "line": 618,
           "call_type": "function_call"
         },
         {
           "name": "get_node",
           "file": "unknown",
-          "line": 621,
+          "line": 623,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 626,
+          "line": 628,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 638,
+          "line": 640,
           "call_type": "method_call"
         },
         {
           "name": "remove",
           "file": "unknown",
-          "line": 642,
+          "line": 644,
           "call_type": "method_call"
         },
         {
           "name": "insert",
           "file": "unknown",
-          "line": 646,
+          "line": 648,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 649,
+          "line": 651,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 652,
+          "line": 654,
           "call_type": "function_call"
         },
         {
           "name": "_is_ancestor",
           "file": "unknown",
-          "line": 668,
+          "line": 670,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 677,
+          "line": 679,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 678,
+          "line": 680,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 683,
-          "call_type": "method_call"
-        },
-        {
-          "name": "remove",
           "file": "unknown",
           "line": 685,
           "call_type": "method_call"
         },
         {
+          "name": "remove",
+          "file": "unknown",
+          "line": 687,
+          "call_type": "method_call"
+        },
+        {
           "name": "get",
           "file": "unknown",
-          "line": 688,
+          "line": 690,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 689,
+          "line": 691,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 696,
+          "line": 698,
           "call_type": "method_call"
         },
         {
           "name": "insert",
           "file": "unknown",
-          "line": 700,
+          "line": 702,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 704,
+          "line": 706,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 707,
+          "line": 709,
           "call_type": "function_call"
         },
         {
           "name": "_propagate_task_count_decrease",
           "file": "unknown",
-          "line": 717,
+          "line": 719,
           "call_type": "function_call"
         },
         {
           "name": "_propagate_task_count_increase",
           "file": "unknown",
-          "line": 720,
+          "line": 722,
           "call_type": "function_call"
         }
       ]
@@ -81527,7 +81535,7 @@
     {
       "name": "_is_ancestor",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 730,
+      "line": 732,
       "language": "python",
       "docstring": "Check if ancestor_id is an ancestor of descendant_id.\n\nThis is used to prevent circular dependencies when moving nodes.\n\nArgs:\n    spec_data: The full spec data dictionary\n    ancestor_id: Potential ancestor node ID\n    descendant_id: Potential descendant node ID\n\nReturns:\n    True if ancestor_id is an ancestor of descendant_id, False otherwise",
       "parameters": [
@@ -81557,7 +81565,7 @@
         {
           "name": "move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 668,
+          "line": 670,
           "call_type": "function_call"
         }
       ],
@@ -81565,32 +81573,261 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 748,
+          "line": 750,
           "call_type": "method_call"
         },
         {
           "name": "set",
           "file": "unknown",
-          "line": 751,
+          "line": 753,
           "call_type": "function_call"
         },
         {
           "name": "add",
           "file": "unknown",
-          "line": 757,
+          "line": 759,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 758,
+          "line": 760,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 762,
+          "line": 764,
           "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "spec_transaction",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 770,
+      "language": "python",
+      "docstring": "Context manager that provides transaction support for spec modifications.\n\nCreates a deep copy of the spec before yielding. If the context exits\nnormally, changes are kept. If an exception is raised, the spec is\nrolled back to its original state.\n\nUsage:\n    with spec_transaction(spec_data):\n        add_node(spec_data, \"phase-1\", {\"node_id\": \"task-1\", ...})\n        # If any error occurs, changes are rolled back\n\nArgs:\n    spec_data: The full spec data dictionary to protect\n\nYields:\n    The original spec_data dict (modifications happen in-place)\n\nNote:\n    This creates a deep copy of the spec, which can be expensive for\n    large specs. Use judiciously for critical operations.",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 2,
+      "decorators": [
+        "contextmanager"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "transactional_modify",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 836,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "deepcopy",
+          "file": "unknown",
+          "line": 794,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 794,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "transactional_modify",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 804,
+      "language": "python",
+      "docstring": "Execute a modification operation with transaction support and optional validation.\n\nThis function wraps a modification operation in a transaction, optionally\nvalidates the spec after the modification, and rolls back if validation fails.\n\nArgs:\n    spec_data: The full spec data dictionary\n    operation: A callable that performs the modification. It receives spec_data\n              and should return a result dict with \"success\" and \"message\" keys.\n    validate: If True, validates the spec after modification (default: True)\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"operation_result\": {...} (result from the operation if successful)\n    }\n\nExample:\n    def my_operation(spec):\n        return add_node(spec, \"phase-1\", {\"node_id\": \"task-1\", ...})\n\n    result = transactional_modify(spec_data, my_operation, validate=True)",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "operation",
+          "type": "Callable[[Dict[str, Any]], Dict[str, Any]]",
+          "default": null
+        },
+        {
+          "name": "validate",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "spec_transaction",
+          "file": "unknown",
+          "line": 836,
+          "call_type": "function_call"
+        },
+        {
+          "name": "operation",
+          "file": "unknown",
+          "line": 838,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 841,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 842,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_validate_spec_integrity",
+          "file": "unknown",
+          "line": 846,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 859,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_validate_spec_integrity",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 863,
+      "language": "python",
+      "docstring": "Validate the integrity of a spec after modifications.\n\nChecks for common integrity issues:\n- All parent references point to existing nodes\n- All child references point to existing nodes\n- No orphaned nodes (except spec-root)\n- Parent-child relationships are bidirectional\n- Task counts are consistent\n\nArgs:\n    spec_data: The full spec data dictionary\n\nReturns:\n    Dict with validation result:\n    {\n        \"valid\": True|False,\n        \"message\": \"Description of validation result\",\n        \"errors\": [...] (list of specific errors if validation failed)\n    }",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 12,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "transactional_modify",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 846,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 885,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 889,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 890,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 895,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 900,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 905,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 910,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 912,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 915,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 916,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 920,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 925,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 926,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 931,
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -81598,7 +81835,7 @@
     {
       "name": "update_task_counts",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 767,
+      "line": 942,
       "language": "python",
       "docstring": "Recalculate and update task counts for a node and its ancestors.\n\nThis function recursively calculates total_tasks and completed_tasks\nfor a node based on its descendants, then propagates the counts upward.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to recalculate (typically after modifications)\n\nReturns:\n    Dict with success status and updated counts",
       "parameters": [
@@ -114352,16 +114589,21 @@
       "modification.remove_node",
       "modification.move_node",
       "modification.update_node_field",
-      "modification.update_task_counts"
+      "modification.update_task_counts",
+      "modification.spec_transaction",
+      "modification.transactional_modify"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/modification.py": [
       "sys",
+      "copy",
       "typing.Dict",
       "typing.Any",
       "typing.Optional",
       "typing.List",
+      "typing.Callable",
       "datetime.datetime",
       "datetime.timezone",
+      "contextlib.contextmanager",
       "claude_skills.common.spec.get_node",
       "claude_skills.common.spec.update_node"
     ],
