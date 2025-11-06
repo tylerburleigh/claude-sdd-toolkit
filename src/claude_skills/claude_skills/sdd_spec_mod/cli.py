@@ -8,7 +8,7 @@ import sys
 import json
 from pathlib import Path
 from claude_skills.common import PrettyPrinter, find_spec_file, find_specs_directory, load_json_spec
-from claude_skills.sdd_spec_mod import apply_modifications
+from claude_skills.sdd_spec_mod import apply_modifications, parse_review_report, suggest_modifications
 
 
 def cmd_apply_modifications(args, printer):
@@ -154,6 +154,132 @@ def cmd_apply_modifications(args, printer):
     return 0 if result["success"] else 1
 
 
+def cmd_parse_review(args, printer):
+    """
+    Parse a review report and generate modification suggestions.
+
+    Command: sdd parse-review <spec> --review <report.md> [--output suggestions.json]
+
+    Args:
+        args: Parsed command-line arguments
+            - spec_id: Spec ID being reviewed
+            - review: Path to review report file (markdown or JSON)
+            - output: Optional output path for suggestions JSON
+            - show: If True, display suggestions instead of saving
+        printer: PrettyPrinter instance for formatted output
+
+    Returns:
+        Exit code (0 for success, 1 for error)
+    """
+    # Verify review report exists
+    review_file = Path(args.review)
+    if not review_file.exists():
+        printer.error(f"Review report not found: {args.review}")
+        return 1
+
+    printer.info(f"Parsing review report: {review_file}")
+
+    # Parse review report
+    try:
+        result = parse_review_report(str(review_file))
+    except FileNotFoundError as e:
+        printer.error(str(e))
+        return 1
+    except Exception as e:
+        printer.error(f"Failed to parse review report: {str(e)}")
+        return 1
+
+    if not result.get("success"):
+        printer.error(f"Failed to parse review report: {result.get('error', 'Unknown error')}")
+        return 1
+
+    # Display metadata
+    metadata = result.get("metadata", {})
+    if metadata:
+        printer.header("Review Report Metadata:")
+        if metadata.get("spec_id"):
+            printer.detail(f"  Spec ID: {metadata['spec_id']}")
+        if metadata.get("spec_title"):
+            printer.detail(f"  Title: {metadata['spec_title']}")
+        if metadata.get("overall_score"):
+            printer.detail(f"  Overall Score: {metadata['overall_score']}/10")
+        if metadata.get("recommendation"):
+            rec = metadata['recommendation']
+            if rec == "APPROVE":
+                printer.success(f"  Recommendation: {rec}")
+            elif rec == "REVISE":
+                printer.warning(f"  Recommendation: {rec}")
+            else:
+                printer.error(f"  Recommendation: {rec}")
+
+    # Display issues summary
+    issues = result.get("issues", {})
+    total_issues = sum(len(issues.get(severity, [])) for severity in ["critical", "high", "medium", "low"])
+
+    printer.header(f"\nIssues Summary ({total_issues} total):")
+    for severity in ["critical", "high", "medium", "low"]:
+        count = len(issues.get(severity, []))
+        if count > 0:
+            severity_label = severity.upper()
+            if severity == "critical":
+                printer.error(f"  {severity_label}: {count} issue(s)")
+            elif severity == "high":
+                printer.warning(f"  {severity_label}: {count} issue(s)")
+            else:
+                printer.detail(f"  {severity_label}: {count} issue(s)")
+
+    # Generate modification suggestions
+    printer.info("\nGenerating modification suggestions...")
+    suggestions = suggest_modifications(issues)
+
+    printer.success(f"✓ Generated {len(suggestions)} modification suggestion(s)")
+
+    # Display or save suggestions
+    if args.show:
+        # Display suggestions to console
+        if suggestions:
+            printer.header("\nModification Suggestions:")
+            for i, mod in enumerate(suggestions, 1):
+                printer.detail(f"\n{i}. {mod.get('operation', 'unknown').upper()}")
+                if mod.get('node_id'):
+                    printer.detail(f"   Node: {mod['node_id']}")
+                if mod.get('field'):
+                    printer.detail(f"   Field: {mod['field']}")
+                if mod.get('reason'):
+                    printer.detail(f"   Reason: {mod['reason']}")
+                if mod.get('parent_id'):
+                    printer.detail(f"   Parent: {mod['parent_id']}")
+        else:
+            printer.info("No modifications suggested")
+    else:
+        # Save to file
+        output_file = Path(args.output) if args.output else review_file.with_suffix('.suggestions.json')
+
+        suggestions_data = {
+            "spec_id": metadata.get("spec_id", args.spec_id),
+            "review_file": str(review_file),
+            "generated_at": metadata.get("recommendation", ""),
+            "modifications": suggestions
+        }
+
+        try:
+            with open(output_file, 'w') as f:
+                json.dump(suggestions_data, f, indent=2)
+
+            printer.success(f"\n✓ Saved {len(suggestions)} suggestion(s) to: {output_file}")
+
+            printer.info("\nNext steps:")
+            printer.detail(f"1. Review suggestions: cat {output_file}")
+            printer.detail(f"2. Edit if needed: edit {output_file}")
+            printer.detail(f"3. Apply: sdd apply-modifications {args.spec_id} --from {output_file}")
+
+        except Exception as e:
+            printer.error(f"Failed to save suggestions: {str(e)}")
+            return 1
+
+    return 0
+
+
 def register_spec_mod(subparsers, parent_parser):
     """
     Register spec modification commands.
@@ -188,3 +314,29 @@ def register_spec_mod(subparsers, parent_parser):
         help='Output path for modified spec (default: overwrite original)'
     )
     parser_apply.set_defaults(func=cmd_apply_modifications)
+
+    # parse-review command
+    parser_parse = subparsers.add_parser(
+        'parse-review',
+        parents=[parent_parser],
+        help='Parse review report and generate modification suggestions'
+    )
+    parser_parse.add_argument(
+        'spec_id',
+        help='Spec ID being reviewed'
+    )
+    parser_parse.add_argument(
+        '--review',
+        required=True,
+        help='Path to review report file (.md or .json)'
+    )
+    parser_parse.add_argument(
+        '--output',
+        help='Output path for suggestions JSON (default: <review>.suggestions.json)'
+    )
+    parser_parse.add_argument(
+        '--show',
+        action='store_true',
+        help='Display suggestions instead of saving to file'
+    )
+    parser_parse.set_defaults(func=cmd_parse_review)

@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:12:16
+**Generated:** 2025-11-06 13:15:43
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 224
-- **Total Lines:** 78137
-- **Total Classes:** 293
-- **Total Functions:** 848
-- **Avg Complexity:** 5.75
+- **Total Files:** 226
+- **Total Lines:** 78580
+- **Total Classes:** 294
+- **Total Functions:** 850
+- **Avg Complexity:** 5.77
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -2703,6 +2703,27 @@ Attributes:
 - `test_enhance_class_complete_example()`
 - `test_different_import_types()`
 - `test_instantiation_context_types()`
+
+---
+
+### `TestCmdApplyModifications`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py:12`
+
+**Description:**
+> Test the cmd_apply_modifications CLI command.
+
+**Methods:**
+- `mock_printer()`
+- `sample_spec()`
+- `sample_modifications()`
+- `test_specs_directory_not_found()`
+- `test_spec_file_not_found()`
+- `test_modifications_file_not_found()`
+- `test_dry_run_mode()`
+- `test_successful_application()`
+- `test_partial_failure()`
 
 ---
 
@@ -7466,7 +7487,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:61`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:63`
 **Complexity:** 1
 
 **Description:**
@@ -7481,7 +7502,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:99`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:101`
 **Complexity:** 1
 
 **Description:**
@@ -7496,7 +7517,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:81`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:83`
 **Complexity:** 1
 
 **Description:**
@@ -9722,6 +9743,34 @@ Example:
 **Parameters:**
 - `args`: argparse.Namespace
 - `printer`: PrettyPrinter
+
+---
+
+### `cmd_apply_modifications(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:14`
+⚠️ **Complexity:** 27 (High)
+
+**Description:**
+> Apply batch modifications from a JSON file to a spec.
+
+Command: sdd apply-modifications <spec> --from <file.json>
+
+Args:
+    args: Parsed command-line arguments
+        - spec_id: Spec ID to modify
+        - from_file: Path to modifications JSON file
+        - dry_run: If True, show what would be modified without applying
+        - output: Optional output path for modified spec
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
+
+**Parameters:**
+- `args`: None
+- `printer`: None
 
 ---
 
@@ -18749,6 +18798,25 @@ Args:
 
 ---
 
+### `register_spec_mod(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:157`
+**Complexity:** 1
+
+**Description:**
+> Register spec modification commands.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -24207,6 +24275,18 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/sdd_spec_mod/cli.py`
+
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.find_spec_file`
+- `claude_skills.common.find_specs_directory`
+- `claude_skills.common.load_json_spec`
+- `claude_skills.sdd_spec_mod.apply_modifications`
+- `json`
+- `pathlib.Path`
+- `sys`
+
 ### `src/claude_skills/claude_skills/sdd_spec_mod/estimates.py`
 
 - `typing.Any`
@@ -24756,6 +24836,16 @@ Returns:
 - `shutil`
 - `subprocess`
 - `sys`
+
+### `src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py`
+
+- `claude_skills.sdd_spec_mod.cli.cmd_apply_modifications`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.Mock`
+- `unittest.mock.mock_open`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py`
 

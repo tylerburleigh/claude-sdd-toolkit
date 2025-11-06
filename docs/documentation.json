@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:12:16.841011Z",
+    "generated_at": "2025-11-06T18:15:43.242423Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 224,
-    "total_lines": 78137,
-    "total_classes": 293,
-    "total_functions": 848,
-    "avg_complexity": 5.75,
+    "total_files": 226,
+    "total_lines": 78580,
+    "total_classes": 294,
+    "total_functions": 850,
+    "avg_complexity": 5.77,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 224,
-        "lines": 78137,
-        "classes": 293,
-        "functions": 848,
-        "avg_complexity": 5.75
+        "files": 226,
+        "lines": 78580,
+        "classes": 294,
+        "functions": 850,
+        "avg_complexity": 5.77
       }
     }
   },
@@ -121,7 +121,7 @@
         "logging"
       ],
       "exports": [],
-      "lines": 114
+      "lines": 116
     },
     {
       "name": "gendocs",
@@ -3204,6 +3204,30 @@
       "lines": 201
     },
     {
+      "name": "cli",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+      "language": "python",
+      "docstring": "SDD Spec Modification CLI - Commands for modifying specification files.",
+      "classes": [],
+      "functions": [
+        "cmd_apply_modifications",
+        "register_spec_mod"
+      ],
+      "imports": [
+        "argparse",
+        "sys",
+        "json",
+        "pathlib.Path",
+        "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.find_spec_file",
+        "claude_skills.common.find_specs_directory",
+        "claude_skills.common.load_json_spec",
+        "claude_skills.sdd_spec_mod.apply_modifications"
+      ],
+      "exports": [],
+      "lines": 190
+    },
+    {
       "name": "estimates",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/estimates.py",
       "language": "python",
@@ -4522,6 +4546,27 @@
       "imports": [],
       "exports": [],
       "lines": 1
+    },
+    {
+      "name": "test_apply_modifications_cli",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+      "language": "python",
+      "docstring": "Unit tests for apply-modifications CLI command.",
+      "classes": [
+        "TestCmdApplyModifications"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "pathlib.Path",
+        "unittest.mock.Mock",
+        "unittest.mock.patch",
+        "unittest.mock.mock_open",
+        "claude_skills.sdd_spec_mod.cli.cmd_apply_modifications"
+      ],
+      "exports": [],
+      "lines": 251
     },
     {
       "name": "__init__",
@@ -14684,6 +14729,30 @@
       "imported_by": []
     },
     {
+      "name": "TestCmdApplyModifications",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Test the cmd_apply_modifications CLI command.",
+      "bases": [],
+      "methods": [
+        "mock_printer",
+        "sample_spec",
+        "sample_modifications",
+        "test_specs_directory_not_found",
+        "test_spec_file_not_found",
+        "test_modifications_file_not_found",
+        "test_dry_run_mode",
+        "test_successful_application",
+        "test_partial_failure"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestPromptFormatting",
       "file": "src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py",
       "line": 20,
@@ -18619,97 +18688,103 @@
         {
           "name": "register_next",
           "file": "unknown",
-          "line": 34,
+          "line": 35,
           "call_type": "function_call"
         },
         {
           "name": "register_update",
           "file": "unknown",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         },
         {
           "name": "register_validate",
           "file": "unknown",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         },
         {
           "name": "register_plan",
           "file": "unknown",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         },
         {
           "name": "register_plan_review",
           "file": "unknown",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         },
         {
           "name": "register_render",
           "file": "unknown",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "register_pr",
           "file": "unknown",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         },
         {
           "name": "register_context",
           "file": "unknown",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         },
         {
           "name": "register_session_marker",
           "file": "unknown",
-          "line": 42,
+          "line": 43,
           "call_type": "function_call"
         },
         {
           "name": "register_fidelity_review",
           "file": "unknown",
-          "line": 43,
+          "line": 44,
+          "call_type": "function_call"
+        },
+        {
+          "name": "register_spec_mod",
+          "file": "unknown",
+          "line": 45,
           "call_type": "function_call"
         },
         {
           "name": "_register_doc_cli",
           "file": "unknown",
-          "line": 46,
+          "line": 48,
           "call_type": "function_call"
         },
         {
           "name": "_register_test_cli",
           "file": "unknown",
-          "line": 47,
+          "line": 49,
           "call_type": "function_call"
         },
         {
           "name": "_register_skills_dev_cli",
           "file": "unknown",
-          "line": 48,
+          "line": 50,
           "call_type": "function_call"
         },
         {
           "name": "register_workflow",
           "file": "unknown",
-          "line": 53,
+          "line": 55,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 54,
+          "line": 56,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 56,
+          "line": 58,
           "call_type": "method_call"
         }
       ],
@@ -18718,7 +18793,7 @@
     {
       "name": "_register_doc_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 61,
+      "line": 63,
       "language": "python",
       "docstring": "Register the doc CLI as an SDD subcommand.",
       "parameters": [
@@ -18743,7 +18818,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 46,
+          "line": 48,
           "call_type": "function_call"
         }
       ],
@@ -18751,25 +18826,25 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 66,
+          "line": 68,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 72,
+          "line": 74,
           "call_type": "method_call"
         },
         {
           "name": "register_code_doc",
           "file": "unknown",
-          "line": 77,
+          "line": 79,
           "call_type": "function_call"
         },
         {
           "name": "register_doc_query",
           "file": "unknown",
-          "line": 78,
+          "line": 80,
           "call_type": "function_call"
         }
       ],
@@ -18778,7 +18853,7 @@
     {
       "name": "_register_test_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 81,
+      "line": 83,
       "language": "python",
       "docstring": "Register the test CLI as an SDD subcommand.",
       "parameters": [
@@ -18803,7 +18878,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 47,
+          "line": 49,
           "call_type": "function_call"
         }
       ],
@@ -18811,19 +18886,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 85,
+          "line": 87,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 91,
+          "line": 93,
           "call_type": "method_call"
         },
         {
           "name": "register_run_tests",
           "file": "unknown",
-          "line": 96,
+          "line": 98,
           "call_type": "function_call"
         }
       ],
@@ -18832,7 +18907,7 @@
     {
       "name": "_register_skills_dev_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 99,
+      "line": 101,
       "language": "python",
       "docstring": "Register the skills-dev CLI as an SDD subcommand.",
       "parameters": [
@@ -18857,7 +18932,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 48,
+          "line": 50,
           "call_type": "function_call"
         }
       ],
@@ -18865,19 +18940,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 103,
+          "line": 105,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 109,
+          "line": 111,
           "call_type": "method_call"
         },
         {
           "name": "register_skills_dev_subcommands",
           "file": "unknown",
-          "line": 114,
+          "line": 116,
           "call_type": "function_call"
         }
       ],
@@ -26515,7 +26590,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 77,
+          "line": 79,
           "call_type": "function_call"
         }
       ],
@@ -37461,6 +37536,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_execute_verify",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 57,
@@ -37907,7 +37988,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 68
+      "call_count": 69
     },
     {
       "name": "find_spec_file",
@@ -37977,6 +38058,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 39,
+          "call_type": "function_call"
+        },
+        {
           "name": "activate_spec",
           "file": "src/claude_skills/claude_skills/sdd_update/lifecycle.py",
           "line": 119,
@@ -38033,7 +38120,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 15
+      "call_count": 16
     },
     {
       "name": "validate_path",
@@ -42789,6 +42876,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_execute_verify",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 63,
@@ -43943,7 +44036,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 204
+      "call_count": 205
     },
     {
       "name": "save_json_spec",
@@ -46785,7 +46878,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 42,
+          "line": 43,
           "call_type": "function_call"
         }
       ],
@@ -46833,7 +46926,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         }
       ],
@@ -54206,7 +54299,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 78,
+          "line": 80,
           "call_type": "function_call"
         }
       ],
@@ -61965,7 +62058,7 @@
         {
           "name": "_register_test_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 96,
+          "line": 98,
           "call_type": "function_call"
         }
       ],
@@ -71639,7 +71732,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 34,
+          "line": 35,
           "call_type": "function_call"
         }
       ],
@@ -75318,7 +75411,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         }
       ],
@@ -75743,6 +75836,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "cmd_apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_execute_verify",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 57,
@@ -76069,7 +76168,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 68
+      "call_count": 69
     },
     {
       "name": "suggest_documentation_generation",
@@ -77306,7 +77405,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         }
       ],
@@ -79385,7 +79484,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         },
         {
@@ -81305,7 +81404,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         }
       ],
@@ -81705,6 +81804,582 @@
           "call_type": "method_call"
         }
       ]
+    },
+    {
+      "name": "cmd_apply_modifications",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+      "line": 14,
+      "language": "python",
+      "docstring": "Apply batch modifications from a JSON file to a spec.\n\nCommand: sdd apply-modifications <spec> --from <file.json>\n\nArgs:\n    args: Parsed command-line arguments\n        - spec_id: Spec ID to modify\n        - from_file: Path to modifications JSON file\n        - dry_run: If True, show what would be modified without applying\n        - output: Optional output path for modified spec\n    printer: PrettyPrinter instance for formatted output\n\nReturns:\n    Exit code (0 for success, 1 for error)",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 27,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_specs_directory_not_found",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 84,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_spec_file_not_found",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 97,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_modifications_file_not_found",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 115,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_dry_run_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 149,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_successful_application",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 197,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_partial_failure",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py",
+          "line": 247,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "find_specs_directory",
+          "file": "unknown",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 32,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 34,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 35,
+          "call_type": "method_call"
+        },
+        {
+          "name": "find_spec_file",
+          "file": "unknown",
+          "line": 39,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 41,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 42,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 47,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "method_call"
+        },
+        {
+          "name": "load_json_spec",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 57,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 69,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "function_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 74,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 76,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 78,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 80,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "function_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 85,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 91,
+          "call_type": "method_call"
+        },
+        {
+          "name": "apply_modifications",
+          "file": "unknown",
+          "line": 96,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 96,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 98,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 101,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 101,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 104,
+          "call_type": "function_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "function_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 116,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 118,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 122,
+          "call_type": "method_call"
+        },
+        {
+          "name": "enumerate",
+          "file": "unknown",
+          "line": 123,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 124,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 126,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 127,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 127,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dump",
+          "file": "unknown",
+          "line": 135,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 137,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 140,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 143,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 145,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 147,
+          "call_type": "method_call"
+        },
+        {
+          "name": "detail",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 151,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 6
+    },
+    {
+      "name": "register_spec_mod",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+      "line": 157,
+      "language": "python",
+      "docstring": "Register spec modification commands.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "register_all_subcommands",
+          "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
+          "line": 45,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 171,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 175,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 181,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 190,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
     },
     {
       "name": "update_task_estimate",
@@ -83235,7 +83910,14 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "cmd_apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+          "line": 96,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "exists",
@@ -83393,7 +84075,8 @@
           "line": 1151,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 1
     },
     {
       "name": "_handle_add_node",
@@ -89690,7 +90373,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         }
       ],
@@ -101498,7 +102181,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         }
       ],
@@ -122910,6 +123593,17 @@
       "datetime.datetime",
       "datetime.timezone"
     ],
+    "src/claude_skills/claude_skills/sdd_spec_mod/cli.py": [
+      "argparse",
+      "sys",
+      "json",
+      "pathlib.Path",
+      "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.find_spec_file",
+      "claude_skills.common.find_specs_directory",
+      "claude_skills.common.load_json_spec",
+      "claude_skills.sdd_spec_mod.apply_modifications"
+    ],
     "src/claude_skills/claude_skills/sdd_spec_mod/estimates.py": [
       "typing.Dict",
       "typing.Any",
@@ -123418,6 +124112,15 @@
       "json",
       "shutil",
       "pathlib.Path"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py": [
+      "json",
+      "pytest",
+      "pathlib.Path",
+      "unittest.mock.Mock",
+      "unittest.mock.patch",
+      "unittest.mock.mock_open",
+      "claude_skills.sdd_spec_mod.cli.cmd_apply_modifications"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py": [
       "pytest",
