@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:33:19
+**Generated:** 2025-11-06 12:48:56
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 221
-- **Total Lines:** 76068
-- **Total Classes:** 284
-- **Total Functions:** 832
+- **Total Files:** 222
+- **Total Lines:** 77003
+- **Total Classes:** 290
+- **Total Functions:** 833
 - **Avg Complexity:** 5.75
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -2143,6 +2143,24 @@ Attributes:
 
 ---
 
+### `TestAddAssumptionCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:74`
+
+**Description:**
+> Tests for add-assumption command.
+
+**Methods:**
+- `test_add_assumption_basic()`
+- `test_add_assumption_different_types()`
+- `test_add_assumption_with_author()`
+- `test_add_assumption_json_output()`
+- `test_add_assumption_dry_run()`
+- `test_add_assumption_invalid_spec()`
+
+---
+
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -2174,6 +2192,25 @@ Attributes:
 - `test_add_revision_entry_custom_author()`
 - `test_add_revision_entry_multiple()`
 - `test_add_revision_entry_dry_run()`
+
+---
+
+### `TestAddTaskCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:440`
+
+**Description:**
+> Tests for add-task command.
+
+**Methods:**
+- `test_add_task_basic()`
+- `test_add_task_with_description()`
+- `test_add_task_with_estimate()`
+- `test_add_task_with_position()`
+- `test_add_task_json_output()`
+- `test_add_task_dry_run()`
+- `test_add_task_invalid_parent()`
 
 ---
 
@@ -3904,6 +3941,22 @@ Attributes:
 
 ---
 
+### `TestListAssumptionsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:202`
+
+**Description:**
+> Tests for list-assumptions command.
+
+**Methods:**
+- `test_list_assumptions_basic()`
+- `test_list_assumptions_by_type()`
+- `test_list_assumptions_json_output()`
+- `test_list_assumptions_empty()`
+
+---
+
 ### `TestListBlockers`
 
 **Language:** python
@@ -4678,6 +4731,23 @@ Attributes:
 
 ---
 
+### `TestRemoveTaskCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:615`
+
+**Description:**
+> Tests for remove-task command.
+
+**Methods:**
+- `test_remove_task_basic()`
+- `test_remove_task_with_cascade()`
+- `test_remove_task_json_output()`
+- `test_remove_task_dry_run()`
+- `test_remove_task_invalid()`
+
+---
+
 ### `TestRenderEdgeCases`
 
 **Language:** python
@@ -4924,6 +4994,20 @@ Attributes:
 
 ---
 
+### `TestSpecModificationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:803`
+
+**Description:**
+> End-to-end workflow tests combining multiple commands.
+
+**Methods:**
+- `test_complete_workflow()`
+- `test_multiple_assumptions_workflow()`
+
+---
+
 ### `TestSpecStats`
 
 **Language:** python
@@ -5108,6 +5192,24 @@ Attributes:
 **Methods:**
 - `test_status_report_help()`
 - `test_update_command_exists()`
+
+---
+
+### `TestUpdateEstimateCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:308`
+
+**Description:**
+> Tests for update-estimate command.
+
+**Methods:**
+- `test_update_estimate_hours_only()`
+- `test_update_estimate_complexity_only()`
+- `test_update_estimate_both()`
+- `test_update_estimate_json_output()`
+- `test_update_estimate_dry_run()`
+- `test_update_estimate_invalid_task()`
 
 ---
 
@@ -18578,6 +18680,20 @@ Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-col
 ### `run_cli() -> None`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:25`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/test_status_report.py:19`
 **Complexity:** 7
 
@@ -24112,6 +24228,15 @@ Returns:
 - `__future__.annotations`
 - `os`
 - `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
 - `subprocess`
 - `sys`
 
