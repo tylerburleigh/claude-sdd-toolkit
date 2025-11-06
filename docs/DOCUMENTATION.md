@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 10:32:27
+**Generated:** 2025-11-06 10:35:08
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 216
-- **Total Lines:** 73732
+- **Total Lines:** 73914
 - **Total Classes:** 278
-- **Total Functions:** 803
-- **Avg Complexity:** 5.63
+- **Total Functions:** 806
+- **Avg Complexity:** 5.65
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -5835,6 +5835,25 @@ Returns:
 
 ---
 
+### `_cleanup_dependencies(spec_data, removed_nodes) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:361`
+**Complexity:** 7
+
+**Description:**
+> Remove references to removed nodes from all dependency lists.
+
+Args:
+    spec_data: The full spec data dictionary
+    removed_nodes: List of node IDs being removed
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `removed_nodes`: List[str]
+
+---
+
 ### `_coerce_scalar(value) -> Any`
 
 **Language:** python
@@ -5843,6 +5862,27 @@ Returns:
 
 **Parameters:**
 - `value`: str
+
+---
+
+### `_collect_descendants(spec_data, node_id, result) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:336`
+**Complexity:** 3
+
+**Description:**
+> Recursively collect all descendants of a node.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID
+    result: List to append descendant IDs to (modified in place)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `result`: List[str]
 
 ---
 
@@ -6752,6 +6792,32 @@ Returns:
 
 Returns:
     List of git permissions to add (may include read-only, write, or both)
+
+---
+
+### `_propagate_task_count_decrease(spec_data, node_id, total_decrease, completed_decrease) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:392`
+**Complexity:** 9
+
+**Description:**
+> Propagate task count decreases up the hierarchy tree.
+
+This is called when nodes are removed from the hierarchy.
+It updates total_tasks and/or completed_tasks for all ancestors.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID (typically the parent of removed nodes)
+    total_decrease: Amount to decrease total_tasks by (default: 0)
+    completed_decrease: Amount to decrease completed_tasks by (default: 0)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `total_decrease`: int
+- `completed_decrease`: int
 
 ---
 
@@ -16533,7 +16599,7 @@ Returns:
 ### `move_node(spec_data, node_id, new_parent_id, position) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:254`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:436`
 **Complexity:** 1
 
 **Description:**
@@ -17629,27 +17695,41 @@ Note:
 
 ---
 
-### `remove_node(spec_data, node_id, recursive) -> Dict[str, Any]`
+### `remove_node(spec_data, node_id, cascade) -> Dict[str, Any]`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:231`
-**Complexity:** 1
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
 > Remove a node from the spec hierarchy.
 
+This function removes a node and optionally its descendants (cascade mode).
+It also updates parent-child relationships, cleans up dependencies, and
+propagates task count decreases up the hierarchy.
+
 Args:
     spec_data: The full spec data dictionary
     node_id: ID of the node to remove
-    recursive: If True, removes all descendants as well (default: False)
+    cascade: If True, recursively removes all descendants (default: False)
+            If False and node has children, operation fails
 
 Returns:
-    Dict with success status and message
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "removed_nodes": [...] (only if success=True)
+    }
+
+Raises:
+    KeyError: If node_id doesn't exist in hierarchy
+    ValueError: If trying to remove spec-root
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `node_id`: str
-- `recursive`: bool
+- `cascade`: bool
 
 ---
 
@@ -20681,7 +20761,7 @@ Returns:
 ### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:279`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:461`
 **Complexity:** 1
 
 **Description:**

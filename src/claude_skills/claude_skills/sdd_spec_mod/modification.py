@@ -433,6 +433,137 @@ def _propagate_task_count_decrease(
             spec_root["completed_tasks"] = max(0, spec_root.get("completed_tasks", 0) - completed_decrease)
 
 
+def update_node_field(
+    spec_data: Dict[str, Any],
+    node_id: str,
+    field: str,
+    value: Any
+) -> Dict[str, Any]:
+    """
+    Update a specific field on a node in the spec hierarchy.
+
+    This function provides a safe way to update node fields with validation.
+    For metadata updates, it merges with existing metadata rather than replacing it.
+
+    Args:
+        spec_data: The full spec data dictionary
+        node_id: ID of the node to update
+        field: Name of the field to update (e.g., 'title', 'description', 'status', 'metadata')
+        value: New value for the field
+
+    Returns:
+        Dict with success status and message:
+        {
+            "success": True|False,
+            "message": "Description of result",
+            "old_value": previous_value (only if success=True)
+        }
+
+    Raises:
+        KeyError: If node_id doesn't exist in hierarchy
+        ValueError: If attempting to update protected fields
+    """
+    # Validate spec_data structure
+    if not isinstance(spec_data, dict):
+        raise ValueError("spec_data must be a dictionary")
+
+    if "hierarchy" not in spec_data:
+        raise ValueError("spec_data must contain 'hierarchy' key")
+
+    # Check if node exists
+    node = get_node(spec_data, node_id)
+    if node is None:
+        raise KeyError(f"Node '{node_id}' not found in hierarchy")
+
+    # Protected fields that cannot be updated via this function
+    protected_fields = ["parent", "children", "total_tasks", "completed_tasks"]
+    if field in protected_fields:
+        raise ValueError(
+            f"Cannot update protected field '{field}'. "
+            f"Use appropriate modification functions instead."
+        )
+
+    # Store old value for return
+    old_value = node.get(field)
+
+    # Special handling for metadata field (merge instead of replace)
+    if field == "metadata":
+        if not isinstance(value, dict):
+            return {
+                "success": False,
+                "message": "metadata value must be a dictionary"
+            }
+
+        # Use update_node which handles metadata merging
+        success = update_node(spec_data, node_id, {"metadata": value})
+        if success:
+            return {
+                "success": True,
+                "message": f"Successfully merged metadata for node '{node_id}'",
+                "old_value": old_value
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Failed to update metadata for node '{node_id}'"
+            }
+
+    # Validate status field
+    if field == "status":
+        valid_statuses = ["pending", "in_progress", "completed", "blocked"]
+        if value not in valid_statuses:
+            return {
+                "success": False,
+                "message": f"Invalid status '{value}'. Must be one of: {', '.join(valid_statuses)}"
+            }
+
+    # Validate type field
+    if field == "type":
+        valid_types = ["phase", "task", "subtask", "verify", "group", "spec"]
+        if value not in valid_types:
+            return {
+                "success": False,
+                "message": f"Invalid type '{value}'. Must be one of: {', '.join(valid_types)}"
+            }
+
+    # Validate title field (cannot be empty)
+    if field == "title":
+        if not value or (isinstance(value, str) and not value.strip()):
+            return {
+                "success": False,
+                "message": "title cannot be empty"
+            }
+        # Strip whitespace from title
+        value = value.strip() if isinstance(value, str) else value
+
+    # Validate dependencies field
+    if field == "dependencies":
+        if not isinstance(value, dict):
+            return {
+                "success": False,
+                "message": "dependencies must be a dictionary"
+            }
+
+        # Ensure required keys exist
+        for dep_key in ["blocks", "blocked_by", "depends"]:
+            if dep_key not in value:
+                value[dep_key] = []
+            if not isinstance(value[dep_key], list):
+                return {
+                    "success": False,
+                    "message": f"dependencies['{dep_key}'] must be a list"
+                }
+
+    # Update the field
+    node[field] = value
+
+    return {
+        "success": True,
+        "message": f"Successfully updated field '{field}' for node '{node_id}'",
+        "old_value": old_value
+    }
+
+
 def move_node(
     spec_data: Dict[str, Any],
     node_id: str,
