@@ -318,6 +318,77 @@ def cmd_add_assumption(args, printer):
         return 1
 
 
+def cmd_list_assumptions(args, printer):
+    """List assumptions from spec metadata."""
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Get assumptions
+    try:
+        assumption_type = getattr(args, 'type', None)
+        assumptions = list_assumptions(spec_data, assumption_type=assumption_type)
+    except (KeyError, TypeError, ValueError) as e:
+        printer.error(f"Failed to list assumptions: {e}")
+        return 1
+
+    if not assumptions:
+        if assumption_type:
+            printer.info(f"No {assumption_type} assumptions found")
+        else:
+            printer.info("No assumptions found")
+        return 0
+
+    # Display assumptions
+    if assumption_type:
+        printer.success(f"Found {len(assumptions)} {assumption_type} assumption(s):")
+    else:
+        printer.success(f"Found {len(assumptions)} assumption(s):")
+
+    # Check if JSON output is enabled (either via flag or config default)
+    # When json arg is None, the main CLI will apply config defaults
+    use_json = getattr(args, 'json', None)
+    if use_json is None:
+        # No explicit --json or --no-json flag, check config
+        try:
+            from claude_skills.common.sdd_config import load_sdd_config
+            config = load_sdd_config()
+            use_json = config.get('output', {}).get('json', False)
+        except Exception:
+            use_json = False
+
+    if use_json:
+        # JSON output
+        print(json.dumps(assumptions, indent=2))
+    else:
+        # Pretty print for human readability
+        for i, assumption in enumerate(assumptions, 1):
+            # Handle both legacy string format and new structured format
+            if isinstance(assumption, str):
+                # Legacy format: just a string
+                print(f"\n{i}. {assumption}")
+            elif isinstance(assumption, dict):
+                # New structured format
+                print(f"\n{assumption.get('id', f'assumption-{i}')}:")
+                printer.detail(f"Type: {assumption.get('type', 'unknown')}")
+                printer.detail(f"Text: {assumption.get('text', '')}")
+                printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
+                printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
+                if 'updated_at' in assumption:
+                    printer.detail(f"Updated at: {assumption['updated_at']}")
+            else:
+                printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
+
+    return 0
+
+
 def cmd_update_estimate(args, printer):
     """Update task estimate (hours and/or complexity)."""
     printer.action(f"Updating estimate for task {args.task_id}...")
@@ -1359,6 +1430,12 @@ def register_update(subparsers, parent_parser):
     p_assumption.add_argument("--author", default="claude-code", help="Author who added the assumption")
     p_assumption.add_argument("--dry-run", action="store_true", help="Preview assumption without saving")
     p_assumption.set_defaults(func=cmd_add_assumption)
+
+    # list-assumptions command
+    p_list_assumptions = subparsers.add_parser("list-assumptions", help="List assumptions from spec metadata", parents=[parent_parser])
+    p_list_assumptions.add_argument("spec_id", help="Specification ID")
+    p_list_assumptions.add_argument("--type", choices=["constraint", "requirement"], help="Filter by assumption type")
+    p_list_assumptions.set_defaults(func=cmd_list_assumptions)
 
     # update-estimate command
     p_estimate = subparsers.add_parser("update-estimate", help="Update task estimate (hours and/or complexity)", parents=[parent_parser])

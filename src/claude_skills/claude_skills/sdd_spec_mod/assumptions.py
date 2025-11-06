@@ -89,16 +89,18 @@ def add_assumption(
 def list_assumptions(
     spec_data: Dict[str, Any],
     assumption_type: Optional[str] = None
-) -> List[Dict[str, Any]]:
+) -> List[Any]:
     """
     List all assumptions from the spec metadata.
 
+    Supports both legacy string format and new structured dict format.
+
     Args:
         spec_data: The full spec data dictionary
-        assumption_type: Optional filter by assumption type
+        assumption_type: Optional filter by assumption type (only works with structured format)
 
     Returns:
-        List of assumption entries
+        List of assumption entries (can be strings or dicts depending on format)
     """
     if not isinstance(spec_data, dict) or "metadata" not in spec_data:
         return []
@@ -106,8 +108,10 @@ def list_assumptions(
     metadata = spec_data.get("metadata", {})
     assumptions = metadata.get("assumptions", [])
 
+    # If filtering by type, only return structured assumptions that match
     if assumption_type:
-        return [a for a in assumptions if a.get("type") == assumption_type]
+        # Filter only works on dict assumptions
+        return [a for a in assumptions if isinstance(a, dict) and a.get("type") == assumption_type]
 
     return assumptions
 
