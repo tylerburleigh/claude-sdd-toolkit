@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T22:54:52.034587Z",
+    "generated_at": "2025-11-06T23:09:56.718986Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 233,
-    "total_lines": 82134,
-    "total_classes": 306,
+    "total_files": 237,
+    "total_lines": 83517,
+    "total_classes": 338,
     "total_functions": 859,
     "avg_complexity": 5.77,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 233,
-        "lines": 82134,
-        "classes": 306,
+        "files": 237,
+        "lines": 83517,
+        "classes": 338,
         "functions": 859,
         "avg_complexity": 5.77
       }
@@ -5340,6 +5340,35 @@
       "lines": 223
     },
     {
+      "name": "test_plain_ui",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "language": "python",
+      "docstring": "Unit tests for plain_ui module.\n\nTests PlainUi backend implementation including plain text rendering,\nASCII tables, trees, diffs, and status messages.",
+      "classes": [
+        "TestPlainUiInitialization",
+        "TestPlainUiPrintTable",
+        "TestPlainUiPrintTree",
+        "TestPlainUiPrintDiff",
+        "TestPlainUiProgress",
+        "TestPlainUiPrintPanel",
+        "TestPlainUiPrintStatus",
+        "TestPlainUiQuietMode",
+        "TestPlainUiMessageCollection",
+        "TestPlainUiIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "io.StringIO",
+        "sys",
+        "claude_skills.common.plain_ui.PlainUi",
+        "claude_skills.common.ui_protocol.MessageLevel",
+        "claude_skills.common.ui_protocol.Message"
+      ],
+      "exports": [],
+      "lines": 448
+    },
+    {
       "name": "test_printer",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
       "language": "python",
@@ -5350,16 +5379,22 @@
         "TestPrettyPrinterColorMode",
         "TestPrettyPrinterVerbosity",
         "TestPrettyPrinterFormatting",
-        "TestPrettyPrinterIntegration"
+        "TestPrettyPrinterIntegration",
+        "TestPrettyPrinterUiBackend",
+        "TestPrettyPrinterBackwardCompatibility"
       ],
       "functions": [],
       "imports": [
         "pytest",
         "io.StringIO",
-        "claude_skills.common.PrettyPrinter"
+        "unittest.mock.MagicMock",
+        "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.ui_protocol.MessageLevel",
+        "claude_skills.common.plain_ui.PlainUi",
+        "claude_skills.common.rich_ui.RichUi"
       ],
       "exports": [],
-      "lines": 227
+      "lines": 348
     },
     {
       "name": "test_progress",
@@ -5387,6 +5422,36 @@
       "lines": 307
     },
     {
+      "name": "test_rich_ui",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "language": "python",
+      "docstring": "Unit tests for rich_ui module.\n\nTests RichUi backend implementation including table rendering, tree rendering,\nprogress bars, panels, and status messages.",
+      "classes": [
+        "TestRichUiInitialization",
+        "TestRichUiPrintTable",
+        "TestRichUiPrintTree",
+        "TestRichUiPrintDiff",
+        "TestRichUiProgress",
+        "TestRichUiPrintPanel",
+        "TestRichUiPrintStatus",
+        "TestRichUiMessageCollection",
+        "TestRichUiIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "io.StringIO",
+        "unittest.mock.MagicMock",
+        "unittest.mock.patch",
+        "claude_skills.common.rich_ui.RichUi",
+        "claude_skills.common.ui_protocol.MessageLevel",
+        "claude_skills.common.ui_protocol.Message",
+        "rich.console.Console"
+      ],
+      "exports": [],
+      "lines": 371
+    },
+    {
       "name": "test_spec",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py",
       "language": "python",
@@ -5412,6 +5477,63 @@
       ],
       "exports": [],
       "lines": 289
+    },
+    {
+      "name": "test_ui_factory",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "language": "python",
+      "docstring": "Unit tests for ui_factory module.\n\nTests backend selection logic, TTY detection, CI detection, and create_ui factory function.",
+      "classes": [
+        "TestTTYDetection",
+        "TestCIDetection",
+        "TestShouldUsePlainUI",
+        "TestCreateUI",
+        "TestCreateUIFromArgs",
+        "TestGetBackendName",
+        "TestFormatBackendInfo",
+        "TestUIShorthand"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "os",
+        "sys",
+        "unittest.mock.patch",
+        "unittest.mock.MagicMock",
+        "claude_skills.common.ui_factory.is_tty_available",
+        "claude_skills.common.ui_factory.is_ci_environment",
+        "claude_skills.common.ui_factory.should_use_plain_ui",
+        "claude_skills.common.ui_factory.create_ui",
+        "claude_skills.common.ui_factory.create_ui_from_args",
+        "claude_skills.common.ui_factory.get_backend_name",
+        "claude_skills.common.ui_factory.format_backend_info",
+        "claude_skills.common.ui_factory.ui",
+        "claude_skills.common.rich_ui.RichUi",
+        "claude_skills.common.plain_ui.PlainUi"
+      ],
+      "exports": [],
+      "lines": 284
+    },
+    {
+      "name": "test_ui_protocol",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+      "language": "python",
+      "docstring": "Unit tests for ui_protocol module.\n\nTests the Ui protocol definition, MessageLevel enum, and Message dataclass.",
+      "classes": [
+        "TestMessageLevel",
+        "TestMessage",
+        "TestUiProtocol"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "datetime.datetime",
+        "claude_skills.common.ui_protocol.Ui",
+        "claude_skills.common.ui_protocol.MessageLevel",
+        "claude_skills.common.ui_protocol.Message"
+      ],
+      "exports": [],
+      "lines": 159
     },
     {
       "name": "__init__",
@@ -8111,10 +8233,289 @@
           "context": [
             "create_ui"
           ]
+        },
+        {
+          "instantiator": "test_plain_ui_default_initialization",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 20,
+          "context": [
+            "TestPlainUiInitialization",
+            "test_plain_ui_default_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_plain_ui_with_quiet_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 31,
+          "context": [
+            "TestPlainUiInitialization",
+            "test_plain_ui_with_quiet_mode"
+          ]
+        },
+        {
+          "instantiator": "test_plain_ui_with_collect_messages",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 37,
+          "context": [
+            "TestPlainUiInitialization",
+            "test_plain_ui_with_collect_messages"
+          ]
+        },
+        {
+          "instantiator": "test_plain_ui_with_custom_file",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 45,
+          "context": [
+            "TestPlainUiInitialization",
+            "test_plain_ui_with_custom_file"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 56,
+          "context": [
+            "TestPlainUiPrintTable",
+            "test_print_table_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_with_title",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 74,
+          "context": [
+            "TestPlainUiPrintTable",
+            "test_print_table_with_title"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_with_columns",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 85,
+          "context": [
+            "TestPlainUiPrintTable",
+            "test_print_table_with_columns"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_empty_data",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 100,
+          "context": [
+            "TestPlainUiPrintTable",
+            "test_print_table_empty_data"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 115,
+          "context": [
+            "TestPlainUiPrintTree",
+            "test_print_tree_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_nested",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 135,
+          "context": [
+            "TestPlainUiPrintTree",
+            "test_print_tree_nested"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_empty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 157,
+          "context": [
+            "TestPlainUiPrintTree",
+            "test_print_tree_empty"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 172,
+          "context": [
+            "TestPlainUiPrintDiff",
+            "test_print_diff_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_with_labels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 185,
+          "context": [
+            "TestPlainUiPrintDiff",
+            "test_print_diff_with_labels"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_identical_text",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 198,
+          "context": [
+            "TestPlainUiPrintDiff",
+            "test_print_diff_identical_text"
+          ]
+        },
+        {
+          "instantiator": "test_progress_context_manager",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 214,
+          "context": [
+            "TestPlainUiProgress",
+            "test_progress_context_manager"
+          ]
+        },
+        {
+          "instantiator": "test_progress_indeterminate",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 227,
+          "context": [
+            "TestPlainUiProgress",
+            "test_progress_indeterminate"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 242,
+          "context": [
+            "TestPlainUiPrintPanel",
+            "test_print_panel_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_with_title",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 252,
+          "context": [
+            "TestPlainUiPrintPanel",
+            "test_print_panel_with_title"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_with_style",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 263,
+          "context": [
+            "TestPlainUiPrintPanel",
+            "test_print_panel_with_style"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_action",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 281,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_action"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_success",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 291,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_success"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 301,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_error"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_warning",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 311,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_warning"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_info",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 321,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_info"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_all_levels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 331,
+          "context": [
+            "TestPlainUiPrintStatus",
+            "test_print_status_all_levels"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_suppresses_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 347,
+          "context": [
+            "TestPlainUiQuietMode",
+            "test_quiet_mode_suppresses_output"
+          ]
+        },
+        {
+          "instantiator": "test_quiet_mode_shows_errors",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 360,
+          "context": [
+            "TestPlainUiQuietMode",
+            "test_quiet_mode_shows_errors"
+          ]
+        },
+        {
+          "instantiator": "test_collect_messages_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 374,
+          "context": [
+            "TestPlainUiMessageCollection",
+            "test_collect_messages_mode"
+          ]
+        },
+        {
+          "instantiator": "test_messages_not_collected_by_default",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 393,
+          "context": [
+            "TestPlainUiMessageCollection",
+            "test_messages_not_collected_by_default"
+          ]
+        },
+        {
+          "instantiator": "test_plain_ui_complete_workflow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 408,
+          "context": [
+            "TestPlainUiIntegration",
+            "test_plain_ui_complete_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_plain_ui_no_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+          "line": 440,
+          "context": [
+            "TestPlainUiIntegration",
+            "test_plain_ui_no_ansi_codes"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 32
     },
     {
       "name": "PlainProgressTask",
@@ -8576,7 +8977,7 @@
         {
           "instantiator": "test_printer_default_initialization",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 17,
+          "line": 21,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_default_initialization"
@@ -8585,7 +8986,7 @@
         {
           "instantiator": "test_printer_with_no_color",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 26,
+          "line": 30,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_no_color"
@@ -8594,7 +8995,7 @@
         {
           "instantiator": "test_printer_with_verbose",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 32,
+          "line": 36,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_verbose"
@@ -8603,7 +9004,7 @@
         {
           "instantiator": "test_printer_with_quiet",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 38,
+          "line": 42,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_quiet"
@@ -8612,7 +9013,7 @@
         {
           "instantiator": "test_printer_success_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 48,
+          "line": 52,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_success_message"
@@ -8621,7 +9022,7 @@
         {
           "instantiator": "test_printer_error_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 56,
+          "line": 60,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_error_message"
@@ -8630,7 +9031,7 @@
         {
           "instantiator": "test_printer_warning_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 64,
+          "line": 69,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_warning_message"
@@ -8639,7 +9040,7 @@
         {
           "instantiator": "test_printer_info_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 72,
+          "line": 78,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_info_message"
@@ -8648,7 +9049,7 @@
         {
           "instantiator": "test_printer_action_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 80,
+          "line": 86,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_action_message"
@@ -8657,7 +9058,7 @@
         {
           "instantiator": "test_printer_result_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 88,
+          "line": 94,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_result_message"
@@ -8666,7 +9067,7 @@
         {
           "instantiator": "test_printer_detail_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 96,
+          "line": 102,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_detail_message"
@@ -8675,7 +9076,7 @@
         {
           "instantiator": "test_colored_output_contains_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 108,
+          "line": 114,
           "context": [
             "TestPrettyPrinterColorMode",
             "test_colored_output_contains_ansi_codes"
@@ -8684,7 +9085,7 @@
         {
           "instantiator": "test_no_color_output_lacks_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 120,
+          "line": 126,
           "context": [
             "TestPrettyPrinterColorMode",
             "test_no_color_output_lacks_ansi_codes"
@@ -8693,7 +9094,7 @@
         {
           "instantiator": "test_quiet_mode_minimal_output",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 133,
+          "line": 139,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_quiet_mode_minimal_output"
@@ -8702,7 +9103,7 @@
         {
           "instantiator": "test_quiet_mode_shows_errors",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 146,
+          "line": 152,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_quiet_mode_shows_errors"
@@ -8711,7 +9112,7 @@
         {
           "instantiator": "test_verbose_mode_shows_details",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 156,
+          "line": 162,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_verbose_mode_shows_details"
@@ -8720,7 +9121,7 @@
         {
           "instantiator": "test_result_formatting_aligns_output",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 170,
+          "line": 176,
           "context": [
             "TestPrettyPrinterFormatting",
             "test_result_formatting_aligns_output"
@@ -8729,7 +9130,7 @@
         {
           "instantiator": "test_detail_with_indentation",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 187,
+          "line": 193,
           "context": [
             "TestPrettyPrinterFormatting",
             "test_detail_with_indentation"
@@ -8738,7 +9139,7 @@
         {
           "instantiator": "test_printer_combined_output_flow",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 202,
+          "line": 208,
           "context": [
             "TestPrettyPrinterIntegration",
             "test_printer_combined_output_flow"
@@ -8747,10 +9148,127 @@
         {
           "instantiator": "test_printer_error_warning_flow",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 219,
+          "line": 225,
           "context": [
             "TestPrettyPrinterIntegration",
             "test_printer_error_warning_flow"
+          ]
+        },
+        {
+          "instantiator": "test_printer_has_ui_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 243,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_has_ui_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_delegates_to_ui_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 252,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_delegates_to_ui_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_uses_plain_ui_when_color_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 264,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_uses_plain_ui_when_color_disabled"
+          ]
+        },
+        {
+          "instantiator": "test_printer_passes_quiet_to_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 271,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_passes_quiet_to_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_backend_selection",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 279,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_backend_selection"
+          ]
+        },
+        {
+          "instantiator": "test_colorize_method_preserved",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 291,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_colorize_method_preserved"
+          ]
+        },
+        {
+          "instantiator": "test_all_original_methods_exist",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 302,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_all_original_methods_exist"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 316,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 317,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 318,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 319,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 320,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_method_parameters_backward_compatible",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 327,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_method_parameters_backward_compatible"
           ]
         },
         {
@@ -8881,7 +9399,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 83
+      "instantiation_count": 96
     },
     {
       "name": "RichUi",
@@ -8915,10 +9433,271 @@
           "context": [
             "create_ui"
           ]
+        },
+        {
+          "instantiator": "test_rich_ui_default_initialization",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 21,
+          "context": [
+            "TestRichUiInitialization",
+            "test_rich_ui_default_initialization"
+          ]
+        },
+        {
+          "instantiator": "test_rich_ui_with_custom_console",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 32,
+          "context": [
+            "TestRichUiInitialization",
+            "test_rich_ui_with_custom_console"
+          ]
+        },
+        {
+          "instantiator": "test_rich_ui_with_collect_messages",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 38,
+          "context": [
+            "TestRichUiInitialization",
+            "test_rich_ui_with_collect_messages"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 51,
+          "context": [
+            "TestRichUiPrintTable",
+            "test_print_table_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_with_title",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 65,
+          "context": [
+            "TestRichUiPrintTable",
+            "test_print_table_with_title"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_with_columns",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 76,
+          "context": [
+            "TestRichUiPrintTable",
+            "test_print_table_with_columns"
+          ]
+        },
+        {
+          "instantiator": "test_print_table_empty_data",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 90,
+          "context": [
+            "TestRichUiPrintTable",
+            "test_print_table_empty_data"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 103,
+          "context": [
+            "TestRichUiPrintTree",
+            "test_print_tree_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_nested",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 119,
+          "context": [
+            "TestRichUiPrintTree",
+            "test_print_tree_nested"
+          ]
+        },
+        {
+          "instantiator": "test_print_tree_empty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 136,
+          "context": [
+            "TestRichUiPrintTree",
+            "test_print_tree_empty"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 148,
+          "context": [
+            "TestRichUiPrintDiff",
+            "test_print_diff_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_with_labels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 159,
+          "context": [
+            "TestRichUiPrintDiff",
+            "test_print_diff_with_labels"
+          ]
+        },
+        {
+          "instantiator": "test_print_diff_identical_text",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 170,
+          "context": [
+            "TestRichUiPrintDiff",
+            "test_print_diff_identical_text"
+          ]
+        },
+        {
+          "instantiator": "test_progress_context_manager",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 183,
+          "context": [
+            "TestRichUiProgress",
+            "test_progress_context_manager"
+          ]
+        },
+        {
+          "instantiator": "test_progress_indeterminate",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 197,
+          "context": [
+            "TestRichUiProgress",
+            "test_progress_indeterminate"
+          ]
+        },
+        {
+          "instantiator": "test_progress_with_description",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 207,
+          "context": [
+            "TestRichUiProgress",
+            "test_progress_with_description"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_basic",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 221,
+          "context": [
+            "TestRichUiPrintPanel",
+            "test_print_panel_basic"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_with_title",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 229,
+          "context": [
+            "TestRichUiPrintPanel",
+            "test_print_panel_with_title"
+          ]
+        },
+        {
+          "instantiator": "test_print_panel_with_style",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 237,
+          "context": [
+            "TestRichUiPrintPanel",
+            "test_print_panel_with_style"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_action",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 251,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_action"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_success",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 259,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_success"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 267,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_error"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_warning",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 275,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_warning"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_info",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 283,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_info"
+          ]
+        },
+        {
+          "instantiator": "test_print_status_all_levels",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 291,
+          "context": [
+            "TestRichUiPrintStatus",
+            "test_print_status_all_levels"
+          ]
+        },
+        {
+          "instantiator": "test_collect_messages_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 305,
+          "context": [
+            "TestRichUiMessageCollection",
+            "test_collect_messages_mode"
+          ]
+        },
+        {
+          "instantiator": "test_messages_not_collected_by_default",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 318,
+          "context": [
+            "TestRichUiMessageCollection",
+            "test_messages_not_collected_by_default"
+          ]
+        },
+        {
+          "instantiator": "test_rich_ui_complete_workflow",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 332,
+          "context": [
+            "TestRichUiIntegration",
+            "test_rich_ui_complete_workflow"
+          ]
+        },
+        {
+          "instantiator": "test_rich_ui_with_real_output",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+          "line": 362,
+          "context": [
+            "TestRichUiIntegration",
+            "test_rich_ui_with_real_output"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 30
     },
     {
       "name": "ProgressTask",
@@ -8994,10 +9773,64 @@
             "RichUi",
             "_add_message"
           ]
+        },
+        {
+          "instantiator": "test_message_creation_minimal",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 44,
+          "context": [
+            "TestMessage",
+            "test_message_creation_minimal"
+          ]
+        },
+        {
+          "instantiator": "test_message_creation_full",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 59,
+          "context": [
+            "TestMessage",
+            "test_message_creation_full"
+          ]
+        },
+        {
+          "instantiator": "test_message_default_timestamp",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 77,
+          "context": [
+            "TestMessage",
+            "test_message_default_timestamp"
+          ]
+        },
+        {
+          "instantiator": "test_message_default_rendered_false",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 82,
+          "context": [
+            "TestMessage",
+            "test_message_default_rendered_false"
+          ]
+        },
+        {
+          "instantiator": "test_message_context_mutable",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 87,
+          "context": [
+            "TestMessage",
+            "test_message_context_mutable"
+          ]
+        },
+        {
+          "instantiator": "test_message_metadata_mutable",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+          "line": 95,
+          "context": [
+            "TestMessage",
+            "test_message_metadata_mutable"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 2
+      "instantiation_count": 8
     },
     {
       "name": "Ui",
@@ -10876,7 +11709,7 @@
         {
           "instantiator": "test_printer_default_initialization",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 17,
+          "line": 21,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_default_initialization"
@@ -10885,7 +11718,7 @@
         {
           "instantiator": "test_printer_with_no_color",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 26,
+          "line": 30,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_no_color"
@@ -10894,7 +11727,7 @@
         {
           "instantiator": "test_printer_with_verbose",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 32,
+          "line": 36,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_verbose"
@@ -10903,7 +11736,7 @@
         {
           "instantiator": "test_printer_with_quiet",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 38,
+          "line": 42,
           "context": [
             "TestPrettyPrinterInit",
             "test_printer_with_quiet"
@@ -10912,7 +11745,7 @@
         {
           "instantiator": "test_printer_success_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 48,
+          "line": 52,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_success_message"
@@ -10921,7 +11754,7 @@
         {
           "instantiator": "test_printer_error_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 56,
+          "line": 60,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_error_message"
@@ -10930,7 +11763,7 @@
         {
           "instantiator": "test_printer_warning_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 64,
+          "line": 69,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_warning_message"
@@ -10939,7 +11772,7 @@
         {
           "instantiator": "test_printer_info_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 72,
+          "line": 78,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_info_message"
@@ -10948,7 +11781,7 @@
         {
           "instantiator": "test_printer_action_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 80,
+          "line": 86,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_action_message"
@@ -10957,7 +11790,7 @@
         {
           "instantiator": "test_printer_result_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 88,
+          "line": 94,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_result_message"
@@ -10966,7 +11799,7 @@
         {
           "instantiator": "test_printer_detail_message",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 96,
+          "line": 102,
           "context": [
             "TestPrettyPrinterMethods",
             "test_printer_detail_message"
@@ -10975,7 +11808,7 @@
         {
           "instantiator": "test_colored_output_contains_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 108,
+          "line": 114,
           "context": [
             "TestPrettyPrinterColorMode",
             "test_colored_output_contains_ansi_codes"
@@ -10984,7 +11817,7 @@
         {
           "instantiator": "test_no_color_output_lacks_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 120,
+          "line": 126,
           "context": [
             "TestPrettyPrinterColorMode",
             "test_no_color_output_lacks_ansi_codes"
@@ -10993,7 +11826,7 @@
         {
           "instantiator": "test_quiet_mode_minimal_output",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 133,
+          "line": 139,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_quiet_mode_minimal_output"
@@ -11002,7 +11835,7 @@
         {
           "instantiator": "test_quiet_mode_shows_errors",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 146,
+          "line": 152,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_quiet_mode_shows_errors"
@@ -11011,7 +11844,7 @@
         {
           "instantiator": "test_verbose_mode_shows_details",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 156,
+          "line": 162,
           "context": [
             "TestPrettyPrinterVerbosity",
             "test_verbose_mode_shows_details"
@@ -11020,7 +11853,7 @@
         {
           "instantiator": "test_result_formatting_aligns_output",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 170,
+          "line": 176,
           "context": [
             "TestPrettyPrinterFormatting",
             "test_result_formatting_aligns_output"
@@ -11029,7 +11862,7 @@
         {
           "instantiator": "test_detail_with_indentation",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 187,
+          "line": 193,
           "context": [
             "TestPrettyPrinterFormatting",
             "test_detail_with_indentation"
@@ -11038,7 +11871,7 @@
         {
           "instantiator": "test_printer_combined_output_flow",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 202,
+          "line": 208,
           "context": [
             "TestPrettyPrinterIntegration",
             "test_printer_combined_output_flow"
@@ -11047,10 +11880,127 @@
         {
           "instantiator": "test_printer_error_warning_flow",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-          "line": 219,
+          "line": 225,
           "context": [
             "TestPrettyPrinterIntegration",
             "test_printer_error_warning_flow"
+          ]
+        },
+        {
+          "instantiator": "test_printer_has_ui_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 243,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_has_ui_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_delegates_to_ui_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 252,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_delegates_to_ui_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_uses_plain_ui_when_color_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 264,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_uses_plain_ui_when_color_disabled"
+          ]
+        },
+        {
+          "instantiator": "test_printer_passes_quiet_to_backend",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 271,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_passes_quiet_to_backend"
+          ]
+        },
+        {
+          "instantiator": "test_printer_backend_selection",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 279,
+          "context": [
+            "TestPrettyPrinterUiBackend",
+            "test_printer_backend_selection"
+          ]
+        },
+        {
+          "instantiator": "test_colorize_method_preserved",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 291,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_colorize_method_preserved"
+          ]
+        },
+        {
+          "instantiator": "test_all_original_methods_exist",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 302,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_all_original_methods_exist"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 316,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 317,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 318,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 319,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_original_signature_compatibility",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 320,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_original_signature_compatibility"
+          ]
+        },
+        {
+          "instantiator": "test_method_parameters_backward_compatible",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+          "line": 327,
+          "context": [
+            "TestPrettyPrinterBackwardCompatibility",
+            "test_method_parameters_backward_compatible"
           ]
         },
         {
@@ -11181,7 +12131,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 83
+      "instantiation_count": 96
     },
     {
       "name": "FidelityReport",
@@ -16788,9 +17738,190 @@
       "imported_by": []
     },
     {
+      "name": "TestPlainUiInitialization",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 15,
+      "language": "python",
+      "docstring": "Tests for PlainUi initialization.",
+      "bases": [],
+      "methods": [
+        "test_plain_ui_default_initialization",
+        "test_plain_ui_with_quiet_mode",
+        "test_plain_ui_with_collect_messages",
+        "test_plain_ui_with_custom_file"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiPrintTable",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 50,
+      "language": "python",
+      "docstring": "Tests for print_table method.",
+      "bases": [],
+      "methods": [
+        "test_print_table_basic",
+        "test_print_table_with_title",
+        "test_print_table_with_columns",
+        "test_print_table_empty_data"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiPrintTree",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 109,
+      "language": "python",
+      "docstring": "Tests for print_tree method.",
+      "bases": [],
+      "methods": [
+        "test_print_tree_basic",
+        "test_print_tree_nested",
+        "test_print_tree_empty"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiPrintDiff",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 166,
+      "language": "python",
+      "docstring": "Tests for print_diff method.",
+      "bases": [],
+      "methods": [
+        "test_print_diff_basic",
+        "test_print_diff_with_labels",
+        "test_print_diff_identical_text"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiProgress",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 208,
+      "language": "python",
+      "docstring": "Tests for progress method.",
+      "bases": [],
+      "methods": [
+        "test_progress_context_manager",
+        "test_progress_indeterminate"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiPrintPanel",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 236,
+      "language": "python",
+      "docstring": "Tests for print_panel method.",
+      "bases": [],
+      "methods": [
+        "test_print_panel_basic",
+        "test_print_panel_with_title",
+        "test_print_panel_with_style"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiPrintStatus",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 275,
+      "language": "python",
+      "docstring": "Tests for print_status method.",
+      "bases": [],
+      "methods": [
+        "test_print_status_action",
+        "test_print_status_success",
+        "test_print_status_error",
+        "test_print_status_warning",
+        "test_print_status_info",
+        "test_print_status_all_levels"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiQuietMode",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 341,
+      "language": "python",
+      "docstring": "Tests for quiet mode behavior.",
+      "bases": [],
+      "methods": [
+        "test_quiet_mode_suppresses_output",
+        "test_quiet_mode_shows_errors"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiMessageCollection",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 368,
+      "language": "python",
+      "docstring": "Tests for message collection mode.",
+      "bases": [],
+      "methods": [
+        "test_collect_messages_mode",
+        "test_messages_not_collected_by_default"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPlainUiIntegration",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py",
+      "line": 402,
+      "language": "python",
+      "docstring": "Integration tests for PlainUi.",
+      "bases": [],
+      "methods": [
+        "test_plain_ui_complete_workflow",
+        "test_plain_ui_no_ansi_codes"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestPrettyPrinterInit",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 12,
+      "line": 16,
       "language": "python",
       "docstring": "Tests for PrettyPrinter initialization.",
       "bases": [],
@@ -16809,7 +17940,7 @@
     {
       "name": "TestPrettyPrinterMethods",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 43,
+      "line": 47,
       "language": "python",
       "docstring": "Tests for PrettyPrinter methods.",
       "bases": [],
@@ -16831,7 +17962,7 @@
     {
       "name": "TestPrettyPrinterColorMode",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 103,
+      "line": 109,
       "language": "python",
       "docstring": "Tests for color/no-color modes.",
       "bases": [],
@@ -16848,7 +17979,7 @@
     {
       "name": "TestPrettyPrinterVerbosity",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 128,
+      "line": 134,
       "language": "python",
       "docstring": "Tests for verbosity modes.",
       "bases": [],
@@ -16866,7 +17997,7 @@
     {
       "name": "TestPrettyPrinterFormatting",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 165,
+      "line": 171,
       "language": "python",
       "docstring": "Tests for message formatting.",
       "bases": [],
@@ -16883,13 +18014,52 @@
     {
       "name": "TestPrettyPrinterIntegration",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
-      "line": 197,
+      "line": 203,
       "language": "python",
       "docstring": "Integration tests for PrettyPrinter.",
       "bases": [],
       "methods": [
         "test_printer_combined_output_flow",
         "test_printer_error_warning_flow"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPrettyPrinterUiBackend",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+      "line": 238,
+      "language": "python",
+      "docstring": "Tests for PrettyPrinter integration with Ui backend.",
+      "bases": [],
+      "methods": [
+        "test_printer_has_ui_backend",
+        "test_printer_delegates_to_ui_backend",
+        "test_printer_uses_plain_ui_when_color_disabled",
+        "test_printer_passes_quiet_to_backend",
+        "test_printer_backend_selection"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestPrettyPrinterBackwardCompatibility",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py",
+      "line": 286,
+      "language": "python",
+      "docstring": "Tests for backward compatibility after refactoring.",
+      "bases": [],
+      "methods": [
+        "test_colorize_method_preserved",
+        "test_all_original_methods_exist",
+        "test_original_signature_compatibility",
+        "test_method_parameters_backward_compatible"
       ],
       "properties": [],
       "is_exported": false,
@@ -17005,6 +18175,170 @@
       "imported_by": []
     },
     {
+      "name": "TestRichUiInitialization",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 16,
+      "language": "python",
+      "docstring": "Tests for RichUi initialization.",
+      "bases": [],
+      "methods": [
+        "test_rich_ui_default_initialization",
+        "test_rich_ui_with_custom_console",
+        "test_rich_ui_with_collect_messages"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiPrintTable",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 44,
+      "language": "python",
+      "docstring": "Tests for print_table method.",
+      "bases": [],
+      "methods": [
+        "test_print_table_basic",
+        "test_print_table_with_title",
+        "test_print_table_with_columns",
+        "test_print_table_empty_data"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiPrintTree",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 97,
+      "language": "python",
+      "docstring": "Tests for print_tree method.",
+      "bases": [],
+      "methods": [
+        "test_print_tree_basic",
+        "test_print_tree_nested",
+        "test_print_tree_empty"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiPrintDiff",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 142,
+      "language": "python",
+      "docstring": "Tests for print_diff method.",
+      "bases": [],
+      "methods": [
+        "test_print_diff_basic",
+        "test_print_diff_with_labels",
+        "test_print_diff_identical_text"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiProgress",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 177,
+      "language": "python",
+      "docstring": "Tests for progress method.",
+      "bases": [],
+      "methods": [
+        "test_progress_context_manager",
+        "test_progress_indeterminate",
+        "test_progress_with_description"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiPrintPanel",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 215,
+      "language": "python",
+      "docstring": "Tests for print_panel method.",
+      "bases": [],
+      "methods": [
+        "test_print_panel_basic",
+        "test_print_panel_with_title",
+        "test_print_panel_with_style"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiPrintStatus",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 245,
+      "language": "python",
+      "docstring": "Tests for print_status method.",
+      "bases": [],
+      "methods": [
+        "test_print_status_action",
+        "test_print_status_success",
+        "test_print_status_error",
+        "test_print_status_warning",
+        "test_print_status_info",
+        "test_print_status_all_levels"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiMessageCollection",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 299,
+      "language": "python",
+      "docstring": "Tests for message collection mode.",
+      "bases": [],
+      "methods": [
+        "test_collect_messages_mode",
+        "test_messages_not_collected_by_default"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestRichUiIntegration",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py",
+      "line": 326,
+      "language": "python",
+      "docstring": "Integration tests for RichUi.",
+      "bases": [],
+      "methods": [
+        "test_rich_ui_complete_workflow",
+        "test_rich_ui_with_real_output"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
       "name": "TestExtractFrontmatter",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py",
       "line": 17,
@@ -17109,6 +18443,216 @@
       "methods": [
         "test_load_modify_save_workflow",
         "test_backup_before_modification"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestTTYDetection",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 25,
+      "language": "python",
+      "docstring": "Tests for TTY detection.",
+      "bases": [],
+      "methods": [
+        "test_is_tty_available_returns_bool",
+        "test_is_tty_available_when_tty",
+        "test_is_tty_available_when_not_tty"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCIDetection",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 46,
+      "language": "python",
+      "docstring": "Tests for CI environment detection.",
+      "bases": [],
+      "methods": [
+        "test_is_ci_environment_returns_bool",
+        "test_is_ci_environment_detects_github_actions",
+        "test_is_ci_environment_detects_gitlab_ci",
+        "test_is_ci_environment_detects_travis",
+        "test_is_ci_environment_detects_circleci",
+        "test_is_ci_environment_detects_jenkins",
+        "test_is_ci_environment_detects_generic_ci",
+        "test_is_ci_environment_no_ci_vars"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestShouldUsePlainUI",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 94,
+      "language": "python",
+      "docstring": "Tests for should_use_plain_ui decision logic.",
+      "bases": [],
+      "methods": [
+        "test_should_use_plain_ui_with_force_flag",
+        "test_should_use_plain_ui_with_env_var",
+        "test_should_use_plain_ui_no_tty",
+        "test_should_use_plain_ui_in_ci",
+        "test_should_use_plain_ui_interactive_terminal"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCreateUI",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 132,
+      "language": "python",
+      "docstring": "Tests for create_ui factory function.",
+      "bases": [],
+      "methods": [
+        "test_create_ui_returns_ui_instance",
+        "test_create_ui_force_plain",
+        "test_create_ui_force_rich",
+        "test_create_ui_conflicting_flags_raises_error",
+        "test_create_ui_with_collect_messages",
+        "test_create_ui_with_quiet_mode",
+        "test_create_ui_auto_selects_rich_for_tty",
+        "test_create_ui_auto_selects_plain_for_non_tty"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestCreateUIFromArgs",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 193,
+      "language": "python",
+      "docstring": "Tests for create_ui_from_args convenience function.",
+      "bases": [],
+      "methods": [
+        "test_create_ui_from_args_with_plain_flag",
+        "test_create_ui_from_args_with_quiet_flag",
+        "test_create_ui_from_args_missing_attributes"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestGetBackendName",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 231,
+      "language": "python",
+      "docstring": "Tests for get_backend_name utility.",
+      "bases": [],
+      "methods": [
+        "test_get_backend_name_rich",
+        "test_get_backend_name_plain"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestFormatBackendInfo",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 248,
+      "language": "python",
+      "docstring": "Tests for format_backend_info utility.",
+      "bases": [],
+      "methods": [
+        "test_format_backend_info_returns_string",
+        "test_format_backend_info_contains_key_info"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestUIShorthand",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+      "line": 267,
+      "language": "python",
+      "docstring": "Tests for ui() shorthand function.",
+      "bases": [],
+      "methods": [
+        "test_ui_shorthand_creates_instance",
+        "test_ui_shorthand_with_force_plain",
+        "test_ui_shorthand_with_collect_messages"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMessageLevel",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+      "line": 12,
+      "language": "python",
+      "docstring": "Tests for MessageLevel enum.",
+      "bases": [],
+      "methods": [
+        "test_message_level_values",
+        "test_message_level_count",
+        "test_message_level_enum_members"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestMessage",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+      "line": 39,
+      "language": "python",
+      "docstring": "Tests for Message dataclass.",
+      "bases": [],
+      "methods": [
+        "test_message_creation_minimal",
+        "test_message_creation_full",
+        "test_message_default_timestamp",
+        "test_message_default_rendered_false",
+        "test_message_context_mutable",
+        "test_message_metadata_mutable"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestUiProtocol",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py",
+      "line": 102,
+      "language": "python",
+      "docstring": "Tests for Ui protocol definition.",
+      "bases": [],
+      "methods": [
+        "test_ui_is_runtime_checkable",
+        "test_ui_protocol_required_methods"
       ],
       "properties": [],
       "is_exported": false,
@@ -46141,6 +47685,24 @@
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
           "line": 293,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_is_tty_available_returns_bool",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 30,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_tty_available_when_tty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 37,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_tty_available_when_not_tty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 43,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -46151,7 +47713,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 5
     },
     {
       "name": "is_ci_environment",
@@ -46178,6 +47740,54 @@
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
           "line": 294,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_returns_bool",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 51,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_github_actions",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 57,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_gitlab_ci",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 62,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_travis",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_circleci",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_jenkins",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_detects_generic_ci",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_is_ci_environment_no_ci_vars",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 90,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -46194,7 +47804,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 10
     },
     {
       "name": "should_use_plain_ui",
@@ -46227,6 +47837,36 @@
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
           "line": 296,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_should_use_plain_ui_with_force_flag",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 99,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_should_use_plain_ui_with_env_var",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 104,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_should_use_plain_ui_no_tty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 113,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_should_use_plain_ui_in_ci",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 121,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_should_use_plain_ui_interactive_terminal",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 129,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -46249,7 +47889,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 2
+      "call_count": 7
     },
     {
       "name": "create_ui",
@@ -46303,6 +47943,66 @@
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
           "line": 325,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_returns_ui_instance",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 137,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_force_plain",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 145,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_force_rich",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 152,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_conflicting_flags_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 158,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_with_collect_messages",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 164,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_with_quiet_mode",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_auto_selects_rich_for_tty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 181,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_auto_selects_plain_for_non_tty",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 189,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_backend_name_rich",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 239,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_backend_name_plain",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 244,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -46313,7 +48013,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 13
     },
     {
       "name": "create_ui_from_args",
@@ -46334,7 +48034,26 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_create_ui_from_args_with_plain_flag",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 204,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_from_args_with_quiet_flag",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 214,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_from_args_missing_attributes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 227,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "getattr",
@@ -46360,7 +48079,8 @@
           "line": 246,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 3
     },
     {
       "name": "get_backend_name",
@@ -46381,8 +48101,22 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
-      "calls": []
+      "callers": [
+        {
+          "name": "test_get_backend_name_rich",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 240,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_get_backend_name_plain",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 245,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [],
+      "call_count": 2
     },
     {
       "name": "format_backend_info",
@@ -46397,7 +48131,20 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_format_backend_info_returns_string",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 253,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_format_backend_info_contains_key_info",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 258,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "is_tty_available",
@@ -46429,7 +48176,8 @@
           "line": 298,
           "call_type": "method_call"
         }
-      ]
+      ],
+      "call_count": 2
     },
     {
       "name": "ui",
@@ -46460,7 +48208,26 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_ui_shorthand_creates_instance",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 272,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ui_shorthand_with_force_plain",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 277,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ui_shorthand_with_collect_messages",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 282,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "create_ui",
@@ -46468,7 +48235,8 @@
           "line": 325,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 3
     },
     {
       "name": "validate_status",
@@ -126147,10 +127915,22 @@
       "claude_skills.common.validate_path",
       "claude_skills.common.find_spec_file"
     ],
+    "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py": [
+      "pytest",
+      "io.StringIO",
+      "sys",
+      "claude_skills.common.plain_ui.PlainUi",
+      "claude_skills.common.ui_protocol.MessageLevel",
+      "claude_skills.common.ui_protocol.Message"
+    ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py": [
       "pytest",
       "io.StringIO",
-      "claude_skills.common.PrettyPrinter"
+      "unittest.mock.MagicMock",
+      "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.ui_protocol.MessageLevel",
+      "claude_skills.common.plain_ui.PlainUi",
+      "claude_skills.common.rich_ui.RichUi"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py": [
       "pytest",
@@ -126159,6 +127939,16 @@
       "claude_skills.common.get_progress_summary",
       "claude_skills.common.list_phases",
       "claude_skills.common.load_json_spec"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py": [
+      "pytest",
+      "io.StringIO",
+      "unittest.mock.MagicMock",
+      "unittest.mock.patch",
+      "claude_skills.common.rich_ui.RichUi",
+      "claude_skills.common.ui_protocol.MessageLevel",
+      "claude_skills.common.ui_protocol.Message",
+      "rich.console.Console"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py": [
       "json",
@@ -126169,6 +127959,30 @@
       "claude_skills.common.save_json_spec",
       "claude_skills.common.backup_json_spec",
       "claude_skills.common.get_node"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py": [
+      "pytest",
+      "os",
+      "sys",
+      "unittest.mock.patch",
+      "unittest.mock.MagicMock",
+      "claude_skills.common.ui_factory.is_tty_available",
+      "claude_skills.common.ui_factory.is_ci_environment",
+      "claude_skills.common.ui_factory.should_use_plain_ui",
+      "claude_skills.common.ui_factory.create_ui",
+      "claude_skills.common.ui_factory.create_ui_from_args",
+      "claude_skills.common.ui_factory.get_backend_name",
+      "claude_skills.common.ui_factory.format_backend_info",
+      "claude_skills.common.ui_factory.ui",
+      "claude_skills.common.rich_ui.RichUi",
+      "claude_skills.common.plain_ui.PlainUi"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py": [
+      "pytest",
+      "datetime.datetime",
+      "claude_skills.common.ui_protocol.Ui",
+      "claude_skills.common.ui_protocol.MessageLevel",
+      "claude_skills.common.ui_protocol.Message"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_next/conftest.py": [
       "pytest"

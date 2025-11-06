@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 17:54:52
+**Generated:** 2025-11-06 18:09:56
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 233
-- **Total Lines:** 82134
-- **Total Classes:** 306
+- **Total Files:** 237
+- **Total Lines:** 83517
+- **Total Classes:** 338
 - **Total Functions:** 859
 - **Avg Complexity:** 5.77
 - **Max Complexity:** 45
@@ -2538,6 +2538,26 @@ Attributes:
 
 ---
 
+### `TestCIDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:46`
+
+**Description:**
+> Tests for CI environment detection.
+
+**Methods:**
+- `test_is_ci_environment_returns_bool()`
+- `test_is_ci_environment_detects_github_actions()`
+- `test_is_ci_environment_detects_gitlab_ci()`
+- `test_is_ci_environment_detects_travis()`
+- `test_is_ci_environment_detects_circleci()`
+- `test_is_ci_environment_detects_jenkins()`
+- `test_is_ci_environment_detects_generic_ci()`
+- `test_is_ci_environment_no_ci_vars()`
+
+---
+
 ### `TestCLIBasics`
 
 **Language:** python
@@ -3137,6 +3157,41 @@ Attributes:
 
 ---
 
+### `TestCreateUI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:132`
+
+**Description:**
+> Tests for create_ui factory function.
+
+**Methods:**
+- `test_create_ui_returns_ui_instance()`
+- `test_create_ui_force_plain()`
+- `test_create_ui_force_rich()`
+- `test_create_ui_conflicting_flags_raises_error()`
+- `test_create_ui_with_collect_messages()`
+- `test_create_ui_with_quiet_mode()`
+- `test_create_ui_auto_selects_rich_for_tty()`
+- `test_create_ui_auto_selects_plain_for_non_tty()`
+
+---
+
+### `TestCreateUIFromArgs`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:193`
+
+**Description:**
+> Tests for create_ui_from_args convenience function.
+
+**Methods:**
+- `test_create_ui_from_args_with_plain_flag()`
+- `test_create_ui_from_args_with_quiet_flag()`
+- `test_create_ui_from_args_missing_attributes()`
+
+---
+
 ### `TestDependencyGraphGenerator`
 
 **Language:** python
@@ -3566,6 +3621,20 @@ Attributes:
 
 ---
 
+### `TestFormatBackendInfo`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:248`
+
+**Description:**
+> Tests for format_backend_info utility.
+
+**Methods:**
+- `test_format_backend_info_returns_string()`
+- `test_format_backend_info_contains_key_info()`
+
+---
+
 ### `TestFormatCompletionPrompt`
 
 **Language:** python
@@ -3673,6 +3742,20 @@ Attributes:
 - `test_only_tasks_included()`
 - `test_empty_hierarchy()`
 - `test_node_with_no_children()`
+
+---
+
+### `TestGetBackendName`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:231`
+
+**Description:**
+> Tests for get_backend_name utility.
+
+**Methods:**
+- `test_get_backend_name_rich()`
+- `test_get_backend_name_plain()`
 
 ---
 
@@ -4361,6 +4444,39 @@ Attributes:
 
 ---
 
+### `TestMessage`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:39`
+
+**Description:**
+> Tests for Message dataclass.
+
+**Methods:**
+- `test_message_creation_minimal()`
+- `test_message_creation_full()`
+- `test_message_default_timestamp()`
+- `test_message_default_rendered_false()`
+- `test_message_context_mutable()`
+- `test_message_metadata_mutable()`
+
+---
+
+### `TestMessageLevel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:12`
+
+**Description:**
+> Tests for MessageLevel enum.
+
+**Methods:**
+- `test_message_level_values()`
+- `test_message_level_count()`
+- `test_message_level_enum_members()`
+
+---
+
 ### `TestMoveSpec`
 
 **Language:** python
@@ -4571,6 +4687,157 @@ Attributes:
 
 ---
 
+### `TestPlainUiInitialization`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:15`
+
+**Description:**
+> Tests for PlainUi initialization.
+
+**Methods:**
+- `test_plain_ui_default_initialization()`
+- `test_plain_ui_with_quiet_mode()`
+- `test_plain_ui_with_collect_messages()`
+- `test_plain_ui_with_custom_file()`
+
+---
+
+### `TestPlainUiIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:402`
+
+**Description:**
+> Integration tests for PlainUi.
+
+**Methods:**
+- `test_plain_ui_complete_workflow()`
+- `test_plain_ui_no_ansi_codes()`
+
+---
+
+### `TestPlainUiMessageCollection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:368`
+
+**Description:**
+> Tests for message collection mode.
+
+**Methods:**
+- `test_collect_messages_mode()`
+- `test_messages_not_collected_by_default()`
+
+---
+
+### `TestPlainUiPrintDiff`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:166`
+
+**Description:**
+> Tests for print_diff method.
+
+**Methods:**
+- `test_print_diff_basic()`
+- `test_print_diff_with_labels()`
+- `test_print_diff_identical_text()`
+
+---
+
+### `TestPlainUiPrintPanel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:236`
+
+**Description:**
+> Tests for print_panel method.
+
+**Methods:**
+- `test_print_panel_basic()`
+- `test_print_panel_with_title()`
+- `test_print_panel_with_style()`
+
+---
+
+### `TestPlainUiPrintStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:275`
+
+**Description:**
+> Tests for print_status method.
+
+**Methods:**
+- `test_print_status_action()`
+- `test_print_status_success()`
+- `test_print_status_error()`
+- `test_print_status_warning()`
+- `test_print_status_info()`
+- `test_print_status_all_levels()`
+
+---
+
+### `TestPlainUiPrintTable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:50`
+
+**Description:**
+> Tests for print_table method.
+
+**Methods:**
+- `test_print_table_basic()`
+- `test_print_table_with_title()`
+- `test_print_table_with_columns()`
+- `test_print_table_empty_data()`
+
+---
+
+### `TestPlainUiPrintTree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:109`
+
+**Description:**
+> Tests for print_tree method.
+
+**Methods:**
+- `test_print_tree_basic()`
+- `test_print_tree_nested()`
+- `test_print_tree_empty()`
+
+---
+
+### `TestPlainUiProgress`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:208`
+
+**Description:**
+> Tests for progress method.
+
+**Methods:**
+- `test_progress_context_manager()`
+- `test_progress_indeterminate()`
+
+---
+
+### `TestPlainUiQuietMode`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:341`
+
+**Description:**
+> Tests for quiet mode behavior.
+
+**Methods:**
+- `test_quiet_mode_suppresses_output()`
+- `test_quiet_mode_shows_errors()`
+
+---
+
 ### `TestPrepareTask`
 
 **Language:** python
@@ -4588,10 +4855,26 @@ Attributes:
 
 ---
 
+### `TestPrettyPrinterBackwardCompatibility`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:286`
+
+**Description:**
+> Tests for backward compatibility after refactoring.
+
+**Methods:**
+- `test_colorize_method_preserved()`
+- `test_all_original_methods_exist()`
+- `test_original_signature_compatibility()`
+- `test_method_parameters_backward_compatible()`
+
+---
+
 ### `TestPrettyPrinterColorMode`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:103`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:109`
 
 **Description:**
 > Tests for color/no-color modes.
@@ -4605,7 +4888,7 @@ Attributes:
 ### `TestPrettyPrinterFormatting`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:165`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:171`
 
 **Description:**
 > Tests for message formatting.
@@ -4619,7 +4902,7 @@ Attributes:
 ### `TestPrettyPrinterInit`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:12`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:16`
 
 **Description:**
 > Tests for PrettyPrinter initialization.
@@ -4635,7 +4918,7 @@ Attributes:
 ### `TestPrettyPrinterIntegration`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:197`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:203`
 
 **Description:**
 > Integration tests for PrettyPrinter.
@@ -4649,7 +4932,7 @@ Attributes:
 ### `TestPrettyPrinterMethods`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:43`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:47`
 
 **Description:**
 > Tests for PrettyPrinter methods.
@@ -4665,10 +4948,27 @@ Attributes:
 
 ---
 
+### `TestPrettyPrinterUiBackend`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:238`
+
+**Description:**
+> Tests for PrettyPrinter integration with Ui backend.
+
+**Methods:**
+- `test_printer_has_ui_backend()`
+- `test_printer_delegates_to_ui_backend()`
+- `test_printer_uses_plain_ui_when_color_disabled()`
+- `test_printer_passes_quiet_to_backend()`
+- `test_printer_backend_selection()`
+
+---
+
 ### `TestPrettyPrinterVerbosity`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:128`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:134`
 
 **Description:**
 > Tests for verbosity modes.
@@ -5052,6 +5352,143 @@ Attributes:
 
 ---
 
+### `TestRichUiInitialization`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:16`
+
+**Description:**
+> Tests for RichUi initialization.
+
+**Methods:**
+- `test_rich_ui_default_initialization()`
+- `test_rich_ui_with_custom_console()`
+- `test_rich_ui_with_collect_messages()`
+
+---
+
+### `TestRichUiIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:326`
+
+**Description:**
+> Integration tests for RichUi.
+
+**Methods:**
+- `test_rich_ui_complete_workflow()`
+- `test_rich_ui_with_real_output()`
+
+---
+
+### `TestRichUiMessageCollection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:299`
+
+**Description:**
+> Tests for message collection mode.
+
+**Methods:**
+- `test_collect_messages_mode()`
+- `test_messages_not_collected_by_default()`
+
+---
+
+### `TestRichUiPrintDiff`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:142`
+
+**Description:**
+> Tests for print_diff method.
+
+**Methods:**
+- `test_print_diff_basic()`
+- `test_print_diff_with_labels()`
+- `test_print_diff_identical_text()`
+
+---
+
+### `TestRichUiPrintPanel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:215`
+
+**Description:**
+> Tests for print_panel method.
+
+**Methods:**
+- `test_print_panel_basic()`
+- `test_print_panel_with_title()`
+- `test_print_panel_with_style()`
+
+---
+
+### `TestRichUiPrintStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:245`
+
+**Description:**
+> Tests for print_status method.
+
+**Methods:**
+- `test_print_status_action()`
+- `test_print_status_success()`
+- `test_print_status_error()`
+- `test_print_status_warning()`
+- `test_print_status_info()`
+- `test_print_status_all_levels()`
+
+---
+
+### `TestRichUiPrintTable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:44`
+
+**Description:**
+> Tests for print_table method.
+
+**Methods:**
+- `test_print_table_basic()`
+- `test_print_table_with_title()`
+- `test_print_table_with_columns()`
+- `test_print_table_empty_data()`
+
+---
+
+### `TestRichUiPrintTree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:97`
+
+**Description:**
+> Tests for print_tree method.
+
+**Methods:**
+- `test_print_tree_basic()`
+- `test_print_tree_nested()`
+- `test_print_tree_empty()`
+
+---
+
+### `TestRichUiProgress`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:177`
+
+**Description:**
+> Tests for progress method.
+
+**Methods:**
+- `test_progress_context_manager()`
+- `test_progress_indeterminate()`
+- `test_progress_with_description()`
+
+---
+
 ### `TestRollbackToVersion`
 
 **Language:** python
@@ -5204,6 +5641,23 @@ Attributes:
 - `test_error_handling_no_spec_data()`
 - `test_error_handling_no_hierarchy()`
 - `test_error_handling_invalid_phase_id()`
+
+---
+
+### `TestShouldUsePlainUI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:94`
+
+**Description:**
+> Tests for should_use_plain_ui decision logic.
+
+**Methods:**
+- `test_should_use_plain_ui_with_force_flag()`
+- `test_should_use_plain_ui_with_env_var()`
+- `test_should_use_plain_ui_no_tty()`
+- `test_should_use_plain_ui_in_ci()`
+- `test_should_use_plain_ui_interactive_terminal()`
 
 ---
 
@@ -5368,6 +5822,21 @@ Attributes:
 
 ---
 
+### `TestTTYDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:25`
+
+**Description:**
+> Tests for TTY detection.
+
+**Methods:**
+- `test_is_tty_available_returns_bool()`
+- `test_is_tty_available_when_tty()`
+- `test_is_tty_available_when_not_tty()`
+
+---
+
 ### `TestTaskGrouper`
 
 **Language:** python
@@ -5459,6 +5928,35 @@ Attributes:
 - `test_parse_enum()`
 - `test_parse_generic_function()`
 - `test_parse_tsx_component()`
+
+---
+
+### `TestUIShorthand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:267`
+
+**Description:**
+> Tests for ui() shorthand function.
+
+**Methods:**
+- `test_ui_shorthand_creates_instance()`
+- `test_ui_shorthand_with_force_plain()`
+- `test_ui_shorthand_with_collect_messages()`
+
+---
+
+### `TestUiProtocol`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:102`
+
+**Description:**
+> Tests for Ui protocol definition.
+
+**Methods:**
+- `test_ui_is_runtime_checkable()`
+- `test_ui_protocol_required_methods()`
 
 ---
 
@@ -25777,11 +26275,24 @@ Returns:
 - `pathlib.Path`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py`
+
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `io.StringIO`
+- `pytest`
+- `sys`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py`
 
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_protocol.MessageLevel`
 - `io.StringIO`
 - `pytest`
+- `unittest.mock.MagicMock`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py`
 
@@ -25792,6 +26303,17 @@ Returns:
 - `claude_skills.common.update_parent_status`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py`
+
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `io.StringIO`
+- `pytest`
+- `rich.console.Console`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py`
 
 - `claude_skills.common.backup_json_spec`
@@ -25801,6 +26323,32 @@ Returns:
 - `claude_skills.common.save_json_spec`
 - `json`
 - `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py`
+
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_factory.create_ui`
+- `claude_skills.common.ui_factory.create_ui_from_args`
+- `claude_skills.common.ui_factory.format_backend_info`
+- `claude_skills.common.ui_factory.get_backend_name`
+- `claude_skills.common.ui_factory.is_ci_environment`
+- `claude_skills.common.ui_factory.is_tty_available`
+- `claude_skills.common.ui_factory.should_use_plain_ui`
+- `claude_skills.common.ui_factory.ui`
+- `os`
+- `pytest`
+- `sys`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py`
+
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `claude_skills.common.ui_protocol.Ui`
+- `datetime.datetime`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/conftest.py`
