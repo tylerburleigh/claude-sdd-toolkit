@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T17:48:56.411220Z",
+    "generated_at": "2025-11-06T17:58:32.625937Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 222,
-    "total_lines": 77003,
+    "total_lines": 77005,
     "total_classes": 290,
     "total_functions": 833,
     "avg_complexity": 5.75,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 222,
-        "lines": 77003,
+        "lines": 77005,
         "classes": 290,
         "functions": 833,
         "avg_complexity": 5.75
@@ -4360,7 +4360,7 @@
         "pathlib.Path"
       ],
       "exports": [],
-      "lines": 935
+      "lines": 937
     },
     {
       "name": "test_status_report",
@@ -14356,7 +14356,7 @@
     {
       "name": "TestListAssumptionsCLI",
       "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-      "line": 202,
+      "line": 203,
       "language": "python",
       "docstring": "Tests for list-assumptions command.",
       "bases": [],
@@ -14375,7 +14375,7 @@
     {
       "name": "TestUpdateEstimateCLI",
       "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-      "line": 308,
+      "line": 309,
       "language": "python",
       "docstring": "Tests for update-estimate command.",
       "bases": [],
@@ -14396,7 +14396,7 @@
     {
       "name": "TestAddTaskCLI",
       "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-      "line": 440,
+      "line": 441,
       "language": "python",
       "docstring": "Tests for add-task command.",
       "bases": [],
@@ -14418,7 +14418,7 @@
     {
       "name": "TestRemoveTaskCLI",
       "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-      "line": 615,
+      "line": 616,
       "language": "python",
       "docstring": "Tests for remove-task command.",
       "bases": [],
@@ -14438,7 +14438,7 @@
     {
       "name": "TestSpecModificationWorkflow",
       "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-      "line": 803,
+      "line": 804,
       "language": "python",
       "docstring": "End-to-end workflow tests combining multiple commands.",
       "bases": [],
@@ -42954,151 +42954,151 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 133,
+          "line": 134,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 165,
+          "line": 166,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 183,
+          "line": 184,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 291,
+          "line": 292,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 328,
+          "line": 329,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 348,
+          "line": 349,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 369,
+          "line": 370,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 401,
+          "line": 402,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 420,
+          "line": 421,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 460,
+          "line": 461,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 487,
+          "line": 488,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 513,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 539,
+          "line": 540,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 577,
+          "line": 578,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 596,
+          "line": 597,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 634,
+          "line": 635,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 656,
+          "line": 657,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 674,
+          "line": 675,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 694,
+          "line": 695,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 716,
+          "line": 717,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 735,
+          "line": 736,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 785,
+          "line": 786,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 845,
+          "line": 847,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 866,
+          "line": 868,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 882,
+          "line": 884,
           "call_type": "function_call"
         },
         {
@@ -44061,7 +44061,7 @@
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 293,
+          "line": 294,
           "call_type": "function_call"
         },
         {
@@ -106070,253 +106070,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -107163,253 +107163,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -108286,253 +108286,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -109379,253 +109379,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -110472,253 +110472,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -111595,253 +111595,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -113147,253 +113147,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {
@@ -114270,253 +114270,253 @@
         {
           "name": "test_add_assumption_with_author",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 119,
+          "line": 120,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 141,
+          "line": 142,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 169,
+          "line": 170,
           "call_type": "function_call"
         },
         {
           "name": "test_add_assumption_invalid_spec",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 189,
+          "line": 190,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 208,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 216,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 230,
+          "line": 231,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 237,
+          "line": 238,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_by_type",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 246,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 269,
+          "line": 270,
           "call_type": "function_call"
         },
         {
           "name": "test_list_assumptions_empty",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_hours_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 313,
+          "line": 314,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_complexity_only",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 334,
+          "line": 335,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_both",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 354,
+          "line": 355,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 376,
+          "line": 377,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 404,
+          "line": 405,
           "call_type": "function_call"
         },
         {
           "name": "test_update_estimate_invalid_task",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 426,
+          "line": 427,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 445,
+          "line": 446,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_description",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 472,
+          "line": 473,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_estimate",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 498,
+          "line": 499,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_with_position",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 524,
+          "line": 525,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 552,
+          "line": 553,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 580,
+          "line": 581,
           "call_type": "function_call"
         },
         {
           "name": "test_add_task_invalid_parent",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 601,
+          "line": 602,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 621,
+          "line": 622,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 643,
+          "line": 644,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 662,
+          "line": 663,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 683,
+          "line": 684,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_with_cascade",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 703,
+          "line": 704,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 723,
+          "line": 724,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_json_output",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 744,
+          "line": 745,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_dry_run",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 769,
+          "line": 770,
           "call_type": "function_call"
         },
         {
           "name": "test_remove_task_invalid",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 790,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 811,
+          "line": 812,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 821,
+          "line": 823,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 832,
+          "line": 834,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 854,
+          "line": 856,
           "call_type": "function_call"
         },
         {
           "name": "test_complete_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 872,
+          "line": 874,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 901,
+          "line": 903,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 911,
+          "line": 913,
           "call_type": "function_call"
         },
         {
           "name": "test_multiple_assumptions_workflow",
           "file": "src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py",
-          "line": 924,
+          "line": 926,
           "call_type": "function_call"
         },
         {

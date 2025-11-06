@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 12:48:56
+**Generated:** 2025-11-06 12:58:32
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 222
-- **Total Lines:** 77003
+- **Total Lines:** 77005
 - **Total Classes:** 290
 - **Total Functions:** 833
 - **Avg Complexity:** 5.75
@@ -2198,7 +2198,7 @@ Attributes:
 ### `TestAddTaskCLI`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:440`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:441`
 
 **Description:**
 > Tests for add-task command.
@@ -3944,7 +3944,7 @@ Attributes:
 ### `TestListAssumptionsCLI`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:202`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:203`
 
 **Description:**
 > Tests for list-assumptions command.
@@ -4734,7 +4734,7 @@ Attributes:
 ### `TestRemoveTaskCLI`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:615`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:616`
 
 **Description:**
 > Tests for remove-task command.
@@ -4997,7 +4997,7 @@ Attributes:
 ### `TestSpecModificationWorkflow`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:803`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:804`
 
 **Description:**
 > End-to-end workflow tests combining multiple commands.
@@ -5198,7 +5198,7 @@ Attributes:
 ### `TestUpdateEstimateCLI`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:308`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_spec_modification_cli.py:309`
 
 **Description:**
 > Tests for update-estimate command.

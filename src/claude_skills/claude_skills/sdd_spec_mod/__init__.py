@@ -14,6 +14,7 @@ from .modification import (
     update_task_counts,
     spec_transaction,
     transactional_modify,
+    apply_modifications,
 )
 
 from .revision import (
@@ -24,6 +25,7 @@ from .revision import (
 
 __all__ = [
     "add_node",
+    "apply_modifications",
     "create_revision",
     "get_revision_history",
     "move_node",

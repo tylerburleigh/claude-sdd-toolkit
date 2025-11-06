@@ -958,3 +958,269 @@ def update_task_counts(spec_data: Dict[str, Any], node_id: str) -> Dict[str, Any
         "success": False,
         "message": "update_task_counts not yet implemented"
     }
+
+
+def apply_modifications(
+    spec_data: Dict[str, Any],
+    modifications_file: str
+) -> Dict[str, Any]:
+    """
+    Apply a batch of modifications from a JSON file to a spec.
+
+    Reads a JSON file containing an array of modification operations and
+    applies them sequentially to the spec. Each operation is atomic - if
+    one fails, previous successful operations are kept but remaining ones
+    are skipped.
+
+    Args:
+        spec_data: The full spec data dictionary to modify
+        modifications_file: Path to JSON file containing modifications array
+
+    Returns:
+        Dict with overall status and per-operation results:
+        {
+            "success": True|False,
+            "message": "Overall summary",
+            "total_operations": N,
+            "successful": N,
+            "failed": N,
+            "results": [
+                {
+                    "operation": {...},
+                    "success": True|False,
+                    "message": "...",
+                    "error": "..." (only if failed)
+                },
+                ...
+            ]
+        }
+
+    Modification File Format:
+        {
+            "modifications": [
+                {
+                    "operation": "add_node",
+                    "parent_id": "phase-1",
+                    "node_data": {
+                        "node_id": "task-1-5",
+                        "type": "task",
+                        "title": "New task",
+                        "description": "...",
+                        "status": "pending"
+                    },
+                    "position": 2
+                },
+                {
+                    "operation": "update_node_field",
+                    "node_id": "task-1-1",
+                    "field": "title",
+                    "value": "Updated title"
+                },
+                {
+                    "operation": "remove_node",
+                    "node_id": "task-2-3",
+                    "cascade": true
+                },
+                {
+                    "operation": "move_node",
+                    "node_id": "task-1-3",
+                    "new_parent_id": "phase-2",
+                    "position": 0
+                }
+            ]
+        }
+
+    Raises:
+        FileNotFoundError: If modifications_file doesn't exist
+        json.JSONDecodeError: If file is not valid JSON
+        ValueError: If file format is invalid
+    """
+    import json
+    from pathlib import Path
+
+    # Validate modifications file exists
+    mod_file_path = Path(modifications_file)
+    if not mod_file_path.exists():
+        raise FileNotFoundError(f"Modifications file not found: {modifications_file}")
+
+    # Read and parse modifications file
+    try:
+        with open(mod_file_path, 'r', encoding='utf-8') as f:
+            mod_data = json.load(f)
+    except json.JSONDecodeError as e:
+        raise json.JSONDecodeError(
+            f"Invalid JSON in modifications file: {str(e)}",
+            e.doc,
+            e.pos
+        )
+
+    # Validate file structure
+    if not isinstance(mod_data, dict):
+        raise ValueError("Modifications file must contain a JSON object")
+
+    if "modifications" not in mod_data:
+        raise ValueError("Modifications file must contain 'modifications' key")
+
+    modifications = mod_data["modifications"]
+    if not isinstance(modifications, list):
+        raise ValueError("'modifications' must be an array")
+
+    # Track results
+    results = []
+    successful = 0
+    failed = 0
+
+    # Map operation names to functions
+    operation_handlers = {
+        "add_node": _handle_add_node,
+        "remove_node": _handle_remove_node,
+        "update_node_field": _handle_update_node_field,
+        "move_node": _handle_move_node,
+    }
+
+    # Apply each modification sequentially
+    for i, mod in enumerate(modifications):
+        if not isinstance(mod, dict):
+            result = {
+                "operation": mod,
+                "success": False,
+                "message": f"Operation {i+1} is not a valid object",
+                "error": "Expected dict, got " + type(mod).__name__
+            }
+            results.append(result)
+            failed += 1
+            continue
+
+        operation_type = mod.get("operation")
+        if not operation_type:
+            result = {
+                "operation": mod,
+                "success": False,
+                "message": f"Operation {i+1} missing 'operation' field",
+                "error": "Missing required field 'operation'"
+            }
+            results.append(result)
+            failed += 1
+            continue
+
+        if operation_type not in operation_handlers:
+            result = {
+                "operation": mod,
+                "success": False,
+                "message": f"Unknown operation type: {operation_type}",
+                "error": f"Valid operations: {', '.join(operation_handlers.keys())}"
+            }
+            results.append(result)
+            failed += 1
+            continue
+
+        # Execute operation
+        handler = operation_handlers[operation_type]
+        try:
+            op_result = handler(spec_data, mod)
+            result = {
+                "operation": mod,
+                "success": op_result.get("success", False),
+                "message": op_result.get("message", "Operation completed"),
+            }
+
+            # Include additional fields from operation result
+            for key in ["node_id", "old_value", "removed_nodes", "old_parent_id", "new_parent_id"]:
+                if key in op_result:
+                    result[key] = op_result[key]
+
+            if op_result.get("success", False):
+                successful += 1
+            else:
+                failed += 1
+                result["error"] = op_result.get("message", "Operation failed")
+
+            results.append(result)
+
+        except Exception as e:
+            result = {
+                "operation": mod,
+                "success": False,
+                "message": f"Operation failed with exception: {str(e)}",
+                "error": str(e)
+            }
+            results.append(result)
+            failed += 1
+
+    # Prepare overall result
+    total_operations = len(modifications)
+    overall_success = failed == 0
+
+    return {
+        "success": overall_success,
+        "message": f"Applied {successful}/{total_operations} modifications successfully",
+        "total_operations": total_operations,
+        "successful": successful,
+        "failed": failed,
+        "results": results
+    }
+
+
+def _handle_add_node(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle add_node operation from modifications file."""
+    required_fields = ["parent_id", "node_data"]
+    missing = [f for f in required_fields if f not in mod]
+    if missing:
+        return {
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}"
+        }
+
+    parent_id = mod["parent_id"]
+    node_data = mod["node_data"]
+    position = mod.get("position")
+
+    return add_node(spec_data, parent_id, node_data, position)
+
+
+def _handle_remove_node(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle remove_node operation from modifications file."""
+    if "node_id" not in mod:
+        return {
+            "success": False,
+            "message": "Missing required field: node_id"
+        }
+
+    node_id = mod["node_id"]
+    cascade = mod.get("cascade", False)
+
+    return remove_node(spec_data, node_id, cascade)
+
+
+def _handle_update_node_field(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle update_node_field operation from modifications file."""
+    required_fields = ["node_id", "field", "value"]
+    missing = [f for f in required_fields if f not in mod]
+    if missing:
+        return {
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}"
+        }
+
+    node_id = mod["node_id"]
+    field = mod["field"]
+    value = mod["value"]
+
+    return update_node_field(spec_data, node_id, field, value)
+
+
+def _handle_move_node(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle move_node operation from modifications file."""
+    required_fields = ["node_id", "new_parent_id"]
+    missing = [f for f in required_fields if f not in mod]
+    if missing:
+        return {
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}"
+        }
+
+    node_id = mod["node_id"]
+    new_parent_id = mod["new_parent_id"]
+    position = mod.get("position")
+
+    return move_node(spec_data, node_id, new_parent_id, position)
