@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 17:26:26
+**Generated:** 2025-11-06 17:29:28
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 231
-- **Total Lines:** 80957
-- **Total Classes:** 304
+- **Total Files:** 232
+- **Total Lines:** 81603
+- **Total Classes:** 306
 - **Total Functions:** 851
 - **Avg Complexity:** 5.8
 - **Max Complexity:** 45
@@ -1743,6 +1743,68 @@ parsing across multiple languages.
 - `get_language_statistics()`
 - `_should_exclude()`
 - `_print_summary()`
+
+---
+
+### `PlainProgressTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/plain_ui.py:593`
+
+**Description:**
+> Progress task wrapper for PlainUi.
+
+Tracks progress and displays text updates.
+No visual progress bars - just percentage updates.
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `set_description()`
+
+---
+
+### `PlainUi`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/plain_ui.py:37`
+
+**Description:**
+> Plain text TUI backend for non-TTY environments.
+
+Provides simple text output without ANSI codes or Rich formatting.
+Designed for CI/CD, pipes, logs, and other non-interactive contexts
+where fancy formatting is not desired or not supported.
+
+All Ui protocol methods are implemented with plain text equivalents:
+- Tables rendered as ASCII text
+- Trees rendered with ASCII box characters
+- Panels rendered with simple borders
+- Progress shown as text updates
+- Diffs shown as unified diff format
+
+Attributes:
+    collect_messages: Whether to collect messages for deferred rendering
+    _messages: Collection of structured messages
+    _context_stack: Stack of context dictionaries for message tagging
+    quiet: Whether to suppress non-error output
+    file: Output file object (default stdout)
+
+**Methods:**
+- `__init__()`
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
+- `_output()`
+- `_write()`
+- `_add_message()`
+- `get_messages()`
+- `render_all()`
+- `clear_messages()`
+- `context()`
 
 ---
 
@@ -23510,6 +23572,7 @@ Returns:
 - `paths.normalize_path`
 - `paths.validate_and_normalize_paths`
 - `paths.validate_path`
+- `plain_ui.PlainUi`
 - `printer.PrettyPrinter`
 - `progress.get_progress_summary`
 - `progress.list_phases`
@@ -23691,6 +23754,21 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/plain_ui.py`
+
+- `contextlib.contextmanager`
+- `difflib`
+- `io.StringIO`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Iterator`
+- `typing.List`
+- `typing.Optional`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 
 ### `src/claude_skills/claude_skills/common/printer.py`
 

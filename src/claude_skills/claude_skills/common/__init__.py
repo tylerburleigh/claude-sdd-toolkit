@@ -48,6 +48,16 @@ from .printer import PrettyPrinter
 from .ui_protocol import Ui, Message, MessageLevel
 from .rich_ui import RichUi
 from .plain_ui import PlainUi
+from .ui_factory import (
+    create_ui,
+    create_ui_from_args,
+    is_tty_available,
+    is_ci_environment,
+    should_use_plain_ui,
+    get_backend_name,
+    format_backend_info,
+    ui,
+)
 from .validation import (
     EnhancedError,
     SpecValidationResult,
@@ -212,6 +222,14 @@ __all__ = [
     "MessageLevel",
     "RichUi",
     "PlainUi",
+    "create_ui",
+    "create_ui_from_args",
+    "is_tty_available",
+    "is_ci_environment",
+    "should_use_plain_ui",
+    "get_backend_name",
+    "format_backend_info",
+    "ui",
 
     # Validation utilities
     "EnhancedError",

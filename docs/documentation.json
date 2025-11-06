@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T22:26:26.649796Z",
+    "generated_at": "2025-11-06T22:29:28.552417Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 231,
-    "total_lines": 80957,
-    "total_classes": 304,
+    "total_files": 232,
+    "total_lines": 81603,
+    "total_classes": 306,
     "total_functions": 851,
     "avg_complexity": 5.8,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 231,
-        "lines": 80957,
-        "classes": 304,
+        "files": 232,
+        "lines": 81603,
+        "classes": 306,
         "functions": 851,
         "avg_complexity": 5.8
       }
@@ -786,6 +786,7 @@
         "ui_protocol.Message",
         "ui_protocol.MessageLevel",
         "rich_ui.RichUi",
+        "plain_ui.PlainUi",
         "validation.EnhancedError",
         "validation.SpecValidationResult",
         "validation.JsonSpecValidationResult",
@@ -850,7 +851,7 @@
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 299
+      "lines": 301
     },
     {
       "name": "ai_config",
@@ -1243,6 +1244,33 @@
       ],
       "exports": [],
       "lines": 566
+    },
+    {
+      "name": "plain_ui",
+      "file": "src/claude_skills/claude_skills/common/plain_ui.py",
+      "language": "python",
+      "docstring": "Plain text terminal user interface backend.\n\nThis module implements the PlainUi backend - a simple text-based fallback\nfor non-TTY environments (CI, pipes, non-interactive contexts).\n\nKey Features:\n- Simple text output without ANSI codes\n- No Rich library required for output\n- Safe for CI/CD pipelines and log files\n- Maintains compatibility with Ui protocol\n- Optional message collection for deferred rendering\n\nUsage:\n    from claude_skills.common.plain_ui import PlainUi\n    from claude_skills.common.ui_protocol import MessageLevel\n\n    ui = PlainUi()\n    ui.print_table([{\"task\": \"task-1-1\", \"status\": \"completed\"}], title=\"Tasks\")\n    ui.print_status(\"Processing...\", level=MessageLevel.ACTION)\n\n    # Collection mode still works\n    ui_collect = PlainUi(collect_messages=True)\n    ui_collect.print_status(\"Message\", MessageLevel.INFO)\n    messages = ui_collect.get_messages()",
+      "classes": [
+        "PlainUi",
+        "PlainProgressTask"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Optional",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Iterator",
+        "contextlib.contextmanager",
+        "io.StringIO",
+        "difflib",
+        "sys",
+        "ui_protocol.Ui",
+        "ui_protocol.MessageLevel",
+        "ui_protocol.Message"
+      ],
+      "exports": [],
+      "lines": 644
     },
     {
       "name": "printer",
@@ -8010,6 +8038,64 @@
       "imported_by": []
     },
     {
+      "name": "PlainUi",
+      "file": "src/claude_skills/claude_skills/common/plain_ui.py",
+      "line": 37,
+      "language": "python",
+      "docstring": "Plain text TUI backend for non-TTY environments.\n\nProvides simple text output without ANSI codes or Rich formatting.\nDesigned for CI/CD, pipes, logs, and other non-interactive contexts\nwhere fancy formatting is not desired or not supported.\n\nAll Ui protocol methods are implemented with plain text equivalents:\n- Tables rendered as ASCII text\n- Trees rendered with ASCII box characters\n- Panels rendered with simple borders\n- Progress shown as text updates\n- Diffs shown as unified diff format\n\nAttributes:\n    collect_messages: Whether to collect messages for deferred rendering\n    _messages: Collection of structured messages\n    _context_stack: Stack of context dictionaries for message tagging\n    quiet: Whether to suppress non-error output\n    file: Output file object (default stdout)",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "print_table",
+        "print_tree",
+        "print_diff",
+        "progress",
+        "print_panel",
+        "print_status",
+        "_output",
+        "_write",
+        "_add_message",
+        "get_messages",
+        "render_all",
+        "clear_messages",
+        "context"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "PlainProgressTask",
+      "file": "src/claude_skills/claude_skills/common/plain_ui.py",
+      "line": 593,
+      "language": "python",
+      "docstring": "Progress task wrapper for PlainUi.\n\nTracks progress and displays text updates.\nNo visual progress bars - just percentage updates.",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "update",
+        "set_description"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "progress",
+          "file": "src/claude_skills/claude_skills/common/plain_ui.py",
+          "line": 329,
+          "context": [
+            "PlainUi",
+            "progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
       "name": "PrettyPrinter",
       "file": "src/claude_skills/claude_skills/common/printer.py",
       "line": 8,
@@ -8833,6 +8919,15 @@
       "instantiated_by": [
         {
           "instantiator": "_add_message",
+          "file": "src/claude_skills/claude_skills/common/plain_ui.py",
+          "line": 507,
+          "context": [
+            "PlainUi",
+            "_add_message"
+          ]
+        },
+        {
+          "instantiator": "_add_message",
           "file": "src/claude_skills/claude_skills/common/rich_ui.py",
           "line": 494,
           "context": [
@@ -8842,7 +8937,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "Ui",
@@ -123843,6 +123938,7 @@
       "ui_protocol.Message",
       "ui_protocol.MessageLevel",
       "rich_ui.RichUi",
+      "plain_ui.PlainUi",
       "validation.EnhancedError",
       "validation.SpecValidationResult",
       "validation.JsonSpecValidationResult",
@@ -124038,6 +124134,20 @@
       "typing.Optional",
       "typing.List",
       "typing.Dict"
+    ],
+    "src/claude_skills/claude_skills/common/plain_ui.py": [
+      "typing.Optional",
+      "typing.List",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Iterator",
+      "contextlib.contextmanager",
+      "io.StringIO",
+      "difflib",
+      "sys",
+      "ui_protocol.Ui",
+      "ui_protocol.MessageLevel",
+      "ui_protocol.Message"
     ],
     "src/claude_skills/claude_skills/common/printer.py": [
       "sys"
