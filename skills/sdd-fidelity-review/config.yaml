@@ -43,4 +43,4 @@ consensus:
     missing_functionality: discovery-focus
     cross_file: discovery-focus
 consultation:
-  timeout_seconds: 90
+  timeout_seconds: 360

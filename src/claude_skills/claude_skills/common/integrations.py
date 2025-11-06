@@ -223,21 +223,21 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
             result["errors"].append(f"Task {task_id} is manual verification - cannot auto-execute")
             return result
 
-        # Get skill or command
-        skill = metadata.get("skill")
+        # Get agent or command
+        agent = metadata.get("agent")
         command = metadata.get("command")
 
-        if not skill and not command:
-            result["errors"].append(f"Task {task_id} has no skill or command specified")
+        if not agent and not command:
+            result["errors"].append(f"Task {task_id} has no agent or command specified")
             return result
 
         # Execute based on type
-        if skill:
-            result["skill_used"] = skill
+        if agent:
+            result["agent_used"] = agent
             execution_success = False
 
-            # Skill registry - dispatch to appropriate handler
-            if skill == "run-tests":
+            # Agent registry - dispatch to appropriate handler
+            if agent == "run-tests":
                 # Execute run-tests skill
                 test_command = command or "run"
                 proc = subprocess.run(
@@ -256,7 +256,7 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                     if proc.stderr:
                         result["errors"].append(proc.stderr)
 
-            elif skill == "sdd-validate":
+            elif agent == "sdd-validate":
                 # Execute sdd-validate skill
                 validate_command = ["sdd-validate", "validate"]
                 if command:
@@ -278,7 +278,7 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                     if proc.stderr:
                         result["errors"].append(proc.stderr)
 
-            elif skill == "code-doc":
+            elif agent == "code-doc":
                 # Execute code-doc skill
                 doc_command = ["code-doc"]
                 if command:
@@ -300,7 +300,7 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                     if proc.stderr:
                         result["errors"].append(proc.stderr)
 
-            elif skill == "doc-query":
+            elif agent == "doc-query":
                 # Execute doc-query skill
                 query_command = ["doc-query"]
                 if command:
@@ -323,7 +323,7 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                         result["errors"].append(proc.stderr)
 
             else:
-                result["errors"].append(f"Unknown skill: {skill}")
+                result["errors"].append(f"Unknown agent: {agent}")
                 execution_success = False
 
             result["success"] = execution_success

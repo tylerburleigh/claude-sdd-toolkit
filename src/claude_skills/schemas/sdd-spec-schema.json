@@ -132,16 +132,26 @@
             },
             "verification_type": {
               "type": "string",
-              "enum": ["auto", "manual"],
-              "description": "Type of verification (auto=automated, manual=human review)"
+              "enum": ["auto", "manual", "fidelity"],
+              "description": "Type of verification: 'auto' (automated tests/checks), 'manual' (human review checklist), 'fidelity' (implementation vs spec comparison)"
             },
-            "skill": {
+            "agent": {
               "type": "string",
-              "description": "Skill to invoke for automated verification (e.g., run-tests, code-doc, sdd-validate)"
+              "description": "Agent/subagent identifier for automated verification. Use the base name (e.g., 'run-tests', 'sdd-fidelity-review'). The system invokes via Task(subagent_type: 'sdd-toolkit:{agent}-subagent'). For direct invocation, use Skill(sdd-toolkit:{agent}).",
+              "examples": ["run-tests", "sdd-fidelity-review", "sdd-validate", "code-doc"]
             },
             "command": {
               "type": "string",
               "description": "Command or arguments to pass to the skill/tool"
+            },
+            "scope": {
+              "type": "string",
+              "enum": ["phase", "task"],
+              "description": "Scope for fidelity review verification: 'phase' (single phase, typically 3-10 tasks), 'task' (single task, typically 1 file). Only used when verification_type is 'fidelity'."
+            },
+            "target": {
+              "type": "string",
+              "description": "Target identifier for scoped fidelity review. When scope='phase', use phase-id (e.g., 'phase-2'). When scope='task', use task-id (e.g., 'task-2-3')."
             },
             "on_failure": {
               "$ref": "#/definitions/on_failure_actions",

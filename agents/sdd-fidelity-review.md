@@ -3,19 +3,12 @@ name: sdd-fidelity-review-subagent
 description: Review implementation fidelity against specifications, comparing actual code to spec requirements
 model: sonnet
 required_information:
-  full_review:
-    - spec_id (the specification ID to review against)
-    - scope (optional: full, phase, task, or files)
+  phase_review:
+    - spec_id (the specification ID)
+    - phase_id (phase to review, e.g., "phase-1")
   task_review:
     - spec_id (the specification ID)
     - task_id (specific task to review)
-  file_review:
-    - spec_id (the specification ID)
-    - files (list of file paths to review)
-  deviation_analysis:
-    - spec_id (the specification ID)
-    - task_id (optional: specific task context)
-    - deviation_description (what was implemented differently)
 ---
 
 # Implementation Fidelity Review Subagent

@@ -570,16 +570,28 @@ def validate_metadata(hierarchy: Dict) -> Tuple[bool, List[str], List[str]]:
                 errors.append(
                     f"❌ ERROR: Verify node '{node_id}' missing metadata.verification_type"
                 )
-            elif metadata['verification_type'] not in ['auto', 'manual']:
+            elif metadata['verification_type'] not in ['auto', 'manual', 'fidelity']:
                 errors.append(
-                    f"❌ ERROR: Verify node '{node_id}' verification_type must be 'auto' or 'manual'"
+                    f"❌ ERROR: Verify node '{node_id}' verification_type must be 'auto', 'manual', or 'fidelity'"
                 )
 
-            if 'command' not in metadata:
-                warnings.append(f"⚠️  WARNING: Verify node '{node_id}' missing metadata.command")
+            # command and expected are only relevant for auto/manual verification
+            verification_type = metadata.get('verification_type')
+            if verification_type in ['auto', 'manual']:
+                if 'command' not in metadata:
+                    warnings.append(f"⚠️  WARNING: Verify node '{node_id}' missing metadata.command")
 
-            if 'expected' not in metadata:
-                warnings.append(f"⚠️  WARNING: Verify node '{node_id}' missing metadata.expected")
+                if 'expected' not in metadata:
+                    warnings.append(f"⚠️  WARNING: Verify node '{node_id}' missing metadata.expected")
+
+            # fidelity verification should have scope and target
+            elif verification_type == 'fidelity':
+                if 'agent' not in metadata:
+                    warnings.append(f"⚠️  WARNING: Verify node '{node_id}' with fidelity type should have metadata.agent = 'sdd-fidelity-review'")
+                if 'scope' not in metadata:
+                    warnings.append(f"⚠️  WARNING: Verify node '{node_id}' with fidelity type missing metadata.scope (phase/task/file)")
+                if 'target' not in metadata:
+                    warnings.append(f"⚠️  WARNING: Verify node '{node_id}' with fidelity type missing metadata.target")
 
         # Task nodes should have file_path based on task_category
         if node_type == 'task':

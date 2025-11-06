@@ -1563,7 +1563,85 @@ If deviation discovered during implementation:
 
 ### Verification Tasks
 
-For verification tasks (type: verify), use `Skill(sdd-toolkit:run-tests)` to execute tests and verification steps. After verification completes, present findings to user and use `AskUserQuestion` to get approval before marking complete with sdd-update. See run-tests SKILL.md for details.
+For verification tasks (`type: verify`), invoke the appropriate subagent based on `verification_type`:
+
+#### Automated Tests (`verification_type: "auto"`)
+
+**Metadata:**
+```json
+{
+  "verification_type": "auto",
+  "agent": "run-tests",
+  "command": "npm test"
+}
+```
+
+**Invocation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:run-tests-subagent",
+  prompt: "Run tests for {task-id} in spec {spec-id}. Execute tests and handle failures.",
+  description: "Run tests"
+)
+```
+
+After verification completes, present findings to user and use `AskUserQuestion` to get approval before marking complete with sdd-update. See run-tests SKILL.md for details.
+
+---
+
+#### Fidelity Review (`verification_type: "fidelity"`)
+
+**Metadata:**
+```json
+{
+  "verification_type": "fidelity",
+  "agent": "sdd-fidelity-review",
+  "scope": "phase",
+  "target": "phase-2"
+}
+```
+
+**Invocation:**
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
+  prompt: "Review {scope} '{target}' in spec {spec-id}. Compare completed tasks against requirements.",
+  description: "Fidelity review for {scope}"
+)
+```
+
+**Prompt construction by scope:**
+- `"phase"` → "Review phase {target} in spec {spec-id}..."
+- `"task"` → "Review task {target} in spec {spec-id}..."
+
+After review completes, present fidelity report and use `AskUserQuestion` to get user decision:
+- **Accept & Complete** - Mark verification complete, journal deviations
+- **Revise Implementation** - Reopen parent tasks for fixes
+- **Update Spec** - Document accepted deviations
+
+See sdd-fidelity-review SKILL.md for details.
+
+---
+
+#### Manual Review (`verification_type: "manual"`)
+
+**Metadata:**
+```json
+{
+  "verification_type": "manual",
+  "checklist": ["Item 1", "Item 2"]
+}
+```
+
+**Action:** Present checklist to user for manual confirmation.
+
+---
+
+#### Note: Metadata vs Invocation Naming
+
+- **Metadata field:** `"agent": "run-tests"` (base identifier)
+- **Invocation:** `Task(subagent_type: "sdd-toolkit:run-tests-subagent")` (fully qualified)
+- **Why different?** Metadata is concise storage; invocation is namespace-qualified routing
 
 ## Git Integration Workflow
 

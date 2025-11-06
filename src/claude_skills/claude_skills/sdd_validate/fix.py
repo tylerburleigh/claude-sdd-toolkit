@@ -626,7 +626,7 @@ def _build_verification_type_action(error: EnhancedError, spec_data: Dict[str, A
         if not node:
             return
         metadata = node.setdefault("metadata", {})
-        if "verification_type" not in metadata or metadata["verification_type"] not in {"auto", "manual"}:
+        if "verification_type" not in metadata or metadata["verification_type"] not in {"auto", "manual", "fidelity"}:
             metadata["verification_type"] = "manual"  # Safe default
 
     return FixAction(

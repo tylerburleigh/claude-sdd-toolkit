@@ -788,10 +788,13 @@ Use this notation to plan your hierarchy, then translate it into JSON structure 
 ```
 [Verify] What to check [pending] [auto] {#verify-N-M}
 [Verify] What to check [pending] [manual] {#verify-N-M}
+[Verify] What to check [pending] [fidelity] {#verify-N-M}
 ```
-- Mark as `[auto]` if can be scripted
-- Mark as `[manual]` if requires human judgment
+- Mark as `[auto]` if can be scripted (e.g., running tests)
+- Mark as `[manual]` if requires human judgment (e.g., code review checklist)
+- Mark as `[fidelity]` for implementation-vs-spec comparison (uses sdd-fidelity-review skill)
 - Include command for automated checks
+- Include skill/scope/target metadata for fidelity checks
 
 **Example Hierarchy:**
 ```
@@ -812,13 +815,17 @@ Use this notation to plan your hierarchy, then translate it into JSON structure 
 │   │   └─ [Task] src/types/index.ts [pending] [parallel-safe] {#task-1-3}
 │   │       └─ [Subtask] Export User type [pending] {#task-1-3-1}
 │   │
-│   └─ [Group] Verification [blocked-by: phase-1-files] (0/4 tasks) {#phase-1-verify}
+│   └─ [Group] Verification [blocked-by: phase-1-files] (0/5 tasks) {#phase-1-verify}
 │       ├─ [Verify] Migration runs [pending] [auto] {#verify-1-1}
 │       │   └─ Command: `npm run migrate`
 │       ├─ [Verify] Model imports [pending] [auto] {#verify-1-2}
 │       ├─ [Verify] Tests pass [pending] [auto] {#verify-1-3}
 │       │   └─ Command: `npm test -- user.spec.ts`
-│       └─ [Verify] Validation works [pending] [manual] {#verify-1-4}
+│       ├─ [Verify] Implementation fidelity [pending] [fidelity] {#verify-1-4}
+│       │   └─ Skill: sdd-fidelity-review
+│       │   └─ Scope: phase
+│       │   └─ Target: phase-1
+│       └─ [Verify] Validation works [pending] [manual] {#verify-1-5}
 ```
 
 **Verification Steps:**
@@ -826,6 +833,7 @@ Use this notation to plan your hierarchy, then translate it into JSON structure 
 - One verification per test/check
 - Include command/steps for automated verifications
 - Mark manual verifications clearly
+- Add fidelity reviews at phase boundaries to ensure implementation matches spec
 
 **Rule of Thumb:**
 - Each task/subtask should be completable in < 30 minutes
@@ -1105,6 +1113,32 @@ Task(
         "command": "npm run migrate",
         "expected": "Migration completes successfully"
       }
+    },
+
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
     }
   }
 }
@@ -1230,6 +1264,37 @@ Tasks should include a `task_category` field in their metadata to classify the t
   }
 }
 ```
+
+#### Verification Task Metadata
+
+When creating verification tasks with automated execution:
+
+```json
+{
+  "verify-1-1": {
+    "type": "verify",
+    "metadata": {
+      "verification_type": "auto",
+      "agent": "run-tests",
+      "command": "npm test"
+    }
+  },
+  "verify-1-2": {
+    "type": "verify",
+    "metadata": {
+      "verification_type": "fidelity",
+      "agent": "sdd-fidelity-review",
+      "scope": "phase",
+      "target": "phase-1"
+    }
+  }
+}
+```
+
+**Important:**
+- Use `"agent"` field (base agent name)
+- Store: `"run-tests"`, `"sdd-fidelity-review"`
+- System invokes via: `Task(subagent_type: "sdd-toolkit:{agent}-subagent")`
 
 **Setting Default Category (CLI):**
 
