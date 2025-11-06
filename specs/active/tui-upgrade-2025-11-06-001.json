@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-06T23:42:03.273003Z",
+  "last_updated": "2025-11-06T23:42:38.283411Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -826,7 +826,12 @@
         "task_category": "implementation",
         "estimated_hours": 2,
         "changes": "Replace text output with Rich.Table, add status badges, dependency indicators",
-        "reasoning": "Consistent table format across all list commands"
+        "reasoning": "Consistent table format across all list commands",
+        "started_at": "2025-11-06T23:42:22.153580Z",
+        "completed_at": "2025-11-06T23:42:38.271177Z",
+        "needs_journaling": false,
+        "actual_hours": 0.004,
+        "journaled_at": "2025-11-06T23:42:38.283335Z"
       }
     },
     "task-2-2-1": {
@@ -3042,6 +3047,15 @@
       "content": "The --format json flag for structured output was already implemented in the CLI. The query-tasks command parser (cli.py line 1377) includes --format flag with choices=[\"table\", \"json\", \"simple\"], with \"table\" as the default. The cmd_query_tasks function properly handles JSON output when format=\"json\" is specified, returning structured JSON data with all task fields including id, title, type, status, parent, progress, and metadata. Verified through testing that the flag works correctly and returns properly formatted JSON output.",
       "metadata": {},
       "task_id": "task-2-2-3"
+    },
+    {
+      "timestamp": "2025-11-06T23:42:38.283323Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_update/query_tasks.py",
+      "author": "claude-code",
+      "content": "Successfully completed implementation of Rich.Table formatting for query-tasks command. All three subtasks were completed:\n1. Created query_tasks.py module with Rich.Table implementation featuring columns for Task ID, Status, Title, Dependencies, and File\n2. Added color-coded status badges with emojis (\u2705 Complete, \ud83d\udd04 In Progress, \u23f3 Pending, \ud83d\udeab Blocked)\n3. Verified --format json flag support for structured output (already existed in CLI)\n\nThe implementation includes dependency indicators (\u2b05\ufe0f blocked_by, \u27a1\ufe0f blocks), progress display for phases/groups, formatted file paths with truncation, and professional table layout. Integrated into cli.py cmd_query_tasks function and tested successfully with multiple filter scenarios.",
+      "metadata": {},
+      "task_id": "task-2-2"
     }
   ]
 }
