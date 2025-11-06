@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:18:08
+**Generated:** 2025-11-06 13:22:24
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 227
-- **Total Lines:** 79030
-- **Total Classes:** 295
+- **Total Files:** 228
+- **Total Lines:** 79389
+- **Total Classes:** 297
 - **Total Functions:** 851
 - **Avg Complexity:** 5.79
 - **Max Complexity:** 45
@@ -2335,6 +2335,25 @@ Attributes:
 
 ---
 
+### `TestBulkModificationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py:19`
+
+**Description:**
+> Integration tests for the complete modification workflow.
+
+**Methods:**
+- `sample_spec()`
+- `markdown_review()`
+- `test_complete_workflow_markdown_to_modifications()`
+- `test_parse_json_review_format()`
+- `test_empty_review_produces_no_suggestions()`
+- `test_malformed_suggestions_handled_gracefully()`
+- `test_review_to_verification_node_creation()`
+
+---
+
 ### `TestBumpVersion`
 
 **Language:** python
@@ -3138,6 +3157,23 @@ Attributes:
 - `test_auto_generate_failure()`
 - `test_auto_generate_timeout()`
 - `test_prompt_user_mode()`
+
+---
+
+### `TestErrorHandling`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py:305`
+
+**Description:**
+> Test error handling in the workflow.
+
+**Methods:**
+- `test_nonexistent_review_file()`
+- `test_invalid_json_review()`
+- `test_unsupported_file_format()`
+- `test_modifications_file_not_found()`
+- `sample_spec()`
 
 ---
 
@@ -24748,6 +24784,16 @@ Returns:
 - `typing.Any`
 - `typing.Dict`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py`
+
+- `claude_skills.sdd_spec_mod.apply_modifications`
+- `claude_skills.sdd_spec_mod.parse_review_report`
+- `claude_skills.sdd_spec_mod.suggest_modifications`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
 
 ### `src/claude_skills/claude_skills/tests/integration/test_doc_cli.py`
 

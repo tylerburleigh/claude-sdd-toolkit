@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:18:08.668494Z",
+    "generated_at": "2025-11-06T18:22:24.934094Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 227,
-    "total_lines": 79030,
-    "total_classes": 295,
+    "total_files": 228,
+    "total_lines": 79389,
+    "total_classes": 297,
     "total_functions": 851,
     "avg_complexity": 5.79,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 227,
-        "lines": 79030,
-        "classes": 295,
+        "files": 228,
+        "lines": 79389,
+        "classes": 297,
         "functions": 851,
         "avg_complexity": 5.79
       }
@@ -4135,6 +4135,28 @@
       "imports": [],
       "exports": [],
       "lines": 1
+    },
+    {
+      "name": "test_bulk_modify",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+      "language": "python",
+      "docstring": "Integration tests for bulk modification operations.\n\nTests the complete workflow:\n1. Parse review report -> 2. Generate suggestions -> 3. Apply modifications",
+      "classes": [
+        "TestBulkModificationWorkflow",
+        "TestErrorHandling"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "tempfile",
+        "pathlib.Path",
+        "claude_skills.sdd_spec_mod.parse_review_report",
+        "claude_skills.sdd_spec_mod.suggest_modifications",
+        "claude_skills.sdd_spec_mod.apply_modifications"
+      ],
+      "exports": [],
+      "lines": 359
     },
     {
       "name": "test_doc_cli",
@@ -13828,6 +13850,48 @@
       ],
       "imported_by": [],
       "instantiation_count": 3
+    },
+    {
+      "name": "TestBulkModificationWorkflow",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Integration tests for the complete modification workflow.",
+      "bases": [],
+      "methods": [
+        "sample_spec",
+        "markdown_review",
+        "test_complete_workflow_markdown_to_modifications",
+        "test_parse_json_review_format",
+        "test_empty_review_produces_no_suggestions",
+        "test_malformed_suggestions_handled_gracefully",
+        "test_review_to_verification_node_creation"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestErrorHandling",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+      "line": 305,
+      "language": "python",
+      "docstring": "Test error handling in the workflow.",
+      "bases": [],
+      "methods": [
+        "test_nonexistent_review_file",
+        "test_invalid_json_review",
+        "test_unsupported_file_format",
+        "test_modifications_file_not_found",
+        "sample_spec"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "TestRunTestsDocIntegration",
@@ -84481,6 +84545,24 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
           "line": 96,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_complete_workflow_markdown_to_modifications",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 146,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_malformed_suggestions_handled_gracefully",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 263,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_modifications_file_not_found",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 341,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84641,7 +84723,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "_handle_add_node",
@@ -84840,6 +84922,48 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
           "line": 184,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_complete_workflow_markdown_to_modifications",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 119,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_parse_json_review_format",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 194,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_review_produces_no_suggestions",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 232,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_review_to_verification_node_creation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 288,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nonexistent_review_file",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 311,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_json_review",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 321,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_unsupported_file_format",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 334,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84874,7 +84998,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 8
     },
     {
       "name": "_parse_json_report",
@@ -85579,6 +85703,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "test_complete_workflow_markdown_to_modifications",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 131,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_review_produces_no_suggestions",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 235,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_review_to_verification_node_creation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
+          "line": 289,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_empty_issues_returns_empty_list",
           "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
           "line": 15,
@@ -85689,7 +85831,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 7
+      "call_count": 10
     },
     {
       "name": "_suggest_for_issue",
@@ -124568,6 +124710,15 @@
       "typing.Dict",
       "typing.Any",
       "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py": [
+      "json",
+      "pytest",
+      "tempfile",
+      "pathlib.Path",
+      "claude_skills.sdd_spec_mod.parse_review_report",
+      "claude_skills.sdd_spec_mod.suggest_modifications",
+      "claude_skills.sdd_spec_mod.apply_modifications"
     ],
     "src/claude_skills/claude_skills/tests/integration/test_doc_cli.py": [
       "__future__.annotations",
