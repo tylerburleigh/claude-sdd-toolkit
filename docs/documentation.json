@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T15:27:48.919348Z",
+    "generated_at": "2025-11-06T15:32:27.602391Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 214,
-    "total_lines": 73419,
+    "total_files": 216,
+    "total_lines": 73732,
     "total_classes": 278,
-    "total_functions": 798,
-    "avg_complexity": 5.62,
+    "total_functions": 803,
+    "avg_complexity": 5.63,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 214,
-        "lines": 73419,
+        "files": 216,
+        "lines": 73732,
         "classes": 278,
-        "functions": 798,
-        "avg_complexity": 5.62
+        "functions": 803,
+        "avg_complexity": 5.63
       }
     }
   },
@@ -3147,6 +3147,49 @@
       ],
       "exports": [],
       "lines": 566
+    },
+    {
+      "name": "__init__",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/__init__.py",
+      "language": "python",
+      "docstring": "SDD Spec Modification Module.\n\nProvides utilities for modifying SDD JSON specification files,\nincluding adding/removing nodes, updating task hierarchies, and\nmaintaining spec integrity.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "modification.add_node",
+        "modification.remove_node",
+        "modification.move_node",
+        "modification.update_task_counts"
+      ],
+      "exports": [],
+      "lines": 16
+    },
+    {
+      "name": "modification",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "language": "python",
+      "docstring": "Core spec modification operations.\n\nProvides functions for adding, removing, and moving nodes in SDD specification hierarchies.",
+      "classes": [],
+      "functions": [
+        "add_node",
+        "_propagate_task_count_increase",
+        "remove_node",
+        "move_node",
+        "update_task_counts"
+      ],
+      "imports": [
+        "sys",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional",
+        "typing.List",
+        "datetime.datetime",
+        "datetime.timezone",
+        "claude_skills.common.spec.get_node",
+        "claude_skills.common.spec.update_node"
+      ],
+      "exports": [],
+      "lines": 297
     },
     {
       "name": "__init__",
@@ -43815,6 +43858,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "add_node",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_get_existing_task_node",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py",
           "line": 203,
@@ -43859,7 +43908,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 10
+      "call_count": 11
     },
     {
       "name": "update_node",
@@ -80488,6 +80537,342 @@
       ]
     },
     {
+      "name": "add_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 14,
+      "language": "python",
+      "docstring": "Add a new task/subtask/phase to the spec hierarchy at a specified position.\n\nThis function creates a new node in the specification hierarchy, ensuring that\nall required fields are present and that the hierarchy remains valid.\n\nArgs:\n    spec_data: The full spec data dictionary (must include 'hierarchy' key)\n    parent_id: ID of the parent node to add the child to\n    node_data: Dictionary containing the new node's data. Must include:\n        - node_id: Unique identifier for the new node\n        - type: Node type (phase, task, subtask, verify, group)\n        - title: Human-readable title\n        Optional fields:\n        - description: Detailed description\n        - status: Node status (default: 'pending')\n        - metadata: Additional metadata dict\n        - dependencies: Dependencies dict with blocks/blocked_by/depends\n    position: Optional position in parent's children list (0-indexed).\n             If None, appends to end. If negative, counts from end.\n\nReturns:\n    Dict with success status and message:\n    {\n        \"success\": True|False,\n        \"message\": \"Description of result\",\n        \"node_id\": \"ID of created node\" (only if success=True)\n    }\n\nRaises:\n    ValueError: If required fields are missing or invalid\n    KeyError: If parent_id doesn't exist in hierarchy",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "parent_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "node_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "position",
+          "type": "Optional[int]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 21,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 61,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 65,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_node",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 108,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 109,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 129,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 154,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 162,
+          "call_type": "method_call"
+        },
+        {
+          "name": "insert",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 172,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_propagate_task_count_increase",
+          "file": "unknown",
+          "line": 177,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "_propagate_task_count_increase",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 186,
+      "language": "python",
+      "docstring": "Propagate task count increases up the hierarchy tree.\n\nThis is called when a new leaf task is added or a task is completed.\nIt updates total_tasks and/or completed_tasks for all ancestors.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: Starting node ID (typically the parent of the added/completed task)\n    total_increase: Amount to increase total_tasks by (default: 0)\n    completed_increase: Amount to increase completed_tasks by (default: 0)",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "node_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "total_increase",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "completed_increase",
+          "type": "int",
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 9,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "add_node",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 177,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 204,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 215,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 220,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 226,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 228,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "remove_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 231,
+      "language": "python",
+      "docstring": "Remove a node from the spec hierarchy.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to remove\n    recursive: If True, removes all descendants as well (default: False)\n\nReturns:\n    Dict with success status and message",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "node_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "recursive",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "move_node",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 254,
+      "language": "python",
+      "docstring": "Move a node to a different parent in the hierarchy.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to move\n    new_parent_id: ID of the new parent node\n    position: Optional position in new parent's children list\n\nReturns:\n    Dict with success status and message",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "node_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "new_parent_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "position",
+          "type": "Optional[int]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
+      "name": "update_task_counts",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+      "line": 279,
+      "language": "python",
+      "docstring": "Recalculate and update task counts for a node and its ancestors.\n\nThis function recursively calculates total_tasks and completed_tasks\nfor a node based on its descendants, then propagates the counts upward.\n\nArgs:\n    spec_data: The full spec data dictionary\n    node_id: ID of the node to recalculate (typically after modifications)\n\nReturns:\n    Dict with success status and updated counts",
+      "parameters": [
+        {
+          "name": "spec_data",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "node_id",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": []
+    },
+    {
       "name": "cmd_execute_verify",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
       "line": 50,
@@ -113211,6 +113596,23 @@
       "dataclasses.dataclass",
       "datetime.datetime",
       "datetime.timedelta"
+    ],
+    "src/claude_skills/claude_skills/sdd_spec_mod/__init__.py": [
+      "modification.add_node",
+      "modification.remove_node",
+      "modification.move_node",
+      "modification.update_task_counts"
+    ],
+    "src/claude_skills/claude_skills/sdd_spec_mod/modification.py": [
+      "sys",
+      "typing.Dict",
+      "typing.Any",
+      "typing.Optional",
+      "typing.List",
+      "datetime.datetime",
+      "datetime.timezone",
+      "claude_skills.common.spec.get_node",
+      "claude_skills.common.spec.update_node"
     ],
     "src/claude_skills/claude_skills/sdd_update/__init__.py": [
       "status.update_task_status",

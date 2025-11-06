@@ -231,24 +231,206 @@ def _propagate_task_count_increase(
 def remove_node(
     spec_data: Dict[str, Any],
     node_id: str,
-    recursive: bool = False
+    cascade: bool = False
 ) -> Dict[str, Any]:
     """
     Remove a node from the spec hierarchy.
 
+    This function removes a node and optionally its descendants (cascade mode).
+    It also updates parent-child relationships, cleans up dependencies, and
+    propagates task count decreases up the hierarchy.
+
     Args:
         spec_data: The full spec data dictionary
         node_id: ID of the node to remove
-        recursive: If True, removes all descendants as well (default: False)
+        cascade: If True, recursively removes all descendants (default: False)
+                If False and node has children, operation fails
 
     Returns:
-        Dict with success status and message
+        Dict with success status and message:
+        {
+            "success": True|False,
+            "message": "Description of result",
+            "removed_nodes": [...] (only if success=True)
+        }
+
+    Raises:
+        KeyError: If node_id doesn't exist in hierarchy
+        ValueError: If trying to remove spec-root
     """
-    # Placeholder implementation
+    # Validate spec_data structure
+    if not isinstance(spec_data, dict):
+        raise ValueError("spec_data must be a dictionary")
+
+    if "hierarchy" not in spec_data:
+        raise ValueError("spec_data must contain 'hierarchy' key")
+
+    hierarchy = spec_data["hierarchy"]
+
+    # Prevent removal of spec-root
+    if node_id == "spec-root":
+        raise ValueError("Cannot remove spec-root node")
+
+    # Check if node exists
+    node = get_node(spec_data, node_id)
+    if node is None:
+        raise KeyError(f"Node '{node_id}' not found in hierarchy")
+
+    # Check if node has children
+    children = node.get("children", [])
+    if children and not cascade:
+        return {
+            "success": False,
+            "message": f"Node '{node_id}' has {len(children)} children. Use cascade=True to remove node and its descendants."
+        }
+
+    # Collect all nodes to remove (node + descendants if cascade)
+    nodes_to_remove = []
+    if cascade:
+        # Recursively collect all descendants
+        _collect_descendants(spec_data, node_id, nodes_to_remove)
+    else:
+        nodes_to_remove = [node_id]
+
+    # Calculate task count decrease for propagation
+    # (sum of total_tasks for all leaf nodes being removed)
+    leaf_types = ["task", "subtask", "verify"]
+    total_decrease = sum(
+        hierarchy[nid].get("total_tasks", 0)
+        for nid in nodes_to_remove
+        if hierarchy.get(nid, {}).get("type") in leaf_types
+    )
+    completed_decrease = sum(
+        hierarchy[nid].get("completed_tasks", 0)
+        for nid in nodes_to_remove
+        if hierarchy.get(nid, {}).get("type") in leaf_types
+    )
+
+    # Remove node from parent's children list
+    parent_id = node.get("parent")
+    if parent_id and parent_id in hierarchy:
+        parent = hierarchy[parent_id]
+        parent_children = parent.get("children", [])
+        if node_id in parent_children:
+            parent_children.remove(node_id)
+
+    # Clean up dependencies referencing the removed nodes
+    _cleanup_dependencies(spec_data, nodes_to_remove)
+
+    # Remove all nodes from hierarchy
+    for nid in nodes_to_remove:
+        if nid in hierarchy:
+            del hierarchy[nid]
+
+    # Propagate task count decrease up the hierarchy
+    if parent_id and total_decrease > 0:
+        _propagate_task_count_decrease(spec_data, parent_id, total_decrease, completed_decrease)
+
     return {
-        "success": False,
-        "message": "remove_node not yet implemented"
+        "success": True,
+        "message": f"Successfully removed {len(nodes_to_remove)} node(s)",
+        "removed_nodes": nodes_to_remove
     }
+
+
+def _collect_descendants(
+    spec_data: Dict[str, Any],
+    node_id: str,
+    result: List[str]
+) -> None:
+    """
+    Recursively collect all descendants of a node.
+
+    Args:
+        spec_data: The full spec data dictionary
+        node_id: Starting node ID
+        result: List to append descendant IDs to (modified in place)
+    """
+    result.append(node_id)
+
+    hierarchy = spec_data.get("hierarchy", {})
+    node = hierarchy.get(node_id)
+    if node is None:
+        return
+
+    children = node.get("children", [])
+    for child_id in children:
+        _collect_descendants(spec_data, child_id, result)
+
+
+def _cleanup_dependencies(
+    spec_data: Dict[str, Any],
+    removed_nodes: List[str]
+) -> None:
+    """
+    Remove references to removed nodes from all dependency lists.
+
+    Args:
+        spec_data: The full spec data dictionary
+        removed_nodes: List of node IDs being removed
+    """
+    hierarchy = spec_data.get("hierarchy", {})
+    removed_set = set(removed_nodes)
+
+    for node_id, node in hierarchy.items():
+        if node_id in removed_set:
+            continue  # Skip nodes being removed
+
+        deps = node.get("dependencies", {})
+        if not isinstance(deps, dict):
+            continue
+
+        # Clean up blocks, blocked_by, and depends lists
+        for dep_key in ["blocks", "blocked_by", "depends"]:
+            if dep_key in deps and isinstance(deps[dep_key], list):
+                deps[dep_key] = [
+                    dep_id for dep_id in deps[dep_key]
+                    if dep_id not in removed_set
+                ]
+
+
+def _propagate_task_count_decrease(
+    spec_data: Dict[str, Any],
+    node_id: str,
+    total_decrease: int = 0,
+    completed_decrease: int = 0
+) -> None:
+    """
+    Propagate task count decreases up the hierarchy tree.
+
+    This is called when nodes are removed from the hierarchy.
+    It updates total_tasks and/or completed_tasks for all ancestors.
+
+    Args:
+        spec_data: The full spec data dictionary
+        node_id: Starting node ID (typically the parent of removed nodes)
+        total_decrease: Amount to decrease total_tasks by (default: 0)
+        completed_decrease: Amount to decrease completed_tasks by (default: 0)
+    """
+    hierarchy = spec_data.get("hierarchy", {})
+
+    current_id = node_id
+    while current_id and current_id != "spec-root":
+        node = hierarchy.get(current_id)
+        if node is None:
+            break
+
+        # Update counts (ensure they don't go negative)
+        if total_decrease > 0:
+            node["total_tasks"] = max(0, node.get("total_tasks", 0) - total_decrease)
+        if completed_decrease > 0:
+            node["completed_tasks"] = max(0, node.get("completed_tasks", 0) - completed_decrease)
+
+        # Move to parent
+        current_id = node.get("parent")
+
+    # Update spec-root if it exists
+    if "spec-root" in hierarchy:
+        spec_root = hierarchy["spec-root"]
+        if total_decrease > 0:
+            spec_root["total_tasks"] = max(0, spec_root.get("total_tasks", 0) - total_decrease)
+        if completed_decrease > 0:
+            spec_root["completed_tasks"] = max(0, spec_root.get("completed_tasks", 0) - completed_decrease)
 
 
 def move_node(

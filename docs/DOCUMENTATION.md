@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 10:27:48
+**Generated:** 2025-11-06 10:32:27
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 214
-- **Total Lines:** 73419
+- **Total Files:** 216
+- **Total Lines:** 73732
 - **Total Classes:** 278
-- **Total Functions:** 798
-- **Avg Complexity:** 5.62
+- **Total Functions:** 803
+- **Avg Complexity:** 5.63
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6755,6 +6755,32 @@ Returns:
 
 ---
 
+### `_propagate_task_count_increase(spec_data, node_id, total_increase, completed_increase) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:186`
+**Complexity:** 9
+
+**Description:**
+> Propagate task count increases up the hierarchy tree.
+
+This is called when a new leaf task is added or a task is completed.
+It updates total_tasks and/or completed_tasks for all ancestors.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: Starting node ID (typically the parent of the added/completed task)
+    total_increase: Amount to increase total_tasks by (default: 0)
+    completed_increase: Amount to increase completed_tasks by (default: 0)
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `total_increase`: int
+- `completed_increase`: int
+
+---
+
 ### `_regenerate_documentation(specs_dir, printer) -> bool`
 
 **Language:** python
@@ -7166,6 +7192,53 @@ Returns:
 - `specs_dir`: Optional[Path]
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `add_node(spec_data, parent_id, node_data, position) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:14`
+⚠️ **Complexity:** 21 (High)
+
+**Description:**
+> Add a new task/subtask/phase to the spec hierarchy at a specified position.
+
+This function creates a new node in the specification hierarchy, ensuring that
+all required fields are present and that the hierarchy remains valid.
+
+Args:
+    spec_data: The full spec data dictionary (must include 'hierarchy' key)
+    parent_id: ID of the parent node to add the child to
+    node_data: Dictionary containing the new node's data. Must include:
+        - node_id: Unique identifier for the new node
+        - type: Node type (phase, task, subtask, verify, group)
+        - title: Human-readable title
+        Optional fields:
+        - description: Detailed description
+        - status: Node status (default: 'pending')
+        - metadata: Additional metadata dict
+        - dependencies: Dependencies dict with blocks/blocked_by/depends
+    position: Optional position in parent's children list (0-indexed).
+             If None, appends to end. If negative, counts from end.
+
+Returns:
+    Dict with success status and message:
+    {
+        "success": True|False,
+        "message": "Description of result",
+        "node_id": "ID of created node" (only if success=True)
+    }
+
+Raises:
+    ValueError: If required fields are missing or invalid
+    KeyError: If parent_id doesn't exist in hierarchy
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `parent_id`: str
+- `node_data`: Dict[str, Any]
+- `position`: Optional[int]
 
 ---
 
@@ -16457,6 +16530,32 @@ Returns:
 
 ---
 
+### `move_node(spec_data, node_id, new_parent_id, position) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:254`
+**Complexity:** 1
+
+**Description:**
+> Move a node to a different parent in the hierarchy.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to move
+    new_parent_id: ID of the new parent node
+    position: Optional position in new parent's children list
+
+Returns:
+    Dict with success status and message
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `new_parent_id`: str
+- `position`: Optional[int]
+
+---
+
 ### `move_spec(spec_file, target_folder, dry_run, printer) -> bool`
 
 **Language:** python
@@ -17527,6 +17626,30 @@ Note:
 **Parameters:**
 - `subparsers`: None
 - `parent_parser`: None
+
+---
+
+### `remove_node(spec_data, node_id, recursive) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:231`
+**Complexity:** 1
+
+**Description:**
+> Remove a node from the spec hierarchy.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to remove
+    recursive: If True, removes all descendants as well (default: False)
+
+Returns:
+    Dict with success status and message
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+- `recursive`: bool
 
 ---
 
@@ -20555,6 +20678,31 @@ Returns:
 
 ---
 
+### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:279`
+**Complexity:** 1
+
+**Description:**
+> Recalculate and update task counts for a node and its ancestors.
+
+This function recursively calculates total_tasks and completed_tasks
+for a node based on its descendants, then propagates the counts upward.
+
+Args:
+    spec_data: The full spec data dictionary
+    node_id: ID of the node to recalculate (typically after modifications)
+
+Returns:
+    Dict with success status and updated counts
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `node_id`: str
+
+---
+
 ### `update_task_status(spec_id, task_id, new_status, specs_dir, note, dry_run, verify, printer) -> bool`
 
 **Language:** python
@@ -22485,6 +22633,25 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/__init__.py`
+
+- `modification.add_node`
+- `modification.move_node`
+- `modification.remove_node`
+- `modification.update_task_counts`
+
+### `src/claude_skills/claude_skills/sdd_spec_mod/modification.py`
+
+- `claude_skills.common.spec.get_node`
+- `claude_skills.common.spec.update_node`
+- `datetime.datetime`
+- `datetime.timezone`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/sdd_update/__init__.py`
 
