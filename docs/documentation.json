@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-05T23:50:56.970905Z",
+    "generated_at": "2025-11-06T00:12:09.378982Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 214,
-    "total_lines": 73220,
+    "total_lines": 73222,
     "total_classes": 278,
     "total_functions": 796,
     "avg_complexity": 5.61,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 214,
-        "lines": 73220,
+        "lines": 73222,
         "classes": 278,
         "functions": 796,
         "avg_complexity": 5.61
@@ -2129,7 +2129,7 @@
         "claude_skills.common.ai_tools.check_tool_available"
       ],
       "exports": [],
-      "lines": 802
+      "lines": 804
     },
     {
       "name": "report",
@@ -9479,7 +9479,7 @@
         {
           "instantiator": "parse_review_response",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 363,
+          "line": 365,
           "context": [
             "parse_review_response"
           ]
@@ -9487,7 +9487,7 @@
         {
           "instantiator": "parse_review_response",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 454,
+          "line": 456,
           "context": [
             "parse_review_response"
           ]
@@ -9521,7 +9521,7 @@
         {
           "instantiator": "consult_multiple_ai_on_fidelity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 250,
+          "line": 252,
           "context": [
             "consult_multiple_ai_on_fidelity"
           ]
@@ -9529,7 +9529,7 @@
         {
           "instantiator": "consult_multiple_ai_on_fidelity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 262,
+          "line": 264,
           "context": [
             "consult_multiple_ai_on_fidelity"
           ]
@@ -9617,7 +9617,7 @@
     {
       "name": "ConsensusResult",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 488,
+      "line": 490,
       "language": "python",
       "docstring": "Consensus analysis across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence in findings.\n\nAttributes:\n    consensus_verdict: Majority verdict across all responses\n    consensus_issues: Issues mentioned by 2+ models\n    consensus_recommendations: Recommendations mentioned by 2+ models\n    all_issues: All unique issues across all models\n    all_recommendations: All unique recommendations across all models\n    verdict_distribution: Count of each verdict type\n    agreement_rate: Percentage of models agreeing on verdict (0.0-1.0)\n    model_count: Total number of models consulted",
       "bases": [],
@@ -9631,7 +9631,7 @@
         {
           "instantiator": "detect_consensus",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 563,
+          "line": 565,
           "context": [
             "detect_consensus"
           ]
@@ -9639,7 +9639,7 @@
         {
           "instantiator": "detect_consensus",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 621,
+          "line": 623,
           "context": [
             "detect_consensus"
           ]
@@ -9651,7 +9651,7 @@
     {
       "name": "CategorizedIssue",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 634,
+      "line": 636,
       "language": "python",
       "docstring": "Issue with assigned severity category.\n\nAttributes:\n    issue: The issue description\n    severity: Assigned severity level\n    keywords_matched: Keywords that triggered this severity",
       "bases": [],
@@ -9665,7 +9665,7 @@
         {
           "instantiator": "categorize_issue_severity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 720,
+          "line": 722,
           "context": [
             "categorize_issue_severity"
           ]
@@ -9673,7 +9673,7 @@
         {
           "instantiator": "categorize_issue_severity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 730,
+          "line": 732,
           "context": [
             "categorize_issue_severity"
           ]
@@ -9681,7 +9681,7 @@
         {
           "instantiator": "categorize_issue_severity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 740,
+          "line": 742,
           "context": [
             "categorize_issue_severity"
           ]
@@ -9689,7 +9689,7 @@
         {
           "instantiator": "categorize_issue_severity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 750,
+          "line": 752,
           "context": [
             "categorize_issue_severity"
           ]
@@ -9697,7 +9697,7 @@
         {
           "instantiator": "categorize_issue_severity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 757,
+          "line": 759,
           "context": [
             "categorize_issue_severity"
           ]
@@ -28364,7 +28364,7 @@
         {
           "name": "consult_multiple_ai_on_fidelity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 238,
+          "line": 240,
           "call_type": "function_call"
         },
         {
@@ -66078,19 +66078,19 @@
         {
           "name": "execute_tools_parallel",
           "file": "unknown",
-          "line": 238,
+          "line": 240,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 251,
+          "line": 253,
           "call_type": "method_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 261,
+          "line": 263,
           "call_type": "method_call"
         }
       ],
@@ -66099,7 +66099,7 @@
     {
       "name": "get_consultation_summary",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 265,
+      "line": 267,
       "language": "python",
       "docstring": "Generate summary statistics for multiple consultation responses.\n\nUseful for understanding overall consultation health and results.\n\nArgs:\n    responses: List of ToolResponse objects\n\nReturns:\n    Dictionary with summary statistics:\n    {\n        \"total\": int,\n        \"successful\": int,\n        \"failed\": int,\n        \"timed_out\": int,\n        \"total_duration\": float,\n        \"average_duration\": float,\n        \"tools_used\": List[str],\n        \"success_rate\": float\n    }\n\nExample:\n    >>> summary = get_consultation_summary(responses)\n    >>> print(f\"Success rate: {summary['success_rate']:.1%}\")",
       "parameters": [
@@ -66120,19 +66120,7 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 291,
-          "call_type": "function_call"
-        },
-        {
-          "name": "sum",
-          "file": "unknown",
-          "line": 304,
-          "call_type": "function_call"
-        },
-        {
-          "name": "sum",
-          "file": "unknown",
-          "line": 305,
+          "line": 293,
           "call_type": "function_call"
         },
         {
@@ -66146,13 +66134,25 @@
           "file": "unknown",
           "line": 307,
           "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 308,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sum",
+          "file": "unknown",
+          "line": 309,
+          "call_type": "function_call"
         }
       ]
     },
     {
       "name": "parse_review_response",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 324,
+      "line": 326,
       "language": "python",
       "docstring": "Parse AI tool response to extract structured review information.\n\nExtracts verdict, issues, recommendations from free-form AI response.\nUses pattern matching and heuristics to identify key information.\n\nArgs:\n    response: ToolResponse from AI consultation\n\nReturns:\n    ParsedReviewResponse with extracted information\n\nExample:\n    >>> tool_response = consult_ai_on_fidelity(prompt)\n    >>> parsed = parse_review_response(tool_response)\n    >>> print(f\"Verdict: {parsed.verdict.value}\")\n    >>> for issue in parsed.issues:\n    ...     print(f\"- {issue}\")",
       "parameters": [
@@ -66172,7 +66172,7 @@
         {
           "name": "parse_multiple_responses",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 484,
+          "line": 486,
           "call_type": "function_call"
         }
       ],
@@ -66180,181 +66180,181 @@
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 345,
+          "line": 347,
           "call_type": "function_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 346,
+          "line": 348,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 350,
+          "line": 352,
           "call_type": "method_call"
         },
         {
           "name": "search",
           "file": "unknown",
-          "line": 380,
+          "line": 382,
           "call_type": "method_call"
         },
         {
           "name": "lower",
           "file": "unknown",
-          "line": 387,
+          "line": 389,
           "call_type": "method_call"
         },
         {
           "name": "any",
           "file": "unknown",
-          "line": 393,
+          "line": 395,
           "call_type": "function_call"
         },
         {
           "name": "search",
           "file": "unknown",
-          "line": 393,
+          "line": 395,
           "call_type": "method_call"
         },
         {
           "name": "any",
           "file": "unknown",
-          "line": 398,
+          "line": 400,
           "call_type": "function_call"
         },
         {
           "name": "finditer",
           "file": "unknown",
-          "line": 409,
+          "line": 411,
           "call_type": "method_call"
         },
         {
           "name": "strip",
-          "file": "unknown",
-          "line": 411,
-          "call_type": "method_call"
-        },
-        {
-          "name": "group",
-          "file": "unknown",
-          "line": 411,
-          "call_type": "method_call"
-        },
-        {
-          "name": "split",
           "file": "unknown",
           "line": 413,
           "call_type": "method_call"
         },
         {
-          "name": "extend",
-          "file": "unknown",
-          "line": 414,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
-          "file": "unknown",
-          "line": 414,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
-          "file": "unknown",
-          "line": 414,
-          "call_type": "method_call"
-        },
-        {
-          "name": "finditer",
-          "file": "unknown",
-          "line": 424,
-          "call_type": "method_call"
-        },
-        {
-          "name": "strip",
-          "file": "unknown",
-          "line": 426,
-          "call_type": "method_call"
-        },
-        {
           "name": "group",
           "file": "unknown",
-          "line": 426,
+          "line": 413,
           "call_type": "method_call"
         },
         {
           "name": "split",
           "file": "unknown",
-          "line": 428,
+          "line": 415,
           "call_type": "method_call"
         },
         {
           "name": "extend",
           "file": "unknown",
-          "line": 429,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 429,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 429,
+          "line": 416,
+          "call_type": "method_call"
+        },
+        {
+          "name": "finditer",
+          "file": "unknown",
+          "line": 426,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "method_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 430,
+          "call_type": "method_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 431,
+          "call_type": "method_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 431,
           "call_type": "method_call"
         },
         {
           "name": "match",
           "file": "unknown",
-          "line": 432,
+          "line": 434,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 434,
+          "line": 436,
           "call_type": "method_call"
         },
         {
           "name": "group",
           "file": "unknown",
-          "line": 434,
+          "line": 436,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 435,
+          "line": 437,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 438,
+          "line": 440,
           "call_type": "function_call"
         },
         {
           "name": "search",
           "file": "unknown",
-          "line": 441,
+          "line": 443,
           "call_type": "method_call"
         },
         {
           "name": "float",
           "file": "unknown",
-          "line": 447,
+          "line": 449,
           "call_type": "function_call"
         },
         {
           "name": "group",
           "file": "unknown",
-          "line": 447,
+          "line": 449,
           "call_type": "method_call"
         }
       ],
@@ -66363,7 +66363,7 @@
     {
       "name": "parse_multiple_responses",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 464,
+      "line": 466,
       "language": "python",
       "docstring": "Parse multiple AI tool responses.\n\nConvenience function to parse a list of ToolResponse objects.\n\nArgs:\n    responses: List of ToolResponse objects\n\nReturns:\n    List of ParsedReviewResponse objects\n\nExample:\n    >>> responses = consult_multiple_ai_on_fidelity(prompt)\n    >>> parsed_list = parse_multiple_responses(responses)\n    >>> for parsed in parsed_list:\n    ...     print(f\"{parsed.verdict.value}: {len(parsed.issues)} issues\")",
       "parameters": [
@@ -66391,7 +66391,7 @@
         {
           "name": "parse_review_response",
           "file": "unknown",
-          "line": 484,
+          "line": 486,
           "call_type": "function_call"
         }
       ],
@@ -66400,7 +66400,7 @@
     {
       "name": "detect_consensus",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 528,
+      "line": 530,
       "language": "python",
       "docstring": "Detect consensus across multiple AI review responses.\n\nIdentifies issues and recommendations where multiple models agree,\nproviding higher confidence findings.\n\nArgs:\n    parsed_responses: List of ParsedReviewResponse objects\n    min_agreement: Minimum number of models that must agree (default: 2)\n    similarity_threshold: Similarity threshold for fuzzy matching (0.0-1.0)\n                        Not implemented in v1, uses exact matching\n\nReturns:\n    ConsensusResult with consensus analysis\n\nAlgorithm:\n    1. Count verdict distribution and find majority verdict\n    2. Collect all issues/recommendations across models\n    3. Identify items mentioned by >= min_agreement models\n    4. Calculate agreement rate for verdict\n\nExample:\n    >>> parsed = parse_multiple_responses(responses)\n    >>> consensus = detect_consensus(parsed, min_agreement=2)\n    >>> print(f\"Consensus: {consensus.consensus_verdict.value}\")\n    >>> print(f\"Agreement: {consensus.agreement_rate:.1%}\")\n    >>> for issue in consensus.consensus_issues:\n    ...     print(f\"- {issue}\")",
       "parameters": [
@@ -66438,53 +66438,47 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 568,
+          "line": 570,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 573,
+          "line": 575,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 578,
+          "line": 580,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 587,
+          "line": 589,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 594,
+          "line": 596,
           "call_type": "method_call"
         },
         {
           "name": "lower",
           "file": "unknown",
-          "line": 594,
+          "line": 596,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 595,
+          "line": 597,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 600,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 602,
           "call_type": "method_call"
@@ -66492,35 +66486,35 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 603,
+          "line": 604,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 605,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 610,
+          "line": 612,
           "call_type": "method_call"
         },
         {
           "name": "lower",
           "file": "unknown",
-          "line": 610,
+          "line": 612,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 611,
+          "line": 613,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 616,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
           "file": "unknown",
           "line": 618,
           "call_type": "method_call"
@@ -66528,7 +66522,13 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 619,
+          "line": 620,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 621,
           "call_type": "method_call"
         }
       ],
@@ -66537,7 +66537,7 @@
     {
       "name": "categorize_issue_severity",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 656,
+      "line": 658,
       "language": "python",
       "docstring": "Categorize issue severity based on keywords and patterns.\n\nUses keyword matching to assign severity levels:\n- CRITICAL: Security vulnerabilities, data loss, crashes\n- HIGH: Incorrect behavior, spec violations, broken functionality\n- MEDIUM: Performance issues, missing tests, code quality\n- LOW: Style issues, documentation, minor improvements\n\nArgs:\n    issue: Issue description text\n\nReturns:\n    CategorizedIssue with assigned severity\n\nExample:\n    >>> issue = \"SQL injection vulnerability in login form\"\n    >>> categorized = categorize_issue_severity(issue)\n    >>> categorized.severity\n    <IssueSeverity.CRITICAL: 'critical'>\n    >>> categorized.keywords_matched\n    ['sql injection', 'vulnerability']",
       "parameters": [
@@ -66557,7 +66557,7 @@
         {
           "name": "categorize_issues",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-          "line": 789,
+          "line": 791,
           "call_type": "function_call"
         }
       ],
@@ -66565,31 +66565,31 @@
         {
           "name": "lower",
           "file": "unknown",
-          "line": 680,
+          "line": 682,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 718,
+          "line": 720,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 728,
+          "line": 730,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 738,
+          "line": 740,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 748,
+          "line": 750,
           "call_type": "method_call"
         }
       ],
@@ -66598,7 +66598,7 @@
     {
       "name": "categorize_issues",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
-      "line": 764,
+      "line": 766,
       "language": "python",
       "docstring": "Categorize severity for multiple issues.\n\nConvenience function to categorize a list of issues.\n\nArgs:\n    issues: List of issue descriptions\n\nReturns:\n    List of CategorizedIssue objects, sorted by severity (critical first)\n\nExample:\n    >>> issues = [\n    ...     \"SQL injection in login\",\n    ...     \"Missing tests for auth module\",\n    ...     \"Typo in README\"\n    ... ]\n    >>> categorized = categorize_issues(issues)\n    >>> for cat in categorized:\n    ...     print(f\"{cat.severity.value}: {cat.issue}\")\n    critical: SQL injection in login\n    medium: Missing tests for auth module\n    low: Typo in README",
       "parameters": [
@@ -66626,19 +66626,19 @@
         {
           "name": "categorize_issue_severity",
           "file": "unknown",
-          "line": 789,
+          "line": 791,
           "call_type": "function_call"
         },
         {
           "name": "sort",
           "file": "unknown",
-          "line": 800,
+          "line": 802,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 800,
+          "line": 802,
           "call_type": "method_call"
         }
       ],
