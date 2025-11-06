@@ -1130,7 +1130,7 @@ def cmd_list_specs(args, printer):
     list_specs(
         status=args.status,
         specs_dir=specs_dir,
-        output_format="json" if args.json else "text",
+        output_format=getattr(args, 'format', 'text'),
         verbose=args.detailed,
         printer=printer,
     )
@@ -1530,6 +1530,12 @@ def register_update(subparsers, parent_parser):
         "--detailed",
         action="store_true",
         help="Show detailed information",
+    )
+    p_list_specs.add_argument(
+        "--format",
+        choices=["text", "json"],
+        default="text",
+        help="Output format (default: text)",
     )
     p_list_specs.set_defaults(func=cmd_list_specs)
 

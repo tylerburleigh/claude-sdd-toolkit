@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 18:25:17
+**Generated:** 2025-11-06 18:27:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 237
-- **Total Lines:** 83552
+- **Total Lines:** 83586
 - **Total Classes:** 338
-- **Total Functions:** 859
+- **Total Functions:** 860
 - **Avg Complexity:** 5.77
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -7092,6 +7092,28 @@ Returns:
 
 ---
 
+### `_create_progress_bar(percentage, width) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:13`
+**Complexity:** 4
+
+**Description:**
+> Create a visual progress bar using block characters.
+
+Args:
+    percentage: Completion percentage (0-100)
+    width: Width of the progress bar in characters
+
+Returns:
+    Rich markup string with colored progress bar
+
+**Parameters:**
+- `percentage`: int
+- `width`: int
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -8122,7 +8144,7 @@ Returns:
 ### `_print_specs_text(specs_info, verbose, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:110`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:141`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -18343,7 +18365,7 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:13`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:44`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**

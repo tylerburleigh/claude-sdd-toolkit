@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-06T23:27:07.667502Z",
+  "last_updated": "2025-11-06T23:29:27.778522Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 18,
+    "progress_percentage": 19,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -704,13 +704,13 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -725,7 +725,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
         "task_category": "implementation",
@@ -781,7 +781,7 @@
     "task-2-1-3": {
       "type": "subtask",
       "title": "Add --format json flag to output structured JSON instead",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -790,9 +790,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-06T23:28:40.468394Z",
+        "completed_at": "2025-11-06T23:29:27.757747Z",
+        "needs_journaling": false,
+        "actual_hours": 0.013,
+        "journaled_at": "2025-11-06T23:29:27.771867Z"
       }
     },
     "task-2-2": {
@@ -2986,6 +2991,15 @@
       "content": "Successfully added visual progress bars using Rich markup and block characters to the list_specs table.\n\nImplementation details:\n- Created _create_progress_bar() helper function that generates visual bars using block characters (\u2588 for filled, \u2591 for empty)\n- Added color coding based on progress level:\n  * Red: 0-24%\n  * Orange: 25-49%  \n  * Yellow: 50-74%\n  * Green: 75-100%\n- Progress column now displays visual bar, percentage, and task count (e.g., \"\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 100% / 80/80 tasks\")\n- Bar width set to 10 characters for optimal visibility\n- Rich markup ensures proper color rendering in TTY environments\n\nTested with active and completed specs - progress bars display correctly with appropriate color coding based on completion percentage.",
       "metadata": {},
       "task_id": "task-2-1-2"
+    },
+    {
+      "timestamp": "2025-11-06T23:29:27.771846Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add --format json flag to output structured JSON instead",
+      "author": "claude-code",
+      "content": "Successfully added --format json flag to list_specs CLI command for structured JSON output.\n\nImplementation details:\n- Added --format argument to list-specs argument parser in cli.py (line 1534-1539)\n- Choices: [\"text\", \"json\"] with default \"text\"\n- Updated cmd_list_specs() function to use args.format instead of the non-existent args.json\n- Used getattr(args, 'format', 'text') for safe attribute access with fallback\n- Maintained backward compatibility with existing text output as default\n\nTested JSON output successfully:\n- Outputs structured JSON array with spec metadata\n- Includes: spec_id, status, title, total_tasks, completed_tasks, progress_percentage, current_phase, etc.\n- JSON is properly formatted and parseable\n- Text output (Rich.Table) remains default for human-readable display",
+      "metadata": {},
+      "task_id": "task-2-1-3"
     }
   ]
 }
