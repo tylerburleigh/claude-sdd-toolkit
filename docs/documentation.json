@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:22:24.934094Z",
+    "generated_at": "2025-11-06T18:33:02.298483Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 228,
-    "total_lines": 79389,
+    "total_lines": 79439,
     "total_classes": 297,
     "total_functions": 851,
-    "avg_complexity": 5.79,
+    "avg_complexity": 5.8,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 228,
-        "lines": 79389,
+        "lines": 79439,
         "classes": 297,
         "functions": 851,
-        "avg_complexity": 5.79
+        "avg_complexity": 5.8
       }
     }
   },
@@ -3289,7 +3289,7 @@
         "claude_skills.common.spec.update_node"
       ],
       "exports": [],
-      "lines": 1226
+      "lines": 1276
     },
     {
       "name": "review_parser",
@@ -35689,6 +35689,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1143,
+          "call_type": "function_call"
+        },
+        {
           "name": "validate_spec",
           "file": "src/claude_skills/claude_skills/sdd_update/validation.py",
           "line": 52,
@@ -36099,7 +36105,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 33
+      "call_count": 34
     },
     {
       "name": "validate_spec_before_proceed",
@@ -83218,7 +83224,7 @@
         {
           "name": "_handle_add_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 1178,
+          "line": 1228,
           "call_type": "function_call"
         }
       ],
@@ -83479,7 +83485,7 @@
         {
           "name": "_handle_remove_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 1192,
+          "line": 1242,
           "call_type": "function_call"
         }
       ],
@@ -83918,7 +83924,7 @@
         {
           "name": "_handle_update_node_field",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 1209,
+          "line": 1259,
           "call_type": "function_call"
         }
       ],
@@ -84042,7 +84048,7 @@
         {
           "name": "_handle_move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-          "line": 1226,
+          "line": 1276,
           "call_type": "function_call"
         }
       ],
@@ -84286,6 +84292,12 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 836,
           "call_type": "function_call"
+        },
+        {
+          "name": "apply_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
+          "line": 1133,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84302,7 +84314,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "transactional_modify",
@@ -84520,7 +84532,7 @@
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
       "line": 963,
       "language": "python",
-      "docstring": "Apply a batch of modifications from a JSON file to a spec.\n\nReads a JSON file containing an array of modification operations and\napplies them sequentially to the spec. Each operation is atomic - if\none fails, previous successful operations are kept but remaining ones\nare skipped.\n\nArgs:\n    spec_data: The full spec data dictionary to modify\n    modifications_file: Path to JSON file containing modifications array\n\nReturns:\n    Dict with overall status and per-operation results:\n    {\n        \"success\": True|False,\n        \"message\": \"Overall summary\",\n        \"total_operations\": N,\n        \"successful\": N,\n        \"failed\": N,\n        \"results\": [\n            {\n                \"operation\": {...},\n                \"success\": True|False,\n                \"message\": \"...\",\n                \"error\": \"...\" (only if failed)\n            },\n            ...\n        ]\n    }\n\nModification File Format:\n    {\n        \"modifications\": [\n            {\n                \"operation\": \"add_node\",\n                \"parent_id\": \"phase-1\",\n                \"node_data\": {\n                    \"node_id\": \"task-1-5\",\n                    \"type\": \"task\",\n                    \"title\": \"New task\",\n                    \"description\": \"...\",\n                    \"status\": \"pending\"\n                },\n                \"position\": 2\n            },\n            {\n                \"operation\": \"update_node_field\",\n                \"node_id\": \"task-1-1\",\n                \"field\": \"title\",\n                \"value\": \"Updated title\"\n            },\n            {\n                \"operation\": \"remove_node\",\n                \"node_id\": \"task-2-3\",\n                \"cascade\": true\n            },\n            {\n                \"operation\": \"move_node\",\n                \"node_id\": \"task-1-3\",\n                \"new_parent_id\": \"phase-2\",\n                \"position\": 0\n            }\n        ]\n    }\n\nRaises:\n    FileNotFoundError: If modifications_file doesn't exist\n    json.JSONDecodeError: If file is not valid JSON\n    ValueError: If file format is invalid",
+      "docstring": "Apply a batch of modifications from a JSON file to a spec.\n\nReads a JSON file containing an array of modification operations and\napplies them sequentially to the spec. Each operation is atomic - if\none fails, previous successful operations are kept but remaining ones\nare skipped.\n\nArgs:\n    spec_data: The full spec data dictionary to modify\n    modifications_file: Path to JSON file containing modifications array\n    validate_after_each: If True, validates spec after each modification\n                       and rolls back if validation fails (default: False)\n                       Set to True for strict validation with rollback\n\nReturns:\n    Dict with overall status and per-operation results:\n    {\n        \"success\": True|False,\n        \"message\": \"Overall summary\",\n        \"total_operations\": N,\n        \"successful\": N,\n        \"failed\": N,\n        \"results\": [\n            {\n                \"operation\": {...},\n                \"success\": True|False,\n                \"message\": \"...\",\n                \"error\": \"...\" (only if failed),\n                \"validation_error\": \"...\" (if validation failed)\n            },\n            ...\n        ]\n    }\n\nModification File Format:\n    {\n        \"modifications\": [\n            {\n                \"operation\": \"add_node\",\n                \"parent_id\": \"phase-1\",\n                \"node_data\": {\n                    \"node_id\": \"task-1-5\",\n                    \"type\": \"task\",\n                    \"title\": \"New task\",\n                    \"description\": \"...\",\n                    \"status\": \"pending\"\n                },\n                \"position\": 2\n            },\n            {\n                \"operation\": \"update_node_field\",\n                \"node_id\": \"task-1-1\",\n                \"field\": \"title\",\n                \"value\": \"Updated title\"\n            },\n            {\n                \"operation\": \"remove_node\",\n                \"node_id\": \"task-2-3\",\n                \"cascade\": true\n            },\n            {\n                \"operation\": \"move_node\",\n                \"node_id\": \"task-1-3\",\n                \"new_parent_id\": \"phase-2\",\n                \"position\": 0\n            }\n        ]\n    }\n\nRaises:\n    FileNotFoundError: If modifications_file doesn't exist\n    json.JSONDecodeError: If file is not valid JSON\n    ValueError: If file format is invalid",
       "parameters": [
         {
           "name": "spec_data",
@@ -84531,10 +84543,15 @@
           "name": "modifications_file",
           "type": "str",
           "default": null
+        },
+        {
+          "name": "validate_after_each",
+          "type": "bool",
+          "default": null
         }
       ],
       "return_type": "Dict[str, Any]",
-      "complexity": 14,
+      "complexity": 22,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -84569,74 +84586,62 @@
         {
           "name": "exists",
           "file": "unknown",
-          "line": 1043,
+          "line": 1055,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "unknown",
-          "line": 1048,
+          "line": 1060,
           "call_type": "function_call"
         },
         {
           "name": "load",
           "file": "unknown",
-          "line": 1049,
+          "line": 1061,
           "call_type": "method_call"
         },
         {
           "name": "JSONDecodeError",
           "file": "unknown",
-          "line": 1051,
+          "line": 1063,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 1052,
+          "line": 1064,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 1058,
+          "line": 1070,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 1065,
+          "line": 1077,
           "call_type": "function_call"
         },
         {
           "name": "enumerate",
           "file": "unknown",
-          "line": 1082,
+          "line": 1094,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 1083,
+          "line": 1095,
           "call_type": "function_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 1088,
+          "line": 1100,
           "call_type": "function_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 1090,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 1094,
-          "call_type": "method_call"
         },
         {
           "name": "append",
@@ -84645,81 +84650,123 @@
           "call_type": "method_call"
         },
         {
-          "name": "join",
+          "name": "get",
           "file": "unknown",
-          "line": 1111,
-          "call_type": "method_call"
-        },
-        {
-          "name": "keys",
-          "file": "unknown",
-          "line": 1111,
+          "line": 1106,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 1113,
+          "line": 1114,
           "call_type": "method_call"
         },
         {
-          "name": "handler",
-          "file": "unknown",
-          "line": 1120,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
+          "name": "join",
           "file": "unknown",
           "line": 1123,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "keys",
           "file": "unknown",
-          "line": 1124,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 1132,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 1136,
+          "line": 1123,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 1138,
+          "line": 1125,
           "call_type": "method_call"
         },
         {
-          "name": "str",
+          "name": "spec_transaction",
           "file": "unknown",
-          "line": 1144,
+          "line": 1133,
           "call_type": "function_call"
         },
         {
-          "name": "str",
+          "name": "handler",
           "file": "unknown",
-          "line": 1145,
+          "line": 1134,
           "call_type": "function_call"
         },
         {
-          "name": "append",
+          "name": "get",
+          "file": "unknown",
+          "line": 1137,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 1139,
+          "call_type": "method_call"
+        },
+        {
+          "name": "validate_spec_hierarchy",
+          "file": "unknown",
+          "line": 1143,
+          "call_type": "function_call"
+        },
+        {
+          "name": "is_valid",
+          "file": "unknown",
+          "line": 1146,
+          "call_type": "method_call"
+        },
+        {
+          "name": "count_all_issues",
           "file": "unknown",
           "line": 1147,
           "call_type": "method_call"
         },
         {
+          "name": "get",
+          "file": "unknown",
+          "line": 1173,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1182,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1189,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1190,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1194,
+          "call_type": "function_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 1195,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 1197,
+          "call_type": "method_call"
+        },
+        {
           "name": "len",
           "file": "unknown",
-          "line": 1151,
+          "line": 1201,
           "call_type": "function_call"
         }
       ],
@@ -84728,7 +84775,7 @@
     {
       "name": "_handle_add_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 1164,
+      "line": 1214,
       "language": "python",
       "docstring": "Handle add_node operation from modifications file.",
       "parameters": [
@@ -84754,19 +84801,19 @@
         {
           "name": "join",
           "file": "unknown",
-          "line": 1171,
+          "line": 1221,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 1176,
+          "line": 1226,
           "call_type": "method_call"
         },
         {
           "name": "add_node",
           "file": "unknown",
-          "line": 1178,
+          "line": 1228,
           "call_type": "function_call"
         }
       ]
@@ -84774,7 +84821,7 @@
     {
       "name": "_handle_remove_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 1181,
+      "line": 1231,
       "language": "python",
       "docstring": "Handle remove_node operation from modifications file.",
       "parameters": [
@@ -84800,13 +84847,13 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 1190,
+          "line": 1240,
           "call_type": "method_call"
         },
         {
           "name": "remove_node",
           "file": "unknown",
-          "line": 1192,
+          "line": 1242,
           "call_type": "function_call"
         }
       ]
@@ -84814,7 +84861,7 @@
     {
       "name": "_handle_update_node_field",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 1195,
+      "line": 1245,
       "language": "python",
       "docstring": "Handle update_node_field operation from modifications file.",
       "parameters": [
@@ -84840,13 +84887,13 @@
         {
           "name": "join",
           "file": "unknown",
-          "line": 1202,
+          "line": 1252,
           "call_type": "method_call"
         },
         {
           "name": "update_node_field",
           "file": "unknown",
-          "line": 1209,
+          "line": 1259,
           "call_type": "function_call"
         }
       ]
@@ -84854,7 +84901,7 @@
     {
       "name": "_handle_move_node",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
-      "line": 1212,
+      "line": 1262,
       "language": "python",
       "docstring": "Handle move_node operation from modifications file.",
       "parameters": [
@@ -84880,19 +84927,19 @@
         {
           "name": "join",
           "file": "unknown",
-          "line": 1219,
+          "line": 1269,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 1224,
+          "line": 1274,
           "call_type": "method_call"
         },
         {
           "name": "move_node",
           "file": "unknown",
-          "line": 1226,
+          "line": 1276,
           "call_type": "function_call"
         }
       ]

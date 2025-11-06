@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:22:24
+**Generated:** 2025-11-06 13:33:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 228
-- **Total Lines:** 79389
+- **Total Lines:** 79439
 - **Total Classes:** 297
 - **Total Functions:** 851
-- **Avg Complexity:** 5.79
+- **Avg Complexity:** 5.8
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -6855,7 +6855,7 @@ Returns:
 ### `_handle_add_node(spec_data, mod) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1164`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1214`
 **Complexity:** 2
 
 **Description:**
@@ -6936,7 +6936,7 @@ Returns:
 ### `_handle_move_node(spec_data, mod) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1212`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1262`
 **Complexity:** 2
 
 **Description:**
@@ -6951,7 +6951,7 @@ Returns:
 ### `_handle_remove_node(spec_data, mod) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1181`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1231`
 **Complexity:** 2
 
 **Description:**
@@ -6966,7 +6966,7 @@ Returns:
 ### `_handle_update_node_field(spec_data, mod) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1195`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:1245`
 **Complexity:** 2
 
 **Description:**
@@ -8516,11 +8516,11 @@ Returns:
 
 ---
 
-### `apply_modifications(spec_data, modifications_file) -> Dict[str, Any]`
+### `apply_modifications(spec_data, modifications_file, validate_after_each) -> Dict[str, Any]`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/modification.py:963`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 22 (High)
 
 **Description:**
 > Apply a batch of modifications from a JSON file to a spec.
@@ -8533,6 +8533,9 @@ are skipped.
 Args:
     spec_data: The full spec data dictionary to modify
     modifications_file: Path to JSON file containing modifications array
+    validate_after_each: If True, validates spec after each modification
+                       and rolls back if validation fails (default: False)
+                       Set to True for strict validation with rollback
 
 Returns:
     Dict with overall status and per-operation results:
@@ -8547,7 +8550,8 @@ Returns:
                 "operation": {...},
                 "success": True|False,
                 "message": "...",
-                "error": "..." (only if failed)
+                "error": "..." (only if failed),
+                "validation_error": "..." (if validation failed)
             },
             ...
         ]
@@ -8596,6 +8600,7 @@ Raises:
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `modifications_file`: str
+- `validate_after_each`: bool
 
 ---
 
