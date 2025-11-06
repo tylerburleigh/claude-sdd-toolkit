@@ -164,6 +164,60 @@ Best practice: Ask Claude to "Document this codebase" before creating specs to e
 
 Claude uses skills automatically based on your requests.
 
+### Spec Modification & Review
+
+Specs are living documents that evolve during implementation. The toolkit provides comprehensive tools for validating specs, reviewing implementation fidelity, and applying feedback systematically.
+
+**Validation Workflow:**
+
+```bash
+# Validate spec structure
+sdd validate-spec spec-id
+
+# Auto-fix common issues
+sdd validate-spec spec-id --fix
+
+# Generate validation report
+sdd validate-spec spec-id --report
+```
+
+**Fidelity Review Workflow:**
+
+```bash
+# Review entire spec implementation
+sdd fidelity-review spec-id
+
+# Review specific phase or task
+sdd fidelity-review spec-id --phase phase-2
+sdd fidelity-review spec-id --task task-3-1
+
+# Use specific AI tools for review
+sdd fidelity-review spec-id --ai-tools gemini codex
+
+# Output to file
+sdd fidelity-review spec-id --output review.md --format markdown
+```
+
+**Key Capabilities:**
+
+- **Validation** - Check spec structure, detect circular dependencies, verify task relationships
+- **Auto-fixing** - Automatically fix common issues like missing fields or incorrect metadata
+- **Fidelity Review** - Compare implementation against spec using AI consultation
+- **Consensus Analysis** - Multiple AI models review and identify deviations
+- **Systematic Feedback** - Step-by-step workflow for applying review feedback
+
+**When to Use:**
+
+- ✅ After completing each phase (verify implementation matches spec)
+- ✅ Before creating pull requests (ensure quality and alignment)
+- ✅ After manual spec edits (validate structure and dependencies)
+- ✅ When implementation deviates from plan (document and review changes)
+
+**Documentation:**
+
+- [docs/spec-modification.md](docs/spec-modification.md) - Complete modification and validation guide
+- [docs/review-workflow.md](docs/review-workflow.md) - Fidelity review workflow and best practices
+
 ### Subagent Architecture
 
 Some skills use **Claude Code's subagent system** for orchestration. Subagents are specialized instances of Claude that handle complex, multi-step tasks autonomously.
