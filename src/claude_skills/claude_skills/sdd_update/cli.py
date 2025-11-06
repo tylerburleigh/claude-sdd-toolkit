@@ -47,6 +47,7 @@ from claude_skills.sdd_update.query import (
 )
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
+from claude_skills.sdd_spec_mod.task_operations import add_task
 
 
 def cmd_execute_verify(args, printer):
@@ -361,6 +362,59 @@ def cmd_update_estimate(args, printer):
 
     except ValueError as e:
         printer.error(f"Failed to update estimate: {e}")
+        return 1
+
+
+def cmd_add_task(args, printer):
+    """Add a new task to the spec hierarchy."""
+    printer.action(f"Adding task to {args.parent}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Add task
+    try:
+        result = add_task(
+            spec_data=spec_data,
+            parent_id=args.parent,
+            title=args.title,
+            description=args.description if hasattr(args, 'description') and args.description else None,
+            position=args.position if hasattr(args, 'position') and args.position is not None else None,
+            task_type=args.type if hasattr(args, 'type') and args.type else "task",
+            estimated_hours=args.hours if hasattr(args, 'hours') and args.hours is not None else None
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would add task:")
+            printer.detail(f"  ID: {result['task_id']}")
+            printer.detail(f"  Title: {result['task_title']}")
+            printer.detail(f"  Parent: {result['parent_id']}")
+            if args.description:
+                printer.detail(f"  Description: {args.description[:50]}...")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+        printer.info(f"Task ID: {result['task_id']}")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to add task: {e}")
         return 1
 
 
@@ -1266,6 +1320,18 @@ def register_update(subparsers, parent_parser):
     p_estimate.add_argument("--complexity", choices=["low", "medium", "high"], help="Complexity level")
     p_estimate.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
     p_estimate.set_defaults(func=cmd_update_estimate)
+
+    # add-task command
+    p_add_task = subparsers.add_parser("add-task", help="Add a new task to the spec hierarchy", parents=[parent_parser])
+    p_add_task.add_argument("spec_id", help="Specification ID")
+    p_add_task.add_argument("--parent", required=True, help="Parent node ID (e.g., phase-1, task-2-1)")
+    p_add_task.add_argument("--title", required=True, help="Task title")
+    p_add_task.add_argument("--description", help="Task description")
+    p_add_task.add_argument("--type", default="task", choices=["task", "subtask", "verify"], help="Task type")
+    p_add_task.add_argument("--hours", type=float, help="Estimated hours")
+    p_add_task.add_argument("--position", type=int, help="Position in parent's children list (0-based)")
+    p_add_task.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_add_task.set_defaults(func=cmd_add_task)
 
     # bulk-journal command
     p_bulk_journal = subparsers.add_parser("bulk-journal", help="Bulk journal completed tasks", parents=[parent_parser])

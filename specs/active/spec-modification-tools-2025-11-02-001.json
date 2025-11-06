@@ -1,7 +1,7 @@
 {
   "spec_id": "spec-modification-tools-2025-11-02-001",
   "generated": "2025-11-02T22:30:00Z",
-  "last_updated": "2025-11-06T17:13:43.886818Z",
+  "last_updated": "2025-11-06T17:16:12.909260Z",
   "metadata": {
     "title": "SDD Spec Modification & Review Enhancement Tools",
     "description": "Non-interactive CLI tools for modifying existing specs, tracking revisions, and applying review feedback. Enables programmatic spec updates without manual JSON editing.",
@@ -24,7 +24,7 @@
       "All modifications auto-validate before saving",
       "Non-interactive CLI design (no prompts, all args explicit)"
     ],
-    "progress_percentage": 40,
+    "progress_percentage": 41,
     "current_phase": "phase-3",
     "activated_date": "2025-11-06T15:04:57.308241Z"
   },
@@ -42,8 +42,8 @@
         "phase-5",
         "phase-6"
       ],
-      "total_tasks": 47,
-      "completed_tasks": 19,
+      "total_tasks": 48,
+      "completed_tasks": 20,
       "metadata": {}
     },
     "phase-1": {
@@ -758,8 +758,8 @@
         ],
         "depends": []
       },
-      "total_tasks": 10,
-      "completed_tasks": 2,
+      "total_tasks": 11,
+      "completed_tasks": 3,
       "metadata": {
         "estimated_hours": 12,
         "risk_level": "medium",
@@ -776,8 +776,8 @@
         "task-3-2",
         "task-3-3"
       ],
-      "total_tasks": 7,
-      "completed_tasks": 2,
+      "total_tasks": 8,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -796,7 +796,8 @@
         "task-3-1-2",
         "task-3-1-3",
         "task-3-1-4",
-        "task-3-1-5"
+        "task-3-1-5",
+        "task-3-1-6"
       ],
       "dependencies": {
         "blocks": [
@@ -806,8 +807,8 @@
         "blocked_by": [],
         "depends": []
       },
-      "total_tasks": 5,
-      "completed_tasks": 2,
+      "total_tasks": 6,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_modify/cli.py",
         "estimated_hours": 6,
@@ -863,7 +864,7 @@
       "type": "subtask",
       "title": "Implement cmd_add_task(args, printer)",
       "description": "sdd add-task <spec> --parent <id> --title <text> [--description <text>] [--position N]",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -872,9 +873,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "estimated_hours": 2.0
+        "estimated_hours": 2.0,
+        "completed_at": "2025-11-06T17:16:12.897549Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-06T17:16:12.902054Z"
       }
     },
     "task-3-1-4": {
@@ -1818,6 +1822,24 @@
         "expected": "Complete workflow: create spec \u2192 review \u2192 parse review \u2192 apply modifications \u2192 validate",
         "command": ""
       }
+    },
+    "task-3-1-6": {
+      "type": "task",
+      "title": "Test new task",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 0.5
+      },
+      "description": "A test task to verify add-task functionality"
     }
   },
   "journal": [
@@ -2045,6 +2067,15 @@
       "content": "Successfully implemented cmd_update_estimate command for updating task estimates. The implementation includes:\n\n1. Created new estimates.py module in sdd_spec_mod/ with update_task_estimate() and get_task_estimate() functions\n2. Implemented cmd_update_estimate() command handler in sdd_update/cli.py following the same pattern as cmd_add_assumption\n3. Registered update-estimate CLI command with proper argument parsing (--hours, --complexity, --dry-run flags)\n4. Fixed bug in cmd_add_assumption() where save_json_spec arguments were in wrong order\n5. Tested all three use cases:\n   - Updating both hours and complexity\n   - Updating just hours\n   - Updating just complexity\n\nAll tests passed successfully. The command is now accessible via: sdd update-estimate <spec> <task-id> --hours N [--complexity low|medium|high]",
       "metadata": {},
       "task_id": "task-3-1-2"
+    },
+    {
+      "timestamp": "2025-11-06T17:16:12.902038Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement cmd_add_task(args, printer)",
+      "author": "claude-code",
+      "content": "Successfully implemented cmd_add_task command for adding new tasks to spec hierarchy. The implementation includes:\n\n1. Created task_operations.py module in sdd_spec_mod/ with:\n   - add_task() function for adding tasks to hierarchy\n   - _generate_task_id() helper for generating unique task IDs based on parent structure\n   - _propagate_task_count_increase() helper for updating task counts up the hierarchy\n\n2. Implemented cmd_add_task() command handler in sdd_update/cli.py with support for:\n   - Required: --parent (parent node ID), --title (task title)\n   - Optional: --description, --type (task/subtask/verify), --hours, --position\n   - --dry-run flag for preview mode\n\n3. Registered add-task CLI command with proper argument parsing\n\n4. Tested successfully:\n   - Created test task with all parameters\n   - Verified task was added to hierarchy correctly\n   - Confirmed metadata (estimated_hours, description) was preserved\n   - Verified parent-child relationships maintained\n\nThe command is now accessible via: sdd add-task <spec> --parent <id> --title <text> [options]",
+      "metadata": {},
+      "task_id": "task-3-1-3"
     }
   ]
 }
