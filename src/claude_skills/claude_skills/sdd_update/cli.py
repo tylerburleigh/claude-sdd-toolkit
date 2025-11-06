@@ -46,6 +46,7 @@ from claude_skills.sdd_update.query import (
     list_blockers,
 )
 from claude_skills.sdd_update.query_tasks import format_tasks_table
+from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
@@ -859,11 +860,20 @@ def cmd_list_phases(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    phases = list_phases(
-        spec_id=args.spec_id,
-        specs_dir=specs_dir,
-        printer=printer if not args.json else None
-    )
+    # Use Rich.Table formatter for table output
+    if not args.json:
+        phases = format_phases_table(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            printer=printer
+        )
+    else:
+        # Use original list_phases for JSON output
+        phases = list_phases(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            printer=None
+        )
 
     if args.json and phases:
         print(json.dumps(phases, indent=2))
