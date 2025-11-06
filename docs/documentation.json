@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:08:21.106470Z",
+    "generated_at": "2025-11-06T18:12:16.841011Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 223,
-    "total_lines": 77646,
-    "total_classes": 290,
-    "total_functions": 846,
-    "avg_complexity": 5.73,
+    "total_files": 224,
+    "total_lines": 78137,
+    "total_classes": 293,
+    "total_functions": 848,
+    "avg_complexity": 5.75,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 223,
-        "lines": 77646,
-        "classes": 290,
-        "functions": 846,
-        "avg_complexity": 5.73
+        "files": 224,
+        "lines": 78137,
+        "classes": 293,
+        "functions": 848,
+        "avg_complexity": 5.75
       }
     }
   },
@@ -3174,10 +3174,11 @@
         "revision.create_revision",
         "revision.get_revision_history",
         "revision.rollback_to_version",
-        "review_parser.parse_review_report"
+        "review_parser.parse_review_report",
+        "review_parser.suggest_modifications"
       ],
       "exports": [],
-      "lines": 43
+      "lines": 45
     },
     {
       "name": "assumptions",
@@ -3277,7 +3278,9 @@
         "_extract_issues_from_markdown",
         "_extract_section",
         "_parse_issue_list",
-        "_parse_single_issue"
+        "_parse_single_issue",
+        "suggest_modifications",
+        "_suggest_for_issue"
       ],
       "imports": [
         "json",
@@ -3289,7 +3292,7 @@
         "typing.Optional"
       ],
       "exports": [],
-      "lines": 368
+      "lines": 572
     },
     {
       "name": "revision",
@@ -5872,6 +5875,25 @@
       ],
       "exports": [],
       "lines": 220
+    },
+    {
+      "name": "test_suggest_modifications",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+      "language": "python",
+      "docstring": "Unit tests for suggest_modifications function in review_parser module.",
+      "classes": [
+        "TestSuggestModifications",
+        "TestSuggestForIssue",
+        "TestIntegrationScenarios"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "claude_skills.sdd_spec_mod.review_parser.suggest_modifications",
+        "claude_skills.sdd_spec_mod.review_parser._suggest_for_issue"
+      ],
+      "exports": [],
+      "lines": 285
     }
   ],
   "classes": [
@@ -17736,6 +17758,68 @@
         "test_complete_task_workflow_journals_parent_nodes",
         "test_complete_task_workflow_journals_multiple_parent_levels",
         "test_complete_task_workflow_does_not_journal_already_completed_parents"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestSuggestModifications",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+      "line": 9,
+      "language": "python",
+      "docstring": "Test the suggest_modifications function.",
+      "bases": [],
+      "methods": [
+        "test_empty_issues_returns_empty_list",
+        "test_processes_critical_issues_first",
+        "test_handles_missing_severity_keys",
+        "test_processes_multiple_issues"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestSuggestForIssue",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+      "line": 70,
+      "language": "python",
+      "docstring": "Test the _suggest_for_issue helper function.",
+      "bases": [],
+      "methods": [
+        "test_missing_description_generates_update",
+        "test_unclear_description_generates_update",
+        "test_missing_dependency_generates_update",
+        "test_incorrect_estimate_generates_metadata_update",
+        "test_missing_verification_generates_add_node",
+        "test_missing_task_generates_add_node",
+        "test_task_ordering_generates_note",
+        "test_generic_update_generates_review_note",
+        "test_no_node_id_returns_empty_list",
+        "test_unmatched_pattern_returns_empty_list",
+        "test_reason_field_includes_severity_and_title"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestIntegrationScenarios",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+      "line": 216,
+      "language": "python",
+      "docstring": "Integration tests for realistic review scenarios.",
+      "bases": [],
+      "methods": [
+        "test_full_review_with_multiple_issue_types",
+        "test_handles_malformed_issue_gracefully"
       ],
       "properties": [],
       "is_exported": false,
@@ -84213,6 +84297,577 @@
       "call_count": 1
     },
     {
+      "name": "suggest_modifications",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 371,
+      "language": "python",
+      "docstring": "Generate modification suggestions from parsed review issues.\n\nTakes the issues dict from parse_review_report and generates actionable\nmodification suggestions that can be applied using apply_modifications.\n\nArgs:\n    issues: Dict of issues grouped by severity:\n        {\n            \"critical\": [...],\n            \"high\": [...],\n            \"medium\": [...],\n            \"low\": [...]\n        }\n\nReturns:\n    List of modification operation dicts in the format expected by\n    apply_modifications:\n    [\n        {\n            \"operation\": \"update_node_field\",\n            \"node_id\": \"task-1-1\",\n            \"field\": \"description\",\n            \"value\": \"Updated description\",\n            \"reason\": \"Critical issue: Missing context\"\n        },\n        ...\n    ]\n\nCommon mappings from issues to modifications:\n    - Missing dependencies -> add_node with dependency\n    - Incorrect estimates -> update_node_field for metadata.estimated_hours\n    - Missing tasks -> add_node for new task\n    - Unclear descriptions -> update_node_field for description\n    - Missing verification -> add_node with type=verify",
+      "parameters": [
+        {
+          "name": "issues",
+          "type": "Dict[str, List[Dict[str, Any]]]",
+          "default": null
+        }
+      ],
+      "return_type": "List[Dict[str, Any]]",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_empty_issues_returns_empty_list",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 15,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_processes_critical_issues_first",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 33,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_handles_missing_severity_keys",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 41,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_processes_multiple_issues",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 66,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_full_review_with_multiple_issue_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 254,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_handles_malformed_issue_gracefully",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 284,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 411,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_suggest_for_issue",
+          "file": "unknown",
+          "line": 412,
+          "call_type": "function_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 413,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 416,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_suggest_for_issue",
+          "file": "unknown",
+          "line": 417,
+          "call_type": "function_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 418,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 421,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_suggest_for_issue",
+          "file": "unknown",
+          "line": 422,
+          "call_type": "function_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 423,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 426,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_suggest_for_issue",
+          "file": "unknown",
+          "line": 427,
+          "call_type": "function_call"
+        },
+        {
+          "name": "extend",
+          "file": "unknown",
+          "line": 428,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 6
+    },
+    {
+      "name": "_suggest_for_issue",
+      "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+      "line": 433,
+      "language": "python",
+      "docstring": "Generate modification suggestions for a single issue.\n\nArgs:\n    issue: Issue dict with title, description, impact, fix, severity\n    severity: Severity level (critical, high, medium, low)\n\nReturns:\n    List of modification operation dicts",
+      "parameters": [
+        {
+          "name": "issue",
+          "type": "Dict[str, Any]",
+          "default": null
+        },
+        {
+          "name": "severity",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "List[Dict[str, Any]]",
+      "complexity": 22,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "suggest_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 412,
+          "call_type": "function_call"
+        },
+        {
+          "name": "suggest_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 417,
+          "call_type": "function_call"
+        },
+        {
+          "name": "suggest_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 422,
+          "call_type": "function_call"
+        },
+        {
+          "name": "suggest_modifications",
+          "file": "src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py",
+          "line": 427,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_missing_description_generates_update",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 81,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_unclear_description_generates_update",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 95,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_missing_dependency_generates_update",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 107,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_incorrect_estimate_generates_metadata_update",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 120,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_missing_verification_generates_add_node",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_missing_task_generates_add_node",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 148,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_task_ordering_generates_note",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 162,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_generic_update_generates_review_note",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 175,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_no_node_id_returns_empty_list",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 188,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_unmatched_pattern_returns_empty_list",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 199,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_reason_field_includes_severity_and_title",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py",
+          "line": 210,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 447,
+          "call_type": "function_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 450,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 450,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 451,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 451,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 452,
+          "call_type": "method_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 456,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 457,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 460,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 462,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 467,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 467,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 471,
+          "call_type": "function_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 474,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 476,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 479,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 484,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 484,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 488,
+          "call_type": "function_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 491,
+          "call_type": "method_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 493,
+          "call_type": "function_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 493,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 494,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 499,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 499,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 503,
+          "call_type": "function_call"
+        },
+        {
+          "name": "match",
+          "file": "unknown",
+          "line": 506,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 508,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 510,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 517,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 520,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 520,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 524,
+          "call_type": "function_call"
+        },
+        {
+          "name": "search",
+          "file": "unknown",
+          "line": 526,
+          "call_type": "method_call"
+        },
+        {
+          "name": "group",
+          "file": "unknown",
+          "line": 528,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 530,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip",
+          "file": "unknown",
+          "line": 531,
+          "call_type": "method_call"
+        },
+        {
+          "name": "replace",
+          "file": "unknown",
+          "line": 531,
+          "call_type": "method_call"
+        },
+        {
+          "name": "replace",
+          "file": "unknown",
+          "line": 531,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 531,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 535,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 545,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 545,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 549,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 553,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 557,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 558,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 558,
+          "call_type": "method_call"
+        },
+        {
+          "name": "any",
+          "file": "unknown",
+          "line": 562,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 564,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 568,
+          "call_type": "method_call"
+        },
+        {
+          "name": "capitalize",
+          "file": "unknown",
+          "line": 569,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 569,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 15
+    },
+    {
       "name": "_bump_version",
       "file": "src/claude_skills/claude_skills/sdd_spec_mod/revision.py",
       "line": 13,
@@ -122244,7 +122899,8 @@
       "revision.create_revision",
       "revision.get_revision_history",
       "revision.rollback_to_version",
-      "review_parser.parse_review_report"
+      "review_parser.parse_review_report",
+      "review_parser.suggest_modifications"
     ],
     "src/claude_skills/claude_skills/sdd_spec_mod/assumptions.py": [
       "typing.Dict",
@@ -123186,6 +123842,11 @@
       "claude_skills.sdd_validate.stats.calculate_statistics",
       "claude_skills.sdd_validate.stats.render_statistics",
       "claude_skills.sdd_validate.stats.SpecStatistics"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py": [
+      "pytest",
+      "claude_skills.sdd_spec_mod.review_parser.suggest_modifications",
+      "claude_skills.sdd_spec_mod.review_parser._suggest_for_issue"
     ]
   }
 }

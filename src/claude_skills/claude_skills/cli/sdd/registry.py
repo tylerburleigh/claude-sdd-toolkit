@@ -29,6 +29,7 @@ def register_all_subcommands(subparsers, parent_parser):
     from claude_skills.sdd_pr.cli import register_pr
     from claude_skills.context_tracker.cli import register_context, register_session_marker
     from claude_skills.sdd_fidelity_review.cli import register_commands as register_fidelity_review
+    from claude_skills.sdd_spec_mod.cli import register_spec_mod
 
     # Register core SDD subcommands
     register_next(subparsers, parent_parser)
@@ -41,6 +42,7 @@ def register_all_subcommands(subparsers, parent_parser):
     register_context(subparsers, parent_parser)
     register_session_marker(subparsers, parent_parser)
     register_fidelity_review(subparsers, parent_parser)
+    register_spec_mod(subparsers, parent_parser)
 
     # Register unified CLIs as SDD subcommands
     _register_doc_cli(subparsers, parent_parser)

@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:08:21
+**Generated:** 2025-11-06 13:12:16
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 223
-- **Total Lines:** 77646
-- **Total Classes:** 290
-- **Total Functions:** 846
-- **Avg Complexity:** 5.73
+- **Total Files:** 224
+- **Total Lines:** 78137
+- **Total Classes:** 293
+- **Total Functions:** 848
+- **Avg Complexity:** 5.75
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -3804,6 +3804,20 @@ Attributes:
 
 ---
 
+### `TestIntegrationScenarios`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:216`
+
+**Description:**
+> Integration tests for realistic review scenarios.
+
+**Methods:**
+- `test_full_review_with_multiple_issue_types()`
+- `test_handles_malformed_issue_gracefully()`
+
+---
+
 ### `TestIntegrationWithGetSessionState`
 
 **Language:** python
@@ -5053,6 +5067,45 @@ Attributes:
 - `test_non_interactive_behavior()`
 - `test_command_hint_displayed()`
 - `test_incomplete_spec_no_completion_message()`
+
+---
+
+### `TestSuggestForIssue`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:70`
+
+**Description:**
+> Test the _suggest_for_issue helper function.
+
+**Methods:**
+- `test_missing_description_generates_update()`
+- `test_unclear_description_generates_update()`
+- `test_missing_dependency_generates_update()`
+- `test_incorrect_estimate_generates_metadata_update()`
+- `test_missing_verification_generates_add_node()`
+- `test_missing_task_generates_add_node()`
+- `test_task_ordering_generates_note()`
+- `test_generic_update_generates_review_note()`
+- `test_no_node_id_returns_empty_list()`
+- `test_unmatched_pattern_returns_empty_list()`
+- `test_reason_field_includes_severity_and_title()`
+
+---
+
+### `TestSuggestModifications`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py:9`
+
+**Description:**
+> Test the suggest_modifications function.
+
+**Methods:**
+- `test_empty_issues_returns_empty_list()`
+- `test_processes_critical_issues_first()`
+- `test_handles_missing_severity_keys()`
+- `test_processes_multiple_issues()`
 
 ---
 
@@ -7646,6 +7699,28 @@ Returns:
 **Parameters:**
 - `category`: str
 - `normalized_message`: str
+
+---
+
+### `_suggest_for_issue(issue, severity) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:433`
+⚠️ **Complexity:** 22 (High)
+
+**Description:**
+> Generate modification suggestions for a single issue.
+
+Args:
+    issue: Issue dict with title, description, impact, fix, severity
+    severity: Severity level (critical, high, medium, low)
+
+Returns:
+    List of modification operation dicts
+
+**Parameters:**
+- `issue`: Dict[str, Any]
+- `severity`: str
 
 ---
 
@@ -20072,6 +20147,53 @@ Returns:
 
 ---
 
+### `suggest_modifications(issues) -> List[Dict[str, Any]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/review_parser.py:371`
+**Complexity:** 5
+
+**Description:**
+> Generate modification suggestions from parsed review issues.
+
+Takes the issues dict from parse_review_report and generates actionable
+modification suggestions that can be applied using apply_modifications.
+
+Args:
+    issues: Dict of issues grouped by severity:
+        {
+            "critical": [...],
+            "high": [...],
+            "medium": [...],
+            "low": [...]
+        }
+
+Returns:
+    List of modification operation dicts in the format expected by
+    apply_modifications:
+    [
+        {
+            "operation": "update_node_field",
+            "node_id": "task-1-1",
+            "field": "description",
+            "value": "Updated description",
+            "reason": "Critical issue: Missing context"
+        },
+        ...
+    ]
+
+Common mappings from issues to modifications:
+    - Missing dependencies -> add_node with dependency
+    - Incorrect estimates -> update_node_field for metadata.estimated_hours
+    - Missing tasks -> add_node for new task
+    - Unclear descriptions -> update_node_field for description
+    - Missing verification -> add_node with type=verify
+
+**Parameters:**
+- `issues`: Dict[str, List[Dict[str, Any]]]
+
+---
+
 ### `suggest_reading_order(key_files, framework_info) -> List[str]`
 
 **Language:** python
@@ -24071,6 +24193,7 @@ Returns:
 - `modification.update_node_field`
 - `modification.update_task_counts`
 - `review_parser.parse_review_report`
+- `review_parser.suggest_modifications`
 - `revision.create_revision`
 - `revision.get_revision_history`
 - `revision.rollback_to_version`
@@ -25108,4 +25231,10 @@ Returns:
 - `claude_skills.sdd_validate.stats.calculate_statistics`
 - `claude_skills.sdd_validate.stats.render_statistics`
 - `json`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_suggest_modifications.py`
+
+- `claude_skills.sdd_spec_mod.review_parser._suggest_for_issue`
+- `claude_skills.sdd_spec_mod.review_parser.suggest_modifications`
 - `pytest`
