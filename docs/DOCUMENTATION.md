@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 16:26:40
+**Generated:** 2025-11-06 17:13:21
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 229
-- **Total Lines:** 80064
-- **Total Classes:** 299
+- **Total Files:** 230
+- **Total Lines:** 80329
+- **Total Classes:** 302
 - **Total Functions:** 851
 - **Avg Complexity:** 5.8
 - **Max Complexity:** 45
@@ -1387,6 +1387,37 @@ Example:
 - `_parse_task()`
 - `_parse_verifications()`
 - `_parse_verification()`
+
+---
+
+### `Message`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:40`
+
+**Description:**
+> Structured message with metadata for agent analysis.
+
+Supports filtering, querying, and deferred rendering.
+
+Attributes:
+    level: Message severity/type
+    text: Message content
+    timestamp: When message was created
+    context: Task ID, phase, operation, etc.
+    metadata: Custom data (indent, key, etc.)
+    rendered: Whether message has been displayed
+
+---
+
+### `MessageLevel`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:22`
+
+**Description:**
+> Message severity/type levels.
 
 ---
 
@@ -5793,6 +5824,54 @@ Example:
 
 **Description:**
 > Status of AI tool execution.
+
+---
+
+### `Ui`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:64`
+
+**Description:**
+> Agent-first terminal user interface protocol using Rich.
+
+Provides Rich-powered TUI features including tables, trees, panels,
+progress indicators, and diff display. Supports both immediate and
+deferred rendering modes for AI-agent workflows.
+
+Core Rich Features:
+- print_table: Display data in formatted tables
+- print_tree: Show hierarchical data structures
+- print_diff: Display code/text differences
+- progress: Show progress bars and spinners
+- print_panel: Display content in bordered panels
+- print_status: Show status messages with styling
+
+All implementations must support:
+1. Rich-powered output methods
+2. Message collection in deferred mode
+3. Context management for message tagging
+
+Usage:
+    # Rich-powered interface
+    ui = RichUi()
+    ui.print_table(data, title="Task Progress")
+    ui.print_tree(hierarchy)
+
+    # With progress tracking
+    with ui.progress("Processing tasks...") as progress:
+        for task in tasks:
+            process(task)
+            progress.update()
+
+**Methods:**
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
 
 ---
 
@@ -23399,6 +23478,9 @@ Returns:
 - `spec.load_json_spec`
 - `spec.save_json_spec`
 - `spec.update_node`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 - `validation.EnhancedError`
 - `validation.JsonSpecValidationResult`
 - `validation.SpecValidationResult`
@@ -23617,6 +23699,21 @@ Returns:
 - `spec.extract_frontmatter`
 - `typing.Dict`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/ui_protocol.py`
+
+- `abc.abstractmethod`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `enum.Enum`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Union`
+- `typing.runtime_checkable`
 
 ### `src/claude_skills/claude_skills/common/validation.py`
 

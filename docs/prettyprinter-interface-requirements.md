@@ -7,6 +7,20 @@
 
 ---
 
+> **⚠️ IMPORTANT NOTE - BACKGROUND RESEARCH ONLY**
+>
+> This document was created during Phase 1 investigation (task-1-1-2) to understand the existing `PrettyPrinter` class and its usage patterns across the codebase.
+>
+> **This analysis informed the decision to use Rich library instead of enhancing PrettyPrinter.**
+>
+> **Actual Implementation:** The TUI upgrade uses the [Rich library](https://github.com/Textualize/rich) with a new `Ui` protocol that defines methods like `print_table()`, `print_tree()`, `print_diff()`, `progress()`, `print_panel()`, and `print_status()`.
+>
+> **PrettyPrinter Status:** The existing `PrettyPrinter` class remains unchanged and continues to work for backward compatibility. New code should use the Rich-based `Ui` implementations (RichUi, PlainUi).
+>
+> See [TUI Implementation Decision Record](./tui-implementation-decision.md) for details on why Rich was chosen.
+
+---
+
 ## Executive Summary
 
 This document defines the interface requirements for the custom `PrettyPrinter` class, based on analysis of 49 files across the codebase. It specifies:

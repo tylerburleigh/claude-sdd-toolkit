@@ -1,1178 +1,662 @@
 # Ui Interface Specification
 
-**Date:** 2025-11-06
+**Date:** 2025-11-06 (Updated: 2025-11-06)
 **Task:** task-1-2-1 - Define Ui interface methods based on usage analysis
 **Spec:** AI-Agent-First TUI Upgrade (tui-upgrade-2025-11-06-001)
 **Related Documents:**
-- [PrettyPrinter Audit Results](./prettyprinter-audit-results.md)
-- [PrettyPrinter Interface Requirements](./prettyprinter-interface-requirements.md)
+- [TUI Implementation Decision Record](./tui-implementation-decision.md)
+- [PrettyPrinter Audit Results](./prettyprinter-audit-results.md) (Background Research)
+- [PrettyPrinter Interface Requirements](./prettyprinter-interface-requirements.md) (Background Research)
 
 ---
 
 ## Executive Summary
 
-This document defines the **Ui interface** - a unified, agent-first abstraction for terminal user interface operations in the SDD toolkit. The Ui interface:
+This document defines the **Ui interface** - a unified, agent-first abstraction for terminal user interface operations in the SDD toolkit, powered by the [Rich library](https://github.com/Textualize/rich).
 
-1. **Preserves** all existing PrettyPrinter functionality (100% backward compatible)
-2. **Adds** agent-first capabilities (deferred rendering, structured data, context management)
-3. **Provides** a clean abstraction for future TUI enhancements
-4. **Enables** gradual migration without breaking existing code
-
-**Key Design Decision:** Use Python Protocol for maximum flexibility, with PrettyPrinter implementing Ui via an adapter pattern.
+**Key Decisions:**
+1. **Rich-Powered** - Uses Rich library for tables, trees, progress bars, panels, and styled output
+2. **Agent-First** - Supports both immediate and deferred rendering for AI workflows
+3. **Dual Backend** - RichUi for rich terminals, PlainUi for non-TTY fallback
+4. **Protocol-Based** - Type-safe interface using Python Protocol (PEP 544)
+5. **Backward Compatible** - Existing PrettyPrinter remains unchanged
 
 ---
 
 ## Table of Contents
 
-1. [Interface Design](#interface-design)
-2. [Core Methods (PrettyPrinter Compatibility)](#core-methods-prettyprinter-compatibility)
-3. [Agent-First Extensions](#agent-first-extensions)
+1. [Design Rationale](#design-rationale)
+2. [Interface Definition](#interface-definition)
+3. [Rich-Powered Methods](#rich-powered-methods)
 4. [Implementation Strategy](#implementation-strategy)
 5. [Usage Examples](#usage-examples)
-6. [Migration Plan](#migration-plan)
-7. [Testing Requirements](#testing-requirements)
+6. [Testing Requirements](#testing-requirements)
 
 ---
 
-## Interface Design
+## Design Rationale
+
+### Why Rich?
+
+**Background:** Phase 1 investigation (tasks 1-1-1, 1-1-2) analyzed the existing custom `PrettyPrinter` class used across 49 files. The audit revealed:
+- No existing Rich dependency
+- Simple text-based output (10 methods: action, success, info, warning, error, etc.)
+- Missing advanced TUI features (tables, trees, progress bars)
+
+**Decision:** Adopt Rich library instead of enhancing PrettyPrinter.
+
+**Rationale:**
+- ✅ **Rich Feature Set** - Tables, trees, progress bars, panels, syntax highlighting
+- ✅ **Battle-Tested** - 47K+ GitHub stars, used by pandas, pytest, poetry
+- ✅ **Agent-Friendly** - Console API perfect for conditional/captured rendering
+- ✅ **Minimal Migration** - PrettyPrinter stays unchanged (no breaking changes)
+- ✅ **Extensible** - Many additional features available (live displays, logging, etc.)
+
+See [TUI Implementation Decision Record](./tui-implementation-decision.md) for full details.
+
+---
+
+## Interface Definition
 
 ### Design Principles
 
-1. **Backward Compatibility First** - Existing code must work unchanged
-2. **Agent-Centric** - Support both immediate and deferred rendering
-3. **Simple by Default** - Easy to use for common cases
-4. **Extensible** - Support advanced use cases without complexity
-5. **Type-Safe** - Full type hints for IDE support
-
-### Interface Type: Protocol
-
-**Decision:** Use `typing.Protocol` (PEP 544) for structural subtyping.
-
-**Rationale:**
-- ✅ Flexible - Classes can implement Ui without explicit inheritance
-- ✅ Gradual typing - PrettyPrinter already implements most methods
-- ✅ Duck typing - Works with existing code patterns
-- ✅ No runtime overhead - Pure type checking
-
-**Alternative Considered:** Abstract Base Class (abc.ABC)
-- ❌ Requires explicit inheritance
-- ❌ Less flexible for existing code
-- ✅ Runtime type checking (but not needed)
-
----
-
-## Core Methods (PrettyPrinter Compatibility)
+1. **Rich-First** - Leverage Rich's capabilities for modern TUI
+2. **Agent-Centric** - Support immediate and deferred rendering modes
+3. **Simple API** - Easy to use for common cases
+4. **Type-Safe** - Full type hints for IDE support
+5. **Testable** - Clean abstraction for mocking and testing
 
 ### Protocol Definition
 
+**Implementation:** Use `typing.Protocol` (PEP 544) for structural subtyping.
+
+**Benefits:**
+- ✅ No explicit inheritance required
+- ✅ RichUi and PlainUi can have different implementations
+- ✅ Duck typing compatibility
+- ✅ Type checking without runtime overhead
+
 ```python
-from typing import Protocol, Optional, Any, Dict, List
-from datetime import datetime
-from enum import Enum
+from typing import Protocol, Optional, List, Dict, Any, runtime_checkable
 
-class MessageLevel(Enum):
-    """Message severity/type levels."""
-    ACTION = "action"      # In-progress operation
-    SUCCESS = "success"    # Completed successfully
-    INFO = "info"          # Informational detail
-    WARNING = "warning"    # Non-blocking issue
-    ERROR = "error"        # Blocking issue
-    DETAIL = "detail"      # Additional context
-    RESULT = "result"      # Key-value output
-    ITEM = "item"          # List item
-    HEADER = "header"      # Section header
-    BLANK = "blank"        # Spacing
-
-
+@runtime_checkable
 class Ui(Protocol):
     """
-    Agent-first terminal user interface protocol.
+    Agent-first terminal user interface protocol using Rich.
 
-    Provides immediate and deferred rendering modes, structured message
-    collection, and context management for AI-agent workflows.
-
-    All implementations must support:
-    1. 10 core output methods (PrettyPrinter compatibility)
-    2. Message collection in deferred mode
-    3. Context management for message tagging
+    Provides Rich-powered TUI features for modern terminal output.
     """
 
-    # ================================================================
-    # Core Output Methods (PrettyPrinter Compatibility)
-    # ================================================================
-
-    def action(self, msg: str) -> None:
-        """
-        Print an action message (what's being done now).
-
-        Args:
-            msg: Action description
-
-        Example:
-            ui.action("Processing task task-2-1...")
-        """
+    def print_table(
+        self,
+        data: List[Dict[str, Any]],
+        columns: Optional[List[str]] = None,
+        title: Optional[str] = None,
+        **kwargs: Any
+    ) -> None:
+        """Display data as a formatted table."""
         ...
 
-    def success(self, msg: str) -> None:
-        """
-        Print a success message (completed action).
-
-        Args:
-            msg: Success description
-
-        Example:
-            ui.success("Task completed successfully")
-        """
+    def print_tree(
+        self,
+        data: Dict[str, Any],
+        label: str = "Root",
+        **kwargs: Any
+    ) -> None:
+        """Display hierarchical data as a tree."""
         ...
 
-    def info(self, msg: str) -> None:
-        """
-        Print an informational message (context/details).
-
-        Only prints in verbose mode.
-
-        Args:
-            msg: Information to display
-
-        Example:
-            ui.info("Checking 15 dependency files...")
-        """
+    def print_diff(
+        self,
+        old_text: str,
+        new_text: str,
+        old_label: str = "Original",
+        new_label: str = "Modified",
+        **kwargs: Any
+    ) -> None:
+        """Display text differences with syntax highlighting."""
         ...
 
-    def warning(self, msg: str) -> None:
-        """
-        Print a warning message (non-blocking issue).
-
-        Prints to stderr.
-
-        Args:
-            msg: Warning description
-
-        Example:
-            ui.warning("Deprecated configuration format detected")
-        """
+    def progress(
+        self,
+        description: str = "Processing...",
+        total: Optional[int] = None,
+        **kwargs: Any
+    ) -> Any:
+        """Create progress context manager."""
         ...
 
-    def error(self, msg: str) -> None:
-        """
-        Print an error message (blocking issue).
-
-        Prints to stderr. Always prints (ignores quiet mode).
-
-        Args:
-            msg: Error description
-
-        Example:
-            ui.error("Spec file not found")
-        """
+    def print_panel(
+        self,
+        content: str,
+        title: Optional[str] = None,
+        style: str = "default",
+        **kwargs: Any
+    ) -> None:
+        """Display content in a bordered panel."""
         ...
 
-    def header(self, msg: str) -> None:
-        """
-        Print a section header.
-
-        Args:
-            msg: Header text
-
-        Example:
-            ui.header("Spec Validation Report")
-        """
-        ...
-
-    def detail(self, msg: str, indent: int = 1) -> None:
-        """
-        Print an indented detail line.
-
-        Args:
-            msg: Detail text
-            indent: Indentation level (default: 1)
-
-        Example:
-            ui.detail("Status: pending", indent=1)
-        """
-        ...
-
-    def result(self, key: str, value: str, indent: int = 0) -> None:
-        """
-        Print a key-value result.
-
-        Args:
-            key: Result key
-            value: Result value
-            indent: Indentation level (default: 0)
-
-        Example:
-            ui.result("Total Tasks", "23")
-        """
-        ...
-
-    def blank(self) -> None:
-        """
-        Print a blank line.
-
-        Example:
-            ui.blank()
-        """
-        ...
-
-    def item(self, msg: str, indent: int = 0) -> None:
-        """
-        Print a list item with bullet point.
-
-        Args:
-            msg: Item text
-            indent: Indentation level (default: 0)
-
-        Example:
-            ui.item("Task 1: Create directory structure")
-        """
+    def print_status(
+        self,
+        message: str,
+        level: MessageLevel = MessageLevel.INFO,
+        **kwargs: Any
+    ) -> None:
+        """Print a styled status message."""
         ...
 ```
 
-### Method Mapping from PrettyPrinter
-
-| PrettyPrinter Method | Ui Method | Signature Match | Behavior Match |
-|---------------------|-----------|-----------------|----------------|
-| `action(msg)` | `action(msg)` | ✅ Exact | ✅ Exact |
-| `success(msg)` | `success(msg)` | ✅ Exact | ✅ Exact |
-| `info(msg)` | `info(msg)` | ✅ Exact | ✅ Exact |
-| `warning(msg)` | `warning(msg)` | ✅ Exact | ✅ Exact |
-| `error(msg)` | `error(msg)` | ✅ Exact | ✅ Exact |
-| `header(msg)` | `header(msg)` | ✅ Exact | ✅ Exact |
-| `detail(msg, indent=1)` | `detail(msg, indent=1)` | ✅ Exact | ✅ Exact |
-| `result(key, value, indent=0)` | `result(key, value, indent=0)` | ✅ Exact | ✅ Exact |
-| `blank()` | `blank()` | ✅ Exact | ✅ Exact |
-| `item(msg, indent=0)` | `item(msg, indent=0)` | ✅ Exact | ✅ Exact |
-
-**Result:** 100% signature compatibility. PrettyPrinter already implements the core Ui interface.
+**Full protocol definition:** `src/claude_skills/claude_skills/common/ui_protocol.py`
 
 ---
 
-## Agent-First Extensions
+## Rich-Powered Methods
 
-### Message Data Structure
+### 1. print_table()
 
+**Purpose:** Display tabular data with automatic formatting.
+
+**Rich Component:** `rich.table.Table`
+
+**Example:**
 ```python
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
-from datetime import datetime
-
-@dataclass
-class Message:
-    """
-    Structured message with metadata for agent analysis.
-
-    Supports filtering, querying, and deferred rendering.
-    """
-    level: MessageLevel
-    text: str
-    timestamp: datetime
-    context: Dict[str, Any]  # task_id, phase, operation, etc.
-    metadata: Dict[str, Any]  # Custom data
-    rendered: bool = False   # Track if message has been displayed
-
-    def __post_init__(self):
-        if self.timestamp is None:
-            self.timestamp = datetime.now()
+ui.print_table(
+    [
+        {"task": "task-1-1", "status": "completed", "progress": "100%"},
+        {"task": "task-1-2", "status": "in_progress", "progress": "50%"},
+        {"task": "task-1-3", "status": "pending", "progress": "0%"}
+    ],
+    title="Task Status",
+    columns=["task", "status", "progress"]
+)
 ```
 
-### Extended Protocol Methods
-
-```python
-class Ui(Protocol):
-    """Extended with agent-first capabilities."""
-
-    # ... (core methods above) ...
-
-    # ================================================================
-    # Agent-First Extensions
-    # ================================================================
-
-    # ----------------------------------------------------------------
-    # Rendering Mode Control
-    # ----------------------------------------------------------------
-
-    @property
-    def mode(self) -> str:
-        """
-        Get current rendering mode.
-
-        Returns:
-            "immediate" - Messages print immediately (default)
-            "collect" - Messages are collected for later rendering
-        """
-        ...
-
-    def set_mode(self, mode: str) -> None:
-        """
-        Set rendering mode.
-
-        Args:
-            mode: "immediate" or "collect"
-
-        Example:
-            ui.set_mode("collect")
-            ui.action("Step 1")
-            ui.action("Step 2")
-            messages = ui.get_messages()
-            ui.render()  # Render all collected messages
-        """
-        ...
-
-    # ----------------------------------------------------------------
-    # Message Collection & Query
-    # ----------------------------------------------------------------
-
-    def get_messages(
-        self,
-        level: Optional[MessageLevel] = None,
-        context: Optional[Dict[str, Any]] = None,
-        since: Optional[datetime] = None,
-        unrendered_only: bool = False
-    ) -> List[Message]:
-        """
-        Query collected messages.
-
-        Args:
-            level: Filter by message level
-            context: Filter by context fields (partial match)
-            since: Filter by timestamp (messages after this time)
-            unrendered_only: Only return messages not yet rendered
-
-        Returns:
-            List of matching messages
-
-        Example:
-            # Get all errors
-            errors = ui.get_messages(level=MessageLevel.ERROR)
-
-            # Get messages for specific task
-            task_msgs = ui.get_messages(context={"task_id": "task-2-1"})
-
-            # Get recent messages
-            recent = ui.get_messages(since=datetime.now() - timedelta(minutes=5))
-        """
-        ...
-
-    def clear_messages(self) -> None:
-        """
-        Clear all collected messages.
-
-        Example:
-            ui.clear_messages()
-        """
-        ...
-
-    def message_count(self, level: Optional[MessageLevel] = None) -> int:
-        """
-        Count collected messages, optionally filtered by level.
-
-        Args:
-            level: Optional level filter
-
-        Returns:
-            Message count
-
-        Example:
-            error_count = ui.message_count(MessageLevel.ERROR)
-        """
-        ...
-
-    # ----------------------------------------------------------------
-    # Context Management
-    # ----------------------------------------------------------------
-
-    def set_context(self, **kwargs: Any) -> None:
-        """
-        Set context for subsequent messages.
-
-        All messages will be tagged with these context fields
-        until context is cleared or changed.
-
-        Args:
-            **kwargs: Context key-value pairs
-
-        Example:
-            ui.set_context(task_id="task-2-1", phase="implementation")
-            ui.action("Starting work")  # Tagged with task_id and phase
-        """
-        ...
-
-    def update_context(self, **kwargs: Any) -> None:
-        """
-        Update existing context (merge with current).
-
-        Args:
-            **kwargs: Context key-value pairs to add/update
-
-        Example:
-            ui.set_context(task_id="task-2-1")
-            ui.update_context(phase="testing")  # Keeps task_id, adds phase
-        """
-        ...
-
-    def clear_context(self) -> None:
-        """
-        Clear current context.
-
-        Example:
-            ui.clear_context()
-        """
-        ...
-
-    def get_context(self) -> Dict[str, Any]:
-        """
-        Get current context.
-
-        Returns:
-            Current context dictionary
-        """
-        ...
-
-    def context_manager(self, **kwargs: Any):
-        """
-        Context manager for temporary context.
-
-        Args:
-            **kwargs: Context key-value pairs
-
-        Example:
-            with ui.context_manager(task_id="task-2-1"):
-                ui.action("Working")  # Tagged with task_id
-            # Context automatically cleared
-        """
-        ...
-
-    # ----------------------------------------------------------------
-    # Rendering Control
-    # ----------------------------------------------------------------
-
-    def render(
-        self,
-        messages: Optional[List[Message]] = None,
-        clear_after: bool = True
-    ) -> None:
-        """
-        Render collected messages to output.
-
-        Args:
-            messages: Specific messages to render (default: all unrendered)
-            clear_after: Clear messages after rendering (default: True)
-
-        Example:
-            ui.set_mode("collect")
-            ui.action("Step 1")
-            ui.success("Done")
-            ui.render()  # Now prints both messages
-        """
-        ...
-
-    def render_to_string(
-        self,
-        messages: Optional[List[Message]] = None
-    ) -> str:
-        """
-        Render messages to string instead of output.
-
-        Args:
-            messages: Messages to render (default: all unrendered)
-
-        Returns:
-            Rendered output as string
-
-        Example:
-            output = ui.render_to_string()
-        """
-        ...
-
-    # ----------------------------------------------------------------
-    # Output Configuration
-    # ----------------------------------------------------------------
-
-    def set_output_mode(self, mode: str) -> None:
-        """
-        Set output formatting mode.
-
-        Args:
-            mode: "auto" (default), "color", "plain", or "structured"
-
-        Example:
-            ui.set_output_mode("plain")  # Disable colors
-        """
-        ...
+**Output:**
 ```
+┏━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Task     ┃ Status      ┃ Progress ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ task-1-1 │ completed   │ 100%     │
+│ task-1-2 │ in_progress │ 50%      │
+│ task-1-3 │ pending     │ 0%       │
+└──────────┴─────────────┴──────────┘
+```
+
+**Use Cases:**
+- Task progress summaries
+- Dependency status tables
+- Test result matrices
+- File/path listings
+
+---
+
+### 2. print_tree()
+
+**Purpose:** Display hierarchical data structures with visual branching.
+
+**Rich Component:** `rich.tree.Tree`
+
+**Example:**
+```python
+ui.print_tree(
+    {
+        "phase-1": {
+            "task-1-1": {},
+            "task-1-2": {
+                "task-1-2-1": {},
+                "task-1-2-2": {}
+            }
+        },
+        "phase-2": {
+            "task-2-1": {}
+        }
+    },
+    label="Spec Hierarchy"
+)
+```
+
+**Output:**
+```
+Spec Hierarchy
+├── phase-1
+│   ├── task-1-1
+│   └── task-1-2
+│       ├── task-1-2-1
+│       └── task-1-2-2
+└── phase-2
+    └── task-2-1
+```
+
+**Use Cases:**
+- Spec hierarchy visualization
+- Dependency graphs
+- File system structures
+- Task breakdown displays
+
+---
+
+### 3. print_diff()
+
+**Purpose:** Display text differences with syntax highlighting.
+
+**Rich Component:** `rich.syntax.Syntax` + diff algorithms
+
+**Example:**
+```python
+ui.print_diff(
+    old_text='status: "pending"',
+    new_text='status: "completed"',
+    old_label="Before",
+    new_label="After"
+)
+```
+
+**Output:**
+```
+━━━ Before ━━━
+status: "pending"
+
+━━━ After ━━━
+status: "completed"
+       ^^^^^^^^^^
+```
+
+**Use Cases:**
+- Spec modifications review
+- Task status changes
+- Configuration updates
+- Journal entry comparisons
+
+---
+
+### 4. progress()
+
+**Purpose:** Show progress bars and spinners for long operations.
+
+**Rich Component:** `rich.progress.Progress`
+
+**Example:**
+```python
+with ui.progress("Processing tasks...", total=10) as prog:
+    for i in range(10):
+        process_task(i)
+        prog.update(1)
+
+# Indeterminate spinner
+with ui.progress("Validating spec...") as prog:
+    validate()
+```
+
+**Output:**
+```
+Processing tasks... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 70% 7/10
+```
+
+**Use Cases:**
+- File processing loops
+- Batch operations
+- Long-running validations
+- Multi-step workflows
+
+---
+
+### 5. print_panel()
+
+**Purpose:** Display content in bordered panels with optional styling.
+
+**Rich Component:** `rich.panel.Panel`
+
+**Example:**
+```python
+ui.print_panel(
+    "Task completed successfully!",
+    title="Success",
+    style="success"
+)
+
+ui.print_panel(
+    "Missing dependency: task-2-1 must complete first",
+    title="Blocked",
+    style="warning"
+)
+```
+
+**Output:**
+```
+╭─────────── Success ───────────╮
+│ Task completed successfully!  │
+╰───────────────────────────────╯
+
+╭─────────── Blocked ───────────╮
+│ Missing dependency: task-2-1  │
+│ must complete first           │
+╰───────────────────────────────╯
+```
+
+**Use Cases:**
+- Success/error notifications
+- Warnings and alerts
+- Highlighted information
+- Call-out boxes
+
+---
+
+### 6. print_status()
+
+**Purpose:** Print styled status messages with severity levels.
+
+**Rich Component:** `rich.console.Console` with styling
+
+**Example:**
+```python
+ui.print_status("Validating spec...", level=MessageLevel.ACTION)
+ui.print_status("Validation passed!", level=MessageLevel.SUCCESS)
+ui.print_status("Warning: Missing metadata", level=MessageLevel.WARNING)
+ui.print_status("Error: Invalid task ID", level=MessageLevel.ERROR)
+```
+
+**Output:**
+```
+🔵 Validating spec...
+✅ Validation passed!
+⚠️  Warning: Missing metadata
+❌ Error: Invalid task ID
+```
+
+**Use Cases:**
+- Operation progress updates
+- Status notifications
+- Error/warning reporting
+- Agent feedback messages
 
 ---
 
 ## Implementation Strategy
 
-### Chosen Approach: Adapter Pattern
-
-**Strategy:** Create a `UiAdapter` that wraps `PrettyPrinter` and implements the full Ui protocol.
-
-**Architecture:**
+### Dual Backend Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     Ui Protocol                          │
-│  (defines interface, no implementation)                  │
-└─────────────────────────────────────────────────────────┘
-                          ▲
-                          │ implements
-        ┌─────────────────┴─────────────────┐
-        │                                   │
-┌───────┴─────────┐               ┌────────┴────────┐
-│  PrettyPrinter  │               │   UiAdapter     │
-│  (legacy impl)  │               │   (full impl)   │
-│                 │               │                 │
-│ • 10 core       │               │ • Wraps         │
-│   methods       │               │   PrettyPrinter │
-│ • No extensions │               │ • Adds agent    │
-│                 │               │   extensions    │
-└─────────────────┘               └─────────────────┘
+┌─────────────────────────────────────────┐
+│          Ui Protocol                     │
+│  (defines interface, no implementation)  │
+└─────────────────────────────────────────┘
+                  ▲
+                  │ implements
+        ┌─────────┴─────────┐
+        │                   │
+┌───────┴─────────┐  ┌──────┴────────┐
+│     RichUi      │  │   PlainUi     │
+│                 │  │               │
+│ • Rich Console  │  │ • Plain text  │
+│ • Rich Table    │  │ • ASCII boxes │
+│ • Rich Tree     │  │ • Simple      │
+│ • Rich Progress │  │   progress    │
+│ • Rich Panel    │  │ • Basic fmt   │
+└─────────────────┘  └───────────────┘
 ```
 
-**Benefits:**
-- ✅ Zero changes to existing PrettyPrinter
-- ✅ Existing code continues working unchanged
-- ✅ New code can use UiAdapter for agent features
-- ✅ Gradual migration path
-- ✅ Both can coexist
+### RichUi Implementation
 
-**Implementation Files:**
+**Purpose:** Full-featured Rich-powered backend for interactive terminals.
 
-1. **`common/ui_protocol.py`** - Protocol definition, Message class
-2. **`common/ui_adapter.py`** - UiAdapter implementation
-3. **`common/printer.py`** - PrettyPrinter (unchanged)
-4. **`common/__init__.py`** - Export both PrettyPrinter and UiAdapter
+**Dependencies:**
+- `rich.console.Console`
+- `rich.table.Table`
+- `rich.tree.Tree`
+- `rich.progress.Progress`
+- `rich.panel.Panel`
+
+**Location:** `src/claude_skills/claude_skills/common/rich_ui.py`
+
+**Key Features:**
+- Auto-detects TTY for color/formatting
+- Supports Rich's full feature set
+- Handles Unicode and emoji
+- Live displays and updates
 
 ---
 
-### UiAdapter Implementation Outline
+### PlainUi Implementation
+
+**Purpose:** Fallback backend for non-TTY environments (tests, CI, piped output).
+
+**Dependencies:** None (stdlib only)
+
+**Location:** `src/claude_skills/claude_skills/common/plain_ui.py`
+
+**Key Features:**
+- ASCII-only output (no Unicode)
+- Simple box drawing (|, -, +)
+- Text-based progress indicators
+- No color codes
+- Deterministic output for testing
+
+---
+
+### Factory Pattern
+
+**Purpose:** Auto-select backend based on environment.
 
 ```python
-# common/ui_adapter.py
+from claude_skills.common import create_ui
 
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-from contextlib import contextmanager
+# Auto-detect best backend
+ui = create_ui()  # Returns RichUi if TTY, else PlainUi
 
-from .ui_protocol import Ui, Message, MessageLevel
-from .printer import PrettyPrinter
-
-class UiAdapter:
-    """
-    Agent-first Ui implementation wrapping PrettyPrinter.
-
-    Provides backward-compatible interface with agent extensions.
-    """
-
-    def __init__(
-        self,
-        use_color: bool = True,
-        verbose: bool = False,
-        quiet: bool = False,
-        mode: str = "immediate"
-    ):
-        """
-        Initialize UiAdapter.
-
-        Args:
-            use_color: Enable ANSI colors (auto-disabled if not TTY)
-            verbose: Show info messages
-            quiet: Minimal output (errors only)
-            mode: "immediate" or "collect"
-        """
-        self._printer = PrettyPrinter(use_color, verbose, quiet)
-        self._mode = mode
-        self._messages: List[Message] = []
-        self._context: Dict[str, Any] = {}
-        self._output_mode = "auto"
-
-    # ================================================================
-    # Core Methods (delegate to PrettyPrinter)
-    # ================================================================
-
-    def action(self, msg: str) -> None:
-        """Print action message."""
-        self._record_message(MessageLevel.ACTION, msg)
-        if self._mode == "immediate":
-            self._printer.action(msg)
-
-    def success(self, msg: str) -> None:
-        """Print success message."""
-        self._record_message(MessageLevel.SUCCESS, msg)
-        if self._mode == "immediate":
-            self._printer.success(msg)
-
-    # ... (similar for all 10 core methods) ...
-
-    # ================================================================
-    # Agent-First Extensions
-    # ================================================================
-
-    def _record_message(self, level: MessageLevel, text: str, **metadata):
-        """Record message for collection."""
-        msg = Message(
-            level=level,
-            text=text,
-            timestamp=datetime.now(),
-            context=self._context.copy(),
-            metadata=metadata,
-            rendered=(self._mode == "immediate")
-        )
-        self._messages.append(msg)
-
-    @property
-    def mode(self) -> str:
-        return self._mode
-
-    def set_mode(self, mode: str) -> None:
-        if mode not in ("immediate", "collect"):
-            raise ValueError(f"Invalid mode: {mode}")
-        self._mode = mode
-
-    def get_messages(
-        self,
-        level: Optional[MessageLevel] = None,
-        context: Optional[Dict[str, Any]] = None,
-        since: Optional[datetime] = None,
-        unrendered_only: bool = False
-    ) -> List[Message]:
-        """Query collected messages."""
-        results = self._messages
-
-        if level:
-            results = [m for m in results if m.level == level]
-
-        if context:
-            results = [
-                m for m in results
-                if all(m.context.get(k) == v for k, v in context.items())
-            ]
-
-        if since:
-            results = [m for m in results if m.timestamp >= since]
-
-        if unrendered_only:
-            results = [m for m in results if not m.rendered]
-
-        return results
-
-    def set_context(self, **kwargs: Any) -> None:
-        """Set context for messages."""
-        self._context = kwargs
-
-    def update_context(self, **kwargs: Any) -> None:
-        """Update context."""
-        self._context.update(kwargs)
-
-    def clear_context(self) -> None:
-        """Clear context."""
-        self._context = {}
-
-    def get_context(self) -> Dict[str, Any]:
-        """Get current context."""
-        return self._context.copy()
-
-    @contextmanager
-    def context_manager(self, **kwargs: Any):
-        """Temporary context."""
-        old_context = self._context.copy()
-        self._context.update(kwargs)
-        try:
-            yield
-        finally:
-            self._context = old_context
-
-    def render(
-        self,
-        messages: Optional[List[Message]] = None,
-        clear_after: bool = True
-    ) -> None:
-        """Render collected messages."""
-        if messages is None:
-            messages = self.get_messages(unrendered_only=True)
-
-        for msg in messages:
-            # Delegate to appropriate printer method
-            method = getattr(self._printer, msg.level.value)
-            if msg.level in (MessageLevel.DETAIL, MessageLevel.ITEM):
-                # Methods with indent parameter
-                indent = msg.metadata.get("indent", 0)
-                method(msg.text, indent=indent)
-            elif msg.level == MessageLevel.RESULT:
-                # result() has key/value/indent
-                key = msg.metadata.get("key", "")
-                indent = msg.metadata.get("indent", 0)
-                method(key, msg.text, indent=indent)
-            else:
-                method(msg.text)
-
-            msg.rendered = True
-
-        if clear_after:
-            self._messages = [m for m in self._messages if not m.rendered]
-
-    # ... (other extension methods) ...
+# Explicit backend
+ui = create_ui(backend="rich")  # Force RichUi
+ui = create_ui(backend="plain")  # Force PlainUi
 ```
+
+**Implementation:** `src/claude_skills/claude_skills/common/ui_factory.py`
 
 ---
 
 ## Usage Examples
 
-### Example 1: Backward Compatible (Existing Code)
+### Example 1: CLI Command with Progress
 
 ```python
-# Existing code works unchanged
-from claude_skills.common import PrettyPrinter
+from claude_skills.common import create_ui
 
-printer = PrettyPrinter(use_color=True, verbose=False, quiet=False)
-printer.action("Starting validation...")
-printer.success("Validation passed")
-printer.result("Tasks", "23")
-```
+def validate_spec_command(spec_path: str) -> int:
+    ui = create_ui()
 
-**Result:** Works exactly as before, no changes needed.
+    ui.print_status("Starting validation...", level=MessageLevel.ACTION)
 
----
+    tasks = load_tasks(spec_path)
 
-### Example 2: Agent-First with UiAdapter
+    with ui.progress("Validating tasks...", total=len(tasks)) as prog:
+        errors = []
+        for task in tasks:
+            result = validate_task(task)
+            if not result.valid:
+                errors.append(result.error)
+            prog.update(1)
 
-```python
-from claude_skills.common import UiAdapter
+    if errors:
+        ui.print_panel(
+            "\n".join(errors),
+            title="Validation Errors",
+            style="error"
+        )
+        return 1
 
-# Use UiAdapter for agent-first features
-ui = UiAdapter(mode="collect", use_color=True)
-
-# Set context for task
-with ui.context_manager(task_id="task-2-1", phase="implementation"):
-    ui.action("Starting implementation")
-    ui.info("Checking dependencies")
-    ui.success("Implementation complete")
-
-# Get messages for analysis
-messages = ui.get_messages()
-error_count = ui.message_count(MessageLevel.ERROR)
-
-# Render when ready
-if error_count == 0:
-    ui.render()  # Show all messages
-else:
-    # Show errors immediately
-    ui.render(ui.get_messages(level=MessageLevel.ERROR))
+    ui.print_status("Validation passed!", level=MessageLevel.SUCCESS)
+    return 0
 ```
 
 ---
 
-### Example 3: Mixed Mode (Immediate + Collection)
+### Example 2: Hierarchical Display
 
 ```python
-ui = UiAdapter(mode="immediate")
+from claude_skills.common import create_ui
 
-# Immediate output for user feedback
-ui.action("Running tests...")
+def show_spec_hierarchy(spec_path: str):
+    ui = create_ui()
+    spec = load_spec(spec_path)
 
-# Collect detailed progress
-ui.set_mode("collect")
-for test in tests:
-    ui.info(f"Running {test.name}")
-    result = test.run()
-    if result.failed:
-        ui.error(f"Test failed: {test.name}")
+    # Build hierarchy
+    hierarchy = {}
+    for phase in spec.phases:
+        hierarchy[phase.id] = {
+            task.id: {} for task in phase.tasks
+        }
 
-# Switch back to immediate
-ui.set_mode("immediate")
-
-# Final summary (immediate)
-ui.success("Test suite completed")
-
-# Analyze collected details
-failures = ui.get_messages(level=MessageLevel.ERROR)
-ui.result("Failures", str(len(failures)))
+    ui.print_tree(hierarchy, label=f"Spec: {spec.title}")
 ```
 
 ---
 
-### Example 4: Gradual Migration
+### Example 3: Progress Summary Table
 
 ```python
-# Phase 1: Keep PrettyPrinter, add UiAdapter selectively
-def existing_function(printer: PrettyPrinter):
-    """Existing code, uses PrettyPrinter."""
-    printer.action("Working")
-    printer.success("Done")
+from claude_skills.common import create_ui
 
-def new_function(ui: UiAdapter):
-    """New code, uses UiAdapter with agent features."""
-    with ui.context_manager(operation="new_function"):
-        ui.action("Working with context")
-        ui.success("Done with metadata")
+def show_progress_summary(spec_path: str):
+    ui = create_ui()
+    spec = load_spec(spec_path)
 
-# Phase 2: Introduce Ui type hint (works with both)
-from claude_skills.common import Ui
+    data = [
+        {
+            "phase": phase.id,
+            "completed": phase.completed_tasks,
+            "total": phase.total_tasks,
+            "percentage": f"{phase.completion_percentage}%"
+        }
+        for phase in spec.phases
+    ]
 
-def flexible_function(ui: Ui):
-    """Works with PrettyPrinter OR UiAdapter."""
-    ui.action("Working")
-    ui.success("Done")
-    # Can't use agent extensions (not in PrettyPrinter)
-
-# Phase 3: Type check for extensions
-from claude_skills.common import UiAdapter
-
-def smart_function(ui: Ui):
-    """Adapts based on capabilities."""
-    ui.action("Starting")
-
-    if isinstance(ui, UiAdapter):
-        # Use agent features
-        ui.set_context(operation="smart_function")
-        messages = ui.get_messages()
-
-    ui.success("Done")
+    ui.print_table(
+        data,
+        title=f"Progress: {spec.title}",
+        columns=["phase", "completed", "total", "percentage"]
+    )
 ```
-
----
-
-## Migration Plan
-
-### Phase 1: Introduction (Current)
-
-**Goal:** Introduce Ui protocol and UiAdapter without breaking existing code.
-
-**Actions:**
-1. ✅ Create `common/ui_protocol.py` (Protocol, Message, MessageLevel)
-2. ✅ Create `common/ui_adapter.py` (UiAdapter implementation)
-3. ✅ Export from `common/__init__.py`
-4. ✅ Keep PrettyPrinter unchanged
-5. ✅ Add comprehensive tests for UiAdapter
-
-**Timeline:** Phase 1 of spec (current work)
-
-**Result:** Both PrettyPrinter and UiAdapter available, coexist peacefully.
-
----
-
-### Phase 2: Selective Adoption (Future)
-
-**Goal:** Use UiAdapter in new code and high-value migrations.
-
-**Candidates for early adoption:**
-- AI consultation modules (already use Optional[PrettyPrinter])
-- New features developed during Phase 2+
-- Modules that would benefit from context (task tracking)
-
-**Actions:**
-1. Update AI consultation functions to use UiAdapter
-2. Add UiAdapter to new CLI commands
-3. Migrate sdd-update workflow (benefits from context)
-
-**Timeline:** Phase 2-3 of spec
-
-**Result:** New code uses UiAdapter, old code continues with PrettyPrinter.
-
----
-
-### Phase 3: Gradual Migration (Optional, Future)
-
-**Goal:** Migrate remaining PrettyPrinter usage to UiAdapter.
-
-**Priority order:**
-1. High-value: Modules with complex output (CLI commands)
-2. Medium-value: Workflow modules (sdd-update, sdd-next)
-3. Low-value: Simple utility scripts
-
-**Actions:**
-1. Change type hints: `PrettyPrinter` → `Ui`
-2. Update instantiation: `PrettyPrinter()` → `UiAdapter()`
-3. Optionally add agent features (context, collection)
-4. Test thoroughly
-
-**Timeline:** Post Phase 3, ongoing
-
-**Result:** Most code uses UiAdapter, PrettyPrinter only for legacy.
-
----
-
-### Phase 4: Deprecation (Optional, Far Future)
-
-**Goal:** Potentially deprecate PrettyPrinter if fully migrated.
-
-**Considerations:**
-- Is PrettyPrinter still used externally?
-- Is the migration complete and stable?
-- Is the maintenance burden significant?
-
-**Actions:**
-1. Add deprecation warnings to PrettyPrinter
-2. Update documentation to recommend UiAdapter
-3. Eventually remove PrettyPrinter (breaking change)
-
-**Timeline:** TBD (only if needed)
-
-**Result:** Single Ui implementation (UiAdapter).
 
 ---
 
 ## Testing Requirements
 
-### Test Categories
+### Protocol Compliance Tests
 
-#### 1. Protocol Compliance Tests
-
-**Verify PrettyPrinter implements Ui protocol:**
+**Verify both implementations satisfy Ui protocol:**
 
 ```python
-def test_prettyprinter_implements_ui_protocol():
-    """PrettyPrinter should satisfy Ui protocol."""
-    from claude_skills.common import PrettyPrinter, Ui
+def test_richui_implements_protocol():
+    from claude_skills.common import RichUi, Ui
+    ui = RichUi()
+    assert isinstance(ui, Ui)
 
-    printer = PrettyPrinter()
-    # Type checker should pass
-    _ui: Ui = printer
-
-    # Has all required methods
-    assert hasattr(printer, 'action')
-    assert hasattr(printer, 'success')
-    # ... (all 10 methods)
-```
-
-#### 2. UiAdapter Core Method Tests
-
-**Verify delegation to PrettyPrinter:**
-
-```python
-def test_uiadapter_action_immediate_mode(capsys):
-    """action() in immediate mode should print immediately."""
-    ui = UiAdapter(use_color=False, mode="immediate")
-    ui.action("Test message")
-
-    captured = capsys.readouterr()
-    assert "Test message" in captured.out
-    assert "Action:" in captured.out
-
-def test_uiadapter_action_collect_mode(capsys):
-    """action() in collect mode should not print immediately."""
-    ui = UiAdapter(use_color=False, mode="collect")
-    ui.action("Test message")
-
-    captured = capsys.readouterr()
-    assert captured.out == ""  # Nothing printed yet
-
-    messages = ui.get_messages()
-    assert len(messages) == 1
-    assert messages[0].level == MessageLevel.ACTION
-```
-
-#### 3. Message Collection Tests
-
-```python
-def test_message_collection():
-    """Messages should be collected with metadata."""
-    ui = UiAdapter(mode="collect")
-
-    ui.action("Step 1")
-    ui.success("Step 2")
-    ui.error("Step 3")
-
-    messages = ui.get_messages()
-    assert len(messages) == 3
-    assert messages[0].level == MessageLevel.ACTION
-    assert messages[1].level == MessageLevel.SUCCESS
-    assert messages[2].level == MessageLevel.ERROR
-
-def test_message_filtering_by_level():
-    """get_messages() should filter by level."""
-    ui = UiAdapter(mode="collect")
-
-    ui.action("A")
-    ui.error("E1")
-    ui.success("S")
-    ui.error("E2")
-
-    errors = ui.get_messages(level=MessageLevel.ERROR)
-    assert len(errors) == 2
-    assert all(m.level == MessageLevel.ERROR for m in errors)
-```
-
-#### 4. Context Management Tests
-
-```python
-def test_context_tagging():
-    """Messages should be tagged with context."""
-    ui = UiAdapter(mode="collect")
-
-    ui.set_context(task_id="task-1", phase="test")
-    ui.action("Message 1")
-    ui.success("Message 2")
-
-    messages = ui.get_messages()
-    assert all(m.context["task_id"] == "task-1" for m in messages)
-    assert all(m.context["phase"] == "test" for m in messages)
-
-def test_context_manager():
-    """Context manager should temporarily set context."""
-    ui = UiAdapter(mode="collect")
-
-    with ui.context_manager(task_id="task-1"):
-        ui.action("Inside")
-
-    ui.action("Outside")
-
-    messages = ui.get_messages()
-    assert messages[0].context.get("task_id") == "task-1"
-    assert messages[1].context.get("task_id") is None
-```
-
-#### 5. Rendering Tests
-
-```python
-def test_render_collected_messages(capsys):
-    """render() should output collected messages."""
-    ui = UiAdapter(use_color=False, mode="collect")
-
-    ui.action("Step 1")
-    ui.success("Step 2")
-
-    # Nothing printed yet
-    captured = capsys.readouterr()
-    assert captured.out == ""
-
-    # Render
-    ui.render()
-
-    captured = capsys.readouterr()
-    assert "Step 1" in captured.out
-    assert "Step 2" in captured.out
-```
-
-#### 6. Backward Compatibility Tests
-
-```python
-def test_backward_compatibility_signatures():
-    """All PrettyPrinter methods should have same signature in UiAdapter."""
-    from inspect import signature
-    from claude_skills.common import PrettyPrinter, UiAdapter
-
-    printer = PrettyPrinter()
-    ui = UiAdapter()
-
-    methods = ['action', 'success', 'info', 'warning', 'error',
-               'header', 'detail', 'result', 'blank', 'item']
-
-    for method_name in methods:
-        printer_sig = signature(getattr(printer, method_name))
-        ui_sig = signature(getattr(ui, method_name))
-        assert printer_sig == ui_sig, f"Signature mismatch for {method_name}"
-
-def test_backward_compatibility_output(capsys):
-    """UiAdapter immediate mode should produce same output as PrettyPrinter."""
-    from claude_skills.common import PrettyPrinter, UiAdapter
-
-    # PrettyPrinter output
-    printer = PrettyPrinter(use_color=False)
-    printer.action("Test")
-    printer_output = capsys.readouterr().out
-
-    # UiAdapter output
-    ui = UiAdapter(use_color=False, mode="immediate")
-    ui.action("Test")
-    ui_output = capsys.readouterr().out
-
-    assert printer_output == ui_output
+def test_plainui_implements_protocol():
+    from claude_skills.common import PlainUi, Ui
+    ui = PlainUi()
+    assert isinstance(ui, Ui)
 ```
 
 ---
 
-## Summary
+### Rich Output Tests
 
-### Key Decisions
+**Test RichUi produces Rich-formatted output:**
 
-1. **Interface Type:** Python Protocol (structural subtyping)
-2. **Core Methods:** 10 methods, 100% backward compatible with PrettyPrinter
-3. **Agent Extensions:** Message collection, context management, deferred rendering
-4. **Implementation:** Adapter pattern wrapping PrettyPrinter
-5. **Migration:** Gradual, both systems coexist
+```python
+def test_richui_print_table(capsys):
+    ui = RichUi()
+    ui.print_table([{"a": "1", "b": "2"}])
 
-### Benefits
+    output = capsys.readouterr().out
+    assert "┃" in output  # Rich box characters
+    assert "━" in output
 
-✅ **Backward Compatible** - Existing code works unchanged
-✅ **Agent-First** - Supports deferred rendering and structured data
-✅ **Flexible** - Protocol allows multiple implementations
-✅ **Gradual Migration** - No big-bang rewrites required
-✅ **Type-Safe** - Full type hints for IDE support
+def test_richui_print_tree(capsys):
+    ui = RichUi()
+    ui.print_tree({"child": {}}, label="Root")
 
-### Next Steps
-
-**Immediate (Phase 1):**
-1. Implement `common/ui_protocol.py` (Protocol, Message, MessageLevel)
-2. Implement `common/ui_adapter.py` (UiAdapter class)
-3. Write comprehensive test suite
-4. Update `common/__init__.py` exports
-5. Document usage patterns
-
-**Future (Phase 2+):**
-1. Adopt UiAdapter in AI consultation modules
-2. Use UiAdapter for new CLI commands
-3. Migrate high-value modules selectively
-4. Consider progress indicators (may need Rich integration)
+    output = capsys.readouterr().out
+    assert "Root" in output
+    assert "child" in output
+```
 
 ---
 
-## Appendix: Design Alternatives Considered
+### Plain Output Tests
 
-### Alternative 1: Make PrettyPrinter Implement Ui Directly
+**Test PlainUi produces ASCII-only output:**
 
-**Approach:** Add agent extensions directly to PrettyPrinter class.
+```python
+def test_plainui_print_table(capsys):
+    ui = PlainUi()
+    ui.print_table([{"a": "1", "b": "2"}])
 
-**Pros:**
-- Single implementation
-- No adapter overhead
+    output = capsys.readouterr().out
+    assert "|" in output  # ASCII pipes
+    assert "-" in output
+    assert "┃" not in output  # No Unicode
 
-**Cons:**
-- ❌ Changes existing class (riskier)
-- ❌ Mixes concerns (legacy + agent-first)
-- ❌ Harder to test in isolation
+def test_plainui_print_tree(capsys):
+    ui = PlainUi()
+    ui.print_tree({"child": {}}, label="Root")
 
-**Decision:** Rejected - adapter pattern is safer
-
----
-
-### Alternative 2: Replace PrettyPrinter Entirely
-
-**Approach:** Create new Ui class, deprecate PrettyPrinter.
-
-**Pros:**
-- Clean slate
-- No legacy baggage
-
-**Cons:**
-- ❌ Breaking change for 49 files
-- ❌ High migration cost
-- ❌ Risk of bugs in all modules
-
-**Decision:** Rejected - too risky, adapter is safer
+    output = capsys.readouterr().out
+    assert "Root" in output
+    assert "child" in output
+    assert all(ord(c) < 128 for c in output)  # ASCII only
+```
 
 ---
 
-### Alternative 3: Use Rich Library
+### Factory Tests
 
-**Approach:** Adopt Rich library for formatting, wrap in Ui interface.
+**Test auto-detection:**
 
-**Pros:**
-- Rich formatting capabilities
-- Progress bars, tables, syntax highlighting
+```python
+def test_factory_detects_tty(monkeypatch):
+    monkeypatch.setattr("sys.stdout.isatty", lambda: True)
+    ui = create_ui()
+    assert isinstance(ui, RichUi)
 
-**Cons:**
-- ❌ New dependency (audit found none currently)
-- ❌ Larger footprint
-- ❌ Less control over behavior
-- ❌ May have TTY detection issues
+def test_factory_fallback_no_tty(monkeypatch):
+    monkeypatch.setattr("sys.stdout.isatty", lambda: False)
+    ui = create_ui()
+    assert isinstance(ui, PlainUi)
 
-**Decision:** Deferred - can add later if needed, start with custom
+def test_factory_explicit_backend():
+    ui = create_ui(backend="rich")
+    assert isinstance(ui, RichUi)
+
+    ui = create_ui(backend="plain")
+    assert isinstance(ui, PlainUi)
+```
 
 ---
 
-**End of Specification**
+## Migration Notes
 
+### Relationship with PrettyPrinter
+
+**PrettyPrinter Status:** The existing custom `PrettyPrinter` class (used in 49 files) remains **unchanged** and fully supported.
+
+**Migration Strategy:**
+- **No forced migration** - PrettyPrinter continues working
+- **New code** - Use `Ui` interface (via `create_ui()`)
+- **High-value modules** - Selectively migrate to leverage Rich features
+- **Gradual transition** - Both systems coexist indefinitely
+
+**When to use each:**
+- **PrettyPrinter** - Existing code, simple text output, backward compatibility
+- **Ui (Rich)** - New code, tables/trees/progress needed, modern TUI desired
+
+---
+
+## References
+
+- [Rich Library Documentation](https://rich.readthedocs.io/)
+- [TUI Implementation Decision Record](./tui-implementation-decision.md)
+- [PrettyPrinter Audit Results](./prettyprinter-audit-results.md)
+- [PrettyPrinter Interface Requirements](./prettyprinter-interface-requirements.md)
+
+---
+
+**Document Status:** Revised to reflect Rich-based implementation (2025-11-06)

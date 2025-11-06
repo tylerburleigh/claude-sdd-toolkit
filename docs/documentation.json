@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T21:26:40.121074Z",
+    "generated_at": "2025-11-06T22:13:21.978093Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 229,
-    "total_lines": 80064,
-    "total_classes": 299,
+    "total_files": 230,
+    "total_lines": 80329,
+    "total_classes": 302,
     "total_functions": 851,
     "avg_complexity": 5.8,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 229,
-        "lines": 80064,
-        "classes": 299,
+        "files": 230,
+        "lines": 80329,
+        "classes": 302,
         "functions": 851,
         "avg_complexity": 5.8
       }
@@ -782,6 +782,9 @@
         "paths.ensure_human_readable_directory",
         "paths.generate_human_readable_readme_content",
         "printer.PrettyPrinter",
+        "ui_protocol.Ui",
+        "ui_protocol.Message",
+        "ui_protocol.MessageLevel",
         "validation.EnhancedError",
         "validation.SpecValidationResult",
         "validation.JsonSpecValidationResult",
@@ -846,7 +849,7 @@
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 293
+      "lines": 297
     },
     {
       "name": "ai_config",
@@ -1408,6 +1411,34 @@
       ],
       "exports": [],
       "lines": 336
+    },
+    {
+      "name": "ui_protocol",
+      "file": "src/claude_skills/claude_skills/common/ui_protocol.py",
+      "language": "python",
+      "docstring": "Agent-first terminal user interface protocol using Rich library.\n\nThis module defines the Ui protocol - a unified, agent-first abstraction\nfor terminal user interface operations in the SDD toolkit, built on Rich.\n\nKey Features:\n- Rich-powered TUI with tables, trees, panels, and progress indicators\n- Support for both immediate and deferred rendering modes\n- Structured message collection with metadata\n- Context management for message tagging\n- Type-safe protocol for multiple implementations",
+      "classes": [
+        "MessageLevel",
+        "Message",
+        "Ui"
+      ],
+      "functions": [],
+      "imports": [
+        "typing.Protocol",
+        "typing.Optional",
+        "typing.List",
+        "typing.Dict",
+        "typing.Any",
+        "typing.runtime_checkable",
+        "typing.Union",
+        "datetime.datetime",
+        "enum.Enum",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "abc.abstractmethod"
+      ],
+      "exports": [],
+      "lines": 261
     },
     {
       "name": "validation",
@@ -8677,6 +8708,59 @@
       ],
       "imported_by": [],
       "instantiation_count": 83
+    },
+    {
+      "name": "MessageLevel",
+      "file": "src/claude_skills/claude_skills/common/ui_protocol.py",
+      "line": 22,
+      "language": "python",
+      "docstring": "Message severity/type levels.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "Message",
+      "file": "src/claude_skills/claude_skills/common/ui_protocol.py",
+      "line": 40,
+      "language": "python",
+      "docstring": "Structured message with metadata for agent analysis.\n\nSupports filtering, querying, and deferred rendering.\n\nAttributes:\n    level: Message severity/type\n    text: Message content\n    timestamp: When message was created\n    context: Task ID, phase, operation, etc.\n    metadata: Custom data (indent, key, etc.)\n    rendered: Whether message has been displayed",
+      "bases": [],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "Ui",
+      "file": "src/claude_skills/claude_skills/common/ui_protocol.py",
+      "line": 64,
+      "language": "python",
+      "docstring": "Agent-first terminal user interface protocol using Rich.\n\nProvides Rich-powered TUI features including tables, trees, panels,\nprogress indicators, and diff display. Supports both immediate and\ndeferred rendering modes for AI-agent workflows.\n\nCore Rich Features:\n- print_table: Display data in formatted tables\n- print_tree: Show hierarchical data structures\n- print_diff: Display code/text differences\n- progress: Show progress bars and spinners\n- print_panel: Display content in bordered panels\n- print_status: Show status messages with styling\n\nAll implementations must support:\n1. Rich-powered output methods\n2. Message collection in deferred mode\n3. Context management for message tagging\n\nUsage:\n    # Rich-powered interface\n    ui = RichUi()\n    ui.print_table(data, title=\"Task Progress\")\n    ui.print_tree(hierarchy)\n\n    # With progress tracking\n    with ui.progress(\"Processing tasks...\") as progress:\n        for task in tasks:\n            process(task)\n            progress.update()",
+      "bases": [
+        "Protocol"
+      ],
+      "methods": [
+        "print_table",
+        "print_tree",
+        "print_diff",
+        "progress",
+        "print_panel",
+        "print_status"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "EnhancedError",
@@ -123644,6 +123728,9 @@
       "paths.ensure_human_readable_directory",
       "paths.generate_human_readable_readme_content",
       "printer.PrettyPrinter",
+      "ui_protocol.Ui",
+      "ui_protocol.Message",
+      "ui_protocol.MessageLevel",
       "validation.EnhancedError",
       "validation.SpecValidationResult",
       "validation.JsonSpecValidationResult",
@@ -123895,6 +123982,20 @@
       "typing.Dict",
       "typing.Optional",
       "spec.extract_frontmatter"
+    ],
+    "src/claude_skills/claude_skills/common/ui_protocol.py": [
+      "typing.Protocol",
+      "typing.Optional",
+      "typing.List",
+      "typing.Dict",
+      "typing.Any",
+      "typing.runtime_checkable",
+      "typing.Union",
+      "datetime.datetime",
+      "enum.Enum",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "abc.abstractmethod"
     ],
     "src/claude_skills/claude_skills/common/validation.py": [
       "re",

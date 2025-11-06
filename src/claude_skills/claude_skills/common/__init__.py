@@ -46,6 +46,7 @@ from .paths import (
 )
 from .printer import PrettyPrinter
 from .ui_protocol import Ui, Message, MessageLevel
+from .rich_ui import RichUi
 from .validation import (
     EnhancedError,
     SpecValidationResult,
@@ -208,6 +209,7 @@ __all__ = [
     "Ui",
     "Message",
     "MessageLevel",
+    "RichUi",
 
     # Validation utilities
     "EnhancedError",

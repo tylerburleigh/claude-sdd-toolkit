@@ -6,6 +6,20 @@
 
 ---
 
+> **⚠️ IMPORTANT NOTE - BACKGROUND RESEARCH ONLY**
+>
+> This audit was conducted during Phase 1 investigation (task-1-1-1) to understand how terminal output is currently handled in the codebase.
+>
+> **This analysis informed the decision to adopt Rich library for the new TUI system.**
+>
+> **Actual Implementation:** Based on this audit showing no existing Rich dependency and extensive PrettyPrinter usage, the decision was made to introduce Rich as a new dependency and create a modern `Ui` interface with Rich-powered features (tables, trees, progress bars, panels).
+>
+> **PrettyPrinter Status:** The existing `PrettyPrinter` class (49 files) remains unchanged for backward compatibility.
+>
+> See [TUI Implementation Decision Record](./tui-implementation-decision.md) for the full rationale.
+
+---
+
 ## Executive Summary
 
 **CRITICAL FINDING:** The codebase does NOT use Rich library's PrettyPrinter at all. Instead, it uses a custom lightweight `PrettyPrinter` class defined in `common/printer.py`.
