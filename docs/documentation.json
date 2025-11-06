@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T18:33:02.298483Z",
+    "generated_at": "2025-11-06T18:36:44.296493Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 228,
-    "total_lines": 79439,
-    "total_classes": 297,
+    "total_files": 229,
+    "total_lines": 80064,
+    "total_classes": 299,
     "total_functions": 851,
     "avg_complexity": 5.8,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 228,
-        "lines": 79439,
-        "classes": 297,
+        "files": 229,
+        "lines": 80064,
+        "classes": 299,
         "functions": 851,
         "avg_complexity": 5.8
       }
@@ -4178,6 +4178,33 @@
       ],
       "exports": [],
       "lines": 41
+    },
+    {
+      "name": "test_modify_validation",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+      "language": "python",
+      "docstring": "Integration tests for spec modification validation and rollback.\n\nTests that invalid modifications are rejected and rolled back, leaving\nthe spec unchanged. Covers transactional modification operations with\nautomatic validation and rollback on failure.",
+      "classes": [
+        "TestValidationRollback",
+        "TestValidationEdgeCases"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "pytest",
+        "tempfile",
+        "pathlib.Path",
+        "copy.deepcopy",
+        "claude_skills.sdd_spec_mod.modification.add_node",
+        "claude_skills.sdd_spec_mod.modification.remove_node",
+        "claude_skills.sdd_spec_mod.modification.update_node_field",
+        "claude_skills.sdd_spec_mod.modification.move_node",
+        "claude_skills.sdd_spec_mod.modification.spec_transaction",
+        "claude_skills.sdd_spec_mod.modification.transactional_modify",
+        "claude_skills.sdd_spec_mod.modification.apply_modifications"
+      ],
+      "exports": [],
+      "lines": 625
     },
     {
       "name": "test_run_tests_doc_integration",
@@ -13886,6 +13913,59 @@
         "test_unsupported_file_format",
         "test_modifications_file_not_found",
         "sample_spec"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestValidationRollback",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+      "line": 25,
+      "language": "python",
+      "docstring": "Integration tests for validation and rollback mechanisms.",
+      "bases": [],
+      "methods": [
+        "sample_spec",
+        "test_transaction_rollback_on_exception",
+        "test_add_node_with_invalid_type",
+        "test_add_node_with_empty_title",
+        "test_add_node_with_duplicate_id",
+        "test_add_node_with_nonexistent_parent",
+        "test_remove_node_with_children_no_cascade",
+        "test_remove_node_nonexistent",
+        "test_update_field_invalid_status",
+        "test_update_field_protected_field",
+        "test_move_node_creates_circular_dependency",
+        "test_move_node_to_nonexistent_parent",
+        "test_transactional_modify_with_validation",
+        "test_apply_modifications_with_validation",
+        "test_apply_modifications_with_missing_fields",
+        "test_apply_modifications_with_invalid_json",
+        "test_apply_modifications_with_nonexistent_file",
+        "test_complex_rollback_scenario"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestValidationEdgeCases",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+      "line": 521,
+      "language": "python",
+      "docstring": "Edge case tests for validation and rollback.",
+      "bases": [],
+      "methods": [
+        "minimal_spec",
+        "test_add_node_with_invalid_dependencies_structure",
+        "test_update_metadata_with_invalid_type",
+        "test_remove_spec_root",
+        "test_move_spec_root"
       ],
       "properties": [],
       "is_exported": false,
@@ -83226,6 +83306,84 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 1228,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_transaction_rollback_on_exception",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_add_node_with_invalid_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 117,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_add_node_with_empty_title",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_add_node_with_duplicate_id",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 165,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_add_node_with_nonexistent_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 191,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_move_node_creates_circular_dependency",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 268,
+          "call_type": "function_call"
+        },
+        {
+          "name": "valid_operation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 312,
+          "call_type": "function_call"
+        },
+        {
+          "name": "invalid_operation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 334,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_complex_rollback_scenario",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 474,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_complex_rollback_scenario",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 491,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_add_node_with_invalid_dependencies_structure",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 547,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_update_metadata_with_invalid_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 568,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_move_spec_root",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 606,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -83344,7 +83502,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 14
     },
     {
       "name": "_propagate_task_count_increase",
@@ -83487,6 +83645,24 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 1242,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_remove_node_with_children_no_cascade",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 213,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_remove_node_nonexistent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 229,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_remove_spec_root",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 596,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -83605,7 +83781,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "_collect_descendants",
@@ -83926,6 +84102,30 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 1259,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_update_field_invalid_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 242,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_update_field_protected_field",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 258,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_complex_rollback_scenario",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 487,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_update_metadata_with_invalid_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 581,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84008,7 +84208,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 5
     },
     {
       "name": "move_node",
@@ -84049,6 +84249,24 @@
           "name": "_handle_move_node",
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 1276,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_move_node_creates_circular_dependency",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 283,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_move_node_to_nonexistent_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 299,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_move_spec_root",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 620,
           "call_type": "function_call"
         }
       ],
@@ -84192,7 +84410,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 4
     },
     {
       "name": "_is_ancestor",
@@ -84298,6 +84516,18 @@
           "file": "src/claude_skills/claude_skills/sdd_spec_mod/modification.py",
           "line": 1133,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_transaction_rollback_on_exception",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_complex_rollback_scenario",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 472,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84314,7 +84544,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 4
     },
     {
       "name": "transactional_modify",
@@ -84345,7 +84575,20 @@
       "is_async": false,
       "is_exported": false,
       "is_public": true,
-      "callers": [],
+      "callers": [
+        {
+          "name": "test_transactional_modify_with_validation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 324,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_transactional_modify_with_validation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 344,
+          "call_type": "function_call"
+        }
+      ],
       "calls": [
         {
           "name": "spec_transaction",
@@ -84383,7 +84626,8 @@
           "line": 859,
           "call_type": "function_call"
         }
-      ]
+      ],
+      "call_count": 2
     },
     {
       "name": "_validate_spec_integrity",
@@ -84580,6 +84824,30 @@
           "file": "src/claude_skills/claude_skills/tests/integration/test_bulk_modify.py",
           "line": 341,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_apply_modifications_with_validation",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 388,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_apply_modifications_with_missing_fields",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 436,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_apply_modifications_with_invalid_json",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_apply_modifications_with_nonexistent_file",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py",
+          "line": 465,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -84770,7 +85038,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 4
+      "call_count": 8
     },
     {
       "name": "_handle_add_node",
@@ -124773,6 +125041,20 @@
       "subprocess",
       "sys",
       "pathlib.Path"
+    ],
+    "src/claude_skills/claude_skills/tests/integration/test_modify_validation.py": [
+      "json",
+      "pytest",
+      "tempfile",
+      "pathlib.Path",
+      "copy.deepcopy",
+      "claude_skills.sdd_spec_mod.modification.add_node",
+      "claude_skills.sdd_spec_mod.modification.remove_node",
+      "claude_skills.sdd_spec_mod.modification.update_node_field",
+      "claude_skills.sdd_spec_mod.modification.move_node",
+      "claude_skills.sdd_spec_mod.modification.spec_transaction",
+      "claude_skills.sdd_spec_mod.modification.transactional_modify",
+      "claude_skills.sdd_spec_mod.modification.apply_modifications"
     ],
     "src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py": [
       "sys",

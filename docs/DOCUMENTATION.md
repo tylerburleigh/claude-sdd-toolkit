@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:33:02
+**Generated:** 2025-11-06 13:36:44
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 228
-- **Total Lines:** 79439
-- **Total Classes:** 297
+- **Total Files:** 229
+- **Total Lines:** 80064
+- **Total Classes:** 299
 - **Total Functions:** 851
 - **Avg Complexity:** 5.8
 - **Max Complexity:** 45
@@ -5664,6 +5664,53 @@ Attributes:
 - `test_validate_timestamp_pair_negative_disallowed()`
 - `test_validate_timestamp_pair_negative_allowed()`
 - `test_validate_timestamp_pair_with_printer()`
+
+---
+
+### `TestValidationEdgeCases`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py:521`
+
+**Description:**
+> Edge case tests for validation and rollback.
+
+**Methods:**
+- `minimal_spec()`
+- `test_add_node_with_invalid_dependencies_structure()`
+- `test_update_metadata_with_invalid_type()`
+- `test_remove_spec_root()`
+- `test_move_spec_root()`
+
+---
+
+### `TestValidationRollback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py:25`
+
+**Description:**
+> Integration tests for validation and rollback mechanisms.
+
+**Methods:**
+- `sample_spec()`
+- `test_transaction_rollback_on_exception()`
+- `test_add_node_with_invalid_type()`
+- `test_add_node_with_empty_title()`
+- `test_add_node_with_duplicate_id()`
+- `test_add_node_with_nonexistent_parent()`
+- `test_remove_node_with_children_no_cascade()`
+- `test_remove_node_nonexistent()`
+- `test_update_field_invalid_status()`
+- `test_update_field_protected_field()`
+- `test_move_node_creates_circular_dependency()`
+- `test_move_node_to_nonexistent_parent()`
+- `test_transactional_modify_with_validation()`
+- `test_apply_modifications_with_validation()`
+- `test_apply_modifications_with_missing_fields()`
+- `test_apply_modifications_with_invalid_json()`
+- `test_apply_modifications_with_nonexistent_file()`
+- `test_complex_rollback_scenario()`
 
 ---
 
@@ -24807,6 +24854,21 @@ Returns:
 - `pathlib.Path`
 - `subprocess`
 - `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_modify_validation.py`
+
+- `claude_skills.sdd_spec_mod.modification.add_node`
+- `claude_skills.sdd_spec_mod.modification.apply_modifications`
+- `claude_skills.sdd_spec_mod.modification.move_node`
+- `claude_skills.sdd_spec_mod.modification.remove_node`
+- `claude_skills.sdd_spec_mod.modification.spec_transaction`
+- `claude_skills.sdd_spec_mod.modification.transactional_modify`
+- `claude_skills.sdd_spec_mod.modification.update_node_field`
+- `copy.deepcopy`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
 
 ### `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py`
 
