@@ -37,79 +37,208 @@ Use this skill when you need to:
 
 ## Review Types
 
-### 1. Full Spec Review
-**Scope:** Entire specification across all phases
-**When to use:** Post-completion audits, major milestones
-**Output:** Comprehensive fidelity report
+### 1. Phase Review
+**Scope:** Single phase within specification (typically 3-10 tasks)
+**When to use:** Phase completion checkpoints, before moving to next phase
+**Output:** Phase-specific fidelity report with per-task breakdown
+**Best practice:** Use at phase boundaries to catch drift before starting next phase
 
-### 2. Phase Review
-**Scope:** Single phase within specification
-**When to use:** Phase completion checkpoints
-**Output:** Phase-specific fidelity report
+### 2. Task Review
+**Scope:** Individual task implementation (typically 1 file)
+**When to use:** Critical task validation, complex implementation verification
+**Output:** Task-specific compliance check with implementation comparison
+**Best practice:** Use for high-risk tasks (auth, data handling, API contracts)
 
-### 3. Task Review
-**Scope:** Individual task implementation
-**When to use:** Task completion verification
-**Output:** Task-specific compliance check
-
-### 4. File Review
-**Scope:** Specific files against spec
-**When to use:** Targeted code review, PR reviews
-**Output:** File-level fidelity analysis
-
-### 5. Deviation Analysis
-**Scope:** Documented deviations from plan
-**When to use:** Investigating implementation changes
-**Output:** Deviation impact assessment
+**Note:** For full spec reviews, run phase-by-phase reviews for better manageability and quality.
 
 ## Invocation
 
-**Using Subagent:**
+### For Automated Workflows
+
+**Metadata in verification task:**
+```json
+{
+  "verification_type": "fidelity",
+  "agent": "sdd-fidelity-review",
+  "scope": "phase",
+  "target": "phase-1"
+}
+```
+
+**Invocation from sdd-next:**
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review implementation fidelity for spec {spec-id}. [Details about what to review]",
+  prompt: "Review implementation fidelity for spec {spec-id}. [Details about scope/target]",
   description: "Review spec fidelity"
 )
 ```
 
-**Using Skill:**
+### For Direct User Requests
+
 ```
 Skill(sdd-toolkit:sdd-fidelity-review)
 ```
 
 Then provide the spec ID and review scope when prompted.
 
+### Understanding the Naming
+
+- `metadata.agent = "sdd-fidelity-review"` → What to execute (routing identifier)
+- `Task(subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent")` → How to invoke (orchestration)
+- `Skill(sdd-toolkit:sdd-fidelity-review)` → Direct skill invocation (user-facing)
+
 ## Required Information
 
-### For Full Review
+### For Phase Review
 - ✅ `spec_id` - Valid specification ID
-- Optional: `scope` - Review scope (full/phase/task/files)
+- ✅ `phase_id` - Phase to review (e.g., "phase-1")
 
 ### For Task Review
 - ✅ `spec_id` - Valid specification ID
 - ✅ `task_id` - Valid task ID within the spec
 
-### For File Review
-- ✅ `spec_id` - Valid specification ID
-- ✅ `files` - List of file paths to review
+## Spec Reading Best Practices
 
-### For Deviation Analysis
-- ✅ `spec_id` - Valid specification ID
-- ✅ `deviation_description` - What was implemented differently
-- Optional: `task_id` - Task context for the deviation
+**CRITICAL: Never read spec files directly - use sdd CLI commands**
+
+- ✅ **ALWAYS** use `sdd` commands to read spec files (e.g., `sdd task-info`, `sdd query-tasks`, `sdd get-journal`)
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use Python code to parse spec JSON directly
+- The `sdd` CLI provides efficient, structured access with proper parsing and validation
+
+### Available sdd Commands for Fidelity Review
+
+**Task-Level Review:**
+- `sdd task-info {spec-id} {task-id} --json` - Get complete task details (requirements, files, metadata)
+- `sdd get-task {spec-id} {task-id} --json` - Alternative task query interface
+- `sdd check-deps {spec-id} {task-id} --json` - Check task dependencies status
+- `sdd get-journal {spec-id} {task-id} --json` - Get journal entries for task
+
+**Phase-Level Review:**
+- `sdd list-phases {spec-id} --json` - List all phases with completion status
+- `sdd query-tasks {spec-id} --parent {phase-id} --json` - Get all tasks in phase
+- `sdd query-tasks {spec-id} --status completed --parent {phase-id} --json` - Get completed tasks only
+
+**Spec-Level Review:**
+- `sdd progress {spec-id} --json` - Overall spec progress summary
+- `sdd query-tasks {spec-id} --status completed --json` - All completed tasks
+- `sdd list-blockers {spec-id} --json` - Current blockers (useful for identifying incomplete work)
+
+**Verification Review:**
+- `sdd query-tasks {spec-id} --type verify --json` - Find all verification tasks
+
+### Command Usage Pattern
+
+Always use `--json` flag for structured output that's easy to parse:
+
+```bash
+# Get task details
+sdd task-info user-auth-001 task-2-3 --json
+
+# Returns structured JSON:
+{
+  "id": "task-2-3",
+  "title": "Implement JWT middleware",
+  "type": "task",
+  "status": "completed",
+  "files": ["src/middleware/auth.ts"],
+  "acceptance_criteria": [...],
+  "verification_steps": [...],
+  ...
+}
+```
+
+### Command Execution Best Practices
+
+**CRITICAL: Run sdd commands individually, never in loops or chains**
+
+**DO:**
+- ✅ Run each `sdd` command as a separate Bash tool call
+- ✅ Wait for each command to complete before running the next
+- ✅ Parse JSON output from each command individually
+
+**Example - Phase Review (Correct):**
+```bash
+# First call: Get phase info
+sdd list-phases spec-id --json
+
+# Second call: Get tasks in phase
+sdd query-tasks spec-id --parent phase-3 --json
+
+# Third call: Get specific task details
+sdd task-info spec-id task-3-1 --json
+
+# Fourth call: Get journal for that task
+sdd get-journal spec-id task-3-1 --json
+
+# Fifth call: Next task
+sdd task-info spec-id task-3-2 --json
+# ... and so on
+```
+
+**DON'T:**
+- ❌ Use bash loops: `for task_id in task-3-1 task-3-2; do sdd get-journal ...; done`
+- ❌ Chain commands: `sdd task-info && sdd get-journal`
+- ❌ Combine with echo: `echo "===" && sdd get-journal`
+- ❌ Use compound commands or semicolons
+
+**Why?**
+- Individual commands are easier to debug
+- Better error handling per command
+- Clearer permission boundaries
+- More observable progress
+- Follows SDD toolkit conventions
 
 ## Workflow
 
 ### Phase 1: Load Specification
-1. Validate inputs (spec_id, task_id, etc.)
-2. Load spec data using SDD CLI
-3. Extract requirements from spec
+
+**1. Validate inputs:**
+   - Check required information is provided
+   - Validate spec_id exists:
+     ```bash
+     sdd find-specs --verbose --json
+     ```
+
+**2. Load spec metadata based on review scope:**
+
+**For Task Review:**
+```bash
+# Get complete task details
+sdd task-info {spec-id} {task-id} --json
+
+# Get journal entries to check for documented deviations
+sdd get-journal {spec-id} {task-id} --json
+
+# Check dependencies (useful for impact assessment)
+sdd check-deps {spec-id} {task-id} --json
+```
+
+**For Phase Review:**
+```bash
+# Get phase metadata
+sdd list-phases {spec-id} --json
+
+# Get all completed tasks in the phase
+sdd query-tasks {spec-id} --status completed --parent {phase-id} --json
+
+# For each task, get detailed info:
+sdd task-info {spec-id} {task-id} --json
+sdd get-journal {spec-id} {task-id} --json
+```
+
+**3. Extract requirements from JSON output:**
+   - Parse the JSON response from sdd commands
+   - Extract from task-info: `acceptance_criteria`, `files`, `dependencies`, `verification_steps`
+   - Extract from get-journal: Documented deviations and decisions
+   - **NEVER read the spec file directly with Read() or cat**
 
 ### Phase 2: Analyze Implementation
-1. Identify files from task metadata
-2. Read implementation code
-3. Compare against spec requirements
+1. **Identify files** from task metadata (extracted from `sdd task-info` JSON output)
+2. **Read implementation code** using Read tool for each file
+3. **Compare against spec requirements** from task-info output
 
 ### Phase 3: Identify Deviations
 1. Categorize findings:
@@ -248,12 +377,12 @@ Specified features not implemented:
 
 ## Example Invocations
 
-**Full spec review:**
+**Phase review:**
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review implementation fidelity for spec sdd-next-enhancement-001. Perform full review across all completed phases.",
-  description: "Full fidelity review"
+  prompt: "Review phase phase-1 in spec user-auth-001. Compare all completed tasks in Phase 1 (User Model & Authentication) against specification requirements.",
+  description: "Phase 1 fidelity review"
 )
 ```
 
@@ -261,17 +390,8 @@ Task(
 ```
 Task(
   subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review task-2-3 in spec user-auth-001. Compare implementation in src/middleware/auth.ts against specification requirements.",
+  prompt: "Review task task-2-3 in spec user-auth-001. Compare implementation in src/middleware/auth.ts against task requirements for JWT authentication middleware.",
   description: "Review auth middleware task"
-)
-```
-
-**Deviation analysis:**
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Analyze deviation in spec api-refactor-001 task-1-2. Deviation: Used dependency injection instead of singleton pattern as specified. Assess impact and document.",
-  description: "Analyze DI deviation"
 )
 ```
 
