@@ -971,6 +971,228 @@ sdd add-journal myspec --title "Deferred optimization concern" \
   --content "Codex flagged potential N+1 query in Phase 2. Decision: defer to Phase 3 performance optimization task. Reasoning: premature optimization, need working implementation first."
 ```
 
+## Applying Plan Review Feedback Systematically
+
+After running a multi-model plan review, you can apply consensus recommendations systematically using `Skill(sdd-toolkit:sdd-modify)`.
+
+### When to Apply Plan Review Feedback
+
+Plan reviews generate improvement recommendations **before implementation begins**. Unlike fidelity reviews (which compare code to spec), plan reviews evaluate the spec itself.
+
+**Apply feedback when:**
+- ✅ Multiple models agree on improvements (consensus recommendations)
+- ✅ Critical or high-severity issues identified
+- ✅ Clarity improvements suggested (vague task descriptions)
+- ✅ Missing verification steps identified
+- ✅ Architectural improvements have consensus
+- ✅ Feasibility concerns about estimates
+
+**Don't apply feedback for:**
+- ❌ Low-severity suggestions (note for future)
+- ❌ Conflicting recommendations (no consensus)
+- ❌ Stylistic preferences without substance
+- ❌ Overly conservative estimates (balance needed)
+
+### Consensus Extraction
+
+Multi-model reviews provide diverse perspectives. Focus on **consensus recommendations** where multiple models agree:
+
+**Strong consensus (2-3 models agree):**
+- High confidence to apply
+- Clear problem identification
+- Aligned solutions
+
+**Weak consensus (1 model flags):**
+- Review carefully before applying
+- May be edge case or misunderstanding
+- Consider with context
+
+**Conflicting feedback:**
+- Models disagree on approach
+- Requires human judgment
+- Document decision rationale
+
+### Systematic Application Workflow
+
+#### Step 1: Run Plan Review
+
+```bash
+sdd review my-spec-001 --type full --output review-report.md
+```
+
+**Example output:**
+```
+Overall Score: 6.5/10 (REVISE)
+Models: gemini, codex, cursor-agent
+
+Consensus recommendations (2-3 models agree):
+  1. Task descriptions too vague in Phase 2 (3 models)
+  2. Missing error handling verification (2 models)
+  3. Time estimates unrealistic for task-3-2 (2 models)
+
+Single-model recommendations:
+  4. Consider adding performance benchmarks (codex only)
+  5. Add API versioning strategy (gemini only)
+```
+
+#### Step 2: Extract Consensus Improvements
+
+Review the report and extract modifications where models agree:
+
+**Create consensus-improvements.json:**
+```json
+{
+  "modifications": [
+    {
+      "operation": "update_task",
+      "task_id": "task-2-1",
+      "field": "description",
+      "value": "Implement OAuth 2.0 authentication with PKCE flow, including JWT token generation, refresh token rotation, and session management",
+      "rationale": "Consensus: All 3 models flagged vague description"
+    },
+    {
+      "operation": "add_verification",
+      "task_id": "task-2-3",
+      "verify_id": "verify-2-3-4",
+      "description": "Verify error handling for network timeouts and service unavailability",
+      "command": "pytest tests/test_error_handling.py -v",
+      "rationale": "Consensus: 2 models recommended error handling verification"
+    },
+    {
+      "operation": "update_metadata",
+      "task_id": "task-3-2",
+      "field": "estimated_hours",
+      "value": 12.0,
+      "rationale": "Consensus: 2 models flagged 8 hours as unrealistic, recommend 12"
+    }
+  ],
+  "metadata": {
+    "source": "plan-review-consensus",
+    "review_date": "2025-11-06",
+    "review_type": "full",
+    "models": ["gemini", "codex", "cursor-agent"]
+  }
+}
+```
+
+#### Step 3: Preview Modifications
+
+```bash
+sdd apply-modifications my-spec-001 --from consensus-improvements.json --dry-run
+```
+
+Review the preview to ensure changes align with your understanding and requirements.
+
+#### Step 4: Apply Consensus Recommendations
+
+```bash
+sdd apply-modifications my-spec-001 --from consensus-improvements.json
+```
+
+Features:
+- Automatic backup before changes
+- Validation after application
+- Rollback on errors
+- Clear success/failure reporting
+
+#### Step 5: Document Applied Changes
+
+```bash
+sdd add-journal my-spec-001 \
+  --title "Applied Multi-Model Review Consensus Improvements" \
+  --content "Applied 3 consensus recommendations from full review. Updated task-2-1 description for clarity, added error handling verification to task-2-3, increased task-3-2 estimate from 8h to 12h based on complexity assessment. 2 single-model suggestions noted for future consideration." \
+  --entry-type note
+```
+
+#### Step 6: Re-Review (Optional)
+
+After applying consensus improvements, optionally run a quick re-review to confirm score improvement:
+
+```bash
+sdd review my-spec-001 --type quick
+```
+
+**Expected outcome:**
+```
+Overall Score: 7.8/10 (APPROVE)
+Improvement: +1.3 from previous review
+
+Previously flagged issues:
+  ✓ Vague task descriptions (resolved)
+  ✓ Missing error handling verification (resolved)
+  ✓ Unrealistic estimates (resolved)
+```
+
+### Using sdd-modify Subagent
+
+For automated workflows, use the subagent programmatically:
+
+```
+Task(
+  subagent_type: "sdd-toolkit:sdd-modify-subagent",
+  prompt: "Apply consensus improvements from consensus-improvements.json to spec my-spec-001. These modifications were extracted from multi-model plan review where 2-3 models agreed. Validate and report results.",
+  description: "Apply plan review consensus"
+)
+```
+
+### Example: Complete Closed-Loop Workflow
+
+```bash
+# 1. Create spec
+# (Use Skill(sdd-toolkit:sdd-plan))
+# → specs/active/my-spec-001.json
+
+# 2. Run plan review
+sdd review my-spec-001 --type full --output plan-review.md
+# → 6.5/10 (REVISE): 3 consensus issues, 2 single-model suggestions
+
+# 3. Extract consensus improvements
+# → Manually create consensus-improvements.json with agreed-upon fixes
+
+# 4. Preview modifications
+sdd apply-modifications my-spec-001 --from consensus-improvements.json --dry-run
+# → Shows 3 modifications
+
+# 5. Apply consensus improvements
+sdd apply-modifications my-spec-001 --from consensus-improvements.json
+# → 3 modifications applied, backup created, validation passed
+
+# 6. Document changes
+sdd add-journal my-spec-001 --title "Applied plan review consensus" \
+  --content "Applied 3 consensus recommendations. Spec improved from 6.5/10 to estimated 7.8/10."
+
+# 7. Re-review (optional)
+sdd review my-spec-001 --type quick
+# → 7.8/10 (APPROVE)
+
+# 8. Approve and proceed
+sdd update-frontmatter my-spec-001 status "approved"
+
+# 9. Begin implementation
+# (Use Skill(sdd-toolkit:sdd-next))
+```
+
+### Benefits of Systematic Application
+
+**Compared to manual spec editing:**
+- ✅ **Higher confidence** - Multiple AI models validated changes
+- ✅ **Faster** - Apply consensus in batch vs. one-by-one edits
+- ✅ **Safer** - Automatic backup, validation, rollback
+- ✅ **Traceable** - Clear record of what changed and why (rationale field)
+- ✅ **Validated** - Spec structure checked after changes
+
+**Consensus-driven improvements:**
+- Focus on changes multiple experts agree on
+- Higher probability of being correct
+- Reduces individual model bias
+- Builds confidence in spec quality
+
+### See Also
+
+- **Skill(sdd-toolkit:sdd-modify)** - Full documentation on spec modification workflows
+- **skills/sdd-modify/examples/bulk-modify.md** - Bulk modification walkthrough
+- **sdd apply-modifications --help** - CLI command reference
+
 ## See Also
 
 **Skill(sdd-toolkit:sdd-plan)** - Use before this skill:

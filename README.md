@@ -158,6 +158,7 @@ Best practice: Ask Claude to "Document this codebase" before creating specs to e
 | `sdd-render` | Render specs to markdown | Generate human-readable documentation with AI enhancement (3 modes: basic/summary/standard/full) |
 | `sdd-plan-review` | Multi-model review | "Review my spec" |
 | `sdd-fidelity-review` | Review implementation fidelity | "Did I implement what the spec actually said?" "Check implementation against task requirements" |
+| `sdd-modify` | Apply spec modifications systematically | "Apply review feedback to spec" "Update task descriptions from review report" |
 | `code-doc` | Generate docs | "Document this codebase" |
 | `doc-query` | Query docs & analyze relationships | "What calls this function?" "Show call graph" "Find refactor candidates" |
 | `run-tests` | Run & debug tests | "Run tests and fix failures" |
@@ -196,6 +197,40 @@ sdd fidelity-review spec-id --ai-tools gemini codex
 
 # Output to file
 sdd fidelity-review spec-id --output review.md --format markdown
+```
+
+**Systematic Modification Workflow:**
+
+After reviews identify issues, apply fixes systematically:
+
+```bash
+# Parse review feedback into structured modifications
+sdd parse-review spec-id --review review-report.md --output suggestions.json
+
+# Preview modifications before applying
+sdd apply-modifications spec-id --from suggestions.json --dry-run
+
+# Apply modifications with automatic backup and validation
+sdd apply-modifications spec-id --from suggestions.json
+```
+
+**Complete Closed-Loop:**
+
+```bash
+# 1. Review implementation
+sdd fidelity-review spec-id --output review.md
+
+# 2. Parse feedback
+sdd parse-review spec-id --review review.md
+
+# 3. Preview modifications
+sdd apply-modifications spec-id --from spec-id-suggestions.json --dry-run
+
+# 4. Apply modifications
+sdd apply-modifications spec-id --from spec-id-suggestions.json
+
+# 5. Re-review to confirm fixes
+sdd fidelity-review spec-id
 ```
 
 **Key Capabilities:**

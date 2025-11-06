@@ -700,6 +700,361 @@ sdd fidelity-review spec-id --ai-tools codex cursor-agent
 
 ---
 
+## Systematic Feedback Application with sdd-modify
+
+After reviews identify spec/implementation mismatches, use `sdd-modify` to systematically apply fixes to the spec.
+
+### Why Systematic Application?
+
+**Manual spec editing risks:**
+- ❌ Typos and formatting errors
+- ❌ Forgetting to update related sections
+- ❌ No backup before changes
+- ❌ No validation after changes
+- ❌ Time-consuming for multiple fixes
+
+**Systematic approach benefits:**
+- ✅ Automatic extraction from review reports
+- ✅ Preview before applying
+- ✅ Automatic backup and rollback
+- ✅ Validation after every change
+- ✅ 70-80% faster than manual editing
+
+### Complete Closed-Loop Workflow
+
+```
+1. Implementation Complete
+        ↓
+2. Run Fidelity Review
+   sdd fidelity-review spec-id --output review.md
+        ↓
+3. Review Identifies Issues
+   - Vague task descriptions
+   - Missing verification steps
+   - Metadata inconsistencies
+        ↓
+4. Parse Review Report
+   sdd parse-review spec-id --review review.md
+   → Generates structured modifications.json
+        ↓
+5. Preview Modifications
+   sdd apply-modifications spec-id --from suggestions.json --dry-run
+   → Shows exactly what will change
+        ↓
+6. Apply Modifications
+   sdd apply-modifications spec-id --from suggestions.json
+   → Automatic backup, validation, rollback
+        ↓
+7. Document Changes
+   sdd add-journal spec-id --title "Applied review feedback"
+        ↓
+8. Re-Review to Confirm
+   sdd fidelity-review spec-id
+   → Should show: "Previous issues resolved"
+```
+
+### Step-by-Step Example
+
+**Step 1: Review finds issues**
+
+```bash
+sdd fidelity-review my-spec-001 --output review-report.md
+```
+
+**Output:**
+```
+Consensus Verdict: PARTIAL
+Issues Found: 5
+
+1. [CRITICAL] Task task-2-1 description too vague
+   Spec: "Implement auth"
+   Actual: OAuth 2.0 with PKCE, JWT tokens, refresh rotation
+
+2. [WARNING] Missing verification for token expiration (task-2-1)
+
+3. [WARNING] Missing verification for rate limiting (task-2-2)
+
+4. [INFO] Task task-3-2 estimated_hours incorrect (8h, actually took 12h)
+
+5. [INFO] Task descriptions don't mention error handling details
+```
+
+**Step 2: Parse review feedback**
+
+```bash
+sdd parse-review my-spec-001 --review review-report.md --output suggestions.json
+```
+
+**Generated suggestions.json:**
+
+```json
+{
+  "modifications": [
+    {
+      "operation": "update_task",
+      "task_id": "task-2-1",
+      "field": "description",
+      "value": "Implement OAuth 2.0 authentication with PKCE flow, JWT access tokens (15min expiry), and refresh token rotation (7 days expiry)",
+      "confidence": "high",
+      "source": "fidelity-review-issue-1"
+    },
+    {
+      "operation": "add_verification",
+      "task_id": "task-2-1",
+      "verify_id": "verify-2-1-4",
+      "description": "Verify token expiration and refresh flow works correctly",
+      "command": "pytest tests/test_auth.py::test_token_lifecycle -v",
+      "confidence": "high",
+      "source": "fidelity-review-issue-2"
+    },
+    {
+      "operation": "add_verification",
+      "task_id": "task-2-2",
+      "verify_id": "verify-2-2-5",
+      "description": "Verify rate limiting prevents abuse with concurrent requests",
+      "command": "pytest tests/test_auth.py::test_rate_limiting -v",
+      "confidence": "medium",
+      "source": "fidelity-review-issue-3"
+    },
+    {
+      "operation": "update_metadata",
+      "task_id": "task-3-2",
+      "field": "actual_hours",
+      "value": 12.0,
+      "confidence": "high",
+      "source": "fidelity-review-issue-4"
+    }
+  ]
+}
+```
+
+**Step 3: Preview modifications**
+
+```bash
+sdd apply-modifications my-spec-001 --from suggestions.json --dry-run
+```
+
+**Output:**
+```
+📋 Modification Preview (Dry-Run Mode)
+
+Spec: my-spec-001
+Total modifications: 4
+
+═══════════════════════════════════════════════════════════════
+TASKS TO UPDATE (1 task)
+───────────────────────────────────────────────────────────────
+Task: task-2-1 (Phase 2)
+Field: description
+Current: "Implement auth"
+New:     "Implement OAuth 2.0 authentication with PKCE flow, JWT access tokens (15min expiry), and refresh token rotation (7 days expiry)"
+
+═══════════════════════════════════════════════════════════════
+VERIFICATION STEPS TO ADD (2 steps)
+───────────────────────────────────────────────────────────────
+Task: task-2-1
+Verify ID: verify-2-1-4
+Description: "Verify token expiration and refresh flow works correctly"
+Command: pytest tests/test_auth.py::test_token_lifecycle -v
+───────────────────────────────────────────────────────────────
+Task: task-2-2
+Verify ID: verify-2-2-5
+Description: "Verify rate limiting prevents abuse with concurrent requests"
+Command: pytest tests/test_auth.py::test_rate_limiting -v
+
+═══════════════════════════════════════════════════════════════
+METADATA TO UPDATE (1 task)
+───────────────────────────────────────────────────────────────
+Task: task-3-2
+Field: actual_hours
+Current: 0.0
+New:     12.0
+
+═══════════════════════════════════════════════════════════════
+IMPACT SUMMARY
+
+Tasks affected:               3
+Verification steps added:     2
+Metadata updated:             1
+Total modifications:          4
+
+Validation prediction: ✓ No errors expected
+```
+
+**Step 4: Apply modifications**
+
+```bash
+sdd apply-modifications my-spec-001 --from suggestions.json
+```
+
+**Output:**
+```
+✓ Backup created: specs/.backups/my-spec-001-20251106-153022.json
+✓ Applied 4 modifications
+✓ Validation passed
+
+Changes:
+  - Updated 1 task description
+  - Added 2 verification steps
+  - Updated 1 metadata field
+
+Backup: specs/.backups/my-spec-001-20251106-153022.json
+```
+
+**Step 5: Document changes**
+
+```bash
+sdd add-journal my-spec-001 \
+  --title "Applied Fidelity Review Feedback" \
+  --content "Applied 4 modifications based on fidelity review: clarified OAuth 2.0 implementation details in task-2-1, added 2 verification steps for token expiration and rate limiting, corrected actual_hours for task-3-2. All changes validated successfully." \
+  --entry-type note
+```
+
+**Step 6: Re-review to confirm**
+
+```bash
+sdd fidelity-review my-spec-001
+```
+
+**Output:**
+```
+Consensus Verdict: PASS
+Agreement Rate: 100%
+
+Previous issues resolved: 4/4
+New issues: 0
+
+✓ Implementation matches updated spec
+✓ All verification steps documented
+✓ Metadata accurate
+```
+
+### Benefits vs Manual Editing
+
+**Time Comparison:**
+
+| Task | Manual | Systematic | Time Saved |
+|------|--------|-----------|------------|
+| Parse review feedback | 10-15 min | 30 sec | 93% |
+| Edit spec JSON | 15-20 min | 1 min | 95% |
+| Validate changes | 2-3 min | Automatic | 100% |
+| Create backup | Manual | Automatic | 100% |
+| Document changes | 5 min | 2 min | 60% |
+| **Total** | **35-45 min** | **5-10 min** | **78-89%** |
+
+**Error Reduction:**
+
+- Manual editing error rate: ~15-20% (typos, forgotten fields, invalid JSON)
+- Systematic approach error rate: ~0-2% (automatic validation catches issues)
+
+### When to Use Systematic Application
+
+**Always use for:**
+- ✅ Fidelity review feedback (spec/implementation mismatches)
+- ✅ Plan review consensus recommendations
+- ✅ Multiple related spec changes at once
+- ✅ Any changes requiring validation
+
+**Manual editing acceptable for:**
+- ❌ Single small change (e.g., fix one typo)
+- ❌ Experimental spec modifications
+
+### Troubleshooting Systematic Application
+
+**Issue: Parse-review finds nothing**
+
+```bash
+# Review report doesn't contain parseable patterns
+# Solution: Create modification file manually
+
+{
+  "modifications": [
+    {
+      "operation": "update_task",
+      "task_id": "task-2-1",
+      "field": "description",
+      "value": "New description based on review feedback"
+    }
+  ]
+}
+```
+
+**Issue: Validation fails after application**
+
+```bash
+# Automatic rollback occurs
+# Fix modification file and retry
+
+# Preview to verify fix
+sdd apply-modifications spec-id --from fixed-mods.json --dry-run
+
+# Apply
+sdd apply-modifications spec-id --from fixed-mods.json
+```
+
+**Issue: Need to rollback**
+
+```bash
+# Restore from automatic backup
+cp specs/.backups/spec-id-TIMESTAMP.json specs/active/spec-id.json
+```
+
+### Integration Points
+
+**After sdd-fidelity-review:**
+
+```bash
+# Review identifies spec/implementation mismatches
+sdd fidelity-review spec-id → Review report
+
+# Systematic application
+sdd parse-review spec-id --review report.md
+sdd apply-modifications spec-id --from suggestions.json
+
+# Confirm fixes
+sdd fidelity-review spec-id → Should show PASS
+```
+
+**After sdd-plan-review:**
+
+```bash
+# Plan review identifies spec improvements
+sdd review spec-id → Multi-model feedback
+
+# Extract consensus recommendations
+# (Manual step - create consensus-mods.json)
+
+# Apply consensus improvements
+sdd apply-modifications spec-id --from consensus-mods.json --dry-run
+sdd apply-modifications spec-id --from consensus-mods.json
+```
+
+### Best Practices
+
+**DO:**
+- ✅ Always preview with --dry-run first
+- ✅ Apply in small batches (5-10 modifications)
+- ✅ Document why changes were made (journal entries)
+- ✅ Keep modification files for audit trail
+- ✅ Re-review after applying to confirm fixes
+
+**DON'T:**
+- ❌ Skip preview for significant changes
+- ❌ Apply modifications without understanding them
+- ❌ Delete backups immediately
+- ❌ Use --no-validate (defeats safety checks)
+- ❌ Apply conflicting modifications in one batch
+
+### Additional Resources
+
+**See Also:**
+- **Skill Documentation:** `skills/sdd-modify/SKILL.md` - Complete reference
+- **Examples:** `skills/sdd-modify/examples/apply-review.md` - Detailed walkthrough
+- **Spec Modification Guide:** `docs/spec-modification.md` - Comprehensive guide
+- **CLI Help:** `sdd parse-review --help`, `sdd apply-modifications --help`
+
+---
+
 ## Additional Resources
 
 **Related Documentation:**

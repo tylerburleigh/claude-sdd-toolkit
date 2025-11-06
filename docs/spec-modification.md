@@ -182,6 +182,335 @@ Task(
 
 ---
 
+## Systematic Spec Modification with sdd-modify
+
+For applying review feedback or making bulk structural changes, use the `sdd-modify` skill which provides a systematic, safe workflow.
+
+### When to Use sdd-modify
+
+Use `Skill(sdd-toolkit:sdd-modify)` when:
+- ✅ Applying feedback from sdd-fidelity-review or sdd-plan-review
+- ✅ Making multiple related changes at once (bulk modifications)
+- ✅ Updating task descriptions based on implementation learnings
+- ✅ Adding verification steps discovered during implementation
+- ✅ Needing automatic backup, validation, and rollback
+
+Use `sdd-update` instead for:
+- ❌ Task status updates (in_progress, completed, blocked)
+- ❌ Adding journal entries
+- ❌ Tracking progress
+- ❌ Moving specs between folders
+
+### Basic Workflow: Apply Review Feedback
+
+**Step 1: Run Review**
+
+```bash
+# Run fidelity review
+sdd fidelity-review spec-id --output review-report.md
+```
+
+**Step 2: Parse Review Feedback**
+
+```bash
+# Extract structured modifications from review report
+sdd parse-review spec-id --review review-report.md --output suggestions.json
+```
+
+This automatically converts review recommendations into structured modification format.
+
+**Step 3: Preview Modifications**
+
+```bash
+# See what will change before applying
+sdd apply-modifications spec-id --from suggestions.json --dry-run
+```
+
+Output shows:
+- Tasks to update
+- Verification steps to add
+- Metadata to change
+- Impact summary
+- Validation prediction
+
+**Step 4: Apply Modifications**
+
+```bash
+# Apply with automatic backup and validation
+sdd apply-modifications spec-id --from suggestions.json
+```
+
+Features:
+- Automatic backup created before changes
+- Transaction support (all-or-nothing)
+- Validation runs after applying
+- Rollback on validation failure
+- Clear success/failure reporting
+
+**Step 5: Verify Results**
+
+```bash
+# Optionally re-review to confirm fixes
+sdd fidelity-review spec-id
+```
+
+### Bulk Modifications
+
+For planned bulk changes, create a modification JSON file:
+
+**Create modifications.json:**
+
+```json
+{
+  "modifications": [
+    {
+      "operation": "update_task",
+      "task_id": "task-2-1",
+      "field": "description",
+      "value": "Implement OAuth 2.0 authentication with PKCE flow and JWT tokens",
+      "rationale": "Spec description was too vague after implementation"
+    },
+    {
+      "operation": "add_verification",
+      "task_id": "task-2-1",
+      "verify_id": "verify-2-1-4",
+      "description": "Verify token expiration handling",
+      "command": "pytest tests/test_auth.py::test_token_expiration -v",
+      "rationale": "Implementation added expiration logic not verified in original spec"
+    },
+    {
+      "operation": "update_metadata",
+      "task_id": "task-3-2",
+      "field": "actual_hours",
+      "value": 12.0,
+      "rationale": "Task took longer than estimated 8 hours"
+    }
+  ]
+}
+```
+
+**Apply bulk modifications:**
+
+```bash
+# Preview first
+sdd apply-modifications spec-id --from modifications.json --dry-run
+
+# Apply
+sdd apply-modifications spec-id --from modifications.json
+```
+
+### Supported Modification Operations
+
+**1. update_task - Modify task fields**
+
+```json
+{
+  "operation": "update_task",
+  "task_id": "task-2-1",
+  "field": "description",
+  "value": "Updated task description"
+}
+```
+
+Updatable fields: `description`, `task_category`, `skill`, `command`, `file_path`, `status_note`
+
+**2. add_verification - Add verification step**
+
+```json
+{
+  "operation": "add_verification",
+  "task_id": "task-2-1",
+  "verify_id": "verify-2-1-4",
+  "description": "What to verify",
+  "command": "pytest tests/test_feature.py -v"
+}
+```
+
+**3. update_metadata - Update task metadata**
+
+```json
+{
+  "operation": "update_metadata",
+  "task_id": "task-2-1",
+  "field": "actual_hours",
+  "value": 5.5
+}
+```
+
+Updatable metadata: `actual_hours`, `estimated_hours`, `priority`, `complexity`
+
+### Safety Features
+
+**Automatic Backup:**
+```
+specs/.backups/spec-id-20251106-143815.json
+```
+- Created before any changes
+- Preserved indefinitely
+- Use for rollback if needed
+
+**Transaction Rollback:**
+- If validation fails after applying modifications
+- All changes automatically rolled back
+- Spec restored to pre-modification state
+- Clear error message with suggestions
+
+**Validation After Apply:**
+- Always runs unless `--no-validate` (not recommended)
+- Checks schema compliance
+- Validates references
+- Ensures required fields present
+
+**Idempotency:**
+- Applying same modification twice is safe
+- Second application results in "no changes" not error
+- Safe to retry failed operations
+
+### Complete Closed-Loop Example
+
+```bash
+# 1. Implement feature following spec
+# ... coding work ...
+
+# 2. Run fidelity review
+sdd fidelity-review my-spec-001 --output review.md
+# → Identifies 5 issues where spec doesn't match implementation
+
+# 3. Parse review feedback
+sdd parse-review my-spec-001 --review review.md
+# → Creates my-spec-001-suggestions.json with 5 modifications
+
+# 4. Preview modifications
+sdd apply-modifications my-spec-001 --from my-spec-001-suggestions.json --dry-run
+# → Shows what will change:
+#   - 3 task descriptions updated
+#   - 2 verification steps added
+
+# 5. Apply modifications
+sdd apply-modifications my-spec-001 --from my-spec-001-suggestions.json
+# → ✓ Backup created
+# → ✓ 5 modifications applied
+# → ✓ Validation passed
+
+# 6. Document changes
+sdd add-journal my-spec-001 \
+  --title "Applied fidelity review feedback" \
+  --content "Updated 3 task descriptions and added 2 verification steps based on implementation learnings."
+
+# 7. Re-review to confirm
+sdd fidelity-review my-spec-001
+# → Should show: "Previous issues resolved: 5/5"
+```
+
+### Integration with Review Workflows
+
+**After sdd-fidelity-review:**
+
+Fidelity reviews identify where spec doesn't match implementation. Use sdd-modify to systematically apply the fixes:
+
+```
+Implementation Complete
+        ↓
+Run Fidelity Review → Generates review report
+        ↓
+Parse Review → Extract modifications
+        ↓
+Preview → See what will change
+        ↓
+Apply → Update spec systematically
+        ↓
+Validate → Ensure spec is correct
+        ↓
+Re-Review → Confirm issues resolved
+```
+
+**After sdd-plan-review:**
+
+Plan reviews identify spec improvements before implementation. Apply consensus recommendations:
+
+```
+Spec Created
+        ↓
+Run Plan Review → Multi-model feedback
+        ↓
+Extract Consensus → Modifications multiple models agree on
+        ↓
+Preview → Check consensus changes
+        ↓
+Apply → Update spec with improvements
+        ↓
+Validate → Ensure spec is valid
+        ↓
+Approve → Begin implementation
+```
+
+### Best Practices for sdd-modify
+
+**DO:**
+- ✅ Always preview with `--dry-run` before applying
+- ✅ Keep modification files for documentation
+- ✅ Add `rationale` field to document why changes needed
+- ✅ Apply in small batches (5-10 modifications at a time)
+- ✅ Document bulk modifications in journal entries
+
+**DON'T:**
+- ❌ Skip preview for significant changes
+- ❌ Use `--no-validate` unless absolutely necessary
+- ❌ Delete backups immediately after applying
+- ❌ Apply modifications without understanding what they do
+- ❌ Modify completed tasks (journal deviations instead)
+
+### Troubleshooting
+
+**Issue: Modifications failed with validation errors**
+
+Rollback occurs automatically. Fix issues in modification file and retry:
+
+```bash
+# Failed with validation errors
+sdd apply-modifications spec-id --from mods.json
+# ✗ Rolled back due to validation failure
+
+# Fix mods.json based on error messages
+
+# Preview to verify fix
+sdd apply-modifications spec-id --from mods.json --dry-run
+
+# Retry
+sdd apply-modifications spec-id --from mods.json
+```
+
+**Issue: Parse-review found no modifications**
+
+Review report may not contain parseable modification patterns:
+
+```bash
+# Manual modification file creation needed
+# Create mods.json based on review recommendations manually
+```
+
+**Issue: Need to rollback applied modifications**
+
+Restore from automatic backup:
+
+```bash
+# Find backup
+ls -lt specs/.backups/spec-id-*.json
+
+# Restore
+cp specs/.backups/spec-id-20251106-143815.json specs/active/spec-id.json
+```
+
+### Additional Resources
+
+**See Also:**
+- **Skill Documentation:** `skills/sdd-modify/SKILL.md` - Complete skill reference
+- **Examples:** `skills/sdd-modify/examples/` - Detailed workflow examples
+- **Subagent Contract:** `agents/sdd-modify.md` - Programmatic API
+- **CLI Help:** `sdd parse-review --help`, `sdd apply-modifications --help`
+
+---
+
 ## Validation After Modification
 
 ### Understanding Validation Severity
