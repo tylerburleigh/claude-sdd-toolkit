@@ -13,6 +13,17 @@ from .spec import (
     update_node,
     extract_frontmatter,
 )
+
+# Spec modification operations (CRUD for spec hierarchy)
+from claude_skills.sdd_spec_mod.modification import (
+    add_node,
+    remove_node,
+    update_node_field,
+    move_node,
+    spec_transaction,
+    transactional_modify,
+    update_task_counts,
+)
 from .progress import recalculate_progress, update_parent_status, get_progress_summary, list_phases
 from .completion import check_spec_completion, should_prompt_completion, format_completion_prompt
 from .paths import (
@@ -152,6 +163,15 @@ __all__ = [
     "get_node",
     "update_node",
     "extract_frontmatter",
+
+    # Spec modification operations
+    "add_node",
+    "remove_node",
+    "update_node_field",
+    "move_node",
+    "spec_transaction",
+    "transactional_modify",
+    "update_task_counts",
 
     # Progress calculation
     "recalculate_progress",
