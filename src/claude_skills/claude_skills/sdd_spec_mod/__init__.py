@@ -16,12 +16,21 @@ from .modification import (
     transactional_modify,
 )
 
+from .revision import (
+    create_revision,
+    get_revision_history,
+    rollback_to_version,
+)
+
 __all__ = [
     "add_node",
-    "remove_node",
+    "create_revision",
+    "get_revision_history",
     "move_node",
-    "update_node_field",
-    "update_task_counts",
+    "remove_node",
+    "rollback_to_version",
     "spec_transaction",
     "transactional_modify",
+    "update_node_field",
+    "update_task_counts",
 ]
