@@ -47,7 +47,7 @@ from claude_skills.sdd_update.query import (
 )
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
-from claude_skills.sdd_spec_mod.task_operations import add_task
+from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
 
 
 def cmd_execute_verify(args, printer):
@@ -415,6 +415,54 @@ def cmd_add_task(args, printer):
 
     except ValueError as e:
         printer.error(f"Failed to add task: {e}")
+        return 1
+
+
+def cmd_remove_task(args, printer):
+    """Remove a task from the spec hierarchy."""
+    printer.action(f"Removing task {args.task_id}...")
+
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        printer.error("Specs directory not found")
+        return 1
+
+    # Load spec
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    if not spec_data:
+        printer.error(f"Could not load spec: {args.spec_id}")
+        return 1
+
+    # Remove task
+    try:
+        result = remove_task(
+            spec_data=spec_data,
+            task_id=args.task_id,
+            cascade=args.cascade if hasattr(args, 'cascade') and args.cascade else False
+        )
+
+        if args.dry_run:
+            printer.info("[DRY RUN] Would remove task:")
+            printer.detail(f"  ID: {result['task_id']}")
+            printer.detail(f"  Title: {result['task_title']}")
+            printer.detail(f"  Removed count: {result['removed_count']}")
+            return 0
+
+        # Save spec
+        save_json_spec(args.spec_id, specs_dir, spec_data)
+
+        printer.success(result['message'])
+        if result['removed_count'] > 1:
+            printer.info(f"Removed {result['removed_count']} task(s) total (including children)")
+
+        # If JSON output requested, print structured data
+        if getattr(args, 'json', False):
+            print(json.dumps(result, indent=2))
+
+        return 0
+
+    except ValueError as e:
+        printer.error(f"Failed to remove task: {e}")
         return 1
 
 
@@ -1332,6 +1380,14 @@ def register_update(subparsers, parent_parser):
     p_add_task.add_argument("--position", type=int, help="Position in parent's children list (0-based)")
     p_add_task.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
     p_add_task.set_defaults(func=cmd_add_task)
+
+    # remove-task command
+    p_remove_task = subparsers.add_parser("remove-task", help="Remove a task from the spec hierarchy", parents=[parent_parser])
+    p_remove_task.add_argument("spec_id", help="Specification ID")
+    p_remove_task.add_argument("task_id", help="Task ID to remove")
+    p_remove_task.add_argument("--cascade", action="store_true", help="Also remove all child tasks recursively")
+    p_remove_task.add_argument("--dry-run", action="store_true", help="Preview changes without saving")
+    p_remove_task.set_defaults(func=cmd_remove_task)
 
     # bulk-journal command
     p_bulk_journal = subparsers.add_parser("bulk-journal", help="Bulk journal completed tasks", parents=[parent_parser])

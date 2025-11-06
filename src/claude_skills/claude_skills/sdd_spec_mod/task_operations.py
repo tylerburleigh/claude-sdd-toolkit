@@ -180,3 +180,116 @@ def _propagate_task_count_increase(hierarchy: Dict[str, Any], node_id: str, incr
     parent_id = node.get("parent")
     if parent_id:
         _propagate_task_count_increase(hierarchy, parent_id, increase)
+
+
+def remove_task(
+    spec_data: Dict[str, Any],
+    task_id: str,
+    cascade: bool = False
+) -> Dict[str, Any]:
+    """
+    Remove a task from the spec hierarchy.
+
+    Args:
+        spec_data: The full spec data dictionary (modified in-place)
+        task_id: Task ID to remove
+        cascade: If True, also remove all child tasks recursively
+
+    Returns:
+        Dict with success status and details:
+        {
+            "success": True,
+            "task_id": "task-3-5",
+            "message": "Removed task: <title>",
+            "removed_count": 1
+        }
+
+    Raises:
+        ValueError: If spec data is invalid, task not found, or has children without cascade
+    """
+    # Validate spec structure
+    if not isinstance(spec_data, dict):
+        raise ValueError("spec_data must be a dictionary")
+
+    if "hierarchy" not in spec_data:
+        raise ValueError("spec_data must have 'hierarchy' key")
+
+    hierarchy = spec_data["hierarchy"]
+
+    # Find task in hierarchy
+    if task_id not in hierarchy:
+        raise ValueError(f"Task '{task_id}' not found in spec hierarchy")
+
+    task_node = hierarchy[task_id]
+    task_title = task_node.get("title", "Untitled")
+
+    # Check for children
+    children = task_node.get("children", [])
+    if children and not cascade:
+        raise ValueError(
+            f"Task '{task_id}' has {len(children)} child task(s). "
+            f"Use --cascade to remove task and all children, or remove children first."
+        )
+
+    # Remove children recursively if cascade=True
+    removed_count = 0
+    if cascade and children:
+        for child_id in list(children):  # Copy list to avoid modification during iteration
+            result = remove_task(spec_data, child_id, cascade=True)
+            removed_count += result["removed_count"]
+
+    # Remove task from parent's children list
+    parent_id = task_node.get("parent")
+    if parent_id and parent_id in hierarchy:
+        parent_node = hierarchy[parent_id]
+        parent_children = parent_node.get("children", [])
+        if task_id in parent_children:
+            parent_children.remove(task_id)
+
+    # Get task count before removal (for propagation)
+    task_total = task_node.get("total_tasks", 1)
+
+    # Remove task from hierarchy
+    del hierarchy[task_id]
+    removed_count += 1
+
+    # Propagate task count decrease up the hierarchy
+    if parent_id:
+        _propagate_task_count_decrease(hierarchy, parent_id, task_total)
+
+    return {
+        "success": True,
+        "task_id": task_id,
+        "task_title": task_title,
+        "message": f"Removed task: {task_title}",
+        "removed_count": removed_count
+    }
+
+
+def _propagate_task_count_decrease(hierarchy: Dict[str, Any], node_id: str, decrease: int = 1):
+    """
+    Propagate task count decrease up the hierarchy.
+
+    Args:
+        hierarchy: Spec hierarchy
+        node_id: Starting node ID
+        decrease: Amount to decrease (default: 1)
+    """
+    if node_id not in hierarchy:
+        return
+
+    node = hierarchy[node_id]
+
+    # Decrease total_tasks for this node
+    current_total = node.get("total_tasks", 0)
+    node["total_tasks"] = max(0, current_total - decrease)
+
+    # Also decrease completed_tasks proportionally if needed
+    current_completed = node.get("completed_tasks", 0)
+    if current_completed > node["total_tasks"]:
+        node["completed_tasks"] = node["total_tasks"]
+
+    # Propagate to parent
+    parent_id = node.get("parent")
+    if parent_id:
+        _propagate_task_count_decrease(hierarchy, parent_id, decrease)
