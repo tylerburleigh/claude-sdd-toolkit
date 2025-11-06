@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 11:39:45
+**Generated:** 2025-11-06 11:43:22
 
 ---
 
@@ -15272,7 +15272,7 @@ Returns:
     Each entry contains:
     {
         "version": "X.Y",
-        "timestamp": "ISO 8601 timestamp",
+        "date": "ISO 8601 timestamp",
         "modified_by": "identifier",
         "changelog": "description of changes"
     }
