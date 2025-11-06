@@ -23,12 +23,17 @@ from .revision import (
     rollback_to_version,
 )
 
+from .review_parser import (
+    parse_review_report,
+)
+
 __all__ = [
     "add_node",
     "apply_modifications",
     "create_revision",
     "get_revision_history",
     "move_node",
+    "parse_review_report",
     "remove_node",
     "rollback_to_version",
     "spec_transaction",
