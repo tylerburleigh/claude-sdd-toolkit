@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-06T23:54:06.276223Z",
+  "last_updated": "2025-11-06T23:57:00.434093Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 27,
+    "progress_percentage": 29,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 24,
+      "completed_tasks": 26,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 10,
+      "completed_tasks": 12,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -704,7 +704,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 10,
+      "completed_tasks": 12,
       "metadata": {}
     },
     "task-2-1": {
@@ -975,7 +975,7 @@
     "task-2-4": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_update/cli.py (check-deps)",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-4-1",
@@ -990,7 +990,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
         "task_category": "implementation",
@@ -1046,7 +1046,7 @@
     "task-2-4-3": {
       "type": "subtask",
       "title": "Add --format json flag for machine-readable output",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-4",
       "children": [],
       "dependencies": {
@@ -1055,15 +1055,19 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "completed_at": "2025-11-06T23:55:08.067511Z",
+        "needs_journaling": false,
+        "status_note": "JSON output already implemented via --json flag from parent_parser",
+        "journaled_at": "2025-11-06T23:55:15.117529Z"
       }
     },
     "task-2-5": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/cli_utils.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-5-1",
@@ -1075,7 +1079,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/cli_utils.py",
         "task_category": "implementation",
@@ -1087,7 +1091,7 @@
     "task-2-5-1": {
       "type": "subtask",
       "title": "Create format_json_output() helper that strips ANSI codes",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-5",
       "children": [],
       "dependencies": {
@@ -1096,9 +1100,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-06T23:55:43.813242Z",
+        "completed_at": "2025-11-06T23:57:00.418116Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-06T23:57:00.429981Z"
       }
     },
     "task-2-5-2": {
@@ -3112,6 +3121,24 @@
       "content": "Successfully added status icons and color coding to the check-deps command for all-tasks view. Implementation includes:\n\n1. Enhanced _check_all_task_deps() function (lines 513-538) to use Rich Console for colored output\n2. Added status-specific color coding:\n   - \u2705 Ready tasks: Green ([bold green] headers, [green] task IDs)\n   - \ud83d\udeab Blocked tasks: Red ([bold red] headers, [red] task IDs)  \n   - \u26a0\ufe0f Soft dependencies: Yellow ([bold yellow] headers, [yellow] task IDs)\n3. Added emoji status indicators (\u2705, \ud83d\udeab, \u26a0\ufe0f) matching single-task view\n4. Used [dim] styling for dependency details to reduce visual clutter\n5. JSON output remains completely unchanged\n\nTesting performed:\n- check-deps without task ID: Shows all 25 tasks with proper color coding \u2705\n- Ready tasks list: Green color applied \u2705\n- Blocked tasks list: Red color applied with dimmed blocker info \u2705\n- Soft dependencies list: Yellow color applied \u2705\n- JSON output: Structure unchanged \u2705\n\nThe enhanced color coding makes it immediately clear which tasks are ready to work on (green), which are blocked (red), and which have soft dependencies (yellow). This visual enhancement significantly improves the UX when reviewing dependencies across all tasks.",
       "metadata": {},
       "task_id": "task-2-4-2"
+    },
+    {
+      "timestamp": "2025-11-06T23:55:15.117509Z",
+      "entry_type": "status_change",
+      "title": "task-2-4-3 already implemented",
+      "author": "claude-code",
+      "content": "The check-deps command already supports machine-readable JSON output via the --json flag inherited from parent_parser. Users can run 'sdd check-deps <spec-id> <task-id> --json' to get structured JSON output. The --compact flag is also available for more compact formatting. No additional implementation needed.",
+      "metadata": {},
+      "task_id": "task-2-4-3"
+    },
+    {
+      "timestamp": "2025-11-06T23:57:00.429969Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Create format_json_output() helper that strips ANSI codes",
+      "author": "claude-code",
+      "content": "Successfully created cli_utils.py module with ANSI code stripping functionality for JSON output. Implementation includes:\n\n1. Created new file: src/claude_skills/claude_skills/common/cli_utils.py (107 lines)\n2. Implemented strip_ansi_codes() function:\n   - Uses regex pattern to match and remove ANSI escape sequences\n   - Pattern: \\x1b\\[[0-9;]*[a-zA-Z] matches all standard ANSI codes\n   - Returns clean text suitable for JSON output\n3. Implemented format_json_output() helper function:\n   - Accepts data (dict/list), compact flag, and strip_ansi flag\n   - Recursively strips ANSI codes from all string values if enabled\n   - Provides both compact and pretty-printed JSON formatting\n   - Helper function _strip_ansi_recursive() handles nested structures\n4. Updated common/__init__.py to export new utilities:\n   - strip_ansi_codes for direct use\n   - format_json_with_ansi_stripping alias to avoid naming conflicts\n   - Added to __all__ list for proper API exposure\n\nTesting performed:\n- strip_ansi_codes('\\x1b[31mRed text\\x1b[0m') \u2192 'Red text' \u2705\n- format_json_output with nested dict containing ANSI codes \u2192 clean JSON output \u2705\n- Import from claude_skills.common works correctly \u2705\n\nThe module provides clean JSON output by removing terminal color codes (from Rich library) that would otherwise appear as escape sequences in JSON. This ensures machine-readable output is properly formatted.",
+      "metadata": {},
+      "task_id": "task-2-5-1"
     }
   ]
 }

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 18:52:53
+**Generated:** 2025-11-06 18:54:25
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 239
-- **Total Lines:** 84056
+- **Total Lines:** 84060
 - **Total Classes:** 338
 - **Total Functions:** 866
 - **Avg Complexity:** 5.79
@@ -10832,7 +10832,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:944`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:948`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -11077,7 +11077,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:873`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:877`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -11134,7 +11134,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:987`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:991`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -11185,7 +11185,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:852`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:856`
 **Complexity:** 5
 
 **Description:**
@@ -11200,7 +11200,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1027`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1031`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -11230,7 +11230,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:912`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:916`
 **Complexity:** 9
 
 **Description:**
@@ -11275,7 +11275,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:796`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:800`
 **Complexity:** 4
 
 **Description:**
@@ -11392,7 +11392,7 @@ Returns:
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:572`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:576`
 **Complexity:** 6
 
 **Description:**
@@ -11621,7 +11621,7 @@ Returns:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:597`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:601`
 ⚠️ **Complexity:** 24 (High)
 
 **Description:**
@@ -11673,7 +11673,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:539`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:543`
 **Complexity:** 7
 
 **Description:**
@@ -11867,7 +11867,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1090`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1094`
 **Complexity:** 10
 
 **Description:**
@@ -12131,7 +12131,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1063`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1067`
 **Complexity:** 7
 
 **Description:**
@@ -12146,7 +12146,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:815`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:819`
 **Complexity:** 10
 
 **Description:**
@@ -19876,7 +19876,7 @@ Args:
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1137`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1141`
 **Complexity:** 1
 
 **Description:**
