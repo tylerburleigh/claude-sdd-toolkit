@@ -1,0 +1,224 @@
+{
+  "description": "Example: Applying fidelity review feedback to both code and spec",
+  "scenario": "After completing Phase 2, ran fidelity review which identified deviations between spec and implementation. This example shows how to systematically address review feedback.",
+  "fidelity_review_command": "sdd fidelity-review user-auth-001 --phase phase-2 --output phase2-review.md",
+  "review_results": {
+    "verdict": "PARTIAL",
+    "agreement_rate": "66.7%",
+    "models_consulted": 3,
+    "issues": [
+      {
+        "severity": "CRITICAL",
+        "issue": "Missing JWT token expiration validation",
+        "details": "Task task-2-2 spec requires checking exp claim, but implementation doesn't validate token expiration",
+        "files": ["src/middleware/auth.ts:45-67"],
+        "consensus": true,
+        "agreeing_models": ["gemini", "codex", "cursor-agent"]
+      },
+      {
+        "severity": "WARNING",
+        "issue": "Test coverage below spec requirements",
+        "details": "Spec requires 80% coverage, actual is 65%",
+        "files": ["tests/auth.spec.ts"],
+        "consensus": true,
+        "agreeing_models": ["codex", "cursor-agent"]
+      },
+      {
+        "severity": "INFO",
+        "issue": "Consider adding rate limiting",
+        "details": "Not in spec, but recommended for production security",
+        "files": ["src/middleware/auth.ts"],
+        "consensus": false,
+        "agreeing_models": ["gemini"]
+      }
+    ],
+    "recommendations": [
+      "Add JWT expiration validation in auth middleware",
+      "Increase test coverage for edge cases (expired tokens, invalid signatures)",
+      "Consider documenting rate limiting as future Phase 3 work"
+    ]
+  },
+  "feedback_categorization": {
+    "code_fixes_required": [
+      {
+        "issue": "Missing JWT token expiration validation",
+        "action": "Add expiration check to auth middleware",
+        "priority": "CRITICAL",
+        "estimated_time": "30 minutes"
+      },
+      {
+        "issue": "Test coverage below requirements",
+        "action": "Add test cases for edge scenarios",
+        "priority": "WARNING",
+        "estimated_time": "2 hours"
+      }
+    },
+    "spec_updates_required": [],
+    "deferred_items": [
+      {
+        "issue": "Rate limiting suggestion",
+        "action": "Create Phase 3 task for rate limiting",
+        "rationale": "Beyond scope of authentication, separate security concern"
+      }
+    ]
+  },
+  "implementation_fixes": {
+    "fix_1_jwt_expiration": {
+      "file": "src/middleware/auth.ts",
+      "before": "function verifyToken(token: string): User {\n  const payload = jwt.verify(token, SECRET_KEY);\n  return payload.user;\n}",
+      "after": "function verifyToken(token: string): User {\n  const payload = jwt.verify(token, SECRET_KEY);\n  \n  // Added per fidelity review: validate token expiration\n  if (payload.exp && Date.now() >= payload.exp * 1000) {\n    throw new Error('Token expired');\n  }\n  \n  return payload.user;\n}",
+      "journal_entry": {
+        "command": "Task(subagent_type: 'sdd-toolkit:sdd-update-subagent', prompt: 'Add journal entry to task task-2-2 in user-auth-001. Entry: Added JWT expiration validation based on fidelity review feedback. Review identified missing exp claim check required by spec. Implemented per RFC 7519 standard.', description: 'Document review fix')",
+        "content": "Added JWT expiration validation based on fidelity review feedback. Review identified missing exp claim check required by spec. Implemented per RFC 7519 standard."
+      }
+    },
+    "fix_2_test_coverage": {
+      "file": "tests/auth.spec.ts",
+      "added_tests": [
+        "test('should reject expired tokens')",
+        "test('should reject tokens with invalid signature')",
+        "test('should reject tokens with missing exp claim')",
+        "test('should handle token refresh correctly')"
+      ],
+      "coverage_before": "65%",
+      "coverage_after": "82%",
+      "journal_entry": {
+        "command": "Task(subagent_type: 'sdd-toolkit:sdd-update-subagent', prompt: 'Add journal entry to task task-2-3 in user-auth-001. Entry: Increased test coverage from 65% to 82% based on fidelity review. Added edge case tests for expired tokens, invalid signatures, missing claims, and token refresh. Now exceeds spec requirement of 80%.', description: 'Document test coverage fix')",
+        "content": "Increased test coverage from 65% to 82% based on fidelity review. Added edge case tests for expired tokens, invalid signatures, missing claims, and token refresh. Now exceeds spec requirement of 80%."
+      }
+    }
+  },
+  "spec_modifications": {
+    "add_phase_3_task": {
+      "reasoning": "Rate limiting suggested by review but out of scope for Phase 2. Create new task in future phase.",
+      "new_task": {
+        "id": "task-3-5",
+        "title": "Implement rate limiting for authentication endpoints",
+        "description": "Add rate limiting to prevent brute force attacks (deferred from Phase 2 review)",
+        "type": "task",
+        "status": "pending",
+        "dependencies": {
+          "blocked_by": ["task-3-1"]
+        },
+        "metadata": {
+          "file_path": "src/middleware/rateLimit.ts",
+          "estimated_hours": 3,
+          "task_category": "implementation",
+          "risk_notes": [
+            "Deferred from Phase 2 fidelity review",
+            "Recommendation from Gemini model",
+            "Important for production security"
+          ]
+        }
+      },
+      "journal_entry": {
+        "command": "Task(subagent_type: 'sdd-toolkit:sdd-update-subagent', prompt: 'Add journal entry to phase phase-3 in user-auth-001. Entry: Added task-3-5 for rate limiting based on Phase 2 fidelity review suggestion. While not required by original spec, this is important for production security. Deferred to Phase 3 to keep Phase 2 focused on core authentication.', description: 'Document new task')",
+        "content": "Added task-3-5 for rate limiting based on Phase 2 fidelity review suggestion. While not required by original spec, this is important for production security. Deferred to Phase 3 to keep Phase 2 focused on core authentication."
+      }
+    }
+  },
+  "re_review_workflow": {
+    "step_1": "Apply all code fixes",
+    "step_2": "Run tests to verify fixes",
+    "step_3": "Update spec with new tasks (if any)",
+    "step_4": "Validate spec changes",
+    "step_5": "Re-run fidelity review",
+    "command": "sdd fidelity-review user-auth-001 --phase phase-2 --output phase2-review-v2.md",
+    "expected_result": {
+      "verdict": "PASS",
+      "agreement_rate": "100%",
+      "issues": []
+    }
+  },
+  "iteration_tracking": {
+    "review_v1": {
+      "date": "2025-11-01",
+      "verdict": "PARTIAL",
+      "issues": 3,
+      "file": "phase2-review-v1.md"
+    },
+    "fixes_applied": {
+      "date": "2025-11-01",
+      "code_changes": 2,
+      "spec_changes": 1,
+      "time_spent": "2.5 hours"
+    },
+    "review_v2": {
+      "date": "2025-11-01",
+      "verdict": "PASS",
+      "issues": 0,
+      "file": "phase2-review-v2.md"
+    },
+    "journal_entry": {
+      "command": "Task(subagent_type: 'sdd-toolkit:sdd-update-subagent', prompt: 'Add journal entry to phase phase-2 in user-auth-001. Entry: Fidelity review iteration 2 complete. Addressed CRITICAL issue (JWT expiration) and WARNING issue (test coverage now 82%). Deferred INFO suggestion (rate limiting) to Phase 3 as task-3-5. Re-review verdict: PASS with 100% agreement.', description: 'Document review iteration')",
+      "content": "Fidelity review iteration 2 complete. Addressed CRITICAL issue (JWT expiration) and WARNING issue (test coverage now 82%). Deferred INFO suggestion (rate limiting) to Phase 3 as task-3-5. Re-review verdict: PASS with 100% agreement."
+    }
+  },
+  "key_workflow_steps": [
+    {
+      "step": 1,
+      "title": "Run initial fidelity review",
+      "commands": ["sdd fidelity-review spec-id --phase phase-id --output review-v1.md"]
+    },
+    {
+      "step": 2,
+      "title": "Categorize feedback",
+      "actions": ["Code fixes", "Spec updates", "Deferred items"]
+    },
+    {
+      "step": 3,
+      "title": "Apply code fixes",
+      "actions": ["Fix CRITICAL issues first", "Then WARNING issues", "Journal each fix"]
+    },
+    {
+      "step": 4,
+      "title": "Update spec if needed",
+      "actions": ["Add new tasks for deferred items", "Update existing task descriptions", "Validate spec"]
+    },
+    {
+      "step": 5,
+      "title": "Run tests",
+      "commands": ["npm test", "Verify coverage meets requirements"]
+    },
+    {
+      "step": 6,
+      "title": "Re-run fidelity review",
+      "commands": ["sdd fidelity-review spec-id --phase phase-id --output review-v2.md"]
+    },
+    {
+      "step": 7,
+      "title": "Compare results",
+      "commands": ["diff review-v1.md review-v2.md", "Verify PASS verdict"]
+    },
+    {
+      "step": 8,
+      "title": "Journal final status",
+      "actions": ["Document review iterations", "Note what was fixed vs deferred"]
+    }
+  ],
+  "best_practices": [
+    "Always fix CRITICAL issues before proceeding",
+    "Journal why each change was made",
+    "Re-run review after applying fixes to confirm",
+    "Defer out-of-scope suggestions to appropriate phase",
+    "Track review iterations in journal for audit trail",
+    "Include review reports in PR for transparency"
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Modifying spec to match code without fixing real issues",
+      "why_wrong": "Defeats purpose of fidelity review - lowering standards",
+      "correct_approach": "Fix code to match spec requirements, or document valid reasons for deviation"
+    },
+    {
+      "mistake": "Ignoring INFO-level suggestions without consideration",
+      "why_wrong": "May miss valuable improvements",
+      "correct_approach": "Evaluate each suggestion, document decision to defer or implement"
+    },
+    {
+      "mistake": "Skipping re-review after fixes",
+      "why_wrong": "Can't confirm issues were actually resolved",
+      "correct_approach": "Always re-run fidelity review to verify PASS verdict"
+    }
+  ]
+}
