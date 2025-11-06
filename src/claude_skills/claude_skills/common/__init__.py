@@ -45,6 +45,7 @@ from .paths import (
     generate_human_readable_readme_content
 )
 from .printer import PrettyPrinter
+from .ui_protocol import Ui, Message, MessageLevel
 from .validation import (
     EnhancedError,
     SpecValidationResult,
@@ -204,6 +205,9 @@ __all__ = [
 
     # Output formatting
     "PrettyPrinter",
+    "Ui",
+    "Message",
+    "MessageLevel",
 
     # Validation utilities
     "EnhancedError",
