@@ -630,3 +630,53 @@ class TestQueryTasksCLI:
             output_data = json.loads(result.stdout)
             assert len(output_data) == 0
         # If no output, that's also acceptable for empty results
+
+    def test_query_tasks_json_no_ansi_codes(self, tmp_path):
+        """Test that JSON output contains no ANSI escape codes."""
+        import re
+
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        # Create spec with tasks with different statuses that might trigger colored output
+        spec_data = {
+            "metadata": {
+                "title": "ANSI Test Query Tasks",
+                "version": "1.0.0"
+            },
+            "hierarchy": {
+                "task-1": {"type": "task", "title": "Completed Task", "status": "completed"},
+                "task-2": {"type": "task", "title": "In Progress Task", "status": "in_progress"},
+                "task-3": {"type": "task", "title": "Pending Task", "status": "pending"},
+                "task-4": {"type": "task", "title": "Blocked Task", "status": "blocked"}
+            }
+        }
+
+        (active_dir / "ansi-query-001.json").write_text(json.dumps(spec_data))
+
+        # Run query-tasks with JSON output
+        result = run_cli("query-tasks", "--path", str(specs_dir), "ansi-query-001", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # ANSI escape code pattern: ESC [ followed by parameters and a final byte
+        ansi_pattern = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
+
+        # Verify no ANSI codes in output
+        assert not ansi_pattern.search(result.stdout), \
+            "JSON output should not contain ANSI escape codes"
+
+        # Verify it's valid JSON (would fail if ANSI codes present)
+        output_data = json.loads(result.stdout)
+        assert isinstance(output_data, list)
+
+        # Verify no ANSI codes in any string values
+        for task_info in output_data:
+            for key, value in task_info.items():
+                if isinstance(value, str):
+                    assert not ansi_pattern.search(value), \
+                        f"Field '{key}' contains ANSI codes: {value}"

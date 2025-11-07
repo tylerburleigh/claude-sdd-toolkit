@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T00:15:47.460525Z",
+    "generated_at": "2025-11-07T00:31:02.875734Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 242,
-    "total_lines": 84895,
-    "total_classes": 342,
+    "total_lines": 85117,
+    "total_classes": 343,
     "total_functions": 871,
     "avg_complexity": 5.78,
     "max_complexity": 45,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 242,
-        "lines": 84895,
-        "classes": 342,
+        "lines": 85117,
+        "classes": 343,
         "functions": 871,
         "avg_complexity": 5.78
       }
@@ -4413,7 +4413,8 @@
       "language": "python",
       "docstring": "Integration tests for list commands with Rich table output.\n\nTests all list commands:\n- list-specs: List all specifications with Rich.Table\n- query-tasks: Query tasks with Rich.Table\n- list-phases: List phases with Rich.Table\n- check-deps: Show dependencies with Rich.Tree\n\nTests cover:\n- Text/Rich output format (default)\n- JSON output format (--format json)\n- Output correctness and structure\n- Empty result handling",
       "classes": [
-        "TestListSpecsCLI"
+        "TestListSpecsCLI",
+        "TestQueryTasksCLI"
       ],
       "functions": [
         "run_cli"
@@ -4427,7 +4428,7 @@
         "pathlib.Path"
       ],
       "exports": [],
-      "lines": 410
+      "lines": 632
     },
     {
       "name": "test_modify_validation",
@@ -15366,6 +15367,28 @@
         "test_list_specs_verbose_output",
         "test_list_specs_multiple_specs",
         "test_list_specs_json_no_ansi_codes"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestQueryTasksCLI",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+      "line": 414,
+      "language": "python",
+      "docstring": "Tests for query-tasks command with Rich table output.",
+      "bases": [],
+      "methods": [
+        "test_query_tasks_help",
+        "test_query_tasks_text_output",
+        "test_query_tasks_json_output",
+        "test_query_tasks_filter_by_status",
+        "test_query_tasks_filter_by_type",
+        "test_query_tasks_filter_by_parent",
+        "test_query_tasks_empty_result"
       ],
       "properties": [],
       "is_exported": false,
@@ -113243,6 +113266,48 @@
           "call_type": "function_call"
         },
         {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_check_tools_basic",
           "file": "src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py",
           "line": 40,
@@ -114349,7 +114414,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -114423,6 +114488,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -115502,7 +115609,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -115576,6 +115683,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -116685,7 +116834,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -116759,6 +116908,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -117838,7 +118029,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -117912,6 +118103,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -118991,7 +119224,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -119065,6 +119298,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -120174,7 +120449,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -120248,6 +120523,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -121321,7 +121638,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "spec_with_issues",
@@ -121860,6 +122177,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -122969,7 +123328,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "run_cli",
@@ -123043,6 +123402,48 @@
           "name": "test_list_specs_json_no_ansi_codes",
           "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
           "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_help",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 419,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_text_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 459,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_json_output",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 497,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_status",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 532,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_type",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 561,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_filter_by_parent",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 592,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_query_tasks_empty_result",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_list_commands.py",
+          "line": 622,
           "call_type": "function_call"
         },
         {
@@ -124146,7 +124547,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 184
+      "call_count": 191
     },
     {
       "name": "spec_with_all_categories",

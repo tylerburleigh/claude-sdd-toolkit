@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T00:17:35.900418Z",
+  "last_updated": "2025-11-07T00:33:33.048349Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 34,
+    "progress_percentage": 35,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 30,
+      "completed_tasks": 31,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -704,7 +704,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {}
     },
     "task-2-1": {
@@ -1156,7 +1156,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "file_path": "tests/integration/test_list_commands.py",
         "task_category": "implementation",
@@ -1234,7 +1234,7 @@
     "task-2-6-4": {
       "type": "subtask",
       "title": "Test query-tasks JSON output",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-6",
       "children": [],
       "dependencies": {
@@ -1243,9 +1243,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-07T00:31:25.600097Z",
+        "completed_at": "2025-11-07T00:33:33.031655Z",
+        "needs_journaling": false,
+        "actual_hours": 0.035,
+        "journaled_at": "2025-11-07T00:33:33.043190Z"
       }
     },
     "task-2-6-5": {
@@ -3195,6 +3200,15 @@
       "content": "Successfully created comprehensive integration tests for query-tasks command with Rich table output. Added 7 tests to test_list_commands.py covering:\n\n- Help text display\n- Text/Rich table output (default format)\n- JSON output format with task data\n- Status filtering (pending/in_progress/completed)\n- Type filtering (task/verify/phase)\n- Parent filtering (tasks within specific phases)\n- Empty result handling (no matches)\n\nAll 7 tests pass. Tests verify Rich table rendering, JSON output, and various filtering options work correctly. The test suite provides comprehensive coverage for query-tasks functionality including edge cases and command-line filtering options.",
       "metadata": {},
       "task_id": "task-2-6-3"
+    },
+    {
+      "timestamp": "2025-11-07T00:33:33.043174Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Test query-tasks JSON output",
+      "author": "claude-code",
+      "content": "Successfully added test_query_tasks_json_no_ansi_codes test to test_list_commands.py. The test verifies that query-tasks command with --format json flag produces valid JSON output without ANSI escape codes. Test creates a spec with tasks in different statuses (completed, in_progress, pending, blocked) and validates: 1) No ANSI codes in raw output, 2) Output is valid parseable JSON, 3) No ANSI codes in any string field values. All 17 tests in the file pass including the new test.",
+      "metadata": {},
+      "task_id": "task-2-6-4"
     }
   ]
 }

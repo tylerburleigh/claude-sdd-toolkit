@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:15:47
+**Generated:** 2025-11-06 19:31:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 242
-- **Total Lines:** 84895
-- **Total Classes:** 342
+- **Total Lines:** 85117
+- **Total Classes:** 343
 - **Total Functions:** 871
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
@@ -5288,6 +5288,25 @@ Attributes:
 - `test_query_by_type_phase()`
 - `test_query_by_parent()`
 - `test_query_invalid_spec_id()`
+
+---
+
+### `TestQueryTasksCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:414`
+
+**Description:**
+> Tests for query-tasks command with Rich table output.
+
+**Methods:**
+- `test_query_tasks_help()`
+- `test_query_tasks_text_output()`
+- `test_query_tasks_json_output()`
+- `test_query_tasks_filter_by_status()`
+- `test_query_tasks_filter_by_type()`
+- `test_query_tasks_filter_by_parent()`
+- `test_query_tasks_empty_result()`
 
 ---
 
