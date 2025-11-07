@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 10:28:10
+**Generated:** 2025-11-07 10:32:38
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 245
-- **Total Lines:** 87532
+- **Total Lines:** 87561
 - **Total Classes:** 354
-- **Total Functions:** 888
+- **Total Functions:** 889
 - **Avg Complexity:** 5.81
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -13214,7 +13214,7 @@ Example:
 ### `create_blockers_panel(spec_data) -> Panel`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:159`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:188`
 **Complexity:** 9
 
 **Description:**
@@ -13368,7 +13368,7 @@ Returns:
 ### `create_phases_panel(spec_data) -> Panel`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:18`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:46`
 **Complexity:** 10
 
 **Description:**
@@ -13427,10 +13427,32 @@ Returns:
 
 ---
 
+### `create_progress_bar(percentage, width) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:18`
+**Complexity:** 3
+
+**Description:**
+> Create a visual progress bar using Unicode box characters.
+
+Args:
+    percentage: Progress percentage (0-100)
+    width: Width of progress bar in characters
+
+Returns:
+    Formatted progress bar string with color coding
+
+**Parameters:**
+- `percentage`: float
+- `width`: int
+
+---
+
 ### `create_progress_panel(spec_data) -> Panel`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:99`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:128`
 **Complexity:** 7
 
 **Description:**
@@ -13600,7 +13622,7 @@ Returns:
 ### `create_status_layout(spec_data) -> Layout`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:230`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:259`
 **Complexity:** 1
 
 **Description:**
@@ -18342,7 +18364,7 @@ Returns:
 ### `get_status_summary(spec_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:297`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:326`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -20282,7 +20304,7 @@ Args:
 ### `print_status_report(spec_data, title) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:275`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:304`
 **Complexity:** 2
 
 **Description:**
