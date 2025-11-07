@@ -45,6 +45,8 @@ from claude_skills.sdd_update.query import (
     phase_time,
     list_blockers,
 )
+from claude_skills.sdd_update.query_tasks import format_tasks_table
+from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
@@ -759,19 +761,31 @@ def cmd_query_tasks(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    # For simple format or JSON, don't pass printer (we'll handle output ourselves)
-    use_printer = not args.json and args.format != "simple"
+    # Use Rich.Table formatter for table format
+    if args.format == "table" and not args.json:
+        results = format_tasks_table(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            status=args.status,
+            task_type=args.type,
+            parent=args.parent,
+            printer=printer,
+            limit=args.limit
+        )
+    else:
+        # For simple format or JSON, use original query_tasks
+        use_printer = not args.json and args.format != "simple"
 
-    results = query_tasks(
-        spec_id=args.spec_id,
-        specs_dir=specs_dir,
-        status=args.status,
-        task_type=args.type,
-        parent=args.parent,
-        format_type=args.format,
-        printer=printer if use_printer else None,
-        limit=args.limit
-    )
+        results = query_tasks(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            status=args.status,
+            task_type=args.type,
+            parent=args.parent,
+            format_type=args.format,
+            printer=printer if use_printer else None,
+            limit=args.limit
+        )
 
     # Handle output for simple format
     if args.format == "simple" and results:
@@ -846,11 +860,20 @@ def cmd_list_phases(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    phases = list_phases(
-        spec_id=args.spec_id,
-        specs_dir=specs_dir,
-        printer=printer if not args.json else None
-    )
+    # Use Rich.Table formatter for table output
+    if not args.json:
+        phases = format_phases_table(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            printer=printer
+        )
+    else:
+        # Use original list_phases for JSON output
+        phases = list_phases(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            printer=None
+        )
 
     if args.json and phases:
         print(json.dumps(phases, indent=2))
@@ -1130,7 +1153,7 @@ def cmd_list_specs(args, printer):
     list_specs(
         status=args.status,
         specs_dir=specs_dir,
-        output_format="json" if args.json else "text",
+        output_format=getattr(args, 'format', 'text'),
         verbose=args.detailed,
         printer=printer,
     )
@@ -1530,6 +1553,12 @@ def register_update(subparsers, parent_parser):
         "--detailed",
         action="store_true",
         help="Show detailed information",
+    )
+    p_list_specs.add_argument(
+        "--format",
+        choices=["text", "json"],
+        default="text",
+        help="Output format (default: text)",
     )
     p_list_specs.set_defaults(func=cmd_list_specs)
 

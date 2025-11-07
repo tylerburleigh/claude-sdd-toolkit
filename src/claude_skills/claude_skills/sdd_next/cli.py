@@ -10,8 +10,11 @@ import json
 import sys
 import argparse
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 import os
+
+from rich.tree import Tree
+from rich.console import Console
 
 # Clean imports - no sys.path manipulation needed!
 
@@ -386,6 +389,65 @@ def cmd_task_info(args, printer):
     return 0
 
 
+def _build_dependency_tree(deps: Dict[str, Any], task_id: str) -> Tree:
+    """
+    Build a Rich Tree visualization for task dependencies.
+
+    Args:
+        deps: Dependency information dictionary from check_dependencies()
+        task_id: The task ID being analyzed
+
+    Returns:
+        Rich Tree object representing the dependency structure
+    """
+    # Create root node with task information
+    can_start_indicator = "✅" if deps.get('can_start') else "🚫"
+    root = Tree(f"{can_start_indicator} [bold]{task_id}[/bold]")
+
+    # Add blocked_by dependencies (hard blockers)
+    if deps.get('blocked_by'):
+        blocked_branch = root.add("✗ [red bold]Blocked by[/red bold]")
+        for dep in deps['blocked_by']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            dep_status = dep.get('status', 'unknown')
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+            blocked_branch.add(f"[red]{dep_id}[/red]: {dep_title} [dim]({dep_status})[/dim]")
+
+    # Add soft dependencies (recommended pre-work)
+    if deps.get('soft_depends'):
+        soft_branch = root.add("⚠️  [yellow bold]Soft dependencies[/yellow bold]")
+        for dep in deps['soft_depends']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            dep_status = dep.get('status', 'unknown')
+            # Show checkmark if completed
+            status_mark = "✓" if dep_status == 'completed' else "○"
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+            soft_branch.add(f"{status_mark} [yellow]{dep_id}[/yellow]: {dep_title} [dim]({dep_status})[/dim]")
+
+    # Add blocks (tasks blocked by this one)
+    if deps.get('blocks'):
+        blocks_branch = root.add("⏳ [blue bold]This task blocks[/blue bold]")
+        for dep in deps['blocks']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+            blocks_branch.add(f"[blue]{dep_id}[/blue]: {dep_title}")
+
+    # If no dependencies at all, add a note
+    if not deps.get('blocked_by') and not deps.get('soft_depends') and not deps.get('blocks'):
+        root.add("[dim]No dependencies[/dim]")
+
+    return root
+
+
 def cmd_check_deps(args, printer):
     """Check task dependencies."""
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
@@ -415,25 +477,12 @@ def cmd_check_deps(args, printer):
         print_json_output(deps, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
-        printer.result("Task ID", deps['task_id'])
-        can_start = "Yes" if deps['can_start'] else "No"
-        printer.result("Can start", can_start)
+        print()  # Blank line for spacing
 
-        if deps['blocked_by']:
-            print("\n✗ Blocked by:")
-            for dep in deps['blocked_by']:
-                printer.detail(f"• {dep['id']}: {dep['title']} ({dep['status']})", indent=1)
-
-        if deps['soft_depends']:
-            print("\n⚠️  Soft dependencies:")
-            for dep in deps['soft_depends']:
-                status_mark = "✓" if dep['status'] == 'completed' else "○"
-                printer.detail(f"{status_mark} {dep['id']}: {dep['title']} ({dep['status']})", indent=1)
-
-        if deps['blocks']:
-            print("\n⏳ This task blocks:")
-            for dep in deps['blocks']:
-                printer.detail(f"• {dep['id']}: {dep['title']}", indent=1)
+        # Build and render the dependency tree
+        tree = _build_dependency_tree(deps, args.task_id)
+        console = Console()
+        console.print(tree)
 
     return 0
 
@@ -466,23 +515,27 @@ def _check_all_task_deps(spec_data, args, printer):
         printer.result("Ready to start", str(len(ready)))
         printer.result("Blocked", str(len(blocked)))
         printer.result("With soft dependencies", str(len(has_soft_deps)))
+        print()  # Blank line for spacing
+
+        # Use Rich Console for colored output
+        console = Console()
 
         if ready:
-            print("\n✓ Ready to start:")
+            console.print("\n✅ [bold green]Ready to start:[/bold green]")
             for dep in ready:
-                printer.detail(f"• {dep['task_id']}", indent=1)
+                console.print(f"  • [green]{dep['task_id']}[/green]")
 
         if blocked:
-            print("\n✗ Blocked:")
+            console.print("\n🚫 [bold red]Blocked:[/bold red]")
             for dep in blocked:
                 blockers = ", ".join([b['id'] for b in dep['blocked_by']])
-                printer.detail(f"• {dep['task_id']} (blocked by: {blockers})", indent=1)
+                console.print(f"  • [red]{dep['task_id']}[/red] [dim](blocked by: {blockers})[/dim]")
 
         if has_soft_deps:
-            print("\n⚠️  With soft dependencies:")
+            console.print("\n⚠️  [bold yellow]With soft dependencies:[/bold yellow]")
             for dep in has_soft_deps:
                 soft = ", ".join([s['id'] for s in dep['soft_depends']])
-                printer.detail(f"• {dep['task_id']} (depends on: {soft})", indent=1)
+                console.print(f"  • [yellow]{dep['task_id']}[/yellow] [dim](depends on: {soft})[/dim]")
 
     return 0
 

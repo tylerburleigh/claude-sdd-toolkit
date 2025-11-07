@@ -111,33 +111,33 @@ Then provide the spec ID and review scope when prompted.
 ### Available sdd Commands for Fidelity Review
 
 **Task-Level Review:**
-- `sdd task-info {spec-id} {task-id} --json` - Get complete task details (requirements, files, metadata)
-- `sdd get-task {spec-id} {task-id} --json` - Alternative task query interface
-- `sdd check-deps {spec-id} {task-id} --json` - Check task dependencies status
-- `sdd get-journal {spec-id} {task-id} --json` - Get journal entries for task
+- `sdd task-info {spec-id} {task-id}` - Get complete task details (requirements, files, metadata)
+- `sdd get-task {spec-id} {task-id}` - Alternative task query interface
+- `sdd check-deps {spec-id} {task-id}` - Check task dependencies status
+- `sdd get-journal {spec-id} {task-id}` - Get journal entries for task
 
 **Phase-Level Review:**
-- `sdd list-phases {spec-id} --json` - List all phases with completion status
-- `sdd query-tasks {spec-id} --parent {phase-id} --json` - Get all tasks in phase
-- `sdd query-tasks {spec-id} --status completed --parent {phase-id} --json` - Get completed tasks only
+- `sdd list-phases {spec-id}` - List all phases with completion status
+- `sdd query-tasks {spec-id} --parent {phase-id}` - Get all tasks in phase
+- `sdd query-tasks {spec-id} --status completed --parent {phase-id}` - Get completed tasks only
 
 **Spec-Level Review:**
-- `sdd progress {spec-id} --json` - Overall spec progress summary
-- `sdd query-tasks {spec-id} --status completed --json` - All completed tasks
-- `sdd list-blockers {spec-id} --json` - Current blockers (useful for identifying incomplete work)
+- `sdd progress {spec-id}` - Overall spec progress summary
+- `sdd query-tasks {spec-id} --status completed` - All completed tasks
+- `sdd list-blockers {spec-id}` - Current blockers (useful for identifying incomplete work)
 
 **Verification Review:**
-- `sdd query-tasks {spec-id} --type verify --json` - Find all verification tasks
+- `sdd query-tasks {spec-id} --type verify` - Find all verification tasks
 
 ### Command Usage Pattern
 
-Always use `--json` flag for structured output that's easy to parse:
+Commands return structured output that's easy to parse:
 
 ```bash
 # Get task details
-sdd task-info user-auth-001 task-2-3 --json
+sdd task-info user-auth-001 task-2-3
 
-# Returns structured JSON:
+# Returns structured output:
 {
   "id": "task-2-3",
   "title": "Implement JWT middleware",
@@ -162,19 +162,19 @@ sdd task-info user-auth-001 task-2-3 --json
 **Example - Phase Review (Correct):**
 ```bash
 # First call: Get phase info
-sdd list-phases spec-id --json
+sdd list-phases spec-id
 
 # Second call: Get tasks in phase
-sdd query-tasks spec-id --parent phase-3 --json
+sdd query-tasks spec-id --parent phase-3
 
 # Third call: Get specific task details
-sdd task-info spec-id task-3-1 --json
+sdd task-info spec-id task-3-1
 
 # Fourth call: Get journal for that task
-sdd get-journal spec-id task-3-1 --json
+sdd get-journal spec-id task-3-1
 
 # Fifth call: Next task
-sdd task-info spec-id task-3-2 --json
+sdd task-info spec-id task-3-2
 # ... and so on
 ```
 
@@ -193,73 +193,158 @@ sdd task-info spec-id task-3-2 --json
 
 ## Workflow
 
+The fidelity review process follows five phases to systematically compare implementation against specification.
+
 ### Phase 1: Load Specification
 
 **1. Validate inputs:**
-   - Check required information is provided
-   - Validate spec_id exists:
+   - Check required information is provided (spec_id, phase_id or task_id)
+   - Validate spec exists:
      ```bash
-     sdd find-specs --verbose --json
+     sdd find-specs --verbose
      ```
+   - Verify phase/task exists in spec (from output)
 
 **2. Load spec metadata based on review scope:**
 
 **For Task Review:**
 ```bash
 # Get complete task details
-sdd task-info {spec-id} {task-id} --json
+sdd task-info {spec-id} {task-id}
 
 # Get journal entries to check for documented deviations
-sdd get-journal {spec-id} {task-id} --json
+sdd get-journal {spec-id} {task-id}
 
 # Check dependencies (useful for impact assessment)
-sdd check-deps {spec-id} {task-id} --json
+sdd check-deps {spec-id} {task-id}
 ```
 
 **For Phase Review:**
 ```bash
 # Get phase metadata
-sdd list-phases {spec-id} --json
+sdd list-phases {spec-id}
 
 # Get all completed tasks in the phase
-sdd query-tasks {spec-id} --status completed --parent {phase-id} --json
+sdd query-tasks {spec-id} --status completed --parent {phase-id}
 
-# For each task, get detailed info:
-sdd task-info {spec-id} {task-id} --json
-sdd get-journal {spec-id} {task-id} --json
+# For each task in the phase, get detailed info (run individually, NOT in loops):
+sdd task-info {spec-id} task-1-1
+sdd get-journal {spec-id} task-1-1
+sdd task-info {spec-id} task-1-2
+sdd get-journal {spec-id} task-1-2
+# ... continue for each task
 ```
 
-**3. Extract requirements from JSON output:**
-   - Parse the JSON response from sdd commands
-   - Extract from task-info: `acceptance_criteria`, `files`, `dependencies`, `verification_steps`
-   - Extract from get-journal: Documented deviations and decisions
-   - **NEVER read the spec file directly with Read() or cat**
+**3. Extract requirements from command output:**
+   - Parse the structured output from each `sdd` command
+   - Extract from task-info: `acceptance_criteria`, `files`, `dependencies`, `verification_steps`, `requirements`
+   - Extract from get-journal: Documented deviations, design decisions, and rationale
+   - **NEVER read the spec file directly with Read() tool or bash commands (cat, jq, etc.)**
+   - All spec data must come through `sdd` CLI commands
 
 ### Phase 2: Analyze Implementation
-1. **Identify files** from task metadata (extracted from `sdd task-info` JSON output)
-2. **Read implementation code** using Read tool for each file
-3. **Compare against spec requirements** from task-info output
+
+**1. Identify implementation files:**
+   - Extract file paths from task metadata (`files` field in task-info JSON)
+   - List files specified in acceptance criteria
+   - Note any additional files mentioned in journal entries
+   - Cross-reference with spec file paths
+
+**2. Read implementation code:**
+   - Use Read tool for each identified file
+   - Capture actual code structure, functions, classes
+   - Note implementation patterns and approaches
+   - Document code organization
+
+**3. Compare against specification:**
+   - **Requirements vs Implementation:** Does code fulfill stated requirements?
+   - **Acceptance criteria vs Functionality:** Are all acceptance criteria met?
+   - **Planned approach vs Actual approach:** Did implementation follow the specified pattern?
+   - **Verification steps vs Testing:** Are verification steps addressed?
+   - **Dependencies:** Are required dependencies properly handled?
 
 ### Phase 3: Identify Deviations
-1. Categorize findings:
-   - ✅ Exact match
-   - ⚠️ Minor deviation
-   - ❌ Major deviation
-   - 🚫 Missing functionality
-2. Assess impact on other tasks
-3. Document deviations
+
+**1. Categorize findings:**
+
+   - ✅ **Exact match:** Implementation precisely matches specification requirements
+     - All acceptance criteria met exactly as specified
+     - Planned approach followed
+     - No functional differences
+
+   - ⚠️ **Minor deviation:** Small differences with no functional impact
+     - Different variable/function names (but consistent with codebase style)
+     - Minor refactoring for code quality (e.g., extracted helper functions)
+     - Improved error messages beyond spec
+     - Additional logging, comments, or documentation
+     - Equivalent implementation using different but acceptable approach
+
+   - ❌ **Major deviation:** Significant differences affecting functionality or architecture
+     - Different API signatures than specified
+     - Missing required features from acceptance criteria
+     - Different data structures or algorithms
+     - Changed control flow or business logic
+     - Architectural changes from plan
+
+   - 🚫 **Missing functionality:** Specified features not implemented
+     - Required functions/classes missing
+     - Incomplete implementation of acceptance criteria
+     - Skipped verification steps
+     - Unimplemented requirements
+
+**2. Assess impact of each deviation:**
+   - **Task-level impact:** Does deviation affect task completion?
+   - **Phase-level impact:** Does it affect other tasks in the phase?
+   - **Spec-level impact:** Does it impact dependencies in other phases?
+   - **Functional equivalence:** Is the different approach functionally equivalent or better?
+   - **Technical debt:** Does deviation introduce maintenance concerns?
+
+**3. Document deviations systematically:**
+   - **What was specified:** Quote from spec requirements/acceptance criteria
+   - **What was actually implemented:** Description of actual code
+   - **Rationale:** Check journal entries for documented reasoning
+   - **Impact assessment:** Low/Medium/High impact classification
+   - **Recommendation:** Accept, document retroactively, or fix
 
 ### Phase 4: Generate Report
-Create structured report with:
-- Summary and fidelity score
-- Detailed findings per task
-- Recommendations
-- Journal analysis
+
+Create a comprehensive fidelity report following the standard structure (see "Report Structure" section below).
+
+**Report must include:**
+- Executive summary with overall fidelity score
+- Detailed per-task analysis
+- Categorized deviations with impact assessment
+- Recommendations for addressing findings
+- Journal analysis (documented vs undocumented deviations)
+
+**Fidelity scoring:**
+- Calculate percentage based on: (Exact matches + Minor deviations) / Total tasks reviewed
+- Flag major deviations and missing functionality prominently
+- Consider functional equivalence in scoring
 
 ### Phase 5: Update Spec (if needed)
-- Recommend journal entries for undocumented deviations
-- Suggest spec updates if needed
-- Flag items for follow-up
+
+Based on review findings, provide recommendations for spec updates:
+
+**1. Recommend journal entries for undocumented deviations:**
+   - Identify deviations found in code but not in journal
+   - Suggest adding retroactive journal entries with rationale
+   - Document the deviation reasoning for future reference
+   - Template: "Journal entry recommended for task-X-Y: Implemented using [approach] instead of [specified approach] because [reason]"
+
+**2. Suggest spec updates if plan assumptions were incorrect:**
+   - If original plan was based on faulty assumptions
+   - If a better approach was discovered during implementation
+   - If requirements changed mid-implementation
+   - Recommend updating spec to match reality (with proper documentation)
+
+**3. Flag items for follow-up:**
+   - Major deviations requiring further discussion
+   - Missing functionality that needs implementation
+   - Technical debt introduced by deviations
+   - Impacts on future phases or dependent tasks
+
+**Note:** This skill generates recommendations only. Actual spec modifications are handled by `sdd-modify-subagent` through the `sdd-next` orchestration workflow.
 
 ## Report Structure
 
@@ -321,16 +406,51 @@ Create structured report with:
 
 ### When to Invoke
 
-1. **After task completion** - Optional verification step
-2. **Phase completion** - Review entire phase before next phase
-3. **Spec completion** - Final audit before PR creation
-4. **PR review** - Automated or manual PR compliance checks
+Fidelity reviews can be triggered at multiple points in the development workflow:
+
+**1. After task completion (Optional verification):**
+   - Optional verification step for critical tasks
+   - Ensures task acceptance criteria fully met
+   - Particularly useful for high-risk tasks (auth, data handling, API contracts)
+   - Can be automated via verification task metadata
+
+**2. Phase completion (Recommended):**
+   - Review entire phase before moving to next phase
+   - Catch drift early before it compounds
+   - Best practice: Use at phase boundaries
+   - Prevents accumulated technical debt
+
+**3. Spec completion (Pre-PR audit):**
+   - Final comprehensive audit before PR creation
+   - Run phase-by-phase reviews for better quality
+   - Ensures PR matches spec intent
+   - Documents any deviations for PR description
+
+**4. PR review (Automated compliance):**
+   - Automated or manual PR compliance checks
+   - Verify changes align with original specification
+   - Useful for reviewer context and validation
 
 ### Handoff to Other Skills
 
-- **To sdd-update:** Document deviations in journal
-- **From sdd-next:** Triggered during verification tasks
-- **To run-tests:** Verify functional correctness after finding deviations
+**From sdd-next:**
+- Triggered automatically during verification tasks
+- Verification task metadata specifies: `"agent": "sdd-fidelity-review"`
+- sdd-next passes context: spec_id, scope, and target
+
+**To sdd-update:**
+- Document undocumented deviations in journal retroactively
+- Add rationale for implementation choices
+- Pattern: Review identifies deviation → Recommend journal entry → sdd-update adds it
+
+**To run-tests:**
+- After finding deviations, verify functional correctness with tests
+- Ensure different approach still meets requirements
+- Pattern: Review finds major deviation → run-tests validates functionality
+
+**To sdd-modify:**
+- Via sdd-next orchestration (not directly)
+- Pattern: Review recommends spec updates → sdd-next presents options → User approves → sdd-modify applies changes
 
 ### Spec Modification Handoff
 

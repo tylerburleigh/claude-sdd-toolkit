@@ -154,11 +154,10 @@ $ sdd validate my-spec
 Generate a detailed validation report with stats and dependency analysis.
 
 ```bash
-sdd report {spec-id} [--format {markdown,json}] [--output <path>]
+sdd report {spec-id} [--output <path>]
 ```
 
 **Flags:**
-- `--format` - Choose markdown (default) or json
 - `--output` - Output file path (use `-` for stdout)
 - `--bottleneck-threshold N` - Minimum tasks blocked to flag bottleneck (default: 3)
 
@@ -269,29 +268,6 @@ When error count stays the same for 2+ passes:
 **Rule:** If error count decreases each pass, keep going. If it plateaus, switch to manual.
 
 ## Advanced Usage
-
-### JSON Output for Automation
-
-```bash
-# Validate and parse results
-sdd validate {spec-id} | jq '.status'
-
-# Get statistics for dashboards
-sdd stats {spec-id} | jq '.progress'
-
-# Check dependency health
-sdd check-deps {spec-id} | jq '.cycles | length'
-```
-
-### CI/CD Integration
-
-```bash
-# Fail pipeline on errors (exit code 2)
-sdd validate {spec-id} || exit 1
-
-# Generate report for PR comments
-sdd report {spec-id} --format markdown --output validation-report.md
-```
 
 ### Global Flags
 

@@ -45,6 +45,19 @@ from .paths import (
     generate_human_readable_readme_content
 )
 from .printer import PrettyPrinter
+from .ui_protocol import Ui, Message, MessageLevel
+from .rich_ui import RichUi
+from .plain_ui import PlainUi
+from .ui_factory import (
+    create_ui,
+    create_ui_from_args,
+    is_tty_available,
+    is_ci_environment,
+    should_use_plain_ui,
+    get_backend_name,
+    format_backend_info,
+    ui,
+)
 from .validation import (
     EnhancedError,
     SpecValidationResult,
@@ -146,6 +159,13 @@ from .json_output import (
     CommandType,
 )
 
+# CLI utilities (ANSI stripping, JSON helpers, argparse decorators)
+from .cli_utils import (
+    strip_ansi_codes,
+    format_json_output as format_json_with_ansi_stripping,
+    add_format_flag,
+)
+
 # SDD configuration
 from .sdd_config import (
     load_sdd_config,
@@ -204,6 +224,19 @@ __all__ = [
 
     # Output formatting
     "PrettyPrinter",
+    "Ui",
+    "Message",
+    "MessageLevel",
+    "RichUi",
+    "PlainUi",
+    "create_ui",
+    "create_ui_from_args",
+    "is_tty_available",
+    "is_ci_environment",
+    "should_use_plain_ui",
+    "get_backend_name",
+    "format_backend_info",
+    "ui",
 
     # Validation utilities
     "EnhancedError",
@@ -285,6 +318,11 @@ __all__ = [
     "format_compact_output",
     "print_json_output",
     "CommandType",
+
+    # CLI utilities
+    "strip_ansi_codes",
+    "format_json_with_ansi_stripping",
+    "add_format_flag",
 
     # SDD configuration
     "load_sdd_config",

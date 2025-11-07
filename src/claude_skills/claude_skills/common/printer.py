@@ -1,14 +1,58 @@
 """
 Pretty printer utility for consistent console output across SDD tools.
+
+This module provides the PrettyPrinter class - a backward-compatible wrapper
+around the new Ui backend system. It maintains the original API while internally
+delegating to RichUi or PlainUi based on environment detection.
+
+Key Features:
+- 100% backward compatible with existing code
+- Automatically uses RichUi or PlainUi backend
+- All original methods preserved with identical signatures
+- No breaking changes to existing usage
+
+Migration Path:
+- Existing code continues to work unchanged
+- New code can use Ui protocol directly via create_ui()
+- PrettyPrinter wraps Ui for legacy compatibility
 """
 
 import sys
+from typing import Optional
+
+from .ui_factory import create_ui
+from .ui_protocol import Ui, MessageLevel
 
 
 class PrettyPrinter:
-    """Utility for consistent, pretty console output optimized for Claude Code."""
+    """
+    Utility for consistent, pretty console output optimized for Claude Code.
 
-    def __init__(self, use_color=True, verbose=False, quiet=False):
+    This class maintains backward compatibility with the original PrettyPrinter
+    implementation while internally delegating to the new Ui backend system.
+
+    The Ui backend (RichUi or PlainUi) is automatically selected based on:
+    - TTY availability (sys.stdout.isatty())
+    - CI environment detection
+    - Force flags or environment variables
+
+    All original methods are preserved with identical signatures, ensuring
+    100% backward compatibility with existing code.
+
+    Attributes:
+        use_color: Whether to use ANSI color codes (auto-disabled if not TTY)
+        verbose: Whether to show detailed info messages
+        quiet: Whether to suppress non-error output
+        _ui: Internal Ui backend (RichUi or PlainUi)
+    """
+
+    def __init__(
+        self,
+        use_color: bool = True,
+        verbose: bool = False,
+        quiet: bool = False,
+        _ui_backend: Optional[Ui] = None
+    ):
         """
         Initialize the pretty printer.
 
@@ -16,69 +60,209 @@ class PrettyPrinter:
             use_color: Enable ANSI color codes (auto-disabled if not a TTY)
             verbose: Show detailed output including info messages
             quiet: Minimal output (errors only)
+            _ui_backend: Internal parameter for testing (not for public use)
+
+        Example:
+            # Standard usage (auto-detects environment)
+            printer = PrettyPrinter()
+
+            # Verbose mode
+            printer = PrettyPrinter(verbose=True)
+
+            # Quiet mode (errors only)
+            printer = PrettyPrinter(quiet=True)
+
+            # Disable colors
+            printer = PrettyPrinter(use_color=False)
         """
         self.use_color = use_color and sys.stdout.isatty()
         self.verbose = verbose
         self.quiet = quiet
 
-    def _colorize(self, text, color_code):
-        """Apply ANSI color code if colors are enabled."""
+        # Create or use provided Ui backend
+        if _ui_backend is not None:
+            self._ui = _ui_backend
+        else:
+            # Automatically create appropriate backend
+            # Force plain if colors are explicitly disabled
+            force_plain = not self.use_color
+            self._ui = create_ui(
+                force_plain=force_plain,
+                quiet=quiet
+            )
+
+    def _colorize(self, text: str, color_code: str) -> str:
+        """
+        Apply ANSI color code if colors are enabled.
+
+        This method is preserved for backward compatibility but is no longer
+        used internally. The Ui backend handles all styling.
+
+        Args:
+            text: Text to colorize
+            color_code: ANSI color code (e.g., '34' for blue)
+
+        Returns:
+            Colorized text if use_color is True, otherwise plain text
+        """
         if not self.use_color:
             return text
         return f"\033[{color_code}m{text}\033[0m"
 
-    def action(self, msg):
-        """Print an action message (what's being done now)."""
-        if not self.quiet:
-            print(f"🔵 {self._colorize('Action:', '34')} {msg}")
+    def action(self, msg: str) -> None:
+        """
+        Print an action message (what's being done now).
 
-    def success(self, msg):
-        """Print a success message (completed action)."""
-        if not self.quiet:
-            print(f"✅ {self._colorize('Success:', '32')} {msg}")
+        Args:
+            msg: Action message to display
 
-    def info(self, msg):
-        """Print an informational message (context/details)."""
+        Example:
+            printer.action("Processing task task-2-1...")
+            printer.action("Validating dependencies...")
+        """
+        if not self.quiet:
+            self._ui.print_status(msg, level=MessageLevel.ACTION)
+
+    def success(self, msg: str) -> None:
+        """
+        Print a success message (completed action).
+
+        Args:
+            msg: Success message to display
+
+        Example:
+            printer.success("Task completed successfully")
+            printer.success("Spec validation passed")
+        """
+        if not self.quiet:
+            self._ui.print_status(msg, level=MessageLevel.SUCCESS)
+
+    def info(self, msg: str) -> None:
+        """
+        Print an informational message (context/details).
+
+        Only displays if verbose mode is enabled.
+
+        Args:
+            msg: Info message to display
+
+        Example:
+            printer.info("Checking 15 dependency files...")
+            printer.info("Using default configuration")
+        """
         if self.verbose and not self.quiet:
-            print(f"ℹ️  {self._colorize('Info:', '36')} {msg}")
+            self._ui.print_status(msg, level=MessageLevel.INFO)
 
-    def warning(self, msg):
-        """Print a warning message (non-blocking issue)."""
+    def warning(self, msg: str) -> None:
+        """
+        Print a warning message (non-blocking issue).
+
+        Warnings are printed to stderr.
+
+        Args:
+            msg: Warning message to display
+
+        Example:
+            printer.warning("Deprecated configuration format detected")
+            printer.warning("Task has no estimated_hours metadata")
+        """
         if not self.quiet:
-            print(f"⚠️  {self._colorize('Warning:', '33')} {msg}", file=sys.stderr)
+            self._ui.print_status(msg, level=MessageLevel.WARNING)
 
-    def error(self, msg):
-        """Print an error message (blocking issue)."""
-        print(f"❌ {self._colorize('Error:', '31')} {msg}", file=sys.stderr)
+    def error(self, msg: str) -> None:
+        """
+        Print an error message (blocking issue).
 
-    def header(self, msg):
-        """Print a section header."""
+        Errors always print regardless of quiet mode.
+        Printed to stderr.
+
+        Args:
+            msg: Error message to display
+
+        Example:
+            printer.error("Spec file not found")
+            printer.error("Invalid task ID format")
+        """
+        # Errors always print (ignore quiet mode)
+        self._ui.print_status(msg, level=MessageLevel.ERROR)
+
+    def header(self, msg: str) -> None:
+        """
+        Print a section header.
+
+        Args:
+            msg: Header text to display
+
+        Example:
+            printer.header("Spec Validation Report")
+            printer.header("Task Progress Summary")
+        """
         if not self.quiet:
-            line = "═" * 60
-            print(f"\n{self._colorize(line, '35')}")
-            print(f"{self._colorize(msg.center(60), '35;1')}")
-            print(f"{self._colorize(line, '35')}\n")
+            self._ui.print_status(msg, level=MessageLevel.HEADER)
 
-    def detail(self, msg, indent=1):
-        """Print an indented detail line."""
+    def detail(self, msg: str, indent: int = 1) -> None:
+        """
+        Print an indented detail line.
+
+        Args:
+            msg: Detail message to display
+            indent: Indentation level (number of 2-space indents)
+
+        Example:
+            printer.detail("Status: pending", indent=1)
+            printer.detail("Dependencies: 3 tasks", indent=2)
+        """
         if not self.quiet:
+            # Apply indentation manually since Ui doesn't have indent parameter
             prefix = "  " * indent
-            print(f"{prefix}{msg}")
+            self._ui.print_status(f"{prefix}{msg}", level=MessageLevel.DETAIL)
 
-    def result(self, key, value, indent=0):
-        """Print a key-value result."""
+    def result(self, key: str, value: str, indent: int = 0) -> None:
+        """
+        Print a key-value result.
+
+        Args:
+            key: Result key
+            value: Result value
+            indent: Indentation level (number of 2-space indents)
+
+        Example:
+            printer.result("Total Tasks", "23")
+            printer.result("Completed", "15", indent=1)
+        """
         if not self.quiet:
+            # Apply indentation manually
             prefix = "  " * indent
-            print(f"{prefix}{self._colorize(key + ':', '36')} {value}")
+            # Format as key: value
+            text = f"{prefix}{key}: {value}"
+            self._ui.print_status(text, level=MessageLevel.RESULT)
 
-    def blank(self):
-        """Print a blank line."""
-        if not self.quiet:
-            print()
+    def blank(self) -> None:
+        """
+        Print a blank line.
 
-    def item(self, msg, indent=0):
-        """Print a list item."""
+        Example:
+            printer.action("Starting validation")
+            printer.blank()
+            printer.detail("Checking dependencies...")
+        """
         if not self.quiet:
+            self._ui.print_status("", level=MessageLevel.BLANK)
+
+    def item(self, msg: str, indent: int = 0) -> None:
+        """
+        Print a list item.
+
+        Args:
+            msg: Item message to display
+            indent: Indentation level (number of 2-space indents)
+
+        Example:
+            printer.item("Task 1: Create directory structure")
+            printer.item("Subtask: Initialize config", indent=1)
+        """
+        if not self.quiet:
+            # Apply indentation manually
             prefix = "  " * indent
-            print(f"{prefix}• {msg}")
-
+            text = f"{prefix}• {msg}"
+            self._ui.print_status(text, level=MessageLevel.ITEM)

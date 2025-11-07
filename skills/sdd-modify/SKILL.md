@@ -66,6 +66,91 @@ This skill is part of the **Spec-Driven Development** workflow:
 - The `sdd` CLI provides efficient, structured access with proper parsing and validation
 - Spec files can be 50KB+ and reading them directly wastes valuable context window space
 
+## Command Execution Best Practices (CRITICAL)
+
+**CRITICAL: Run sdd commands individually, never in loops or chains**
+
+### DO: Individual Command Execution
+
+Run each `sdd` command as a separate Bash tool call:
+
+```bash
+# Parse review report
+sdd parse-review my-spec-001 --review reports/review.md --output suggestions.json
+
+# Preview modifications
+sdd apply-modifications my-spec-001 --from suggestions.json --dry-run
+
+# Apply modifications
+sdd apply-modifications my-spec-001 --from suggestions.json
+```
+
+### DON'T: Loops, Chains, or Compound Commands
+
+**Never use bash loops:**
+```bash
+# ❌ WRONG - Do not use loops
+for spec in specs/*.json; do
+  sdd apply-modifications $(basename $spec .json) --from mods.json
+done
+```
+
+**Never chain commands:**
+```bash
+# ❌ WRONG - Do not chain commands
+sdd parse-review my-spec-001 --review review.md && sdd apply-modifications my-spec-001 --from suggestions.json
+```
+
+**Never use compound commands:**
+```bash
+# ❌ WRONG - Do not combine with other commands
+echo "Parsing review..." && sdd parse-review my-spec-001 --review review.md
+```
+
+**Never use semicolons:**
+```bash
+# ❌ WRONG - Do not use semicolons
+sdd parse-review spec-1 --review r1.md; sdd parse-review spec-2 --review r2.md
+```
+
+### Why Individual Execution Matters
+
+1. **Transaction Safety** - Each modification operation is a transaction with automatic rollback
+2. **Error Handling** - Easier to identify which operation failed
+3. **Rollback Boundaries** - Clear transaction boundaries prevent partial modifications
+4. **Permission Clarity** - User can approve/deny each operation separately
+5. **Progress Visibility** - User sees each step complete
+6. **Debugging** - Easier to trace issues to specific operations
+7. **Idempotency** - Safe to retry individual failed operations
+
+### Correct Pattern: Sequential Individual Calls
+
+**For multiple specs:**
+```bash
+# ✅ CORRECT - Individual calls
+sdd apply-modifications spec-1 --from mods.json
+# Wait for completion, check result
+
+sdd apply-modifications spec-2 --from mods.json
+# Wait for completion, check result
+
+sdd apply-modifications spec-3 --from mods.json
+# Wait for completion, check result
+```
+
+**For workflow steps:**
+```bash
+# ✅ CORRECT - Sequential individual operations
+sdd parse-review my-spec-001 --review reports/review.md --output suggestions.json
+# Wait, parse results
+
+sdd apply-modifications my-spec-001 --from suggestions.json --dry-run
+# Wait, review preview
+
+sdd apply-modifications my-spec-001 --from suggestions.json
+# Wait, verify completion
+```
+
 ## Workflow 1: Apply Review Feedback
 
 Complete workflow for applying feedback from sdd-fidelity-review or sdd-plan-review.

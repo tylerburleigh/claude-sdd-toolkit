@@ -12,6 +12,7 @@ from typing import Optional
 from pathlib import Path
 
 from .review import FidelityReviewer
+from .report import FidelityReport
 from .consultation import (
     consult_multiple_ai_on_fidelity,
     parse_multiple_responses,
@@ -25,6 +26,8 @@ from claude_skills.common.ai_tools import (
     detect_available_tools,
     check_tool_available
 )
+from claude_skills.common.progress import ProgressEmitter
+from claude_skills.common.sdd_config import get_default_format
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -50,7 +53,9 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         if args.verbose:
             print(f"Loading specification: {args.spec_id}", file=sys.stderr)
 
-        reviewer = FidelityReviewer(args.spec_id)
+        # Check if incremental mode is requested
+        incremental = args.incremental if hasattr(args, 'incremental') else False
+        reviewer = FidelityReviewer(args.spec_id, incremental=incremental)
 
         if reviewer.spec_data is None:
             print(f"Error: Failed to load specification {args.spec_id}", file=sys.stderr)
@@ -86,12 +91,30 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             tool_list = ', '.join(ai_tools) if ai_tools else 'all available'
             print(f"Consulting AI tools: {tool_list}", file=sys.stderr)
 
+        # Create ProgressEmitter (enabled by default, unless --no-stream-progress)
+        progress_emitter = None
+        should_stream = not (hasattr(args, 'no_stream_progress') and args.no_stream_progress)
+        if should_stream:
+            # Determine output stream based on format mode
+            output_format = args.format if hasattr(args, 'format') else 'text'
+
+            # For json/markdown modes, emit progress to stderr to avoid corrupting stdout
+            # For text mode, emit to stdout (existing behavior)
+            progress_stream = sys.stderr if output_format in ['json', 'markdown'] else sys.stdout
+
+            progress_emitter = ProgressEmitter(
+                output=progress_stream,
+                enabled=True,
+                auto_detect_tty=False
+            )
+
         try:
             responses = consult_multiple_ai_on_fidelity(
                 prompt=prompt,
                 tools=args.ai_tools if hasattr(args, 'ai_tools') else None,
                 model=args.model if hasattr(args, 'model') else None,
-                timeout=args.timeout
+                timeout=args.timeout,
+                progress_emitter=progress_emitter
             )
         except NoToolsAvailableError as e:
             print(f"Error: {e}", file=sys.stderr)
@@ -105,10 +128,13 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             return 1
 
         # Step 4: Parse responses
-        if args.verbose:
-            print(f"Parsing {len(responses)} AI responses...", file=sys.stderr)
+        # Extract list of ToolResponse objects from MultiToolResponse
+        response_list = list(responses.responses.values())
 
-        parsed_responses = parse_multiple_responses(responses)
+        if args.verbose:
+            print(f"Parsing {len(response_list)} AI responses...", file=sys.stderr)
+
+        parsed_responses = parse_multiple_responses(response_list)
 
         # Step 5: Detect consensus
         consensus_threshold = args.consensus_threshold if hasattr(args, 'consensus_threshold') else 2
@@ -143,38 +169,21 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
 
 
 def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues):
-    """Generate text output format."""
-    print("\n" + "=" * 80)
-    print("IMPLEMENTATION FIDELITY REVIEW")
-    print("=" * 80)
-    print(f"\nSpec: {reviewer.spec_id}")
-    print(f"Consulted {len(parsed_responses)} AI model(s)")
-    print(f"\nConsensus Verdict: {consensus.consensus_verdict.value.upper()}")
-    print(f"Agreement Rate: {consensus.agreement_rate:.1%}")
+    """Generate text output format using Rich panels and formatting."""
+    # Create review results dictionary for FidelityReport
+    review_results = {
+        "spec_id": reviewer.spec_id,
+        "models_consulted": len(parsed_responses),
+        "consensus": consensus,
+        "categorized_issues": categorized_issues,
+        "parsed_responses": parsed_responses
+    }
 
-    if categorized_issues:
-        print(f"\n{'-' * 80}")
-        print("ISSUES IDENTIFIED (Consensus):")
-        print(f"{'-' * 80}")
-        for cat_issue in categorized_issues:
-            print(f"\n[{cat_issue.severity.value.upper()}] {cat_issue.issue}")
+    # Create FidelityReport instance and use Rich formatting
+    report = FidelityReport(review_results)
 
-    if consensus.consensus_recommendations:
-        print(f"\n{'-' * 80}")
-        print("RECOMMENDATIONS:")
-        print(f"{'-' * 80}")
-        for rec in consensus.consensus_recommendations:
-            print(f"- {rec}")
-
-    if args.verbose:
-        print(f"\n{'-' * 80}")
-        print("INDIVIDUAL MODEL RESPONSES:")
-        print(f"{'-' * 80}")
-        for i, response in enumerate(parsed_responses, 1):
-            tool_name = parsed_responses[i-1]  # Get tool name from original responses
-            print(f"\nModel {i}: {response.verdict.value}")
-            print(f"Issues: {len(response.issues)}")
-            print(f"Recommendations: {len(response.recommendations)}")
+    # Use Rich console output with enhanced visuals
+    report.print_console_rich(verbose=args.verbose if hasattr(args, 'verbose') else False)
 
 
 def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues):
@@ -201,14 +210,20 @@ def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_is
 
 
 def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues):
-    """Generate JSON output format."""
-    result = {
+    """Generate JSON output format using FidelityReport."""
+    # Create review results dictionary for FidelityReport
+    review_results = {
         "spec_id": reviewer.spec_id,
         "models_consulted": len(parsed_responses),
-        "consensus": consensus.to_dict(),
-        "categorized_issues": [issue.to_dict() for issue in categorized_issues],
-        "individual_responses": [response.to_dict() for response in parsed_responses]
+        "consensus": consensus,
+        "categorized_issues": categorized_issues,
+        "parsed_responses": parsed_responses
     }
+
+    # Create FidelityReport instance and use generate_json() method
+    report = FidelityReport(review_results)
+    result = report.generate_json()
+
     print(json.dumps(result, indent=2))
 
 
@@ -347,6 +362,12 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         metavar="SECONDS",
         help="Timeout for AI consultation (default: 120)"
     )
+    parser.add_argument(
+        "--no-stream-progress",
+        action="store_true",
+        help="Disable structured JSON progress events during AI consultation. "
+             "Progress streaming is enabled by default."
+    )
 
     # Review options
     parser.add_argument(
@@ -366,6 +387,11 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         metavar="N",
         help="Minimum models that must agree for consensus (default: 2)"
     )
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="Enable incremental mode (only review changed files since last run)"
+    )
 
     # Output options
     parser.add_argument(
@@ -374,11 +400,14 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         metavar="FILE",
         help="Save review results to file"
     )
+
+    # Get default format from config
+    default_format = get_default_format()
     parser.add_argument(
         "--format",
         choices=["text", "json", "markdown"],
-        default="text",
-        help="Output format (default: text)"
+        default=default_format,
+        help=f"Output format (default: {default_format} from config)"
     )
     # Note: --verbose inherited from parent_parser (global option)
 
@@ -398,11 +427,16 @@ def register_list_review_tools_command(subparsers: argparse._SubParsersAction, p
     )
 
     # Output options
+    # Get default format from config, fallback to "text" for text/json only commands
+    default_format = get_default_format()
+    if default_format not in ["text", "json"]:
+        default_format = "text"  # Fallback for commands that don't support markdown
+
     list_tools_parser.add_argument(
         "--format",
         choices=["text", "json"],
-        default="text",
-        help="Output format (default: text)"
+        default=default_format,
+        help=f"Output format (default: {default_format} from config)"
     )
     # Note: --verbose inherited from parent_parser (global option)
 

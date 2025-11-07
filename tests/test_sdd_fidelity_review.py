@@ -494,6 +494,176 @@ def test_consult_multiple_ai_partial_failure():
 
 
 # =============================================================================
+# Consultation Module Tests - Cache Save Behavior
+# =============================================================================
+
+
+def test_consult_multiple_ai_saves_to_cache():
+    """consult_multiple_ai_on_fidelity should save results to cache after consultation."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            mock_execute.return_value = [
+                                ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                            ]
+                            mock_cache_instance = MockCache.return_value
+                            mock_cache_instance.get.return_value = None  # Cache miss
+                            mock_cache_instance.set.return_value = True  # Cache save succeeds
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Call function with cache_key_params
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+                            responses = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify consultation happened
+                            assert len(responses) == 1
+                            assert responses[0].success
+
+                            # Verify cache was checked
+                            mock_cache_instance.get.assert_called_once_with("test_cache_key")
+
+                            # Verify results were saved to cache
+                            mock_cache_instance.set.assert_called_once()
+                            call_args = mock_cache_instance.set.call_args
+                            assert call_args[0][0] == "test_cache_key"  # First arg is cache_key
+
+                            # Verify serialized format
+                            saved_data = call_args[0][1]  # Second arg is data
+                            assert len(saved_data) == 1
+                            assert saved_data[0]["tool"] == "gemini"
+                            assert saved_data[0]["status"] == "success"
+                            assert saved_data[0]["output"] == "Looks good"
+
+
+def test_consult_multiple_ai_cache_save_failure_non_fatal():
+    """consult_multiple_ai_on_fidelity should handle cache save failures gracefully."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            mock_execute.return_value = [
+                                ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                            ]
+                            mock_cache_instance = MockCache.return_value
+                            mock_cache_instance.get.return_value = None  # Cache miss
+                            mock_cache_instance.set.side_effect = Exception("Disk full")  # Cache save fails
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Call function with cache_key_params
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+
+                            # Should NOT raise exception - cache save failure is non-fatal
+                            responses = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify consultation still succeeded
+                            assert len(responses) == 1
+                            assert responses[0].success
+
+
+def test_consult_multiple_ai_cache_disabled_skips_save():
+    """consult_multiple_ai_on_fidelity should skip cache save when caching disabled."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=False):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                        # Setup mocks
+                        mock_detect.return_value = ["gemini"]
+                        mock_execute.return_value = [
+                            ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                        ]
+
+                        # Call function - caching is disabled
+                        responses = consult_multiple_ai_on_fidelity("Review this code...")
+
+                        # Verify CacheManager was never instantiated
+                        MockCache.assert_not_called()
+
+                        # Verify consultation still succeeded
+                        assert len(responses) == 1
+                        assert responses[0].success
+
+
+def test_consult_multiple_ai_cache_round_trip():
+    """consult_multiple_ai_on_fidelity should retrieve saved results on second call."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            original_response = ToolResponse(
+                                tool="gemini",
+                                status=ToolStatus.SUCCESS,
+                                output="Looks good",
+                                model="gemini-2.0"
+                            )
+                            mock_execute.return_value = [original_response]
+
+                            mock_cache_instance = MockCache.return_value
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Simulate cache behavior: first call misses, saves data
+                            saved_data = None
+
+                            def cache_get_side_effect(key):
+                                return saved_data
+
+                            def cache_set_side_effect(key, data):
+                                nonlocal saved_data
+                                saved_data = data
+                                return True
+
+                            mock_cache_instance.get.side_effect = cache_get_side_effect
+                            mock_cache_instance.set.side_effect = cache_set_side_effect
+
+                            # First call - cache miss, saves to cache
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+                            responses1 = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify first call got results from AI
+                            assert len(responses1) == 1
+                            assert responses1[0].tool == "gemini"
+                            assert responses1[0].output == "Looks good"
+                            assert mock_execute.call_count == 1
+
+                            # Second call - cache hit, should NOT call execute_tools_parallel again
+                            responses2 = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify second call got results from cache
+                            assert len(responses2) == 1
+                            assert responses2[0].tool == "gemini"
+                            assert responses2[0].output == "Looks good"
+                            assert responses2[0].model == "gemini-2.0"
+
+                            # Verify execute_tools_parallel was only called once (first time)
+                            assert mock_execute.call_count == 1
+
+
+# =============================================================================
 # Consultation Module Tests - Response Parsing
 # =============================================================================
 
@@ -876,3 +1046,247 @@ def test_consult_ai_handles_unexpected_exception():
 
             with pytest.raises(ConsultationError):
                 consult_ai_on_fidelity("Review this...", tool="gemini")
+
+
+# =============================================================================
+# File Hashing and Change Detection Tests
+# =============================================================================
+
+
+def test_compute_file_hash_success(tmp_path):
+    """compute_file_hash should return SHA256 hash of file contents."""
+    # Create test file
+    test_file = tmp_path / "test.txt"
+    test_file.write_text("Hello, World!")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path)
+
+        # Compute hash
+        file_hash = reviewer.compute_file_hash(test_file)
+
+        # Verify hash is correct (precomputed SHA256 of "Hello, World!")
+        expected_hash = "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+        assert file_hash == expected_hash
+
+
+def test_compute_file_hash_nonexistent_file(tmp_path):
+    """compute_file_hash should return None for nonexistent files."""
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path)
+
+        # Try to hash nonexistent file
+        file_hash = reviewer.compute_file_hash(Path("/nonexistent/file.txt"))
+
+        assert file_hash is None
+
+
+def test_compute_file_hash_binary_file(tmp_path):
+    """compute_file_hash should handle binary files correctly."""
+    # Create binary test file
+    test_file = tmp_path / "binary.dat"
+    test_file.write_bytes(b'\x00\x01\x02\x03\xFF\xFE\xFD')
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path)
+
+        # Compute hash
+        file_hash = reviewer.compute_file_hash(test_file)
+
+        # Should return valid hash (not crash on binary content)
+        assert file_hash is not None
+        assert len(file_hash) == 64  # SHA256 produces 64-char hex string
+
+
+def test_get_file_changes_full_mode(tmp_path):
+    """get_file_changes should treat all files as added in full mode."""
+    # Create test files
+    file1 = tmp_path / "file1.py"
+    file2 = tmp_path / "file2.py"
+    file1.write_text("content 1")
+    file2.write_text("content 2")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        # Create reviewer with incremental=False (default)
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=False)
+
+        changes = reviewer.get_file_changes([file1, file2])
+
+        assert changes['is_incremental'] is False
+        assert set(changes['added']) == {str(file1), str(file2)}
+        assert changes['modified'] == []
+        assert changes['removed'] == []
+        assert changes['unchanged'] == []
+
+
+def test_get_file_changes_incremental_no_previous_state(tmp_path):
+    """get_file_changes should perform full review when no previous state exists."""
+    # Create test files
+    file1 = tmp_path / "file1.py"
+    file1.write_text("content 1")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        # Create reviewer with incremental=True
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=True)
+
+        # Mock cache to return empty state (no previous run)
+        with patch.object(reviewer.cache, 'get_incremental_state', return_value={}):
+            changes = reviewer.get_file_changes([file1])
+
+            assert changes['is_incremental'] is False
+            assert str(file1) in changes['added']
+
+
+def test_get_file_changes_incremental_detects_modifications(tmp_path):
+    """get_file_changes should detect modified files in incremental mode."""
+    # Create test files
+    file1 = tmp_path / "file1.py"
+    file2 = tmp_path / "file2.py"
+    file1.write_text("original content")
+    file2.write_text("unchanged content")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=True)
+
+        # Compute initial hashes
+        hash1_old = reviewer.compute_file_hash(file1)
+        hash2 = reviewer.compute_file_hash(file2)
+
+        # Mock cache with previous state
+        old_state = {
+            str(file1): hash1_old,
+            str(file2): hash2
+        }
+
+        # Modify file1
+        file1.write_text("modified content")
+
+        with patch.object(reviewer.cache, 'get_incremental_state', return_value=old_state):
+            changes = reviewer.get_file_changes([file1, file2])
+
+            assert changes['is_incremental'] is True
+            assert str(file1) in changes['modified']
+            assert str(file2) in changes['unchanged']
+            assert changes['added'] == []
+            assert changes['removed'] == []
+
+
+def test_get_file_changes_incremental_detects_additions(tmp_path):
+    """get_file_changes should detect new files in incremental mode."""
+    # Create test files
+    file1 = tmp_path / "file1.py"
+    file2 = tmp_path / "file2.py"
+    file1.write_text("existing content")
+    file2.write_text("new content")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=True)
+
+        # Compute hash for existing file
+        hash1 = reviewer.compute_file_hash(file1)
+
+        # Mock cache with only file1 (file2 is new)
+        old_state = {str(file1): hash1}
+
+        with patch.object(reviewer.cache, 'get_incremental_state', return_value=old_state):
+            changes = reviewer.get_file_changes([file1, file2])
+
+            assert changes['is_incremental'] is True
+            assert str(file2) in changes['added']
+            assert str(file1) in changes['unchanged']
+
+
+def test_get_file_changes_incremental_detects_removals(tmp_path):
+    """get_file_changes should detect removed files in incremental mode."""
+    # Create test file
+    file1 = tmp_path / "file1.py"
+    file1.write_text("content")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=True)
+
+        # Compute hash for file1
+        hash1 = reviewer.compute_file_hash(file1)
+
+        # Mock cache with file1 and a removed file2
+        old_state = {
+            str(file1): hash1,
+            "/removed/file2.py": "abc123"
+        }
+
+        with patch.object(reviewer.cache, 'get_incremental_state', return_value=old_state):
+            changes = reviewer.get_file_changes([file1])
+
+            assert changes['is_incremental'] is True
+            assert "/removed/file2.py" in changes['removed']
+            assert str(file1) in changes['unchanged']
+
+
+def test_save_file_state_full_mode(tmp_path):
+    """save_file_state should do nothing in full mode."""
+    file1 = tmp_path / "file1.py"
+    file1.write_text("content")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        # Create reviewer with incremental=False
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=False)
+
+        result = reviewer.save_file_state([file1])
+
+        assert result is False
+
+
+def test_save_file_state_incremental_mode(tmp_path):
+    """save_file_state should save hashes in incremental mode."""
+    file1 = tmp_path / "file1.py"
+    file1.write_text("content")
+
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test", "hierarchy": {}}
+        # Create reviewer with incremental=True
+        reviewer = FidelityReviewer("test-spec-001", spec_path=tmp_path, incremental=True)
+
+        # Mock cache save method
+        with patch.object(reviewer.cache, 'save_incremental_state', return_value=True) as mock_save:
+            result = reviewer.save_file_state([file1])
+
+            assert result is True
+            # Verify save was called with spec_id and file hashes
+            mock_save.assert_called_once()
+            call_args = mock_save.call_args
+            assert call_args[0][0] == "test-spec-001"  # spec_id
+            assert isinstance(call_args[0][1], dict)  # file_hashes dict
+            assert str(file1) in call_args[0][1]  # file1 should be in hashes
+
+
+def test_fidelity_reviewer_init_incremental_mode():
+    """FidelityReviewer should initialize with incremental mode enabled."""
+    spec_path = Path("/fake/specs")
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test Spec", "hierarchy": {}}
+
+        reviewer = FidelityReviewer("test-spec-001", spec_path=spec_path, incremental=True)
+
+        assert reviewer.incremental is True
+        assert reviewer.cache is not None
+
+
+def test_fidelity_reviewer_init_full_mode():
+    """FidelityReviewer should initialize with incremental mode disabled by default."""
+    spec_path = Path("/fake/specs")
+    with patch('claude_skills.sdd_fidelity_review.review.load_json_spec') as mock_load:
+        mock_load.return_value = {"title": "Test Spec", "hierarchy": {}}
+
+        reviewer = FidelityReviewer("test-spec-001", spec_path=spec_path)
+
+        assert reviewer.incremental is False
+        assert reviewer.cache is None

@@ -1230,7 +1230,6 @@ sdd query-tasks {spec-id} --status pending
 
 ### Common Flags
 - `--dry-run` - Preview changes without saving
-- `--json` - Output as JSON for scripting
 - `--verify` - Auto-run verify tasks on completion
 
 ## Systematic Spec Modification

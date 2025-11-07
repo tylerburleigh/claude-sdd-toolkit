@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 13:36:44
+**Generated:** 2025-11-07 15:48:15
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 229
-- **Total Lines:** 80064
-- **Total Classes:** 299
-- **Total Functions:** 851
-- **Avg Complexity:** 5.8
+- **Total Files:** 250
+- **Total Lines:** 89322
+- **Total Classes:** 356
+- **Total Functions:** 904
+- **Avg Complexity:** 5.84
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -142,6 +142,19 @@ the required abstract methods.
 
 ---
 
+### `BatchProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:506`
+
+**Description:**
+> Tracks progress for batch consultations.
+
+**Methods:**
+- `mark_complete()`
+
+---
+
 ### `CSSParser`
 
 **Language:** python
@@ -162,6 +175,48 @@ the required abstract methods.
 **Properties:**
 - `language`
 - `file_extensions`
+
+---
+
+### `CacheManager`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_manager.py:24`
+
+**Description:**
+> File-based cache manager with TTL support.
+
+Stores cache entries as JSON files in a configurable directory.
+Each entry includes the cached value, creation timestamp, and TTL.
+
+Features:
+- Atomic file operations to prevent corruption
+- Automatic TTL expiration
+- Graceful error handling (never crashes, degrades to no-cache)
+- Configurable cache directory
+
+Usage:
+    cache = CacheManager()
+    cache.set("my_key", {"data": "value"}, ttl_hours=24)
+    result = cache.get("my_key")  # Returns {"data": "value"} or None if expired
+
+**Methods:**
+- `__init__()`
+- `_get_cache_dir_from_config()`
+- `_ensure_cache_dir()`
+- `_get_cache_path()`
+- `_maybe_cleanup()`
+- `get()`
+- `set()`
+- `delete()`
+- `clear()`
+- `_matches_filters()`
+- `get_stats()`
+- `cleanup_expired()`
+- `get_incremental_state()`
+- `save_incremental_state()`
+- `compare_file_hashes()`
+- `merge_results()`
 
 ---
 
@@ -213,7 +268,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:636`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:783`
 
 **Description:**
 > Issue with assigned severity category.
@@ -372,7 +427,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:490`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:637`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -399,7 +454,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:79`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:88`
 
 **Description:**
 > Base exception for consultation errors.
@@ -421,7 +476,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:89`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:98`
 
 **Description:**
 > Raised when consultation times out.
@@ -619,7 +674,7 @@ Attributes:
 ### `DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:22`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:29`
 
 **Description:**
 > Complete diff report between before and after states.
@@ -824,7 +879,7 @@ Example:
 ### `FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:130`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:134`
 
 **Description:**
 > Generate structured reports from fidelity review results.
@@ -838,6 +893,11 @@ This class will be implemented in Phase 4 (Report Generation).
 - `generate_markdown()`
 - `generate_json()`
 - `print_console()`
+- `print_console_rich()`
+- `_print_consensus_matrix()`
+- `_print_model_comparison_table()`
+- `_print_recommendation_consensus()`
+- `_print_issue_aggregation_panel()`
 - `save_to_file()`
 - `calculate_fidelity_score()`
 - `summarize_deviations()`
@@ -847,7 +907,7 @@ This class will be implemented in Phase 4 (Report Generation).
 ### `FidelityReviewer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:21`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:23`
 
 **Description:**
 > Core class for performing fidelity reviews of implementations against specs.
@@ -861,6 +921,9 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `review_full_spec()`
 - `review_files()`
 - `analyze_deviation()`
+- `compute_file_hash()`
+- `get_file_changes()`
+- `save_file_state()`
 - `_load_spec()`
 - `get_task_requirements()`
 - `get_phase_tasks()`
@@ -884,7 +947,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:27`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:36`
 
 **Description:**
 > Overall fidelity verdict from AI review.
@@ -894,7 +957,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 ### `FieldChange`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:12`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:19`
 
 **Description:**
 > Represents a single field change.
@@ -1190,7 +1253,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:35`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:44`
 
 **Description:**
 > Severity level for identified issues.
@@ -1390,6 +1453,37 @@ Example:
 
 ---
 
+### `Message`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:40`
+
+**Description:**
+> Structured message with metadata for agent analysis.
+
+Supports filtering, querying, and deferred rendering.
+
+Attributes:
+    level: Message severity/type
+    text: Message content
+    timestamp: When message was created
+    context: Task ID, phase, operation, etc.
+    metadata: Custom data (indent, key, etc.)
+    rendered: Whether message has been displayed
+
+---
+
+### `MessageLevel`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:22`
+
+**Description:**
+> Message severity/type levels.
+
+---
+
 ### `MultiToolResponse`
 
 **Language:** python
@@ -1517,11 +1611,29 @@ Example:
 
 ---
 
+### `NoOpProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:140`
+
+**Description:**
+> No-op implementation for environments without TUI support.
+
+**Methods:**
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
+
+---
+
 ### `NoToolsAvailableError`
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:84`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:93`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -1640,7 +1752,7 @@ Example:
 ### `ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:45`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:54`
 
 **Description:**
 > Structured representation of AI review response.
@@ -1715,13 +1827,92 @@ parsing across multiple languages.
 
 ---
 
+### `PlainProgressTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/plain_ui.py:593`
+
+**Description:**
+> Progress task wrapper for PlainUi.
+
+Tracks progress and displays text updates.
+No visual progress bars - just percentage updates.
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `set_description()`
+
+---
+
+### `PlainUi`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/plain_ui.py:37`
+
+**Description:**
+> Plain text TUI backend for non-TTY environments.
+
+Provides simple text output without ANSI codes or Rich formatting.
+Designed for CI/CD, pipes, logs, and other non-interactive contexts
+where fancy formatting is not desired or not supported.
+
+All Ui protocol methods are implemented with plain text equivalents:
+- Tables rendered as ASCII text
+- Trees rendered with ASCII box characters
+- Panels rendered with simple borders
+- Progress shown as text updates
+- Diffs shown as unified diff format
+
+Attributes:
+    collect_messages: Whether to collect messages for deferred rendering
+    _messages: Collection of structured messages
+    _context_stack: Stack of context dictionaries for message tagging
+    quiet: Whether to suppress non-error output
+    file: Output file object (default stdout)
+
+**Methods:**
+- `__init__()`
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
+- `_output()`
+- `_write()`
+- `_add_message()`
+- `get_messages()`
+- `render_all()`
+- `clear_messages()`
+- `context()`
+
+---
+
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/printer.py:8`
+**Defined in:** `src/claude_skills/claude_skills/common/printer.py:27`
 
 **Description:**
 > Utility for consistent, pretty console output optimized for Claude Code.
+
+This class maintains backward compatibility with the original PrettyPrinter
+implementation while internally delegating to the new Ui backend system.
+
+The Ui backend (RichUi or PlainUi) is automatically selected based on:
+- TTY availability (sys.stdout.isatty())
+- CI environment detection
+- Force flags or environment variables
+
+All original methods are preserved with identical signatures, ensuring
+100% backward compatibility with existing code.
+
+Attributes:
+    use_color: Whether to use ANSI color codes (auto-disabled if not TTY)
+    verbose: Whether to show detailed info messages
+    quiet: Whether to suppress non-error output
+    _ui: Internal Ui backend (RichUi or PlainUi)
 
 **Methods:**
 - `__init__()`
@@ -1742,7 +1933,7 @@ parsing across multiple languages.
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:14`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:18`
 
 **Description:**
 > Pretty printer for console output with optional color support.
@@ -1837,6 +2028,25 @@ Example:
 
 ---
 
+### `ProgressCallback`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:22`
+
+**Description:**
+> Protocol for progress feedback callbacks.
+
+**Methods:**
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
+
+---
+
 ### `ProgressData`
 
 **Language:** python
@@ -1852,6 +2062,81 @@ Attributes:
     pending_tasks: Number of pending tasks
     blocked_tasks: Number of blocked tasks
     completion_percentage: Overall completion percentage
+
+---
+
+### `ProgressEmitter`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:296`
+
+**Description:**
+> Emits structured JSON progress events for AI agents and automation tools.
+
+This class provides a programmatic interface for emitting progress updates
+as JSON events to stdout or a specified stream. Events are newline-delimited
+JSON objects that can be parsed by consuming tools.
+
+Example usage:
+    emitter = ProgressEmitter()
+    emitter.emit("task_started", {"task_id": "task-1-1", "title": "Setup"})
+    emitter.emit("progress", {"completed": 5, "total": 10, "percentage": 50})
+    emitter.emit("task_completed", {"task_id": "task-1-1", "duration": 120})
+
+Event format:
+    {
+        "type": "event_type",
+        "timestamp": "2025-11-07T19:00:00.000Z",
+        "data": {...}
+    }
+
+**Methods:**
+- `__init__()`
+- `_is_interactive()`
+- `emit()`
+- `disable()`
+- `enable()`
+
+---
+
+### `ProgressInfo`
+
+**Language:** python
+**Inherits from:** `NamedTuple`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:31`
+
+**Description:**
+> Current test execution progress.
+
+---
+
+### `ProgressTask`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/rich_ui.py:592`
+
+**Description:**
+> Wrapper for Rich Progress task with simplified API.
+
+Provides a simple update() method for advancing progress.
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `set_description()`
+
+---
+
+### `ProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:331`
+
+**Description:**
+> Tracks progress state within context manager.
+
+**Methods:**
+- `complete()`
 
 ---
 
@@ -1871,6 +2156,64 @@ Attributes:
     optional_vars: List of optional variable names
     output_format: Expected output format description
     example_output: Example of expected output
+
+---
+
+### `PytestOutputParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:56`
+
+**Description:**
+> Parser for pytest verbose output.
+
+Extracts test results line-by-line and maintains running counts.
+
+Usage:
+    parser = PytestOutputParser()
+    for line in pytest_output:
+        result = parser.parse_line(line)
+        if result:
+            progress = parser.get_progress()
+            print(f"{progress.passed} passed, {progress.failed} failed")
+
+**Methods:**
+- `__init__()`
+- `parse_line()`
+- `_update_counts()`
+- `get_progress()`
+- `reset()`
+- `_strip_ansi()`
+
+---
+
+### `PytestProgressDisplay`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:241`
+
+**Description:**
+> Rich.Progress display for pytest test execution.
+
+Shows a live progress bar with pass/fail/skip counters as tests run,
+plus the currently running test file.
+
+Usage:
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        display = PytestProgressDisplay(progress, total_tests=100)
+        parser = PytestOutputParser()
+
+        for line in pytest_output:
+            result = parser.parse_line(line)
+            if result:
+                display.update(parser.get_progress(), current_file=result.file_path)
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `finish()`
 
 ---
 
@@ -1906,6 +2249,46 @@ Attributes:
 
 ---
 
+### `QueuedProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:181`
+
+**Description:**
+> Thread-safe progress callback wrapper using queue.Queue.
+
+Wraps a ProgressCallback and routes all calls through a queue,
+making it safe to call from multiple worker threads in parallel
+consultations. A consumer thread processes the queue and forwards
+calls to the underlying callback.
+
+Usage:
+    # Create queued wrapper
+    queued = QueuedProgressCallback(callback)
+    queued.start()  # Start consumer thread
+
+    # Use from multiple threads
+    queued.on_start("tool", 90)
+    queued.on_complete("tool", ToolStatus.SUCCESS, 45.0)
+
+    # Cleanup
+    queued.stop()  # Stop consumer thread
+
+**Methods:**
+- `__init__()`
+- `start()`
+- `stop()`
+- `_consume_queue()`
+- `_enqueue()`
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
+
+---
+
 ### `ReferenceType`
 
 **Language:** python
@@ -1914,6 +2297,43 @@ Attributes:
 
 **Description:**
 > Types of cross-references that can be tracked.
+
+---
+
+### `RichUi`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/rich_ui.py:45`
+
+**Description:**
+> Rich-powered TUI backend for interactive terminals.
+
+Provides full Rich functionality including tables, trees, progress bars,
+panels, and styled output. Designed for TTY environments where rich
+formatting is available and beneficial.
+
+This implementation uses Rich Console as the core output mechanism,
+providing advanced formatting capabilities for AI-agent workflows.
+
+Attributes:
+    console: Rich Console instance for output
+    _messages: Collection of structured messages (when collecting)
+    _collecting: Whether to collect messages instead of immediate rendering
+    _context_stack: Stack of context dictionaries for message tagging
+
+**Methods:**
+- `__init__()`
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
+- `_add_message()`
+- `get_messages()`
+- `render_all()`
+- `clear_messages()`
+- `context()`
 
 ---
 
@@ -2161,6 +2581,29 @@ Attributes:
 
 ---
 
+### `TestAddFormatFlag`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:119`
+
+**Description:**
+> Tests for add_format_flag decorator function.
+
+**Methods:**
+- `test_basic_usage()`
+- `test_custom_choices()`
+- `test_custom_default()`
+- `test_custom_help_text()`
+- `test_invalid_choice_raises_error()`
+- `test_default_not_in_choices_raises_error()`
+- `test_with_subparsers()`
+- `test_returns_parser()`
+- `test_auto_generated_help_text()`
+- `test_empty_choices_uses_default()`
+- `test_multiple_format_variations()`
+
+---
+
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -2374,6 +2817,26 @@ Attributes:
 
 ---
 
+### `TestCIDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:46`
+
+**Description:**
+> Tests for CI environment detection.
+
+**Methods:**
+- `test_is_ci_environment_returns_bool()`
+- `test_is_ci_environment_detects_github_actions()`
+- `test_is_ci_environment_detects_gitlab_ci()`
+- `test_is_ci_environment_detects_travis()`
+- `test_is_ci_environment_detects_circleci()`
+- `test_is_ci_environment_detects_jenkins()`
+- `test_is_ci_environment_detects_generic_ci()`
+- `test_is_ci_environment_no_ci_vars()`
+
+---
+
 ### `TestCLIBasics`
 
 **Language:** python
@@ -2551,6 +3014,23 @@ Attributes:
 - `test_check_dependencies_nonexistent_task()`
 - `test_check_dependencies_includes_blocks()`
 - `test_check_dependencies_resolved_when_complete()`
+
+---
+
+### `TestCheckDepsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:686`
+
+**Description:**
+> Tests for check-deps command with Rich.Tree output.
+
+**Methods:**
+- `test_check_deps_help()`
+- `test_check_deps_text_output()`
+- `test_check_deps_json_output()`
+- `test_check_deps_with_blocked_task()`
+- `test_check_deps_json_no_ansi_codes()`
 
 ---
 
@@ -2970,6 +3450,41 @@ Attributes:
 - `test_empty_modified_by_fails()`
 - `test_invalid_spec_fails()`
 - `test_invalid_version_format_fails()`
+
+---
+
+### `TestCreateUI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:132`
+
+**Description:**
+> Tests for create_ui factory function.
+
+**Methods:**
+- `test_create_ui_returns_ui_instance()`
+- `test_create_ui_force_plain()`
+- `test_create_ui_force_rich()`
+- `test_create_ui_conflicting_flags_raises_error()`
+- `test_create_ui_with_collect_messages()`
+- `test_create_ui_with_quiet_mode()`
+- `test_create_ui_auto_selects_rich_for_tty()`
+- `test_create_ui_auto_selects_plain_for_non_tty()`
+
+---
+
+### `TestCreateUIFromArgs`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:193`
+
+**Description:**
+> Tests for create_ui_from_args convenience function.
+
+**Methods:**
+- `test_create_ui_from_args_with_plain_flag()`
+- `test_create_ui_from_args_with_quiet_flag()`
+- `test_create_ui_from_args_missing_attributes()`
 
 ---
 
@@ -3402,6 +3917,20 @@ Attributes:
 
 ---
 
+### `TestFormatBackendInfo`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:248`
+
+**Description:**
+> Tests for format_backend_info utility.
+
+**Methods:**
+- `test_format_backend_info_returns_string()`
+- `test_format_backend_info_contains_key_info()`
+
+---
+
 ### `TestFormatCompletionPrompt`
 
 **Language:** python
@@ -3425,6 +3954,26 @@ Attributes:
 - `test_estimated_hours_zero()`
 - `test_prompt_text_structure()`
 - `test_completion_context_completeness()`
+
+---
+
+### `TestFormatJsonOutput`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:47`
+
+**Description:**
+> Tests for format_json_output function.
+
+**Methods:**
+- `test_basic_dict_formatting()`
+- `test_compact_formatting()`
+- `test_pretty_formatting()`
+- `test_ansi_stripping_enabled()`
+- `test_ansi_stripping_disabled()`
+- `test_nested_dict_ansi_stripping()`
+- `test_list_ansi_stripping()`
+- `test_mixed_types()`
 
 ---
 
@@ -3509,6 +4058,20 @@ Attributes:
 - `test_only_tasks_included()`
 - `test_empty_hierarchy()`
 - `test_node_with_no_children()`
+
+---
+
+### `TestGetBackendName`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:231`
+
+**Description:**
+> Tests for get_backend_name utility.
+
+**Methods:**
+- `test_get_backend_name_rich()`
+- `test_get_backend_name_plain()`
 
 ---
 
@@ -4142,6 +4705,27 @@ Attributes:
 
 ---
 
+### `TestListSpecsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:77`
+
+**Description:**
+> Tests for list-specs command with Rich table output.
+
+**Methods:**
+- `test_list_specs_help()`
+- `test_list_specs_text_output()`
+- `test_list_specs_json_output()`
+- `test_list_specs_empty_directory()`
+- `test_list_specs_filter_by_status()`
+- `test_list_specs_progress_calculation()`
+- `test_list_specs_verbose_output()`
+- `test_list_specs_multiple_specs()`
+- `test_list_specs_json_no_ansi_codes()`
+
+---
+
 ### `TestLoadJsonSpec`
 
 **Language:** python
@@ -4194,6 +4778,39 @@ Attributes:
 - `test_parse_task_without_file_path()`
 - `test_parse_verification_without_command()`
 - `test_parse_multiple_phases()`
+
+---
+
+### `TestMessage`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:39`
+
+**Description:**
+> Tests for Message dataclass.
+
+**Methods:**
+- `test_message_creation_minimal()`
+- `test_message_creation_full()`
+- `test_message_default_timestamp()`
+- `test_message_default_rendered_false()`
+- `test_message_context_mutable()`
+- `test_message_metadata_mutable()`
+
+---
+
+### `TestMessageLevel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:12`
+
+**Description:**
+> Tests for MessageLevel enum.
+
+**Methods:**
+- `test_message_level_values()`
+- `test_message_level_count()`
+- `test_message_level_enum_members()`
 
 ---
 
@@ -4407,6 +5024,157 @@ Attributes:
 
 ---
 
+### `TestPlainUiInitialization`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:15`
+
+**Description:**
+> Tests for PlainUi initialization.
+
+**Methods:**
+- `test_plain_ui_default_initialization()`
+- `test_plain_ui_with_quiet_mode()`
+- `test_plain_ui_with_collect_messages()`
+- `test_plain_ui_with_custom_file()`
+
+---
+
+### `TestPlainUiIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:402`
+
+**Description:**
+> Integration tests for PlainUi.
+
+**Methods:**
+- `test_plain_ui_complete_workflow()`
+- `test_plain_ui_no_ansi_codes()`
+
+---
+
+### `TestPlainUiMessageCollection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:368`
+
+**Description:**
+> Tests for message collection mode.
+
+**Methods:**
+- `test_collect_messages_mode()`
+- `test_messages_not_collected_by_default()`
+
+---
+
+### `TestPlainUiPrintDiff`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:166`
+
+**Description:**
+> Tests for print_diff method.
+
+**Methods:**
+- `test_print_diff_basic()`
+- `test_print_diff_with_labels()`
+- `test_print_diff_identical_text()`
+
+---
+
+### `TestPlainUiPrintPanel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:236`
+
+**Description:**
+> Tests for print_panel method.
+
+**Methods:**
+- `test_print_panel_basic()`
+- `test_print_panel_with_title()`
+- `test_print_panel_with_style()`
+
+---
+
+### `TestPlainUiPrintStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:275`
+
+**Description:**
+> Tests for print_status method.
+
+**Methods:**
+- `test_print_status_action()`
+- `test_print_status_success()`
+- `test_print_status_error()`
+- `test_print_status_warning()`
+- `test_print_status_info()`
+- `test_print_status_all_levels()`
+
+---
+
+### `TestPlainUiPrintTable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:50`
+
+**Description:**
+> Tests for print_table method.
+
+**Methods:**
+- `test_print_table_basic()`
+- `test_print_table_with_title()`
+- `test_print_table_with_columns()`
+- `test_print_table_empty_data()`
+
+---
+
+### `TestPlainUiPrintTree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:109`
+
+**Description:**
+> Tests for print_tree method.
+
+**Methods:**
+- `test_print_tree_basic()`
+- `test_print_tree_nested()`
+- `test_print_tree_empty()`
+
+---
+
+### `TestPlainUiProgress`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:208`
+
+**Description:**
+> Tests for progress method.
+
+**Methods:**
+- `test_progress_context_manager()`
+- `test_progress_indeterminate()`
+
+---
+
+### `TestPlainUiQuietMode`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py:341`
+
+**Description:**
+> Tests for quiet mode behavior.
+
+**Methods:**
+- `test_quiet_mode_suppresses_output()`
+- `test_quiet_mode_shows_errors()`
+
+---
+
 ### `TestPrepareTask`
 
 **Language:** python
@@ -4424,10 +5192,26 @@ Attributes:
 
 ---
 
+### `TestPrettyPrinterBackwardCompatibility`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:286`
+
+**Description:**
+> Tests for backward compatibility after refactoring.
+
+**Methods:**
+- `test_colorize_method_preserved()`
+- `test_all_original_methods_exist()`
+- `test_original_signature_compatibility()`
+- `test_method_parameters_backward_compatible()`
+
+---
+
 ### `TestPrettyPrinterColorMode`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:103`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:109`
 
 **Description:**
 > Tests for color/no-color modes.
@@ -4441,7 +5225,7 @@ Attributes:
 ### `TestPrettyPrinterFormatting`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:165`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:171`
 
 **Description:**
 > Tests for message formatting.
@@ -4455,7 +5239,7 @@ Attributes:
 ### `TestPrettyPrinterInit`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:12`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:16`
 
 **Description:**
 > Tests for PrettyPrinter initialization.
@@ -4471,7 +5255,7 @@ Attributes:
 ### `TestPrettyPrinterIntegration`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:197`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:203`
 
 **Description:**
 > Integration tests for PrettyPrinter.
@@ -4485,7 +5269,7 @@ Attributes:
 ### `TestPrettyPrinterMethods`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:43`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:47`
 
 **Description:**
 > Tests for PrettyPrinter methods.
@@ -4501,10 +5285,27 @@ Attributes:
 
 ---
 
+### `TestPrettyPrinterUiBackend`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:238`
+
+**Description:**
+> Tests for PrettyPrinter integration with Ui backend.
+
+**Methods:**
+- `test_printer_has_ui_backend()`
+- `test_printer_delegates_to_ui_backend()`
+- `test_printer_uses_plain_ui_when_color_disabled()`
+- `test_printer_passes_quiet_to_backend()`
+- `test_printer_backend_selection()`
+
+---
+
 ### `TestPrettyPrinterVerbosity`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:128`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py:134`
 
 **Description:**
 > Tests for verbosity modes.
@@ -4766,6 +5567,26 @@ Attributes:
 ### `TestQueryTasksCLI`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:414`
+
+**Description:**
+> Tests for query-tasks command with Rich table output.
+
+**Methods:**
+- `test_query_tasks_help()`
+- `test_query_tasks_text_output()`
+- `test_query_tasks_json_output()`
+- `test_query_tasks_filter_by_status()`
+- `test_query_tasks_filter_by_type()`
+- `test_query_tasks_filter_by_parent()`
+- `test_query_tasks_empty_result()`
+- `test_query_tasks_json_no_ansi_codes()`
+
+---
+
+### `TestQueryTasksCLI`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_update_cli.py:99`
 
 **Description:**
@@ -4885,6 +5706,154 @@ Attributes:
 - `test_report_with_dependencies()`
 - `test_report_json_stdout()`
 - `test_report_with_bottleneck_threshold()`
+
+---
+
+### `TestResult`
+
+**Language:** python
+**Inherits from:** `NamedTuple`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:23`
+
+**Description:**
+> Parsed test result from pytest output.
+
+---
+
+### `TestRichUiInitialization`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:16`
+
+**Description:**
+> Tests for RichUi initialization.
+
+**Methods:**
+- `test_rich_ui_default_initialization()`
+- `test_rich_ui_with_custom_console()`
+- `test_rich_ui_with_collect_messages()`
+
+---
+
+### `TestRichUiIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:326`
+
+**Description:**
+> Integration tests for RichUi.
+
+**Methods:**
+- `test_rich_ui_complete_workflow()`
+- `test_rich_ui_with_real_output()`
+
+---
+
+### `TestRichUiMessageCollection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:299`
+
+**Description:**
+> Tests for message collection mode.
+
+**Methods:**
+- `test_collect_messages_mode()`
+- `test_messages_not_collected_by_default()`
+
+---
+
+### `TestRichUiPrintDiff`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:142`
+
+**Description:**
+> Tests for print_diff method.
+
+**Methods:**
+- `test_print_diff_basic()`
+- `test_print_diff_with_labels()`
+- `test_print_diff_identical_text()`
+
+---
+
+### `TestRichUiPrintPanel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:215`
+
+**Description:**
+> Tests for print_panel method.
+
+**Methods:**
+- `test_print_panel_basic()`
+- `test_print_panel_with_title()`
+- `test_print_panel_with_style()`
+
+---
+
+### `TestRichUiPrintStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:245`
+
+**Description:**
+> Tests for print_status method.
+
+**Methods:**
+- `test_print_status_action()`
+- `test_print_status_success()`
+- `test_print_status_error()`
+- `test_print_status_warning()`
+- `test_print_status_info()`
+- `test_print_status_all_levels()`
+
+---
+
+### `TestRichUiPrintTable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:44`
+
+**Description:**
+> Tests for print_table method.
+
+**Methods:**
+- `test_print_table_basic()`
+- `test_print_table_with_title()`
+- `test_print_table_with_columns()`
+- `test_print_table_empty_data()`
+
+---
+
+### `TestRichUiPrintTree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:97`
+
+**Description:**
+> Tests for print_tree method.
+
+**Methods:**
+- `test_print_tree_basic()`
+- `test_print_tree_nested()`
+- `test_print_tree_empty()`
+
+---
+
+### `TestRichUiProgress`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py:177`
+
+**Description:**
+> Tests for progress method.
+
+**Methods:**
+- `test_progress_context_manager()`
+- `test_progress_indeterminate()`
+- `test_progress_with_description()`
 
 ---
 
@@ -5043,6 +6012,23 @@ Attributes:
 
 ---
 
+### `TestShouldUsePlainUI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:94`
+
+**Description:**
+> Tests for should_use_plain_ui decision logic.
+
+**Methods:**
+- `test_should_use_plain_ui_with_force_flag()`
+- `test_should_use_plain_ui_with_env_var()`
+- `test_should_use_plain_ui_no_tty()`
+- `test_should_use_plain_ui_in_ci()`
+- `test_should_use_plain_ui_interactive_terminal()`
+
+---
+
 ### `TestShowCommitPreview`
 
 **Language:** python
@@ -5133,6 +6119,17 @@ Attributes:
 
 ---
 
+### `TestStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:13`
+
+**Description:**
+> Test execution status.
+
+---
+
 ### `TestStatusReportCompletion`
 
 **Language:** python
@@ -5146,6 +6143,23 @@ Attributes:
 - `test_non_interactive_behavior()`
 - `test_command_hint_displayed()`
 - `test_incomplete_spec_no_completion_message()`
+
+---
+
+### `TestStripAnsiCodes`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:19`
+
+**Description:**
+> Tests for strip_ansi_codes function.
+
+**Methods:**
+- `test_strip_basic_ansi_codes()`
+- `test_strip_multiple_ansi_codes()`
+- `test_no_ansi_codes()`
+- `test_empty_string()`
+- `test_rich_markup_not_stripped()`
 
 ---
 
@@ -5201,6 +6215,21 @@ Attributes:
 - `test_sync_metadata_sets_completed_status()`
 - `test_sync_metadata_finds_current_phase()`
 - `test_sync_metadata_dry_run()`
+
+---
+
+### `TestTTYDetection`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:25`
+
+**Description:**
+> Tests for TTY detection.
+
+**Methods:**
+- `test_is_tty_available_returns_bool()`
+- `test_is_tty_available_when_tty()`
+- `test_is_tty_available_when_not_tty()`
 
 ---
 
@@ -5295,6 +6324,35 @@ Attributes:
 - `test_parse_enum()`
 - `test_parse_generic_function()`
 - `test_parse_tsx_component()`
+
+---
+
+### `TestUIShorthand`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:267`
+
+**Description:**
+> Tests for ui() shorthand function.
+
+**Methods:**
+- `test_ui_shorthand_creates_instance()`
+- `test_ui_shorthand_with_force_plain()`
+- `test_ui_shorthand_with_collect_messages()`
+
+---
+
+### `TestUiProtocol`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py:102`
+
+**Description:**
+> Tests for Ui protocol definition.
+
+**Methods:**
+- `test_ui_is_runtime_checkable()`
+- `test_ui_protocol_required_methods()`
 
 ---
 
@@ -5796,6 +6854,54 @@ Example:
 
 ---
 
+### `Ui`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_protocol.py:64`
+
+**Description:**
+> Agent-first terminal user interface protocol using Rich.
+
+Provides Rich-powered TUI features including tables, trees, panels,
+progress indicators, and diff display. Supports both immediate and
+deferred rendering modes for AI-agent workflows.
+
+Core Rich Features:
+- print_table: Display data in formatted tables
+- print_tree: Show hierarchical data structures
+- print_diff: Display code/text differences
+- progress: Show progress bars and spinners
+- print_panel: Display content in bordered panels
+- print_status: Show status messages with styling
+
+All implementations must support:
+1. Rich-powered output methods
+2. Message collection in deferred mode
+3. Context management for message tagging
+
+Usage:
+    # Rich-powered interface
+    ui = RichUi()
+    ui.print_table(data, title="Task Progress")
+    ui.print_tree(hierarchy)
+
+    # With progress tracking
+    with ui.progress("Processing tasks...") as progress:
+        for task in tasks:
+            process(task)
+            progress.update()
+
+**Methods:**
+- `print_table()`
+- `print_tree()`
+- `print_diff()`
+- `progress()`
+- `print_panel()`
+- `print_status()`
+
+---
+
 ### `VisualizationBuilder`
 
 **Language:** python
@@ -5845,6 +6951,35 @@ Example:
 
 ## ⚡ Functions
 
+### `_apply_env_overrides(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:164`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Apply environment variable overrides to config.
+
+Environment variables take precedence over config file settings.
+
+Supported environment variables:
+- SDD_CACHE_ENABLED: "true" or "false"
+- SDD_CACHE_DIR: Path to cache directory
+- SDD_CACHE_TTL_HOURS: Number (hours)
+- SDD_CACHE_MAX_SIZE_MB: Number (MB)
+- SDD_CACHE_AUTO_CLEANUP: "true" or "false"
+
+Args:
+    config: Configuration dictionary
+
+Returns:
+    Configuration with environment overrides applied
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
 ### `_auto_register_parsers(factory) -> None`
 
 **Language:** python
@@ -5859,6 +6994,25 @@ If a parser's dependencies aren't available, it's skipped silently.
 
 **Parameters:**
 - `factory`: ParserFactory
+
+---
+
+### `_batch_update_worker(tracker, interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:557`
+**Complexity:** 4
+
+**Description:**
+> Background worker thread for periodic batch progress updates.
+
+Args:
+    tracker: BatchProgressTracker to monitor
+    interval: Update interval in seconds
+
+**Parameters:**
+- `tracker`: BatchProgressTracker
+- `interval`: float
 
 ---
 
@@ -5898,6 +7052,28 @@ If a parser's dependencies aren't available, it's skipped silently.
 **Parameters:**
 - `error`: EnhancedError
 - `spec_data`: Dict[str, Any]
+
+---
+
+### `_build_dependency_tree(deps, task_id) -> Tree`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:392`
+⚠️ **Complexity:** 13 (High)
+
+**Description:**
+> Build a Rich Tree visualization for task dependencies.
+
+Args:
+    deps: Dependency information dictionary from check_dependencies()
+    task_id: The task ID being analyzed
+
+Returns:
+    Rich Tree object representing the dependency structure
+
+**Parameters:**
+- `deps`: Dict[str, Any]
+- `task_id`: str
 
 ---
 
@@ -6223,6 +7399,28 @@ Raises:
 
 ---
 
+### `_calculate_update_interval(timeout, custom_interval) -> float`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:75`
+**Complexity:** 4
+
+**Description:**
+> Calculate appropriate update interval based on timeout.
+
+Args:
+    timeout: Expected timeout in seconds
+    custom_interval: Optional custom interval override
+
+Returns:
+    Update interval in seconds
+
+**Parameters:**
+- `timeout`: int
+- `custom_interval`: Optional[float]
+
+---
+
 ### `_category_from_field(field) -> str`
 
 **Language:** python
@@ -6237,7 +7435,7 @@ Raises:
 ### `_check_all_task_deps(spec_data, args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:441`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:490`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -6317,7 +7515,7 @@ Args:
 ### `_compare_dicts(node_id, dict_name, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:142`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:149`
 **Complexity:** 5
 
 **Description:**
@@ -6334,7 +7532,7 @@ Args:
 ### `_compare_nodes(node_id, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:89`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:96`
 **Complexity:** 6
 
 **Description:**
@@ -6382,6 +7580,76 @@ Returns:
 
 ---
 
+### `_create_progress_bar(percentage, width) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:18`
+**Complexity:** 4
+
+**Description:**
+> Create a visual progress bar using block characters.
+
+Args:
+    percentage: Completion percentage (0-100)
+    width: Width of the progress bar in characters
+
+Returns:
+    Rich markup string with colored progress bar
+
+**Parameters:**
+- `percentage`: int
+- `width`: int
+
+---
+
+### `_create_progress_bar(percentage, width) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:13`
+**Complexity:** 4
+
+**Description:**
+> Create a visual progress bar using block characters.
+
+Args:
+    percentage: Completion percentage (0-100)
+    width: Width of the progress bar in characters
+
+Returns:
+    Rich markup string with colored progress bar
+
+**Parameters:**
+- `percentage`: int
+- `width`: int
+
+---
+
+### `_create_value_display(field_path, value, change_type, is_before) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:463`
+**Complexity:** 10
+
+**Description:**
+> Create formatted display for a value in the diff.
+
+Args:
+    field_path: Path to the field (e.g., "status", "metadata.file_path")
+    value: Value to display
+    change_type: Type of change ("added", "removed", "modified")
+    is_before: True if this is the "before" column, False for "after"
+
+Returns:
+    Rich Text or Syntax object with formatted content
+
+**Parameters:**
+- `field_path`: str
+- `value`: Any
+- `change_type`: str
+- `is_before`: bool
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -6404,6 +7672,28 @@ Returns:
 - `task_title`: str
 - `actual_hours`: Optional[float]
 - `note`: Optional[str]
+
+---
+
+### `_detect_code_language(field_path, value) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:274`
+⚠️ **Complexity:** 17 (High)
+
+**Description:**
+> Detect programming language from field path or value content.
+
+Args:
+    field_path: Field path like "metadata.command" or "verification.script"
+    value: Value to analyze for language detection
+
+Returns:
+    Language identifier for Rich.Syntax or None if not code
+
+**Parameters:**
+- `field_path`: str
+- `value`: Any
 
 ---
 
@@ -6732,7 +8022,7 @@ Returns:
 ### `_format_value(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:256`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:263`
 **Complexity:** 4
 
 **Description:**
@@ -6930,8 +8220,8 @@ Returns:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:30`
-⚠️ **Complexity:** 21 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:32`
+⚠️ **Complexity:** 23 (High)
 
 **Description:**
 > Handle fidelity-review command execution.
@@ -6959,7 +8249,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:215`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:217`
 **Complexity:** 10
 
 **Description:**
@@ -7022,6 +8312,30 @@ Returns:
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `mod`: Dict[str, Any]
+
+---
+
+### `_hash_files(file_paths) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:73`
+**Complexity:** 4
+
+**Description:**
+> Generate hash of file contents.
+
+Args:
+    file_paths: List of file paths to hash
+
+Returns:
+    Hex string hash of all file contents combined
+
+Note:
+    If a file doesn't exist or can't be read, it's skipped with a warning marker.
+    This ensures cache keys can still be generated even with missing files.
+
+**Parameters:**
+- `file_paths`: List[str]
 
 ---
 
@@ -7174,6 +8488,26 @@ Args:
 
 ---
 
+### `_merge_with_defaults(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:73`
+⚠️ **Complexity:** 16 (High)
+
+**Description:**
+> Merge loaded config with defaults.
+
+Args:
+    config: Loaded configuration dictionary
+
+Returns:
+    Merged configuration with defaults
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
 ### `_normalize_node_type(value) -> str`
 
 **Language:** python
@@ -7224,11 +8558,11 @@ Args:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:203`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:199`
 **Complexity:** 1
 
 **Description:**
-> Generate JSON output format.
+> Generate JSON output format using FidelityReport.
 
 **Parameters:**
 - `args`: None
@@ -7242,7 +8576,7 @@ Args:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:180`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:176`
 **Complexity:** 5
 
 **Description:**
@@ -7260,11 +8594,11 @@ Args:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:145`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:158`
+**Complexity:** 1
 
 **Description:**
-> Generate text output format.
+> Generate text output format using Rich panels and formatting.
 
 **Parameters:**
 - `args`: None
@@ -7397,6 +8731,20 @@ Returns:
 
 ---
 
+### `_print_phases_table(phases) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:98`
+**Complexity:** 5
+
+**Description:**
+> Print phases using Rich.Table for structured output.
+
+**Parameters:**
+- `phases`: List[Dict[str, Any]]
+
+---
+
 ### `_print_results(args, results) -> None`
 
 **Language:** python
@@ -7412,16 +8760,36 @@ Returns:
 ### `_print_specs_text(specs_info, verbose, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:107`
-⚠️ **Complexity:** 16 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:141`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
-> Print specs in human-readable text format.
+> Print specs using Rich.Table for structured output.
 
 **Parameters:**
 - `specs_info`: List[Dict[str, Any]]
 - `verbose`: bool
 - `printer`: PrettyPrinter
+
+---
+
+### `_print_tasks_table(matches, total_count, limited, status_filter, type_filter, parent_filter, limit) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:102`
+⚠️ **Complexity:** 18 (High)
+
+**Description:**
+> Print tasks using Rich.Table for structured output.
+
+**Parameters:**
+- `matches`: List[Dict[str, Any]]
+- `total_count`: int
+- `limited`: bool
+- `status_filter`: Optional[str]
+- `type_filter`: Optional[str]
+- `parent_filter`: Optional[str]
+- `limit`: Optional[int]
 
 ---
 
@@ -7592,7 +8960,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:63`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:65`
 **Complexity:** 1
 
 **Description:**
@@ -7607,7 +8975,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:101`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:103`
 **Complexity:** 1
 
 **Description:**
@@ -7622,7 +8990,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:83`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:85`
 **Complexity:** 1
 
 **Description:**
@@ -7774,6 +9142,28 @@ Returns:
 
 ---
 
+### `_should_use_syntax_highlighting(value, language) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:331`
+**Complexity:** 6
+
+**Description:**
+> Determine if value should use syntax highlighting.
+
+Args:
+    value: Value to check
+    language: Detected language or None
+
+Returns:
+    True if syntax highlighting should be used
+
+**Parameters:**
+- `value`: Any
+- `language`: Optional[str]
+
+---
+
 ### `_simulate_workflow(state, task_id, actual_hours, note, journal_title, journal_content, journal_entry_type, author, revision_version, revision_changes) -> Dict[str, Any]`
 
 **Language:** python
@@ -7816,6 +9206,29 @@ Returns:
 
 ---
 
+### `_strip_ansi_recursive(obj) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:76`
+**Complexity:** 4
+
+**Description:**
+> Recursively strip ANSI codes from all string values in an object.
+
+Handles dictionaries, lists, and nested structures. Non-string values
+are returned unchanged.
+
+Args:
+    obj: Object to process (dict, list, str, or primitive)
+
+Returns:
+    Object with ANSI codes stripped from all strings
+
+**Parameters:**
+- `obj`: Any
+
+---
+
 ### `_suggest_fix(category, normalized_message) -> Optional[str]`
 
 **Language:** python
@@ -7847,6 +9260,25 @@ Returns:
 **Parameters:**
 - `issue`: Dict[str, Any]
 - `severity`: str
+
+---
+
+### `_update_worker(tracker, interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:370`
+**Complexity:** 4
+
+**Description:**
+> Background worker thread for periodic progress updates.
+
+Args:
+    tracker: ProgressTracker to monitor
+    interval: Update interval in seconds
+
+**Parameters:**
+- `tracker`: ProgressTracker
+- `interval`: float
 
 ---
 
@@ -8034,6 +9466,49 @@ Raises:
 - `text`: str
 - `assumption_type`: str
 - `added_by`: str
+
+---
+
+### `add_format_flag(parser, choices, default, help_text) -> argparse.ArgumentParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:100`
+**Complexity:** 4
+
+**Description:**
+> Add a consistent --format flag to an argparse parser.
+
+This utility function provides a standardized way to add output format options
+to CLI commands, reducing code duplication across different command implementations.
+
+Args:
+    parser: The argparse ArgumentParser or subparser to modify
+    choices: Valid format options (default: ['text', 'json'])
+    default: Default format value (default: 'text')
+    help_text: Custom help text (default: auto-generated from choices)
+
+Returns:
+    The modified parser (for chaining)
+
+Example:
+    >>> parser = argparse.ArgumentParser()
+    >>> add_format_flag(parser, choices=['json', 'table'], default='table')
+    <ArgumentParser ...>
+
+    >>> # With subparsers
+    >>> subparsers = parser.add_subparsers()
+    >>> cmd_parser = subparsers.add_parser('stats')
+    >>> add_format_flag(cmd_parser, choices=['text', 'json', 'markdown'])
+    <ArgumentParser ...>
+
+Raises:
+    ValueError: If default is not in choices
+
+**Parameters:**
+- `parser`: argparse.ArgumentParser
+- `choices`: Optional[Sequence[str]]
+- `default`: str
+- `help_text`: Optional[str]
 
 ---
 
@@ -8306,6 +9781,43 @@ Examples:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `ai_consultation_progress(tool, timeout, callback, update_interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:402`
+⚠️ **Complexity:** 11 (High)
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager for AI consultation with progress feedback.
+
+Automatically handles progress lifecycle: start, update (Phase 5), and completion.
+Ensures cleanup even if exceptions occur.
+
+Usage:
+    with ai_consultation_progress("gemini", timeout=90) as progress:
+        response = execute_tool("gemini", prompt)
+        progress.complete(response)
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    timeout: Expected timeout in seconds (default 90)
+    callback: Optional progress callback (defaults to no-op)
+    update_interval: Optional custom update interval in seconds (auto-calculated if None)
+    **context: Additional context for progress display (model, prompt_length, etc.)
+
+Yields:
+    ProgressTracker: Progress tracker object with complete() method
+
+**Parameters:**
+- `tool`: str
+- `timeout`: int
+- `callback`: Optional[ProgressCallback]
+- `update_interval`: Optional[float]
 
 ---
 
@@ -8781,6 +10293,43 @@ Example:
 
 ---
 
+### `batch_consultation_progress(tools, timeout, callback, update_interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:596`
+**Complexity:** 6
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager for batch AI consultation with progress feedback.
+
+Handles parallel tool execution with per-tool and aggregate progress tracking.
+
+Usage:
+    with batch_consultation_progress(["gemini", "codex"], timeout=120) as progress:
+        multi_response = execute_tools_parallel(...)
+        for tool, response in multi_response.responses.items():
+            progress.mark_complete(tool, response)
+
+Args:
+    tools: List of tool names to execute
+    timeout: Per-tool timeout in seconds (default 90)
+    callback: Optional progress callback (defaults to no-op)
+    update_interval: Optional custom update interval in seconds (auto-calculated if None)
+    **context: Additional context for progress display
+
+Yields:
+    BatchProgressTracker: Batch progress tracker with mark_complete() method
+
+**Parameters:**
+- `tools`: list[str]
+- `timeout`: int
+- `callback`: Optional[ProgressCallback]
+- `update_interval`: Optional[float]
+
+---
+
 ### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
@@ -9163,7 +10712,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:658`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:805`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -9197,7 +10746,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:766`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:913`
 **Complexity:** 1
 
 **Description:**
@@ -9730,7 +11279,7 @@ Example:
 ### `cmd_activate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:638`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:640`
 **Complexity:** 4
 
 **Description:**
@@ -9745,7 +11294,7 @@ Example:
 ### `cmd_add_assumption(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:273`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:275`
 **Complexity:** 7
 
 **Description:**
@@ -9760,7 +11309,7 @@ Example:
 ### `cmd_add_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:227`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:229`
 **Complexity:** 3
 
 **Description:**
@@ -9775,7 +11324,7 @@ Example:
 ### `cmd_add_revision(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:251`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:253`
 **Complexity:** 3
 
 **Description:**
@@ -9790,7 +11339,7 @@ Example:
 ### `cmd_add_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:439`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:441`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -9805,7 +11354,7 @@ Example:
 ### `cmd_add_verification(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:564`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:566`
 **Complexity:** 3
 
 **Description:**
@@ -9887,7 +11436,7 @@ Returns:
 ### `cmd_audit_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:730`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:732`
 **Complexity:** 5
 
 **Description:**
@@ -9902,7 +11451,7 @@ Returns:
 ### `cmd_bulk_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:989`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1012`
 **Complexity:** 4
 
 **Description:**
@@ -9977,7 +11526,7 @@ Returns:
 ### `cmd_check_complete(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:861`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:884`
 **Complexity:** 5
 
 **Description:**
@@ -9992,8 +11541,8 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:389`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:451`
+**Complexity:** 8
 
 **Description:**
 > Check task dependencies.
@@ -10007,7 +11556,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:498`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:529`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -10022,7 +11571,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:895`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:948`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10052,7 +11601,7 @@ Returns:
 ### `cmd_check_journaling(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:949`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:972`
 **Complexity:** 8
 
 **Description:**
@@ -10097,7 +11646,7 @@ Returns:
 ### `cmd_complete_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:660`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:662`
 **Complexity:** 3
 
 **Description:**
@@ -10112,7 +11661,7 @@ Returns:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1090`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1113`
 **Complexity:** 6
 
 **Description:**
@@ -10228,7 +11777,7 @@ Returns:
 ### `cmd_create_task_commit(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1016`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1039`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -10267,7 +11816,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:824`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:877`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -10294,7 +11843,7 @@ Returns:
 ### `cmd_execute_verify(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:53`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:55`
 ⚠️ **Complexity:** 29 (High)
 
 **Description:**
@@ -10324,7 +11873,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:938`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:991`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -10375,7 +11924,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:803`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:856`
 **Complexity:** 5
 
 **Description:**
@@ -10390,7 +11939,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:978`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1031`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -10405,7 +11954,7 @@ Returns:
 ### `cmd_find_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:269`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:272`
 **Complexity:** 8
 
 **Description:**
@@ -10420,7 +11969,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:863`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:916`
 **Complexity:** 9
 
 **Description:**
@@ -10435,7 +11984,7 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:278`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:309`
 ⚠️ **Complexity:** 34 (High)
 
 **Description:**
@@ -10465,7 +12014,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:747`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:800`
 **Complexity:** 4
 
 **Description:**
@@ -10480,7 +12029,7 @@ Returns:
 ### `cmd_format_verification_summary(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:589`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:591`
 **Complexity:** 6
 
 **Description:**
@@ -10522,7 +12071,7 @@ Returns:
 ### `cmd_get_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:810`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:824`
 **Complexity:** 7
 
 **Description:**
@@ -10552,7 +12101,7 @@ Returns:
 ### `cmd_get_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:786`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:800`
 **Complexity:** 6
 
 **Description:**
@@ -10582,7 +12131,7 @@ Returns:
 ### `cmd_init_env(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:523`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:576`
 **Complexity:** 6
 
 **Description:**
@@ -10597,7 +12146,7 @@ Returns:
 ### `cmd_list_assumptions(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:321`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:323`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -10612,7 +12161,7 @@ Returns:
 ### `cmd_list_blockers(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:908`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:931`
 **Complexity:** 6
 
 **Description:**
@@ -10663,8 +12212,8 @@ Returns:
 ### `cmd_list_phases(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:839`
-**Complexity:** 6
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:853`
+**Complexity:** 7
 
 **Description:**
 > List all phases.
@@ -10678,7 +12227,7 @@ Returns:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1123`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1146`
 **Complexity:** 3
 
 **Description:**
@@ -10708,7 +12257,7 @@ Returns:
 ### `cmd_mark_blocked(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:183`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:185`
 **Complexity:** 3
 
 **Description:**
@@ -10738,7 +12287,7 @@ Returns:
 ### `cmd_move_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:622`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:624`
 **Complexity:** 1
 
 **Description:**
@@ -10753,7 +12302,7 @@ Returns:
 ### `cmd_next_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:297`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:300`
 **Complexity:** 10
 
 **Description:**
@@ -10796,7 +12345,7 @@ Returns:
 ### `cmd_phase_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:885`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:908`
 **Complexity:** 6
 
 **Description:**
@@ -10811,7 +12360,7 @@ Returns:
 ### `cmd_prepare_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:548`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:601`
 ⚠️ **Complexity:** 24 (High)
 
 **Description:**
@@ -10863,7 +12412,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_progress(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:490`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:543`
 **Complexity:** 7
 
 **Description:**
@@ -10878,8 +12427,8 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_query_tasks(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:752`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:754`
+⚠️ **Complexity:** 13 (High)
 
 **Description:**
 > Query and filter tasks.
@@ -10893,7 +12442,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_reconcile_state(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:930`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:953`
 **Complexity:** 3
 
 **Description:**
@@ -10923,7 +12472,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_remove_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:492`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:494`
 **Complexity:** 9
 
 **Description:**
@@ -10964,7 +12513,7 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:411`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:442`
 **Complexity:** 9
 
 **Description:**
@@ -11057,7 +12606,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1041`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1094`
 **Complexity:** 10
 
 **Description:**
@@ -11084,7 +12633,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:472`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:503`
 **Complexity:** 4
 
 **Description:**
@@ -11099,7 +12648,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_status_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:708`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:710`
 **Complexity:** 6
 
 **Description:**
@@ -11114,7 +12663,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1141`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1164`
 **Complexity:** 3
 
 **Description:**
@@ -11129,7 +12678,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_task_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:348`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:351`
 **Complexity:** 9
 
 **Description:**
@@ -11159,7 +12708,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_time_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:684`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:686`
 **Complexity:** 6
 
 **Description:**
@@ -11204,7 +12753,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_unblock_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:206`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:208`
 **Complexity:** 3
 
 **Description:**
@@ -11234,7 +12783,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_estimate(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:392`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:394`
 **Complexity:** 10
 
 **Description:**
@@ -11249,7 +12798,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_frontmatter(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:540`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:542`
 **Complexity:** 1
 
 **Description:**
@@ -11264,7 +12813,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_status(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:160`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:162`
 **Complexity:** 3
 
 **Description:**
@@ -11279,7 +12828,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1160`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1183`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -11307,7 +12856,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:192`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Validate JSON spec file.
@@ -11321,7 +12870,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1014`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1067`
 **Complexity:** 7
 
 **Description:**
@@ -11336,7 +12885,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:766`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:819`
 **Complexity:** 10
 
 **Description:**
@@ -11351,7 +12900,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_verify_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:250`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:253`
 **Complexity:** 3
 
 **Description:**
@@ -11547,7 +13096,7 @@ Returns:
 ### `compute_diff(before, after) -> DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:30`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:37`
 **Complexity:** 6
 
 **Description:**
@@ -11569,7 +13118,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:94`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:103`
 **Complexity:** 8
 
 **Description:**
@@ -11677,17 +13226,24 @@ Returns:
 
 ---
 
-### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success) -> List[ToolResponse]`
+### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success, cache_key_params, use_cache, progress_emitter) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:179`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:188`
+⚠️ **Complexity:** 32 (High)
 
 **Description:**
 > Consult multiple AI tools in parallel for fidelity review.
 
-Wrapper around execute_tools_parallel() with fidelity-review defaults
-and comprehensive error handling.
+Wrapper around execute_tools_parallel() with fidelity-review defaults,
+comprehensive error handling, and optional caching support.
+
+Caching Behavior:
+    - First checks cache for existing results (cache hit = instant return)
+    - On cache miss, consults AI tools via execute_tools_parallel()
+    - Saves fresh consultation results to cache for future use
+    - Cache save failures are non-fatal (logged as warnings)
+    - Serialization format preserves tool, status, output, error, model, metadata
 
 Args:
     prompt: The review prompt to send to all AI tools
@@ -11696,6 +13252,10 @@ Args:
     model: Model to request (optional, tool-specific)
     timeout: Timeout in seconds per tool (default: 120)
     require_all_success: If True, raise exception if any tool fails
+    cache_key_params: Parameters for cache key generation (spec_id, scope, target, file_paths)
+    use_cache: Enable caching (overrides config, defaults to config setting)
+    progress_emitter: Optional ProgressEmitter for emitting structured events (cache_check,
+                      ai_consultation, model_response, cache_save, complete)
 
 Returns:
     List of ToolResponse objects, one per tool
@@ -11707,7 +13267,8 @@ Raises:
 Example:
     >>> responses = consult_multiple_ai_on_fidelity(
     ...     prompt="Review this implementation...",
-    ...     tools=["gemini", "codex"]
+    ...     tools=["gemini", "codex"],
+    ...     cache_key_params={"spec_id": "my-spec-001", "scope": "phase", "target": "phase-1"}
     ... )
     >>> for response in responses:
     ...     print(f"{response.tool}: {response.status.value}")
@@ -11718,6 +13279,9 @@ Example:
 - `model`: Optional[str]
 - `timeout`: int
 - `require_all_success`: bool
+- `cache_key_params`: Optional[Dict[str, Any]]
+- `use_cache`: Optional[bool]
+- `progress_emitter`: Optional[ProgressEmitter]
 
 ---
 
@@ -11811,6 +13375,26 @@ Example:
 
 **Parameters:**
 - `spec_content`: str
+
+---
+
+### `create_blockers_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:188`
+**Complexity:** 9
+
+**Description:**
+> Create a panel showing blocked tasks with reasons.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with blockers list
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -11948,6 +13532,26 @@ Returns:
 
 ---
 
+### `create_phases_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:46`
+**Complexity:** 10
+
+**Description:**
+> Create a panel showing all phases with status indicators.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with phases table
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `create_pr_with_ai_description(repo_root, branch_name, base_branch, pr_title, pr_body, spec_data, spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
@@ -11987,6 +13591,48 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: PrettyPrinter
+
+---
+
+### `create_progress_bar(percentage, width) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:18`
+**Complexity:** 3
+
+**Description:**
+> Create a visual progress bar using Unicode box characters.
+
+Args:
+    percentage: Progress percentage (0-100)
+    width: Width of progress bar in characters
+
+Returns:
+    Formatted progress bar string with color coding
+
+**Parameters:**
+- `percentage`: float
+- `width`: int
+
+---
+
+### `create_progress_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:128`
+**Complexity:** 7
+
+**Description:**
+> Create a panel showing overall and phase-specific progress metrics.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with progress metrics
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -12140,6 +13786,38 @@ Returns:
 
 ---
 
+### `create_status_layout(spec_data) -> Layout`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:259`
+**Complexity:** 1
+
+**Description:**
+> Create a Rich.Layout with multiple panels for status dashboard.
+
+Layout structure:
+┌─────────────────────────┬──────────────┐
+│                         │              │
+│   Phases Panel          │   Progress   │
+│                         │   Panel      │
+│                         │              │
+├─────────────────────────┴──────────────┤
+│                                         │
+│   Blockers Panel                        │
+│                                         │
+└─────────────────────────────────────────┘
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Layout with populated panels
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `create_temp_json_spec(tmp_path) -> None`
 
 **Language:** python
@@ -12169,6 +13847,102 @@ Returns:
 
 **Parameters:**
 - `tmp_path`: None
+
+---
+
+### `create_ui(force_plain, force_rich, collect_messages, quiet) -> Ui`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:137`
+**Complexity:** 7
+
+**Description:**
+> Create appropriate UI backend based on environment.
+
+Automatically selects RichUi or PlainUi based on:
+- TTY availability
+- CI environment detection
+- Explicit force flags
+- Environment variables
+
+Args:
+    force_plain: Force PlainUi backend (overrides auto-detection)
+    force_rich: Force RichUi backend (overrides auto-detection)
+    collect_messages: Enable message collection mode
+    quiet: Enable quiet mode (errors only, PlainUi only)
+    **kwargs: Additional backend-specific options
+
+Returns:
+    Ui implementation (RichUi or PlainUi)
+
+Raises:
+    ValueError: If both force_plain and force_rich are True
+
+Examples:
+    # Automatic selection (recommended)
+    ui = create_ui()
+
+    # Force plain mode (for testing)
+    ui = create_ui(force_plain=True)
+
+    # Force rich mode (for demos)
+    ui = create_ui(force_rich=True)
+
+    # Collection mode with automatic backend
+    ui = create_ui(collect_messages=True)
+
+    # Quiet mode for scripts
+    ui = create_ui(quiet=True)
+
+Decision Flow:
+    1. Check force_rich/force_plain flags
+    2. Check FORCE_PLAIN_UI environment variable
+    3. Check TTY availability
+    4. Check CI environment
+    5. Default to RichUi for interactive terminals
+
+**Parameters:**
+- `force_plain`: bool
+- `force_rich`: bool
+- `collect_messages`: bool
+- `quiet`: bool
+
+---
+
+### `create_ui_from_args(args) -> Ui`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:215`
+**Complexity:** 1
+
+**Description:**
+> Create UI backend from parsed CLI arguments.
+
+Convenience function for CLI commands that use argparse.
+Expects args object with optional attributes:
+- plain: bool (force plain mode)
+- quiet: bool (suppress output)
+- collect: bool (collection mode)
+
+Args:
+    args: argparse.Namespace with CLI arguments
+
+Returns:
+    Ui implementation based on CLI flags
+
+Example:
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--plain", action="store_true")
+    parser.add_argument("--quiet", action="store_true")
+    args = parser.parse_args()
+
+    ui = create_ui_from_args(args)
+    ui.print_status("Processing...", MessageLevel.ACTION)
+
+**Parameters:**
+- `args`: None
 
 ---
 
@@ -12221,7 +13995,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:530`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:677`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12421,6 +14195,29 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `display_diff_side_by_side(report, spec_id, console) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:354`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Display diff report as side-by-side comparison using Rich.Columns and Panel.
+
+Shows before/after values in parallel columns with color coding for changes.
+
+Args:
+    report: DiffReport with changes to display
+    spec_id: Spec identifier for display
+    console: Optional Rich Console instance (creates one if not provided)
+
+**Parameters:**
+- `report`: DiffReport
+- `spec_id`: str
+- `console`: Optional[Console]
 
 ---
 
@@ -13816,6 +15613,33 @@ Returns:
 
 ---
 
+### `format_backend_info() -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:271`
+**Complexity:** 1
+
+**Description:**
+> Get formatted information about backend selection.
+
+Returns diagnostic information about the runtime environment
+and which backend would be selected.
+
+Returns:
+    Formatted string with backend selection details
+
+Example:
+    print(format_backend_info())
+
+    Output:
+    Backend Selection Info:
+    - TTY Available: Yes
+    - CI Environment: No
+    - Force Plain: No
+    - Selected Backend: RichUi
+
+---
+
 ### `format_call_graph_as_dot(graph) -> str`
 
 **Language:** python
@@ -14041,7 +15865,7 @@ Returns:
 ### `format_diff_json(report) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:234`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:241`
 **Complexity:** 2
 
 **Description:**
@@ -14055,7 +15879,7 @@ Returns:
 ### `format_diff_markdown(report, spec_id) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:171`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:178`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -14070,7 +15894,7 @@ Returns:
 ### `format_execution_plan(spec_id, task_id, specs_dir) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:60`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:63`
 ⚠️ **Complexity:** 39 (High)
 
 **Description:**
@@ -14128,6 +15952,41 @@ Returns:
 
 **Parameters:**
 - `trace_result`: Dict[str, Any]
+
+---
+
+### `format_json_output(data, compact, strip_ansi) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:40`
+**Complexity:** 3
+
+**Description:**
+> Format data as JSON output with optional ANSI code stripping.
+
+This helper ensures consistent JSON output across CLI commands by:
+1. Stripping ANSI escape codes from string values (if enabled)
+2. Providing compact or pretty-printed formatting
+3. Handling nested dictionaries and lists recursively
+
+Args:
+    data: Dictionary or list to convert to JSON
+    compact: If True, use compact formatting (no indentation)
+            If False, use pretty-printed formatting (2-space indentation)
+    strip_ansi: If True, strip ANSI codes from all string values
+
+Returns:
+    JSON-formatted string
+
+Example:
+    >>> data = {"status": "\x1b[32mcompleted\x1b[0m", "count": 5}
+    >>> format_json_output(data, compact=False, strip_ansi=True)
+    '{\n  "status": "completed",\n  "count": 5\n}'
+
+**Parameters:**
+- `data`: Union[Dict[str, Any], List[Any]]
+- `compact`: bool
+- `strip_ansi`: bool
 
 ---
 
@@ -14389,6 +16248,93 @@ Args:
 
 ---
 
+### `format_phases_table(spec_id, specs_dir, printer) -> Optional[List[Dict]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:49`
+**Complexity:** 6
+
+**Description:**
+> List all phases using Rich.Table format.
+
+Args:
+    spec_id: Specification ID
+    specs_dir: Path to specs directory
+    printer: Optional printer for output
+
+Returns:
+    List of phase dictionaries, or None on error
+
+**Parameters:**
+- `spec_id`: str
+- `specs_dir`: Path
+- `printer`: Optional[PrettyPrinter]
+
+---
+
+### `format_progress_message(tool, elapsed, timeout, include_timeout) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:98`
+**Complexity:** 3
+
+**Description:**
+> Format a progress status message for display.
+
+Args:
+    tool: Tool name (e.g., "gemini", "codex")
+    elapsed: Elapsed time in seconds
+    timeout: Optional timeout in seconds
+    include_timeout: Whether to include timeout in message
+
+Returns:
+    Formatted message like "Waiting for gemini... 30.5s" or
+    "Waiting for gemini... 30.5s / 90s"
+
+Examples:
+    >>> format_progress_message("gemini", 30.5)
+    'Waiting for gemini... 30.5s'
+
+    >>> format_progress_message("gemini", 30.5, 90)
+    'Waiting for gemini... 30.5s / 90s'
+
+    >>> format_progress_message("codex", 125.7, 300, include_timeout=False)
+    'Waiting for codex... 125.7s'
+
+**Parameters:**
+- `tool`: str
+- `elapsed`: float
+- `timeout`: Optional[int]
+- `include_timeout`: bool
+
+---
+
+### `format_progress_summary(progress) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:202`
+**Complexity:** 8
+
+**Description:**
+> Format progress info as a human-readable summary.
+
+Args:
+    progress: Progress information to format
+
+Returns:
+    Formatted summary string
+
+Examples:
+    >>> progress = ProgressInfo(passed=10, failed=2, skipped=1, errors=0,
+    ...                         xfailed=0, xpassed=0, total_run=13, percentage=65)
+    >>> format_progress_summary(progress)
+    '10 passed, 2 failed, 1 skipped (65%)'
+
+**Parameters:**
+- `progress`: ProgressInfo
+
+---
+
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
@@ -14631,6 +16577,38 @@ Args:
 - `synthesis`: Dict[str, any]
 - `responses`: List[ConsultationResponse]
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `format_tasks_table(spec_id, specs_dir, status, task_type, parent, printer, limit) -> Optional[List[Dict]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:17`
+⚠️ **Complexity:** 16 (High)
+
+**Description:**
+> Query and display tasks using Rich.Table format.
+
+Args:
+    spec_id: Specification ID
+    specs_dir: Path to specs directory
+    status: Filter by status (pending/in_progress/completed/blocked)
+    task_type: Filter by type (task/verify/group/phase)
+    parent: Filter by parent node ID
+    printer: Optional printer for output
+    limit: Maximum number of results to return (default 20, use 0 for unlimited)
+
+Returns:
+    List of matching task dictionaries, or None on error
+
+**Parameters:**
+- `spec_id`: str
+- `specs_dir`: Path
+- `status`: Optional[str]
+- `task_type`: Optional[str]
+- `parent`: Optional[str]
+- `printer`: Optional[PrettyPrinter]
+- `limit`: Optional[int]
 
 ---
 
@@ -14957,6 +16935,49 @@ Returns:
 
 ---
 
+### `generate_cache_key(spec_id, file_paths, model, prompt_version, extra_params) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:13`
+**Complexity:** 4
+
+**Description:**
+> Generate deterministic cache key based on consultation inputs.
+
+The cache key includes:
+- Spec ID
+- Hash of file contents (if file paths provided)
+- Model name
+- Prompt version (for cache invalidation on prompt changes)
+- Extra parameters (optional)
+
+Args:
+    spec_id: Specification identifier
+    file_paths: List of file paths to include in hash (optional)
+    model: Model name (e.g., "gemini", "codex")
+    prompt_version: Version identifier for prompt template (default: "v1")
+    extra_params: Additional parameters to include in key (optional)
+
+Returns:
+    Deterministic cache key (hex string)
+
+Example:
+    key = generate_cache_key(
+        spec_id="my-spec-001",
+        file_paths=["src/auth.py", "tests/test_auth.py"],
+        model="gemini",
+        prompt_version="v2"
+    )
+
+**Parameters:**
+- `spec_id`: str
+- `file_paths`: Optional[List[str]]
+- `model`: Optional[str]
+- `prompt_version`: str
+- `extra_params`: Optional[Dict[str, Any]]
+
+---
+
 ### `generate_combined_report(spec_result, json_spec_result) -> str`
 
 **Language:** python
@@ -15036,6 +17057,34 @@ Returns:
 **Parameters:**
 - `skill_name`: str
 - `sections`: Optional[List[str]]
+
+---
+
+### `generate_fidelity_review_key(spec_id, scope, target, file_paths, model) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:105`
+**Complexity:** 1
+
+**Description:**
+> Generate cache key for fidelity review consultations.
+
+Args:
+    spec_id: Specification identifier
+    scope: Review scope ("task", "phase", or "spec")
+    target: Target identifier (task ID, phase ID, or spec ID)
+    file_paths: Files being reviewed (optional)
+    model: Model name (optional)
+
+Returns:
+    Deterministic cache key
+
+**Parameters:**
+- `spec_id`: str
+- `scope`: str
+- `target`: str
+- `file_paths`: Optional[List[str]]
+- `model`: Optional[str]
 
 ---
 
@@ -15144,6 +17193,30 @@ Returns:
 - `spec_title`: str
 - `review_type`: str
 - `parsed_responses`: List[Dict[str, Any]]
+
+---
+
+### `generate_plan_review_key(spec_id, models, review_focus) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:140`
+**Complexity:** 2
+
+**Description:**
+> Generate cache key for plan review consultations.
+
+Args:
+    spec_id: Specification identifier
+    models: List of models consulted
+    review_focus: Focus areas (e.g., ["architecture", "security"])
+
+Returns:
+    Deterministic cache key
+
+**Parameters:**
+- `spec_id`: str
+- `models`: List[str]
+- `review_focus`: Optional[List[str]]
 
 ---
 
@@ -15470,6 +17543,31 @@ Returns:
 
 ---
 
+### `get_backend_name(ui) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:253`
+**Complexity:** 1
+
+**Description:**
+> Get the name of the UI backend.
+
+Args:
+    ui: Ui instance
+
+Returns:
+    "RichUi" or "PlainUi"
+
+Example:
+    ui = create_ui()
+    print(f"Using {get_backend_name(ui)} backend")
+    # Output: "Using RichUi backend" or "Using PlainUi backend"
+
+**Parameters:**
+- `ui`: Ui
+
+---
+
 ### `get_best_tool(doc_type, available_tools) -> Optional[str]`
 
 **Language:** python
@@ -15511,6 +17609,32 @@ Returns:
 **Parameters:**
 - `failure_type`: str
 - `available_tools`: Optional[List[str]]
+
+---
+
+### `get_cache_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:261`
+**Complexity:** 1
+
+**Description:**
+> Get cache configuration section.
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Dictionary with cache configuration settings
+
+Example:
+    cache_config = get_cache_config()
+    if cache_config['enabled']:
+        cache_dir = cache_config.get('directory')
+        ttl_hours = cache_config['ttl_hours']
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -15575,6 +17699,30 @@ Returns:
 
 **Parameters:**
 - `skill_name`: str
+
+---
+
+### `get_config_path(project_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:29`
+**Complexity:** 6
+
+**Description:**
+> Get path to config.json file.
+
+Checks multiple locations in order of precedence:
+1. Project-local: {project_path}/.claude/config.json
+2. Global: ~/.claude/config.json
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Path to config.json if found, None otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -15673,7 +17821,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:267`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:414`
 **Complexity:** 3
 
 **Description:**
@@ -16182,7 +18330,7 @@ Returns:
 ### `get_progress_summary(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:162`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:164`
 **Complexity:** 8
 
 **Description:**
@@ -16397,6 +18545,34 @@ Example:
 
 ---
 
+### `get_setting(key, project_path, default) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:227`
+**Complexity:** 4
+
+**Description:**
+> Get a specific configuration setting.
+
+Args:
+    key: Configuration key (supports nested keys with dots, e.g., 'cache.enabled')
+    project_path: Path to project root (optional)
+    default: Default value if key not found
+
+Returns:
+    Configuration value
+
+Examples:
+    enabled = get_setting('cache.enabled')
+    ttl = get_setting('cache.ttl_hours', default=24)
+
+**Parameters:**
+- `key`: str
+- `project_path`: Optional[Path]
+- `default`: Optional[Any]
+
+---
+
 ### `get_spec_git_diffs(repo_root, base_branch, max_size_kb) -> str`
 
 **Language:** python
@@ -16525,6 +18701,34 @@ Returns:
 
 ---
 
+### `get_status_summary(spec_data) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:326`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Get a dictionary summary of status metrics.
+
+Useful for programmatic access to status data without printing.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Dictionary with status metrics:
+    - total_tasks: Total number of tasks
+    - completed_tasks: Number of completed tasks
+    - in_progress_tasks: Number of in-progress tasks
+    - blocked_tasks: Number of blocked tasks
+    - phases: List of phase summaries
+    - blockers: List of blocked task details
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `get_summary_stats(test_files, conftest_files) -> Dict`
 
 **Language:** python
@@ -16632,7 +18836,7 @@ Example:
 ### `get_task_counts_by_status(spec_data) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:263`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:265`
 **Complexity:** 5
 
 **Description:**
@@ -16881,6 +19085,57 @@ Expected JSON format:
 
 Returns:
     Transcript path from stdin, or None if stdin is a TTY or parsing fails
+
+---
+
+### `handle_cache_clear(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:19`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Handle 'sdd cache clear' command.
+
+Clears cache entries with optional filters:
+- --spec: Clear only entries for a specific spec ID
+- --type: Clear only entries of a specific review type (fidelity, plan)
+
+Args:
+    args: Parsed command-line arguments
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
+### `handle_cache_info(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:93`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Handle 'sdd cache info' command.
+
+Displays cache statistics including:
+- Cache location (directory path)
+- Total cache size (MB)
+- Number of entries (total, active, expired)
+- Cache hit rate (if trackable)
+
+Args:
+    args: Parsed command-line arguments
+    printer: PrettyPrinter instance for formatted output
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
 
 ---
 
@@ -17166,6 +19421,75 @@ Returns:
 
 ---
 
+### `is_cache_enabled(project_path) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:281`
+**Complexity:** 1
+
+**Description:**
+> Check if caching is enabled.
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    True if caching is enabled
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
+### `is_cache_key_valid(key) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:172`
+**Complexity:** 4
+
+**Description:**
+> Validate cache key format.
+
+Args:
+    key: Cache key to validate
+
+Returns:
+    True if key is a valid hex string of appropriate length
+
+**Parameters:**
+- `key`: str
+
+---
+
+### `is_ci_environment() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:55`
+**Complexity:** 1
+
+**Description:**
+> Detect if running in a CI/CD environment.
+
+Checks common CI environment variables to determine if
+the code is running in an automated CI/CD pipeline.
+
+Detected CI systems:
+- GitHub Actions (GITHUB_ACTIONS)
+- GitLab CI (GITLAB_CI)
+- Travis CI (TRAVIS)
+- CircleCI (CIRCLECI)
+- Jenkins (JENKINS_URL)
+- Generic CI (CI=true)
+
+Returns:
+    True if running in CI, False otherwise
+
+Example:
+    if is_ci_environment():
+        print("Running in CI/CD pipeline")
+
+---
+
 ### `is_clear_command(entry) -> bool`
 
 **Language:** python
@@ -17292,6 +19616,29 @@ Returns:
 
 ---
 
+### `is_tty_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:36`
+**Complexity:** 1
+
+**Description:**
+> Check if stdout is connected to a TTY.
+
+Returns True if stdout is an interactive terminal that supports
+rich formatting. Returns False for pipes, files, CI environments.
+
+Returns:
+    True if TTY available, False otherwise
+
+Example:
+    if is_tty_available():
+        print("Interactive terminal")
+    else:
+        print("Non-interactive (pipe, file, CI)")
+
+---
+
 ### `is_unblocked(spec_data, task_id, task_data) -> bool`
 
 **Language:** python
@@ -17372,7 +19719,7 @@ Returns:
 ### `list_phases(spec_data) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:226`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:228`
 **Complexity:** 4
 
 **Description:**
@@ -17433,7 +19780,7 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:10`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:44`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -17462,6 +19809,32 @@ Returns:
 
 Returns:
     Dictionary of template_id -> template_info
+
+---
+
+### `load_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:118`
+**Complexity:** 5
+
+**Description:**
+> Load configuration from file with fallback to defaults.
+
+Attempts to load from:
+1. Project-local config ({project_path}/.claude/config.json)
+2. Global config (~/.claude/config.json)
+3. Environment variables (override config file)
+4. Built-in defaults
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Complete configuration dictionary
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -17676,7 +20049,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:431`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:443`
 **Complexity:** 3
 
 **Description:**
@@ -18018,7 +20391,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:466`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:613`
 **Complexity:** 1
 
 **Description:**
@@ -18125,7 +20498,7 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:326`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:473`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -18385,6 +20758,25 @@ Args:
 
 ---
 
+### `print_status_report(spec_data, title) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:304`
+**Complexity:** 2
+
+**Description:**
+> Print a dashboard-style status report to console.
+
+Args:
+    spec_data: Loaded JSON spec data
+    title: Optional title for the report
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `title`: Optional[str]
+
+---
+
 ### `print_tree_structure(structure, indent) -> None`
 
 **Language:** python
@@ -18536,7 +20928,7 @@ Returns:
 ### `recalculate_progress(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:10`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:12`
 **Complexity:** 5
 
 **Description:**
@@ -18658,6 +21050,25 @@ Provides development utilities for maintaining the claude_skills package.
 
 ---
 
+### `register_cache(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:183`
+**Complexity:** 1
+
+**Description:**
+> Register 'cache' subcommand for unified SDD CLI.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
 ### `register_code_doc(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -18676,7 +21087,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:413`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:425`
 **Complexity:** 1
 
 **Description:**
@@ -18735,7 +21146,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:290`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:292`
 **Complexity:** 1
 
 **Description:**
@@ -18780,7 +21191,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:389`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:401`
 **Complexity:** 1
 
 **Description:**
@@ -18810,7 +21221,7 @@ Args:
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1088`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1141`
 **Complexity:** 1
 
 **Description:**
@@ -18973,7 +21384,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1240`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1263`
 **Complexity:** 1
 
 **Description:**
@@ -18992,7 +21403,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:554`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:585`
 **Complexity:** 1
 
 **Description:**
@@ -19229,6 +21640,20 @@ Example:
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `target_version`: str
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:28`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
 
 ---
 
@@ -19987,6 +22412,43 @@ Example:
 
 ---
 
+### `should_use_plain_ui(force_plain) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:90`
+**Complexity:** 5
+
+**Description:**
+> Determine if PlainUi should be used instead of RichUi.
+
+Decision logic:
+1. If force_plain=True → Use PlainUi
+2. If FORCE_PLAIN_UI env var set → Use PlainUi
+3. If not TTY (piped/redirected) → Use PlainUi
+4. If CI environment detected → Use PlainUi
+5. Otherwise → Use RichUi
+
+Args:
+    force_plain: Explicitly force PlainUi backend
+
+Returns:
+    True if PlainUi should be used, False for RichUi
+
+Example:
+    # Check decision logic
+    if should_use_plain_ui():
+        print("Will use PlainUi")
+    else:
+        print("Will use RichUi")
+
+    # Force plain mode
+    should_use_plain_ui(force_plain=True)  # → True
+
+**Parameters:**
+- `force_plain`: bool
+
+---
+
 ### `show_commit_preview(repo_root, printer) -> Dict[str, List[str]]`
 
 **Language:** python
@@ -20308,6 +22770,35 @@ Returns:
 
 **Parameters:**
 - `specs_structure`: None
+
+---
+
+### `strip_ansi_codes(text) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:15`
+**Complexity:** 1
+
+**Description:**
+> Remove ANSI escape codes from text.
+
+ANSI codes are used for terminal coloring and formatting (e.g., from Rich library).
+This function strips them to produce clean text suitable for JSON output.
+
+Args:
+    text: Text potentially containing ANSI escape sequences
+
+Returns:
+    Text with all ANSI codes removed
+
+Example:
+    >>> strip_ansi_codes("\x1b[31mRed text\x1b[0m")
+    'Red text'
+    >>> strip_ansi_codes("[bold]Text[/bold]")  # Rich markup
+    '[bold]Text[/bold]'  # Rich markup is not ANSI codes
+
+**Parameters:**
+- `text`: str
 
 ---
 
@@ -22176,6 +24667,37 @@ Example:
 
 ---
 
+### `ui(force_plain, collect_messages, quiet) -> Ui`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:302`
+**Complexity:** 1
+
+**Description:**
+> Shorthand for create_ui().
+
+Args:
+    force_plain: Force PlainUi backend
+    collect_messages: Enable collection mode
+    quiet: Enable quiet mode
+
+Returns:
+    Ui implementation
+
+Example:
+    from claude_skills.common.ui_factory import ui
+
+    # Quick usage
+    terminal = ui()
+    terminal.print_status("Ready", MessageLevel.SUCCESS)
+
+**Parameters:**
+- `force_plain`: bool
+- `collect_messages`: bool
+- `quiet`: bool
+
+---
+
 ### `unblock_task(spec_id, task_id, resolution, specs_dir, dry_run, printer) -> bool`
 
 **Language:** python
@@ -22333,7 +24855,7 @@ Raises:
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:61`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:63`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -22355,7 +24877,7 @@ Args:
 ### `update_parent_status(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:126`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:128`
 **Complexity:** 5
 
 **Description:**
@@ -23322,6 +25844,9 @@ Returns:
 - `claude_skills.sdd_spec_mod.modification.transactional_modify`
 - `claude_skills.sdd_spec_mod.modification.update_node_field`
 - `claude_skills.sdd_spec_mod.modification.update_task_counts`
+- `cli_utils.add_format_flag`
+- `cli_utils.format_json_output`
+- `cli_utils.strip_ansi_codes`
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
@@ -23377,6 +25902,7 @@ Returns:
 - `paths.normalize_path`
 - `paths.validate_and_normalize_paths`
 - `paths.validate_path`
+- `plain_ui.PlainUi`
 - `printer.PrettyPrinter`
 - `progress.get_progress_summary`
 - `progress.list_phases`
@@ -23390,6 +25916,7 @@ Returns:
 - `reporting.generate_combined_report`
 - `reporting.generate_json_spec_report`
 - `reporting.generate_spec_report`
+- `rich_ui.RichUi`
 - `sdd_config.DEFAULT_SDD_CONFIG`
 - `sdd_config.get_sdd_setting`
 - `sdd_config.load_sdd_config`
@@ -23399,6 +25926,17 @@ Returns:
 - `spec.load_json_spec`
 - `spec.save_json_spec`
 - `spec.update_node`
+- `ui_factory.create_ui`
+- `ui_factory.create_ui_from_args`
+- `ui_factory.format_backend_info`
+- `ui_factory.get_backend_name`
+- `ui_factory.is_ci_environment`
+- `ui_factory.is_tty_available`
+- `ui_factory.should_use_plain_ui`
+- `ui_factory.ui`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 - `validation.EnhancedError`
 - `validation.JsonSpecValidationResult`
 - `validation.SpecValidationResult`
@@ -23429,10 +25967,76 @@ Returns:
 - `time`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/common/cache/__init__.py`
+
+- `cache_key.generate_cache_key`
+- `cache_key.generate_fidelity_review_key`
+- `cache_key.generate_plan_review_key`
+- `cache_key.is_cache_key_valid`
+- `cache_manager.CacheManager`
+
+### `src/claude_skills/claude_skills/common/cache/cache_key.py`
+
+- `hashlib`
+- `json`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/cache/cache_manager.py`
+
+- `datetime.datetime`
+- `datetime.timedelta`
+- `json`
+- `logging`
+- `os`
+- `pathlib.Path`
+- `time`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/cache/cli.py`
+
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.cache.CacheManager`
+- `claude_skills.common.config.get_cache_config`
+- `claude_skills.common.config.is_cache_enabled`
+- `json`
+- `pathlib.Path`
+- `sys`
+
+### `src/claude_skills/claude_skills/common/cli_utils.py`
+
+- `argparse`
+- `functools.wraps`
+- `json`
+- `re`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Sequence`
+- `typing.Union`
+
 ### `src/claude_skills/claude_skills/common/completion.py`
 
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/config.py`
+
+- `json`
+- `logging`
+- `os`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/contracts.py`
@@ -23555,16 +26159,39 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/common/plain_ui.py`
+
+- `contextlib.contextmanager`
+- `difflib`
+- `io.StringIO`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Iterator`
+- `typing.List`
+- `typing.Optional`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
+
 ### `src/claude_skills/claude_skills/common/printer.py`
 
 - `sys`
+- `typing.Optional`
+- `ui_factory.create_ui`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 
 ### `src/claude_skills/claude_skills/common/progress.py`
 
 - `datetime.datetime`
 - `datetime.timezone`
+- `json`
+- `sys`
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+- `typing.TextIO`
 
 ### `src/claude_skills/claude_skills/common/query_operations.py`
 
@@ -23584,6 +26211,31 @@ Returns:
 - `datetime.datetime`
 - `pathlib.Path`
 - `typing.List`
+
+### `src/claude_skills/claude_skills/common/rich_ui.py`
+
+- `contextlib.contextmanager`
+- `difflib`
+- `io.StringIO`
+- `rich.console.Console`
+- `rich.panel.Panel`
+- `rich.progress.BarColumn`
+- `rich.progress.Progress`
+- `rich.progress.SpinnerColumn`
+- `rich.progress.TaskProgressColumn`
+- `rich.progress.TextColumn`
+- `rich.syntax.Syntax`
+- `rich.table.Table`
+- `rich.text.Text`
+- `rich.tree.Tree`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Iterator`
+- `typing.List`
+- `typing.Optional`
+- `ui_protocol.Message`
+- `ui_protocol.MessageLevel`
+- `ui_protocol.Ui`
 
 ### `src/claude_skills/claude_skills/common/sdd_config.py`
 
@@ -23617,6 +26269,48 @@ Returns:
 - `spec.extract_frontmatter`
 - `typing.Dict`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/tui_progress.py`
+
+- `ai_tools.MultiToolResponse`
+- `ai_tools.ToolResponse`
+- `ai_tools.ToolStatus`
+- `contextlib.contextmanager`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `logging`
+- `queue`
+- `threading`
+- `time`
+- `typing.Any`
+- `typing.Optional`
+- `typing.Protocol`
+
+### `src/claude_skills/claude_skills/common/ui_factory.py`
+
+- `os`
+- `plain_ui.PlainUi`
+- `rich_ui.RichUi`
+- `sys`
+- `typing.Optional`
+- `typing.Union`
+- `ui_protocol.Ui`
+
+### `src/claude_skills/claude_skills/common/ui_protocol.py`
+
+- `abc.abstractmethod`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `datetime.datetime`
+- `enum.Enum`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Union`
+- `typing.runtime_checkable`
 
 ### `src/claude_skills/claude_skills/common/validation.py`
 
@@ -23832,6 +26526,13 @@ Returns:
 - `typing.Optional`
 - `typing.Tuple`
 
+### `src/claude_skills/claude_skills/run_tests/pytest_parser.py`
+
+- `enum.Enum`
+- `re`
+- `typing.NamedTuple`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/run_tests/pytest_runner.py`
 
 - `claude_skills.common.PrettyPrinter`
@@ -23858,6 +26559,7 @@ Returns:
 - `argparse`
 - `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.progress.ProgressEmitter`
 - `consultation.ConsultationError`
 - `consultation.ConsultationTimeoutError`
 - `consultation.NoToolsAvailableError`
@@ -23867,6 +26569,7 @@ Returns:
 - `consultation.parse_multiple_responses`
 - `json`
 - `pathlib.Path`
+- `report.FidelityReport`
 - `review.FidelityReviewer`
 - `sys`
 - `typing.Optional`
@@ -23879,6 +26582,7 @@ Returns:
 - `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.ai_tools.execute_tool`
 - `claude_skills.common.ai_tools.execute_tools_parallel`
+- `claude_skills.common.progress.ProgressEmitter`
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `enum.Enum`
@@ -23894,6 +26598,9 @@ Returns:
 - `datetime.datetime`
 - `json`
 - `pathlib.Path`
+- `rich.console.Console`
+- `rich.panel.Panel`
+- `rich.table.Table`
 - `sys`
 - `typing.Any`
 - `typing.Dict`
@@ -23902,10 +26609,12 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
 
+- `claude_skills.common.cache.CacheManager`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.spec.get_node`
 - `claude_skills.common.spec.load_json_spec`
+- `hashlib`
 - `logging`
 - `pathlib.Path`
 - `subprocess`
@@ -23964,7 +26673,11 @@ Returns:
 - `json`
 - `os`
 - `pathlib.Path`
+- `rich.console.Console`
+- `rich.tree.Tree`
 - `sys`
+- `typing.Any`
+- `typing.Dict`
 - `typing.List`
 
 ### `src/claude_skills/claude_skills/sdd_next/discovery.py`
@@ -24520,6 +27233,7 @@ Returns:
 - `claude_skills.sdd_update.lifecycle.activate_spec`
 - `claude_skills.sdd_update.lifecycle.complete_spec`
 - `claude_skills.sdd_update.lifecycle.move_spec`
+- `claude_skills.sdd_update.list_phases.format_phases_table`
 - `claude_skills.sdd_update.list_specs.list_specs`
 - `claude_skills.sdd_update.query.check_complete`
 - `claude_skills.sdd_update.query.get_task`
@@ -24527,6 +27241,7 @@ Returns:
 - `claude_skills.sdd_update.query.list_phases`
 - `claude_skills.sdd_update.query.phase_time`
 - `claude_skills.sdd_update.query.query_tasks`
+- `claude_skills.sdd_update.query_tasks.format_tasks_table`
 - `claude_skills.sdd_update.status.mark_task_blocked`
 - `claude_skills.sdd_update.status.unblock_task`
 - `claude_skills.sdd_update.status.update_task_status`
@@ -24610,6 +27325,19 @@ Returns:
 - `subprocess`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/sdd_update/list_phases.py`
+
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.load_json_spec`
+- `claude_skills.common.progress.list_phases`
+- `pathlib.Path`
+- `rich.console.Console`
+- `rich.table.Table`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/sdd_update/list_specs.py`
 
 - `claude_skills.common.PrettyPrinter`
@@ -24617,6 +27345,8 @@ Returns:
 - `claude_skills.common.load_json_spec`
 - `json`
 - `pathlib.Path`
+- `rich.console.Console`
+- `rich.table.Table`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
@@ -24636,6 +27366,18 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/sdd_update/query_tasks.py`
+
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.load_json_spec`
+- `pathlib.Path`
+- `rich.console.Console`
+- `rich.table.Table`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/sdd_update/status.py`
 
 - `claude_skills.common.completion.check_spec_completion`
@@ -24648,6 +27390,18 @@ Returns:
 - `datetime.datetime`
 - `datetime.timezone`
 - `pathlib.Path`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_update/status_report.py`
+
+- `rich.console.Console`
+- `rich.layout.Layout`
+- `rich.panel.Panel`
+- `rich.table.Table`
+- `rich.text.Text`
+- `typing.Any`
+- `typing.Dict`
 - `typing.List`
 - `typing.Optional`
 
@@ -24723,6 +27477,7 @@ Returns:
 
 - `diff.DiffReport`
 - `diff.compute_diff`
+- `diff.display_diff_side_by_side`
 - `diff.format_diff_json`
 - `diff.format_diff_markdown`
 - `fix.FixAction`
@@ -24754,6 +27509,12 @@ Returns:
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `json`
+- `rich.columns.Columns`
+- `rich.console.Console`
+- `rich.panel.Panel`
+- `rich.syntax.Syntax`
+- `rich.table.Table`
+- `rich.text.Text`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
@@ -24852,6 +27613,15 @@ Returns:
 - `__future__.annotations`
 - `os`
 - `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_list_commands.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
 - `subprocess`
 - `sys`
 
@@ -25135,6 +27905,15 @@ Returns:
 - `datetime.datetime`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py`
+
+- `argparse`
+- `claude_skills.common.cli_utils.add_format_flag`
+- `claude_skills.common.cli_utils.format_json_output`
+- `claude_skills.common.cli_utils.strip_ansi_codes`
+- `json`
+- `pytest`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`
 
 - `claude_skills.common.completion.check_spec_completion`
@@ -25215,11 +27994,24 @@ Returns:
 - `pathlib.Path`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_plain_ui.py`
+
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `io.StringIO`
+- `pytest`
+- `sys`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_printer.py`
 
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_protocol.MessageLevel`
 - `io.StringIO`
 - `pytest`
+- `unittest.mock.MagicMock`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_progress.py`
 
@@ -25230,6 +28022,17 @@ Returns:
 - `claude_skills.common.update_parent_status`
 - `pytest`
 
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_rich_ui.py`
+
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `io.StringIO`
+- `pytest`
+- `rich.console.Console`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_spec.py`
 
 - `claude_skills.common.backup_json_spec`
@@ -25239,6 +28042,32 @@ Returns:
 - `claude_skills.common.save_json_spec`
 - `json`
 - `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py`
+
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_factory.create_ui`
+- `claude_skills.common.ui_factory.create_ui_from_args`
+- `claude_skills.common.ui_factory.format_backend_info`
+- `claude_skills.common.ui_factory.get_backend_name`
+- `claude_skills.common.ui_factory.is_ci_environment`
+- `claude_skills.common.ui_factory.is_tty_available`
+- `claude_skills.common.ui_factory.should_use_plain_ui`
+- `claude_skills.common.ui_factory.ui`
+- `os`
+- `pytest`
+- `sys`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_protocol.py`
+
+- `claude_skills.common.ui_protocol.Message`
+- `claude_skills.common.ui_protocol.MessageLevel`
+- `claude_skills.common.ui_protocol.Ui`
+- `datetime.datetime`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_next/conftest.py`
