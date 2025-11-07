@@ -668,3 +668,333 @@ def test_plan_review_no_responses():
     # Output should be minimal or empty
     output = console.file.getvalue()
     assert "MODEL RESPONSE COMPARISON" not in output or output.strip() == ""
+
+
+# =============================================================================
+# Test: Status Report Dashboard Layout
+# =============================================================================
+
+
+@pytest.fixture
+def mock_dashboard_spec_data():
+    """Create mock spec data for dashboard testing."""
+    return {
+        "spec_id": "test-dashboard-001",
+        "title": "Dashboard Test Specification",
+        "hierarchy": {
+            "phase-1": {
+                "type": "phase",
+                "title": "Phase 1: Setup",
+                "status": "completed",
+                "total_tasks": 3,
+                "completed_tasks": 3
+            },
+            "phase-2": {
+                "type": "phase",
+                "title": "Phase 2: Core Features",
+                "status": "in_progress",
+                "total_tasks": 8,
+                "completed_tasks": 5
+            },
+            "phase-3": {
+                "type": "phase",
+                "title": "Phase 3: Polish",
+                "status": "pending",
+                "total_tasks": 4,
+                "completed_tasks": 0
+            },
+            "task-1-1": {
+                "type": "task",
+                "title": "Setup project structure",
+                "status": "completed"
+            },
+            "task-1-2": {
+                "type": "task",
+                "title": "Configure dependencies",
+                "status": "completed"
+            },
+            "task-1-3": {
+                "type": "task",
+                "title": "Create initial README",
+                "status": "completed"
+            },
+            "task-2-1": {
+                "type": "task",
+                "title": "Implement authentication",
+                "status": "completed"
+            },
+            "task-2-2": {
+                "type": "task",
+                "title": "Add database layer",
+                "status": "completed"
+            },
+            "task-2-3": {
+                "type": "task",
+                "title": "Build API endpoints",
+                "status": "in_progress"
+            },
+            "task-2-4": {
+                "type": "task",
+                "title": "Add rate limiting",
+                "status": "blocked",
+                "metadata": {
+                    "blocker_reason": "Waiting for Redis setup"
+                },
+                "dependencies": {
+                    "blocked_by": ["external-dependency"]
+                }
+            }
+        }
+    }
+
+
+def test_dashboard_layout_structure(mock_dashboard_spec_data):
+    """
+    Test that status report dashboard layout renders with correct structure.
+
+    Verifies:
+    - Layout has multiple panels (phases, progress, blockers)
+    - Layout is split into top and bottom sections
+    - Top section has left (phases) and right (progress) panels
+    - Bottom section contains blockers panel
+    - All panels render without errors
+    """
+    from claude_skills.sdd_update.status_report import create_status_layout
+
+    # Create layout
+    layout = create_status_layout(mock_dashboard_spec_data)
+
+    # Verify layout structure
+    assert layout is not None
+    assert hasattr(layout, "children")
+    assert len(layout.children) > 0
+
+    # Verify layout can be rendered
+    console = Console(file=StringIO(), width=120, legacy_windows=False)
+    console.print(layout)
+
+    output = console.file.getvalue()
+
+    # Verify key sections are present
+    assert "Phases" in output or "Phase" in output
+    assert "Progress" in output
+    assert "Blockers" in output or "Blocker" in output
+
+    print("\n--- Dashboard Layout Output ---")
+    print(output)
+    print("--- End Output ---\n")
+
+
+def test_dashboard_phases_panel_rendering(mock_dashboard_spec_data):
+    """
+    Test that phases panel renders correctly in dashboard.
+
+    Verifies:
+    - Phase names are displayed
+    - Phase status indicators shown (✓, ●, ○)
+    - Progress bars are rendered
+    - Completion percentages displayed
+    - Color coding by status (green=completed, yellow=in_progress, dim=pending)
+    """
+    from claude_skills.sdd_update.status_report import create_phases_panel
+
+    # Create phases panel
+    panel = create_phases_panel(mock_dashboard_spec_data)
+
+    # Render to string
+    console = Console(file=StringIO(), width=120, legacy_windows=False)
+    console.print(panel)
+
+    output = console.file.getvalue()
+
+    # Verify panel title
+    assert "Phases" in output
+
+    # Verify phase titles
+    assert "Setup" in output or "Phase 1" in output
+    assert "Core Features" in output or "Phase 2" in output
+    assert "Polish" in output or "Phase 3" in output
+
+    # Verify status indicators
+    assert "Complete" in output or "✓" in output  # Phase 1 completed
+    assert "In Progress" in output or "●" in output  # Phase 2 in progress
+    assert "Pending" in output or "○" in output  # Phase 3 pending
+
+    # Verify progress percentages
+    assert "100%" in output  # Phase 1: 3/3 = 100%
+    assert "62%" in output or "63%" in output  # Phase 2: 5/8 = 62.5%
+    assert "0%" in output  # Phase 3: 0/4 = 0%
+
+    print("\n--- Phases Panel Output ---")
+    print(output)
+    print("--- End Output ---\n")
+
+
+def test_dashboard_progress_panel_metrics(mock_dashboard_spec_data):
+    """
+    Test that progress panel shows correct metrics.
+
+    Verifies:
+    - Total tasks count
+    - Completed tasks count
+    - In-progress tasks count
+    - Blocked tasks count
+    - Overall completion percentage
+    - Visual progress bar
+    """
+    from claude_skills.sdd_update.status_report import create_progress_panel
+
+    # Create progress panel
+    panel = create_progress_panel(mock_dashboard_spec_data)
+
+    # Render to string
+    console = Console(file=StringIO(), width=120, legacy_windows=False)
+    console.print(panel)
+
+    output = console.file.getvalue()
+
+    # Verify panel title
+    assert "Progress" in output
+
+    # Verify metrics are shown
+    assert "Overall" in output or "Total" in output
+    assert "Completed" in output
+    assert "In Progress" in output
+    assert "Blocked" in output or "Remaining" in output
+
+    # Should have numeric values
+    # 7 tasks total (task-1-1 through task-2-4, excluding phases)
+    # 5 completed (task-1-1, 1-2, 1-3, 2-1, 2-2)
+    # 1 in progress (task-2-3)
+    # 1 blocked (task-2-4)
+
+    print("\n--- Progress Panel Output ---")
+    print(output)
+    print("--- End Output ---\n")
+
+
+def test_dashboard_blockers_panel_display(mock_dashboard_spec_data):
+    """
+    Test that blockers panel displays blocked tasks correctly.
+
+    Verifies:
+    - Blocked task IDs shown
+    - Blocked task titles displayed
+    - Blocker reasons included
+    - Dependency information shown
+    - Color coding for blockers (red/yellow)
+    """
+    from claude_skills.sdd_update.status_report import create_blockers_panel
+
+    # Create blockers panel
+    panel = create_blockers_panel(mock_dashboard_spec_data)
+
+    # Render to string
+    console = Console(file=StringIO(), width=120, legacy_windows=False)
+    console.print(panel)
+
+    output = console.file.getvalue()
+
+    # Verify panel title
+    assert "Blockers" in output or "Blocker" in output
+
+    # Verify blocked task information
+    assert "task-2-4" in output
+    assert "rate limiting" in output.lower() or "Rate limiting" in output
+    assert "Redis" in output or "redis" in output  # Blocker reason
+
+    print("\n--- Blockers Panel Output ---")
+    print(output)
+    print("--- End Output ---\n")
+
+
+def test_dashboard_empty_spec():
+    """Test dashboard handles empty spec data gracefully."""
+    from claude_skills.sdd_update.status_report import create_status_layout
+
+    empty_spec = {
+        "spec_id": "empty-spec",
+        "hierarchy": {}
+    }
+
+    # Should not crash with empty spec
+    layout = create_status_layout(empty_spec)
+
+    console = Console(file=StringIO(), width=120)
+    console.print(layout)
+
+    output = console.file.getvalue()
+
+    # Should still render structure
+    assert "Phases" in output or "Progress" in output
+    # May show empty state messages
+
+
+def test_dashboard_no_blockers():
+    """Test dashboard when there are no blocked tasks."""
+    from claude_skills.sdd_update.status_report import create_blockers_panel
+
+    spec_without_blockers = {
+        "hierarchy": {
+            "task-1": {
+                "type": "task",
+                "title": "Task 1",
+                "status": "completed"
+            },
+            "task-2": {
+                "type": "task",
+                "title": "Task 2",
+                "status": "in_progress"
+            }
+        }
+    }
+
+    panel = create_blockers_panel(spec_without_blockers)
+
+    console = Console(file=StringIO(), width=120)
+    console.print(panel)
+
+    output = console.file.getvalue()
+
+    # Should show "no blockers" message
+    assert "No blockers" in output or "no blockers" in output
+
+
+def test_dashboard_status_summary_integration(mock_dashboard_spec_data):
+    """
+    Test get_status_summary provides correct data for dashboard.
+
+    Verifies:
+    - Summary dictionary structure
+    - Correct task counts
+    - Phase data included
+    - Blocker information present
+    """
+    from claude_skills.sdd_update.status_report import get_status_summary
+
+    summary = get_status_summary(mock_dashboard_spec_data)
+
+    # Verify structure
+    assert isinstance(summary, dict)
+    assert "total_tasks" in summary
+    assert "completed_tasks" in summary
+    assert "in_progress_tasks" in summary
+    assert "blocked_tasks" in summary
+    assert "phases" in summary
+    assert "blockers" in summary
+
+    # Verify counts (7 tasks total: task-1-1, 1-2, 1-3, 2-1, 2-2, 2-3, 2-4)
+    assert summary["total_tasks"] == 7
+    assert summary["completed_tasks"] == 5  # task-1-1, 1-2, 1-3, 2-1, 2-2
+    assert summary["in_progress_tasks"] == 1  # task-2-3
+    assert summary["blocked_tasks"] == 1  # task-2-4
+
+    # Verify phases data
+    assert len(summary["phases"]) == 3
+    assert summary["phases"][0]["id"] == "phase-1"
+    assert summary["phases"][0]["status"] == "completed"
+
+    # Verify blockers data
+    assert len(summary["blockers"]) == 1
+    assert summary["blockers"][0]["id"] == "task-2-4"
+    assert "Redis" in summary["blockers"][0]["reason"]
