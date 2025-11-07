@@ -742,3 +742,167 @@ class TestPytestRunProgress:
         # Verify phase context was passed
         start_kwargs = mock_callback.on_start.call_args[1]
         assert start_kwargs["phase"] == "collection"
+
+
+class TestValidationProgress:
+    """Test validation progress feedback with multiple specs."""
+
+    def test_single_spec_validation(self):
+        """Test progress tracking for single spec validation."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "sdd-validate",
+            timeout=60,
+            callback=mock_callback,
+            spec_file="user-auth-001.json"
+        ) as progress:
+            time.sleep(0.2)
+
+            response = ToolResponse(
+                tool="sdd-validate",
+                status=ToolStatus.SUCCESS,
+                output="Validation passed: 0 errors, 2 warnings",
+                duration=0.2
+            )
+            progress.complete(response)
+
+        # Verify context metadata
+        start_kwargs = mock_callback.on_start.call_args[1]
+        assert start_kwargs["spec_file"] == "user-auth-001.json"
+
+        # Verify completion
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        assert complete_kwargs["status"] == ToolStatus.SUCCESS
+
+    def test_multiple_spec_validation_batch(self):
+        """Test batch validation progress for multiple specs."""
+        mock_callback = Mock(spec=ProgressCallback)
+        spec_files = ["spec-1.json", "spec-2.json", "spec-3.json"]
+
+        with batch_consultation_progress(
+            spec_files,
+            timeout=120,
+            callback=mock_callback
+        ) as progress:
+            # Mark each spec validation complete
+            for spec_file in spec_files:
+                response = ToolResponse(
+                    tool=spec_file,
+                    status=ToolStatus.SUCCESS,
+                    output="Validation passed",
+                    duration=0.3
+                )
+                progress.mark_complete(spec_file, response)
+
+        # Verify batch completion
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+        assert batch_complete["total_count"] == 3
+        assert batch_complete["success_count"] == 3
+        assert batch_complete["failure_count"] == 0
+
+    def test_validation_progress_with_errors(self):
+        """Test validation progress when specs have errors."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "sdd-validate",
+            timeout=60,
+            callback=mock_callback,
+            spec_file="broken-spec.json"
+        ) as progress:
+            response = ToolResponse(
+                tool="sdd-validate",
+                status=ToolStatus.ERROR,
+                output="Validation failed: 5 errors, 10 warnings",
+                duration=0.3,
+                error="Critical errors found in spec"
+            )
+            progress.complete(response)
+
+        # Verify error status
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        assert complete_kwargs["status"] == ToolStatus.ERROR
+
+    def test_multi_spec_validation_mixed_results(self):
+        """Test batch validation with mixed success/failure results."""
+        mock_callback = Mock(spec=ProgressCallback)
+        specs = ["good-spec.json", "bad-spec.json", "warning-spec.json"]
+
+        with batch_consultation_progress(specs, timeout=120, callback=mock_callback) as progress:
+            # First spec succeeds
+            progress.mark_complete("good-spec.json", ToolResponse(
+                tool="good-spec.json",
+                status=ToolStatus.SUCCESS,
+                output="Validation passed",
+                duration=0.2
+            ))
+
+            # Second spec fails
+            progress.mark_complete("bad-spec.json", ToolResponse(
+                tool="bad-spec.json",
+                status=ToolStatus.ERROR,
+                output="Validation failed: 3 errors",
+                duration=0.3,
+                error="Critical errors"
+            ))
+
+            # Third spec succeeds with warnings
+            progress.mark_complete("warning-spec.json", ToolResponse(
+                tool="warning-spec.json",
+                status=ToolStatus.SUCCESS,
+                output="Validation passed: 0 errors, 5 warnings",
+                duration=0.25
+            ))
+
+        # Verify mixed results
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+        assert batch_complete["total_count"] == 3
+        assert batch_complete["success_count"] == 2
+        assert batch_complete["failure_count"] == 1
+
+    def test_validation_progress_per_file_tracking(self):
+        """Test that individual file validation progress is tracked."""
+        mock_callback = Mock(spec=ProgressCallback)
+        specs = ["spec-1.json", "spec-2.json"]
+
+        with batch_consultation_progress(specs, timeout=120, callback=mock_callback) as progress:
+            for spec in specs:
+                progress.mark_complete(spec, ToolResponse(
+                    tool=spec,
+                    status=ToolStatus.SUCCESS,
+                    output="Validation passed",
+                    duration=0.2
+                ))
+
+                # Verify on_tool_complete was called after each file
+                assert mock_callback.on_tool_complete.call_count >= 1
+
+        # Should have been called once per spec
+        assert mock_callback.on_tool_complete.call_count == 2
+
+    def test_validation_progress_with_metadata(self):
+        """Test validation progress includes spec metadata."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "sdd-validate",
+            timeout=60,
+            callback=mock_callback,
+            spec_file="api-spec.json",
+            validation_level="strict",
+            check_dependencies=True
+        ) as progress:
+            response = ToolResponse(
+                tool="sdd-validate",
+                status=ToolStatus.SUCCESS,
+                output="Strict validation passed",
+                duration=0.4
+            )
+            progress.complete(response)
+
+        # Verify all metadata was passed through
+        start_kwargs = mock_callback.on_start.call_args[1]
+        assert start_kwargs["spec_file"] == "api-spec.json"
+        assert start_kwargs["validation_level"] == "strict"
+        assert start_kwargs["check_dependencies"] is True
