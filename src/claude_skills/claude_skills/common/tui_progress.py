@@ -10,8 +10,12 @@ from typing import Optional, Protocol, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import time
+import threading
+import logging
 
 from .ai_tools import ToolStatus, ToolResponse, MultiToolResponse
+
+logger = logging.getLogger(__name__)
 
 
 class ProgressCallback(Protocol):
@@ -67,6 +71,29 @@ class ProgressCallback(Protocol):
         ...
 
 
+def _calculate_update_interval(timeout: int, custom_interval: Optional[float] = None) -> float:
+    """
+    Calculate appropriate update interval based on timeout.
+
+    Args:
+        timeout: Expected timeout in seconds
+        custom_interval: Optional custom interval override
+
+    Returns:
+        Update interval in seconds
+    """
+    if custom_interval is not None:
+        return custom_interval
+
+    # Intelligent interval based on timeout duration
+    if timeout < 30:
+        return 2.0  # Short operations: update every 2s
+    elif timeout <= 120:
+        return 5.0  # Medium operations: update every 5s
+    else:
+        return 10.0  # Long operations: update every 10s
+
+
 class NoOpProgressCallback:
     """No-op implementation for environments without TUI support."""
 
@@ -117,6 +144,8 @@ class ProgressTracker:
     context: dict[str, Any]
     start_time: float = 0.0
     completed: bool = False
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
+    _update_thread: Optional[threading.Thread] = field(default=None, init=False, repr=False)
 
     def complete(self, response: ToolResponse) -> None:
         """
@@ -125,10 +154,11 @@ class ProgressTracker:
         Args:
             response: ToolResponse from AI tool execution
         """
-        if self.completed:
-            return  # Prevent double-completion
+        with self._lock:
+            if self.completed:
+                return  # Prevent double-completion
+            self.completed = True
 
-        self.completed = True
         duration = time.time() - self.start_time
 
         try:
@@ -142,8 +172,38 @@ class ProgressTracker:
             )
         except Exception as e:
             # Don't let callback errors break execution
-            import logging
-            logging.warning(f"Progress callback error in on_complete: {e}")
+            logger.warning(f"Progress callback error in on_complete: {e}")
+
+
+def _update_worker(tracker: ProgressTracker, interval: float) -> None:
+    """
+    Background worker thread for periodic progress updates.
+
+    Args:
+        tracker: ProgressTracker to monitor
+        interval: Update interval in seconds
+    """
+    while True:
+        time.sleep(interval)
+
+        # Check if completed (thread-safe)
+        with tracker._lock:
+            if tracker.completed:
+                break
+
+        # Calculate elapsed time
+        elapsed = time.time() - tracker.start_time
+
+        # Call update callback
+        try:
+            tracker.callback.on_update(
+                tool=tracker.tool,
+                elapsed=elapsed,
+                timeout=tracker.timeout,
+                **tracker.context
+            )
+        except Exception as e:
+            logger.warning(f"Progress callback error in on_update: {e}")
 
 
 @contextmanager
@@ -151,6 +211,7 @@ def ai_consultation_progress(
     tool: str,
     timeout: int = 90,
     callback: Optional[ProgressCallback] = None,
+    update_interval: Optional[float] = None,
     **context
 ):
     """
@@ -168,6 +229,7 @@ def ai_consultation_progress(
         tool: Tool name ("gemini", "codex", "cursor-agent")
         timeout: Expected timeout in seconds (default 90)
         callback: Optional progress callback (defaults to no-op)
+        update_interval: Optional custom update interval in seconds (auto-calculated if None)
         **context: Additional context for progress display (model, prompt_length, etc.)
 
     Yields:
@@ -188,33 +250,53 @@ def ai_consultation_progress(
     try:
         callback.on_start(tool=tool, timeout=timeout, **context)
     except Exception as e:
-        import logging
-        logging.warning(f"Progress callback error in on_start: {e}")
+        logger.warning(f"Progress callback error in on_start: {e}")
 
     tracker.start_time = time.time()
+
+    # Start background update thread
+    interval = _calculate_update_interval(timeout, update_interval)
+    update_thread = threading.Thread(
+        target=_update_worker,
+        args=(tracker, interval),
+        daemon=True,
+        name=f"progress-update-{tool}"
+    )
+    tracker._update_thread = update_thread
+    update_thread.start()
 
     try:
         yield tracker
     except Exception as e:
         # Handle errors gracefully
-        if not tracker.completed:
-            tracker.completed = True  # Mark as completed to prevent double-call in finally
-            duration = time.time() - tracker.start_time
-            try:
-                callback.on_complete(
-                    tool=tool,
-                    status=ToolStatus.ERROR,
-                    duration=duration,
-                    error=str(e),
-                    **context
-                )
-            except Exception as callback_error:
-                import logging
-                logging.warning(f"Progress callback error in on_complete (exception): {callback_error}")
+        with tracker._lock:
+            if not tracker.completed:
+                tracker.completed = True  # Mark as completed to prevent double-call in finally
+
+        duration = time.time() - tracker.start_time
+        try:
+            callback.on_complete(
+                tool=tool,
+                status=ToolStatus.ERROR,
+                duration=duration,
+                error=str(e),
+                **context
+            )
+        except Exception as callback_error:
+            logger.warning(f"Progress callback error in on_complete (exception): {callback_error}")
         raise
     finally:
         # Ensure cleanup happens
-        if not tracker.completed:
+        with tracker._lock:
+            was_completed = tracker.completed
+            if not tracker.completed:
+                tracker.completed = True
+
+        # Wait for update thread to finish (it will exit when it sees completed=True)
+        if tracker._update_thread and tracker._update_thread.is_alive():
+            tracker._update_thread.join(timeout=1.0)
+
+        if not was_completed:
             # Auto-complete if user forgot to call complete()
             duration = time.time() - tracker.start_time
             try:
@@ -225,8 +307,7 @@ def ai_consultation_progress(
                     **context
                 )
             except Exception as callback_error:
-                import logging
-                logging.warning(f"Progress callback error in on_complete (finally): {callback_error}")
+                logger.warning(f"Progress callback error in on_complete (finally): {callback_error}")
 
 
 @dataclass
@@ -241,6 +322,9 @@ class BatchProgressTracker:
     success_count: int = 0
     failure_count: int = 0
     max_duration: float = 0.0
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
+    _update_thread: Optional[threading.Thread] = field(default=None, init=False, repr=False)
+    _all_complete: bool = field(default=False, init=False, repr=False)
 
     def mark_complete(self, tool: str, response: ToolResponse) -> None:
         """
@@ -250,17 +334,22 @@ class BatchProgressTracker:
             tool: Tool name
             response: ToolResponse from tool execution
         """
-        if tool in self.completed_tools:
-            return  # Prevent double-counting
+        with self._lock:
+            if tool in self.completed_tools:
+                return  # Prevent double-counting
 
-        self.completed_tools.append(tool)
+            self.completed_tools.append(tool)
 
-        if response.success:
-            self.success_count += 1
-        else:
-            self.failure_count += 1
+            if response.success:
+                self.success_count += 1
+            else:
+                self.failure_count += 1
 
-        self.max_duration = max(self.max_duration, response.duration)
+            self.max_duration = max(self.max_duration, response.duration)
+
+            # Check if all tools are complete
+            if len(self.completed_tools) >= len(self.tools):
+                self._all_complete = True
 
         try:
             self.callback.on_tool_complete(
@@ -270,8 +359,45 @@ class BatchProgressTracker:
                 total_count=len(self.tools)
             )
         except Exception as e:
-            import logging
-            logging.warning(f"Progress callback error in on_tool_complete: {e}")
+            logger.warning(f"Progress callback error in on_tool_complete: {e}")
+
+
+def _batch_update_worker(tracker: BatchProgressTracker, interval: float) -> None:
+    """
+    Background worker thread for periodic batch progress updates.
+
+    Args:
+        tracker: BatchProgressTracker to monitor
+        interval: Update interval in seconds
+    """
+    # Note: For batch operations, we track elapsed time for the entire batch,
+    # not individual tools. Individual tool completion is reported via on_tool_complete.
+    while True:
+        time.sleep(interval)
+
+        # Check if all tools are complete (thread-safe)
+        with tracker._lock:
+            if tracker._all_complete:
+                break
+
+        # Calculate elapsed time for the batch
+        elapsed = time.time() - tracker.start_time
+
+        # Call update callback with batch context
+        # Use first tool name as representative (or "batch" as tool name)
+        tool_name = tracker.tools[0] if tracker.tools else "batch"
+        try:
+            tracker.callback.on_update(
+                tool=tool_name,
+                elapsed=elapsed,
+                timeout=tracker.timeout,
+                batch_mode=True,
+                completed_count=len(tracker.completed_tools),
+                total_count=len(tracker.tools),
+                **tracker.context
+            )
+        except Exception as e:
+            logger.warning(f"Progress callback error in batch on_update: {e}")
 
 
 @contextmanager
@@ -279,6 +405,7 @@ def batch_consultation_progress(
     tools: list[str],
     timeout: int = 90,
     callback: Optional[ProgressCallback] = None,
+    update_interval: Optional[float] = None,
     **context
 ):
     """
@@ -296,6 +423,7 @@ def batch_consultation_progress(
         tools: List of tool names to execute
         timeout: Per-tool timeout in seconds (default 90)
         callback: Optional progress callback (defaults to no-op)
+        update_interval: Optional custom update interval in seconds (auto-calculated if None)
         **context: Additional context for progress display
 
     Yields:
@@ -320,14 +448,32 @@ def batch_consultation_progress(
             **context
         )
     except Exception as e:
-        import logging
-        logging.warning(f"Progress callback error in on_batch_start: {e}")
+        logger.warning(f"Progress callback error in on_batch_start: {e}")
 
     tracker.start_time = time.time()
+
+    # Start background update thread for batch
+    interval = _calculate_update_interval(timeout, update_interval)
+    update_thread = threading.Thread(
+        target=_batch_update_worker,
+        args=(tracker, interval),
+        daemon=True,
+        name=f"batch-progress-update"
+    )
+    tracker._update_thread = update_thread
+    update_thread.start()
 
     try:
         yield tracker
     finally:
+        # Mark batch as complete
+        with tracker._lock:
+            tracker._all_complete = True
+
+        # Wait for update thread to finish
+        if tracker._update_thread and tracker._update_thread.is_alive():
+            tracker._update_thread.join(timeout=1.0)
+
         # Batch complete
         total_duration = time.time() - tracker.start_time
         try:
@@ -339,8 +485,7 @@ def batch_consultation_progress(
                 max_duration=tracker.max_duration
             )
         except Exception as e:
-            import logging
-            logging.warning(f"Progress callback error in on_batch_complete: {e}")
+            logger.warning(f"Progress callback error in on_batch_complete: {e}")
 
 
 __all__ = [

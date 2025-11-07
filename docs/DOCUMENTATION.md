@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 06:35:02
+**Generated:** 2025-11-07 07:35:50
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 242
-- **Total Lines:** 85382
-- **Total Classes:** 344
-- **Total Functions:** 871
+- **Total Files:** 243
+- **Total Lines:** 85735
+- **Total Classes:** 348
+- **Total Functions:** 873
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -139,6 +139,19 @@ the required abstract methods.
 **Properties:**
 - `language`
 - `file_extensions`
+
+---
+
+### `BatchProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:233`
+
+**Description:**
+> Tracks progress for batch consultations.
+
+**Methods:**
+- `mark_complete()`
 
 ---
 
@@ -1548,6 +1561,24 @@ Example:
 
 ---
 
+### `NoOpProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:70`
+
+**Description:**
+> No-op implementation for environments without TUI support.
+
+**Methods:**
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
+
+---
+
 ### `NoToolsAvailableError`
 
 **Language:** python
@@ -1947,6 +1978,25 @@ Example:
 
 ---
 
+### `ProgressCallback`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:17`
+
+**Description:**
+> Protocol for progress feedback callbacks.
+
+**Methods:**
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
+
+---
+
 ### `ProgressData`
 
 **Language:** python
@@ -1979,6 +2029,19 @@ Provides a simple update() method for advancing progress.
 - `__init__()`
 - `update()`
 - `set_description()`
+
+---
+
+### `ProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:112`
+
+**Description:**
+> Tracks progress state within context manager.
+
+**Methods:**
+- `complete()`
 
 ---
 
@@ -9303,6 +9366,41 @@ Examples:
 
 ---
 
+### `ai_consultation_progress(tool, timeout, callback) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:150`
+**Complexity:** 8
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager for AI consultation with progress feedback.
+
+Automatically handles progress lifecycle: start, update (Phase 5), and completion.
+Ensures cleanup even if exceptions occur.
+
+Usage:
+    with ai_consultation_progress("gemini", timeout=90) as progress:
+        response = execute_tool("gemini", prompt)
+        progress.complete(response)
+
+Args:
+    tool: Tool name ("gemini", "codex", "cursor-agent")
+    timeout: Expected timeout in seconds (default 90)
+    callback: Optional progress callback (defaults to no-op)
+    **context: Additional context for progress display (model, prompt_length, etc.)
+
+Yields:
+    ProgressTracker: Progress tracker object with complete() method
+
+**Parameters:**
+- `tool`: str
+- `timeout`: int
+- `callback`: Optional[ProgressCallback]
+
+---
+
 ### `analyze_code_quality(statistics) -> Dict[str, str]`
 
 **Language:** python
@@ -9772,6 +9870,41 @@ Example:
 **Parameters:**
 - `paths`: List[str]
 - `base_directory`: Optional[Path]
+
+---
+
+### `batch_consultation_progress(tools, timeout, callback) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:278`
+**Complexity:** 4
+
+**Decorators:** `@contextmanager`
+
+**Description:**
+> Context manager for batch AI consultation with progress feedback.
+
+Handles parallel tool execution with per-tool and aggregate progress tracking.
+
+Usage:
+    with batch_consultation_progress(["gemini", "codex"], timeout=120) as progress:
+        multi_response = execute_tools_parallel(...)
+        for tool, response in multi_response.responses.items():
+            progress.mark_complete(tool, response)
+
+Args:
+    tools: List of tool names to execute
+    timeout: Per-tool timeout in seconds (default 90)
+    callback: Optional progress callback (defaults to no-op)
+    **context: Additional context for progress display
+
+Yields:
+    BatchProgressTracker: Batch progress tracker with mark_complete() method
+
+**Parameters:**
+- `tools`: list[str]
+- `timeout`: int
+- `callback`: Optional[ProgressCallback]
 
 ---
 
@@ -25087,6 +25220,20 @@ Returns:
 - `spec.extract_frontmatter`
 - `typing.Dict`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/tui_progress.py`
+
+- `ai_tools.MultiToolResponse`
+- `ai_tools.ToolResponse`
+- `ai_tools.ToolStatus`
+- `contextlib.contextmanager`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `time`
+- `typing.Any`
+- `typing.Optional`
+- `typing.Protocol`
 
 ### `src/claude_skills/claude_skills/common/ui_factory.py`
 

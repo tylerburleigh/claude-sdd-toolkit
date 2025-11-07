@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T11:35:02.916234Z",
+    "generated_at": "2025-11-07T12:35:50.502159Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 242,
-    "total_lines": 85382,
-    "total_classes": 344,
-    "total_functions": 871,
+    "total_files": 243,
+    "total_lines": 85735,
+    "total_classes": 348,
+    "total_functions": 873,
     "avg_complexity": 5.78,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 242,
-        "lines": 85382,
-        "classes": 344,
-        "functions": 871,
+        "files": 243,
+        "lines": 85735,
+        "classes": 348,
+        "functions": 873,
         "avg_complexity": 5.78
       }
     }
@@ -1520,6 +1520,37 @@
       ],
       "exports": [],
       "lines": 336
+    },
+    {
+      "name": "tui_progress",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "language": "python",
+      "docstring": "TUI progress feedback for AI tool consultations.\n\nProvides context managers and callbacks for displaying progress\nindicators during long-running AI tool executions.",
+      "classes": [
+        "ProgressCallback",
+        "NoOpProgressCallback",
+        "ProgressTracker",
+        "BatchProgressTracker"
+      ],
+      "functions": [
+        "ai_consultation_progress",
+        "batch_consultation_progress"
+      ],
+      "imports": [
+        "contextlib.contextmanager",
+        "typing.Optional",
+        "typing.Protocol",
+        "typing.Any",
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "enum.Enum",
+        "time",
+        "ai_tools.ToolStatus",
+        "ai_tools.ToolResponse",
+        "ai_tools.MultiToolResponse"
+      ],
+      "exports": [],
+      "lines": 353
     },
     {
       "name": "ui_factory",
@@ -9859,6 +9890,120 @@
           "context": [
             "RichUi",
             "progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ProgressCallback",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 17,
+      "language": "python",
+      "docstring": "Protocol for progress feedback callbacks.",
+      "bases": [
+        "Protocol"
+      ],
+      "methods": [
+        "on_start",
+        "on_update",
+        "on_complete",
+        "on_batch_start",
+        "on_tool_complete",
+        "on_batch_complete"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "NoOpProgressCallback",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 70,
+      "language": "python",
+      "docstring": "No-op implementation for environments without TUI support.",
+      "bases": [],
+      "methods": [
+        "on_start",
+        "on_update",
+        "on_complete",
+        "on_batch_start",
+        "on_tool_complete",
+        "on_batch_complete"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "ai_consultation_progress",
+          "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+          "line": 177,
+          "context": [
+            "ai_consultation_progress"
+          ]
+        },
+        {
+          "instantiator": "batch_consultation_progress",
+          "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+          "line": 305,
+          "context": [
+            "batch_consultation_progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 2
+    },
+    {
+      "name": "ProgressTracker",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 112,
+      "language": "python",
+      "docstring": "Tracks progress state within context manager.",
+      "bases": [],
+      "methods": [
+        "complete"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "ai_consultation_progress",
+          "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+          "line": 180,
+          "context": [
+            "ai_consultation_progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "BatchProgressTracker",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 233,
+      "language": "python",
+      "docstring": "Tracks progress for batch consultations.",
+      "bases": [],
+      "methods": [
+        "mark_complete"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "batch_consultation_progress",
+          "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+          "line": 307,
+          "context": [
+            "batch_consultation_progress"
           ]
         }
       ],
@@ -48408,6 +48553,184 @@
           "name": "replace",
           "file": "unknown",
           "line": 329,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "ai_consultation_progress",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 150,
+      "language": "python",
+      "docstring": "Context manager for AI consultation with progress feedback.\n\nAutomatically handles progress lifecycle: start, update (Phase 5), and completion.\nEnsures cleanup even if exceptions occur.\n\nUsage:\n    with ai_consultation_progress(\"gemini\", timeout=90) as progress:\n        response = execute_tool(\"gemini\", prompt)\n        progress.complete(response)\n\nArgs:\n    tool: Tool name (\"gemini\", \"codex\", \"cursor-agent\")\n    timeout: Expected timeout in seconds (default 90)\n    callback: Optional progress callback (defaults to no-op)\n    **context: Additional context for progress display (model, prompt_length, etc.)\n\nYields:\n    ProgressTracker: Progress tracker object with complete() method",
+      "parameters": [
+        {
+          "name": "tool",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "callback",
+          "type": "Optional[ProgressCallback]",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 8,
+      "decorators": [
+        "contextmanager"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "on_start",
+          "file": "unknown",
+          "line": 189,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 192,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 194,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "method_call"
+        },
+        {
+          "name": "on_complete",
+          "file": "unknown",
+          "line": 204,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 213,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 219,
+          "call_type": "method_call"
+        },
+        {
+          "name": "on_complete",
+          "file": "unknown",
+          "line": 221,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "batch_consultation_progress",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 278,
+      "language": "python",
+      "docstring": "Context manager for batch AI consultation with progress feedback.\n\nHandles parallel tool execution with per-tool and aggregate progress tracking.\n\nUsage:\n    with batch_consultation_progress([\"gemini\", \"codex\"], timeout=120) as progress:\n        multi_response = execute_tools_parallel(...)\n        for tool, response in multi_response.responses.items():\n            progress.mark_complete(tool, response)\n\nArgs:\n    tools: List of tool names to execute\n    timeout: Per-tool timeout in seconds (default 90)\n    callback: Optional progress callback (defaults to no-op)\n    **context: Additional context for progress display\n\nYields:\n    BatchProgressTracker: Batch progress tracker with mark_complete() method",
+      "parameters": [
+        {
+          "name": "tools",
+          "type": "list[str]",
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "int",
+          "default": null
+        },
+        {
+          "name": "callback",
+          "type": "Optional[ProgressCallback]",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 4,
+      "decorators": [
+        "contextmanager"
+      ],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "on_batch_start",
+          "file": "unknown",
+          "line": 316,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 318,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 324,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 326,
+          "call_type": "method_call"
+        },
+        {
+          "name": "time",
+          "file": "unknown",
+          "line": 332,
+          "call_type": "method_call"
+        },
+        {
+          "name": "on_batch_complete",
+          "file": "unknown",
+          "line": 334,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 335,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 343,
           "call_type": "method_call"
         }
       ]
@@ -130733,6 +131056,19 @@
       "typing.Dict",
       "typing.Optional",
       "spec.extract_frontmatter"
+    ],
+    "src/claude_skills/claude_skills/common/tui_progress.py": [
+      "contextlib.contextmanager",
+      "typing.Optional",
+      "typing.Protocol",
+      "typing.Any",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "enum.Enum",
+      "time",
+      "ai_tools.ToolStatus",
+      "ai_tools.ToolResponse",
+      "ai_tools.MultiToolResponse"
     ],
     "src/claude_skills/claude_skills/common/ui_factory.py": [
       "os",

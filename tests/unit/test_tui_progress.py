@@ -438,3 +438,395 @@ class TestBatchProgressTracker:
 
         assert tracker.success_count == 1
         assert tracker.failure_count == 1
+
+
+class TestElapsedTimeTracking:
+    """Test elapsed time tracking and periodic update callbacks."""
+
+    def test_on_update_called_periodically(self):
+        """Context manager calls on_update at regular intervals."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=10,
+            callback=callback,
+            update_interval=0.5  # Fast updates for testing
+        ) as progress:
+            # Wait for at least 2 updates
+            time.sleep(1.5)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=1.5,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+        # Should have called on_update at least twice (at 0.5s and 1.0s)
+        assert callback.on_update.call_count >= 2
+
+    def test_on_update_receives_elapsed_time(self):
+        """on_update callback receives elapsed time parameter."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=10,
+            callback=callback,
+            update_interval=0.3
+        ) as progress:
+            time.sleep(0.8)  # Wait for at least 2 updates
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.8,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+        # Check that on_update was called with elapsed parameter
+        assert callback.on_update.call_count >= 1
+        args, kwargs = callback.on_update.call_args
+        assert "elapsed" in kwargs
+        assert kwargs["elapsed"] > 0.0
+        assert kwargs["tool"] == "gemini"
+        assert kwargs["timeout"] == 10
+
+    def test_update_thread_stops_on_completion(self):
+        """Background update thread stops when consultation completes."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2
+        ) as progress:
+            time.sleep(0.5)  # Wait for at least 2 updates
+            initial_count = callback.on_update.call_count
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.5,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+            # Wait a bit to ensure thread has stopped
+            time.sleep(0.5)
+            final_count = callback.on_update.call_count
+
+        # No new updates should have occurred after completion
+        assert final_count == initial_count
+
+    def test_update_thread_stops_on_context_exit(self):
+        """Background update thread stops when exiting context."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2
+        ) as progress:
+            time.sleep(0.5)
+
+        # After exiting context, thread should be stopped
+        # Wait to ensure no more updates
+        initial_count = callback.on_update.call_count
+        time.sleep(0.5)
+        final_count = callback.on_update.call_count
+
+        # No new updates should occur after context exit
+        assert final_count == initial_count
+
+    def test_update_thread_stops_on_exception(self):
+        """Background update thread stops when exception raised."""
+        callback = Mock(spec=ProgressCallback)
+
+        try:
+            with ai_consultation_progress(
+                "gemini",
+                timeout=30,
+                callback=callback,
+                update_interval=0.2
+            ) as progress:
+                time.sleep(0.5)
+                raise ValueError("Test exception")
+        except ValueError:
+            pass
+
+        # After exception, thread should be stopped
+        initial_count = callback.on_update.call_count
+        time.sleep(0.5)
+        final_count = callback.on_update.call_count
+
+        # No new updates should occur after exception
+        assert final_count == initial_count
+
+    def test_no_race_condition_on_completion(self):
+        """No race condition when complete() called during update."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.1  # Very fast updates to increase chance of race
+        ) as progress:
+            time.sleep(0.25)  # Let some updates happen
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.25,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+        # Should only call on_complete once, not multiple times
+        assert callback.on_complete.call_count == 1
+
+    def test_update_interval_calculation_short_timeout(self):
+        """Update interval is 2s for short timeouts (<30s)."""
+        from claude_skills.common.tui_progress import _calculate_update_interval
+
+        interval = _calculate_update_interval(20)
+        assert interval == 2.0
+
+    def test_update_interval_calculation_medium_timeout(self):
+        """Update interval is 5s for medium timeouts (30-120s)."""
+        from claude_skills.common.tui_progress import _calculate_update_interval
+
+        interval = _calculate_update_interval(60)
+        assert interval == 5.0
+
+    def test_update_interval_calculation_long_timeout(self):
+        """Update interval is 10s for long timeouts (>120s)."""
+        from claude_skills.common.tui_progress import _calculate_update_interval
+
+        interval = _calculate_update_interval(300)
+        assert interval == 10.0
+
+    def test_custom_update_interval_override(self):
+        """Custom update_interval parameter overrides calculation."""
+        from claude_skills.common.tui_progress import _calculate_update_interval
+
+        interval = _calculate_update_interval(60, custom_interval=1.0)
+        assert interval == 1.0
+
+
+class TestBatchElapsedTimeTracking:
+    """Test elapsed time tracking for batch operations."""
+
+    def test_batch_on_update_called_periodically(self):
+        """Batch context manager calls on_update at regular intervals."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(
+            ["gemini", "codex"],
+            timeout=10,
+            callback=callback,
+            update_interval=0.5
+        ) as progress:
+            # Wait for at least 2 updates
+            time.sleep(1.5)
+
+            # Complete the batch
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=1.0,
+                timestamp="2025-11-07T12:00:00Z"
+            ))
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=1.2,
+                timestamp="2025-11-07T12:00:01Z"
+            ))
+
+        # Should have called on_update at least twice
+        assert callback.on_update.call_count >= 2
+
+    def test_batch_on_update_includes_batch_context(self):
+        """Batch on_update includes batch-specific context."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(
+            ["gemini", "codex"],
+            timeout=10,
+            callback=callback,
+            update_interval=0.3
+        ) as progress:
+            time.sleep(0.5)
+
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.4,
+                timestamp="2025-11-07T12:00:00Z"
+            ))
+
+        # Check that on_update was called with batch context
+        assert callback.on_update.call_count >= 1
+        args, kwargs = callback.on_update.call_args
+        assert "batch_mode" in kwargs
+        assert kwargs["batch_mode"] is True
+        assert "completed_count" in kwargs
+        assert "total_count" in kwargs
+
+    def test_batch_update_thread_stops_on_all_complete(self):
+        """Batch update thread stops when all tools complete."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(
+            ["gemini", "codex"],
+            timeout=30,
+            callback=callback,
+            update_interval=0.2
+        ) as progress:
+            time.sleep(0.5)
+
+            # Complete all tools
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.3,
+                timestamp="2025-11-07T12:00:00Z"
+            ))
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.4,
+                timestamp="2025-11-07T12:00:01Z"
+            ))
+
+            initial_count = callback.on_update.call_count
+
+            # Wait to ensure no more updates
+            time.sleep(0.5)
+            final_count = callback.on_update.call_count
+
+        # No new updates should occur after all tools complete
+        assert final_count == initial_count
+
+    def test_batch_update_thread_stops_on_context_exit(self):
+        """Batch update thread stops when exiting context."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(
+            ["gemini", "codex"],
+            timeout=30,
+            callback=callback,
+            update_interval=0.2
+        ) as progress:
+            time.sleep(0.5)
+
+        # After exiting, thread should be stopped
+        initial_count = callback.on_update.call_count
+        time.sleep(0.5)
+        final_count = callback.on_update.call_count
+
+        # No new updates should occur
+        assert final_count == initial_count
+
+
+class TestThreadSafety:
+    """Test thread safety of progress tracking."""
+
+    def test_concurrent_completion_is_safe(self):
+        """Multiple threads can safely interact with tracker."""
+        import threading
+        callback = Mock(spec=ProgressCallback)
+
+        def complete_task(progress):
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.1,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.1
+        ) as progress:
+            # Spawn multiple threads trying to complete simultaneously
+            threads = [
+                threading.Thread(target=complete_task, args=(progress,))
+                for _ in range(5)
+            ]
+
+            for t in threads:
+                t.start()
+
+            for t in threads:
+                t.join()
+
+        # Despite multiple threads, on_complete should only be called once
+        assert callback.on_complete.call_count == 1
+
+    def test_batch_concurrent_marking_is_safe(self):
+        """Multiple threads can safely mark tools complete in batch."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(
+            ["tool1", "tool2", "tool3", "tool4"],
+            timeout=30,
+            callback=callback,
+            update_interval=0.1
+        ) as progress:
+            # Mark tools complete from different threads
+            import threading
+
+            def mark_tool(tool_name):
+                progress.mark_complete(tool_name, ToolResponse(
+                    tool=tool_name,
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.1,
+                    timestamp="2025-11-07T12:00:00Z"
+                ))
+
+            threads = [
+                threading.Thread(target=mark_tool, args=(f"tool{i}",))
+                for i in range(1, 5)
+            ]
+
+            for t in threads:
+                t.start()
+
+            for t in threads:
+                t.join()
+
+        # All 4 tools should be marked complete exactly once
+        assert callback.on_tool_complete.call_count == 4
