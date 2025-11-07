@@ -453,8 +453,13 @@ class FidelityReport:
                     console.print(panel)
                     console.print()
 
-        # Recommendations section
-        if consensus_recommendations:
+        # Recommendations section with consensus indicators
+        parsed_responses_list = self._convert_to_dict(self.parsed_responses)
+        if parsed_responses_list and len(parsed_responses_list) > 1:
+            # Use consensus-aware display for multiple models
+            self._print_recommendation_consensus(console, parsed_responses_list)
+        elif consensus_recommendations:
+            # Fallback to simple list for single model or consensus-only data
             console.print("[bold]RECOMMENDATIONS[/bold]")
             console.print()
             for rec in consensus_recommendations:
@@ -644,6 +649,73 @@ class FidelityReport:
                 if len(issues) > 3:
                     console.print(f"  [dim]... and {len(issues) - 3} more[/dim]")
                 console.print()
+
+    def _print_recommendation_consensus(
+        self,
+        console: Console,
+        parsed_responses: List[Dict[str, Any]]
+    ) -> None:
+        """
+        Print recommendations with consensus indicators showing agreement levels.
+
+        Analyzes recommendations from all model responses and displays them
+        with visual indicators showing how many models agreed on each.
+
+        Args:
+            console: Rich Console instance for output
+            parsed_responses: List of parsed model responses
+        """
+        # Collect all recommendations from all models
+        all_recommendations = []
+        for response in parsed_responses:
+            recommendations = response.get("recommendations", [])
+            for rec in recommendations:
+                rec_text = rec if isinstance(rec, str) else str(rec)
+                all_recommendations.append(rec_text)
+
+        if not all_recommendations:
+            return
+
+        # Count recommendation frequency (exact matching for now)
+        from collections import Counter
+        rec_counts = Counter(all_recommendations)
+
+        # Sort by frequency (most common first)
+        sorted_recs = rec_counts.most_common(10)  # Limit to top 10
+
+        if not sorted_recs:
+            return
+
+        console.print("[bold]RECOMMENDATIONS (with consensus)[/bold]")
+        console.print("[dim]Recommendations with agreement levels from AI models[/dim]")
+        console.print()
+
+        # Calculate total models for percentage
+        num_models = len(parsed_responses)
+
+        # Display recommendations with consensus indicators
+        for rec_text, count in sorted_recs:
+            # Calculate percentage of models that made this recommendation
+            percentage = (count / num_models) * 100
+
+            # Create consensus indicator symbols
+            if count >= num_models:
+                # All models agree
+                indicator = "[bold green]✓✓✓[/bold green]"
+                consensus_label = f"[green]{percentage:.0f}%[/green]"
+            elif count >= num_models * 0.66:
+                # Majority agreement (66%+)
+                indicator = "[yellow]✓✓[/yellow]"
+                consensus_label = f"[yellow]{percentage:.0f}%[/yellow]"
+            else:
+                # Minority (less than 66%)
+                indicator = "[cyan]✓[/cyan]"
+                consensus_label = f"[cyan]{percentage:.0f}%[/cyan]"
+
+            # Display recommendation with consensus indicator
+            console.print(f"{indicator} {consensus_label} • {rec_text}")
+
+        console.print()
 
     def _print_issue_aggregation_panel(
         self,
