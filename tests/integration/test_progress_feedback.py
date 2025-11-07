@@ -453,3 +453,152 @@ class TestBatchConsultationProgress:
         batch_start_kwargs = mock_callback.on_batch_start.call_args[1]
         assert batch_start_kwargs["operation"] == "consensus"
         assert batch_start_kwargs["phase"] == "analysis"
+
+
+class TestElapsedTimeTracking:
+    """Test elapsed time tracking accuracy in progress feedback."""
+
+    def test_single_consultation_elapsed_time(self):
+        """Test that elapsed time is accurately tracked for single consultations."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=90, callback=mock_callback) as progress:
+            # Simulate operation taking ~0.5 seconds
+            time.sleep(0.5)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.5
+            )
+            progress.complete(response)
+
+        # Verify on_complete was called with duration
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        reported_duration = complete_kwargs["duration"]
+
+        # Duration should be approximately the sleep time (with some overhead)
+        assert 0.4 < reported_duration < 2.0  # Allow overhead for thread operations
+
+    def test_update_elapsed_time_increases(self):
+        """Test that elapsed time increases in periodic updates."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=90,
+            callback=mock_callback,
+            update_interval=0.1
+        ) as progress:
+            # Wait for multiple updates
+            time.sleep(0.35)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.35
+            )
+            progress.complete(response)
+
+        # Verify multiple updates were called
+        assert mock_callback.on_update.call_count >= 2
+
+        # Verify elapsed time increases across updates
+        update_calls = mock_callback.on_update.call_args_list
+        elapsed_times = [call[1]["elapsed"] for call in update_calls]
+
+        # Each elapsed time should be greater than the previous
+        for i in range(1, len(elapsed_times)):
+            assert elapsed_times[i] > elapsed_times[i-1]
+
+    def test_batch_total_duration_tracking(self):
+        """Test that batch tracks total duration accurately."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            # Simulate staggered completions
+            time.sleep(0.2)
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="output",
+                duration=0.2
+            ))
+
+            time.sleep(0.3)
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.SUCCESS,
+                output="output",
+                duration=0.3
+            ))
+
+        # Verify batch complete reports total duration
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+        reported_total = batch_complete["total_duration"]
+
+        # Duration should be at least the sum of sleeps (0.5s) with overhead
+        assert 0.4 < reported_total < 2.0
+
+    def test_max_duration_vs_total_duration(self):
+        """Test that max_duration tracks longest individual tool, not total."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="output",
+                duration=0.2
+            ))
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.SUCCESS,
+                output="output",
+                duration=0.5  # Longer individual duration
+            ))
+
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+
+        # max_duration should be the longest individual tool (0.5)
+        assert batch_complete["max_duration"] == 0.5
+
+        # total_duration should be the wall-clock time (will be >= 0.5 in sequential)
+        assert batch_complete["total_duration"] >= 0.5
+
+    def test_elapsed_time_on_error(self):
+        """Test that elapsed time is tracked even when errors occur."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        try:
+            with ai_consultation_progress("gemini", timeout=90, callback=mock_callback):
+                time.sleep(0.3)
+                raise RuntimeError("Simulated error")
+        except RuntimeError:
+            pass  # Expected
+
+        # Verify on_complete was still called with duration
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        reported_duration = complete_kwargs["duration"]
+
+        # Duration should be approximately the sleep time (with some overhead)
+        assert 0.2 < reported_duration < 2.0
+
+    def test_auto_complete_tracks_elapsed_time(self):
+        """Test that auto-complete (no explicit complete() call) tracks elapsed time."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=90, callback=mock_callback):
+            time.sleep(0.4)
+            # No explicit complete() call - should auto-complete
+
+        # Verify on_complete was called with duration
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        reported_duration = complete_kwargs["duration"]
+
+        # Duration should be approximately the sleep time (with some overhead)
+        assert 0.3 < reported_duration < 2.0
