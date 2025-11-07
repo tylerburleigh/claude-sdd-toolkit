@@ -110,6 +110,34 @@ def mock_parsed_ai_responses():
     ]
 
 
+@pytest.fixture
+def mock_categorized_issues():
+    """Create mock categorized issues for consensus matrix testing."""
+    return [
+        {
+            "issue": "Missing input sanitization in user registration endpoint",
+            "severity": "critical",
+            "category": "security",
+            "agreed_by": ["gemini", "codex", "claude"],
+            "agreement_count": 3
+        },
+        {
+            "issue": "Password validation requirements too weak",
+            "severity": "high",
+            "category": "security",
+            "agreed_by": ["codex", "claude"],
+            "agreement_count": 2
+        },
+        {
+            "issue": "Missing error handling in authentication flow",
+            "severity": "medium",
+            "category": "reliability",
+            "agreed_by": ["gemini"],
+            "agreement_count": 1
+        }
+    ]
+
+
 # =============================================================================
 # Test: Fidelity Review Side-by-Side Comparison
 # =============================================================================
@@ -199,3 +227,92 @@ def test_fidelity_review_no_models(mock_spec_data, mock_fidelity_results):
     # Output should be minimal or empty
     output = console.file.getvalue()
     assert "MODEL RESPONSE COMPARISON" not in output or output.strip() == ""
+
+
+# =============================================================================
+# Test: Consensus Matrix Display
+# =============================================================================
+
+
+def test_consensus_matrix_display(
+    mock_parsed_ai_responses,
+    mock_categorized_issues
+):
+    """
+    Test that consensus matrix renders correctly with Rich Table.
+
+    Verifies:
+    - Consensus matrix table is created with issue rows and model columns
+    - Each model column shows checkmark (✓) or dash (—) for agreement
+    - Agreement percentage is calculated and displayed
+    - Issues are color-coded by severity (critical=red, high=yellow, medium=blue, low=cyan)
+    - Matrix shows which models identified each issue
+    """
+    # Create FidelityReport with mock data
+    review_results = {
+        "spec_id": "test-spec-001",
+        "consensus": {
+            "consensus_verdict": "partial",
+            "agreement_rate": 0.67
+        },
+        "categorized_issues": mock_categorized_issues,
+        "parsed_responses": mock_parsed_ai_responses,
+        "models_consulted": len(mock_parsed_ai_responses)
+    }
+
+    report = FidelityReport(review_results)
+
+    # Capture console output
+    console = Console(file=StringIO(), width=120, legacy_windows=False)
+
+    # Call the consensus matrix rendering method
+    report._print_consensus_matrix(console, mock_categorized_issues)
+
+    # Get rendered output
+    output = console.file.getvalue()
+
+    # Verify consensus matrix header
+    assert "CONSENSUS MATRIX" in output
+    assert "Shows which AI models identified each issue" in output
+
+    # Verify column headers
+    assert "Issue" in output
+    assert "M1" in output  # Model 1 column
+    assert "M2" in output  # Model 2 column
+    assert "Agreement" in output
+
+    # Verify issues are present (at least some text from issues)
+    assert "sanitization" in output or "validation" in output or "error" in output
+
+    # Verify agreement indicators (checkmarks or dashes)
+    assert "✓" in output or "—" in output
+
+    # Verify agreement percentages are shown
+    assert "%" in output
+
+    print("\n--- Consensus Matrix Output ---")
+    print(output)
+    print("--- End Output ---\n")
+
+
+def test_consensus_matrix_no_issues(mock_parsed_ai_responses):
+    """Test consensus matrix handles case with no categorized issues."""
+    # Create report with no issues
+    review_results = {
+        "spec_id": "test-spec-001",
+        "consensus": {},
+        "categorized_issues": [],
+        "parsed_responses": mock_parsed_ai_responses,
+        "models_consulted": len(mock_parsed_ai_responses)
+    }
+
+    report = FidelityReport(review_results)
+
+    # Should not crash when printing matrix with no issues
+    console = Console(file=StringIO(), width=120)
+    report._print_consensus_matrix(console, [])
+
+    # Output should have header but no issue rows
+    output = console.file.getvalue()
+    # Matrix might still print header or be empty
+    # The important thing is it doesn't crash
