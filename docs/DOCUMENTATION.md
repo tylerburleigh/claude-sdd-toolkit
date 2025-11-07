@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:11:16
+**Generated:** 2025-11-06 19:14:22
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 241
-- **Total Lines:** 84485
-- **Total Classes:** 341
-- **Total Functions:** 870
+- **Total Files:** 242
+- **Total Lines:** 84846
+- **Total Classes:** 342
+- **Total Functions:** 871
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -4429,6 +4429,26 @@ Attributes:
 **Methods:**
 - `test_list_phases()`
 - `test_list_phases_json()`
+
+---
+
+### `TestListSpecsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:77`
+
+**Description:**
+> Tests for list-specs command with Rich table output.
+
+**Methods:**
+- `test_list_specs_help()`
+- `test_list_specs_text_output()`
+- `test_list_specs_json_output()`
+- `test_list_specs_empty_directory()`
+- `test_list_specs_filter_by_status()`
+- `test_list_specs_progress_calculation()`
+- `test_list_specs_verbose_output()`
+- `test_list_specs_multiple_specs()`
 
 ---
 
@@ -20462,6 +20482,20 @@ Example:
 ### `run_cli() -> None`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:28`
+**Complexity:** 6
+
+**Description:**
+> Run sdd command with fallback to python -m if sdd not on PATH.
+
+Automatically reorders arguments to put global flags before subcommands.
+Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
+
+---
+
+### `run_cli() -> None`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/test_run_tests_doc_integration.py:19`
 **Complexity:** 2
 
@@ -26308,6 +26342,15 @@ Returns:
 - `__future__.annotations`
 - `os`
 - `pathlib.Path`
+- `subprocess`
+- `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_list_commands.py`
+
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `shutil`
 - `subprocess`
 - `sys`
 
