@@ -15,7 +15,7 @@ The `Skill(sdd-toolkit:doc-query)` skill provides targeted query capabilities fo
 - **Cross-Reference Tracking**: Find callers/callees, build call graphs, track class instantiations and imports
 - **Call Graph Analysis**: Visualize function call relationships with configurable depth and direction
 - **Module Summaries**: `describe-module` surfaces docstrings, hot spots, dependencies, and key entities in one call
-- **JSON Output Available**: Use `--json` or `--format json` on commands for structured output ready for `jq`, scripts, or downstream tools
+- **Structured Output**: Commands return structured output ready for scripts or downstream tools
 - **Complexity Analysis**: Identify refactoring candidates with configurable complexity thresholds
 - **Dependency Mapping**: Understand module relationships and perform impact analysis
 - **Context Gathering**: Smart context collection for specific tasks or feature areas
@@ -295,12 +295,11 @@ These commands automate common workflows by combining multiple queries into sing
 Trace execution flow from an entry function, showing the complete call chain with architectural layers and complexity analysis.
 
 ```bash
-sdd doc trace-entry <function> [--max-depth N] [--format text|json] [--docs-path PATH]
+sdd doc trace-entry <function> [--max-depth N] [--docs-path PATH]
 ```
 
 **Options:**
 - `--max-depth N` - Maximum call chain depth (default: 5)
-- `--format` - Output format: text or json (default: text)
 
 **Examples:**
 ```bash
@@ -309,9 +308,6 @@ sdd doc trace-entry main
 
 # Trace with custom depth
 sdd doc trace-entry process_request --max-depth 3
-
-# JSON output for programmatic use
-sdd doc trace-entry main --format json
 ```
 
 **Output includes:**
@@ -332,12 +328,11 @@ sdd doc trace-entry main --format json
 Trace how a data object (class) flows through the codebase, showing CRUD operations and usage patterns.
 
 ```bash
-sdd doc trace-data <classname> [--include-properties] [--format text|json] [--docs-path PATH]
+sdd doc trace-data <classname> [--include-properties] [--docs-path PATH]
 ```
 
 **Options:**
 - `--include-properties` - Include detailed property access analysis
-- `--format` - Output format: text or json (default: text)
 
 **Examples:**
 ```bash
@@ -346,9 +341,6 @@ sdd doc trace-data User
 
 # Include property access patterns
 sdd doc trace-data User --include-properties
-
-# JSON output
-sdd doc trace-data DocumentationQuery --format json
 ```
 
 **Output includes:**
@@ -370,12 +362,11 @@ sdd doc trace-data DocumentationQuery --format json
 Analyze the impact of changing a function or class, calculating the blast radius with risk assessment.
 
 ```bash
-sdd doc impact <entity> [--depth N] [--format text|json] [--docs-path PATH]
+sdd doc impact <entity> [--depth N] [--docs-path PATH]
 ```
 
 **Options:**
 - `--depth N` - Maximum depth for indirect dependency traversal (default: 2)
-- `--format` - Output format: text or json (default: text)
 
 **Examples:**
 ```bash
@@ -384,9 +375,6 @@ sdd doc impact calculate_score
 
 # Deep analysis with 3 levels
 sdd doc impact UserService --depth 3
-
-# JSON output
-sdd doc impact main --format json
 ```
 
 **Output includes:**
@@ -408,13 +396,12 @@ sdd doc impact main --format json
 Find high-priority refactoring candidates by combining complexity metrics with usage data.
 
 ```bash
-sdd doc refactor-candidates [--min-complexity N] [--limit N] [--format text|json] [--docs-path PATH]
+sdd doc refactor-candidates [--min-complexity N] [--limit N] [--docs-path PATH]
 ```
 
 **Options:**
 - `--min-complexity N` - Minimum complexity threshold (default: 10)
 - `--limit N` - Maximum number of candidates to return (default: 20)
-- `--format` - Output format: text or json (default: text)
 
 **Examples:**
 ```bash
@@ -423,9 +410,6 @@ sdd doc refactor-candidates
 
 # Focus on high-complexity functions
 sdd doc refactor-candidates --min-complexity 20 --limit 10
-
-# JSON output for tooling integration
-sdd doc refactor-candidates --format json
 ```
 
 **Output includes:**
@@ -671,7 +655,7 @@ sdd doc dependencies "myapp.services.auth" --reverse
 Show functions that call the specified function using cross-reference data from AST analysis.
 
 ```bash
-sdd doc callers <function> [--format text|json] [--docs-path PATH]
+sdd doc callers <function> [--docs-path PATH]
 ```
 
 **Examples:**
@@ -679,8 +663,8 @@ sdd doc callers <function> [--format text|json] [--docs-path PATH]
 # Find all functions that call calculate_score
 sdd doc callers calculate_score
 
-# JSON output for programmatic use
-sdd doc callers process_data --format json
+# Find callers with specific path
+sdd doc callers process_data --docs-path ./docs
 ```
 
 **Output includes:**
@@ -700,7 +684,7 @@ sdd doc callers process_data --format json
 Show functions called by the specified function using cross-reference data from AST analysis.
 
 ```bash
-sdd doc callees <function> [--format text|json] [--docs-path PATH]
+sdd doc callees <function> [--docs-path PATH]
 ```
 
 **Examples:**
@@ -708,8 +692,8 @@ sdd doc callees <function> [--format text|json] [--docs-path PATH]
 # Find all functions called by main
 sdd doc callees main
 
-# JSON output for programmatic use
-sdd doc callees process_request --format json
+# Find callees with specific path
+sdd doc callees process_request --docs-path ./docs
 ```
 
 **Output includes:**
@@ -729,7 +713,7 @@ sdd doc callees process_request --format json
 Build and visualize function call graphs with configurable depth and direction.
 
 ```bash
-sdd doc call-graph <function> [--depth N] [--direction up|down|both] [--format text|json|dot] [--docs-path PATH]
+sdd doc call-graph <function> [--depth N] [--direction up|down|both] [--docs-path PATH]
 ```
 
 **Options:**
@@ -738,10 +722,6 @@ sdd doc call-graph <function> [--depth N] [--direction up|down|both] [--format t
   - `down`: Show callees (functions this calls) - default
   - `up`: Show callers (functions that call this)
   - `both`: Show both callers and callees
-- `--format` - Output format:
-  - `text`: Human-readable tree (default)
-  - `json`: Structured data for tooling
-  - `dot`: Graphviz format for visualization
 
 **Examples:**
 ```bash
@@ -753,10 +733,6 @@ sdd doc call-graph calculate_score --direction up --depth 2
 
 # Show bidirectional graph
 sdd doc call-graph main --direction both --depth 3
-
-# Generate Graphviz visualization
-sdd doc call-graph main --direction both --format dot > callgraph.dot
-dot -Tpng callgraph.dot -o callgraph.png
 ```
 
 **Output includes:**

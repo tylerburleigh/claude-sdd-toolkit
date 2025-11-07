@@ -25,6 +25,7 @@ DEFAULT_SDD_CONFIG = {
         "json": True,  # Output JSON by default for automation-friendly behavior
         "compact": True,  # Use compact JSON formatting by default
         "default_format": "text",  # Default output format: "text" (TUI), "json", or "markdown"
+        "text_renderer": "auto",  # Text rendering backend: "auto" (intelligent), "rich" (TUI), or "plain" (simple text)
     }
 }
 
@@ -126,6 +127,18 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
                 logger.warning(
                     f"Invalid value for sdd config 'output.default_format': expected one of {allowed_formats}, "
                     f"got {value!r}. Using default: {DEFAULT_SDD_CONFIG['output']['default_format']}"
+                )
+
+        # Validate text_renderer field
+        if "text_renderer" in output:
+            value = output["text_renderer"]
+            allowed_renderers = ["auto", "rich", "plain"]
+            if isinstance(value, str) and value in allowed_renderers:
+                validated["output"]["text_renderer"] = value
+            else:
+                logger.warning(
+                    f"Invalid value for sdd config 'output.text_renderer': expected one of {allowed_renderers}, "
+                    f"got {value!r}. Using default: {DEFAULT_SDD_CONFIG['output']['text_renderer']}"
                 )
 
     # Warn about unknown keys (but don't fail)
@@ -244,3 +257,19 @@ def get_default_format(project_path: Optional[Path] = None) -> str:
         parser.add_argument('--format', default=default_format, ...)
     """
     return get_sdd_setting("output.default_format", project_path, default="text")
+
+
+def get_text_renderer(project_path: Optional[Path] = None) -> str:
+    """Get the text renderer preference from configuration.
+
+    Args:
+        project_path: Path to project root (optional)
+
+    Returns:
+        Text renderer string: "auto" (intelligent detection), "rich" (TUI), or "plain" (simple text)
+
+    Example:
+        renderer = get_text_renderer()
+        ui = create_ui(force_plain=(renderer == "plain"), force_rich=(renderer == "rich"))
+    """
+    return get_sdd_setting("output.text_renderer", project_path, default="auto")

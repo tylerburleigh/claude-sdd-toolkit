@@ -139,12 +139,14 @@ def create_ui(
     force_rich: bool = False,
     collect_messages: bool = False,
     quiet: bool = False,
+    project_path: Optional['Path'] = None,
     **kwargs
 ) -> Ui:
     """
-    Create appropriate UI backend based on environment.
+    Create appropriate UI backend based on environment and configuration.
 
     Automatically selects RichUi or PlainUi based on:
+    - User configuration (output.text_renderer in .claude/sdd_config.json)
     - TTY availability
     - CI environment detection
     - Explicit force flags
@@ -155,6 +157,7 @@ def create_ui(
         force_rich: Force RichUi backend (overrides auto-detection)
         collect_messages: Enable message collection mode
         quiet: Enable quiet mode (errors only, PlainUi only)
+        project_path: Path to project root for config loading (optional)
         **kwargs: Additional backend-specific options
 
     Returns:
@@ -181,10 +184,11 @@ def create_ui(
 
     Decision Flow:
         1. Check force_rich/force_plain flags
-        2. Check FORCE_PLAIN_UI environment variable
-        3. Check TTY availability
-        4. Check CI environment
-        5. Default to RichUi for interactive terminals
+        2. Check user config (output.text_renderer)
+        3. Check FORCE_PLAIN_UI environment variable
+        4. Check TTY availability
+        5. Check CI environment
+        6. Default to RichUi for interactive terminals
     """
     # Validate flags
     if force_plain and force_rich:
@@ -195,8 +199,24 @@ def create_ui(
 
     if force_rich:
         use_plain = False
-    elif force_plain or should_use_plain_ui():
+    elif force_plain:
         use_plain = True
+    else:
+        # Check user config preference
+        try:
+            from .sdd_config import get_text_renderer
+            renderer_pref = get_text_renderer(project_path)
+
+            if renderer_pref == "plain":
+                use_plain = True
+            elif renderer_pref == "rich":
+                use_plain = False
+            # else: "auto" - fall through to auto-detection
+            else:
+                use_plain = should_use_plain_ui()
+        except (ImportError, Exception):
+            # If config loading fails, fall back to auto-detection
+            use_plain = should_use_plain_ui()
 
     # Create appropriate backend
     if use_plain:

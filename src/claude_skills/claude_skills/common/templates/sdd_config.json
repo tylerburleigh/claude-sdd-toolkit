@@ -2,6 +2,7 @@
   "output": {
     "json": true,
     "compact": true,
-    "default_format": "text"
+    "default_format": "text",
+    "text_renderer": "auto"
   }
 }

@@ -195,7 +195,7 @@ Ready to generate documentation. Proceeding with generation..."
 Use the generate subcommand with appropriate options:
 
 ```bash
-sdd doc generate <directory> --name "ProjectName" --version "X.Y.Z" --output-dir ./docs --format both --exclude tests --exclude migrations --exclude __pycache__ --verbose
+sdd doc generate <directory> --name "ProjectName" --version "X.Y.Z" --output-dir ./docs --exclude tests --exclude migrations --exclude __pycache__ --verbose
 ```
 
 **Command breakdown:**
@@ -203,7 +203,6 @@ sdd doc generate <directory> --name "ProjectName" --version "X.Y.Z" --output-dir
 - `--name`: Project name (required for good output)
 - `--version`: Version string (defaults to 1.0.0)
 - `--output-dir`: Where to save files (defaults to ./docs)
-- `--format`: `markdown`, `json`, or `both` (default: both)
 - `--exclude`: Pattern to exclude (can use multiple times)
 - `--verbose`: Show progress (ALWAYS use this)
 
@@ -358,7 +357,6 @@ sdd doc generate <directory> [options]
 - `--name NAME`: Project name (IMPORTANT - use this!)
 - `--version VERSION`: Version string (default: 1.0.0)
 - `--output-dir DIR`: Output location (default: ./docs)
-- `--format FORMAT`: markdown, json, or both (default: both)
 - `--exclude PATTERN`: Exclude pattern (repeatable)
 - `--verbose, -v`: Show progress (ALWAYS use)
 

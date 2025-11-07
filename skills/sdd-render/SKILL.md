@@ -921,7 +921,6 @@ Directly render a JSON file by providing its full path
 | `--enhancement-level` | | AI enhancement level: `summary`, `standard`, or `full`. Automatically enables `enhanced` mode. | `standard` |
 | `--output` | `-o` | Output file path | `specs/.human-readable/{spec-id}.md` |
 | `--path` | | Specs directory path | Auto-discovery |
-| `--format` | | Output format | `markdown` |
 | `--verbose` | `-v` | Show detailed output | Off |
 | `--debug` | | Show debug information | Off |
 
@@ -1486,17 +1485,11 @@ Rendered markdown shows "Untitled" or missing information
 
 **Solutions:**
 
-1. **Check spec metadata:**
-```bash
-# View raw JSON
-cat specs/active/my-spec-001.json | jq '.metadata'
-```
-
-2. **Update spec with missing information:**
+1. **Update spec with missing information:**
 - Use `Skill(sdd-toolkit:sdd-plan)` to add metadata
 - Ensure title, description, objectives are populated
 
-3. **Re-render:**
+2. **Re-render:**
 ```bash
 sdd render my-spec-001
 ```

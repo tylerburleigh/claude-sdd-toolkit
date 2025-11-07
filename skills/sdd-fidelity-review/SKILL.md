@@ -111,33 +111,33 @@ Then provide the spec ID and review scope when prompted.
 ### Available sdd Commands for Fidelity Review
 
 **Task-Level Review:**
-- `sdd task-info {spec-id} {task-id} --json` - Get complete task details (requirements, files, metadata)
-- `sdd get-task {spec-id} {task-id} --json` - Alternative task query interface
-- `sdd check-deps {spec-id} {task-id} --json` - Check task dependencies status
-- `sdd get-journal {spec-id} {task-id} --json` - Get journal entries for task
+- `sdd task-info {spec-id} {task-id}` - Get complete task details (requirements, files, metadata)
+- `sdd get-task {spec-id} {task-id}` - Alternative task query interface
+- `sdd check-deps {spec-id} {task-id}` - Check task dependencies status
+- `sdd get-journal {spec-id} {task-id}` - Get journal entries for task
 
 **Phase-Level Review:**
-- `sdd list-phases {spec-id} --json` - List all phases with completion status
-- `sdd query-tasks {spec-id} --parent {phase-id} --json` - Get all tasks in phase
-- `sdd query-tasks {spec-id} --status completed --parent {phase-id} --json` - Get completed tasks only
+- `sdd list-phases {spec-id}` - List all phases with completion status
+- `sdd query-tasks {spec-id} --parent {phase-id}` - Get all tasks in phase
+- `sdd query-tasks {spec-id} --status completed --parent {phase-id}` - Get completed tasks only
 
 **Spec-Level Review:**
-- `sdd progress {spec-id} --json` - Overall spec progress summary
-- `sdd query-tasks {spec-id} --status completed --json` - All completed tasks
-- `sdd list-blockers {spec-id} --json` - Current blockers (useful for identifying incomplete work)
+- `sdd progress {spec-id}` - Overall spec progress summary
+- `sdd query-tasks {spec-id} --status completed` - All completed tasks
+- `sdd list-blockers {spec-id}` - Current blockers (useful for identifying incomplete work)
 
 **Verification Review:**
-- `sdd query-tasks {spec-id} --type verify --json` - Find all verification tasks
+- `sdd query-tasks {spec-id} --type verify` - Find all verification tasks
 
 ### Command Usage Pattern
 
-Always use `--json` flag for structured output that's easy to parse:
+Commands return structured output that's easy to parse:
 
 ```bash
 # Get task details
-sdd task-info user-auth-001 task-2-3 --json
+sdd task-info user-auth-001 task-2-3
 
-# Returns structured JSON:
+# Returns structured output:
 {
   "id": "task-2-3",
   "title": "Implement JWT middleware",
@@ -162,19 +162,19 @@ sdd task-info user-auth-001 task-2-3 --json
 **Example - Phase Review (Correct):**
 ```bash
 # First call: Get phase info
-sdd list-phases spec-id --json
+sdd list-phases spec-id
 
 # Second call: Get tasks in phase
-sdd query-tasks spec-id --parent phase-3 --json
+sdd query-tasks spec-id --parent phase-3
 
 # Third call: Get specific task details
-sdd task-info spec-id task-3-1 --json
+sdd task-info spec-id task-3-1
 
 # Fourth call: Get journal for that task
-sdd get-journal spec-id task-3-1 --json
+sdd get-journal spec-id task-3-1
 
 # Fifth call: Next task
-sdd task-info spec-id task-3-2 --json
+sdd task-info spec-id task-3-2
 # ... and so on
 ```
 
@@ -201,42 +201,42 @@ The fidelity review process follows five phases to systematically compare implem
    - Check required information is provided (spec_id, phase_id or task_id)
    - Validate spec exists:
      ```bash
-     sdd find-specs --verbose --json
+     sdd find-specs --verbose
      ```
-   - Verify phase/task exists in spec (from JSON output)
+   - Verify phase/task exists in spec (from output)
 
 **2. Load spec metadata based on review scope:**
 
 **For Task Review:**
 ```bash
 # Get complete task details
-sdd task-info {spec-id} {task-id} --json
+sdd task-info {spec-id} {task-id}
 
 # Get journal entries to check for documented deviations
-sdd get-journal {spec-id} {task-id} --json
+sdd get-journal {spec-id} {task-id}
 
 # Check dependencies (useful for impact assessment)
-sdd check-deps {spec-id} {task-id} --json
+sdd check-deps {spec-id} {task-id}
 ```
 
 **For Phase Review:**
 ```bash
 # Get phase metadata
-sdd list-phases {spec-id} --json
+sdd list-phases {spec-id}
 
 # Get all completed tasks in the phase
-sdd query-tasks {spec-id} --status completed --parent {phase-id} --json
+sdd query-tasks {spec-id} --status completed --parent {phase-id}
 
 # For each task in the phase, get detailed info (run individually, NOT in loops):
-sdd task-info {spec-id} task-1-1 --json
-sdd get-journal {spec-id} task-1-1 --json
-sdd task-info {spec-id} task-1-2 --json
-sdd get-journal {spec-id} task-1-2 --json
+sdd task-info {spec-id} task-1-1
+sdd get-journal {spec-id} task-1-1
+sdd task-info {spec-id} task-1-2
+sdd get-journal {spec-id} task-1-2
 # ... continue for each task
 ```
 
-**3. Extract requirements from JSON output:**
-   - Parse the JSON response from each `sdd` command
+**3. Extract requirements from command output:**
+   - Parse the structured output from each `sdd` command
    - Extract from task-info: `acceptance_criteria`, `files`, `dependencies`, `verification_steps`, `requirements`
    - Extract from get-journal: Documented deviations, design decisions, and rationale
    - **NEVER read the spec file directly with Read() tool or bash commands (cat, jq, etc.)**
