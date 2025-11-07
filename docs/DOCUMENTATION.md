@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 12:45:04
+**Generated:** 2025-11-07 13:03:20
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 249
-- **Total Lines:** 88465
+- **Total Lines:** 88500
 - **Total Classes:** 355
 - **Total Functions:** 901
-- **Avg Complexity:** 5.81
+- **Avg Complexity:** 5.82
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -263,7 +263,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:685`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:720`
 
 **Description:**
 > Issue with assigned severity category.
@@ -422,7 +422,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:539`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:574`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -10670,7 +10670,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:707`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:742`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10704,7 +10704,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:815`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:850`
 **Complexity:** 1
 
 **Description:**
@@ -13188,13 +13188,20 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:187`
-⚠️ **Complexity:** 16 (High)
+⚠️ **Complexity:** 23 (High)
 
 **Description:**
 > Consult multiple AI tools in parallel for fidelity review.
 
 Wrapper around execute_tools_parallel() with fidelity-review defaults,
 comprehensive error handling, and optional caching support.
+
+Caching Behavior:
+    - First checks cache for existing results (cache hit = instant return)
+    - On cache miss, consults AI tools via execute_tools_parallel()
+    - Saves fresh consultation results to cache for future use
+    - Cache save failures are non-fatal (logged as warnings)
+    - Serialization format preserves tool, status, output, error, model, metadata
 
 Args:
     prompt: The review prompt to send to all AI tools
@@ -13943,7 +13950,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:579`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:614`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -17769,7 +17776,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:316`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:351`
 **Complexity:** 3
 
 **Description:**
@@ -20288,7 +20295,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:515`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:550`
 **Complexity:** 1
 
 **Description:**
@@ -20395,7 +20402,7 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:375`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:410`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
