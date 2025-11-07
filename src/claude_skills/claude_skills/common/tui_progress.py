@@ -12,6 +12,7 @@ from enum import Enum
 import time
 import threading
 import logging
+import queue
 
 from .ai_tools import ToolStatus, ToolResponse, MultiToolResponse
 
@@ -133,6 +134,155 @@ class NoOpProgressCallback:
     ) -> None:
         """No-op batch completion handler."""
         pass
+
+
+class QueuedProgressCallback:
+    """
+    Thread-safe progress callback wrapper using queue.Queue.
+
+    Wraps a ProgressCallback and routes all calls through a queue,
+    making it safe to call from multiple worker threads in parallel
+    consultations. A consumer thread processes the queue and forwards
+    calls to the underlying callback.
+
+    Usage:
+        # Create queued wrapper
+        queued = QueuedProgressCallback(callback)
+        queued.start()  # Start consumer thread
+
+        # Use from multiple threads
+        queued.on_start("tool", 90)
+        queued.on_complete("tool", ToolStatus.SUCCESS, 45.0)
+
+        # Cleanup
+        queued.stop()  # Stop consumer thread
+    """
+
+    def __init__(self, wrapped: ProgressCallback):
+        """
+        Initialize queued callback wrapper.
+
+        Args:
+            wrapped: The underlying ProgressCallback to forward calls to
+        """
+        self.wrapped = wrapped
+        self._queue: queue.Queue = queue.Queue()
+        self._consumer_thread: Optional[threading.Thread] = None
+        self._stop_event = threading.Event()
+
+    def start(self) -> None:
+        """Start the consumer thread that processes queued callback calls."""
+        if self._consumer_thread and self._consumer_thread.is_alive():
+            return  # Already running
+
+        self._stop_event.clear()
+        self._consumer_thread = threading.Thread(
+            target=self._consume_queue,
+            daemon=True,
+            name="progress-queue-consumer"
+        )
+        self._consumer_thread.start()
+
+    def stop(self, timeout: float = 2.0) -> None:
+        """
+        Stop the consumer thread.
+
+        Args:
+            timeout: Maximum time to wait for thread to finish (seconds)
+        """
+        if not self._consumer_thread:
+            return
+
+        # Signal stop and put sentinel
+        self._stop_event.set()
+        self._queue.put(None)  # Sentinel to wake up consumer
+
+        # Wait for thread to finish
+        if self._consumer_thread.is_alive():
+            self._consumer_thread.join(timeout=timeout)
+
+    def _consume_queue(self) -> None:
+        """Consumer thread worker that processes queued callbacks."""
+        while not self._stop_event.is_set():
+            try:
+                # Get next item with timeout so we can check stop_event
+                item = self._queue.get(timeout=0.1)
+
+                # Check for sentinel (None means stop)
+                if item is None:
+                    break
+
+                # Unpack and execute callback
+                method_name, args, kwargs = item
+                method = getattr(self.wrapped, method_name)
+                method(*args, **kwargs)
+
+            except queue.Empty:
+                # Timeout expired, check stop_event
+                continue
+            except Exception as e:
+                logger.warning(f"Error processing queued callback: {e}")
+
+    def _enqueue(self, method_name: str, *args, **kwargs) -> None:
+        """
+        Enqueue a callback method call.
+
+        Args:
+            method_name: Name of the callback method to call
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+        """
+        self._queue.put((method_name, args, kwargs))
+
+    def on_start(self, tool: str, timeout: int, **context) -> None:
+        """Queue on_start callback."""
+        self._enqueue("on_start", tool=tool, timeout=timeout, **context)
+
+    def on_update(self, tool: str, elapsed: float, timeout: int, **context) -> None:
+        """Queue on_update callback."""
+        self._enqueue("on_update", tool=tool, elapsed=elapsed, timeout=timeout, **context)
+
+    def on_complete(self, tool: str, status: ToolStatus, duration: float, **context) -> None:
+        """Queue on_complete callback."""
+        self._enqueue("on_complete", tool=tool, status=status, duration=duration, **context)
+
+    def on_batch_start(self, tools: list[str], count: int, timeout: int, **context) -> None:
+        """Queue on_batch_start callback."""
+        self._enqueue("on_batch_start", tools=tools, count=count, timeout=timeout, **context)
+
+    def on_tool_complete(
+        self,
+        tool: str,
+        response: ToolResponse,
+        completed_count: int,
+        total_count: int
+    ) -> None:
+        """Queue on_tool_complete callback."""
+        self._enqueue(
+            "on_tool_complete",
+            tool=tool,
+            response=response,
+            completed_count=completed_count,
+            total_count=total_count
+        )
+
+    def on_batch_complete(
+        self,
+        total_count: int,
+        success_count: int,
+        failure_count: int,
+        total_duration: float,
+        max_duration: float
+    ) -> None:
+        """Queue on_batch_complete callback."""
+        self._enqueue(
+            "on_batch_complete",
+            total_count=total_count,
+            success_count=success_count,
+            failure_count=failure_count,
+            total_duration=total_duration,
+            max_duration=max_duration
+        )
 
 
 @dataclass
@@ -491,6 +641,7 @@ def batch_consultation_progress(
 __all__ = [
     "ProgressCallback",
     "NoOpProgressCallback",
+    "QueuedProgressCallback",
     "ai_consultation_progress",
     "batch_consultation_progress",
     "ProgressTracker",

@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:35:50
+**Generated:** 2025-11-07 07:42:07
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 243
-- **Total Lines:** 85735
+- **Total Lines:** 85880
 - **Total Classes:** 348
-- **Total Functions:** 873
+- **Total Functions:** 876
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -145,7 +145,7 @@ the required abstract methods.
 ### `BatchProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:233`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:314`
 
 **Description:**
 > Tracks progress for batch consultations.
@@ -1564,7 +1564,7 @@ Example:
 ### `NoOpProgressCallback`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:70`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:97`
 
 **Description:**
 > No-op implementation for environments without TUI support.
@@ -1982,7 +1982,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Protocol`
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:17`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:21`
 
 **Description:**
 > Protocol for progress feedback callbacks.
@@ -2035,7 +2035,7 @@ Provides a simple update() method for advancing progress.
 ### `ProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:112`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:139`
 
 **Description:**
 > Tracks progress state within context manager.
@@ -6753,6 +6753,25 @@ If a parser's dependencies aren't available, it's skipped silently.
 
 ---
 
+### `_batch_update_worker(tracker, interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:365`
+**Complexity:** 4
+
+**Description:**
+> Background worker thread for periodic batch progress updates.
+
+Args:
+    tracker: BatchProgressTracker to monitor
+    interval: Update interval in seconds
+
+**Parameters:**
+- `tracker`: BatchProgressTracker
+- `interval`: float
+
+---
+
 ### `_build_bidirectional_deps_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
@@ -7133,6 +7152,28 @@ Raises:
 - `before`: Dict[str, Any]
 - `after`: Dict[str, Any]
 - `task_id`: str
+
+---
+
+### `_calculate_update_interval(timeout, custom_interval) -> float`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:74`
+**Complexity:** 4
+
+**Description:**
+> Calculate appropriate update interval based on timeout.
+
+Args:
+    timeout: Expected timeout in seconds
+    custom_interval: Optional custom interval override
+
+Returns:
+    Update interval in seconds
+
+**Parameters:**
+- `timeout`: int
+- `custom_interval`: Optional[float]
 
 ---
 
@@ -8864,6 +8905,25 @@ Returns:
 
 ---
 
+### `_update_worker(tracker, interval) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:178`
+**Complexity:** 4
+
+**Description:**
+> Background worker thread for periodic progress updates.
+
+Args:
+    tracker: ProgressTracker to monitor
+    interval: Update interval in seconds
+
+**Parameters:**
+- `tracker`: ProgressTracker
+- `interval`: float
+
+---
+
 ### `_validate_git_config(config) -> Dict[str, Any]`
 
 **Language:** python
@@ -9366,11 +9426,11 @@ Examples:
 
 ---
 
-### `ai_consultation_progress(tool, timeout, callback) -> None`
+### `ai_consultation_progress(tool, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:150`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:210`
+⚠️ **Complexity:** 11 (High)
 
 **Decorators:** `@contextmanager`
 
@@ -9389,6 +9449,7 @@ Args:
     tool: Tool name ("gemini", "codex", "cursor-agent")
     timeout: Expected timeout in seconds (default 90)
     callback: Optional progress callback (defaults to no-op)
+    update_interval: Optional custom update interval in seconds (auto-calculated if None)
     **context: Additional context for progress display (model, prompt_length, etc.)
 
 Yields:
@@ -9398,6 +9459,7 @@ Yields:
 - `tool`: str
 - `timeout`: int
 - `callback`: Optional[ProgressCallback]
+- `update_interval`: Optional[float]
 
 ---
 
@@ -9873,11 +9935,11 @@ Example:
 
 ---
 
-### `batch_consultation_progress(tools, timeout, callback) -> None`
+### `batch_consultation_progress(tools, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:278`
-**Complexity:** 4
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:404`
+**Complexity:** 6
 
 **Decorators:** `@contextmanager`
 
@@ -9896,6 +9958,7 @@ Args:
     tools: List of tool names to execute
     timeout: Per-tool timeout in seconds (default 90)
     callback: Optional progress callback (defaults to no-op)
+    update_interval: Optional custom update interval in seconds (auto-calculated if None)
     **context: Additional context for progress display
 
 Yields:
@@ -9905,6 +9968,7 @@ Yields:
 - `tools`: list[str]
 - `timeout`: int
 - `callback`: Optional[ProgressCallback]
+- `update_interval`: Optional[float]
 
 ---
 
@@ -25230,6 +25294,8 @@ Returns:
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `enum.Enum`
+- `logging`
+- `threading`
 - `time`
 - `typing.Any`
 - `typing.Optional`

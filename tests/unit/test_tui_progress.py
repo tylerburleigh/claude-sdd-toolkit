@@ -13,6 +13,7 @@ from claude_skills.common.tui_progress import (
     ai_consultation_progress,
     batch_consultation_progress,
     NoOpProgressCallback,
+    QueuedProgressCallback,
     ProgressTracker,
     BatchProgressTracker,
     ProgressCallback
@@ -830,3 +831,224 @@ class TestThreadSafety:
 
         # All 4 tools should be marked complete exactly once
         assert callback.on_tool_complete.call_count == 4
+
+
+class TestQueuedProgressCallback:
+    """Test queue-based progress callback wrapper for parallel consultations."""
+
+    def test_forwards_on_start_to_wrapped_callback(self):
+        """QueuedProgressCallback forwards on_start calls to wrapped callback."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        queued.on_start("gemini", 90, model="gemini-2.5-pro")
+
+        # Give consumer thread time to process
+        time.sleep(0.2)
+        queued.stop()
+
+        wrapped.on_start.assert_called_once()
+        args, kwargs = wrapped.on_start.call_args
+        assert kwargs["tool"] == "gemini"
+        assert kwargs["timeout"] == 90
+        assert kwargs["model"] == "gemini-2.5-pro"
+
+    def test_forwards_on_update_to_wrapped_callback(self):
+        """QueuedProgressCallback forwards on_update calls to wrapped callback."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        queued.on_update("gemini", elapsed=30.0, timeout=90)
+
+        time.sleep(0.2)
+        queued.stop()
+
+        wrapped.on_update.assert_called_once()
+        args, kwargs = wrapped.on_update.call_args
+        assert kwargs["tool"] == "gemini"
+        assert kwargs["elapsed"] == 30.0
+        assert kwargs["timeout"] == 90
+
+    def test_forwards_on_complete_to_wrapped_callback(self):
+        """QueuedProgressCallback forwards on_complete calls to wrapped callback."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        queued.on_complete("gemini", ToolStatus.SUCCESS, 45.0, output_length=1024)
+
+        time.sleep(0.2)
+        queued.stop()
+
+        wrapped.on_complete.assert_called_once()
+        args, kwargs = wrapped.on_complete.call_args
+        assert kwargs["tool"] == "gemini"
+        assert kwargs["status"] == ToolStatus.SUCCESS
+        assert kwargs["duration"] == 45.0
+        assert kwargs["output_length"] == 1024
+
+    def test_handles_multiple_parallel_calls(self):
+        """QueuedProgressCallback safely handles calls from multiple threads."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Spawn multiple threads making calls
+        def make_calls(thread_id):
+            for i in range(10):
+                queued.on_update(f"tool{thread_id}", elapsed=float(i), timeout=90)
+
+        import threading
+        threads = [
+            threading.Thread(target=make_calls, args=(tid,))
+            for tid in range(5)
+        ]
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        # Give consumer time to process all
+        time.sleep(0.5)
+        queued.stop()
+
+        # Should have called on_update 50 times (5 threads * 10 calls each)
+        assert wrapped.on_update.call_count == 50
+
+    def test_stops_cleanly(self):
+        """QueuedProgressCallback stops consumer thread cleanly."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        assert queued._consumer_thread is not None
+        assert queued._consumer_thread.is_alive()
+
+        queued.stop()
+
+        # Thread should have stopped
+        assert not queued._consumer_thread.is_alive()
+
+    def test_ignores_duplicate_start(self):
+        """QueuedProgressCallback ignores duplicate start() calls."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        first_thread = queued._consumer_thread
+
+        queued.start()  # Try to start again
+        second_thread = queued._consumer_thread
+
+        # Should be the same thread instance
+        assert first_thread is second_thread
+
+        queued.stop()
+
+    def test_processes_queued_calls_in_order(self):
+        """QueuedProgressCallback processes calls in FIFO order."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Queue multiple different calls
+        queued.on_start("gemini", 90)
+        queued.on_update("gemini", 10.0, 90)
+        queued.on_update("gemini", 20.0, 90)
+        queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
+
+        # Give consumer time to process
+        time.sleep(0.3)
+        queued.stop()
+
+        # Verify order using call_args_list
+        assert wrapped.on_start.call_count == 1
+        assert wrapped.on_update.call_count == 2
+        assert wrapped.on_complete.call_count == 1
+
+        # Check elapsed times are in order
+        first_update = wrapped.on_update.call_args_list[0][1]["elapsed"]
+        second_update = wrapped.on_update.call_args_list[1][1]["elapsed"]
+        assert first_update == 10.0
+        assert second_update == 20.0
+
+    def test_handles_wrapped_callback_exceptions(self):
+        """QueuedProgressCallback handles exceptions from wrapped callback gracefully."""
+        wrapped = Mock(spec=ProgressCallback)
+        wrapped.on_start.side_effect = Exception("Callback error")
+
+        queued = QueuedProgressCallback(wrapped)
+        queued.start()
+
+        # This should not crash the consumer thread
+        queued.on_start("gemini", 90)
+
+        time.sleep(0.2)
+
+        # Queue should still be working
+        queued.on_update("gemini", 10.0, 90)
+
+        time.sleep(0.2)
+        queued.stop()
+
+        # Both calls should have been attempted
+        assert wrapped.on_start.call_count == 1
+        assert wrapped.on_update.call_count == 1
+
+    def test_forwards_batch_callbacks(self):
+        """QueuedProgressCallback forwards batch-specific callbacks."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Test batch_start
+        queued.on_batch_start(["gemini", "codex"], 2, 120)
+
+        # Test tool_complete
+        response = ToolResponse(
+            tool="gemini",
+            status=ToolStatus.SUCCESS,
+            output="test",
+            error=None,
+            duration=45.0,
+            timestamp="2025-11-07T12:00:00Z"
+        )
+        queued.on_tool_complete("gemini", response, 1, 2)
+
+        # Test batch_complete
+        queued.on_batch_complete(
+            total_count=2,
+            success_count=2,
+            failure_count=0,
+            total_duration=100.0,
+            max_duration=55.0
+        )
+
+        time.sleep(0.3)
+        queued.stop()
+
+        wrapped.on_batch_start.assert_called_once()
+        wrapped.on_tool_complete.assert_called_once()
+        wrapped.on_batch_complete.assert_called_once()
+
+    def test_can_be_used_with_no_op_callback(self):
+        """QueuedProgressCallback works with NoOpProgressCallback."""
+        noop = NoOpProgressCallback()
+        queued = QueuedProgressCallback(noop)
+
+        queued.start()
+
+        # Should not raise any exceptions
+        queued.on_start("gemini", 90)
+        queued.on_update("gemini", 30.0, 90)
+        queued.on_complete("gemini", ToolStatus.SUCCESS, 45.0)
+
+        time.sleep(0.2)
+        queued.stop()
