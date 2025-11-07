@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:59:23
+**Generated:** 2025-11-07 08:05:21
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86448
+- **Total Lines:** 86479
 - **Total Classes:** 354
 - **Total Functions:** 878
 - **Avg Complexity:** 5.78
@@ -11329,7 +11329,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:498`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:529`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -11757,7 +11757,7 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:278`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:309`
 ⚠️ **Complexity:** 34 (High)
 
 **Description:**
@@ -12286,7 +12286,7 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:411`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:442`
 **Complexity:** 9
 
 **Description:**
@@ -12406,7 +12406,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:472`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:503`
 **Complexity:** 4
 
 **Description:**
@@ -12629,7 +12629,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:192`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Validate JSON spec file.
@@ -20668,7 +20668,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:554`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:585`
 **Complexity:** 1
 
 **Description:**
