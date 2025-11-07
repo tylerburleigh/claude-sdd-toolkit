@@ -20,6 +20,7 @@ from claude_skills.common.ai_tools import (
     detect_available_tools,
     check_tool_available
 )
+from claude_skills.common.progress import ProgressEmitter
 
 # Import cache modules with fallback
 try:
@@ -191,7 +192,8 @@ def consult_multiple_ai_on_fidelity(
     timeout: int = 120,
     require_all_success: bool = False,
     cache_key_params: Optional[Dict[str, Any]] = None,
-    use_cache: Optional[bool] = None
+    use_cache: Optional[bool] = None,
+    progress_emitter: Optional[ProgressEmitter] = None
 ) -> List[ToolResponse]:
     """
     Consult multiple AI tools in parallel for fidelity review.
@@ -215,6 +217,8 @@ def consult_multiple_ai_on_fidelity(
         require_all_success: If True, raise exception if any tool fails
         cache_key_params: Parameters for cache key generation (spec_id, scope, target, file_paths)
         use_cache: Enable caching (overrides config, defaults to config setting)
+        progress_emitter: Optional ProgressEmitter for emitting structured events (cache_check,
+                          ai_consultation, model_response, cache_save, complete)
 
     Returns:
         List of ToolResponse objects, one per tool
@@ -252,6 +256,13 @@ def consult_multiple_ai_on_fidelity(
             cached_data = cache.get(cache_key)
             if cached_data:
                 logger.info("Cache hit: Using cached AI consultation results")
+                # Emit cache_check event (cache hit)
+                if progress_emitter:
+                    progress_emitter.emit("cache_check", {
+                        "cache_hit": True,
+                        "cache_key": cache_key[:32] + "...",
+                        "num_responses": len(cached_data)
+                    })
                 # Reconstruct ToolResponse objects from cached data
                 cached_responses = []
                 for resp_data in cached_data:
@@ -267,6 +278,12 @@ def consult_multiple_ai_on_fidelity(
                 return cached_responses
             else:
                 logger.debug("Cache miss: Will consult AI tools and cache results")
+                # Emit cache_check event (cache miss)
+                if progress_emitter:
+                    progress_emitter.emit("cache_check", {
+                        "cache_hit": False,
+                        "cache_key": cache_key[:32] + "..."
+                    })
         except Exception as e:
             logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
 
@@ -292,6 +309,14 @@ def consult_multiple_ai_on_fidelity(
             unavailable = set(tools) - set(available_tools)
             logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
 
+        # Emit ai_consultation event before calling AI tools
+        if progress_emitter:
+            progress_emitter.emit("ai_consultation", {
+                "tools": available_tools,
+                "model": model,
+                "timeout": timeout
+            })
+
         # Execute consultations in parallel
         # Convert single model string to models dict if provided
         models_dict = {tool: model for tool in available_tools} if model else None
@@ -301,6 +326,17 @@ def consult_multiple_ai_on_fidelity(
             models=models_dict,
             timeout=timeout
         )
+
+        # Emit model_response events for each response
+        if progress_emitter:
+            for resp in responses:
+                progress_emitter.emit("model_response", {
+                    "tool": resp.tool,
+                    "status": resp.status.value,
+                    "model": resp.model,
+                    "has_error": resp.error is not None,
+                    "output_length": len(resp.output) if resp.output else 0
+                })
 
         # Save responses to cache if caching enabled
         if cache_enabled and cache_key and cache and _CACHE_AVAILABLE:
@@ -322,10 +358,28 @@ def consult_multiple_ai_on_fidelity(
                 success = cache.set(cache_key, serialized_responses)
                 if success:
                     logger.info(f"Saved AI consultation results to cache (key: {cache_key[:32]}...)")
+                    # Emit cache_save event
+                    if progress_emitter:
+                        progress_emitter.emit("cache_save", {
+                            "success": True,
+                            "cache_key": cache_key[:32] + "...",
+                            "num_responses": len(serialized_responses)
+                        })
                 else:
                     logger.warning("Failed to save consultation results to cache")
+                    if progress_emitter:
+                        progress_emitter.emit("cache_save", {
+                            "success": False,
+                            "cache_key": cache_key[:32] + "..."
+                        })
             except Exception as e:
                 logger.warning(f"Failed to save consultation results to cache: {e}")
+                # Emit cache_save failure event
+                if progress_emitter:
+                    progress_emitter.emit("cache_save", {
+                        "success": False,
+                        "error": str(e)
+                    })
                 # Continue without caching - non-fatal error
 
         # Check for failures if required
@@ -336,6 +390,15 @@ def consult_multiple_ai_on_fidelity(
                 raise ConsultationError(
                     f"Consultation failed for tools: {', '.join(failed_tools)}"
                 )
+
+        # Emit complete event
+        if progress_emitter:
+            successful = len([r for r in responses if r.success])
+            progress_emitter.emit("complete", {
+                "total_responses": len(responses),
+                "successful": successful,
+                "failed": len(responses) - successful
+            })
 
         return responses
 

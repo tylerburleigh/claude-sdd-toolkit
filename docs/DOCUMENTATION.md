@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 14:17:39
+**Generated:** 2025-11-07 14:21:34
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 88887
+- **Total Lines:** 88908
 - **Total Classes:** 356
 - **Total Functions:** 904
 - **Avg Complexity:** 5.83
@@ -2085,6 +2085,7 @@ Event format:
 
 **Methods:**
 - `__init__()`
+- `_is_interactive()`
 - `emit()`
 - `disable()`
 - `enable()`
