@@ -242,7 +242,8 @@ class PytestProgressDisplay:
     """
     Rich.Progress display for pytest test execution.
 
-    Shows a live progress bar with pass/fail/skip counters as tests run.
+    Shows a live progress bar with pass/fail/skip counters as tests run,
+    plus the currently running test file.
 
     Usage:
         from rich.progress import Progress
@@ -254,7 +255,7 @@ class PytestProgressDisplay:
             for line in pytest_output:
                 result = parser.parse_line(line)
                 if result:
-                    display.update(parser.get_progress())
+                    display.update(parser.get_progress(), current_file=result.file_path)
     """
 
     def __init__(self, progress, total_tests: Optional[int] = None):
@@ -267,6 +268,7 @@ class PytestProgressDisplay:
         """
         self.progress = progress
         self.total_tests = total_tests
+        self._last_file: Optional[str] = None
 
         # Create progress task
         description = "Running tests"
@@ -282,13 +284,18 @@ class PytestProgressDisplay:
                 total=None
             )
 
-    def update(self, progress_info: ProgressInfo) -> None:
+    def update(self, progress_info: ProgressInfo, current_file: Optional[str] = None) -> None:
         """
         Update progress display with new test results.
 
         Args:
             progress_info: Current progress information from parser
+            current_file: Optional currently running test file path
         """
+        # Track last file if provided
+        if current_file is not None:
+            self._last_file = current_file
+
         # Build description with counters
         parts = []
         if progress_info.passed > 0:
@@ -301,6 +308,12 @@ class PytestProgressDisplay:
             parts.append(f"[red]{progress_info.errors} errors[/red]")
 
         description = "Running tests: " + ", ".join(parts) if parts else "Running tests"
+
+        # Add current file if available
+        if self._last_file:
+            # Show just the filename, not full path
+            filename = self._last_file.split('/')[-1]
+            description += f" [dim]({filename})[/dim]"
 
         # Update progress
         if self.total_tests is not None:

@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T12:55:33.314971Z",
+    "generated_at": "2025-11-07T12:57:35.515112Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 244,
-    "total_lines": 86321,
-    "total_classes": 353,
+    "total_lines": 86435,
+    "total_classes": 354,
     "total_functions": 878,
     "avg_complexity": 5.78,
     "max_complexity": 45,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 244,
-        "lines": 86321,
-        "classes": 353,
+        "lines": 86435,
+        "classes": 354,
         "functions": 878,
         "avg_complexity": 5.78
       }
@@ -2203,7 +2203,8 @@
         "TestStatus",
         "TestResult",
         "ProgressInfo",
-        "PytestOutputParser"
+        "PytestOutputParser",
+        "PytestProgressDisplay"
       ],
       "functions": [
         "format_progress_summary"
@@ -2215,7 +2216,7 @@
         "enum.Enum"
       ],
       "exports": [],
-      "lines": 247
+      "lines": 361
     },
     {
       "name": "pytest_runner",
@@ -11437,6 +11438,24 @@
         "get_progress",
         "reset",
         "_strip_ansi"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "PytestProgressDisplay",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 241,
+      "language": "python",
+      "docstring": "Rich.Progress display for pytest test execution.\n\nShows a live progress bar with pass/fail/skip counters as tests run.\n\nUsage:\n    from rich.progress import Progress\n\n    with Progress() as progress:\n        display = PytestProgressDisplay(progress, total_tests=100)\n        parser = PytestOutputParser()\n\n        for line in pytest_output:\n            result = parser.parse_line(line)\n            if result:\n                display.update(parser.get_progress())",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "update",
+        "finish"
       ],
       "properties": [],
       "is_exported": false,
@@ -91706,6 +91725,18 @@
           "call_type": "method_call"
         },
         {
+          "name": "__init__",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+          "line": 274,
+          "call_type": "method_call"
+        },
+        {
+          "name": "__init__",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+          "line": 280,
+          "call_type": "method_call"
+        },
+        {
           "name": "cmd_add_task",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 458,
@@ -91804,7 +91835,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 2
+      "call_count": 4
     },
     {
       "name": "_generate_task_id",

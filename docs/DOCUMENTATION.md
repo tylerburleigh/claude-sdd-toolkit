@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:55:33
+**Generated:** 2025-11-07 07:57:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86321
-- **Total Classes:** 353
+- **Total Lines:** 86435
+- **Total Classes:** 354
 - **Total Functions:** 878
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
@@ -2100,6 +2100,35 @@ Usage:
 - `get_progress()`
 - `reset()`
 - `_strip_ansi()`
+
+---
+
+### `PytestProgressDisplay`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:241`
+
+**Description:**
+> Rich.Progress display for pytest test execution.
+
+Shows a live progress bar with pass/fail/skip counters as tests run.
+
+Usage:
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        display = PytestProgressDisplay(progress, total_tests=100)
+        parser = PytestOutputParser()
+
+        for line in pytest_output:
+            result = parser.parse_line(line)
+            if result:
+                display.update(parser.get_progress())
+
+**Methods:**
+- `__init__()`
+- `update()`
+- `finish()`
 
 ---
 

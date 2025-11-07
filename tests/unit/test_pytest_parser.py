@@ -589,3 +589,96 @@ class TestPytestProgressDisplay:
         assert "[green]" in description  # passed should be green
         assert "[red]" in description    # failed should be red
         assert "[yellow]" in description # skipped should be yellow
+
+    def test_update_with_current_file(self):
+        """Test that current file is displayed in description."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=10)
+
+        progress_info = ProgressInfo(
+            passed=3,
+            failed=0,
+            skipped=0,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=3,
+            percentage=30
+        )
+
+        display.update(progress_info, current_file="tests/integration/test_auth.py")
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+
+        # Should show filename (not full path)
+        assert "test_auth.py" in description
+        # Should be dimmed
+        assert "[dim]" in description
+
+    def test_update_retains_last_file(self):
+        """Test that last file is retained across updates without file."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=10)
+
+        # First update with file
+        progress1 = ProgressInfo(1, 0, 0, 0, 0, 0, 1, 10)
+        display.update(progress1, current_file="tests/test_a.py")
+
+        # Second update without file (should retain last file)
+        progress2 = ProgressInfo(2, 0, 0, 0, 0, 0, 2, 20)
+        display.update(progress2)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+
+        # Should still show last file
+        assert "test_a.py" in description
+
+    def test_update_changes_file(self):
+        """Test that current file updates when new file provided."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=10)
+
+        # First update with file A
+        progress1 = ProgressInfo(1, 0, 0, 0, 0, 0, 1, 10)
+        display.update(progress1, current_file="tests/test_a.py")
+
+        # Second update with file B
+        progress2 = ProgressInfo(2, 0, 0, 0, 0, 0, 2, 20)
+        display.update(progress2, current_file="tests/test_b.py")
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+
+        # Should show new file
+        assert "test_b.py" in description
+        # Should NOT show old file
+        assert "test_a.py" not in description
+
+    def test_update_filename_only_not_path(self):
+        """Test that only filename is shown, not full path."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=10)
+
+        progress_info = ProgressInfo(1, 0, 0, 0, 0, 0, 1, 10)
+        display.update(
+            progress_info,
+            current_file="tests/integration/auth/test_oauth_flow.py"
+        )
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+
+        # Should show only filename
+        assert "test_oauth_flow.py" in description
+        # Should NOT show directory structure
+        assert "tests/integration/auth/" not in description
