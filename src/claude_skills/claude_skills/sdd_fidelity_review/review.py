@@ -10,10 +10,12 @@ import sys
 import subprocess
 import logging
 import xml.etree.ElementTree as ET
+import hashlib
 
 from claude_skills.common.spec import load_json_spec, get_node
 from claude_skills.common.paths import find_specs_directory
 from claude_skills.common.git_metadata import find_git_root
+from claude_skills.common.cache import CacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -25,17 +27,20 @@ class FidelityReviewer:
     This class will be implemented in Phase 3 (Core Review Logic).
     """
 
-    def __init__(self, spec_id: str, spec_path: Optional[Path] = None):
+    def __init__(self, spec_id: str, spec_path: Optional[Path] = None, incremental: bool = False):
         """
         Initialize the fidelity reviewer.
 
         Args:
             spec_id: Specification ID to review against
             spec_path: Optional path to specs directory
+            incremental: Enable incremental mode (only review changed files)
         """
         self.spec_id = spec_id
         self.spec_path = spec_path
         self.spec_data: Optional[Dict[str, Any]] = None
+        self.incremental = incremental
+        self.cache = CacheManager() if incremental else None
         self._load_spec()
 
     def review_task(self, task_id: str) -> Dict[str, Any]:
@@ -114,6 +119,134 @@ class FidelityReviewer:
             Implementation will be added in Phase 3.
         """
         raise NotImplementedError("Deviation analysis will be implemented in Phase 3")
+
+    def compute_file_hash(self, file_path: Path) -> Optional[str]:
+        """
+        Compute SHA256 hash of file contents.
+
+        Args:
+            file_path: Path to file to hash
+
+        Returns:
+            Hexadecimal hash string, or None if file cannot be read
+
+        Note:
+            Reads file in binary mode to handle all file types correctly.
+            Uses chunked reading to efficiently handle large files.
+        """
+        try:
+            hasher = hashlib.sha256()
+            with open(file_path, 'rb') as f:
+                # Read file in 8KB chunks for memory efficiency
+                for chunk in iter(lambda: f.read(8192), b''):
+                    hasher.update(chunk)
+            return hasher.hexdigest()
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            logger.warning(f"Failed to hash file {file_path}: {e}")
+            return None
+
+    def get_file_changes(self, files: List[Path]) -> Dict[str, Any]:
+        """
+        Detect file changes compared to previous review run.
+
+        This method uses incremental state tracking to identify which files
+        have been added, modified, or removed since the last review.
+
+        Args:
+            files: List of file paths to check
+
+        Returns:
+            Dictionary containing:
+            {
+                'added': List[str],      # Files that are new
+                'modified': List[str],   # Files with changed content
+                'removed': List[str],    # Files that no longer exist
+                'unchanged': List[str],  # Files with same content
+                'is_incremental': bool   # Whether incremental mode was used
+            }
+
+        Note:
+            If incremental mode is disabled (self.incremental=False), this
+            returns all files as 'added' (full review mode).
+        """
+        if not self.incremental or self.cache is None:
+            # Full review mode - treat all files as new
+            return {
+                'added': [str(f) for f in files],
+                'modified': [],
+                'removed': [],
+                'unchanged': [],
+                'is_incremental': False
+            }
+
+        # Load previous state from cache
+        old_hashes = self.cache.get_incremental_state(self.spec_id)
+
+        if not old_hashes:
+            # No previous state - first incremental run
+            logger.info(f"No previous state found for {self.spec_id}, performing full review")
+            return {
+                'added': [str(f) for f in files],
+                'modified': [],
+                'removed': [],
+                'unchanged': [],
+                'is_incremental': False
+            }
+
+        # Compute hashes for current files
+        new_hashes = {}
+        for file_path in files:
+            file_hash = self.compute_file_hash(file_path)
+            if file_hash:
+                new_hashes[str(file_path)] = file_hash
+
+        # Detect changes using CacheManager utility
+        changes = CacheManager.compare_file_hashes(old_hashes, new_hashes)
+        changes['is_incremental'] = True
+
+        logger.info(
+            f"File changes for {self.spec_id}: "
+            f"{len(changes['added'])} added, "
+            f"{len(changes['modified'])} modified, "
+            f"{len(changes['removed'])} removed, "
+            f"{len(changes['unchanged'])} unchanged"
+        )
+
+        return changes
+
+    def save_file_state(self, files: List[Path]) -> bool:
+        """
+        Save current file hashes for future incremental reviews.
+
+        Args:
+            files: List of file paths to hash and save
+
+        Returns:
+            True if state was saved successfully, False otherwise
+
+        Note:
+            Only saves state if incremental mode is enabled.
+        """
+        if not self.incremental or self.cache is None:
+            # Not in incremental mode, skip saving
+            return False
+
+        # Compute hashes for all files
+        file_hashes = {}
+        for file_path in files:
+            file_hash = self.compute_file_hash(file_path)
+            if file_hash:
+                file_hashes[str(file_path)] = file_hash
+
+        # Save to cache
+        result = self.cache.save_incremental_state(self.spec_id, file_hashes)
+
+        if result:
+            logger.info(f"Saved incremental state for {self.spec_id}: {len(file_hashes)} files")
+        else:
+            logger.warning(f"Failed to save incremental state for {self.spec_id}")
+
+        return result
 
     def _load_spec(self) -> None:
         """

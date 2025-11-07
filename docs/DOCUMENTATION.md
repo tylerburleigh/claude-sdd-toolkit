@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 14:38:09
+**Generated:** 2025-11-07 15:00:52
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 88983
+- **Total Lines:** 89119
 - **Total Classes:** 356
 - **Total Functions:** 904
 - **Avg Complexity:** 5.84
@@ -213,6 +213,9 @@ Usage:
 - `_matches_filters()`
 - `get_stats()`
 - `cleanup_expired()`
+- `get_incremental_state()`
+- `save_incremental_state()`
+- `compare_file_hashes()`
 
 ---
 
