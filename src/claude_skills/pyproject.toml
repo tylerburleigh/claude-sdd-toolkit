@@ -24,6 +24,9 @@ test = [
     "pytest>=7.4.0",
     "pytest-mock>=3.12.0",
 ]
+tui = [
+    "textual>=0.47.0",
+]
 
 [project.scripts]
 # Unified SDD CLI - Single entry point for all SDD, doc, test, and skills-dev commands
