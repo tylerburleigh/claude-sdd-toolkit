@@ -998,3 +998,292 @@ def test_dashboard_status_summary_integration(mock_dashboard_spec_data):
     assert len(summary["blockers"]) == 1
     assert summary["blockers"][0]["id"] == "task-2-4"
     assert "Redis" in summary["blockers"][0]["reason"]
+
+
+# =============================================================================
+# Test: JSON Output Format for Comparison Views
+# =============================================================================
+
+
+def test_fidelity_review_json_output_structure(
+    mock_spec_data,
+    mock_fidelity_results,
+    mock_parsed_ai_responses
+):
+    """
+    Test that fidelity review generates valid JSON output.
+
+    Verifies:
+    - JSON structure contains all required fields
+    - metadata field with generation timestamp
+    - spec_id field present
+    - models_consulted count correct
+    - consensus data included
+    - categorized_issues array present
+    - individual_responses array present
+    - JSON is serializable
+    """
+    review_results = {
+        "spec_id": "test-spec-json-001",
+        "consensus": {
+            "consensus_verdict": "partial",
+            "agreement_rate": 0.75,
+            "consensus_issues": ["Issue 1", "Issue 2"],
+            "consensus_recommendations": ["Rec 1", "Rec 2"]
+        },
+        "categorized_issues": [
+            {
+                "issue": "Missing input validation",
+                "severity": "high",
+                "category": "security",
+                "agreed_by": ["model1", "model2"],
+                "agreement_count": 2
+            }
+        ],
+        "parsed_responses": mock_parsed_ai_responses,
+        "models_consulted": len(mock_parsed_ai_responses)
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    # Verify top-level structure
+    assert isinstance(json_output, dict)
+    assert "metadata" in json_output
+    assert "spec_id" in json_output
+    assert "models_consulted" in json_output
+    assert "consensus" in json_output
+    assert "categorized_issues" in json_output
+    assert "individual_responses" in json_output
+
+    # Verify metadata structure
+    assert isinstance(json_output["metadata"], dict)
+    assert "generated_at" in json_output["metadata"]
+    assert "spec_id" in json_output["metadata"]
+
+    # Verify spec_id
+    assert json_output["spec_id"] == "test-spec-json-001"
+
+    # Verify models_consulted
+    assert json_output["models_consulted"] == len(mock_parsed_ai_responses)
+
+    # Verify consensus structure
+    assert isinstance(json_output["consensus"], dict)
+    assert "consensus_verdict" in json_output["consensus"]
+    assert "agreement_rate" in json_output["consensus"]
+
+    # Verify categorized_issues is list
+    assert isinstance(json_output["categorized_issues"], list)
+    assert len(json_output["categorized_issues"]) > 0
+
+    # Verify individual_responses is list
+    assert isinstance(json_output["individual_responses"], list)
+    assert len(json_output["individual_responses"]) == len(mock_parsed_ai_responses)
+
+    # Verify JSON is serializable
+    import json
+    json_str = json.dumps(json_output, indent=2)
+    assert isinstance(json_str, str)
+    assert len(json_str) > 0
+
+
+def test_fidelity_review_json_issue_structure(
+    mock_parsed_ai_responses,
+    mock_categorized_issues
+):
+    """
+    Test that categorized issues in JSON have correct structure.
+
+    Verifies:
+    - Each issue has required fields
+    - Issue text/description present
+    - Severity level included
+    - Category field present
+    - Agreement information included
+    - Flagged_by list of models
+    """
+    review_results = {
+        "spec_id": "test-spec-json-002",
+        "consensus": {},
+        "categorized_issues": mock_categorized_issues,
+        "parsed_responses": mock_parsed_ai_responses,
+        "models_consulted": len(mock_parsed_ai_responses)
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    issues = json_output["categorized_issues"]
+    assert len(issues) > 0
+
+    # Check first issue structure
+    first_issue = issues[0]
+    assert "issue" in first_issue
+    assert "severity" in first_issue
+    assert "category" in first_issue
+    assert "agreed_by" in first_issue or "flagged_by" in first_issue
+    assert "agreement_count" in first_issue
+
+    # Verify severity values are valid
+    valid_severities = ["critical", "high", "medium", "low"]
+    for issue in issues:
+        assert issue["severity"].lower() in valid_severities
+
+
+def test_status_summary_json_serialization(mock_dashboard_spec_data):
+    """
+    Test that status summary dictionary is JSON-serializable.
+
+    Verifies:
+    - Dictionary can be converted to JSON string
+    - All nested structures are serializable
+    - No circular references
+    - Proper data types (no objects)
+    """
+    from claude_skills.sdd_update.status_report import get_status_summary
+    import json
+
+    summary = get_status_summary(mock_dashboard_spec_data)
+
+    # Should be JSON-serializable without errors
+    json_str = json.dumps(summary, indent=2)
+    assert isinstance(json_str, str)
+    assert len(json_str) > 0
+
+    # Should be deserializable
+    parsed = json.loads(json_str)
+    assert isinstance(parsed, dict)
+    assert parsed["total_tasks"] == summary["total_tasks"]
+    assert parsed["completed_tasks"] == summary["completed_tasks"]
+
+
+def test_comparison_view_json_with_empty_data():
+    """Test JSON output handles empty/minimal data gracefully."""
+    review_results = {
+        "spec_id": "empty-spec",
+        "consensus": {},
+        "categorized_issues": [],
+        "parsed_responses": [],
+        "models_consulted": 0
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    # Should still have valid structure
+    assert "metadata" in json_output
+    assert "spec_id" in json_output
+    assert "models_consulted" in json_output
+
+    # Empty arrays should be present
+    assert json_output["categorized_issues"] == []
+    assert json_output["individual_responses"] == []
+
+    # Should be JSON-serializable
+    import json
+    json_str = json.dumps(json_output)
+    assert isinstance(json_str, str)
+
+
+def test_json_output_model_responses_structure(mock_parsed_ai_responses):
+    """
+    Test that individual model responses in JSON have correct structure.
+
+    Verifies:
+    - Each response has model/tool identifier
+    - Verdict/recommendation present
+    - Issues array included
+    - Recommendations array present
+    - Confidence field (if available)
+    """
+    review_results = {
+        "spec_id": "test-spec-json-003",
+        "consensus": {},
+        "categorized_issues": [],
+        "parsed_responses": mock_parsed_ai_responses,
+        "models_consulted": len(mock_parsed_ai_responses)
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    responses = json_output["individual_responses"]
+    assert len(responses) == len(mock_parsed_ai_responses)
+
+    # Check first response structure
+    first_response = responses[0]
+    assert "model" in first_response or "tool" in first_response
+    assert "verdict" in first_response or "recommendation" in first_response
+    assert "issues" in first_response
+    assert "recommendations" in first_response
+
+    # Verify issues and recommendations are lists
+    for response in responses:
+        assert isinstance(response.get("issues", []), list)
+        assert isinstance(response.get("recommendations", []), list)
+
+
+def test_json_timestamp_format():
+    """Test that JSON metadata includes properly formatted timestamp."""
+    review_results = {
+        "spec_id": "test-timestamp",
+        "consensus": {},
+        "categorized_issues": [],
+        "parsed_responses": [],
+        "models_consulted": 0
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    # Verify timestamp exists
+    assert "metadata" in json_output
+    assert "generated_at" in json_output["metadata"]
+
+    timestamp = json_output["metadata"]["generated_at"]
+    assert isinstance(timestamp, str)
+
+    # Should be in ISO format with Z suffix
+    assert "T" in timestamp  # ISO format separator
+    assert timestamp.endswith("Z")  # UTC indicator
+
+
+def test_json_output_field_types():
+    """Test that JSON output has correct field types."""
+    review_results = {
+        "spec_id": "test-types",
+        "consensus": {
+            "consensus_verdict": "pass",
+            "agreement_rate": 0.85,
+            "consensus_issues": ["Issue 1"],
+            "consensus_recommendations": ["Rec 1"]
+        },
+        "categorized_issues": [
+            {
+                "issue": "Test issue",
+                "severity": "medium",
+                "category": "quality",
+                "agreed_by": ["model1"],
+                "agreement_count": 1
+            }
+        ],
+        "parsed_responses": [],
+        "models_consulted": 2
+    }
+
+    report = FidelityReport(review_results)
+    json_output = report.generate_json()
+
+    # Verify field types
+    assert isinstance(json_output["spec_id"], str)
+    assert isinstance(json_output["models_consulted"], int)
+    assert isinstance(json_output["consensus"], dict)
+    assert isinstance(json_output["categorized_issues"], list)
+    assert isinstance(json_output["individual_responses"], list)
+
+    # Verify nested types in consensus
+    consensus = json_output["consensus"]
+    assert isinstance(consensus["consensus_verdict"], str)
+    assert isinstance(consensus["agreement_rate"], (int, float))
+    assert isinstance(consensus["consensus_issues"], list)
+    assert isinstance(consensus["consensus_recommendations"], list)
