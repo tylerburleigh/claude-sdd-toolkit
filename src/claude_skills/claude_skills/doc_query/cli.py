@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
+from claude_skills.common.sdd_config import get_default_format
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
     QueryResult,
@@ -1068,29 +1069,49 @@ def register_doc_query(subparsers: argparse._SubParsersAction, parent_parser: ar
     call_graph.add_argument('function_name', help='Name of the function to analyze')
     call_graph.add_argument('--direction', choices=['callers', 'callees', 'both'], default='both', help='Direction to traverse (default: both)')
     call_graph.add_argument('--max-depth', type=int, default=3, help='Maximum recursion depth (default: 3)')
-    call_graph.add_argument('--format', choices=['text', 'json', 'dot'], default='text', help='Output format (default: text)')
+    # Get default format from config (call-graph supports text/json/dot)
+    default_fmt_cg = get_default_format()
+    if default_fmt_cg not in ['text', 'json', 'dot']:
+        default_fmt_cg = 'text'
+    call_graph.add_argument('--format', choices=['text', 'json', 'dot'], default=default_fmt_cg, help=f'Output format (default: {default_fmt_cg} from config)')
     call_graph.set_defaults(func=cmd_call_graph)
 
     trace_entry = subparsers.add_parser('trace-entry', parents=[parent_parser], help='Trace execution flow from entry function')
     trace_entry.add_argument('function', help='Name of the entry function to trace from')
     trace_entry.add_argument('--max-depth', type=int, default=5, help='Maximum call chain depth (default: 5)')
-    trace_entry.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    # Get default format from config (text/json only)
+    default_fmt_te = get_default_format()
+    if default_fmt_te not in ['text', 'json']:
+        default_fmt_te = 'text'
+    trace_entry.add_argument('--format', choices=['text', 'json'], default=default_fmt_te, help=f'Output format (default: {default_fmt_te} from config)')
     trace_entry.set_defaults(func=cmd_trace_entry)
 
     trace_data = subparsers.add_parser('trace-data', parents=[parent_parser], help='Trace data object lifecycle through codebase')
     trace_data.add_argument('classname', help='Name of the class to trace')
     trace_data.add_argument('--include-properties', action='store_true', help='Include detailed property access analysis')
-    trace_data.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    # Get default format from config (text/json only)
+    default_fmt_td = get_default_format()
+    if default_fmt_td not in ['text', 'json']:
+        default_fmt_td = 'text'
+    trace_data.add_argument('--format', choices=['text', 'json'], default=default_fmt_td, help=f'Output format (default: {default_fmt_td} from config)')
     trace_data.set_defaults(func=cmd_trace_data)
 
     impact = subparsers.add_parser('impact', parents=[parent_parser], help='Analyze impact of changing a function or class')
     impact.add_argument('entity', help='Name of the function or class to analyze')
     impact.add_argument('--depth', type=int, default=2, help='Maximum depth for indirect dependency traversal (default: 2)')
-    impact.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    # Get default format from config (text/json only)
+    default_fmt_im = get_default_format()
+    if default_fmt_im not in ['text', 'json']:
+        default_fmt_im = 'text'
+    impact.add_argument('--format', choices=['text', 'json'], default=default_fmt_im, help=f'Output format (default: {default_fmt_im} from config)')
     impact.set_defaults(func=cmd_impact)
 
     refactor = subparsers.add_parser('refactor-candidates', parents=[parent_parser], help='Find high-priority refactoring candidates')
     refactor.add_argument('--min-complexity', type=int, default=10, help='Minimum complexity threshold (default: 10)')
     refactor.add_argument('--limit', type=int, default=20, help='Maximum number of candidates to return (default: 20)')
-    refactor.add_argument('--format', choices=['text', 'json'], default='text', help='Output format (default: text)')
+    # Get default format from config (text/json only)
+    default_fmt_rf = get_default_format()
+    if default_fmt_rf not in ['text', 'json']:
+        default_fmt_rf = 'text'
+    refactor.add_argument('--format', choices=['text', 'json'], default=default_fmt_rf, help=f'Output format (default: {default_fmt_rf} from config)')
     refactor.set_defaults(func=cmd_refactor_candidates)

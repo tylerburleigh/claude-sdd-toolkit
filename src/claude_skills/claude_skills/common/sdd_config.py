@@ -24,6 +24,7 @@ DEFAULT_SDD_CONFIG = {
     "output": {
         "json": True,  # Output JSON by default for automation-friendly behavior
         "compact": True,  # Use compact JSON formatting by default
+        "default_format": "text",  # Default output format: "text" (TUI), "json", or "markdown"
     }
 }
 
@@ -113,6 +114,18 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
                 logger.warning(
                     f"Invalid type for sdd config 'output.compact': expected bool, got {type(value).__name__}. "
                     f"Using default: {DEFAULT_SDD_CONFIG['output']['compact']}"
+                )
+
+        # Validate default_format field
+        if "default_format" in output:
+            value = output["default_format"]
+            allowed_formats = ["text", "json", "markdown"]
+            if isinstance(value, str) and value in allowed_formats:
+                validated["output"]["default_format"] = value
+            else:
+                logger.warning(
+                    f"Invalid value for sdd config 'output.default_format': expected one of {allowed_formats}, "
+                    f"got {value!r}. Using default: {DEFAULT_SDD_CONFIG['output']['default_format']}"
                 )
 
     # Warn about unknown keys (but don't fail)
@@ -215,3 +228,19 @@ def get_sdd_setting(
             return default_value
 
     return value
+
+
+def get_default_format(project_path: Optional[Path] = None) -> str:
+    """Get the default output format from configuration.
+
+    Args:
+        project_path: Path to project root (optional)
+
+    Returns:
+        Default format string: "text", "json", or "markdown"
+
+    Example:
+        default_format = get_default_format()
+        parser.add_argument('--format', default=default_format, ...)
+    """
+    return get_sdd_setting("output.default_format", project_path, default="text")

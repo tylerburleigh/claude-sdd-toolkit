@@ -1,0 +1,7 @@
+{
+  "output": {
+    "json": true,
+    "compact": true,
+    "default_format": "text"
+  }
+}

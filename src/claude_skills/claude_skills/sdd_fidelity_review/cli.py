@@ -27,6 +27,7 @@ from claude_skills.common.ai_tools import (
     check_tool_available
 )
 from claude_skills.common.progress import ProgressEmitter
+from claude_skills.common.sdd_config import get_default_format
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -386,11 +387,14 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         metavar="FILE",
         help="Save review results to file"
     )
+
+    # Get default format from config
+    default_format = get_default_format()
     parser.add_argument(
         "--format",
         choices=["text", "json", "markdown"],
-        default="text",
-        help="Output format (default: text)"
+        default=default_format,
+        help=f"Output format (default: {default_format} from config)"
     )
     # Note: --verbose inherited from parent_parser (global option)
 
@@ -410,11 +414,16 @@ def register_list_review_tools_command(subparsers: argparse._SubParsersAction, p
     )
 
     # Output options
+    # Get default format from config, fallback to "text" for text/json only commands
+    default_format = get_default_format()
+    if default_format not in ["text", "json"]:
+        default_format = "text"  # Fallback for commands that don't support markdown
+
     list_tools_parser.add_argument(
         "--format",
         choices=["text", "json"],
-        default="text",
-        help="Output format (default: text)"
+        default=default_format,
+        help=f"Output format (default: {default_format} from config)"
     )
     # Note: --verbose inherited from parent_parser (global option)
 

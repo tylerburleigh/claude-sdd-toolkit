@@ -25,6 +25,7 @@ try:
         find_spec_file,
         ensure_reports_directory,
     )
+    from claude_skills.common.sdd_config import get_default_format
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -632,8 +633,14 @@ def register_validate(subparsers, parent_parser):
                                           help='Generate detailed validation report')
     parser_report.add_argument('spec_file', help='Spec name (e.g., my-spec) or path to JSON spec file')
     parser_report.add_argument('--output', '-o', help='Output file path (use "-" for stdout)')
-    parser_report.add_argument('--format', choices=['markdown', 'json'], default='markdown',
-                               help='Report format (default: markdown)')
+
+    # Get default format from config, fallback to "markdown" for markdown/json commands
+    default_format = get_default_format()
+    if default_format not in ['markdown', 'json']:
+        default_format = 'markdown'  # Fallback for commands that only support markdown/json
+
+    parser_report.add_argument('--format', choices=['markdown', 'json'], default=default_format,
+                               help=f'Report format (default: {default_format} from config)')
     parser_report.add_argument('--bottleneck-threshold', type=int, default=DEFAULT_BOTTLENECK_THRESHOLD,
                                help=f'Minimum tasks blocked to flag bottleneck (default: {DEFAULT_BOTTLENECK_THRESHOLD})')
     parser_report.set_defaults(func=cmd_report)
