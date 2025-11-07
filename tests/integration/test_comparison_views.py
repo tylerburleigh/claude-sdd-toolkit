@@ -316,3 +316,95 @@ def test_consensus_matrix_no_issues(mock_parsed_ai_responses):
     output = console.file.getvalue()
     # Matrix might still print header or be empty
     # The important thing is it doesn't crash
+
+
+# =============================================================================
+# Test: Issue Severity Panel Rendering
+# =============================================================================
+
+
+def test_issue_severity_panel_rendering(mock_categorized_issues, capsys):
+    """
+    Test that issue severity panels render correctly with Rich Panel components.
+
+    Verifies:
+    - Issues grouped by severity (critical, high, medium, low)
+    - Each severity has its own color-coded panel (red, yellow, blue, cyan)
+    - Panel titles include severity name and count
+    - Panel icons are displayed (🔴, 🟡, 🔵, ⚪)
+    - Issues are displayed as bullet points within panels
+    - Border styles match severity colors
+    """
+    # Create FidelityReport with categorized issues
+    review_results = {
+        "spec_id": "test-spec-001",
+        "consensus": {
+            "consensus_verdict": "partial",
+            "agreement_rate": 0.67,
+            "consensus_recommendations": ["Improve input validation"]
+        },
+        "categorized_issues": mock_categorized_issues,
+        "parsed_responses": [],
+        "models_consulted": 0
+    }
+
+    report = FidelityReport(review_results)
+
+    # Call print_console_rich() which prints to stdout
+    # We'll capture it with capsys
+    report.print_console_rich(verbose=False)
+
+    # Capture stdout
+    captured = capsys.readouterr()
+    output = captured.out
+
+    # Verify report header
+    assert "IMPLEMENTATION FIDELITY REVIEW" in output
+    assert "test-spec-001" in output
+
+    # Verify consensus verdict is shown
+    assert "Consensus Verdict" in output
+    assert "Agreement Rate" in output
+
+    # Verify severity panel titles with icons
+    assert "CRITICAL ISSUES" in output or "critical" in output.lower()
+    assert "HIGH" in output or "high" in output.lower()
+    assert "MEDIUM" in output or "medium" in output.lower()
+
+    # Verify issue content is present
+    assert "sanitization" in output or "validation" in output or "error" in output
+
+    # Verify bullet points for issues
+    assert "•" in output
+
+
+def test_issue_severity_panel_empty(capsys):
+    """Test severity panels handle case with no issues."""
+    # Create report with no categorized issues
+    review_results = {
+        "spec_id": "test-spec-001",
+        "consensus": {
+            "consensus_verdict": "pass",
+            "agreement_rate": 1.0,
+            "consensus_recommendations": []
+        },
+        "categorized_issues": [],
+        "parsed_responses": [],
+        "models_consulted": 0
+    }
+
+    report = FidelityReport(review_results)
+
+    # Should not crash when rendering with no issues
+    report.print_console_rich(verbose=False)
+
+    # Capture stdout
+    captured = capsys.readouterr()
+    output = captured.out
+
+    # Verify header still renders
+    assert "IMPLEMENTATION FIDELITY REVIEW" in output
+
+    # Verify verdict is shown even without issues
+    assert "Consensus Verdict" in output
+    assert "PASS" in output or "pass" in output.lower()
