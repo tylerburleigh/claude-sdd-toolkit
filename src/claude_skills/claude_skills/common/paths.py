@@ -5,6 +5,7 @@ Path discovery and validation utilities for SDD workflows.
 import sys
 from pathlib import Path
 from typing import Optional, List, Dict
+from claude_skills.common.git_metadata import find_git_root
 
 
 def find_specs_directory(provided_path: Optional[str] = None) -> Optional[Path]:
@@ -56,16 +57,44 @@ def find_specs_directory(provided_path: Optional[str] = None) -> Optional[Path]:
         # If no valid directory found in traversal, return None
         return None
 
-    # Search common locations (return the specs directory, not specs/active)
-    search_paths = [
-        Path.cwd() / "specs",
-        Path.home() / "Documents" / "Sandbox" / "specs",
-        Path.home() / ".claude" / "specs" / Path.cwd().name,
-        Path.cwd().parent / "specs",
-        Path.cwd().parent.parent / "specs",
-    ]
+    # Check if we're in a git repository
+    git_root = find_git_root()
+
+    if git_root:
+        # If in a git repo, only search within repository boundaries
+        # This prevents finding specs from other projects
+        search_paths = [
+            Path.cwd() / "specs",           # Current directory first
+            git_root / "specs",              # Git root specs directory
+        ]
+
+        # If cwd is not under git_root, also check parent directories within git_root
+        cwd = Path.cwd()
+        if cwd.is_relative_to(git_root) and cwd != git_root:
+            # Add parent/specs only if it's within the git repo
+            parent = cwd.parent
+            if parent.is_relative_to(git_root):
+                search_paths.append(parent / "specs")
+    else:
+        # Not in a git repo - search common locations (but not hardcoded project paths)
+        search_paths = [
+            Path.cwd() / "specs",
+            Path.home() / ".claude" / "specs" / Path.cwd().name,
+            Path.cwd().parent / "specs",
+            Path.cwd().parent.parent / "specs",
+        ]
 
     found_dirs = [p.resolve() for p in search_paths if p.exists() and is_valid_specs_dir(p)]
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_dirs = []
+    for d in found_dirs:
+        if d not in seen:
+            seen.add(d)
+            unique_dirs.append(d)
+
+    found_dirs = unique_dirs
 
     if len(found_dirs) == 0:
         return None
