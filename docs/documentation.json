@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T15:23:45.729688Z",
+    "generated_at": "2025-11-07T15:28:10.122569Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 245,
-    "total_lines": 87505,
+    "total_lines": 87532,
     "total_classes": 354,
     "total_functions": 888,
     "avg_complexity": 5.81,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 245,
-        "lines": 87505,
+        "lines": 87532,
         "classes": 354,
         "functions": 888,
         "avg_complexity": 5.81
@@ -4020,7 +4020,7 @@
         "rich.text.Text"
       ],
       "exports": [],
-      "lines": 341
+      "lines": 368
     },
     {
       "name": "time_tracking",
@@ -103230,7 +103230,7 @@
         {
           "name": "create_status_layout",
           "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-          "line": 241,
+          "line": 268,
           "call_type": "function_call"
         }
       ],
@@ -103256,41 +103256,29 @@
         {
           "name": "add_column",
           "file": "unknown",
-          "line": 45,
+          "line": 50,
           "call_type": "method_call"
         },
         {
           "name": "add_column",
           "file": "unknown",
-          "line": 46,
+          "line": 51,
           "call_type": "method_call"
         },
         {
           "name": "add_column",
           "file": "unknown",
-          "line": 47,
+          "line": 52,
           "call_type": "method_call"
         },
         {
           "name": "sorted",
           "file": "unknown",
-          "line": 50,
+          "line": 55,
           "call_type": "function_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 50,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 54,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 55,
           "call_type": "method_call"
@@ -103298,26 +103286,44 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 56,
+          "line": 59,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 57,
+          "line": 60,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 61,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 62,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 77,
+          "line": 82,
           "call_type": "function_call"
         },
         {
           "name": "add_row",
           "file": "unknown",
-          "line": 80,
+          "line": 85,
           "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -103325,7 +103331,7 @@
     {
       "name": "create_progress_panel",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 89,
+      "line": 99,
       "language": "python",
       "docstring": "Create a panel showing overall and phase-specific progress metrics.\n\nArgs:\n    spec_data: Loaded JSON spec data\n\nReturns:\n    Rich Panel with progress metrics",
       "parameters": [
@@ -103345,7 +103351,7 @@
         {
           "name": "create_status_layout",
           "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-          "line": 242,
+          "line": 269,
           "call_type": "function_call"
         }
       ],
@@ -103353,29 +103359,23 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 99,
+          "line": 109,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 107,
+          "line": 117,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 108,
+          "line": 118,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 111,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_column",
           "file": "unknown",
           "line": 121,
           "call_type": "method_call"
@@ -103383,43 +103383,49 @@
         {
           "name": "add_column",
           "file": "unknown",
-          "line": 122,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "unknown",
-          "line": 127,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "unknown",
-          "line": 128,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "unknown",
-          "line": 129,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "unknown",
-          "line": 130,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_row",
-          "file": "unknown",
           "line": 131,
           "call_type": "method_call"
         },
         {
+          "name": "add_column",
+          "file": "unknown",
+          "line": 132,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_row",
           "file": "unknown",
-          "line": 133,
+          "line": 137,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 139,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 140,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 141,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_row",
+          "file": "unknown",
+          "line": 144,
           "call_type": "method_call"
         }
       ],
@@ -103428,7 +103434,7 @@
     {
       "name": "create_blockers_panel",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 142,
+      "line": 159,
       "language": "python",
       "docstring": "Create a panel showing blocked tasks with reasons.\n\nArgs:\n    spec_data: Loaded JSON spec data\n\nReturns:\n    Rich Panel with blockers list",
       "parameters": [
@@ -103448,7 +103454,7 @@
         {
           "name": "create_status_layout",
           "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-          "line": 243,
+          "line": 270,
           "call_type": "function_call"
         }
       ],
@@ -103456,47 +103462,29 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 152,
+          "line": 169,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 156,
+          "line": 173,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 157,
+          "line": 174,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 158,
+          "line": 175,
           "call_type": "method_call"
         },
         {
           "name": "append",
-          "file": "unknown",
-          "line": 159,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 171,
-          "call_type": "method_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 172,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 176,
           "call_type": "method_call"
@@ -103504,61 +103492,79 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 177,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 180,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 181,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 186,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 190,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 191,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 192,
-          "call_type": "method_call"
-        },
-        {
-          "name": "rstrip",
-          "file": "unknown",
-          "line": 194,
-          "call_type": "method_call"
-        },
-        {
-          "name": "join",
-          "file": "unknown",
-          "line": 194,
+          "line": 193,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
+          "line": 194,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
           "line": 198,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 199,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 202,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 203,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 212,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 213,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 214,
+          "call_type": "method_call"
+        },
+        {
+          "name": "rstrip",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 216,
+          "call_type": "method_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 221,
           "call_type": "function_call"
         }
       ],
@@ -103567,7 +103573,7 @@
     {
       "name": "create_status_layout",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 203,
+      "line": 230,
       "language": "python",
       "docstring": "Create a Rich.Layout with multiple panels for status dashboard.\n\nLayout structure:\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                         \u2502              \u2502\n\u2502   Phases Panel          \u2502   Progress   \u2502\n\u2502                         \u2502   Panel      \u2502\n\u2502                         \u2502              \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                                         \u2502\n\u2502   Blockers Panel                        \u2502\n\u2502                                         \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\nArgs:\n    spec_data: Loaded JSON spec data\n\nReturns:\n    Rich Layout with populated panels",
       "parameters": [
@@ -103587,7 +103593,7 @@
         {
           "name": "print_status_report",
           "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-          "line": 265,
+          "line": 292,
           "call_type": "function_call"
         }
       ],
@@ -103595,49 +103601,49 @@
         {
           "name": "split_column",
           "file": "unknown",
-          "line": 229,
+          "line": 256,
           "call_type": "method_call"
         },
         {
           "name": "split_row",
           "file": "unknown",
-          "line": 235,
+          "line": 262,
           "call_type": "method_call"
         },
         {
           "name": "update",
           "file": "unknown",
-          "line": 241,
+          "line": 268,
           "call_type": "method_call"
         },
         {
           "name": "create_phases_panel",
           "file": "unknown",
-          "line": 241,
+          "line": 268,
           "call_type": "function_call"
         },
         {
           "name": "update",
           "file": "unknown",
-          "line": 242,
+          "line": 269,
           "call_type": "method_call"
         },
         {
           "name": "create_progress_panel",
           "file": "unknown",
-          "line": 242,
+          "line": 269,
           "call_type": "function_call"
         },
         {
           "name": "update",
           "file": "unknown",
-          "line": 243,
+          "line": 270,
           "call_type": "method_call"
         },
         {
           "name": "create_blockers_panel",
           "file": "unknown",
-          "line": 243,
+          "line": 270,
           "call_type": "function_call"
         }
       ],
@@ -103646,7 +103652,7 @@
     {
       "name": "print_status_report",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 248,
+      "line": 275,
       "language": "python",
       "docstring": "Print a dashboard-style status report to console.\n\nArgs:\n    spec_data: Loaded JSON spec data\n    title: Optional title for the report",
       "parameters": [
@@ -103672,37 +103678,37 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 260,
+          "line": 287,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 261,
+          "line": 288,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 262,
+          "line": 289,
           "call_type": "method_call"
         },
         {
           "name": "create_status_layout",
           "file": "unknown",
-          "line": 265,
+          "line": 292,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 266,
+          "line": 293,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 267,
+          "line": 294,
           "call_type": "method_call"
         }
       ]
@@ -103710,7 +103716,7 @@
     {
       "name": "get_status_summary",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 270,
+      "line": 297,
       "language": "python",
       "docstring": "Get a dictionary summary of status metrics.\n\nUseful for programmatic access to status data without printing.\n\nArgs:\n    spec_data: Loaded JSON spec data\n\nReturns:\n    Dictionary with status metrics:\n    - total_tasks: Total number of tasks\n    - completed_tasks: Number of completed tasks\n    - in_progress_tasks: Number of in-progress tasks\n    - blocked_tasks: Number of blocked tasks\n    - phases: List of phase summaries\n    - blockers: List of blocked task details",
       "parameters": [
@@ -103731,77 +103737,11 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 288,
-          "call_type": "method_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 296,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 297,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 300,
-          "call_type": "method_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 310,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 311,
-          "call_type": "method_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 312,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 314,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 315,
           "call_type": "method_call"
         },
         {
-          "name": "get",
-          "file": "unknown",
-          "line": 316,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 317,
-          "call_type": "method_call"
-        },
-        {
           "name": "items",
-          "file": "unknown",
-          "line": 322,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 323,
           "call_type": "method_call"
@@ -103815,43 +103755,109 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 325,
+          "line": 327,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 337,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 326,
+          "line": 338,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 327,
+          "line": 339,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 329,
+          "line": 341,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 330,
+          "line": 342,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 331,
+          "line": 343,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 344,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 349,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 350,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 351,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 352,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 353,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 356,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 357,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 358,
           "call_type": "method_call"
         },
         {
           "name": "sorted",
           "file": "unknown",
-          "line": 339,
+          "line": 366,
           "call_type": "function_call"
         }
       ]

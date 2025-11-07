@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 10:23:45
+**Generated:** 2025-11-07 10:28:10
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 245
-- **Total Lines:** 87505
+- **Total Lines:** 87532
 - **Total Classes:** 354
 - **Total Functions:** 888
 - **Avg Complexity:** 5.81
@@ -13214,7 +13214,7 @@ Example:
 ### `create_blockers_panel(spec_data) -> Panel`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:142`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:159`
 **Complexity:** 9
 
 **Description:**
@@ -13430,7 +13430,7 @@ Returns:
 ### `create_progress_panel(spec_data) -> Panel`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:89`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:99`
 **Complexity:** 7
 
 **Description:**
@@ -13600,7 +13600,7 @@ Returns:
 ### `create_status_layout(spec_data) -> Layout`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:203`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:230`
 **Complexity:** 1
 
 **Description:**
@@ -18342,7 +18342,7 @@ Returns:
 ### `get_status_summary(spec_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:270`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:297`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -20282,7 +20282,7 @@ Args:
 ### `print_status_report(spec_data, title) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:248`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:275`
 **Complexity:** 2
 
 **Description:**

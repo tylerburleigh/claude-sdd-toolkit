@@ -15,6 +15,34 @@ from rich.table import Table
 from rich.text import Text
 
 
+def create_progress_bar(percentage: float, width: int = 20) -> str:
+    """
+    Create a visual progress bar using Unicode box characters.
+
+    Args:
+        percentage: Progress percentage (0-100)
+        width: Width of progress bar in characters
+
+    Returns:
+        Formatted progress bar string with color coding
+    """
+    filled_width = int((percentage / 100) * width)
+    empty_width = width - filled_width
+
+    filled_char = "█"
+    empty_char = "░"
+
+    bar = filled_char * filled_width + empty_char * empty_width
+
+    # Color based on progress
+    if percentage >= 100:
+        return f"[green]{bar}[/green]"
+    elif percentage > 0:
+        return f"[yellow]{bar}[/yellow]"
+    else:
+        return f"[dim]{bar}[/dim]"
+
+
 def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
     """
     Create a panel showing all phases with status indicators.
@@ -47,9 +75,9 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
 
     # Create phases table
     table = Table(show_header=True, box=None, padding=(0, 1))
-    table.add_column("Phase", style="bold")
-    table.add_column("Status", justify="center")
-    table.add_column("Progress", justify="right")
+    table.add_column("Phase", style="bold", width=18)
+    table.add_column("Status", justify="center", width=11)
+    table.add_column("Progress", justify="left", no_wrap=True)
 
     # Sort phases by ID
     sorted_phases = sorted(phases.items(), key=lambda x: x[0])
@@ -71,16 +99,17 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
         else:  # pending
             status_indicator = "[dim]○ Pending[/dim]"
 
-        # Progress
+        # Progress with visual bar
         if total_tasks > 0:
             percentage = (completed_tasks / total_tasks) * 100
-            progress_text = f"{completed_tasks}/{total_tasks} ({percentage:.0f}%)"
+            progress_bar = create_progress_bar(percentage, width=15)
+            progress_text = f"{progress_bar} {percentage:.0f}%"
         else:
             progress_text = "—"
 
         # Truncate title if too long
-        if len(title) > 40:
-            title = title[:37] + "..."
+        if len(title) > 18:
+            title = title[:15] + "..."
 
         table.add_row(title, status_indicator, progress_text)
 
