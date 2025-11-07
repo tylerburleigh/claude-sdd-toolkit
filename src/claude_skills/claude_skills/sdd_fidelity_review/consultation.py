@@ -21,6 +21,14 @@ from claude_skills.common.ai_tools import (
     check_tool_available
 )
 
+# Import cache modules with fallback
+try:
+    from claude_skills.common.cache import CacheManager, generate_fidelity_review_key
+    from claude_skills.common.config import is_cache_enabled
+    _CACHE_AVAILABLE = True
+except ImportError:
+    _CACHE_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -181,13 +189,15 @@ def consult_multiple_ai_on_fidelity(
     tools: Optional[List[str]] = None,
     model: Optional[str] = None,
     timeout: int = 120,
-    require_all_success: bool = False
+    require_all_success: bool = False,
+    cache_key_params: Optional[Dict[str, Any]] = None,
+    use_cache: Optional[bool] = None
 ) -> List[ToolResponse]:
     """
     Consult multiple AI tools in parallel for fidelity review.
 
-    Wrapper around execute_tools_parallel() with fidelity-review defaults
-    and comprehensive error handling.
+    Wrapper around execute_tools_parallel() with fidelity-review defaults,
+    comprehensive error handling, and optional caching support.
 
     Args:
         prompt: The review prompt to send to all AI tools
@@ -196,6 +206,8 @@ def consult_multiple_ai_on_fidelity(
         model: Model to request (optional, tool-specific)
         timeout: Timeout in seconds per tool (default: 120)
         require_all_success: If True, raise exception if any tool fails
+        cache_key_params: Parameters for cache key generation (spec_id, scope, target, file_paths)
+        use_cache: Enable caching (overrides config, defaults to config setting)
 
     Returns:
         List of ToolResponse objects, one per tool
@@ -207,11 +219,48 @@ def consult_multiple_ai_on_fidelity(
     Example:
         >>> responses = consult_multiple_ai_on_fidelity(
         ...     prompt="Review this implementation...",
-        ...     tools=["gemini", "codex"]
+        ...     tools=["gemini", "codex"],
+        ...     cache_key_params={"spec_id": "my-spec-001", "scope": "phase", "target": "phase-1"}
         ... )
         >>> for response in responses:
         ...     print(f"{response.tool}: {response.status.value}")
     """
+    # Check cache if enabled and cache_key_params provided
+    cache_enabled = use_cache if use_cache is not None else (_CACHE_AVAILABLE and is_cache_enabled())
+    cached_responses = None
+
+    if cache_enabled and cache_key_params and _CACHE_AVAILABLE:
+        try:
+            cache = CacheManager()
+            cache_key = generate_fidelity_review_key(
+                spec_id=cache_key_params.get("spec_id", ""),
+                scope=cache_key_params.get("scope", ""),
+                target=cache_key_params.get("target", ""),
+                file_paths=cache_key_params.get("file_paths"),
+                model=model
+            )
+
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                logger.info("Cache hit: Using cached AI consultation results")
+                # Reconstruct ToolResponse objects from cached data
+                cached_responses = []
+                for resp_data in cached_data:
+                    cached_responses.append(ToolResponse(
+                        tool=resp_data["tool"],
+                        status=ToolStatus(resp_data["status"]),
+                        output=resp_data["output"],
+                        error=resp_data.get("error"),
+                        exit_code=resp_data.get("exit_code"),
+                        model=resp_data.get("model"),
+                        metadata=resp_data.get("metadata", {})
+                    ))
+                return cached_responses
+            else:
+                logger.debug("Cache miss: Will consult AI tools and cache results")
+        except Exception as e:
+            logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
+
     try:
         # If no tools specified, detect all available tools
         if tools is None:

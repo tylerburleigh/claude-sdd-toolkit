@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T17:40:19.657826Z",
+    "generated_at": "2025-11-07T17:43:14.285685Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 248,
-    "total_lines": 88100,
+    "total_files": 249,
+    "total_lines": 88416,
     "total_classes": 355,
-    "total_functions": 894,
-    "avg_complexity": 5.79,
+    "total_functions": 901,
+    "avg_complexity": 5.8,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 248,
-        "lines": 88100,
+        "files": 249,
+        "lines": 88416,
         "classes": 355,
-        "functions": 894,
-        "avg_complexity": 5.79
+        "functions": 901,
+        "avg_complexity": 5.8
       }
     }
   },
@@ -988,7 +988,7 @@
         "datetime.timedelta"
       ],
       "exports": [],
-      "lines": 321
+      "lines": 346
     },
     {
       "name": "cli_utils",
@@ -1039,6 +1039,33 @@
       ],
       "exports": [],
       "lines": 487
+    },
+    {
+      "name": "config",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "language": "python",
+      "docstring": "General configuration management for SDD toolkit.\n\nProvides configuration settings for various features including cache, AI tools, etc.\nSupports both environment variables and config file settings.",
+      "classes": [],
+      "functions": [
+        "get_config_path",
+        "_merge_with_defaults",
+        "load_config",
+        "_apply_env_overrides",
+        "get_setting",
+        "get_cache_config",
+        "is_cache_enabled"
+      ],
+      "imports": [
+        "json",
+        "logging",
+        "os",
+        "pathlib.Path",
+        "typing.Dict",
+        "typing.Any",
+        "typing.Optional"
+      ],
+      "exports": [],
+      "lines": 291
     },
     {
       "name": "contracts",
@@ -8472,13 +8499,13 @@
     {
       "name": "CacheManager",
       "file": "src/claude_skills/claude_skills/common/cache/cache_manager.py",
-      "line": 18,
+      "line": 24,
       "language": "python",
       "docstring": "File-based cache manager with TTL support.\n\nStores cache entries as JSON files in a configurable directory.\nEach entry includes the cached value, creation timestamp, and TTL.\n\nFeatures:\n- Atomic file operations to prevent corruption\n- Automatic TTL expiration\n- Graceful error handling (never crashes, degrades to no-cache)\n- Configurable cache directory\n\nUsage:\n    cache = CacheManager()\n    cache.set(\"my_key\", {\"data\": \"value\"}, ttl_hours=24)\n    result = cache.get(\"my_key\")  # Returns {\"data\": \"value\"} or None if expired",
       "bases": [],
       "methods": [
         "__init__",
-        "_get_cache_dir_from_env",
+        "_get_cache_dir_from_config",
         "_ensure_cache_dir",
         "_get_cache_path",
         "_maybe_cleanup",
@@ -31208,6 +31235,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
           "line": 193,
@@ -31228,7 +31261,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "load_skill_config",
@@ -33948,6 +33981,525 @@
       "call_count": 16
     },
     {
+      "name": "get_config_path",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 29,
+      "language": "python",
+      "docstring": "Get path to config.json file.\n\nChecks multiple locations in order of precedence:\n1. Project-local: {project_path}/.claude/config.json\n2. Global: ~/.claude/config.json\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Path to config.json if found, None otherwise",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "Optional[Path]",
+      "complexity": 6,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "load_skill_config",
+          "file": "src/claude_skills/claude_skills/common/ai_config.py",
+          "line": 86,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_git_config",
+          "file": "src/claude_skills/claude_skills/common/git_config.py",
+          "line": 193,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load_sdd_config",
+          "file": "src/claude_skills/claude_skills/common/sdd_config.py",
+          "line": 144,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 48,
+          "call_type": "method_call"
+        },
+        {
+          "name": "cwd",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "method_call"
+        },
+        {
+          "name": "list",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 55,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 58,
+          "call_type": "method_call"
+        },
+        {
+          "name": "home",
+          "file": "unknown",
+          "line": 61,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 4
+    },
+    {
+      "name": "_merge_with_defaults",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 73,
+      "language": "python",
+      "docstring": "Merge loaded config with defaults.\n\nArgs:\n    config: Loaded configuration dictionary\n\nReturns:\n    Merged configuration with defaults",
+      "parameters": [
+        {
+          "name": "config",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 16,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 148,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "deepcopy",
+          "file": "unknown",
+          "line": 84,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 95,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 103,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 107,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 110,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 112,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "load_config",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 118,
+      "language": "python",
+      "docstring": "Load configuration from file with fallback to defaults.\n\nAttempts to load from:\n1. Project-local config ({project_path}/.claude/config.json)\n2. Global config (~/.claude/config.json)\n3. Environment variables (override config file)\n4. Built-in defaults\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Complete configuration dictionary",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 5,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "get_setting",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 247,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get_cache_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 277,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "get_config_path",
+          "file": "unknown",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 137,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 138,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
+          "file": "unknown",
+          "line": 142,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 144,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 145,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 146,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_merge_with_defaults",
+          "file": "unknown",
+          "line": 148,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 149,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 153,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 155,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 156,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_apply_env_overrides",
+          "file": "unknown",
+          "line": 159,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "_apply_env_overrides",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 164,
+      "language": "python",
+      "docstring": "Apply environment variable overrides to config.\n\nEnvironment variables take precedence over config file settings.\n\nSupported environment variables:\n- SDD_CACHE_ENABLED: \"true\" or \"false\"\n- SDD_CACHE_DIR: Path to cache directory\n- SDD_CACHE_TTL_HOURS: Number (hours)\n- SDD_CACHE_MAX_SIZE_MB: Number (MB)\n- SDD_CACHE_AUTO_CLEANUP: \"true\" or \"false\"\n\nArgs:\n    config: Configuration dictionary\n\nReturns:\n    Configuration with environment overrides applied",
+      "parameters": [
+        {
+          "name": "config",
+          "type": "Dict[str, Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 14,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 159,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "deepcopy",
+          "file": "unknown",
+          "line": 184,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 188,
+          "call_type": "method_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 201,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 205,
+          "call_type": "method_call"
+        },
+        {
+          "name": "float",
+          "file": "unknown",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 214,
+          "call_type": "method_call"
+        },
+        {
+          "name": "lower",
+          "file": "unknown",
+          "line": 218,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "get_setting",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 227,
+      "language": "python",
+      "docstring": "Get a specific configuration setting.\n\nArgs:\n    key: Configuration key (supports nested keys with dots, e.g., 'cache.enabled')\n    project_path: Path to project root (optional)\n    default: Default value if key not found\n\nReturns:\n    Configuration value\n\nExamples:\n    enabled = get_setting('cache.enabled')\n    ttl = get_setting('cache.ttl_hours', default=24)",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        },
+        {
+          "name": "default",
+          "type": "Optional[Any]",
+          "default": null
+        }
+      ],
+      "return_type": "Any",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "is_cache_enabled",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 291,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "load_config",
+          "file": "unknown",
+          "line": 247,
+          "call_type": "function_call"
+        },
+        {
+          "name": "split",
+          "file": "unknown",
+          "line": 250,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "get_cache_config",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 261,
+      "language": "python",
+      "docstring": "Get cache configuration section.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Dictionary with cache configuration settings\n\nExample:\n    cache_config = get_cache_config()\n    if cache_config['enabled']:\n        cache_dir = cache_config.get('directory')\n        ttl_hours = cache_config['ttl_hours']",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "__init__",
+          "file": "src/claude_skills/claude_skills/common/cache/cache_manager.py",
+          "line": 59,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "load_config",
+          "file": "unknown",
+          "line": 277,
+          "call_type": "function_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 278,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "is_cache_enabled",
+      "file": "src/claude_skills/claude_skills/common/config.py",
+      "line": 281,
+      "language": "python",
+      "docstring": "Check if caching is enabled.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    True if caching is enabled",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "Optional[Path]",
+          "default": null
+        }
+      ],
+      "return_type": "bool",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "get_setting",
+          "file": "unknown",
+          "line": 291,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
       "name": "extract_prepare_task_contract",
       "file": "src/claude_skills/claude_skills/common/contracts.py",
       "line": 23,
@@ -35899,6 +36451,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
           "line": 193,
@@ -35967,7 +36525,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "_validate_git_config",
@@ -45613,6 +46171,12 @@
           "call_type": "function_call"
         },
         {
+          "name": "load_config",
+          "file": "src/claude_skills/claude_skills/common/config.py",
+          "line": 134,
+          "call_type": "function_call"
+        },
+        {
           "name": "load_git_config",
           "file": "src/claude_skills/claude_skills/common/git_config.py",
           "line": 193,
@@ -45681,7 +46245,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "_validate_sdd_config",
@@ -133015,6 +133579,15 @@
     "src/claude_skills/claude_skills/common/completion.py": [
       "typing.Dict",
       "typing.List",
+      "typing.Optional"
+    ],
+    "src/claude_skills/claude_skills/common/config.py": [
+      "json",
+      "logging",
+      "os",
+      "pathlib.Path",
+      "typing.Dict",
+      "typing.Any",
       "typing.Optional"
     ],
     "src/claude_skills/claude_skills/common/contracts.py": [

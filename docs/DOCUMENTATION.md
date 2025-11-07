@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 12:40:19
+**Generated:** 2025-11-07 12:43:14
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 248
-- **Total Lines:** 88100
+- **Total Files:** 249
+- **Total Lines:** 88416
 - **Total Classes:** 355
-- **Total Functions:** 894
-- **Avg Complexity:** 5.79
+- **Total Functions:** 901
+- **Avg Complexity:** 5.8
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -181,7 +181,7 @@ the required abstract methods.
 ### `CacheManager`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_manager.py:18`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_manager.py:24`
 
 **Description:**
 > File-based cache manager with TTL support.
@@ -202,7 +202,7 @@ Usage:
 
 **Methods:**
 - `__init__()`
-- `_get_cache_dir_from_env()`
+- `_get_cache_dir_from_config()`
 - `_ensure_cache_dir()`
 - `_get_cache_path()`
 - `_maybe_cleanup()`
@@ -6909,6 +6909,35 @@ Example:
 
 ## ⚡ Functions
 
+### `_apply_env_overrides(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:164`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Apply environment variable overrides to config.
+
+Environment variables take precedence over config file settings.
+
+Supported environment variables:
+- SDD_CACHE_ENABLED: "true" or "false"
+- SDD_CACHE_DIR: Path to cache directory
+- SDD_CACHE_TTL_HOURS: Number (hours)
+- SDD_CACHE_MAX_SIZE_MB: Number (MB)
+- SDD_CACHE_AUTO_CLEANUP: "true" or "false"
+
+Args:
+    config: Configuration dictionary
+
+Returns:
+    Configuration with environment overrides applied
+
+**Parameters:**
+- `config`: Dict[str, Any]
+
+---
+
 ### `_auto_register_parsers(factory) -> None`
 
 **Language:** python
@@ -8414,6 +8443,26 @@ Args:
 **Parameters:**
 - `issues`: List[Dict[str, Any]]
 - `enhanced_errors`: List[EnhancedError]
+
+---
+
+### `_merge_with_defaults(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:73`
+⚠️ **Complexity:** 16 (High)
+
+**Description:**
+> Merge loaded config with defaults.
+
+Args:
+    config: Loaded configuration dictionary
+
+Returns:
+    Merged configuration with defaults
+
+**Parameters:**
+- `config`: Dict[str, Any]
 
 ---
 
@@ -17506,6 +17555,32 @@ Returns:
 
 ---
 
+### `get_cache_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:261`
+**Complexity:** 1
+
+**Description:**
+> Get cache configuration section.
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Dictionary with cache configuration settings
+
+Example:
+    cache_config = get_cache_config()
+    if cache_config['enabled']:
+        cache_dir = cache_config.get('directory')
+        ttl_hours = cache_config['ttl_hours']
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `get_commit_history(repo_root, base_branch) -> List[Dict[str, str]]`
 
 **Language:** python
@@ -17567,6 +17642,30 @@ Returns:
 
 **Parameters:**
 - `skill_name`: str
+
+---
+
+### `get_config_path(project_path) -> Optional[Path]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:29`
+**Complexity:** 6
+
+**Description:**
+> Get path to config.json file.
+
+Checks multiple locations in order of precedence:
+1. Project-local: {project_path}/.claude/config.json
+2. Global: ~/.claude/config.json
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Path to config.json if found, None otherwise
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -18389,6 +18488,34 @@ Example:
 
 ---
 
+### `get_setting(key, project_path, default) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:227`
+**Complexity:** 4
+
+**Description:**
+> Get a specific configuration setting.
+
+Args:
+    key: Configuration key (supports nested keys with dots, e.g., 'cache.enabled')
+    project_path: Path to project root (optional)
+    default: Default value if key not found
+
+Returns:
+    Configuration value
+
+Examples:
+    enabled = get_setting('cache.enabled')
+    ttl = get_setting('cache.ttl_hours', default=24)
+
+**Parameters:**
+- `key`: str
+- `project_path`: Optional[Path]
+- `default`: Optional[Any]
+
+---
+
 ### `get_spec_git_diffs(repo_root, base_branch, max_size_kb) -> str`
 
 **Language:** python
@@ -19186,6 +19313,26 @@ Returns:
 
 ---
 
+### `is_cache_enabled(project_path) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:281`
+**Complexity:** 1
+
+**Description:**
+> Check if caching is enabled.
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    True if caching is enabled
+
+**Parameters:**
+- `project_path`: Optional[Path]
+
+---
+
 ### `is_cache_key_valid(key) -> bool`
 
 **Language:** python
@@ -19554,6 +19701,32 @@ Returns:
 
 Returns:
     Dictionary of template_id -> template_info
+
+---
+
+### `load_config(project_path) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/config.py:118`
+**Complexity:** 5
+
+**Description:**
+> Load configuration from file with fallback to defaults.
+
+Attempts to load from:
+1. Project-local config ({project_path}/.claude/config.json)
+2. Global config (~/.claude/config.json)
+3. Environment variables (override config file)
+4. Built-in defaults
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Complete configuration dictionary
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -25716,6 +25889,16 @@ Returns:
 
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/config.py`
+
+- `json`
+- `logging`
+- `os`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/contracts.py`
