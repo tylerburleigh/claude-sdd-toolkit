@@ -1179,6 +1179,219 @@ class TestQueuedProgressCallback:
         queued.stop()
 
 
+class TestProgressBarCleanup:
+    """Test progress bar cleanup on completion and error."""
+
+    def test_cleanup_on_successful_completion(self):
+        """Progress tracker cleans up properly on successful completion."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+            time.sleep(0.5)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.5,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+            # Update thread reference before exiting context
+            update_thread = progress._update_thread
+
+        # After context exit, update thread should be stopped
+        assert update_thread is not None
+        assert not update_thread.is_alive()
+
+        # Callback should have been called
+        callback.on_complete.assert_called_once()
+
+    def test_cleanup_on_exception(self):
+        """Progress tracker cleans up properly when exception occurs."""
+        callback = Mock(spec=ProgressCallback)
+
+        update_thread = None
+        try:
+            with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+                update_thread = progress._update_thread
+                time.sleep(0.3)
+                raise ValueError("Test error")
+        except ValueError:
+            pass
+
+        # Update thread should be stopped after exception
+        assert update_thread is not None
+        assert not update_thread.is_alive()
+
+        # on_complete should have been called with error status
+        callback.on_complete.assert_called_once()
+        args, kwargs = callback.on_complete.call_args
+        assert kwargs["status"] == ToolStatus.ERROR
+        assert "Test error" in kwargs["error"]
+
+    def test_cleanup_without_explicit_complete_call(self):
+        """Progress tracker auto-completes and cleans up if complete() not called."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+            update_thread = progress._update_thread
+            time.sleep(0.3)
+            # Intentionally not calling progress.complete()
+
+        # Update thread should still be stopped
+        assert update_thread is not None
+        assert not update_thread.is_alive()
+
+        # on_complete should have been called automatically
+        callback.on_complete.assert_called_once()
+
+    def test_batch_cleanup_on_completion(self):
+        """Batch tracker cleans up properly on completion."""
+        callback = Mock(spec=ProgressCallback)
+
+        with batch_consultation_progress(["gemini", "codex"], timeout=30, callback=callback, update_interval=0.2) as progress:
+            time.sleep(0.3)
+
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.2,
+                timestamp="2025-11-07T12:00:00Z"
+            ))
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.25,
+                timestamp="2025-11-07T12:00:01Z"
+            ))
+
+            update_thread = progress._update_thread
+
+        # After context exit, update thread should be stopped
+        assert update_thread is not None
+        assert not update_thread.is_alive()
+
+        # Batch complete callback should have been called
+        callback.on_batch_complete.assert_called_once()
+
+    def test_batch_cleanup_on_exception(self):
+        """Batch tracker cleans up properly when exception occurs."""
+        callback = Mock(spec=ProgressCallback)
+
+        update_thread = None
+        try:
+            with batch_consultation_progress(["gemini", "codex"], timeout=30, callback=callback, update_interval=0.2) as progress:
+                update_thread = progress._update_thread
+                time.sleep(0.3)
+                raise RuntimeError("Batch processing failed")
+        except RuntimeError:
+            pass
+
+        # Update thread should be stopped after exception
+        assert update_thread is not None
+        assert not update_thread.is_alive()
+
+        # on_batch_complete should still have been called
+        callback.on_batch_complete.assert_called_once()
+
+    def test_cleanup_stops_update_callbacks(self):
+        """Cleanup stops periodic update callbacks from firing."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+            time.sleep(0.5)  # Let some updates happen
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.5,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+            progress.complete(response)
+
+        # Count updates before cleanup
+        update_count_at_complete = callback.on_update.call_count
+
+        # Wait to ensure no more updates after cleanup
+        time.sleep(0.5)
+        update_count_after_wait = callback.on_update.call_count
+
+        # No new updates should have occurred after completion
+        assert update_count_after_wait == update_count_at_complete
+
+    def test_cleanup_is_idempotent(self):
+        """Cleanup can be safely called multiple times."""
+        callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+            time.sleep(0.3)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="test",
+                error=None,
+                duration=0.3,
+                timestamp="2025-11-07T12:00:00Z"
+            )
+
+            # Call complete() multiple times
+            progress.complete(response)
+            progress.complete(response)
+            progress.complete(response)
+
+        # on_complete should only be called once despite multiple complete() calls
+        assert callback.on_complete.call_count == 1
+
+    def test_queued_callback_cleanup(self):
+        """QueuedProgressCallback cleans up consumer thread properly."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+        assert queued._consumer_thread is not None
+        assert queued._consumer_thread.is_alive()
+
+        queued.on_start("gemini", 90)
+        time.sleep(0.2)
+
+        # Stop and verify cleanup
+        queued.stop(timeout=2.0)
+
+        # Consumer thread should be stopped
+        assert not queued._consumer_thread.is_alive()
+
+        # No errors should occur, callback should have been processed
+        assert wrapped.on_start.call_count == 1
+
+    def test_queued_callback_cleanup_after_exception(self):
+        """QueuedProgressCallback cleans up even when wrapped callback raises."""
+        wrapped = Mock(spec=ProgressCallback)
+        wrapped.on_start.side_effect = Exception("Callback error")
+
+        queued = QueuedProgressCallback(wrapped)
+        queued.start()
+
+        # This should not crash the consumer thread
+        queued.on_start("gemini", 90)
+        time.sleep(0.2)
+
+        # Cleanup should still work
+        queued.stop(timeout=2.0)
+
+        # Consumer thread should be stopped despite exception
+        assert not queued._consumer_thread.is_alive()
+
+
 class TestProgressMessageFormatting:
     """Test progress message formatting helper."""
 
