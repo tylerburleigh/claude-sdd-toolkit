@@ -680,3 +680,141 @@ class TestQueryTasksCLI:
                 if isinstance(value, str):
                     assert not ansi_pattern.search(value), \
                         f"Field '{key}' contains ANSI codes: {value}"
+
+
+@pytest.mark.integration
+class TestCheckDepsCLI:
+    """Tests for check-deps command with Rich.Tree output."""
+
+    def test_check_deps_help(self):
+        """Test check-deps shows help text."""
+        result = run_cli("check-deps", "--help",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert "check-deps" in result.stdout.lower()
+
+    def test_check_deps_text_output(self, tmp_path):
+        """Test check-deps with default text/Rich.Tree output."""
+        # Create a spec with task dependencies
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Dependency Test"},
+            "hierarchy": {
+                "task-1": {
+                    "type": "task",
+                    "title": "First Task",
+                    "status": "completed",
+                    "dependencies": {"blocks": ["task-2"], "blocked_by": [], "depends": []}
+                },
+                "task-2": {
+                    "type": "task",
+                    "title": "Second Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": [], "blocked_by": ["task-1"], "depends": []}
+                }
+            }
+        }
+
+        (active_dir / "deps-001.json").write_text(json.dumps(spec_data))
+
+        # Run check-deps with Rich.Tree output (--no-json)
+        result = run_cli("check-deps", "--path", str(specs_dir), "deps-001", "task-1", "--no-json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        # Check for Rich tree structure elements
+        assert "task-1" in result.stdout
+        # Tree structure indicators
+        assert "└──" in result.stdout or "├──" in result.stdout
+
+    def test_check_deps_json_output(self, tmp_path):
+        """Test check-deps with JSON output format."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "JSON Deps Test"},
+            "hierarchy": {
+                "task-1": {
+                    "type": "task",
+                    "title": "First Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": ["task-2"], "blocked_by": [], "depends": []}
+                },
+                "task-2": {
+                    "type": "task",
+                    "title": "Second Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": [], "blocked_by": ["task-1"], "depends": []}
+                }
+            }
+        }
+
+        (active_dir / "json-deps-001.json").write_text(json.dumps(spec_data))
+
+        # Run check-deps with JSON format (default or explicit --json)
+        result = run_cli("check-deps", "--path", str(specs_dir), "json-deps-001", "task-1", "--json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # Parse JSON output
+        output_data = json.loads(result.stdout)
+        assert isinstance(output_data, dict)
+
+        # Verify dependency information
+        assert output_data["task_id"] == "task-1"
+        assert "can_start" in output_data
+        assert "blocked_by" in output_data
+        assert "blocks" in output_data
+
+    def test_check_deps_with_blocked_task(self, tmp_path):
+        """Test check-deps shows blocked status correctly."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Blocked Task Test"},
+            "hierarchy": {
+                "task-1": {
+                    "type": "task",
+                    "title": "Prerequisite Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": ["task-2"], "blocked_by": [], "depends": []}
+                },
+                "task-2": {
+                    "type": "task",
+                    "title": "Dependent Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": [], "blocked_by": ["task-1"], "depends": []}
+                }
+            }
+        }
+
+        (active_dir / "blocked-001.json").write_text(json.dumps(spec_data))
+
+        # Check task-2 which is blocked by task-1
+        result = run_cli("check-deps", "--path", str(specs_dir), "blocked-001", "task-2", "--json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        output_data = json.loads(result.stdout)
+
+        # task-2 should be blocked by task-1
+        assert output_data["can_start"] == False
+        assert len(output_data["blocked_by"]) == 1
+        assert output_data["blocked_by"][0]["id"] == "task-1"

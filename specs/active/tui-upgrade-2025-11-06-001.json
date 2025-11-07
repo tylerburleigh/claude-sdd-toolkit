@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T00:33:33.048349Z",
+  "last_updated": "2025-11-07T11:32:22.175067Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 35,
+    "progress_percentage": 36,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 31,
+      "completed_tasks": 32,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -704,7 +704,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {}
     },
     "task-2-1": {
@@ -1156,7 +1156,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "tests/integration/test_list_commands.py",
         "task_category": "implementation",
@@ -1256,7 +1256,7 @@
     "task-2-6-5": {
       "type": "subtask",
       "title": "Test check-deps Rich.Tree output",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-6",
       "children": [],
       "dependencies": {
@@ -1265,9 +1265,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-07T00:34:11.780969Z",
+        "completed_at": "2025-11-07T11:32:22.141926Z",
+        "needs_journaling": false,
+        "actual_hours": 10.97,
+        "journaled_at": "2025-11-07T11:32:22.168193Z"
       }
     },
     "task-2-6-6": {
@@ -3209,6 +3214,15 @@
       "content": "Successfully added test_query_tasks_json_no_ansi_codes test to test_list_commands.py. The test verifies that query-tasks command with --format json flag produces valid JSON output without ANSI escape codes. Test creates a spec with tasks in different statuses (completed, in_progress, pending, blocked) and validates: 1) No ANSI codes in raw output, 2) Output is valid parseable JSON, 3) No ANSI codes in any string field values. All 17 tests in the file pass including the new test.",
       "metadata": {},
       "task_id": "task-2-6-4"
+    },
+    {
+      "timestamp": "2025-11-07T11:32:22.168153Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Test check-deps Rich.Tree output",
+      "author": "claude-code",
+      "content": "Successfully added TestCheckDepsCLI test class with 4 comprehensive tests for check-deps command. Tests cover: 1) Help text display, 2) Rich.Tree output format with --no-json flag (verifies tree structure indicators like \u2514\u2500\u2500 and \u251c\u2500\u2500), 3) JSON output format validation, 4) Blocked task dependency checking. All 21 tests in the file pass including the new check-deps tests. Tests verify both text/Rich.Tree output and JSON output formats work correctly.",
+      "metadata": {},
+      "task_id": "task-2-6-5"
     }
   ]
 }

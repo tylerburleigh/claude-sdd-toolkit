@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:31:02
+**Generated:** 2025-11-06 19:34:01
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 242
-- **Total Lines:** 85117
+- **Total Lines:** 85167
 - **Total Classes:** 343
 - **Total Functions:** 871
 - **Avg Complexity:** 5.78
@@ -5307,6 +5307,7 @@ Attributes:
 - `test_query_tasks_filter_by_type()`
 - `test_query_tasks_filter_by_parent()`
 - `test_query_tasks_empty_result()`
+- `test_query_tasks_json_no_ansi_codes()`
 
 ---
 
