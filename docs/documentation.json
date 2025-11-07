@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T12:52:14.553722Z",
+    "generated_at": "2025-11-07T12:55:33.314971Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 243,
-    "total_lines": 86074,
-    "total_classes": 349,
-    "total_functions": 877,
+    "total_files": 244,
+    "total_lines": 86321,
+    "total_classes": 353,
+    "total_functions": 878,
     "avg_complexity": 5.78,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 243,
-        "lines": 86074,
-        "classes": 349,
-        "functions": 877,
+        "files": 244,
+        "lines": 86321,
+        "classes": 353,
+        "functions": 878,
         "avg_complexity": 5.78
       }
     }
@@ -2193,6 +2193,29 @@
       ],
       "exports": [],
       "lines": 1047
+    },
+    {
+      "name": "pytest_parser",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "language": "python",
+      "docstring": "Pytest output parser for extracting test progress in real-time.\n\nParses pytest's verbose output line-by-line to extract test results,\ntrack running counts, and calculate progress percentages.",
+      "classes": [
+        "TestStatus",
+        "TestResult",
+        "ProgressInfo",
+        "PytestOutputParser"
+      ],
+      "functions": [
+        "format_progress_summary"
+      ],
+      "imports": [
+        "re",
+        "typing.Optional",
+        "typing.NamedTuple",
+        "enum.Enum"
+      ],
+      "exports": [],
+      "lines": 247
     },
     {
       "name": "pytest_runner",
@@ -11318,6 +11341,108 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "TestStatus",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Test execution status.",
+      "bases": [
+        "Enum"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "parse_line",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+          "line": 111,
+          "context": [
+            "PytestOutputParser",
+            "parse_line"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "TestResult",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 23,
+      "language": "python",
+      "docstring": "Parsed test result from pytest output.",
+      "bases": [
+        "NamedTuple"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "parse_line",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+          "line": 121,
+          "context": [
+            "PytestOutputParser",
+            "parse_line"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "ProgressInfo",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 31,
+      "language": "python",
+      "docstring": "Current test execution progress.",
+      "bases": [
+        "NamedTuple"
+      ],
+      "methods": [],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [
+        {
+          "instantiator": "get_progress",
+          "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+          "line": 165,
+          "context": [
+            "PytestOutputParser",
+            "get_progress"
+          ]
+        }
+      ],
+      "imported_by": [],
+      "instantiation_count": 1
+    },
+    {
+      "name": "PytestOutputParser",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 56,
+      "language": "python",
+      "docstring": "Parser for pytest verbose output.\n\nExtracts test results line-by-line and maintains running counts.\n\nUsage:\n    parser = PytestOutputParser()\n    for line in pytest_output:\n        result = parser.parse_line(line)\n        if result:\n            progress = parser.get_progress()\n            print(f\"{progress.passed} passed, {progress.failed} failed\")",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "parse_line",
+        "_update_counts",
+        "get_progress",
+        "reset",
+        "_strip_ansi"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "FidelityVerdict",
@@ -68780,6 +68905,71 @@
         }
       ],
       "call_count": 3
+    },
+    {
+      "name": "format_progress_summary",
+      "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
+      "line": 202,
+      "language": "python",
+      "docstring": "Format progress info as a human-readable summary.\n\nArgs:\n    progress: Progress information to format\n\nReturns:\n    Formatted summary string\n\nExamples:\n    >>> progress = ProgressInfo(passed=10, failed=2, skipped=1, errors=0,\n    ...                         xfailed=0, xpassed=0, total_run=13, percentage=65)\n    >>> format_progress_summary(progress)\n    '10 passed, 2 failed, 1 skipped (65%)'",
+      "parameters": [
+        {
+          "name": "progress",
+          "type": "ProgressInfo",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 8,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 221,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 223,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 225,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 227,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 229,
+          "call_type": "method_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 231,
+          "call_type": "method_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 233,
+          "call_type": "method_call"
+        }
+      ]
     },
     {
       "name": "_detect_source_directory",
@@ -131590,6 +131780,12 @@
       "claude_skills.common.ai_tools.MultiToolResponse",
       "claude_skills.common.ai_tools.detect_available_tools",
       "claude_skills.common.ai_config"
+    ],
+    "src/claude_skills/claude_skills/run_tests/pytest_parser.py": [
+      "re",
+      "typing.Optional",
+      "typing.NamedTuple",
+      "enum.Enum"
     ],
     "src/claude_skills/claude_skills/run_tests/pytest_runner.py": [
       "subprocess",

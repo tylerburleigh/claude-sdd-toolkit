@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:52:14
+**Generated:** 2025-11-07 07:55:33
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 243
-- **Total Lines:** 86074
-- **Total Classes:** 349
-- **Total Functions:** 877
+- **Total Files:** 244
+- **Total Lines:** 86321
+- **Total Classes:** 353
+- **Total Functions:** 878
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -2015,6 +2015,17 @@ Attributes:
 
 ---
 
+### `ProgressInfo`
+
+**Language:** python
+**Inherits from:** `NamedTuple`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:31`
+
+**Description:**
+> Current test execution progress.
+
+---
+
 ### `ProgressTask`
 
 **Language:** python
@@ -2061,6 +2072,34 @@ Attributes:
     optional_vars: List of optional variable names
     output_format: Expected output format description
     example_output: Example of expected output
+
+---
+
+### `PytestOutputParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:56`
+
+**Description:**
+> Parser for pytest verbose output.
+
+Extracts test results line-by-line and maintains running counts.
+
+Usage:
+    parser = PytestOutputParser()
+    for line in pytest_output:
+        result = parser.parse_line(line)
+        if result:
+            progress = parser.get_progress()
+            print(f"{progress.passed} passed, {progress.failed} failed")
+
+**Methods:**
+- `__init__()`
+- `parse_line()`
+- `_update_counts()`
+- `get_progress()`
+- `reset()`
+- `_strip_ansi()`
 
 ---
 
@@ -5556,6 +5595,17 @@ Attributes:
 
 ---
 
+### `TestResult`
+
+**Language:** python
+**Inherits from:** `NamedTuple`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:23`
+
+**Description:**
+> Parsed test result from pytest output.
+
+---
+
 ### `TestRichUiInitialization`
 
 **Language:** python
@@ -5952,6 +6002,17 @@ Attributes:
 - `test_stats_json()`
 - `test_stats_deep_hierarchy()`
 - `test_stats_verification_coverage()`
+
+---
+
+### `TestStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:13`
+
+**Description:**
+> Test execution status.
 
 ---
 
@@ -15839,6 +15900,32 @@ Examples:
 
 ---
 
+### `format_progress_summary(progress) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/run_tests/pytest_parser.py:202`
+**Complexity:** 8
+
+**Description:**
+> Format progress info as a human-readable summary.
+
+Args:
+    progress: Progress information to format
+
+Returns:
+    Formatted summary string
+
+Examples:
+    >>> progress = ProgressInfo(passed=10, failed=2, skipped=1, errors=0,
+    ...                         xfailed=0, xpassed=0, total_run=13, percentage=65)
+    >>> format_progress_summary(progress)
+    '10 passed, 2 failed, 1 skipped (65%)'
+
+**Parameters:**
+- `progress`: ProgressInfo
+
+---
+
 ### `format_prompt(failure_type, error_message, hypothesis, test_code, impl_code, context, question) -> str`
 
 **Language:** python
@@ -25617,6 +25704,13 @@ Returns:
 - `typing.NamedTuple`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/run_tests/pytest_parser.py`
+
+- `enum.Enum`
+- `re`
+- `typing.NamedTuple`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/run_tests/pytest_runner.py`
 

@@ -238,10 +238,124 @@ def format_progress_summary(progress: ProgressInfo) -> str:
     return summary
 
 
+class PytestProgressDisplay:
+    """
+    Rich.Progress display for pytest test execution.
+
+    Shows a live progress bar with pass/fail/skip counters as tests run.
+
+    Usage:
+        from rich.progress import Progress
+
+        with Progress() as progress:
+            display = PytestProgressDisplay(progress, total_tests=100)
+            parser = PytestOutputParser()
+
+            for line in pytest_output:
+                result = parser.parse_line(line)
+                if result:
+                    display.update(parser.get_progress())
+    """
+
+    def __init__(self, progress, total_tests: Optional[int] = None):
+        """
+        Initialize progress display.
+
+        Args:
+            progress: Rich Progress instance
+            total_tests: Optional total number of tests (if known)
+        """
+        self.progress = progress
+        self.total_tests = total_tests
+
+        # Create progress task
+        description = "Running tests"
+        if total_tests:
+            self.task_id = self.progress.add_task(
+                description,
+                total=total_tests
+            )
+        else:
+            # Indeterminate progress (no total known)
+            self.task_id = self.progress.add_task(
+                description,
+                total=None
+            )
+
+    def update(self, progress_info: ProgressInfo) -> None:
+        """
+        Update progress display with new test results.
+
+        Args:
+            progress_info: Current progress information from parser
+        """
+        # Build description with counters
+        parts = []
+        if progress_info.passed > 0:
+            parts.append(f"[green]{progress_info.passed} passed[/green]")
+        if progress_info.failed > 0:
+            parts.append(f"[red]{progress_info.failed} failed[/red]")
+        if progress_info.skipped > 0:
+            parts.append(f"[yellow]{progress_info.skipped} skipped[/yellow]")
+        if progress_info.errors > 0:
+            parts.append(f"[red]{progress_info.errors} errors[/red]")
+
+        description = "Running tests: " + ", ".join(parts) if parts else "Running tests"
+
+        # Update progress
+        if self.total_tests is not None:
+            # Known total - update completed count
+            self.progress.update(
+                self.task_id,
+                completed=progress_info.total_run,
+                description=description
+            )
+        else:
+            # Unknown total - show as indeterminate with count
+            self.progress.update(
+                self.task_id,
+                description=f"{description} ({progress_info.total_run} run)"
+            )
+
+    def finish(self, progress_info: ProgressInfo) -> None:
+        """
+        Mark progress as complete.
+
+        Args:
+            progress_info: Final progress information
+        """
+        # Build final description
+        parts = []
+        if progress_info.passed > 0:
+            parts.append(f"[green]{progress_info.passed} passed[/green]")
+        if progress_info.failed > 0:
+            parts.append(f"[red]{progress_info.failed} failed[/red]")
+        if progress_info.skipped > 0:
+            parts.append(f"[yellow]{progress_info.skipped} skipped[/yellow]")
+        if progress_info.errors > 0:
+            parts.append(f"[red]{progress_info.errors} errors[/red]")
+
+        description = "Tests complete: " + ", ".join(parts) if parts else "Tests complete"
+
+        # Mark as complete
+        if self.total_tests is not None:
+            self.progress.update(
+                self.task_id,
+                completed=self.total_tests,
+                description=description
+            )
+        else:
+            self.progress.update(
+                self.task_id,
+                description=description
+            )
+
+
 __all__ = [
     "TestStatus",
     "TestResult",
     "ProgressInfo",
     "PytestOutputParser",
+    "PytestProgressDisplay",
     "format_progress_summary",
 ]

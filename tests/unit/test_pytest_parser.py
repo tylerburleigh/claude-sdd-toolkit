@@ -3,8 +3,10 @@ Unit tests for pytest output parser.
 """
 
 import pytest
+from unittest.mock import Mock, MagicMock
 from claude_skills.run_tests.pytest_parser import (
     PytestOutputParser,
+    PytestProgressDisplay,
     TestStatus,
     TestResult,
     ProgressInfo,
@@ -366,3 +368,224 @@ class TestFormatProgressSummary:
         summary = format_progress_summary(progress)
 
         assert summary == "No tests run"
+
+
+class TestPytestProgressDisplay:
+    """Test suite for PytestProgressDisplay."""
+
+    def test_init_with_total(self):
+        """Test initialization with known total tests."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 123
+
+        display = PytestProgressDisplay(mock_progress, total_tests=100)
+
+        assert display.total_tests == 100
+        assert display.task_id == 123
+        mock_progress.add_task.assert_called_once_with(
+            "Running tests",
+            total=100
+        )
+
+    def test_init_without_total(self):
+        """Test initialization without known total."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 456
+
+        display = PytestProgressDisplay(mock_progress, total_tests=None)
+
+        assert display.total_tests is None
+        assert display.task_id == 456
+        mock_progress.add_task.assert_called_once_with(
+            "Running tests",
+            total=None
+        )
+
+    def test_update_with_passed_tests(self):
+        """Test updating display with passed tests."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=100)
+
+        progress_info = ProgressInfo(
+            passed=5,
+            failed=0,
+            skipped=0,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=5,
+            percentage=5
+        )
+
+        display.update(progress_info)
+
+        # Verify update was called with correct arguments
+        mock_progress.update.assert_called_once()
+        call_args = mock_progress.update.call_args
+        assert call_args[0][0] == 1  # task_id as first positional arg
+        assert call_args[1]["completed"] == 5
+        assert "5 passed" in call_args[1]["description"]
+
+    def test_update_with_mixed_results(self):
+        """Test updating display with mixed test results."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=100)
+
+        progress_info = ProgressInfo(
+            passed=10,
+            failed=2,
+            skipped=1,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=13,
+            percentage=13
+        )
+
+        display.update(progress_info)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+        assert "10 passed" in description
+        assert "2 failed" in description
+        assert "1 skipped" in description
+        assert call_args[1]["completed"] == 13
+
+    def test_update_without_total(self):
+        """Test updating display when total is unknown."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=None)
+
+        progress_info = ProgressInfo(
+            passed=5,
+            failed=1,
+            skipped=0,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=6,
+            percentage=None
+        )
+
+        display.update(progress_info)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+        assert "5 passed" in description
+        assert "1 failed" in description
+        assert "(6 run)" in description
+
+    def test_update_with_errors(self):
+        """Test updating display with errors."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=50)
+
+        progress_info = ProgressInfo(
+            passed=10,
+            failed=2,
+            skipped=0,
+            errors=3,
+            xfailed=0,
+            xpassed=0,
+            total_run=15,
+            percentage=30
+        )
+
+        display.update(progress_info)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+        assert "10 passed" in description
+        assert "2 failed" in description
+        assert "3 errors" in description
+
+    def test_finish_with_total(self):
+        """Test finishing progress with known total."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=100)
+
+        progress_info = ProgressInfo(
+            passed=95,
+            failed=3,
+            skipped=2,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=100,
+            percentage=100
+        )
+
+        display.finish(progress_info)
+
+        call_args = mock_progress.update.call_args
+        assert call_args[0][0] == 1  # task_id as first positional arg
+        assert call_args[1]["completed"] == 100
+        description = call_args[1]["description"]
+        assert "Tests complete" in description
+        assert "95 passed" in description
+        assert "3 failed" in description
+        assert "2 skipped" in description
+
+    def test_finish_without_total(self):
+        """Test finishing progress without known total."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=None)
+
+        progress_info = ProgressInfo(
+            passed=50,
+            failed=5,
+            skipped=0,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=55,
+            percentage=None
+        )
+
+        display.finish(progress_info)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+        assert "Tests complete" in description
+        assert "50 passed" in description
+        assert "5 failed" in description
+
+    def test_color_formatting_in_description(self):
+        """Test that descriptions include Rich color formatting."""
+        mock_progress = Mock()
+        mock_progress.add_task.return_value = 1
+
+        display = PytestProgressDisplay(mock_progress, total_tests=10)
+
+        progress_info = ProgressInfo(
+            passed=5,
+            failed=2,
+            skipped=1,
+            errors=0,
+            xfailed=0,
+            xpassed=0,
+            total_run=8,
+            percentage=80
+        )
+
+        display.update(progress_info)
+
+        call_args = mock_progress.update.call_args
+        description = call_args[1]["description"]
+
+        # Check for Rich color tags
+        assert "[green]" in description  # passed should be green
+        assert "[red]" in description    # failed should be red
+        assert "[yellow]" in description # skipped should be yellow
