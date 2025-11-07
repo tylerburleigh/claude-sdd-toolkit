@@ -301,3 +301,155 @@ class TestBatchConsultationProgress:
 
         # on_tool_complete should only be called once
         assert mock_callback.on_tool_complete.call_count == 1
+
+    def test_batch_periodic_updates(self):
+        """Test that periodic updates are called during batch execution."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(
+            tools,
+            timeout=120,
+            callback=mock_callback,
+            update_interval=0.1  # Fast updates for testing
+        ) as progress:
+            # Wait for at least one update before completing
+            time.sleep(0.25)
+
+            # Mark tools complete
+            for tool in tools:
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=20.0
+                ))
+
+        # Verify at least one update was called
+        assert mock_callback.on_update.call_count >= 1
+
+        # Verify update includes batch context
+        first_update = mock_callback.on_update.call_args_list[0]
+        update_kwargs = first_update[1]
+        assert update_kwargs.get("batch_mode") is True
+        assert "completed_count" in update_kwargs
+        assert "total_count" in update_kwargs
+
+    def test_batch_concurrent_mark_complete(self):
+        """Test thread-safety when marking tools complete concurrently."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex", "cursor-agent"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            # Simulate concurrent completion from multiple threads
+            def mark_tool_complete(tool_name):
+                response = ToolResponse(
+                    tool=tool_name,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=25.0
+                )
+                progress.mark_complete(tool_name, response)
+
+            # Create threads to mark tools complete concurrently
+            threads = []
+            for tool in tools:
+                t = threading.Thread(target=mark_tool_complete, args=(tool,))
+                threads.append(t)
+                t.start()
+
+            # Wait for all threads to complete
+            for t in threads:
+                t.join()
+
+        # Verify all tools were counted exactly once
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+        assert batch_complete["total_count"] == 3
+        assert batch_complete["success_count"] == 3
+        assert batch_complete["failure_count"] == 0
+
+        # Verify on_tool_complete was called exactly 3 times
+        assert mock_callback.on_tool_complete.call_count == 3
+
+    def test_batch_early_completion(self):
+        """Test that batch completes immediately when all tools finish early."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        start_time = time.time()
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            # Mark all tools complete immediately
+            for tool in tools:
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=1.0
+                ))
+
+            # Verify _all_complete flag is set
+            assert progress._all_complete is True
+
+        elapsed = time.time() - start_time
+
+        # Should complete much faster than timeout
+        assert elapsed < 10.0
+
+        # Verify batch complete was called
+        mock_callback.on_batch_complete.assert_called_once()
+
+    def test_batch_partial_completion(self):
+        """Test batch behavior when only some tools complete."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex", "cursor-agent"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            # Only mark 2 out of 3 tools complete
+            progress.mark_complete("gemini", ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="output",
+                duration=20.0
+            ))
+            progress.mark_complete("codex", ToolResponse(
+                tool="codex",
+                status=ToolStatus.ERROR,
+                output="",
+                duration=15.0,
+                error="Failed"
+            ))
+            # cursor-agent is never marked complete (simulates timeout/hang)
+
+        # Verify batch complete still fires with partial results
+        batch_complete = mock_callback.on_batch_complete.call_args[1]
+        assert batch_complete["total_count"] == 3
+        assert batch_complete["success_count"] == 1
+        assert batch_complete["failure_count"] == 1
+
+        # Only 2 tool completions should be recorded
+        assert mock_callback.on_tool_complete.call_count == 2
+
+    def test_batch_with_context_metadata(self):
+        """Test that context metadata is passed through batch callbacks."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(
+            tools,
+            timeout=120,
+            callback=mock_callback,
+            operation="consensus",
+            phase="analysis"
+        ) as progress:
+            for tool in tools:
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=30.0
+                ))
+
+        # Verify context was passed to batch_start
+        batch_start_kwargs = mock_callback.on_batch_start.call_args[1]
+        assert batch_start_kwargs["operation"] == "consensus"
+        assert batch_start_kwargs["phase"] == "analysis"
