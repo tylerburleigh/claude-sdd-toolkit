@@ -602,3 +602,143 @@ class TestElapsedTimeTracking:
 
         # Duration should be approximately the sleep time (with some overhead)
         assert 0.3 < reported_duration < 2.0
+
+
+class TestPytestRunProgress:
+    """Test pytest test run progress feedback with mock subprocess output."""
+
+    def test_pytest_progress_basic_lifecycle(self):
+        """Test basic pytest progress tracking lifecycle."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        # Simulate pytest execution with mock callback
+        # This would use a hypothetical test_run_progress context manager
+        # For now, test using ai_consultation_progress as a stand-in
+        with ai_consultation_progress("pytest", timeout=300, callback=mock_callback) as progress:
+            # Simulate pytest collecting tests
+            time.sleep(0.1)
+
+            # Simulate pytest running tests
+            time.sleep(0.2)
+
+            response = ToolResponse(
+                tool="pytest",
+                status=ToolStatus.SUCCESS,
+                output="5 passed in 0.3s",
+                duration=0.3
+            )
+            progress.complete(response)
+
+        # Verify lifecycle callbacks
+        mock_callback.on_start.assert_called_once()
+        assert mock_callback.on_start.call_args[1]["tool"] == "pytest"
+        mock_callback.on_complete.assert_called_once()
+        assert mock_callback.on_complete.call_args[1]["status"] == ToolStatus.SUCCESS
+
+    def test_pytest_progress_with_test_count(self):
+        """Test pytest progress tracking with test count metadata."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "pytest",
+            timeout=300,
+            callback=mock_callback,
+            test_count=10,
+            test_file="tests/unit/test_example.py"
+        ) as progress:
+            response = ToolResponse(
+                tool="pytest",
+                status=ToolStatus.SUCCESS,
+                output="10 passed in 1.5s",
+                duration=1.5
+            )
+            progress.complete(response)
+
+        # Verify context metadata was passed
+        start_kwargs = mock_callback.on_start.call_args[1]
+        assert start_kwargs["test_count"] == 10
+        assert start_kwargs["test_file"] == "tests/unit/test_example.py"
+
+    def test_pytest_progress_with_failures(self):
+        """Test pytest progress when tests fail."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress("pytest", timeout=300, callback=mock_callback) as progress:
+            response = ToolResponse(
+                tool="pytest",
+                status=ToolStatus.ERROR,
+                output="2 failed, 3 passed in 2.0s",
+                duration=2.0,
+                error="Test failures detected"
+            )
+            progress.complete(response)
+
+        # Verify error status propagated
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        assert complete_kwargs["status"] == ToolStatus.ERROR
+
+    def test_pytest_progress_with_periodic_updates(self):
+        """Test that pytest shows periodic updates during long test runs."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "pytest",
+            timeout=300,
+            callback=mock_callback,
+            update_interval=0.1
+        ) as progress:
+            # Simulate long test run
+            time.sleep(0.35)
+
+            response = ToolResponse(
+                tool="pytest",
+                status=ToolStatus.SUCCESS,
+                output="20 passed in 0.35s",
+                duration=0.35
+            )
+            progress.complete(response)
+
+        # Verify periodic updates were called
+        assert mock_callback.on_update.call_count >= 2
+
+    def test_pytest_progress_timeout_handling(self):
+        """Test pytest progress when tests timeout."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        try:
+            with ai_consultation_progress("pytest", timeout=5, callback=mock_callback):
+                # Simulate timeout scenario
+                time.sleep(0.2)
+                raise TimeoutError("Test execution timed out after 5s")
+        except TimeoutError:
+            pass  # Expected
+
+        # Verify complete was called with error
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        assert complete_kwargs["status"] == ToolStatus.ERROR
+        assert "timed out" in complete_kwargs.get("error", "").lower()
+
+    def test_pytest_progress_with_collection_info(self):
+        """Test pytest progress tracking during test collection phase."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        with ai_consultation_progress(
+            "pytest",
+            timeout=300,
+            callback=mock_callback,
+            phase="collection"
+        ) as progress:
+            # Simulate collection
+            time.sleep(0.1)
+
+            response = ToolResponse(
+                tool="pytest",
+                status=ToolStatus.SUCCESS,
+                output="collected 25 items",
+                duration=0.1
+            )
+            progress.complete(response)
+
+        # Verify phase context was passed
+        start_kwargs = mock_callback.on_start.call_args[1]
+        assert start_kwargs["phase"] == "collection"
