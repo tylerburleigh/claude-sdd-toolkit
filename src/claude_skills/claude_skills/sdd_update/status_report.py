@@ -37,7 +37,12 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
         return Panel(
             "[dim]No phases defined[/dim]",
             title="📋 Phases",
-            border_style="blue"
+            subtitle="0 total",
+            border_style="blue",
+            title_align="left",
+            subtitle_align="right",
+            padding=(1, 2),
+            expand=True
         )
 
     # Create phases table
@@ -82,7 +87,12 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
     return Panel(
         table,
         title="📋 Phases",
-        border_style="blue"
+        subtitle=f"{len(phases)} total",
+        border_style="blue",
+        title_align="left",
+        subtitle_align="right",
+        padding=(1, 2),
+        expand=True
     )
 
 
@@ -129,13 +139,20 @@ def create_progress_panel(spec_data: Dict[str, Any]) -> Panel:
         table.add_row("In Progress", f"[yellow]{in_progress_tasks}[/yellow]")
         table.add_row("Blocked", f"[red]{blocked_tasks}[/red]" if blocked_tasks > 0 else "[dim]0[/dim]")
         table.add_row("Remaining", f"{total_tasks - completed_tasks}")
+        subtitle_text = f"{percentage:.0f}% complete"
     else:
         table.add_row("Overall", "[dim]No tasks[/dim]")
+        subtitle_text = "No tasks"
 
     return Panel(
         table,
         title="📊 Progress",
-        border_style="green"
+        subtitle=subtitle_text,
+        border_style="green",
+        title_align="left",
+        subtitle_align="right",
+        padding=(1, 2),
+        expand=True
     )
 
 
@@ -162,7 +179,12 @@ def create_blockers_panel(spec_data: Dict[str, Any]) -> Panel:
         return Panel(
             "[green]✓ No blockers[/green]",
             title="🚧 Blockers",
-            border_style="red"
+            subtitle="None",
+            border_style="green",
+            title_align="left",
+            subtitle_align="right",
+            padding=(1, 2),
+            expand=True
         )
 
     # Create blockers content
@@ -195,8 +217,13 @@ def create_blockers_panel(spec_data: Dict[str, Any]) -> Panel:
 
     return Panel(
         content,
-        title=f"🚧 Blockers ({len(blocked_tasks)})",
-        border_style="red"
+        title="🚧 Blockers",
+        subtitle=f"{len(blocked_tasks)} blocked",
+        border_style="red",
+        title_align="left",
+        subtitle_align="right",
+        padding=(1, 2),
+        expand=True
     )
 
 

@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 10:08:31
+**Generated:** 2025-11-07 10:23:45
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 244
-- **Total Lines:** 87164
+- **Total Files:** 245
+- **Total Lines:** 87505
 - **Total Classes:** 354
-- **Total Functions:** 882
+- **Total Functions:** 888
 - **Avg Complexity:** 5.81
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -13211,6 +13211,26 @@ Example:
 
 ---
 
+### `create_blockers_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:142`
+**Complexity:** 9
+
+**Description:**
+> Create a panel showing blocked tasks with reasons.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with blockers list
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
 
 **Language:** python
@@ -13345,6 +13365,26 @@ Returns:
 
 ---
 
+### `create_phases_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:18`
+**Complexity:** 10
+
+**Description:**
+> Create a panel showing all phases with status indicators.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with phases table
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `create_pr_with_ai_description(repo_root, branch_name, base_branch, pr_title, pr_body, spec_data, spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
@@ -13384,6 +13424,26 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: PrettyPrinter
+
+---
+
+### `create_progress_panel(spec_data) -> Panel`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:89`
+**Complexity:** 7
+
+**Description:**
+> Create a panel showing overall and phase-specific progress metrics.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Panel with progress metrics
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -13534,6 +13594,38 @@ Returns:
 - `template`: str
 - `specs_dir`: Path
 - `default_category`: Optional[str]
+
+---
+
+### `create_status_layout(spec_data) -> Layout`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:203`
+**Complexity:** 1
+
+**Description:**
+> Create a Rich.Layout with multiple panels for status dashboard.
+
+Layout structure:
+┌─────────────────────────┬──────────────┐
+│                         │              │
+│   Phases Panel          │   Progress   │
+│                         │   Panel      │
+│                         │              │
+├─────────────────────────┴──────────────┤
+│                                         │
+│   Blockers Panel                        │
+│                                         │
+└─────────────────────────────────────────┘
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Rich Layout with populated panels
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -18247,6 +18339,34 @@ Returns:
 
 ---
 
+### `get_status_summary(spec_data) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:270`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Get a dictionary summary of status metrics.
+
+Useful for programmatic access to status data without printing.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Dictionary with status metrics:
+    - total_tasks: Total number of tasks
+    - completed_tasks: Number of completed tasks
+    - in_progress_tasks: Number of in-progress tasks
+    - blocked_tasks: Number of blocked tasks
+    - phases: List of phase summaries
+    - blockers: List of blocked task details
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `get_summary_stats(test_files, conftest_files) -> Dict`
 
 **Language:** python
@@ -20156,6 +20276,25 @@ Args:
 
 **Parameters:**
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `print_status_report(spec_data, title) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:248`
+**Complexity:** 2
+
+**Description:**
+> Print a dashboard-style status report to console.
+
+Args:
+    spec_data: Loaded JSON spec data
+    title: Optional title for the report
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `title`: Optional[str]
 
 ---
 
@@ -26693,6 +26832,18 @@ Returns:
 - `datetime.datetime`
 - `datetime.timezone`
 - `pathlib.Path`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/sdd_update/status_report.py`
+
+- `rich.console.Console`
+- `rich.layout.Layout`
+- `rich.panel.Panel`
+- `rich.table.Table`
+- `rich.text.Text`
+- `typing.Any`
+- `typing.Dict`
 - `typing.List`
 - `typing.Optional`
 
