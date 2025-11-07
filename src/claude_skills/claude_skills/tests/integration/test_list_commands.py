@@ -408,3 +408,225 @@ class TestListSpecsCLI:
                 if isinstance(value, str):
                     assert not ansi_pattern.search(value), \
                         f"Field '{key}' contains ANSI codes: {value}"
+
+
+@pytest.mark.integration
+class TestQueryTasksCLI:
+    """Tests for query-tasks command with Rich table output."""
+
+    def test_query_tasks_help(self):
+        """Test query-tasks shows help text."""
+        result = run_cli("query-tasks", "--help",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert "query-tasks" in result.stdout.lower()
+
+    def test_query_tasks_text_output(self, tmp_path):
+        """Test query-tasks with default text/Rich output."""
+        # Create a spec with tasks
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Query Test"},
+            "hierarchy": {
+                "phase-1": {
+                    "type": "phase",
+                    "title": "Phase 1",
+                    "status": "in_progress",
+                    "children": ["task-1-1"],
+                    "total_tasks": 1,
+                    "completed_tasks": 0
+                },
+                "task-1-1": {
+                    "type": "task",
+                    "title": "Task 1",
+                    "status": "pending",
+                    "parent": "phase-1",
+                    "total_tasks": 1,
+                    "completed_tasks": 0
+                }
+            }
+        }
+
+        (active_dir / "query-001.json").write_text(json.dumps(spec_data))
+
+        # Run query-tasks (text output is default)
+        result = run_cli("query-tasks", "--path", str(specs_dir), "query-001",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        # Check for Rich table output elements
+        assert "Tasks" in result.stdout or "task-1-1" in result.stdout
+
+    def test_query_tasks_json_output(self, tmp_path):
+        """Test query-tasks with JSON output format."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "JSON Query Test"},
+            "hierarchy": {
+                "task-1": {
+                    "type": "task",
+                    "title": "First Task",
+                    "status": "pending",
+                    "total_tasks": 1,
+                    "completed_tasks": 0
+                },
+                "task-2": {
+                    "type": "task",
+                    "title": "Second Task",
+                    "status": "completed",
+                    "total_tasks": 1,
+                    "completed_tasks": 1
+                }
+            }
+        }
+
+        (active_dir / "json-query-001.json").write_text(json.dumps(spec_data))
+
+        # Run query-tasks with JSON format
+        result = run_cli("query-tasks", "--path", str(specs_dir), "json-query-001", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # Parse JSON output
+        output_data = json.loads(result.stdout)
+        assert isinstance(output_data, list)
+        assert len(output_data) == 2
+
+        # Verify task information
+        task_ids = [task["id"] for task in output_data]
+        assert "task-1" in task_ids
+        assert "task-2" in task_ids
+
+    def test_query_tasks_filter_by_status(self, tmp_path):
+        """Test query-tasks with status filtering."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Filter Test"},
+            "hierarchy": {
+                "task-1": {"type": "task", "title": "Pending Task", "status": "pending"},
+                "task-2": {"type": "task", "title": "In Progress Task", "status": "in_progress"},
+                "task-3": {"type": "task", "title": "Completed Task", "status": "completed"}
+            }
+        }
+
+        (active_dir / "filter-001.json").write_text(json.dumps(spec_data))
+
+        # Query only pending tasks
+        result = run_cli("query-tasks", "--path", str(specs_dir), "filter-001", "--status", "pending", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        output_data = json.loads(result.stdout)
+        assert len(output_data) == 1
+        assert output_data[0]["id"] == "task-1"
+        assert output_data[0]["status"] == "pending"
+
+    def test_query_tasks_filter_by_type(self, tmp_path):
+        """Test query-tasks with type filtering."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Type Filter Test"},
+            "hierarchy": {
+                "phase-1": {"type": "phase", "title": "Phase 1", "status": "in_progress"},
+                "task-1": {"type": "task", "title": "Task 1", "status": "pending", "parent": "phase-1"},
+                "verify-1": {"type": "verify", "title": "Verify 1", "status": "pending", "parent": "phase-1"}
+            }
+        }
+
+        (active_dir / "type-filter-001.json").write_text(json.dumps(spec_data))
+
+        # Query only tasks (not phases or verifications)
+        result = run_cli("query-tasks", "--path", str(specs_dir), "type-filter-001", "--type", "task", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        output_data = json.loads(result.stdout)
+        assert len(output_data) == 1
+        assert output_data[0]["id"] == "task-1"
+        assert output_data[0]["type"] == "task"
+
+    def test_query_tasks_filter_by_parent(self, tmp_path):
+        """Test query-tasks with parent filtering."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Parent Filter Test"},
+            "hierarchy": {
+                "phase-1": {"type": "phase", "title": "Phase 1", "status": "in_progress"},
+                "phase-2": {"type": "phase", "title": "Phase 2", "status": "pending"},
+                "task-1-1": {"type": "task", "title": "Task 1.1", "status": "pending", "parent": "phase-1"},
+                "task-1-2": {"type": "task", "title": "Task 1.2", "status": "completed", "parent": "phase-1"},
+                "task-2-1": {"type": "task", "title": "Task 2.1", "status": "pending", "parent": "phase-2"}
+            }
+        }
+
+        (active_dir / "parent-filter-001.json").write_text(json.dumps(spec_data))
+
+        # Query only tasks in phase-1
+        result = run_cli("query-tasks", "--path", str(specs_dir), "parent-filter-001", "--parent", "phase-1", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        output_data = json.loads(result.stdout)
+        assert len(output_data) == 2
+
+        task_ids = [task["id"] for task in output_data]
+        assert "task-1-1" in task_ids
+        assert "task-1-2" in task_ids
+        assert "task-2-1" not in task_ids
+
+    def test_query_tasks_empty_result(self, tmp_path):
+        """Test query-tasks with no matching tasks."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Empty Test"},
+            "hierarchy": {
+                "task-1": {"type": "task", "title": "Only Task", "status": "pending"}
+            }
+        }
+
+        (active_dir / "empty-001.json").write_text(json.dumps(spec_data))
+
+        # Query for completed tasks (none exist)
+        result = run_cli("query-tasks", "--path", str(specs_dir), "empty-001", "--status", "completed", "--format", "json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        # Empty results may return empty string or empty array
+        if result.stdout.strip():
+            output_data = json.loads(result.stdout)
+            assert len(output_data) == 0
+        # If no output, that's also acceptable for empty results

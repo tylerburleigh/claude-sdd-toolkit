@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:14:22
+**Generated:** 2025-11-06 19:15:47
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 242
-- **Total Lines:** 84846
+- **Total Lines:** 84895
 - **Total Classes:** 342
 - **Total Functions:** 871
 - **Avg Complexity:** 5.78
@@ -4449,6 +4449,7 @@ Attributes:
 - `test_list_specs_progress_calculation()`
 - `test_list_specs_verbose_output()`
 - `test_list_specs_multiple_specs()`
+- `test_list_specs_json_no_ansi_codes()`
 
 ---
 
