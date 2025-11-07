@@ -91,9 +91,10 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             tool_list = ', '.join(ai_tools) if ai_tools else 'all available'
             print(f"Consulting AI tools: {tool_list}", file=sys.stderr)
 
-        # Create ProgressEmitter if --stream-progress flag is set
+        # Create ProgressEmitter (enabled by default, unless --no-stream-progress)
         progress_emitter = None
-        if hasattr(args, 'stream_progress') and args.stream_progress:
+        should_stream = not (hasattr(args, 'no_stream_progress') and args.no_stream_progress)
+        if should_stream:
             # Determine output stream based on format mode
             output_format = args.format if hasattr(args, 'format') else 'text'
 
@@ -362,10 +363,10 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         help="Timeout for AI consultation (default: 120)"
     )
     parser.add_argument(
-        "--stream-progress",
+        "--no-stream-progress",
         action="store_true",
-        help="Enable structured JSON progress events during AI consultation. "
-             "Events go to stderr in json/markdown modes, stdout in text mode."
+        help="Disable structured JSON progress events during AI consultation. "
+             "Progress streaming is enabled by default."
     )
 
     # Review options
