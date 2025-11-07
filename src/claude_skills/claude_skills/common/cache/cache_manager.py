@@ -12,6 +12,12 @@ from pathlib import Path
 from typing import Any, Optional, Dict
 from datetime import datetime, timedelta
 
+try:
+    from claude_skills.common.config import get_cache_config
+    _CONFIG_AVAILABLE = True
+except ImportError:
+    _CONFIG_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,16 +44,28 @@ class CacheManager:
     DEFAULT_TTL_HOURS = 24
     CLEANUP_INTERVAL_HOURS = 1  # Run automatic cleanup every hour
 
-    def __init__(self, cache_dir: Optional[Path] = None, auto_cleanup: bool = True):
+    def __init__(self, cache_dir: Optional[Path] = None, auto_cleanup: Optional[bool] = None):
         """
         Initialize cache manager.
 
+        Reads configuration from config.py if available, with fallback to defaults.
+
         Args:
-            cache_dir: Custom cache directory path (defaults to ~/.cache/sdd-toolkit/consultations/)
-            auto_cleanup: Enable automatic cleanup of expired entries (default: True)
+            cache_dir: Custom cache directory path (overrides config, defaults to config or ~/.cache/sdd-toolkit/consultations/)
+            auto_cleanup: Enable automatic cleanup of expired entries (overrides config, defaults to config or True)
         """
-        self.cache_dir = cache_dir or self._get_cache_dir_from_env()
-        self.auto_cleanup = auto_cleanup
+        # Load config if available
+        if _CONFIG_AVAILABLE:
+            config = get_cache_config()
+            config_dir = config.get("directory")
+            config_auto_cleanup = config.get("auto_cleanup", True)
+        else:
+            config_dir = None
+            config_auto_cleanup = True
+
+        # Apply parameters (parameters override config)
+        self.cache_dir = cache_dir or self._get_cache_dir_from_config(config_dir)
+        self.auto_cleanup = auto_cleanup if auto_cleanup is not None else config_auto_cleanup
         self._last_cleanup_time = 0
         self._ensure_cache_dir()
 
@@ -55,11 +73,18 @@ class CacheManager:
         if self.auto_cleanup:
             self._maybe_cleanup()
 
-    def _get_cache_dir_from_env(self) -> Path:
-        """Get cache directory from environment variable or use default."""
+    def _get_cache_dir_from_config(self, config_dir: Optional[str]) -> Path:
+        """Get cache directory from config or environment variable or use default."""
+        # Environment variable takes precedence
         env_path = os.environ.get("SDD_CACHE_DIR")
         if env_path:
             return Path(env_path).expanduser()
+
+        # Use config directory if provided
+        if config_dir:
+            return Path(config_dir).expanduser()
+
+        # Fall back to default
         return self.DEFAULT_CACHE_DIR
 
     def _ensure_cache_dir(self) -> None:

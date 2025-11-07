@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T17:37:50.909513Z",
+    "generated_at": "2025-11-07T17:40:19.657826Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 248,
-    "total_lines": 88061,
+    "total_lines": 88100,
     "total_classes": 355,
     "total_functions": 894,
     "avg_complexity": 5.79,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 248,
-        "lines": 88061,
+        "lines": 88100,
         "classes": 355,
         "functions": 894,
         "avg_complexity": 5.79
@@ -988,7 +988,7 @@
         "datetime.timedelta"
       ],
       "exports": [],
-      "lines": 282
+      "lines": 321
     },
     {
       "name": "cli_utils",
@@ -8481,6 +8481,7 @@
         "_get_cache_dir_from_env",
         "_ensure_cache_dir",
         "_get_cache_path",
+        "_maybe_cleanup",
         "get",
         "set",
         "delete",

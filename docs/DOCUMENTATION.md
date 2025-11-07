@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 12:37:50
+**Generated:** 2025-11-07 12:40:19
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 248
-- **Total Lines:** 88061
+- **Total Lines:** 88100
 - **Total Classes:** 355
 - **Total Functions:** 894
 - **Avg Complexity:** 5.79
@@ -205,6 +205,7 @@ Usage:
 - `_get_cache_dir_from_env()`
 - `_ensure_cache_dir()`
 - `_get_cache_path()`
+- `_maybe_cleanup()`
 - `get()`
 - `set()`
 - `delete()`
