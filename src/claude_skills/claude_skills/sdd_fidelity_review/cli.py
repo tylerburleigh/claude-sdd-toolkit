@@ -106,10 +106,13 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             return 1
 
         # Step 4: Parse responses
-        if args.verbose:
-            print(f"Parsing {len(responses)} AI responses...", file=sys.stderr)
+        # Extract list of ToolResponse objects from MultiToolResponse
+        response_list = list(responses.responses.values())
 
-        parsed_responses = parse_multiple_responses(responses)
+        if args.verbose:
+            print(f"Parsing {len(response_list)} AI responses...", file=sys.stderr)
+
+        parsed_responses = parse_multiple_responses(response_list)
 
         # Step 5: Detect consensus
         consensus_threshold = args.consensus_threshold if hasattr(args, 'consensus_threshold') else 2
