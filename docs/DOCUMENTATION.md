@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 12:31:46
+**Generated:** 2025-11-07 12:35:57
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 245
-- **Total Lines:** 87564
-- **Total Classes:** 354
+- **Total Files:** 247
+- **Total Lines:** 87855
+- **Total Classes:** 355
 - **Total Functions:** 889
 - **Avg Complexity:** 5.81
 - **Max Complexity:** 45
@@ -175,6 +175,42 @@ the required abstract methods.
 **Properties:**
 - `language`
 - `file_extensions`
+
+---
+
+### `CacheManager`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_manager.py:18`
+
+**Description:**
+> File-based cache manager with TTL support.
+
+Stores cache entries as JSON files in a configurable directory.
+Each entry includes the cached value, creation timestamp, and TTL.
+
+Features:
+- Atomic file operations to prevent corruption
+- Automatic TTL expiration
+- Graceful error handling (never crashes, degrades to no-cache)
+- Configurable cache directory
+
+Usage:
+    cache = CacheManager()
+    cache.set("my_key", {"data": "value"}, ttl_hours=24)
+    result = cache.get("my_key")  # Returns {"data": "value"} or None if expired
+
+**Methods:**
+- `__init__()`
+- `_get_cache_dir_from_env()`
+- `_ensure_cache_dir()`
+- `_get_cache_path()`
+- `get()`
+- `set()`
+- `delete()`
+- `clear()`
+- `get_stats()`
+- `cleanup_expired()`
 
 ---
 
@@ -25489,6 +25525,23 @@ Returns:
 - `shutil`
 - `subprocess`
 - `time`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/cache/__init__.py`
+
+- `cache_manager.CacheManager`
+
+### `src/claude_skills/claude_skills/common/cache/cache_manager.py`
+
+- `datetime.datetime`
+- `datetime.timedelta`
+- `json`
+- `logging`
+- `os`
+- `pathlib.Path`
+- `time`
+- `typing.Any`
+- `typing.Dict`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/cli_utils.py`

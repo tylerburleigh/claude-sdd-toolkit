@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T17:31:47.001421Z",
+    "generated_at": "2025-11-07T17:35:57.694931Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 245,
-    "total_lines": 87564,
-    "total_classes": 354,
+    "total_files": 247,
+    "total_lines": 87855,
+    "total_classes": 355,
     "total_functions": 889,
     "avg_complexity": 5.81,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 245,
-        "lines": 87564,
-        "classes": 354,
+        "files": 247,
+        "lines": 87855,
+        "classes": 355,
         "functions": 889,
         "avg_complexity": 5.81
       }
@@ -923,6 +923,43 @@
       ],
       "exports": [],
       "lines": 637
+    },
+    {
+      "name": "__init__",
+      "file": "src/claude_skills/claude_skills/common/cache/__init__.py",
+      "language": "python",
+      "docstring": "Cache management for SDD toolkit.\n\nProvides file-based caching for AI consultation results with TTL support.",
+      "classes": [],
+      "functions": [],
+      "imports": [
+        "cache_manager.CacheManager"
+      ],
+      "exports": [],
+      "lines": 9
+    },
+    {
+      "name": "cache_manager",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_manager.py",
+      "language": "python",
+      "docstring": "File-based cache manager for AI consultation results.\n\nProvides persistent caching with TTL support to reduce redundant AI consultations.",
+      "classes": [
+        "CacheManager"
+      ],
+      "functions": [],
+      "imports": [
+        "json",
+        "logging",
+        "os",
+        "time",
+        "pathlib.Path",
+        "typing.Any",
+        "typing.Optional",
+        "typing.Dict",
+        "datetime.datetime",
+        "datetime.timedelta"
+      ],
+      "exports": [],
+      "lines": 282
     },
     {
       "name": "cli_utils",
@@ -8402,6 +8439,31 @@
       ],
       "imported_by": [],
       "instantiation_count": 2
+    },
+    {
+      "name": "CacheManager",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_manager.py",
+      "line": 18,
+      "language": "python",
+      "docstring": "File-based cache manager with TTL support.\n\nStores cache entries as JSON files in a configurable directory.\nEach entry includes the cached value, creation timestamp, and TTL.\n\nFeatures:\n- Atomic file operations to prevent corruption\n- Automatic TTL expiration\n- Graceful error handling (never crashes, degrades to no-cache)\n- Configurable cache directory\n\nUsage:\n    cache = CacheManager()\n    cache.set(\"my_key\", {\"data\": \"value\"}, ttl_hours=24)\n    result = cache.get(\"my_key\")  # Returns {\"data\": \"value\"} or None if expired",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "_get_cache_dir_from_env",
+        "_ensure_cache_dir",
+        "_get_cache_path",
+        "get",
+        "set",
+        "delete",
+        "clear",
+        "get_stats",
+        "cleanup_expired"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "DependencyAnalysis",
@@ -132523,6 +132585,21 @@
       "time",
       "concurrent.futures.ThreadPoolExecutor",
       "concurrent.futures.as_completed"
+    ],
+    "src/claude_skills/claude_skills/common/cache/__init__.py": [
+      "cache_manager.CacheManager"
+    ],
+    "src/claude_skills/claude_skills/common/cache/cache_manager.py": [
+      "json",
+      "logging",
+      "os",
+      "time",
+      "pathlib.Path",
+      "typing.Any",
+      "typing.Optional",
+      "typing.Dict",
+      "datetime.datetime",
+      "datetime.timedelta"
     ],
     "src/claude_skills/claude_skills/common/cli_utils.py": [
       "argparse",
