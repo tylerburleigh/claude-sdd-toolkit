@@ -315,16 +315,37 @@ class ProgressEmitter:
         }
     """
 
-    def __init__(self, output: Optional[TextIO] = None, enabled: bool = True):
+    def __init__(self, output: Optional[TextIO] = None, enabled: Optional[bool] = None, auto_detect_tty: bool = True):
         """
         Initialize the ProgressEmitter.
 
         Args:
             output: Output stream for events (default: sys.stdout)
-            enabled: Whether emission is enabled (default: True)
+            enabled: Whether emission is enabled. If None, auto-detect based on TTY (default: None)
+            auto_detect_tty: Automatically disable in non-TTY environments (default: True)
         """
         self.output = output or sys.stdout
-        self.enabled = enabled
+        self.auto_detect_tty = auto_detect_tty
+
+        # Auto-detect TTY if enabled is not explicitly set
+        if enabled is None and auto_detect_tty:
+            # Disable in non-interactive environments (pipes, redirects, CI/CD)
+            self.enabled = not self._is_interactive()
+        else:
+            self.enabled = enabled if enabled is not None else True
+
+    def _is_interactive(self) -> bool:
+        """
+        Check if the output stream is interactive (TTY).
+
+        Returns:
+            True if output is a TTY (interactive terminal), False otherwise
+        """
+        try:
+            return hasattr(self.output, 'isatty') and self.output.isatty()
+        except (AttributeError, ValueError):
+            # If isatty() raises or doesn't exist, assume non-interactive
+            return False
 
     def emit(self, event_type: str, data: Optional[Dict] = None) -> None:
         """

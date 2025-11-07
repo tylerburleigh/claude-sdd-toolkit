@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T19:02:07.857887Z",
+    "generated_at": "2025-11-07T19:17:39.609007Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 88809,
-    "total_classes": 355,
+    "total_lines": 88887,
+    "total_classes": 356,
     "total_functions": 904,
     "avg_complexity": 5.83,
     "max_complexity": 45,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 88809,
-        "classes": 355,
+        "lines": 88887,
+        "classes": 356,
         "functions": 904,
         "avg_complexity": 5.83
       }
@@ -1452,7 +1452,9 @@
       "file": "src/claude_skills/claude_skills/common/progress.py",
       "language": "python",
       "docstring": "Progress calculation utilities for SDD JSON specs.\nProvides hierarchical progress recalculation and status updates.",
-      "classes": [],
+      "classes": [
+        "ProgressEmitter"
+      ],
       "functions": [
         "recalculate_progress",
         "update_node_status",
@@ -1462,13 +1464,17 @@
         "get_task_counts_by_status"
       ],
       "imports": [
+        "json",
+        "sys",
         "datetime.datetime",
         "datetime.timezone",
         "typing.Dict",
-        "typing.List"
+        "typing.List",
+        "typing.Optional",
+        "typing.TextIO"
       ],
       "exports": [],
-      "lines": 291
+      "lines": 369
     },
     {
       "name": "query_operations",
@@ -9830,6 +9836,25 @@
       ],
       "imported_by": [],
       "instantiation_count": 96
+    },
+    {
+      "name": "ProgressEmitter",
+      "file": "src/claude_skills/claude_skills/common/progress.py",
+      "line": 296,
+      "language": "python",
+      "docstring": "Emits structured JSON progress events for AI agents and automation tools.\n\nThis class provides a programmatic interface for emitting progress updates\nas JSON events to stdout or a specified stream. Events are newline-delimited\nJSON objects that can be parsed by consuming tools.\n\nExample usage:\n    emitter = ProgressEmitter()\n    emitter.emit(\"task_started\", {\"task_id\": \"task-1-1\", \"title\": \"Setup\"})\n    emitter.emit(\"progress\", {\"completed\": 5, \"total\": 10, \"percentage\": 50})\n    emitter.emit(\"task_completed\", {\"task_id\": \"task-1-1\", \"duration\": 120})\n\nEvent format:\n    {\n        \"type\": \"event_type\",\n        \"timestamp\": \"2025-11-07T19:00:00.000Z\",\n        \"data\": {...}\n    }",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "emit",
+        "disable",
+        "enable"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
     },
     {
       "name": "RichUi",
@@ -43858,7 +43883,7 @@
     {
       "name": "recalculate_progress",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 10,
+      "line": 12,
       "language": "python",
       "docstring": "Recursively recalculate progress for a node and all its parents.\n\nModifies spec_data in-place by updating completed_tasks, total_tasks,\nand status fields for the node and all ancestors.\n\nArgs:\n    spec_data: JSON spec file data dictionary\n    node_id: Node to start recalculation from (default: spec-root)\n\nReturns:\n    The modified spec_data dictionary (for convenience/chaining)",
       "parameters": [
@@ -43883,19 +43908,19 @@
         {
           "name": "recalculate_progress",
           "file": "src/claude_skills/claude_skills/common/progress.py",
-          "line": 46,
+          "line": 48,
           "call_type": "function_call"
         },
         {
           "name": "update_parent_status",
           "file": "src/claude_skills/claude_skills/common/progress.py",
-          "line": 153,
+          "line": 155,
           "call_type": "function_call"
         },
         {
           "name": "get_progress_summary",
           "file": "src/claude_skills/claude_skills/common/progress.py",
-          "line": 177,
+          "line": 179,
           "call_type": "function_call"
         },
         {
@@ -44011,38 +44036,26 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 27,
+          "line": 29,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 33,
+          "line": 35,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 37,
+          "line": 39,
           "call_type": "method_call"
         },
         {
           "name": "recalculate_progress",
           "file": "unknown",
-          "line": 46,
-          "call_type": "function_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 48,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 49,
-          "call_type": "method_call"
+          "call_type": "function_call"
         },
         {
           "name": "get",
@@ -44051,9 +44064,21 @@
           "call_type": "method_call"
         },
         {
+          "name": "get",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "method_call"
+        },
+        {
           "name": "update_node_status",
           "file": "unknown",
-          "line": 56,
+          "line": 58,
           "call_type": "function_call"
         }
       ],
@@ -44062,7 +44087,7 @@
     {
       "name": "update_node_status",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 61,
+      "line": 63,
       "language": "python",
       "docstring": "Update a node's status based on its children's progress.\n\nModifies node in-place. Does not affect manually set statuses\nfor leaf nodes (tasks).\n\nArgs:\n    node: Node dictionary from hierarchy\n    hierarchy: Full hierarchy dictionary (needed to check child statuses)",
       "parameters": [
@@ -44087,7 +44112,7 @@
         {
           "name": "recalculate_progress",
           "file": "src/claude_skills/claude_skills/common/progress.py",
-          "line": 56,
+          "line": 58,
           "call_type": "function_call"
         }
       ],
@@ -44095,61 +44120,49 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 73,
+          "line": 75,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 73,
+          "line": 75,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 77,
+          "line": 79,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 80,
+          "line": 82,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 80,
+          "line": 82,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 80,
+          "line": 82,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 83,
+          "line": 85,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 87,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 96,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 97,
+          "line": 89,
           "call_type": "method_call"
         },
         {
@@ -44167,43 +44180,55 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 103,
+          "line": 100,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 104,
+          "line": 101,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 112,
+          "line": 105,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 117,
+          "line": 106,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 114,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 119,
           "call_type": "method_call"
         },
         {
           "name": "replace",
           "file": "unknown",
-          "line": 121,
+          "line": 123,
           "call_type": "method_call"
         },
         {
           "name": "isoformat",
           "file": "unknown",
-          "line": 121,
+          "line": 123,
           "call_type": "method_call"
         },
         {
           "name": "now",
           "file": "unknown",
-          "line": 121,
+          "line": 123,
           "call_type": "method_call"
         }
       ],
@@ -44212,7 +44237,7 @@
     {
       "name": "update_parent_status",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 126,
+      "line": 128,
       "language": "python",
       "docstring": "Update status and progress for a node's parent chain.\n\nUse this after updating a task status to propagate changes up the hierarchy.\n\nArgs:\n    spec_data: JSON spec file data dictionary\n    node_id: Node whose parents should be updated\n\nReturns:\n    The modified spec_data dictionary (for convenience/chaining)",
       "parameters": [
@@ -44251,25 +44276,25 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 142,
+          "line": 144,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 148,
+          "line": 150,
           "call_type": "method_call"
         },
         {
           "name": "recalculate_progress",
           "file": "unknown",
-          "line": 153,
+          "line": 155,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 157,
+          "line": 159,
           "call_type": "method_call"
         }
       ],
@@ -44278,7 +44303,7 @@
     {
       "name": "get_progress_summary",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 162,
+      "line": 164,
       "language": "python",
       "docstring": "Get progress summary for a node.\n\nArgs:\n    spec_data: JSON spec file data\n    node_id: Node to get progress for (default: spec-root)\n\nReturns:\n    Dictionary with progress information",
       "parameters": [
@@ -44371,59 +44396,47 @@
         {
           "name": "recalculate_progress",
           "file": "unknown",
-          "line": 177,
+          "line": 179,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 179,
+          "line": 181,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 180,
+          "line": 182,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 185,
+          "line": 187,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 186,
+          "line": 188,
           "call_type": "method_call"
         },
         {
           "name": "int",
           "file": "unknown",
-          "line": 187,
+          "line": 189,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 190,
+          "line": 192,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 194,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 195,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 196,
           "call_type": "method_call"
@@ -44431,13 +44444,13 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 199,
+          "line": 197,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 200,
+          "line": 198,
           "call_type": "method_call"
         },
         {
@@ -44449,19 +44462,19 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 204,
+          "line": 202,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 207,
+          "line": 203,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 208,
+          "line": 206,
           "call_type": "method_call"
         },
         {
@@ -44473,19 +44486,31 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 215,
+          "line": 210,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 216,
+          "line": 211,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
           "line": 217,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 218,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 219,
           "call_type": "method_call"
         }
       ],
@@ -44494,7 +44519,7 @@
     {
       "name": "list_phases",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 226,
+      "line": 228,
       "language": "python",
       "docstring": "List all phases with their status and progress.\n\nArgs:\n    spec_data: JSON spec file data\n\nReturns:\n    List of phase dictionaries",
       "parameters": [
@@ -44576,23 +44601,11 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 239,
+          "line": 241,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 242,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 243,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 244,
           "call_type": "method_call"
@@ -44604,19 +44617,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "int",
+          "name": "get",
           "file": "unknown",
           "line": 246,
-          "call_type": "function_call"
-        },
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 248,
           "call_type": "method_call"
         },
         {
           "name": "get",
+          "file": "unknown",
+          "line": 247,
+          "call_type": "method_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 248,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
           "file": "unknown",
           "line": 250,
           "call_type": "method_call"
@@ -44624,13 +44643,19 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 251,
+          "line": 252,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 253,
           "call_type": "method_call"
         },
         {
           "name": "sort",
           "file": "unknown",
-          "line": 258,
+          "line": 260,
           "call_type": "method_call"
         }
       ],
@@ -44639,7 +44664,7 @@
     {
       "name": "get_task_counts_by_status",
       "file": "src/claude_skills/claude_skills/common/progress.py",
-      "line": 263,
+      "line": 265,
       "language": "python",
       "docstring": "Count tasks by their status.\n\nArgs:\n    spec_data: JSON spec file data\n\nReturns:\n    Dictionary mapping status to count",
       "parameters": [
@@ -44667,25 +44692,25 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 276,
+          "line": 278,
           "call_type": "method_call"
         },
         {
           "name": "values",
           "file": "unknown",
-          "line": 285,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
-          "line": 286,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 287,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 288,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 289,
           "call_type": "method_call"
         }
       ],
@@ -134474,10 +134499,14 @@
       "ui_protocol.MessageLevel"
     ],
     "src/claude_skills/claude_skills/common/progress.py": [
+      "json",
+      "sys",
       "datetime.datetime",
       "datetime.timezone",
       "typing.Dict",
-      "typing.List"
+      "typing.List",
+      "typing.Optional",
+      "typing.TextIO"
     ],
     "src/claude_skills/claude_skills/common/query_operations.py": [
       "pathlib.Path",

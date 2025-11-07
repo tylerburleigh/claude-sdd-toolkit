@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 14:02:07
+**Generated:** 2025-11-07 14:17:39
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 88809
-- **Total Classes:** 355
+- **Total Lines:** 88887
+- **Total Classes:** 356
 - **Total Functions:** 904
 - **Avg Complexity:** 5.83
 - **Max Complexity:** 45
@@ -2055,6 +2055,39 @@ Attributes:
     pending_tasks: Number of pending tasks
     blocked_tasks: Number of blocked tasks
     completion_percentage: Overall completion percentage
+
+---
+
+### `ProgressEmitter`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:296`
+
+**Description:**
+> Emits structured JSON progress events for AI agents and automation tools.
+
+This class provides a programmatic interface for emitting progress updates
+as JSON events to stdout or a specified stream. Events are newline-delimited
+JSON objects that can be parsed by consuming tools.
+
+Example usage:
+    emitter = ProgressEmitter()
+    emitter.emit("task_started", {"task_id": "task-1-1", "title": "Setup"})
+    emitter.emit("progress", {"completed": 5, "total": 10, "percentage": 50})
+    emitter.emit("task_completed", {"task_id": "task-1-1", "duration": 120})
+
+Event format:
+    {
+        "type": "event_type",
+        "timestamp": "2025-11-07T19:00:00.000Z",
+        "data": {...}
+    }
+
+**Methods:**
+- `__init__()`
+- `emit()`
+- `disable()`
+- `enable()`
 
 ---
 
@@ -18286,7 +18319,7 @@ Returns:
 ### `get_progress_summary(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:162`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:164`
 **Complexity:** 8
 
 **Description:**
@@ -18792,7 +18825,7 @@ Example:
 ### `get_task_counts_by_status(spec_data) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:263`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:265`
 **Complexity:** 5
 
 **Description:**
@@ -19675,7 +19708,7 @@ Returns:
 ### `list_phases(spec_data) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:226`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:228`
 **Complexity:** 4
 
 **Description:**
@@ -20884,7 +20917,7 @@ Returns:
 ### `recalculate_progress(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:10`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:12`
 **Complexity:** 5
 
 **Description:**
@@ -24811,7 +24844,7 @@ Raises:
 ### `update_node_status(node, hierarchy) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:61`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:63`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -24833,7 +24866,7 @@ Args:
 ### `update_parent_status(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:126`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:128`
 **Complexity:** 5
 
 **Description:**
@@ -26142,8 +26175,12 @@ Returns:
 
 - `datetime.datetime`
 - `datetime.timezone`
+- `json`
+- `sys`
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+- `typing.TextIO`
 
 ### `src/claude_skills/claude_skills/common/query_operations.py`
 
