@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T15:04:26.483532Z",
+    "generated_at": "2025-11-07T15:08:31.128709Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 244,
-    "total_lines": 87092,
+    "total_lines": 87164,
     "total_classes": 354,
     "total_functions": 882,
     "avg_complexity": 5.81,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 244,
-        "lines": 87092,
+        "lines": 87164,
         "classes": 354,
         "functions": 882,
         "avg_complexity": 5.81
@@ -2396,7 +2396,7 @@
         "rich.table.Table"
       ],
       "exports": [],
-      "lines": 758
+      "lines": 830
     },
     {
       "name": "review",
@@ -12625,6 +12625,7 @@
         "print_console_rich",
         "_print_consensus_matrix",
         "_print_model_comparison_table",
+        "_print_recommendation_consensus",
         "_print_issue_aggregation_panel",
         "save_to_file",
         "calculate_fidelity_score",
