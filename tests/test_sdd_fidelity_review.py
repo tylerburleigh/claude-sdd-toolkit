@@ -494,6 +494,176 @@ def test_consult_multiple_ai_partial_failure():
 
 
 # =============================================================================
+# Consultation Module Tests - Cache Save Behavior
+# =============================================================================
+
+
+def test_consult_multiple_ai_saves_to_cache():
+    """consult_multiple_ai_on_fidelity should save results to cache after consultation."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            mock_execute.return_value = [
+                                ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                            ]
+                            mock_cache_instance = MockCache.return_value
+                            mock_cache_instance.get.return_value = None  # Cache miss
+                            mock_cache_instance.set.return_value = True  # Cache save succeeds
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Call function with cache_key_params
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+                            responses = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify consultation happened
+                            assert len(responses) == 1
+                            assert responses[0].success
+
+                            # Verify cache was checked
+                            mock_cache_instance.get.assert_called_once_with("test_cache_key")
+
+                            # Verify results were saved to cache
+                            mock_cache_instance.set.assert_called_once()
+                            call_args = mock_cache_instance.set.call_args
+                            assert call_args[0][0] == "test_cache_key"  # First arg is cache_key
+
+                            # Verify serialized format
+                            saved_data = call_args[0][1]  # Second arg is data
+                            assert len(saved_data) == 1
+                            assert saved_data[0]["tool"] == "gemini"
+                            assert saved_data[0]["status"] == "success"
+                            assert saved_data[0]["output"] == "Looks good"
+
+
+def test_consult_multiple_ai_cache_save_failure_non_fatal():
+    """consult_multiple_ai_on_fidelity should handle cache save failures gracefully."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            mock_execute.return_value = [
+                                ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                            ]
+                            mock_cache_instance = MockCache.return_value
+                            mock_cache_instance.get.return_value = None  # Cache miss
+                            mock_cache_instance.set.side_effect = Exception("Disk full")  # Cache save fails
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Call function with cache_key_params
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+
+                            # Should NOT raise exception - cache save failure is non-fatal
+                            responses = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify consultation still succeeded
+                            assert len(responses) == 1
+                            assert responses[0].success
+
+
+def test_consult_multiple_ai_cache_disabled_skips_save():
+    """consult_multiple_ai_on_fidelity should skip cache save when caching disabled."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=False):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                        # Setup mocks
+                        mock_detect.return_value = ["gemini"]
+                        mock_execute.return_value = [
+                            ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="Looks good")
+                        ]
+
+                        # Call function - caching is disabled
+                        responses = consult_multiple_ai_on_fidelity("Review this code...")
+
+                        # Verify CacheManager was never instantiated
+                        MockCache.assert_not_called()
+
+                        # Verify consultation still succeeded
+                        assert len(responses) == 1
+                        assert responses[0].success
+
+
+def test_consult_multiple_ai_cache_round_trip():
+    """consult_multiple_ai_on_fidelity should retrieve saved results on second call."""
+    with patch('claude_skills.sdd_fidelity_review.consultation._CACHE_AVAILABLE', True):
+        with patch('claude_skills.sdd_fidelity_review.consultation.is_cache_enabled', return_value=True):
+            with patch('claude_skills.sdd_fidelity_review.consultation.CacheManager') as MockCache:
+                with patch('claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key') as mock_keygen:
+                    with patch('claude_skills.sdd_fidelity_review.consultation.detect_available_tools') as mock_detect:
+                        with patch('claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel') as mock_execute:
+                            # Setup mocks
+                            mock_detect.return_value = ["gemini"]
+                            original_response = ToolResponse(
+                                tool="gemini",
+                                status=ToolStatus.SUCCESS,
+                                output="Looks good",
+                                model="gemini-2.0"
+                            )
+                            mock_execute.return_value = [original_response]
+
+                            mock_cache_instance = MockCache.return_value
+                            mock_keygen.return_value = "test_cache_key"
+
+                            # Simulate cache behavior: first call misses, saves data
+                            saved_data = None
+
+                            def cache_get_side_effect(key):
+                                return saved_data
+
+                            def cache_set_side_effect(key, data):
+                                nonlocal saved_data
+                                saved_data = data
+                                return True
+
+                            mock_cache_instance.get.side_effect = cache_get_side_effect
+                            mock_cache_instance.set.side_effect = cache_set_side_effect
+
+                            # First call - cache miss, saves to cache
+                            cache_params = {"spec_id": "test-spec", "scope": "phase", "target": "phase-1"}
+                            responses1 = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify first call got results from AI
+                            assert len(responses1) == 1
+                            assert responses1[0].tool == "gemini"
+                            assert responses1[0].output == "Looks good"
+                            assert mock_execute.call_count == 1
+
+                            # Second call - cache hit, should NOT call execute_tools_parallel again
+                            responses2 = consult_multiple_ai_on_fidelity(
+                                "Review this code...",
+                                cache_key_params=cache_params
+                            )
+
+                            # Verify second call got results from cache
+                            assert len(responses2) == 1
+                            assert responses2[0].tool == "gemini"
+                            assert responses2[0].output == "Looks good"
+                            assert responses2[0].model == "gemini-2.0"
+
+                            # Verify execute_tools_parallel was only called once (first time)
+                            assert mock_execute.call_count == 1
+
+
+# =============================================================================
 # Consultation Module Tests - Response Parsing
 # =============================================================================
 

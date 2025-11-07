@@ -199,6 +199,13 @@ def consult_multiple_ai_on_fidelity(
     Wrapper around execute_tools_parallel() with fidelity-review defaults,
     comprehensive error handling, and optional caching support.
 
+    Caching Behavior:
+        - First checks cache for existing results (cache hit = instant return)
+        - On cache miss, consults AI tools via execute_tools_parallel()
+        - Saves fresh consultation results to cache for future use
+        - Cache save failures are non-fatal (logged as warnings)
+        - Serialization format preserves tool, status, output, error, model, metadata
+
     Args:
         prompt: The review prompt to send to all AI tools
         tools: List of tools to consult (gemini, codex, cursor-agent).
@@ -228,6 +235,8 @@ def consult_multiple_ai_on_fidelity(
     # Check cache if enabled and cache_key_params provided
     cache_enabled = use_cache if use_cache is not None else (_CACHE_AVAILABLE and is_cache_enabled())
     cached_responses = None
+    cache_key = None  # Initialize cache_key for use in both lookup and save
+    cache = None  # Initialize cache instance for reuse
 
     if cache_enabled and cache_key_params and _CACHE_AVAILABLE:
         try:
@@ -292,6 +301,32 @@ def consult_multiple_ai_on_fidelity(
             models=models_dict,
             timeout=timeout
         )
+
+        # Save responses to cache if caching enabled
+        if cache_enabled and cache_key and cache and _CACHE_AVAILABLE:
+            try:
+                # Serialize ToolResponse objects to cache-friendly format
+                serialized_responses = []
+                for resp in responses:
+                    serialized_responses.append({
+                        "tool": resp.tool,
+                        "status": resp.status.value,
+                        "output": resp.output,
+                        "error": resp.error,
+                        "exit_code": resp.exit_code,
+                        "model": resp.model,
+                        "metadata": resp.metadata
+                    })
+
+                # Save to cache (CacheManager handles TTL from config)
+                success = cache.set(cache_key, serialized_responses)
+                if success:
+                    logger.info(f"Saved AI consultation results to cache (key: {cache_key[:32]}...)")
+                else:
+                    logger.warning("Failed to save consultation results to cache")
+            except Exception as e:
+                logger.warning(f"Failed to save consultation results to cache: {e}")
+                # Continue without caching - non-fatal error
 
         # Check for failures if required
         if require_all_success:
