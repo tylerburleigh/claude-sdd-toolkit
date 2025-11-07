@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 18:54:25
+**Generated:** 2025-11-06 19:07:15
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 239
-- **Total Lines:** 84060
+- **Total Files:** 240
+- **Total Lines:** 84165
 - **Total Classes:** 338
-- **Total Functions:** 866
-- **Avg Complexity:** 5.79
+- **Total Functions:** 869
+- **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -8626,6 +8626,29 @@ Returns:
 
 ---
 
+### `_strip_ansi_recursive(obj) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:74`
+**Complexity:** 4
+
+**Description:**
+> Recursively strip ANSI codes from all string values in an object.
+
+Handles dictionaries, lists, and nested structures. Non-string values
+are returned unchanged.
+
+Args:
+    obj: Object to process (dict, list, str, or primitive)
+
+Returns:
+    Object with ANSI codes stripped from all strings
+
+**Parameters:**
+- `obj`: Any
+
+---
+
 ### `_suggest_fix(category, normalized_message) -> Optional[str]`
 
 **Language:** python
@@ -15064,6 +15087,41 @@ Returns:
 
 ---
 
+### `format_json_output(data, compact, strip_ansi) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:38`
+**Complexity:** 3
+
+**Description:**
+> Format data as JSON output with optional ANSI code stripping.
+
+This helper ensures consistent JSON output across CLI commands by:
+1. Stripping ANSI escape codes from string values (if enabled)
+2. Providing compact or pretty-printed formatting
+3. Handling nested dictionaries and lists recursively
+
+Args:
+    data: Dictionary or list to convert to JSON
+    compact: If True, use compact formatting (no indentation)
+            If False, use pretty-printed formatting (2-space indentation)
+    strip_ansi: If True, strip ANSI codes from all string values
+
+Returns:
+    JSON-formatted string
+
+Example:
+    >>> data = {"status": "\x1b[32mcompleted\x1b[0m", "count": 5}
+    >>> format_json_output(data, compact=False, strip_ansi=True)
+    '{\n  "status": "completed",\n  "count": 5\n}'
+
+**Parameters:**
+- `data`: Union[Dict[str, Any], List[Any]]
+- `compact`: bool
+- `strip_ansi`: bool
+
+---
+
 ### `format_json_output(data, compact, sort_keys) -> str`
 
 **Language:** python
@@ -21414,6 +21472,35 @@ Returns:
 
 ---
 
+### `strip_ansi_codes(text) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:13`
+**Complexity:** 1
+
+**Description:**
+> Remove ANSI escape codes from text.
+
+ANSI codes are used for terminal coloring and formatting (e.g., from Rich library).
+This function strips them to produce clean text suitable for JSON output.
+
+Args:
+    text: Text potentially containing ANSI escape sequences
+
+Returns:
+    Text with all ANSI codes removed
+
+Example:
+    >>> strip_ansi_codes("\x1b[31mRed text\x1b[0m")
+    'Red text'
+    >>> strip_ansi_codes("[bold]Text[/bold]")  # Rich markup
+    '[bold]Text[/bold]'  # Rich markup is not ANSI codes
+
+**Parameters:**
+- `text`: str
+
+---
+
 ### `suggest_documentation_generation(directory) -> str`
 
 **Language:** python
@@ -24456,6 +24543,8 @@ Returns:
 - `claude_skills.sdd_spec_mod.modification.transactional_modify`
 - `claude_skills.sdd_spec_mod.modification.update_node_field`
 - `claude_skills.sdd_spec_mod.modification.update_task_counts`
+- `cli_utils.format_json_output`
+- `cli_utils.strip_ansi_codes`
 - `completion.check_spec_completion`
 - `completion.format_completion_prompt`
 - `completion.should_prompt_completion`
@@ -24575,6 +24664,15 @@ Returns:
 - `subprocess`
 - `time`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/cli_utils.py`
+
+- `json`
+- `re`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Union`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
 

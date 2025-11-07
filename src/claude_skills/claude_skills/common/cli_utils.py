@@ -5,9 +5,11 @@ Provides helper functions for JSON output formatting, ANSI code stripping,
 and other common CLI operations.
 """
 
+import argparse
 import json
 import re
-from typing import Any, Dict, List, Union
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 
 def strip_ansi_codes(text: str) -> str:
@@ -93,3 +95,63 @@ def _strip_ansi_recursive(obj: Any) -> Any:
     else:
         # Return primitives (int, float, bool, None) unchanged
         return obj
+
+
+def add_format_flag(
+    parser: argparse.ArgumentParser,
+    choices: Optional[Sequence[str]] = None,
+    default: str = 'text',
+    help_text: Optional[str] = None
+) -> argparse.ArgumentParser:
+    """
+    Add a consistent --format flag to an argparse parser.
+
+    This utility function provides a standardized way to add output format options
+    to CLI commands, reducing code duplication across different command implementations.
+
+    Args:
+        parser: The argparse ArgumentParser or subparser to modify
+        choices: Valid format options (default: ['text', 'json'])
+        default: Default format value (default: 'text')
+        help_text: Custom help text (default: auto-generated from choices)
+
+    Returns:
+        The modified parser (for chaining)
+
+    Example:
+        >>> parser = argparse.ArgumentParser()
+        >>> add_format_flag(parser, choices=['json', 'table'], default='table')
+        <ArgumentParser ...>
+
+        >>> # With subparsers
+        >>> subparsers = parser.add_subparsers()
+        >>> cmd_parser = subparsers.add_parser('stats')
+        >>> add_format_flag(cmd_parser, choices=['text', 'json', 'markdown'])
+        <ArgumentParser ...>
+
+    Raises:
+        ValueError: If default is not in choices
+    """
+    if choices is None:
+        choices = ['text', 'json']
+
+    # Validate default is in choices
+    if default not in choices:
+        raise ValueError(
+            f"Default format '{default}' must be one of {list(choices)}"
+        )
+
+    # Generate help text if not provided
+    if help_text is None:
+        choices_str = ', '.join(choices)
+        help_text = f'Output format: {choices_str} (default: {default})'
+
+    # Add the --format argument
+    parser.add_argument(
+        '--format',
+        choices=list(choices),
+        default=default,
+        help=help_text
+    )
+
+    return parser

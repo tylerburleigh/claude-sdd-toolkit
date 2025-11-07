@@ -159,10 +159,11 @@ from .json_output import (
     CommandType,
 )
 
-# CLI utilities (ANSI stripping, JSON helpers)
+# CLI utilities (ANSI stripping, JSON helpers, argparse decorators)
 from .cli_utils import (
     strip_ansi_codes,
     format_json_output as format_json_with_ansi_stripping,
+    add_format_flag,
 )
 
 # SDD configuration
@@ -321,6 +322,7 @@ __all__ = [
     # CLI utilities
     "strip_ansi_codes",
     "format_json_with_ansi_stripping",
+    "add_format_flag",
 
     # SDD configuration
     "load_sdd_config",

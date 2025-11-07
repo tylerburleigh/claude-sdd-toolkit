@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-06T23:54:25.435684Z",
+    "generated_at": "2025-11-07T00:07:15.345346Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 239,
-    "total_lines": 84060,
+    "total_files": 240,
+    "total_lines": 84165,
     "total_classes": 338,
-    "total_functions": 866,
-    "avg_complexity": 5.79,
+    "total_functions": 869,
+    "avg_complexity": 5.78,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 239,
-        "lines": 84060,
+        "files": 240,
+        "lines": 84165,
         "classes": 338,
-        "functions": 866,
-        "avg_complexity": 5.79
+        "functions": 869,
+        "avg_complexity": 5.78
       }
     }
   },
@@ -854,12 +854,14 @@
         "json_output.format_compact_output",
         "json_output.print_json_output",
         "json_output.CommandType",
+        "cli_utils.strip_ansi_codes",
+        "cli_utils.format_json_output",
         "sdd_config.load_sdd_config",
         "sdd_config.DEFAULT_SDD_CONFIG",
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 319
+      "lines": 329
     },
     {
       "name": "ai_config",
@@ -920,6 +922,28 @@
       ],
       "exports": [],
       "lines": 637
+    },
+    {
+      "name": "cli_utils",
+      "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+      "language": "python",
+      "docstring": "CLI Utilities - Shared utilities for command-line interface operations.\n\nProvides helper functions for JSON output formatting, ANSI code stripping,\nand other common CLI operations.",
+      "classes": [],
+      "functions": [
+        "strip_ansi_codes",
+        "format_json_output",
+        "_strip_ansi_recursive"
+      ],
+      "imports": [
+        "json",
+        "re",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Union"
+      ],
+      "exports": [],
+      "lines": 95
     },
     {
       "name": "completion",
@@ -31619,6 +31643,205 @@
         }
       ],
       "call_count": 4
+    },
+    {
+      "name": "strip_ansi_codes",
+      "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Remove ANSI escape codes from text.\n\nANSI codes are used for terminal coloring and formatting (e.g., from Rich library).\nThis function strips them to produce clean text suitable for JSON output.\n\nArgs:\n    text: Text potentially containing ANSI escape sequences\n\nReturns:\n    Text with all ANSI codes removed\n\nExample:\n    >>> strip_ansi_codes(\"\\x1b[31mRed text\\x1b[0m\")\n    'Red text'\n    >>> strip_ansi_codes(\"[bold]Text[/bold]\")  # Rich markup\n    '[bold]Text[/bold]'  # Rich markup is not ANSI codes",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+          "line": 92,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "compile",
+          "file": "unknown",
+          "line": 34,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sub",
+          "file": "unknown",
+          "line": 35,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "format_json_output",
+      "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+      "line": 38,
+      "language": "python",
+      "docstring": "Format data as JSON output with optional ANSI code stripping.\n\nThis helper ensures consistent JSON output across CLI commands by:\n1. Stripping ANSI escape codes from string values (if enabled)\n2. Providing compact or pretty-printed formatting\n3. Handling nested dictionaries and lists recursively\n\nArgs:\n    data: Dictionary or list to convert to JSON\n    compact: If True, use compact formatting (no indentation)\n            If False, use pretty-printed formatting (2-space indentation)\n    strip_ansi: If True, strip ANSI codes from all string values\n\nReturns:\n    JSON-formatted string\n\nExample:\n    >>> data = {\"status\": \"\\x1b[32mcompleted\\x1b[0m\", \"count\": 5}\n    >>> format_json_output(data, compact=False, strip_ansi=True)\n    '{\\n  \"status\": \"completed\",\\n  \"count\": 5\\n}'",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Union[Dict[str, Any], List[Any]]",
+          "default": null
+        },
+        {
+          "name": "compact",
+          "type": "bool",
+          "default": null
+        },
+        {
+          "name": "strip_ansi",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 3,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "format_compact_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 176,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print_json_output",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 226,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_trace_entry",
+          "file": "src/claude_skills/claude_skills/doc_query/cli.py",
+          "line": 845,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 69,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 3
+    },
+    {
+      "name": "_strip_ansi_recursive",
+      "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+      "line": 74,
+      "language": "python",
+      "docstring": "Recursively strip ANSI codes from all string values in an object.\n\nHandles dictionaries, lists, and nested structures. Non-string values\nare returned unchanged.\n\nArgs:\n    obj: Object to process (dict, list, str, or primitive)\n\nReturns:\n    Object with ANSI codes stripped from all strings",
+      "parameters": [
+        {
+          "name": "obj",
+          "type": "Any",
+          "default": null
+        }
+      ],
+      "return_type": "Any",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "format_json_output",
+          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+          "line": 66,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+          "line": 90,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "function_call"
+        },
+        {
+          "name": "items",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "method_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "_strip_ansi_recursive",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 91,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip_ansi_codes",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 3
     },
     {
       "name": "check_spec_completion",
@@ -127246,6 +127469,8 @@
       "json_output.format_compact_output",
       "json_output.print_json_output",
       "json_output.CommandType",
+      "cli_utils.strip_ansi_codes",
+      "cli_utils.format_json_output",
       "sdd_config.load_sdd_config",
       "sdd_config.DEFAULT_SDD_CONFIG",
       "sdd_config.get_sdd_setting"
@@ -127268,6 +127493,14 @@
       "time",
       "concurrent.futures.ThreadPoolExecutor",
       "concurrent.futures.as_completed"
+    ],
+    "src/claude_skills/claude_skills/common/cli_utils.py": [
+      "json",
+      "re",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Union"
     ],
     "src/claude_skills/claude_skills/common/completion.py": [
       "typing.Dict",
