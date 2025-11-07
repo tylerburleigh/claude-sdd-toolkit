@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T14:37:42.314849Z",
+    "generated_at": "2025-11-07T14:42:25.404393Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 244,
-    "total_lines": 86745,
+    "total_lines": 86872,
     "total_classes": 354,
     "total_functions": 882,
     "avg_complexity": 5.81,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 244,
-        "lines": 86745,
+        "lines": 86872,
         "classes": 354,
         "functions": 882,
         "avg_complexity": 5.81
@@ -2389,10 +2389,13 @@
         "pathlib.Path",
         "datetime.datetime",
         "json",
-        "sys"
+        "sys",
+        "rich.console.Console",
+        "rich.panel.Panel",
+        "rich.table.Table"
       ],
       "exports": [],
-      "lines": 401
+      "lines": 528
     },
     {
       "name": "review",
@@ -8881,7 +8884,7 @@
         {
           "instantiator": "print_console",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-          "line": 299,
+          "line": 303,
           "context": [
             "FidelityReport",
             "print_console"
@@ -11753,7 +11756,7 @@
     {
       "name": "PrettyPrinter",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-      "line": 14,
+      "line": 18,
       "language": "python",
       "docstring": "Pretty printer for console output with optional color support.\n\nProvides formatted console output with ANSI color codes for\nbetter readability. Automatically detects terminal capabilities\nand disables colors when not supported.",
       "bases": [],
@@ -11873,7 +11876,7 @@
         {
           "instantiator": "print_console",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-          "line": 299,
+          "line": 303,
           "context": [
             "FidelityReport",
             "print_console"
@@ -12607,7 +12610,7 @@
     {
       "name": "FidelityReport",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
-      "line": 130,
+      "line": 134,
       "language": "python",
       "docstring": "Generate structured reports from fidelity review results.\n\nThis class will be implemented in Phase 4 (Report Generation).",
       "bases": [],
@@ -12618,6 +12621,7 @@
         "generate_markdown",
         "generate_json",
         "print_console",
+        "print_console_rich",
         "save_to_file",
         "calculate_fidelity_score",
         "summarize_deviations"
@@ -132437,7 +132441,10 @@
       "pathlib.Path",
       "datetime.datetime",
       "json",
-      "sys"
+      "sys",
+      "rich.console.Console",
+      "rich.panel.Panel",
+      "rich.table.Table"
     ],
     "src/claude_skills/claude_skills/sdd_fidelity_review/review.py": [
       "pathlib.Path",

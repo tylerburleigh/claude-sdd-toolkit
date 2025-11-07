@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 09:37:42
+**Generated:** 2025-11-07 09:42:25
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86745
+- **Total Lines:** 86872
 - **Total Classes:** 354
 - **Total Functions:** 882
 - **Avg Complexity:** 5.81
@@ -837,7 +837,7 @@ Example:
 ### `FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:130`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:134`
 
 **Description:**
 > Generate structured reports from fidelity review results.
@@ -851,6 +851,7 @@ This class will be implemented in Phase 4 (Report Generation).
 - `generate_markdown()`
 - `generate_json()`
 - `print_console()`
+- `print_console_rich()`
 - `save_to_file()`
 - `calculate_fidelity_score()`
 - `summarize_deviations()`
@@ -1883,7 +1884,7 @@ Attributes:
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:14`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:18`
 
 **Description:**
 > Pretty printer for console output with optional color support.
@@ -25897,6 +25898,9 @@ Returns:
 - `datetime.datetime`
 - `json`
 - `pathlib.Path`
+- `rich.console.Console`
+- `rich.panel.Panel`
+- `rich.table.Table`
 - `sys`
 - `typing.Any`
 - `typing.Dict`
