@@ -12,6 +12,7 @@ from typing import Optional
 from pathlib import Path
 
 from .review import FidelityReviewer
+from .report import FidelityReport
 from .consultation import (
     consult_multiple_ai_on_fidelity,
     parse_multiple_responses,
@@ -143,38 +144,21 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
 
 
 def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues):
-    """Generate text output format."""
-    print("\n" + "=" * 80)
-    print("IMPLEMENTATION FIDELITY REVIEW")
-    print("=" * 80)
-    print(f"\nSpec: {reviewer.spec_id}")
-    print(f"Consulted {len(parsed_responses)} AI model(s)")
-    print(f"\nConsensus Verdict: {consensus.consensus_verdict.value.upper()}")
-    print(f"Agreement Rate: {consensus.agreement_rate:.1%}")
+    """Generate text output format using Rich panels and formatting."""
+    # Create review results dictionary for FidelityReport
+    review_results = {
+        "spec_id": reviewer.spec_id,
+        "models_consulted": len(parsed_responses),
+        "consensus": consensus,
+        "categorized_issues": categorized_issues,
+        "parsed_responses": parsed_responses
+    }
 
-    if categorized_issues:
-        print(f"\n{'-' * 80}")
-        print("ISSUES IDENTIFIED (Consensus):")
-        print(f"{'-' * 80}")
-        for cat_issue in categorized_issues:
-            print(f"\n[{cat_issue.severity.value.upper()}] {cat_issue.issue}")
+    # Create FidelityReport instance and use Rich formatting
+    report = FidelityReport(review_results)
 
-    if consensus.consensus_recommendations:
-        print(f"\n{'-' * 80}")
-        print("RECOMMENDATIONS:")
-        print(f"{'-' * 80}")
-        for rec in consensus.consensus_recommendations:
-            print(f"- {rec}")
-
-    if args.verbose:
-        print(f"\n{'-' * 80}")
-        print("INDIVIDUAL MODEL RESPONSES:")
-        print(f"{'-' * 80}")
-        for i, response in enumerate(parsed_responses, 1):
-            tool_name = parsed_responses[i-1]  # Get tool name from original responses
-            print(f"\nModel {i}: {response.verdict.value}")
-            print(f"Issues: {len(response.issues)}")
-            print(f"Recommendations: {len(response.recommendations)}")
+    # Use Rich console output with enhanced visuals
+    report.print_console_rich(verbose=args.verbose if hasattr(args, 'verbose') else False)
 
 
 def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues):
