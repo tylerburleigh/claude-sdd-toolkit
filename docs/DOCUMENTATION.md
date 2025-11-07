@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:45:33
+**Generated:** 2025-11-07 07:52:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 243
-- **Total Lines:** 86031
+- **Total Lines:** 86074
 - **Total Classes:** 349
-- **Total Functions:** 876
+- **Total Functions:** 877
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -145,7 +145,7 @@ the required abstract methods.
 ### `BatchProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:464`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:506`
 
 **Description:**
 > Tracks progress for batch consultations.
@@ -1564,7 +1564,7 @@ Example:
 ### `NoOpProgressCallback`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:98`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:140`
 
 **Description:**
 > No-op implementation for environments without TUI support.
@@ -2035,7 +2035,7 @@ Provides a simple update() method for advancing progress.
 ### `ProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:289`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:331`
 
 **Description:**
 > Tracks progress state within context manager.
@@ -2099,7 +2099,7 @@ Attributes:
 ### `QueuedProgressCallback`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:139`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:181`
 
 **Description:**
 > Thread-safe progress callback wrapper using queue.Queue.
@@ -6796,7 +6796,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_batch_update_worker(tracker, interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:515`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:557`
 **Complexity:** 4
 
 **Description:**
@@ -8948,7 +8948,7 @@ Returns:
 ### `_update_worker(tracker, interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:328`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:370`
 **Complexity:** 4
 
 **Description:**
@@ -9469,7 +9469,7 @@ Examples:
 ### `ai_consultation_progress(tool, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:360`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:402`
 ⚠️ **Complexity:** 11 (High)
 
 **Decorators:** `@contextmanager`
@@ -9978,7 +9978,7 @@ Example:
 ### `batch_consultation_progress(tools, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:554`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:596`
 **Complexity:** 6
 
 **Decorators:** `@contextmanager`
@@ -15799,6 +15799,43 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `format_progress_message(tool, elapsed, timeout, include_timeout) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:98`
+**Complexity:** 3
+
+**Description:**
+> Format a progress status message for display.
+
+Args:
+    tool: Tool name (e.g., "gemini", "codex")
+    elapsed: Elapsed time in seconds
+    timeout: Optional timeout in seconds
+    include_timeout: Whether to include timeout in message
+
+Returns:
+    Formatted message like "Waiting for gemini... 30.5s" or
+    "Waiting for gemini... 30.5s / 90s"
+
+Examples:
+    >>> format_progress_message("gemini", 30.5)
+    'Waiting for gemini... 30.5s'
+
+    >>> format_progress_message("gemini", 30.5, 90)
+    'Waiting for gemini... 30.5s / 90s'
+
+    >>> format_progress_message("codex", 125.7, 300, include_timeout=False)
+    'Waiting for codex... 125.7s'
+
+**Parameters:**
+- `tool`: str
+- `elapsed`: float
+- `timeout`: Optional[int]
+- `include_timeout`: bool
 
 ---
 
