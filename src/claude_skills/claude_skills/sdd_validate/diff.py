@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from rich.console import Console
 from rich.columns import Columns
 from rich.panel import Panel
+from rich.syntax import Syntax
 from rich.text import Text
 from rich.table import Table
 
@@ -270,6 +271,86 @@ def _format_value(value: Any) -> str:
     return str(value)
 
 
+def _detect_code_language(field_path: str, value: Any) -> Optional[str]:
+    """
+    Detect programming language from field path or value content.
+
+    Args:
+        field_path: Field path like "metadata.command" or "verification.script"
+        value: Value to analyze for language detection
+
+    Returns:
+        Language identifier for Rich.Syntax or None if not code
+    """
+    if not isinstance(value, str):
+        return None
+
+    value_lower = value.strip().lower()
+    field_lower = field_path.lower()
+
+    # Empty or very short strings are not code
+    if len(value) < 3:
+        return None
+
+    # Check field path patterns
+    if "command" in field_lower or "script" in field_lower or "bash" in field_lower:
+        return "bash"
+    if "python" in field_lower or ".py" in field_lower:
+        return "python"
+    if "sql" in field_lower:
+        return "sql"
+    if "json" in field_lower:
+        return "json"
+    if "yaml" in field_lower or "yml" in field_lower:
+        return "yaml"
+
+    # Check value content patterns
+    # SQL queries (check before Python to avoid false positives with "from")
+    if any(kw in value_lower for kw in ["select ", "insert ", "update ", "delete ", "create table", " where ", " join "]):
+        return "sql"
+
+    # Bash/shell commands
+    if any(cmd in value_lower for cmd in ["#!/bin/", "&&", "||", "|", "echo ", "export ", "$("]):
+        return "bash"
+
+    # Python code
+    if any(kw in value_lower for kw in ["def ", "class ", "import ", "from ", "if __name__"]):
+        return "python"
+
+    # JSON content (starts with { or [)
+    if value_lower.startswith(("{", "[")):
+        try:
+            json.loads(value)
+            return "json"
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+    return None
+
+
+def _should_use_syntax_highlighting(value: Any, language: Optional[str]) -> bool:
+    """
+    Determine if value should use syntax highlighting.
+
+    Args:
+        value: Value to check
+        language: Detected language or None
+
+    Returns:
+        True if syntax highlighting should be used
+    """
+    if not isinstance(value, str):
+        return False
+    if language is None:
+        return False
+    # Only highlight if the value has some complexity
+    if len(value) < 10:
+        return False
+    if "\n" not in value and len(value) < 30:
+        return False
+    return True
+
+
 def display_diff_side_by_side(
     report: DiffReport,
     spec_id: str = "unknown",
@@ -384,9 +465,9 @@ def _create_value_display(
     value: Any,
     change_type: str,
     is_before: bool
-) -> Text:
+) -> Any:
     """
-    Create formatted text display for a value in the diff.
+    Create formatted display for a value in the diff.
 
     Args:
         field_path: Path to the field (e.g., "status", "metadata.file_path")
@@ -395,7 +476,7 @@ def _create_value_display(
         is_before: True if this is the "before" column, False for "after"
 
     Returns:
-        Rich Text object with formatted content
+        Rich Text or Syntax object with formatted content
     """
     text = Text()
 
@@ -408,16 +489,35 @@ def _create_value_display(
             text.append("(not present)", style="dim italic")
         else:
             text.append("null", style="dim")
+        return text
     elif isinstance(value, (list, dict)):
         # Format complex values with indentation
         formatted = json.dumps(value, indent=2)
         text.append(formatted, style="cyan")
+        return text
     elif isinstance(value, bool):
         text.append(str(value).lower(), style="magenta")
+        return text
     elif isinstance(value, (int, float)):
         text.append(str(value), style="cyan")
+        return text
     else:
-        # String values
-        text.append(str(value), style="white")
+        # String values - check for code and apply syntax highlighting
+        language = _detect_code_language(field_path, value)
+        if _should_use_syntax_highlighting(value, language):
+            # Create a group with field name and syntax-highlighted code
+            from rich.console import Group
 
-    return text
+            field_text = Text(f"{field_path}\n", style="bold")
+            syntax = Syntax(
+                str(value),
+                language,
+                theme="monokai",
+                line_numbers=False,
+                word_wrap=True
+            )
+            return Group(field_text, syntax)
+        else:
+            # Plain string without syntax highlighting
+            text.append(str(value), style="white")
+            return text
