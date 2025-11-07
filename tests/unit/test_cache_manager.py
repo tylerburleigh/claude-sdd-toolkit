@@ -249,3 +249,268 @@ def test_automatic_cleanup_initial(temp_cache_dir):
     # Both entries should be gone
     cache_files = list(temp_cache_dir.glob("*.json"))
     assert len(cache_files) == 0
+
+
+# ========================================================================
+# Incremental State Tests
+# ========================================================================
+
+
+class TestIncrementalState:
+    """Test suite for incremental state tracking functionality."""
+
+    def test_get_incremental_state_empty(self, cache_manager):
+        """Test getting incremental state when none exists."""
+        spec_id = "test-spec-001"
+        state = cache_manager.get_incremental_state(spec_id)
+
+        assert state == {}
+        assert isinstance(state, dict)
+
+    def test_save_and_get_incremental_state(self, cache_manager):
+        """Test save and retrieve cycle for incremental state."""
+        spec_id = "test-spec-001"
+        file_hashes = {
+            "src/main.py": "abc123",
+            "src/utils.py": "def456",
+            "tests/test_main.py": "ghi789"
+        }
+
+        # Save state
+        result = cache_manager.save_incremental_state(spec_id, file_hashes)
+        assert result is True
+
+        # Retrieve state
+        retrieved = cache_manager.get_incremental_state(spec_id)
+        assert retrieved == file_hashes
+
+    def test_save_incremental_state_overwrites(self, cache_manager):
+        """Test that saving state overwrites previous state."""
+        spec_id = "test-spec-001"
+
+        # Save initial state
+        initial_hashes = {"src/main.py": "abc123"}
+        cache_manager.save_incremental_state(spec_id, initial_hashes)
+
+        # Overwrite with new state
+        new_hashes = {"src/main.py": "xyz789", "src/new.py": "def456"}
+        cache_manager.save_incremental_state(spec_id, new_hashes)
+
+        # Should get new state, not initial
+        retrieved = cache_manager.get_incremental_state(spec_id)
+        assert retrieved == new_hashes
+
+    def test_incremental_state_ttl(self, cache_manager):
+        """Test incremental state respects TTL."""
+        spec_id = "test-spec-001"
+        file_hashes = {"src/main.py": "abc123"}
+
+        # Save with very short TTL
+        cache_manager.save_incremental_state(spec_id, file_hashes, ttl_hours=0.001)
+
+        # Should exist immediately
+        assert cache_manager.get_incremental_state(spec_id) == file_hashes
+
+        # Wait for expiration
+        time.sleep(4)
+
+        # Should be expired now
+        assert cache_manager.get_incremental_state(spec_id) == {}
+
+    def test_incremental_state_default_ttl(self, cache_manager):
+        """Test incremental state uses longer default TTL (7 days)."""
+        spec_id = "test-spec-001"
+        file_hashes = {"src/main.py": "abc123"}
+
+        # Save without specifying TTL
+        cache_manager.save_incremental_state(spec_id, file_hashes)
+
+        # Verify the cache entry has the correct TTL (7 days = 168 hours)
+        cache_key = f"incremental_state:{spec_id}"
+        cache_path = cache_manager._get_cache_path(cache_key)
+
+        with cache_path.open("r") as f:
+            entry = json.load(f)
+
+        expected_ttl_seconds = 168 * 3600  # 7 days in seconds
+        assert entry["ttl_seconds"] == expected_ttl_seconds
+
+    def test_incremental_state_multiple_specs(self, cache_manager):
+        """Test incremental state for multiple specs are independent."""
+        spec1 = "test-spec-001"
+        spec2 = "test-spec-002"
+
+        hashes1 = {"src/main.py": "abc123"}
+        hashes2 = {"src/utils.py": "def456"}
+
+        # Save state for both specs
+        cache_manager.save_incremental_state(spec1, hashes1)
+        cache_manager.save_incremental_state(spec2, hashes2)
+
+        # Each should retrieve its own state
+        assert cache_manager.get_incremental_state(spec1) == hashes1
+        assert cache_manager.get_incremental_state(spec2) == hashes2
+
+    def test_save_incremental_state_validates_input(self, cache_manager):
+        """Test save_incremental_state validates input types."""
+        spec_id = "test-spec-001"
+
+        # Should reject non-dict input
+        result = cache_manager.save_incremental_state(spec_id, "not a dict")
+        assert result is False
+
+        result = cache_manager.save_incremental_state(spec_id, ["list", "not", "dict"])
+        assert result is False
+
+        # Should accept valid dict
+        result = cache_manager.save_incremental_state(spec_id, {})
+        assert result is True
+
+    def test_get_incremental_state_validates_cached_data(self, cache_manager):
+        """Test get_incremental_state handles invalid cached data gracefully."""
+        spec_id = "test-spec-001"
+
+        # Manually corrupt the cache entry with non-dict value
+        cache_key = f"incremental_state:{spec_id}"
+        cache_manager.set(cache_key, "corrupted data", ttl_hours=24)
+
+        # Should return empty dict instead of crashing
+        state = cache_manager.get_incremental_state(spec_id)
+        assert state == {}
+
+    def test_incremental_state_includes_metadata(self, cache_manager):
+        """Test incremental state entries include proper metadata."""
+        spec_id = "test-spec-001"
+        file_hashes = {"src/main.py": "abc123", "src/utils.py": "def456"}
+
+        cache_manager.save_incremental_state(spec_id, file_hashes)
+
+        # Read raw cache entry
+        cache_key = f"incremental_state:{spec_id}"
+        cache_path = cache_manager._get_cache_path(cache_key)
+
+        with cache_path.open("r") as f:
+            entry = json.load(f)
+
+        # Verify metadata
+        metadata = entry.get("metadata", {})
+        assert metadata["spec_id"] == spec_id
+        assert metadata["type"] == "incremental_state"
+        assert metadata["file_count"] == 2
+        assert "timestamp" in metadata
+
+
+class TestCompareFileHashes:
+    """Test suite for compare_file_hashes utility function."""
+
+    def test_compare_no_changes(self):
+        """Test comparison when no files changed."""
+        old = {"src/main.py": "abc123", "src/utils.py": "def456"}
+        new = {"src/main.py": "abc123", "src/utils.py": "def456"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == []
+        assert result["modified"] == []
+        assert result["removed"] == []
+        assert result["unchanged"] == ["src/main.py", "src/utils.py"]
+
+    def test_compare_added_files(self):
+        """Test comparison detects added files."""
+        old = {"src/main.py": "abc123"}
+        new = {"src/main.py": "abc123", "src/new.py": "xyz789"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == ["src/new.py"]
+        assert result["modified"] == []
+        assert result["removed"] == []
+        assert result["unchanged"] == ["src/main.py"]
+
+    def test_compare_modified_files(self):
+        """Test comparison detects modified files."""
+        old = {"src/main.py": "abc123"}
+        new = {"src/main.py": "xyz789"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == []
+        assert result["modified"] == ["src/main.py"]
+        assert result["removed"] == []
+        assert result["unchanged"] == []
+
+    def test_compare_removed_files(self):
+        """Test comparison detects removed files."""
+        old = {"src/main.py": "abc123", "src/old.py": "def456"}
+        new = {"src/main.py": "abc123"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == []
+        assert result["modified"] == []
+        assert result["removed"] == ["src/old.py"]
+        assert result["unchanged"] == ["src/main.py"]
+
+    def test_compare_complex_scenario(self):
+        """Test comparison with mixed changes."""
+        old = {
+            "src/main.py": "abc123",  # will be modified
+            "src/old.py": "def456",   # will be removed
+            "src/same.py": "ghi789"   # unchanged
+        }
+        new = {
+            "src/main.py": "xyz123",  # modified
+            "src/same.py": "ghi789",  # unchanged
+            "src/new.py": "jkl012"    # added
+        }
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == ["src/new.py"]
+        assert result["modified"] == ["src/main.py"]
+        assert result["removed"] == ["src/old.py"]
+        assert result["unchanged"] == ["src/same.py"]
+
+    def test_compare_empty_old_hashes(self):
+        """Test comparison when no previous hashes exist."""
+        old = {}
+        new = {"src/main.py": "abc123", "src/utils.py": "def456"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == ["src/main.py", "src/utils.py"]
+        assert result["modified"] == []
+        assert result["removed"] == []
+        assert result["unchanged"] == []
+
+    def test_compare_empty_new_hashes(self):
+        """Test comparison when all files removed."""
+        old = {"src/main.py": "abc123", "src/utils.py": "def456"}
+        new = {}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        assert result["added"] == []
+        assert result["modified"] == []
+        assert result["removed"] == ["src/main.py", "src/utils.py"]
+        assert result["unchanged"] == []
+
+    def test_compare_both_empty(self):
+        """Test comparison when both are empty."""
+        result = CacheManager.compare_file_hashes({}, {})
+
+        assert result["added"] == []
+        assert result["modified"] == []
+        assert result["removed"] == []
+        assert result["unchanged"] == []
+
+    def test_compare_results_sorted(self):
+        """Test comparison results are sorted alphabetically."""
+        old = {"z.py": "1", "a.py": "2"}
+        new = {"m.py": "3", "b.py": "4"}
+
+        result = CacheManager.compare_file_hashes(old, new)
+
+        # Results should be sorted
+        assert result["added"] == ["b.py", "m.py"]
+        assert result["removed"] == ["a.py", "z.py"]

@@ -408,3 +408,139 @@ class CacheManager:
         except Exception as e:
             logger.warning(f"Failed to cleanup expired entries: {e}")
             return count
+
+    def get_incremental_state(self, spec_id: str) -> Dict[str, str]:
+        """
+        Retrieve previous file hashes for incremental review.
+
+        This enables fidelity reviews to detect which files have changed since
+        the last review, allowing for more efficient incremental reviews.
+
+        Args:
+            spec_id: Specification ID to get state for
+
+        Returns:
+            Dictionary mapping file paths to their last known hashes.
+            Returns empty dict if no previous state exists.
+
+        Example:
+            >>> cache = CacheManager()
+            >>> state = cache.get_incremental_state("my-spec-001")
+            >>> # {'src/main.py': 'abc123', 'src/utils.py': 'def456'}
+        """
+        state_key = f"incremental_state:{spec_id}"
+        state = self.get(state_key)
+
+        if state is None:
+            logger.debug(f"No incremental state found for {spec_id}")
+            return {}
+
+        # Validate state structure
+        if not isinstance(state, dict):
+            logger.warning(f"Invalid incremental state for {spec_id}: expected dict, got {type(state)}")
+            return {}
+
+        logger.debug(f"Retrieved incremental state for {spec_id}: {len(state)} files")
+        return state
+
+    def save_incremental_state(self, spec_id: str, file_hashes: Dict[str, str], ttl_hours: Optional[float] = None) -> bool:
+        """
+        Store file hashes for future incremental reviews.
+
+        This overwrites any previous state for the same spec_id.
+
+        Args:
+            spec_id: Specification ID to store state for
+            file_hashes: Dictionary mapping file paths to their hash values
+            ttl_hours: Time to live in hours (defaults to 168 hours = 7 days)
+
+        Returns:
+            True if successful, False if operation failed
+
+        Example:
+            >>> cache = CacheManager()
+            >>> hashes = {'src/main.py': 'abc123', 'src/utils.py': 'def456'}
+            >>> cache.save_incremental_state("my-spec-001", hashes)
+            True
+        """
+        # Validate input
+        if not isinstance(file_hashes, dict):
+            logger.warning(f"Invalid file_hashes for {spec_id}: expected dict, got {type(file_hashes)}")
+            return False
+
+        # Use longer TTL for state (7 days default vs 1 day for regular cache)
+        if ttl_hours is None:
+            ttl_hours = 168  # 7 days
+
+        state_key = f"incremental_state:{spec_id}"
+
+        # Include metadata for tracking
+        metadata = {
+            "spec_id": spec_id,
+            "type": "incremental_state",
+            "file_count": len(file_hashes),
+            "timestamp": datetime.now().isoformat()
+        }
+
+        result = self.set(state_key, file_hashes, ttl_hours=ttl_hours, metadata=metadata)
+
+        if result:
+            logger.debug(f"Saved incremental state for {spec_id}: {len(file_hashes)} files")
+        else:
+            logger.warning(f"Failed to save incremental state for {spec_id}")
+
+        return result
+
+    @staticmethod
+    def compare_file_hashes(old_hashes: Dict[str, str], new_hashes: Dict[str, str]) -> Dict[str, list]:
+        """
+        Compare two sets of file hashes to identify changes.
+
+        This utility helps consumers determine which files need to be re-analyzed
+        in incremental reviews.
+
+        Args:
+            old_hashes: Previous file hashes from get_incremental_state()
+            new_hashes: Current file hashes from recent scan
+
+        Returns:
+            Dictionary with four lists:
+            - 'added': Files that exist in new_hashes but not old_hashes
+            - 'modified': Files that exist in both but have different hashes
+            - 'removed': Files that exist in old_hashes but not new_hashes
+            - 'unchanged': Files that exist in both with same hashes
+
+        Example:
+            >>> old = {'src/main.py': 'abc123', 'src/old.py': 'xyz789'}
+            >>> new = {'src/main.py': 'def456', 'src/new.py': 'ghi012'}
+            >>> CacheManager.compare_file_hashes(old, new)
+            {
+                'added': ['src/new.py'],
+                'modified': ['src/main.py'],
+                'removed': ['src/old.py'],
+                'unchanged': []
+            }
+        """
+        old_keys = set(old_hashes.keys())
+        new_keys = set(new_hashes.keys())
+
+        added = sorted(new_keys - old_keys)
+        removed = sorted(old_keys - new_keys)
+
+        # Check common keys for modifications
+        common_keys = old_keys & new_keys
+        modified = sorted([
+            key for key in common_keys
+            if old_hashes[key] != new_hashes[key]
+        ])
+        unchanged = sorted([
+            key for key in common_keys
+            if old_hashes[key] == new_hashes[key]
+        ])
+
+        return {
+            'added': added,
+            'modified': modified,
+            'removed': removed,
+            'unchanged': unchanged
+        }
