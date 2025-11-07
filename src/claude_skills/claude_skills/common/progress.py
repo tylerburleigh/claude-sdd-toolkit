@@ -3,8 +3,10 @@ Progress calculation utilities for SDD JSON specs.
 Provides hierarchical progress recalculation and status updates.
 """
 
+import json
+import sys
 from datetime import datetime, timezone
-from typing import Dict, List
+from typing import Dict, List, Optional, TextIO
 
 
 def recalculate_progress(spec_data: Dict, node_id: str = "spec-root") -> Dict:
@@ -289,3 +291,79 @@ def get_task_counts_by_status(spec_data: Dict) -> Dict[str, int]:
                 counts[status] += 1
 
     return counts
+
+
+class ProgressEmitter:
+    """
+    Emits structured JSON progress events for AI agents and automation tools.
+
+    This class provides a programmatic interface for emitting progress updates
+    as JSON events to stdout or a specified stream. Events are newline-delimited
+    JSON objects that can be parsed by consuming tools.
+
+    Example usage:
+        emitter = ProgressEmitter()
+        emitter.emit("task_started", {"task_id": "task-1-1", "title": "Setup"})
+        emitter.emit("progress", {"completed": 5, "total": 10, "percentage": 50})
+        emitter.emit("task_completed", {"task_id": "task-1-1", "duration": 120})
+
+    Event format:
+        {
+            "type": "event_type",
+            "timestamp": "2025-11-07T19:00:00.000Z",
+            "data": {...}
+        }
+    """
+
+    def __init__(self, output: Optional[TextIO] = None, enabled: bool = True):
+        """
+        Initialize the ProgressEmitter.
+
+        Args:
+            output: Output stream for events (default: sys.stdout)
+            enabled: Whether emission is enabled (default: True)
+        """
+        self.output = output or sys.stdout
+        self.enabled = enabled
+
+    def emit(self, event_type: str, data: Optional[Dict] = None) -> None:
+        """
+        Emit a structured JSON event.
+
+        Args:
+            event_type: Type of event (e.g., "task_started", "progress", "error")
+            data: Event data dictionary (optional)
+
+        Emits a newline-delimited JSON object with:
+            - type: The event type
+            - timestamp: ISO 8601 timestamp with UTC timezone
+            - data: The provided data dictionary (or empty dict if None)
+
+        Example:
+            emitter.emit("task_started", {"task_id": "task-1-1", "title": "Setup"})
+            # Output: {"type":"task_started","timestamp":"2025-11-07T19:00:00.000Z","data":{"task_id":"task-1-1","title":"Setup"}}
+        """
+        if not self.enabled:
+            return
+
+        event = {
+            "type": event_type,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "data": data or {}
+        }
+
+        try:
+            json_str = json.dumps(event, separators=(',', ':'))
+            self.output.write(json_str + '\n')
+            self.output.flush()
+        except (IOError, OSError):
+            # Silently handle output errors (e.g., broken pipe)
+            pass
+
+    def disable(self) -> None:
+        """Disable event emission."""
+        self.enabled = False
+
+    def enable(self) -> None:
+        """Enable event emission."""
+        self.enabled = True
