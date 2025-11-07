@@ -94,7 +94,18 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         # Create ProgressEmitter if --stream-progress flag is set
         progress_emitter = None
         if hasattr(args, 'stream_progress') and args.stream_progress:
-            progress_emitter = ProgressEmitter(enabled=True, auto_detect_tty=False)
+            # Determine output stream based on format mode
+            output_format = args.format if hasattr(args, 'format') else 'text'
+
+            # For json/markdown modes, emit progress to stderr to avoid corrupting stdout
+            # For text mode, emit to stdout (existing behavior)
+            progress_stream = sys.stderr if output_format in ['json', 'markdown'] else sys.stdout
+
+            progress_emitter = ProgressEmitter(
+                output=progress_stream,
+                enabled=True,
+                auto_detect_tty=False
+            )
 
         try:
             responses = consult_multiple_ai_on_fidelity(
@@ -353,7 +364,8 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
     parser.add_argument(
         "--stream-progress",
         action="store_true",
-        help="Enable structured JSON progress events during AI consultation"
+        help="Enable structured JSON progress events during AI consultation. "
+             "Events go to stderr in json/markdown modes, stdout in text mode."
     )
 
     # Review options
