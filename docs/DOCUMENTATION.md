@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 09:48:03
+**Generated:** 2025-11-07 09:58:45
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86939
+- **Total Lines:** 87012
 - **Total Classes:** 354
 - **Total Functions:** 882
 - **Avg Complexity:** 5.81
@@ -853,6 +853,7 @@ This class will be implemented in Phase 4 (Report Generation).
 - `print_console()`
 - `print_console_rich()`
 - `_print_consensus_matrix()`
+- `_print_model_comparison_table()`
 - `save_to_file()`
 - `calculate_fidelity_score()`
 - `summarize_deviations()`

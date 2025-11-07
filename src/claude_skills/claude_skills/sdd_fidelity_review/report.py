@@ -465,6 +465,11 @@ class FidelityReport:
         if categorized_issues_list and len(categorized_issues_list) > 0:
             self._print_consensus_matrix(console, categorized_issues_list)
 
+        # Issue aggregation panel showing common concerns
+        parsed_responses_list = self._convert_to_dict(self.parsed_responses)
+        if parsed_responses_list and len(parsed_responses_list) > 1:
+            self._print_issue_aggregation_panel(console, parsed_responses_list)
+
         # Individual responses (if verbose)
         if verbose:
             self._print_model_comparison_table(console)
@@ -639,6 +644,81 @@ class FidelityReport:
                 if len(issues) > 3:
                     console.print(f"  [dim]... and {len(issues) - 3} more[/dim]")
                 console.print()
+
+    def _print_issue_aggregation_panel(
+        self,
+        console: Console,
+        parsed_responses: List[Dict[str, Any]]
+    ) -> None:
+        """
+        Print issue aggregation panel showing common concerns across models.
+
+        Analyzes issues from all model responses and displays frequency of
+        common issues with visual indicators.
+
+        Args:
+            console: Rich Console instance for output
+            parsed_responses: List of parsed model responses
+        """
+        # Collect all issues from all models
+        all_issues = []
+        for response in parsed_responses:
+            issues = response.get("issues", [])
+            for issue in issues:
+                issue_text = issue if isinstance(issue, str) else str(issue)
+                all_issues.append(issue_text)
+
+        if not all_issues:
+            return
+
+        # Count issue frequency (exact matching for now)
+        from collections import Counter
+        issue_counts = Counter(all_issues)
+
+        # Sort by frequency (most common first)
+        sorted_issues = issue_counts.most_common(10)  # Limit to top 10
+
+        if not sorted_issues:
+            return
+
+        console.print("[bold]COMMON CONCERNS[/bold]")
+        console.print("[dim]Issues identified by multiple AI models[/dim]")
+        console.print()
+
+        # Calculate total models for percentage
+        num_models = len(parsed_responses)
+
+        # Create aggregation table
+        table = Table(show_header=True, box=None, padding=(0, 1))
+        table.add_column("Issue", style="bold", max_width=60)
+        table.add_column("Count", justify="center", style="cyan")
+        table.add_column("Models", justify="center", style="green")
+
+        for issue_text, count in sorted_issues:
+            # Truncate if too long
+            if len(issue_text) > 57:
+                display_text = issue_text[:54] + "..."
+            else:
+                display_text = issue_text
+
+            # Calculate percentage of models that mentioned this issue
+            percentage = (count / num_models) * 100
+
+            # Format count with visual indicator
+            if count >= num_models:
+                count_display = f"[bold green]{count}[/bold green]"
+            elif count >= num_models * 0.66:
+                count_display = f"[yellow]{count}[/yellow]"
+            else:
+                count_display = f"[cyan]{count}[/cyan]"
+
+            # Format percentage
+            percentage_display = f"{percentage:.0f}%"
+
+            table.add_row(display_text, count_display, percentage_display)
+
+        console.print(table)
+        console.print()
 
     def save_to_file(self, output_path: Path, format: str = "markdown") -> None:
         """
