@@ -185,14 +185,20 @@ def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_is
 
 
 def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues):
-    """Generate JSON output format."""
-    result = {
+    """Generate JSON output format using FidelityReport."""
+    # Create review results dictionary for FidelityReport
+    review_results = {
         "spec_id": reviewer.spec_id,
         "models_consulted": len(parsed_responses),
-        "consensus": consensus.to_dict(),
-        "categorized_issues": [issue.to_dict() for issue in categorized_issues],
-        "individual_responses": [response.to_dict() for response in parsed_responses]
+        "consensus": consensus,
+        "categorized_issues": categorized_issues,
+        "parsed_responses": parsed_responses
     }
+
+    # Create FidelityReport instance and use generate_json() method
+    report = FidelityReport(review_results)
+    result = report.generate_json()
+
     print(json.dumps(result, indent=2))
 
 
