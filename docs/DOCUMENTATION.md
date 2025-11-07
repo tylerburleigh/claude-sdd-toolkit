@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 15:00:52
+**Generated:** 2025-11-07 15:07:25
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89119
+- **Total Lines:** 89252
 - **Total Classes:** 356
 - **Total Functions:** 904
 - **Avg Complexity:** 5.84
@@ -906,7 +906,7 @@ This class will be implemented in Phase 4 (Report Generation).
 ### `FidelityReviewer`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:21`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/review.py:23`
 
 **Description:**
 > Core class for performing fidelity reviews of implementations against specs.
@@ -920,6 +920,9 @@ This class will be implemented in Phase 3 (Core Review Logic).
 - `review_full_spec()`
 - `review_files()`
 - `analyze_deviation()`
+- `compute_file_hash()`
+- `get_file_changes()`
+- `save_file_state()`
 - `_load_spec()`
 - `get_task_requirements()`
 - `get_phase_tasks()`
@@ -26605,10 +26608,12 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/review.py`
 
+- `claude_skills.common.cache.CacheManager`
 - `claude_skills.common.git_metadata.find_git_root`
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.spec.get_node`
 - `claude_skills.common.spec.load_json_spec`
+- `hashlib`
 - `logging`
 - `pathlib.Path`
 - `subprocess`

@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T20:00:52.287856Z",
+    "generated_at": "2025-11-07T20:07:25.145212Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89119,
+    "total_lines": 89252,
     "total_classes": 356,
     "total_functions": 904,
     "avg_complexity": 5.84,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89119,
+        "lines": 89252,
         "classes": 356,
         "functions": 904,
         "avg_complexity": 5.84
@@ -2542,13 +2542,15 @@
         "subprocess",
         "logging",
         "xml.etree.ElementTree",
+        "hashlib",
         "claude_skills.common.spec.load_json_spec",
         "claude_skills.common.spec.get_node",
         "claude_skills.common.paths.find_specs_directory",
-        "claude_skills.common.git_metadata.find_git_root"
+        "claude_skills.common.git_metadata.find_git_root",
+        "claude_skills.common.cache.CacheManager"
       ],
       "exports": [],
-      "lines": 1140
+      "lines": 1273
     },
     {
       "name": "__init__",
@@ -8595,10 +8597,19 @@
           "context": [
             "consult_multiple_ai_on_fidelity"
           ]
+        },
+        {
+          "instantiator": "__init__",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
+          "line": 43,
+          "context": [
+            "FidelityReviewer",
+            "__init__"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 3
+      "instantiation_count": 4
     },
     {
       "name": "DependencyAnalysis",
@@ -12914,7 +12925,7 @@
     {
       "name": "FidelityReviewer",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-      "line": 21,
+      "line": 23,
       "language": "python",
       "docstring": "Core class for performing fidelity reviews of implementations against specs.\n\nThis class will be implemented in Phase 3 (Core Review Logic).",
       "bases": [],
@@ -12925,6 +12936,9 @@
         "review_full_spec",
         "review_files",
         "analyze_deviation",
+        "compute_file_hash",
+        "get_file_changes",
+        "save_file_state",
         "_load_spec",
         "get_task_requirements",
         "get_phase_tasks",
@@ -37626,13 +37640,13 @@
         {
           "name": "get_file_diff",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 310,
+          "line": 443,
           "call_type": "function_call"
         },
         {
           "name": "get_branch_diff",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 463,
+          "line": 596,
           "call_type": "function_call"
         },
         {
@@ -42318,7 +42332,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 127,
+          "line": 260,
           "call_type": "function_call"
         },
         {
@@ -45998,19 +46012,19 @@
         {
           "name": "get_task_journals",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 797,
+          "line": 930,
           "call_type": "method_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 1103,
+          "line": 1236,
           "call_type": "method_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 1105,
+          "line": 1238,
           "call_type": "method_call"
         },
         {
@@ -47688,7 +47702,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 134,
+          "line": 267,
           "call_type": "function_call"
         },
         {
@@ -49623,19 +49637,19 @@
         {
           "name": "get_task_requirements",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 168,
+          "line": 301,
           "call_type": "function_call"
         },
         {
           "name": "get_phase_tasks",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 210,
+          "line": 343,
           "call_type": "function_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 937,
+          "line": 1070,
           "call_type": "function_call"
         },
         {
@@ -82168,7 +82182,7 @@
         {
           "name": "_load_spec",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 127,
+          "line": 260,
           "call_type": "function_call"
         },
         {
@@ -86371,19 +86385,19 @@
         {
           "name": "get_task_journals",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 797,
+          "line": 930,
           "call_type": "method_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 1103,
+          "line": 1236,
           "call_type": "method_call"
         },
         {
           "name": "generate_review_prompt",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/review.py",
-          "line": 1105,
+          "line": 1238,
           "call_type": "method_call"
         },
         {
@@ -135023,10 +135037,12 @@
       "subprocess",
       "logging",
       "xml.etree.ElementTree",
+      "hashlib",
       "claude_skills.common.spec.load_json_spec",
       "claude_skills.common.spec.get_node",
       "claude_skills.common.paths.find_specs_directory",
-      "claude_skills.common.git_metadata.find_git_root"
+      "claude_skills.common.git_metadata.find_git_root",
+      "claude_skills.common.cache.CacheManager"
     ],
     "src/claude_skills/claude_skills/sdd_next/__init__.py": [
       "discovery.get_next_task",

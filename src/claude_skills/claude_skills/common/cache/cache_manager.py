@@ -544,3 +544,66 @@ class CacheManager:
             'removed': removed,
             'unchanged': unchanged
         }
+
+    @staticmethod
+    def merge_results(cached_results: Dict[str, Any], fresh_results: Dict[str, Any], changed_files: set) -> Dict[str, Any]:
+        """
+        Merge cached results with fresh results for changed files.
+
+        This utility enables incremental processing by reusing cached results
+        for unchanged files while incorporating fresh results for modified files.
+
+        Args:
+            cached_results: Previously cached results (file path → result data)
+            fresh_results: Newly generated results for changed files (file path → result data)
+            changed_files: Set of file paths that have changed (includes added and modified files)
+
+        Returns:
+            Merged dictionary combining cached and fresh results.
+            - Unchanged files: Use cached version
+            - Changed files: Use fresh version
+            - Removed files: Excluded from result
+
+        Example:
+            >>> cached = {
+            ...     'src/main.py': {'functions': ['main'], 'lines': 100},
+            ...     'src/utils.py': {'functions': ['helper'], 'lines': 50},
+            ...     'src/old.py': {'functions': ['old_func'], 'lines': 30}
+            ... }
+            >>> fresh = {
+            ...     'src/main.py': {'functions': ['main', 'init'], 'lines': 120}
+            ... }
+            >>> changed = {'src/main.py'}
+            >>> CacheManager.merge_results(cached, fresh, changed)
+            {
+                'src/main.py': {'functions': ['main', 'init'], 'lines': 120},  # Fresh
+                'src/utils.py': {'functions': ['helper'], 'lines': 50}         # Cached
+            }
+
+        Note:
+            - Files in changed_files set but missing from fresh_results are excluded
+              (treats as deleted or generation failure)
+            - Files in cached_results but not in changed_files are preserved
+              (treats as unchanged, reuses cache)
+            - Operates in O(n) time where n = total files
+        """
+        merged = {}
+
+        # Start with all cached results
+        for file_path, result_data in cached_results.items():
+            if file_path not in changed_files:
+                # File unchanged - use cached version
+                merged[file_path] = result_data
+            # If file is in changed_files, skip it (will be replaced by fresh version)
+
+        # Add fresh results for changed files
+        for file_path, result_data in fresh_results.items():
+            # Fresh results always override (whether file was modified or newly added)
+            merged[file_path] = result_data
+
+        logger.debug(
+            f"Merged results: {len(cached_results)} cached + {len(fresh_results)} fresh → "
+            f"{len(merged)} total ({len(changed_files)} files changed)"
+        )
+
+        return merged
