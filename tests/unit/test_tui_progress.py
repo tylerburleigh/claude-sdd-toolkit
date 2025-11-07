@@ -855,6 +855,130 @@ class TestQueuedProgressCallback:
         assert kwargs["timeout"] == 90
         assert kwargs["model"] == "gemini-2.5-pro"
 
+    def test_handles_large_queue_bursts(self):
+        """QueuedProgressCallback handles large bursts of progress updates."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Queue a large burst of updates
+        for i in range(100):
+            queued.on_update(f"tool{i % 5}", elapsed=float(i), timeout=90)
+
+        # Give time to process all items
+        time.sleep(1.0)
+        queued.stop()
+
+        # All updates should have been processed
+        assert wrapped.on_update.call_count == 100
+
+    def test_stop_waits_for_pending_queue_items(self):
+        """QueuedProgressCallback waits for pending items when stopping."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Queue several items
+        queued.on_start("gemini", 90)
+        queued.on_update("gemini", 10.0, 90)
+        queued.on_update("gemini", 20.0, 90)
+        queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
+
+        # Give a short time for processing to start
+        time.sleep(0.1)
+
+        # Stop with sufficient timeout for processing
+        queued.stop(timeout=5.0)
+
+        # All items should have been processed before stop completed
+        assert wrapped.on_start.call_count == 1
+        assert wrapped.on_update.call_count == 2
+        assert wrapped.on_complete.call_count == 1
+
+    def test_restart_after_stop(self):
+        """QueuedProgressCallback can be restarted after stopping."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        # First cycle
+        queued.start()
+        queued.on_start("gemini", 90)
+        time.sleep(0.2)
+        queued.stop()
+
+        first_call_count = wrapped.on_start.call_count
+
+        # Second cycle
+        queued.start()
+        queued.on_start("codex", 120)
+        time.sleep(0.2)
+        queued.stop()
+
+        # Should have two on_start calls total
+        assert wrapped.on_start.call_count == first_call_count + 1
+
+    def test_queue_preserves_update_sequence(self):
+        """QueuedProgressCallback preserves exact sequence of rapid updates."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Rapid sequence of updates with increasing elapsed times
+        expected_sequence = [5.0, 10.0, 15.0, 20.0, 25.0, 30.0]
+        for elapsed in expected_sequence:
+            queued.on_update("gemini", elapsed, 90)
+
+        # Give time to process
+        time.sleep(0.5)
+        queued.stop()
+
+        # Verify exact sequence was preserved
+        assert wrapped.on_update.call_count == len(expected_sequence)
+        actual_sequence = [
+            call[1]["elapsed"]
+            for call in wrapped.on_update.call_args_list
+        ]
+        assert actual_sequence == expected_sequence
+
+    def test_queue_with_mixed_callback_types(self):
+        """QueuedProgressCallback handles mixed callback types in sequence."""
+        wrapped = Mock(spec=ProgressCallback)
+        queued = QueuedProgressCallback(wrapped)
+
+        queued.start()
+
+        # Mix different callback types
+        queued.on_start("gemini", 90)
+        queued.on_update("gemini", 10.0, 90)
+        queued.on_batch_start(["codex", "cursor-agent"], 2, 120)
+        queued.on_update("gemini", 20.0, 90)
+        response = ToolResponse(
+            tool="codex",
+            status=ToolStatus.SUCCESS,
+            output="test",
+            error=None,
+            duration=45.0,
+            timestamp="2025-11-07T12:00:00Z"
+        )
+        queued.on_tool_complete("codex", response, 1, 2)
+        queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
+        queued.on_batch_complete(2, 2, 0, 100.0, 45.0)
+
+        # Give time to process
+        time.sleep(0.5)
+        queued.stop()
+
+        # Verify all callbacks were called
+        assert wrapped.on_start.call_count == 1
+        assert wrapped.on_update.call_count == 2
+        assert wrapped.on_batch_start.call_count == 1
+        assert wrapped.on_tool_complete.call_count == 1
+        assert wrapped.on_complete.call_count == 1
+        assert wrapped.on_batch_complete.call_count == 1
+
     def test_forwards_on_update_to_wrapped_callback(self):
         """QueuedProgressCallback forwards on_update calls to wrapped callback."""
         wrapped = Mock(spec=ProgressCallback)
