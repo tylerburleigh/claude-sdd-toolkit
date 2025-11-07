@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T12:57:35.515112Z",
+    "generated_at": "2025-11-07T12:59:23.084912Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 244,
-    "total_lines": 86435,
+    "total_lines": 86448,
     "total_classes": 354,
     "total_functions": 878,
     "avg_complexity": 5.78,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 244,
-        "lines": 86435,
+        "lines": 86448,
         "classes": 354,
         "functions": 878,
         "avg_complexity": 5.78
@@ -2216,7 +2216,7 @@
         "enum.Enum"
       ],
       "exports": [],
-      "lines": 361
+      "lines": 374
     },
     {
       "name": "pytest_runner",
@@ -11450,7 +11450,7 @@
       "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
       "line": 241,
       "language": "python",
-      "docstring": "Rich.Progress display for pytest test execution.\n\nShows a live progress bar with pass/fail/skip counters as tests run.\n\nUsage:\n    from rich.progress import Progress\n\n    with Progress() as progress:\n        display = PytestProgressDisplay(progress, total_tests=100)\n        parser = PytestOutputParser()\n\n        for line in pytest_output:\n            result = parser.parse_line(line)\n            if result:\n                display.update(parser.get_progress())",
+      "docstring": "Rich.Progress display for pytest test execution.\n\nShows a live progress bar with pass/fail/skip counters as tests run,\nplus the currently running test file.\n\nUsage:\n    from rich.progress import Progress\n\n    with Progress() as progress:\n        display = PytestProgressDisplay(progress, total_tests=100)\n        parser = PytestOutputParser()\n\n        for line in pytest_output:\n            result = parser.parse_line(line)\n            if result:\n                display.update(parser.get_progress(), current_file=result.file_path)",
       "bases": [],
       "methods": [
         "__init__",
@@ -91727,13 +91727,13 @@
         {
           "name": "__init__",
           "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
-          "line": 274,
+          "line": 276,
           "call_type": "method_call"
         },
         {
           "name": "__init__",
           "file": "src/claude_skills/claude_skills/run_tests/pytest_parser.py",
-          "line": 280,
+          "line": 282,
           "call_type": "method_call"
         },
         {

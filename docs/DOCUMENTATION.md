@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:57:35
+**Generated:** 2025-11-07 07:59:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86435
+- **Total Lines:** 86448
 - **Total Classes:** 354
 - **Total Functions:** 878
 - **Avg Complexity:** 5.78
@@ -2111,7 +2111,8 @@ Usage:
 **Description:**
 > Rich.Progress display for pytest test execution.
 
-Shows a live progress bar with pass/fail/skip counters as tests run.
+Shows a live progress bar with pass/fail/skip counters as tests run,
+plus the currently running test file.
 
 Usage:
     from rich.progress import Progress
@@ -2123,7 +2124,7 @@ Usage:
         for line in pytest_output:
             result = parser.parse_line(line)
             if result:
-                display.update(parser.get_progress())
+                display.update(parser.get_progress(), current_file=result.file_path)
 
 **Methods:**
 - `__init__()`

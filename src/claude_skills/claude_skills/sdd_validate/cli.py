@@ -193,19 +193,50 @@ def cmd_validate(args, printer):
     """Validate JSON spec file."""
     spec_file = _resolve_spec_file(args.spec_file, printer)
 
-    if not args.json and not args.quiet:
-        printer.action("Validating JSON spec...")
-        printer.info(f"Spec: {spec_file}")
+    # Check if we should show progress
+    show_progress = not args.json and not args.quiet and sys.stdout.isatty()
 
-    # Load and validate spec
-    try:
-        with open(spec_file, 'r') as f:
-            spec_data = json.load(f)
-    except json.JSONDecodeError as e:
-        printer.error(f"Invalid JSON in spec file: {e}")
-        return 2
+    if show_progress:
+        from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
-    result = validate_spec_hierarchy(spec_data)
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=printer.console if hasattr(printer, 'console') else None
+        ) as progress:
+            task_id = progress.add_task("Validating spec...", total=100)
+
+            # Load spec
+            progress.update(task_id, advance=20, description="Loading spec file...")
+            try:
+                with open(spec_file, 'r') as f:
+                    spec_data = json.load(f)
+            except json.JSONDecodeError as e:
+                printer.error(f"Invalid JSON in spec file: {e}")
+                return 2
+
+            # Validate hierarchy
+            progress.update(task_id, advance=60, description="Validating hierarchy...")
+            result = validate_spec_hierarchy(spec_data)
+
+            # Complete
+            progress.update(task_id, advance=20, description="Validation complete")
+    else:
+        if not args.json and not args.quiet:
+            printer.action("Validating JSON spec...")
+            printer.info(f"Spec: {spec_file}")
+
+        # Load and validate spec
+        try:
+            with open(spec_file, 'r') as f:
+                spec_data = json.load(f)
+        except json.JSONDecodeError as e:
+            printer.error(f"Invalid JSON in spec file: {e}")
+            return 2
+
+        result = validate_spec_hierarchy(spec_data)
 
     normalized = normalize_validation_result(result)
 
