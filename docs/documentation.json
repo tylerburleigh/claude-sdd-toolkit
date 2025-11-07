@@ -2,18 +2,18 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T17:35:57.694931Z",
+    "generated_at": "2025-11-07T17:37:50.909513Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 247,
-    "total_lines": 87855,
+    "total_files": 248,
+    "total_lines": 88061,
     "total_classes": 355,
-    "total_functions": 889,
-    "avg_complexity": 5.81,
+    "total_functions": 894,
+    "avg_complexity": 5.79,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -24,11 +24,11 @@
     ],
     "by_language": {
       "python": {
-        "files": 247,
-        "lines": 87855,
+        "files": 248,
+        "lines": 88061,
         "classes": 355,
-        "functions": 889,
-        "avg_complexity": 5.81
+        "functions": 894,
+        "avg_complexity": 5.79
       }
     }
   },
@@ -932,10 +932,39 @@
       "classes": [],
       "functions": [],
       "imports": [
-        "cache_manager.CacheManager"
+        "cache_manager.CacheManager",
+        "cache_key.generate_cache_key",
+        "cache_key.generate_fidelity_review_key",
+        "cache_key.generate_plan_review_key",
+        "cache_key.is_cache_key_valid"
       ],
       "exports": [],
-      "lines": 9
+      "lines": 21
+    },
+    {
+      "name": "cache_key",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "language": "python",
+      "docstring": "Cache key generation utilities.\n\nGenerates deterministic cache keys based on spec ID, file contents, model, and prompt version.",
+      "classes": [],
+      "functions": [
+        "generate_cache_key",
+        "_hash_files",
+        "generate_fidelity_review_key",
+        "generate_plan_review_key",
+        "is_cache_key_valid"
+      ],
+      "imports": [
+        "hashlib",
+        "json",
+        "pathlib.Path",
+        "typing.List",
+        "typing.Optional",
+        "typing.Dict",
+        "typing.Any"
+      ],
+      "exports": [],
+      "lines": 194
     },
     {
       "name": "cache_manager",
@@ -32284,6 +32313,361 @@
         }
       ],
       "call_count": 4
+    },
+    {
+      "name": "generate_cache_key",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "line": 13,
+      "language": "python",
+      "docstring": "Generate deterministic cache key based on consultation inputs.\n\nThe cache key includes:\n- Spec ID\n- Hash of file contents (if file paths provided)\n- Model name\n- Prompt version (for cache invalidation on prompt changes)\n- Extra parameters (optional)\n\nArgs:\n    spec_id: Specification identifier\n    file_paths: List of file paths to include in hash (optional)\n    model: Model name (e.g., \"gemini\", \"codex\")\n    prompt_version: Version identifier for prompt template (default: \"v1\")\n    extra_params: Additional parameters to include in key (optional)\n\nReturns:\n    Deterministic cache key (hex string)\n\nExample:\n    key = generate_cache_key(\n        spec_id=\"my-spec-001\",\n        file_paths=[\"src/auth.py\", \"tests/test_auth.py\"],\n        model=\"gemini\",\n        prompt_version=\"v2\"\n    )",
+      "parameters": [
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "file_paths",
+          "type": "Optional[List[str]]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "prompt_version",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "extra_params",
+          "type": "Optional[Dict[str, Any]]",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "generate_fidelity_review_key",
+          "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+          "line": 131,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate_plan_review_key",
+          "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+          "line": 164,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "_hash_files",
+          "file": "unknown",
+          "line": 57,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sorted",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "function_call"
+        },
+        {
+          "name": "keys",
+          "file": "unknown",
+          "line": 63,
+          "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sha256",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "encode",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "hexdigest",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 2
+    },
+    {
+      "name": "_hash_files",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "line": 73,
+      "language": "python",
+      "docstring": "Generate hash of file contents.\n\nArgs:\n    file_paths: List of file paths to hash\n\nReturns:\n    Hex string hash of all file contents combined\n\nNote:\n    If a file doesn't exist or can't be read, it's skipped with a warning marker.\n    This ensures cache keys can still be generated even with missing files.",
+      "parameters": [
+        {
+          "name": "file_paths",
+          "type": "List[str]",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": false,
+      "callers": [
+        {
+          "name": "generate_cache_key",
+          "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+          "line": 57,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "sha256",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sorted",
+          "file": "unknown",
+          "line": 89,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "method_call"
+        },
+        {
+          "name": "update",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "method_call"
+        },
+        {
+          "name": "encode",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "method_call"
+        },
+        {
+          "name": "update",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "method_call"
+        },
+        {
+          "name": "read_bytes",
+          "file": "unknown",
+          "line": 94,
+          "call_type": "method_call"
+        },
+        {
+          "name": "update",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "method_call"
+        },
+        {
+          "name": "encode",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "method_call"
+        },
+        {
+          "name": "update",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "method_call"
+        },
+        {
+          "name": "encode",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hexdigest",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
+      "name": "generate_fidelity_review_key",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "line": 105,
+      "language": "python",
+      "docstring": "Generate cache key for fidelity review consultations.\n\nArgs:\n    spec_id: Specification identifier\n    scope: Review scope (\"task\", \"phase\", or \"spec\")\n    target: Target identifier (task ID, phase ID, or spec ID)\n    file_paths: Files being reviewed (optional)\n    model: Model name (optional)\n\nReturns:\n    Deterministic cache key",
+      "parameters": [
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "scope",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "target",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "file_paths",
+          "type": "Optional[List[str]]",
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "Optional[str]",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "generate_cache_key",
+          "file": "unknown",
+          "line": 131,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "generate_plan_review_key",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "line": 140,
+      "language": "python",
+      "docstring": "Generate cache key for plan review consultations.\n\nArgs:\n    spec_id: Specification identifier\n    models: List of models consulted\n    review_focus: Focus areas (e.g., [\"architecture\", \"security\"])\n\nReturns:\n    Deterministic cache key",
+      "parameters": [
+        {
+          "name": "spec_id",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "models",
+          "type": "List[str]",
+          "default": null
+        },
+        {
+          "name": "review_focus",
+          "type": "Optional[List[str]]",
+          "default": null
+        }
+      ],
+      "return_type": "str",
+      "complexity": 2,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "sorted",
+          "file": "unknown",
+          "line": 157,
+          "call_type": "function_call"
+        },
+        {
+          "name": "sorted",
+          "file": "unknown",
+          "line": 162,
+          "call_type": "function_call"
+        },
+        {
+          "name": "generate_cache_key",
+          "file": "unknown",
+          "line": 164,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "method_call"
+        },
+        {
+          "name": "sorted",
+          "file": "unknown",
+          "line": 166,
+          "call_type": "function_call"
+        }
+      ]
+    },
+    {
+      "name": "is_cache_key_valid",
+      "file": "src/claude_skills/claude_skills/common/cache/cache_key.py",
+      "line": 172,
+      "language": "python",
+      "docstring": "Validate cache key format.\n\nArgs:\n    key: Cache key to validate\n\nReturns:\n    True if key is a valid hex string of appropriate length",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "str",
+          "default": null
+        }
+      ],
+      "return_type": "bool",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 186,
+          "call_type": "function_call"
+        },
+        {
+          "name": "int",
+          "file": "unknown",
+          "line": 191,
+          "call_type": "function_call"
+        }
+      ]
     },
     {
       "name": "strip_ansi_codes",
@@ -132587,7 +132971,20 @@
       "concurrent.futures.as_completed"
     ],
     "src/claude_skills/claude_skills/common/cache/__init__.py": [
-      "cache_manager.CacheManager"
+      "cache_manager.CacheManager",
+      "cache_key.generate_cache_key",
+      "cache_key.generate_fidelity_review_key",
+      "cache_key.generate_plan_review_key",
+      "cache_key.is_cache_key_valid"
+    ],
+    "src/claude_skills/claude_skills/common/cache/cache_key.py": [
+      "hashlib",
+      "json",
+      "pathlib.Path",
+      "typing.List",
+      "typing.Optional",
+      "typing.Dict",
+      "typing.Any"
     ],
     "src/claude_skills/claude_skills/common/cache/cache_manager.py": [
       "json",

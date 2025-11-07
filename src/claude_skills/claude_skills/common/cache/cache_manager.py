@@ -36,16 +36,24 @@ class CacheManager:
 
     DEFAULT_CACHE_DIR = Path.home() / ".cache" / "sdd-toolkit" / "consultations"
     DEFAULT_TTL_HOURS = 24
+    CLEANUP_INTERVAL_HOURS = 1  # Run automatic cleanup every hour
 
-    def __init__(self, cache_dir: Optional[Path] = None):
+    def __init__(self, cache_dir: Optional[Path] = None, auto_cleanup: bool = True):
         """
         Initialize cache manager.
 
         Args:
             cache_dir: Custom cache directory path (defaults to ~/.cache/sdd-toolkit/consultations/)
+            auto_cleanup: Enable automatic cleanup of expired entries (default: True)
         """
         self.cache_dir = cache_dir or self._get_cache_dir_from_env()
+        self.auto_cleanup = auto_cleanup
+        self._last_cleanup_time = 0
         self._ensure_cache_dir()
+
+        # Run initial cleanup if auto_cleanup enabled
+        if self.auto_cleanup:
+            self._maybe_cleanup()
 
     def _get_cache_dir_from_env(self) -> Path:
         """Get cache directory from environment variable or use default."""
@@ -69,6 +77,31 @@ class CacheManager:
         safe_key = key.replace("/", "_").replace("\\", "_")
         return self.cache_dir / f"{safe_key}.json"
 
+    def _maybe_cleanup(self) -> None:
+        """
+        Run automatic cleanup if enough time has passed since last cleanup.
+
+        This is called automatically on cache operations when auto_cleanup is enabled.
+        Cleanup runs at most once per CLEANUP_INTERVAL_HOURS.
+        """
+        if not self.auto_cleanup:
+            return
+
+        now = time.time()
+        interval_seconds = self.CLEANUP_INTERVAL_HOURS * 3600
+
+        if now - self._last_cleanup_time >= interval_seconds:
+            logger.debug("Running automatic cache cleanup")
+            try:
+                count = self.cleanup_expired()
+                if count > 0:
+                    logger.info(f"Automatic cleanup removed {count} expired entries")
+                self._last_cleanup_time = now
+            except Exception as e:
+                logger.warning(f"Automatic cleanup failed: {e}")
+                # Update last cleanup time anyway to avoid hammering on errors
+                self._last_cleanup_time = now
+
     def get(self, key: str) -> Optional[Any]:
         """
         Retrieve value from cache if it exists and hasn't expired.
@@ -79,6 +112,9 @@ class CacheManager:
         Returns:
             Cached value if found and not expired, None otherwise
         """
+        # Maybe run automatic cleanup
+        self._maybe_cleanup()
+
         cache_path = self._get_cache_path(key)
 
         try:
@@ -123,6 +159,9 @@ class CacheManager:
         Returns:
             True if successful, False if operation failed
         """
+        # Maybe run automatic cleanup
+        self._maybe_cleanup()
+
         if ttl_hours is None:
             ttl_hours = self.DEFAULT_TTL_HOURS
 

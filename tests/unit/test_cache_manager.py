@@ -177,3 +177,75 @@ def test_graceful_error_handling(cache_manager):
 
     # Get should still work
     assert cache_manager.get("other_key") is None
+
+
+def test_automatic_cleanup_disabled(temp_cache_dir):
+    """Test cache manager with automatic cleanup disabled."""
+    cache = CacheManager(cache_dir=temp_cache_dir, auto_cleanup=False)
+
+    # Add expired entry
+    cache.set("expired_key", {"data": 1}, ttl_hours=0.001)
+    time.sleep(4)
+
+    # Should still exist in filesystem (not automatically cleaned)
+    cache_files = list(temp_cache_dir.glob("*.json"))
+    assert len(cache_files) == 1
+
+    # But get() should return None because it's expired
+    assert cache.get("expired_key") is None
+
+
+def test_automatic_cleanup_on_operations(temp_cache_dir):
+    """Test automatic cleanup runs during normal operations."""
+    # Create cache with very short cleanup interval
+    cache = CacheManager(cache_dir=temp_cache_dir, auto_cleanup=True)
+    cache.CLEANUP_INTERVAL_HOURS = 0.001  # ~3.6 seconds
+
+    # Add expired entry
+    cache.set("expired1", {"data": 1}, ttl_hours=0.001)
+    time.sleep(4)
+
+    # Add new entry - should trigger cleanup if interval passed
+    cache._last_cleanup_time = 0  # Force cleanup on next operation
+    cache.set("active1", {"data": 2}, ttl_hours=24)
+
+    # After cleanup, only active entry should remain
+    cache_files = list(temp_cache_dir.glob("*.json"))
+    # Should have 1 file (active1), expired1 should be cleaned
+    assert len(cache_files) == 1
+
+
+def test_automatic_cleanup_interval(temp_cache_dir):
+    """Test automatic cleanup respects interval."""
+    cache = CacheManager(cache_dir=temp_cache_dir, auto_cleanup=True)
+    cache.CLEANUP_INTERVAL_HOURS = 100  # Very long interval
+
+    # Add expired entry
+    cache.set("expired1", {"data": 1}, ttl_hours=0.001)
+    time.sleep(4)
+
+    # Perform operations - cleanup should not run yet (interval not passed)
+    cache.set("active1", {"data": 2})
+    cache.get("active1")
+
+    # Expired entry should still be in filesystem
+    cache_files = list(temp_cache_dir.glob("*.json"))
+    assert len(cache_files) == 2  # Both expired1 and active1
+
+
+def test_automatic_cleanup_initial(temp_cache_dir):
+    """Test automatic cleanup runs on initialization."""
+    # Create some expired entries directly
+    cache1 = CacheManager(cache_dir=temp_cache_dir, auto_cleanup=False)
+    cache1.set("expired1", {"data": 1}, ttl_hours=0.001)
+    cache1.set("expired2", {"data": 2}, ttl_hours=0.001)
+
+    time.sleep(4)
+
+    # Now create new cache manager with auto_cleanup enabled
+    # It should clean up expired entries on init
+    cache2 = CacheManager(cache_dir=temp_cache_dir, auto_cleanup=True)
+
+    # Both entries should be gone
+    cache_files = list(temp_cache_dir.glob("*.json"))
+    assert len(cache_files) == 0

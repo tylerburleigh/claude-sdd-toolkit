@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 12:35:57
+**Generated:** 2025-11-07 12:37:50
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 247
-- **Total Lines:** 87855
+- **Total Files:** 248
+- **Total Lines:** 88061
 - **Total Classes:** 355
-- **Total Functions:** 889
-- **Avg Complexity:** 5.81
+- **Total Functions:** 894
+- **Avg Complexity:** 5.79
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -8240,6 +8240,30 @@ Returns:
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `mod`: Dict[str, Any]
+
+---
+
+### `_hash_files(file_paths) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:73`
+**Complexity:** 4
+
+**Description:**
+> Generate hash of file contents.
+
+Args:
+    file_paths: List of file paths to hash
+
+Returns:
+    Hex string hash of all file contents combined
+
+Note:
+    If a file doesn't exist or can't be read, it's skipped with a warning marker.
+    This ensures cache keys can still be generated even with missing files.
+
+**Parameters:**
+- `file_paths`: List[str]
 
 ---
 
@@ -16804,6 +16828,49 @@ Returns:
 
 ---
 
+### `generate_cache_key(spec_id, file_paths, model, prompt_version, extra_params) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:13`
+**Complexity:** 4
+
+**Description:**
+> Generate deterministic cache key based on consultation inputs.
+
+The cache key includes:
+- Spec ID
+- Hash of file contents (if file paths provided)
+- Model name
+- Prompt version (for cache invalidation on prompt changes)
+- Extra parameters (optional)
+
+Args:
+    spec_id: Specification identifier
+    file_paths: List of file paths to include in hash (optional)
+    model: Model name (e.g., "gemini", "codex")
+    prompt_version: Version identifier for prompt template (default: "v1")
+    extra_params: Additional parameters to include in key (optional)
+
+Returns:
+    Deterministic cache key (hex string)
+
+Example:
+    key = generate_cache_key(
+        spec_id="my-spec-001",
+        file_paths=["src/auth.py", "tests/test_auth.py"],
+        model="gemini",
+        prompt_version="v2"
+    )
+
+**Parameters:**
+- `spec_id`: str
+- `file_paths`: Optional[List[str]]
+- `model`: Optional[str]
+- `prompt_version`: str
+- `extra_params`: Optional[Dict[str, Any]]
+
+---
+
 ### `generate_combined_report(spec_result, json_spec_result) -> str`
 
 **Language:** python
@@ -16883,6 +16950,34 @@ Returns:
 **Parameters:**
 - `skill_name`: str
 - `sections`: Optional[List[str]]
+
+---
+
+### `generate_fidelity_review_key(spec_id, scope, target, file_paths, model) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:105`
+**Complexity:** 1
+
+**Description:**
+> Generate cache key for fidelity review consultations.
+
+Args:
+    spec_id: Specification identifier
+    scope: Review scope ("task", "phase", or "spec")
+    target: Target identifier (task ID, phase ID, or spec ID)
+    file_paths: Files being reviewed (optional)
+    model: Model name (optional)
+
+Returns:
+    Deterministic cache key
+
+**Parameters:**
+- `spec_id`: str
+- `scope`: str
+- `target`: str
+- `file_paths`: Optional[List[str]]
+- `model`: Optional[str]
 
 ---
 
@@ -16991,6 +17086,30 @@ Returns:
 - `spec_title`: str
 - `review_type`: str
 - `parsed_responses`: List[Dict[str, Any]]
+
+---
+
+### `generate_plan_review_key(spec_id, models, review_focus) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:140`
+**Complexity:** 2
+
+**Description:**
+> Generate cache key for plan review consultations.
+
+Args:
+    spec_id: Specification identifier
+    models: List of models consulted
+    review_focus: Focus areas (e.g., ["architecture", "security"])
+
+Returns:
+    Deterministic cache key
+
+**Parameters:**
+- `spec_id`: str
+- `models`: List[str]
+- `review_focus`: Optional[List[str]]
 
 ---
 
@@ -19063,6 +19182,26 @@ Returns:
 
 **Parameters:**
 - `specs_structure`: None
+
+---
+
+### `is_cache_key_valid(key) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cache_key.py:172`
+**Complexity:** 4
+
+**Description:**
+> Validate cache key format.
+
+Args:
+    key: Cache key to validate
+
+Returns:
+    True if key is a valid hex string of appropriate length
+
+**Parameters:**
+- `key`: str
 
 ---
 
@@ -25529,7 +25668,21 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/cache/__init__.py`
 
+- `cache_key.generate_cache_key`
+- `cache_key.generate_fidelity_review_key`
+- `cache_key.generate_plan_review_key`
+- `cache_key.is_cache_key_valid`
 - `cache_manager.CacheManager`
+
+### `src/claude_skills/claude_skills/common/cache/cache_key.py`
+
+- `hashlib`
+- `json`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/common/cache/cache_manager.py`
 
