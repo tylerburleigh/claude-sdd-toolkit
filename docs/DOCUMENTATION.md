@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 13:03:20
+**Generated:** 2025-11-07 13:22:44
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 249
-- **Total Lines:** 88500
+- **Total Files:** 250
+- **Total Lines:** 88647
 - **Total Classes:** 355
-- **Total Functions:** 901
+- **Total Functions:** 903
 - **Avg Complexity:** 5.82
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -8918,7 +8918,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:63`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:65`
 **Complexity:** 1
 
 **Description:**
@@ -8933,7 +8933,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:101`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:103`
 **Complexity:** 1
 
 **Description:**
@@ -8948,7 +8948,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:83`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:85`
 **Complexity:** 1
 
 **Description:**
@@ -19043,6 +19043,31 @@ Returns:
 
 ---
 
+### `handle_cache_info(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:19`
+⚠️ **Complexity:** 12 (High)
+
+**Description:**
+> Handle 'sdd cache info' command.
+
+Displays cache statistics including:
+- Cache location (directory path)
+- Total cache size (MB)
+- Number of entries (total, active, expired)
+- Cache hit rate (if trackable)
+
+Args:
+    args: Parsed command-line arguments
+    printer: PrettyPrinter instance for formatted output
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
 ### `has_dependency_cycle(graph, node) -> Tuple[bool, Optional[List[str]]]`
 
 **Language:** python
@@ -20951,6 +20976,25 @@ Provides development utilities for maintaining the claude_skills package.
 **Parameters:**
 - `subparsers`: Any
 - `parent_parser`: argparse.ArgumentParser
+
+---
+
+### `register_cache(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:109`
+**Complexity:** 1
+
+**Description:**
+> Register 'cache' subcommand for unified SDD CLI.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
 
 ---
 
@@ -25882,6 +25926,17 @@ Returns:
 - `typing.Any`
 - `typing.Dict`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/common/cache/cli.py`
+
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.cache.CacheManager`
+- `claude_skills.common.config.get_cache_config`
+- `claude_skills.common.config.is_cache_enabled`
+- `json`
+- `pathlib.Path`
+- `sys`
 
 ### `src/claude_skills/claude_skills/common/cli_utils.py`
 

@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T18:03:20.364755Z",
+    "generated_at": "2025-11-07T18:22:44.468945Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 249,
-    "total_lines": 88500,
+    "total_files": 250,
+    "total_lines": 88647,
     "total_classes": 355,
-    "total_functions": 901,
+    "total_functions": 903,
     "avg_complexity": 5.82,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 249,
-        "lines": 88500,
+        "files": 250,
+        "lines": 88647,
         "classes": 355,
-        "functions": 901,
+        "functions": 903,
         "avg_complexity": 5.82
       }
     }
@@ -121,7 +121,7 @@
         "logging"
       ],
       "exports": [],
-      "lines": 116
+      "lines": 118
     },
     {
       "name": "gendocs",
@@ -989,6 +989,29 @@
       ],
       "exports": [],
       "lines": 346
+    },
+    {
+      "name": "cli",
+      "file": "src/claude_skills/claude_skills/common/cache/cli.py",
+      "language": "python",
+      "docstring": "Cache Management CLI - Commands for managing the SDD consultation cache.\n\nProvides commands to inspect, manage, and maintain the cache used for\nAI consultation results.",
+      "classes": [],
+      "functions": [
+        "handle_cache_info",
+        "register_cache"
+      ],
+      "imports": [
+        "argparse",
+        "json",
+        "sys",
+        "pathlib.Path",
+        "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.cache.CacheManager",
+        "claude_skills.common.config.get_cache_config",
+        "claude_skills.common.config.is_cache_enabled"
+      ],
+      "exports": [],
+      "lines": 145
     },
     {
       "name": "cli_utils",
@@ -8537,6 +8560,14 @@
       "is_public": true,
       "instantiated_by": [
         {
+          "instantiator": "handle_cache_info",
+          "file": "src/claude_skills/claude_skills/common/cache/cli.py",
+          "line": 44,
+          "context": [
+            "handle_cache_info"
+          ]
+        },
+        {
           "instantiator": "consult_multiple_ai_on_fidelity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
           "line": 243,
@@ -8546,7 +8577,7 @@
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "DependencyAnalysis",
@@ -21577,103 +21608,109 @@
         {
           "name": "register_next",
           "file": "unknown",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         },
         {
           "name": "register_update",
           "file": "unknown",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         },
         {
           "name": "register_validate",
           "file": "unknown",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         },
         {
           "name": "register_plan",
           "file": "unknown",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         },
         {
           "name": "register_plan_review",
           "file": "unknown",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         },
         {
           "name": "register_render",
           "file": "unknown",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         },
         {
           "name": "register_pr",
           "file": "unknown",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         },
         {
           "name": "register_context",
           "file": "unknown",
-          "line": 42,
+          "line": 43,
           "call_type": "function_call"
         },
         {
           "name": "register_session_marker",
           "file": "unknown",
-          "line": 43,
+          "line": 44,
           "call_type": "function_call"
         },
         {
           "name": "register_fidelity_review",
           "file": "unknown",
-          "line": 44,
+          "line": 45,
           "call_type": "function_call"
         },
         {
           "name": "register_spec_mod",
           "file": "unknown",
-          "line": 45,
+          "line": 46,
+          "call_type": "function_call"
+        },
+        {
+          "name": "register_cache",
+          "file": "unknown",
+          "line": 47,
           "call_type": "function_call"
         },
         {
           "name": "_register_doc_cli",
           "file": "unknown",
-          "line": 48,
+          "line": 50,
           "call_type": "function_call"
         },
         {
           "name": "_register_test_cli",
           "file": "unknown",
-          "line": 49,
+          "line": 51,
           "call_type": "function_call"
         },
         {
           "name": "_register_skills_dev_cli",
           "file": "unknown",
-          "line": 50,
+          "line": 52,
           "call_type": "function_call"
         },
         {
           "name": "register_workflow",
           "file": "unknown",
-          "line": 55,
+          "line": 57,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 56,
+          "line": 58,
           "call_type": "method_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 58,
+          "line": 60,
           "call_type": "method_call"
         }
       ],
@@ -21682,7 +21719,7 @@
     {
       "name": "_register_doc_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 63,
+      "line": 65,
       "language": "python",
       "docstring": "Register the doc CLI as an SDD subcommand.",
       "parameters": [
@@ -21707,7 +21744,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 48,
+          "line": 50,
           "call_type": "function_call"
         }
       ],
@@ -21715,25 +21752,25 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 68,
+          "line": 70,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 74,
+          "line": 76,
           "call_type": "method_call"
         },
         {
           "name": "register_code_doc",
           "file": "unknown",
-          "line": 79,
+          "line": 81,
           "call_type": "function_call"
         },
         {
           "name": "register_doc_query",
           "file": "unknown",
-          "line": 80,
+          "line": 82,
           "call_type": "function_call"
         }
       ],
@@ -21742,7 +21779,7 @@
     {
       "name": "_register_test_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 83,
+      "line": 85,
       "language": "python",
       "docstring": "Register the test CLI as an SDD subcommand.",
       "parameters": [
@@ -21767,7 +21804,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 49,
+          "line": 51,
           "call_type": "function_call"
         }
       ],
@@ -21775,19 +21812,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 87,
+          "line": 89,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 93,
+          "line": 95,
           "call_type": "method_call"
         },
         {
           "name": "register_run_tests",
           "file": "unknown",
-          "line": 98,
+          "line": 100,
           "call_type": "function_call"
         }
       ],
@@ -21796,7 +21833,7 @@
     {
       "name": "_register_skills_dev_cli",
       "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-      "line": 101,
+      "line": 103,
       "language": "python",
       "docstring": "Register the skills-dev CLI as an SDD subcommand.",
       "parameters": [
@@ -21821,7 +21858,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 50,
+          "line": 52,
           "call_type": "function_call"
         }
       ],
@@ -21829,19 +21866,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 105,
+          "line": 107,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 111,
+          "line": 113,
           "call_type": "method_call"
         },
         {
           "name": "register_skills_dev_subcommands",
           "file": "unknown",
-          "line": 116,
+          "line": 118,
           "call_type": "function_call"
         }
       ],
@@ -29479,7 +29516,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 79,
+          "line": 81,
           "call_type": "function_call"
         }
       ],
@@ -32738,6 +32775,322 @@
       ]
     },
     {
+      "name": "handle_cache_info",
+      "file": "src/claude_skills/claude_skills/common/cache/cli.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Handle 'sdd cache info' command.\n\nDisplays cache statistics including:\n- Cache location (directory path)\n- Total cache size (MB)\n- Number of entries (total, active, expired)\n- Cache hit rate (if trackable)\n\nArgs:\n    args: Parsed command-line arguments\n    printer: PrettyPrinter instance for formatted output",
+      "parameters": [
+        {
+          "name": "args",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "printer",
+          "type": "PrettyPrinter",
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 12,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [],
+      "calls": [
+        {
+          "name": "is_cache_enabled",
+          "file": "unknown",
+          "line": 35,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 36,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 37,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 37,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 39,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 40,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get_stats",
+          "file": "unknown",
+          "line": 47,
+          "call_type": "method_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 51,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 52,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 54,
+          "call_type": "method_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 59,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 62,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 66,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 67,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 68,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 70,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 71,
+          "call_type": "function_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 72,
+          "call_type": "function_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 75,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 77,
+          "call_type": "method_call"
+        },
+        {
+          "name": "str",
+          "file": "unknown",
+          "line": 77,
+          "call_type": "function_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 79,
+          "call_type": "method_call"
+        },
+        {
+          "name": "header",
+          "file": "unknown",
+          "line": 81,
+          "call_type": "method_call"
+        },
+        {
+          "name": "result",
+          "file": "unknown",
+          "line": 82,
+          "call_type": "method_call"
+        },
+        {
+          "name": "exists",
+          "file": "unknown",
+          "line": 86,
+          "call_type": "method_call"
+        },
+        {
+          "name": "is_dir",
+          "file": "unknown",
+          "line": 87,
+          "call_type": "method_call"
+        },
+        {
+          "name": "success",
+          "file": "unknown",
+          "line": 88,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 92,
+          "call_type": "method_call"
+        },
+        {
+          "name": "blank",
+          "file": "unknown",
+          "line": 96,
+          "call_type": "method_call"
+        },
+        {
+          "name": "action",
+          "file": "unknown",
+          "line": 97,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 102,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 105,
+          "call_type": "method_call"
+        },
+        {
+          "name": "format_exc",
+          "file": "unknown",
+          "line": 105,
+          "call_type": "method_call"
+        }
+      ]
+    },
+    {
+      "name": "register_cache",
+      "file": "src/claude_skills/claude_skills/common/cache/cli.py",
+      "line": 109,
+      "language": "python",
+      "docstring": "Register 'cache' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
+      "parameters": [
+        {
+          "name": "subparsers",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "parent_parser",
+          "type": null,
+          "default": null
+        }
+      ],
+      "return_type": null,
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "register_all_subcommands",
+          "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
+          "line": 47,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 117,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_subparsers",
+          "file": "unknown",
+          "line": 125,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 133,
+          "call_type": "method_call"
+        },
+        {
+          "name": "set_defaults",
+          "file": "unknown",
+          "line": 139,
+          "call_type": "method_call"
+        }
+      ],
+      "call_count": 1
+    },
+    {
       "name": "strip_ansi_codes",
       "file": "src/claude_skills/claude_skills/common/cli_utils.py",
       "line": 15,
@@ -34525,6 +34878,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "handle_cache_info",
+          "file": "src/claude_skills/claude_skills/common/cache/cli.py",
+          "line": 35,
+          "call_type": "function_call"
+        },
+        {
           "name": "consult_multiple_ai_on_fidelity",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py",
           "line": 236,
@@ -34539,7 +34898,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 1
+      "call_count": 2
     },
     {
       "name": "extract_prepare_task_contract",
@@ -52186,7 +52545,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 43,
+          "line": 44,
           "call_type": "function_call"
         }
       ],
@@ -52234,7 +52593,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 42,
+          "line": 43,
           "call_type": "function_call"
         }
       ],
@@ -59607,7 +59966,7 @@
         {
           "name": "_register_doc_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 80,
+          "line": 82,
           "call_type": "function_call"
         }
       ],
@@ -67558,7 +67917,7 @@
         {
           "name": "_register_test_cli",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 98,
+          "line": 100,
           "call_type": "function_call"
         }
       ],
@@ -77445,7 +77804,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 35,
+          "line": 36,
           "call_type": "function_call"
         }
       ],
@@ -81124,7 +81483,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 38,
+          "line": 39,
           "call_type": "function_call"
         }
       ],
@@ -83118,7 +83477,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 39,
+          "line": 40,
           "call_type": "function_call"
         }
       ],
@@ -85197,7 +85556,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 41,
+          "line": 42,
           "call_type": "function_call"
         },
         {
@@ -87117,7 +87476,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 40,
+          "line": 41,
           "call_type": "function_call"
         }
       ],
@@ -88530,7 +88889,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 45,
+          "line": 46,
           "call_type": "function_call"
         }
       ],
@@ -96965,7 +97324,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 36,
+          "line": 37,
           "call_type": "function_call"
         }
       ],
@@ -110342,7 +110701,7 @@
         {
           "name": "register_all_subcommands",
           "file": "src/claude_skills/claude_skills/cli/sdd/registry.py",
-          "line": 37,
+          "line": 38,
           "call_type": "function_call"
         }
       ],
@@ -133734,6 +134093,16 @@
       "typing.Dict",
       "datetime.datetime",
       "datetime.timedelta"
+    ],
+    "src/claude_skills/claude_skills/common/cache/cli.py": [
+      "argparse",
+      "json",
+      "sys",
+      "pathlib.Path",
+      "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.cache.CacheManager",
+      "claude_skills.common.config.get_cache_config",
+      "claude_skills.common.config.is_cache_enabled"
     ],
     "src/claude_skills/claude_skills/common/cli_utils.py": [
       "argparse",

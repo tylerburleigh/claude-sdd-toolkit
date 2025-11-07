@@ -16,6 +16,80 @@ from claude_skills.common.cache import CacheManager
 from claude_skills.common.config import get_cache_config, is_cache_enabled
 
 
+def handle_cache_clear(args, printer: PrettyPrinter):
+    """
+    Handle 'sdd cache clear' command.
+
+    Clears cache entries with optional filters:
+    - --spec: Clear only entries for a specific spec ID
+    - --type: Clear only entries of a specific review type (fidelity, plan)
+
+    Args:
+        args: Parsed command-line arguments
+        printer: PrettyPrinter instance for formatted output
+
+    Returns:
+        Exit code (0 for success, 1 for error)
+    """
+    try:
+        # Check if caching is enabled
+        if not is_cache_enabled():
+            if getattr(args, 'json', None):
+                print(json.dumps({"error": "Cache is disabled in configuration"}, indent=2))
+            else:
+                printer.warning("Cache is disabled in configuration")
+                printer.info("To enable caching, check .claude/config.json")
+            return 1
+
+        # Extract filters from args
+        spec_id = getattr(args, 'spec_id', None)
+        review_type = getattr(args, 'review_type', None)
+
+        # Initialize cache manager
+        cache = CacheManager()
+
+        # Perform clear operation
+        count = cache.clear(spec_id=spec_id, review_type=review_type)
+
+        # Format output
+        if getattr(args, 'json', None):
+            result = {
+                "entries_deleted": count,
+                "filters": {}
+            }
+            if spec_id:
+                result["filters"]["spec_id"] = spec_id
+            if review_type:
+                result["filters"]["review_type"] = review_type
+            print(json.dumps(result, indent=2))
+        else:
+            # Human-readable output
+            if count == 0:
+                printer.warning("No cache entries matched the specified filters")
+                if spec_id:
+                    printer.info(f"Filter: spec_id={spec_id}")
+                if review_type:
+                    printer.info(f"Filter: review_type={review_type}")
+            else:
+                printer.success(f"Cleared {count} cache entries")
+                if spec_id or review_type:
+                    printer.blank()
+                    printer.header("Filters Applied")
+                    if spec_id:
+                        printer.result("Spec ID", spec_id)
+                    if review_type:
+                        printer.result("Review Type", review_type)
+
+        return 0
+
+    except Exception as e:
+        printer.error(f"Error clearing cache: {e}")
+        if getattr(args, 'debug', False):
+            import traceback
+            printer.error(traceback.format_exc())
+        return 1
+
+
 def handle_cache_info(args, printer: PrettyPrinter):
     """
     Handle 'sdd cache info' command.
@@ -138,8 +212,32 @@ def register_cache(subparsers, parent_parser):
     )
     info_parser.set_defaults(func=handle_cache_info)
 
-    # Note: Additional subcommands (cleanup, clear) will be added in future tasks
+    # Register 'clear' subcommand
+    clear_parser = cache_subparsers.add_parser(
+        'clear',
+        parents=[parent_parser],
+        help='Clear cache entries with optional filters',
+        description='Remove cache entries, optionally filtered by spec ID or review type'
+    )
+    clear_parser.add_argument(
+        '--spec-id',
+        type=str,
+        dest='spec_id',
+        metavar='SPEC_ID',
+        help='Clear only entries for the specified spec ID'
+    )
+    clear_parser.add_argument(
+        '--review-type',
+        type=str,
+        dest='review_type',
+        metavar='TYPE',
+        choices=['fidelity', 'plan'],
+        help='Clear only entries of the specified review type (fidelity or plan)'
+    )
+    clear_parser.set_defaults(func=handle_cache_clear)
+
+    # Note: Additional subcommand (cleanup) will be added in future task
     # This follows the spec's task breakdown:
-    # - task-1-4-1: Implement 'info' command (this task)
-    # - task-1-4-2: Implement 'cleanup' command (removes expired entries)
-    # - task-1-4-3: Implement 'clear' command (removes all entries)
+    # - task-1-4-1: Implement 'info' command (completed)
+    # - task-1-4-2: Implement 'clear' command with filters (this task)
+    # - task-1-4-3: Implement 'cleanup' command (removes expired entries)

@@ -1,7 +1,7 @@
 {
   "spec_id": "phase5-agent-optimization-2025-11-07-001",
   "generated": "2025-11-07T17:20:00Z",
-  "last_updated": "2025-11-07T18:16:58.485336Z",
+  "last_updated": "2025-11-07T18:33:46.240336Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 38,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {
         "description": "Replace interactive TUI features with AI-agent-optimized streaming output and smart caching",
         "objectives": [
@@ -38,7 +38,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {
         "purpose": "Build file-based caching system for AI model responses with TTL and invalidation",
         "risk_level": "low",
@@ -65,7 +65,7 @@
         "task-1-5"
       ],
       "total_tasks": 9,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -291,7 +291,7 @@
     "task-1-4": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/cli/cache_commands.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-4-1",
@@ -305,7 +305,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/cache_commands.py",
         "task_category": "implementation",
@@ -340,7 +340,7 @@
     "task-1-4-2": {
       "type": "subtask",
       "title": "Implement 'sdd cache clear' command with --type and --spec filters",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-4",
       "children": [],
       "dependencies": {
@@ -349,9 +349,12 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "estimated_hours": 0.75
+        "estimated_hours": 0.75,
+        "completed_at": "2025-11-07T18:33:46.230174Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-07T18:33:46.232956Z"
       }
     },
     "task-1-5": {
@@ -1301,7 +1304,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-07T17:33:28.331361Z",
-    "progress_percentage": 18,
+    "progress_percentage": 21,
     "current_phase": "phase-1"
   },
   "journal": [
@@ -1367,6 +1370,15 @@
       "content": "Successfully implemented 'sdd cache info' CLI command that displays cache statistics. The command shows cache location, total/active/expired entries, cache size in MB and bytes, and directory status. Supports both JSON output (default) and human-readable format via --no-json flag. Integrated with unified SDD CLI registry. Added comprehensive error handling for cache disabled, missing directories, and general errors. Created 5 unit tests covering JSON output, human-readable output, cache disabled scenario, error handling, and cleanup suggestions. All tests pass.\n\nChanges made:\n- Created src/claude_skills/claude_skills/common/cache/cli.py with handle_cache_info() handler and register_cache() function\n- Registered cache command in src/claude_skills/claude_skills/cli/sdd/registry.py\n- Used CacheManager.get_stats() to retrieve cache statistics\n- Implemented dual output modes (JSON and human-readable) using PrettyPrinter\n- Added 5 comprehensive unit tests in tests/unit/test_cache_cli.py\n- Verified command works with both 'sdd cache info' (JSON) and 'sdd cache info --no-json' (human-readable)\n\nThe command provides clear visibility into cache health and suggests cleanup when expired entries are detected.",
       "metadata": {},
       "task_id": "task-1-4-1"
+    },
+    {
+      "timestamp": "2025-11-07T18:33:46.232944Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement 'sdd cache clear' command with --type and --spec filters",
+      "author": "claude-code",
+      "content": "Successfully implemented the 'sdd cache clear' command with selective filtering capabilities. The command supports two filter options:\n\n1. --spec-id SPEC_ID: Clears only cache entries for a specific specification\n2. --review-type TYPE: Clears only entries of a specific review type (fidelity or plan)\n\nFilters can be combined to target specific entries (e.g., all fidelity reviews for spec-001).\n\nImplementation details:\n- Extended CacheManager.clear() to accept optional spec_id and review_type parameters\n- Extended CacheManager.set() to accept optional metadata for filtering support\n- Added _matches_filters() helper method for metadata-based filtering\n- Implemented handle_cache_clear() CLI handler with JSON and human-readable output\n- Registered 'clear' subcommand with argument parsing (--spec-id and --review-type)\n- Fixed argument naming conflict with global --specs-dir option\n- Created comprehensive unit tests (8 test cases covering all scenarios)\n\nAll tests pass successfully. The filtering logic correctly identifies and removes only matching cache entries while preserving others.",
+      "metadata": {},
+      "task_id": "task-1-4-2"
     }
   ]
 }

@@ -172,7 +172,7 @@ class CacheManager:
             logger.warning(f"Failed to read cache entry {key}: {e}")
             return None
 
-    def set(self, key: str, value: Any, ttl_hours: Optional[float] = None) -> bool:
+    def set(self, key: str, value: Any, ttl_hours: Optional[float] = None, metadata: Optional[Dict[str, Any]] = None) -> bool:
         """
         Store value in cache with TTL.
 
@@ -180,6 +180,7 @@ class CacheManager:
             key: Cache key
             value: Value to cache (must be JSON-serializable)
             ttl_hours: Time to live in hours (defaults to 24 hours)
+            metadata: Optional metadata for filtering (spec_id, review_type, model, etc.)
 
         Returns:
             True if successful, False if operation failed
@@ -201,6 +202,10 @@ class CacheManager:
                 "ttl_seconds": ttl_hours * 3600,
                 "expires_at_human": (datetime.now() + timedelta(hours=ttl_hours)).isoformat()
             }
+
+            # Add metadata if provided (for filtering support)
+            if metadata:
+                entry["metadata"] = metadata
 
             # Atomic write: write to temp file, then rename
             temp_path = cache_path.with_suffix(".tmp")
@@ -238,28 +243,87 @@ class CacheManager:
             logger.warning(f"Failed to delete cache entry {key}: {e}")
             return False
 
-    def clear(self) -> int:
+    def clear(self, spec_id: Optional[str] = None, review_type: Optional[str] = None) -> int:
         """
-        Clear all cache entries.
+        Clear cache entries with optional filters.
+
+        Args:
+            spec_id: Filter by spec ID (clears only entries for this spec)
+            review_type: Filter by review type ("fidelity", "plan", or None for all types)
 
         Returns:
             Number of entries deleted
+
+        Examples:
+            cache.clear()  # Clear all entries
+            cache.clear(spec_id="my-spec-001")  # Clear all entries for my-spec-001
+            cache.clear(review_type="fidelity")  # Clear all fidelity review entries
+            cache.clear(spec_id="my-spec-001", review_type="plan")  # Clear plan reviews for my-spec-001
         """
         count = 0
         try:
             for cache_file in self.cache_dir.glob("*.json"):
                 try:
+                    # If filters specified, check if entry matches
+                    if spec_id or review_type:
+                        with cache_file.open("r") as f:
+                            entry = json.load(f)
+
+                        # Check if entry matches filters
+                        if not self._matches_filters(entry, spec_id, review_type):
+                            continue
+
+                    # Delete matching entry
                     cache_file.unlink()
                     count += 1
                 except Exception as e:
                     logger.warning(f"Failed to delete cache file {cache_file}: {e}")
 
-            logger.info(f"Cache cleared: {count} entries deleted")
+            logger.info(f"Cache cleared: {count} entries deleted (spec_id={spec_id}, review_type={review_type})")
             return count
 
         except Exception as e:
             logger.warning(f"Failed to clear cache: {e}")
             return count
+
+    def _matches_filters(self, entry: Dict[str, Any], spec_id: Optional[str], review_type: Optional[str]) -> bool:
+        """
+        Check if cache entry matches the specified filters.
+
+        Args:
+            entry: Cache entry dictionary
+            spec_id: Spec ID filter (None to ignore)
+            review_type: Review type filter (None to ignore)
+
+        Returns:
+            True if entry matches all specified filters
+
+        Note:
+            Uses the metadata field added in the cache entry for filtering.
+            Entries without metadata are skipped when filters are applied.
+        """
+        # Get metadata from entry (added in set() method)
+        metadata = entry.get("metadata", {})
+
+        # If no metadata and filters are specified, skip this entry
+        # (it's an old entry without metadata support)
+        if (spec_id or review_type) and not metadata:
+            return False
+
+        # Extract spec_id from metadata
+        entry_spec_id = metadata.get("spec_id")
+
+        # Extract review_type from metadata
+        entry_review_type = metadata.get("review_type")
+
+        # Apply filters
+        if spec_id and entry_spec_id != spec_id:
+            return False
+
+        if review_type and entry_review_type != review_type:
+            return False
+
+        return True
 
     def get_stats(self) -> Dict[str, Any]:
         """
