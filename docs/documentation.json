@@ -2,17 +2,17 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T00:07:15.345346Z",
+    "generated_at": "2025-11-07T00:11:16.464617Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 240,
-    "total_lines": 84165,
-    "total_classes": 338,
-    "total_functions": 869,
+    "total_files": 241,
+    "total_lines": 84485,
+    "total_classes": 341,
+    "total_functions": 870,
     "avg_complexity": 5.78,
     "max_complexity": 45,
     "high_complexity_functions": [
@@ -24,10 +24,10 @@
     ],
     "by_language": {
       "python": {
-        "files": 240,
-        "lines": 84165,
-        "classes": 338,
-        "functions": 869,
+        "files": 241,
+        "lines": 84485,
+        "classes": 341,
+        "functions": 870,
         "avg_complexity": 5.78
       }
     }
@@ -856,12 +856,13 @@
         "json_output.CommandType",
         "cli_utils.strip_ansi_codes",
         "cli_utils.format_json_output",
+        "cli_utils.add_format_flag",
         "sdd_config.load_sdd_config",
         "sdd_config.DEFAULT_SDD_CONFIG",
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 329
+      "lines": 331
     },
     {
       "name": "ai_config",
@@ -932,18 +933,24 @@
       "functions": [
         "strip_ansi_codes",
         "format_json_output",
-        "_strip_ansi_recursive"
+        "_strip_ansi_recursive",
+        "add_format_flag"
       ],
       "imports": [
+        "argparse",
         "json",
         "re",
+        "functools.wraps",
         "typing.Any",
+        "typing.Callable",
         "typing.Dict",
         "typing.List",
+        "typing.Optional",
+        "typing.Sequence",
         "typing.Union"
       ],
       "exports": [],
-      "lines": 95
+      "lines": 157
     },
     {
       "name": "completion",
@@ -5251,6 +5258,28 @@
       "imports": [],
       "exports": [],
       "lines": 1
+    },
+    {
+      "name": "test_cli_utils",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+      "language": "python",
+      "docstring": "Unit tests for CLI utilities module.\n\nTests for helper functions including JSON formatting, ANSI code stripping,\nand argument parser decorators.",
+      "classes": [
+        "TestStripAnsiCodes",
+        "TestFormatJsonOutput",
+        "TestAddFormatFlag"
+      ],
+      "functions": [],
+      "imports": [
+        "argparse",
+        "json",
+        "pytest",
+        "claude_skills.common.cli_utils.strip_ansi_codes",
+        "claude_skills.common.cli_utils.format_json_output",
+        "claude_skills.common.cli_utils.add_format_flag"
+      ],
+      "exports": [],
+      "lines": 256
     },
     {
       "name": "test_completion",
@@ -17174,6 +17203,75 @@
       "methods": [
         "test_full_revision_lifecycle",
         "test_revision_timestamps_are_iso8601"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestStripAnsiCodes",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+      "line": 19,
+      "language": "python",
+      "docstring": "Tests for strip_ansi_codes function.",
+      "bases": [],
+      "methods": [
+        "test_strip_basic_ansi_codes",
+        "test_strip_multiple_ansi_codes",
+        "test_no_ansi_codes",
+        "test_empty_string",
+        "test_rich_markup_not_stripped"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestFormatJsonOutput",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+      "line": 47,
+      "language": "python",
+      "docstring": "Tests for format_json_output function.",
+      "bases": [],
+      "methods": [
+        "test_basic_dict_formatting",
+        "test_compact_formatting",
+        "test_pretty_formatting",
+        "test_ansi_stripping_enabled",
+        "test_ansi_stripping_disabled",
+        "test_nested_dict_ansi_stripping",
+        "test_list_ansi_stripping",
+        "test_mixed_types"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestAddFormatFlag",
+      "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+      "line": 119,
+      "language": "python",
+      "docstring": "Tests for add_format_flag decorator function.",
+      "bases": [],
+      "methods": [
+        "test_basic_usage",
+        "test_custom_choices",
+        "test_custom_default",
+        "test_custom_help_text",
+        "test_invalid_choice_raises_error",
+        "test_default_not_in_choices_raises_error",
+        "test_with_subparsers",
+        "test_returns_parser",
+        "test_auto_generated_help_text",
+        "test_empty_choices_uses_default",
+        "test_multiple_format_variations"
       ],
       "properties": [],
       "is_exported": false,
@@ -31647,7 +31745,7 @@
     {
       "name": "strip_ansi_codes",
       "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-      "line": 13,
+      "line": 15,
       "language": "python",
       "docstring": "Remove ANSI escape codes from text.\n\nANSI codes are used for terminal coloring and formatting (e.g., from Rich library).\nThis function strips them to produce clean text suitable for JSON output.\n\nArgs:\n    text: Text potentially containing ANSI escape sequences\n\nReturns:\n    Text with all ANSI codes removed\n\nExample:\n    >>> strip_ansi_codes(\"\\x1b[31mRed text\\x1b[0m\")\n    'Red text'\n    >>> strip_ansi_codes(\"[bold]Text[/bold]\")  # Rich markup\n    '[bold]Text[/bold]'  # Rich markup is not ANSI codes",
       "parameters": [
@@ -31667,7 +31765,37 @@
         {
           "name": "_strip_ansi_recursive",
           "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-          "line": 92,
+          "line": 94,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_strip_basic_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 25,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_strip_multiple_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 30,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_no_ansi_codes",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 35,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_string",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 39,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rich_markup_not_stripped",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 44,
           "call_type": "function_call"
         }
       ],
@@ -31675,22 +31803,22 @@
         {
           "name": "compile",
           "file": "unknown",
-          "line": 34,
+          "line": 36,
           "call_type": "method_call"
         },
         {
           "name": "sub",
           "file": "unknown",
-          "line": 35,
+          "line": 37,
           "call_type": "method_call"
         }
       ],
-      "call_count": 1
+      "call_count": 6
     },
     {
       "name": "format_json_output",
       "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-      "line": 38,
+      "line": 40,
       "language": "python",
       "docstring": "Format data as JSON output with optional ANSI code stripping.\n\nThis helper ensures consistent JSON output across CLI commands by:\n1. Stripping ANSI escape codes from string values (if enabled)\n2. Providing compact or pretty-printed formatting\n3. Handling nested dictionaries and lists recursively\n\nArgs:\n    data: Dictionary or list to convert to JSON\n    compact: If True, use compact formatting (no indentation)\n            If False, use pretty-printed formatting (2-space indentation)\n    strip_ansi: If True, strip ANSI codes from all string values\n\nReturns:\n    JSON-formatted string\n\nExample:\n    >>> data = {\"status\": \"\\x1b[32mcompleted\\x1b[0m\", \"count\": 5}\n    >>> format_json_output(data, compact=False, strip_ansi=True)\n    '{\\n  \"status\": \"completed\",\\n  \"count\": 5\\n}'",
       "parameters": [
@@ -31734,34 +31862,82 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
         {
           "name": "_strip_ansi_recursive",
           "file": "unknown",
-          "line": 66,
+          "line": 68,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 69,
-          "call_type": "method_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
           "line": 71,
           "call_type": "method_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 73,
+          "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "_strip_ansi_recursive",
       "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-      "line": 74,
+      "line": 76,
       "language": "python",
       "docstring": "Recursively strip ANSI codes from all string values in an object.\n\nHandles dictionaries, lists, and nested structures. Non-string values\nare returned unchanged.\n\nArgs:\n    obj: Object to process (dict, list, str, or primitive)\n\nReturns:\n    Object with ANSI codes stripped from all strings",
       "parameters": [
@@ -31781,13 +31957,7 @@
         {
           "name": "format_json_output",
           "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-          "line": 66,
-          "call_type": "function_call"
-        },
-        {
-          "name": "_strip_ansi_recursive",
-          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
-          "line": 88,
+          "line": 68,
           "call_type": "function_call"
         },
         {
@@ -31795,27 +31965,15 @@
           "file": "src/claude_skills/claude_skills/common/cli_utils.py",
           "line": 90,
           "call_type": "function_call"
-        }
-      ],
-      "calls": [
-        {
-          "name": "isinstance",
-          "file": "unknown",
-          "line": 87,
-          "call_type": "function_call"
         },
         {
           "name": "_strip_ansi_recursive",
-          "file": "unknown",
-          "line": 88,
+          "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+          "line": 92,
           "call_type": "function_call"
-        },
-        {
-          "name": "items",
-          "file": "unknown",
-          "line": 88,
-          "call_type": "method_call"
-        },
+        }
+      ],
+      "calls": [
         {
           "name": "isinstance",
           "file": "unknown",
@@ -31829,19 +31987,179 @@
           "call_type": "function_call"
         },
         {
+          "name": "items",
+          "file": "unknown",
+          "line": 90,
+          "call_type": "method_call"
+        },
+        {
           "name": "isinstance",
           "file": "unknown",
           "line": 91,
           "call_type": "function_call"
         },
         {
-          "name": "strip_ansi_codes",
+          "name": "_strip_ansi_recursive",
           "file": "unknown",
           "line": 92,
+          "call_type": "function_call"
+        },
+        {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "strip_ansi_codes",
+          "file": "unknown",
+          "line": 94,
           "call_type": "function_call"
         }
       ],
       "call_count": 3
+    },
+    {
+      "name": "add_format_flag",
+      "file": "src/claude_skills/claude_skills/common/cli_utils.py",
+      "line": 100,
+      "language": "python",
+      "docstring": "Add a consistent --format flag to an argparse parser.\n\nThis utility function provides a standardized way to add output format options\nto CLI commands, reducing code duplication across different command implementations.\n\nArgs:\n    parser: The argparse ArgumentParser or subparser to modify\n    choices: Valid format options (default: ['text', 'json'])\n    default: Default format value (default: 'text')\n    help_text: Custom help text (default: auto-generated from choices)\n\nReturns:\n    The modified parser (for chaining)\n\nExample:\n    >>> parser = argparse.ArgumentParser()\n    >>> add_format_flag(parser, choices=['json', 'table'], default='table')\n    <ArgumentParser ...>\n\n    >>> # With subparsers\n    >>> subparsers = parser.add_subparsers()\n    >>> cmd_parser = subparsers.add_parser('stats')\n    >>> add_format_flag(cmd_parser, choices=['text', 'json', 'markdown'])\n    <ArgumentParser ...>\n\nRaises:\n    ValueError: If default is not in choices",
+      "parameters": [
+        {
+          "name": "parser",
+          "type": "argparse.ArgumentParser",
+          "default": null
+        },
+        {
+          "name": "choices",
+          "type": "Optional[Sequence[str]]",
+          "default": null
+        },
+        {
+          "name": "default",
+          "type": "str",
+          "default": null
+        },
+        {
+          "name": "help_text",
+          "type": "Optional[str]",
+          "default": null
+        }
+      ],
+      "return_type": "argparse.ArgumentParser",
+      "complexity": 4,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "test_basic_usage",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 125,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_custom_choices",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 138,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_custom_default",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 151,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_custom_help_text",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 160,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_invalid_choice_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 175,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_default_not_in_choices_raises_error",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 185,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_with_subparsers",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 194,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_returns_parser",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 203,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_auto_generated_help_text",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 210,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_empty_choices_uses_default",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 226,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_multiple_format_variations",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 242,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_multiple_format_variations",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 248,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_multiple_format_variations",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 254,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "list",
+          "file": "unknown",
+          "line": 141,
+          "call_type": "function_call"
+        },
+        {
+          "name": "join",
+          "file": "unknown",
+          "line": 146,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 150,
+          "call_type": "method_call"
+        },
+        {
+          "name": "list",
+          "file": "unknown",
+          "line": 152,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 13
     },
     {
       "name": "check_spec_completion",
@@ -39232,6 +39550,54 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -39248,7 +39614,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "format_compact_output",
@@ -60735,6 +61101,54 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -60745,7 +61159,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "find_refactor_candidates",
@@ -62073,6 +62487,54 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -62083,7 +62545,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "trace_data_lifecycle",
@@ -63436,6 +63898,54 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -63446,7 +63956,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "trace_execution_flow",
@@ -64301,6 +64811,54 @@
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 845,
           "call_type": "function_call"
+        },
+        {
+          "name": "test_basic_dict_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 53,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_compact_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 60,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_pretty_formatting",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 67,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_enabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ansi_stripping_disabled",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 82,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_nested_dict_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 93,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_list_ansi_stripping",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 100,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_mixed_types",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py",
+          "line": 115,
+          "call_type": "function_call"
         }
       ],
       "calls": [
@@ -64311,7 +64869,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 3
+      "call_count": 11
     },
     {
       "name": "_dump_json",
@@ -127471,6 +128029,7 @@
       "json_output.CommandType",
       "cli_utils.strip_ansi_codes",
       "cli_utils.format_json_output",
+      "cli_utils.add_format_flag",
       "sdd_config.load_sdd_config",
       "sdd_config.DEFAULT_SDD_CONFIG",
       "sdd_config.get_sdd_setting"
@@ -127495,11 +128054,16 @@
       "concurrent.futures.as_completed"
     ],
     "src/claude_skills/claude_skills/common/cli_utils.py": [
+      "argparse",
       "json",
       "re",
+      "functools.wraps",
       "typing.Any",
+      "typing.Callable",
       "typing.Dict",
       "typing.List",
+      "typing.Optional",
+      "typing.Sequence",
       "typing.Union"
     ],
     "src/claude_skills/claude_skills/common/completion.py": [
@@ -129162,6 +129726,14 @@
       "claude_skills.sdd_spec_mod.revision.rollback_to_version",
       "claude_skills.sdd_spec_mod.revision._bump_version",
       "claude_skills.sdd_spec_mod.revision._validate_spec_metadata"
+    ],
+    "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py": [
+      "argparse",
+      "json",
+      "pytest",
+      "claude_skills.common.cli_utils.strip_ansi_codes",
+      "claude_skills.common.cli_utils.format_json_output",
+      "claude_skills.common.cli_utils.add_format_flag"
     ],
     "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py": [
       "pytest",

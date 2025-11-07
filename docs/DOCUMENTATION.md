@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:07:15
+**Generated:** 2025-11-06 19:11:16
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 240
-- **Total Lines:** 84165
-- **Total Classes:** 338
-- **Total Functions:** 869
+- **Total Files:** 241
+- **Total Lines:** 84485
+- **Total Classes:** 341
+- **Total Functions:** 870
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
 - **High Complexity Functions:**
@@ -2325,6 +2325,29 @@ Attributes:
 
 ---
 
+### `TestAddFormatFlag`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:119`
+
+**Description:**
+> Tests for add_format_flag decorator function.
+
+**Methods:**
+- `test_basic_usage()`
+- `test_custom_choices()`
+- `test_custom_default()`
+- `test_custom_help_text()`
+- `test_invalid_choice_raises_error()`
+- `test_default_not_in_choices_raises_error()`
+- `test_with_subparsers()`
+- `test_returns_parser()`
+- `test_auto_generated_help_text()`
+- `test_empty_choices_uses_default()`
+- `test_multiple_format_variations()`
+
+---
+
 ### `TestAddJournalEntry`
 
 **Language:** python
@@ -3658,6 +3681,26 @@ Attributes:
 - `test_estimated_hours_zero()`
 - `test_prompt_text_structure()`
 - `test_completion_context_completeness()`
+
+---
+
+### `TestFormatJsonOutput`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:47`
+
+**Description:**
+> Tests for format_json_output function.
+
+**Methods:**
+- `test_basic_dict_formatting()`
+- `test_compact_formatting()`
+- `test_pretty_formatting()`
+- `test_ansi_stripping_enabled()`
+- `test_ansi_stripping_disabled()`
+- `test_nested_dict_ansi_stripping()`
+- `test_list_ansi_stripping()`
+- `test_mixed_types()`
 
 ---
 
@@ -5764,6 +5807,23 @@ Attributes:
 - `test_non_interactive_behavior()`
 - `test_command_hint_displayed()`
 - `test_incomplete_spec_no_completion_message()`
+
+---
+
+### `TestStripAnsiCodes`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py:19`
+
+**Description:**
+> Tests for strip_ansi_codes function.
+
+**Methods:**
+- `test_strip_basic_ansi_codes()`
+- `test_strip_multiple_ansi_codes()`
+- `test_no_ansi_codes()`
+- `test_empty_string()`
+- `test_rich_markup_not_stripped()`
 
 ---
 
@@ -8629,7 +8689,7 @@ Returns:
 ### `_strip_ansi_recursive(obj) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:74`
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:76`
 **Complexity:** 4
 
 **Description:**
@@ -8867,6 +8927,49 @@ Raises:
 - `text`: str
 - `assumption_type`: str
 - `added_by`: str
+
+---
+
+### `add_format_flag(parser, choices, default, help_text) -> argparse.ArgumentParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:100`
+**Complexity:** 4
+
+**Description:**
+> Add a consistent --format flag to an argparse parser.
+
+This utility function provides a standardized way to add output format options
+to CLI commands, reducing code duplication across different command implementations.
+
+Args:
+    parser: The argparse ArgumentParser or subparser to modify
+    choices: Valid format options (default: ['text', 'json'])
+    default: Default format value (default: 'text')
+    help_text: Custom help text (default: auto-generated from choices)
+
+Returns:
+    The modified parser (for chaining)
+
+Example:
+    >>> parser = argparse.ArgumentParser()
+    >>> add_format_flag(parser, choices=['json', 'table'], default='table')
+    <ArgumentParser ...>
+
+    >>> # With subparsers
+    >>> subparsers = parser.add_subparsers()
+    >>> cmd_parser = subparsers.add_parser('stats')
+    >>> add_format_flag(cmd_parser, choices=['text', 'json', 'markdown'])
+    <ArgumentParser ...>
+
+Raises:
+    ValueError: If default is not in choices
+
+**Parameters:**
+- `parser`: argparse.ArgumentParser
+- `choices`: Optional[Sequence[str]]
+- `default`: str
+- `help_text`: Optional[str]
 
 ---
 
@@ -15090,7 +15193,7 @@ Returns:
 ### `format_json_output(data, compact, strip_ansi) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:38`
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:40`
 **Complexity:** 3
 
 **Description:**
@@ -21475,7 +21578,7 @@ Returns:
 ### `strip_ansi_codes(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:13`
+**Defined in:** `src/claude_skills/claude_skills/common/cli_utils.py:15`
 **Complexity:** 1
 
 **Description:**
@@ -24543,6 +24646,7 @@ Returns:
 - `claude_skills.sdd_spec_mod.modification.transactional_modify`
 - `claude_skills.sdd_spec_mod.modification.update_node_field`
 - `claude_skills.sdd_spec_mod.modification.update_task_counts`
+- `cli_utils.add_format_flag`
 - `cli_utils.format_json_output`
 - `cli_utils.strip_ansi_codes`
 - `completion.check_spec_completion`
@@ -24667,11 +24771,16 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/cli_utils.py`
 
+- `argparse`
+- `functools.wraps`
 - `json`
 - `re`
 - `typing.Any`
+- `typing.Callable`
 - `typing.Dict`
 - `typing.List`
+- `typing.Optional`
+- `typing.Sequence`
 - `typing.Union`
 
 ### `src/claude_skills/claude_skills/common/completion.py`
@@ -26480,6 +26589,15 @@ Returns:
 - `claude_skills.sdd_spec_mod.revision.get_revision_history`
 - `claude_skills.sdd_spec_mod.revision.rollback_to_version`
 - `datetime.datetime`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py`
+
+- `argparse`
+- `claude_skills.common.cli_utils.add_format_flag`
+- `claude_skills.common.cli_utils.format_json_output`
+- `claude_skills.common.cli_utils.strip_ansi_codes`
+- `json`
 - `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_completion.py`

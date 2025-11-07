@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T00:10:57.711124Z",
+  "last_updated": "2025-11-07T00:13:56.521439Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 30,
+    "progress_percentage": 31,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 27,
+      "completed_tasks": 28,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -704,7 +704,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {}
     },
     "task-2-1": {
@@ -1135,7 +1135,7 @@
     "task-2-6": {
       "type": "task",
       "title": "tests/integration/test_list_commands.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-6-1",
@@ -1156,7 +1156,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/integration/test_list_commands.py",
         "task_category": "implementation",
@@ -1168,7 +1168,7 @@
     "task-2-6-1": {
       "type": "subtask",
       "title": "Test list-specs Rich table output",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-6",
       "children": [],
       "dependencies": {
@@ -1177,9 +1177,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-07T00:11:58.975195Z",
+        "completed_at": "2025-11-07T00:13:56.501268Z",
+        "needs_journaling": false,
+        "actual_hours": 0.033,
+        "journaled_at": "2025-11-07T00:13:56.515110Z"
       }
     },
     "task-2-6-2": {
@@ -3153,6 +3158,15 @@
       "content": "Successfully created add_format_flag() utility function in cli_utils.py. The function:\n- Adds a consistent --format flag to argparse parsers\n- Supports customizable choices and default values\n- Includes auto-generated help text\n- Returns parser for chaining\n- Properly validates inputs (raises ValueError if default not in choices)\n\nCreated comprehensive test suite with 24 tests covering:\n- Basic usage with default options\n- Custom choices and defaults\n- Custom help text\n- Error handling (invalid choices, invalid defaults)\n- Subparser integration\n- Parser chaining\n- Multiple common format variations from existing tools\n\nAll tests pass. Function is exported in common/__init__.py for use across all SDD skills.",
       "metadata": {},
       "task_id": "task-2-5-2"
+    },
+    {
+      "timestamp": "2025-11-07T00:13:56.515099Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Test list-specs Rich table output",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive integration tests for list-specs command with Rich table output. Created test_list_commands.py with 8 tests covering:\n\n- Help text display\n- Text/Rich table output (default format)\n- JSON output format\n- Empty directory handling\n- Status filtering (active, completed)\n- Progress calculation accuracy (50% = 2/4 tasks)\n- Detailed/verbose mode with additional metadata fields\n- Multiple specifications listing\n\nAll 8 tests pass. Tests verify both Rich table rendering and JSON output modes work correctly. The test suite provides strong coverage for list-specs functionality including edge cases and various command-line options.",
+      "metadata": {},
+      "task_id": "task-2-6-1"
     }
   ]
 }
