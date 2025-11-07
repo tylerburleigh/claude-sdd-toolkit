@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T12:42:07.360674Z",
+    "generated_at": "2025-11-07T12:45:33.519609Z",
     "languages": [
       "python"
     ],
@@ -10,8 +10,8 @@
   },
   "statistics": {
     "total_files": 243,
-    "total_lines": 85880,
-    "total_classes": 348,
+    "total_lines": 86031,
+    "total_classes": 349,
     "total_functions": 876,
     "avg_complexity": 5.78,
     "max_complexity": 45,
@@ -25,8 +25,8 @@
     "by_language": {
       "python": {
         "files": 243,
-        "lines": 85880,
-        "classes": 348,
+        "lines": 86031,
+        "classes": 349,
         "functions": 876,
         "avg_complexity": 5.78
       }
@@ -1529,6 +1529,7 @@
       "classes": [
         "ProgressCallback",
         "NoOpProgressCallback",
+        "QueuedProgressCallback",
         "ProgressTracker",
         "BatchProgressTracker"
       ],
@@ -1550,12 +1551,13 @@
         "time",
         "threading",
         "logging",
+        "queue",
         "ai_tools.ToolStatus",
         "ai_tools.ToolResponse",
         "ai_tools.MultiToolResponse"
       ],
       "exports": [],
-      "lines": 498
+      "lines": 649
     },
     {
       "name": "ui_factory",
@@ -9904,7 +9906,7 @@
     {
       "name": "ProgressCallback",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 21,
+      "line": 22,
       "language": "python",
       "docstring": "Protocol for progress feedback callbacks.",
       "bases": [
@@ -9927,7 +9929,7 @@
     {
       "name": "NoOpProgressCallback",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 97,
+      "line": 98,
       "language": "python",
       "docstring": "No-op implementation for environments without TUI support.",
       "bases": [],
@@ -9946,7 +9948,7 @@
         {
           "instantiator": "ai_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 239,
+          "line": 389,
           "context": [
             "ai_consultation_progress"
           ]
@@ -9954,7 +9956,7 @@
         {
           "instantiator": "batch_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 433,
+          "line": 583,
           "context": [
             "batch_consultation_progress"
           ]
@@ -9964,9 +9966,35 @@
       "instantiation_count": 2
     },
     {
-      "name": "ProgressTracker",
+      "name": "QueuedProgressCallback",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
       "line": 139,
+      "language": "python",
+      "docstring": "Thread-safe progress callback wrapper using queue.Queue.\n\nWraps a ProgressCallback and routes all calls through a queue,\nmaking it safe to call from multiple worker threads in parallel\nconsultations. A consumer thread processes the queue and forwards\ncalls to the underlying callback.\n\nUsage:\n    # Create queued wrapper\n    queued = QueuedProgressCallback(callback)\n    queued.start()  # Start consumer thread\n\n    # Use from multiple threads\n    queued.on_start(\"tool\", 90)\n    queued.on_complete(\"tool\", ToolStatus.SUCCESS, 45.0)\n\n    # Cleanup\n    queued.stop()  # Stop consumer thread",
+      "bases": [],
+      "methods": [
+        "__init__",
+        "start",
+        "stop",
+        "_consume_queue",
+        "_enqueue",
+        "on_start",
+        "on_update",
+        "on_complete",
+        "on_batch_start",
+        "on_tool_complete",
+        "on_batch_complete"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "ProgressTracker",
+      "file": "src/claude_skills/claude_skills/common/tui_progress.py",
+      "line": 289,
       "language": "python",
       "docstring": "Tracks progress state within context manager.",
       "bases": [],
@@ -9980,7 +10008,7 @@
         {
           "instantiator": "ai_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 242,
+          "line": 392,
           "context": [
             "ai_consultation_progress"
           ]
@@ -9992,7 +10020,7 @@
     {
       "name": "BatchProgressTracker",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 314,
+      "line": 464,
       "language": "python",
       "docstring": "Tracks progress for batch consultations.",
       "bases": [],
@@ -10006,7 +10034,7 @@
         {
           "instantiator": "batch_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 435,
+          "line": 585,
           "context": [
             "batch_consultation_progress"
           ]
@@ -48565,7 +48593,7 @@
     {
       "name": "_calculate_update_interval",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 74,
+      "line": 75,
       "language": "python",
       "docstring": "Calculate appropriate update interval based on timeout.\n\nArgs:\n    timeout: Expected timeout in seconds\n    custom_interval: Optional custom interval override\n\nReturns:\n    Update interval in seconds",
       "parameters": [
@@ -48590,13 +48618,13 @@
         {
           "name": "ai_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 258,
+          "line": 408,
           "call_type": "function_call"
         },
         {
           "name": "batch_consultation_progress",
           "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-          "line": 456,
+          "line": 606,
           "call_type": "function_call"
         }
       ],
@@ -48606,7 +48634,7 @@
     {
       "name": "_update_worker",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 178,
+      "line": 328,
       "language": "python",
       "docstring": "Background worker thread for periodic progress updates.\n\nArgs:\n    tracker: ProgressTracker to monitor\n    interval: Update interval in seconds",
       "parameters": [
@@ -48632,25 +48660,25 @@
         {
           "name": "sleep",
           "file": "unknown",
-          "line": 187,
+          "line": 337,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 195,
+          "line": 345,
           "call_type": "method_call"
         },
         {
           "name": "on_update",
           "file": "unknown",
-          "line": 199,
+          "line": 349,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 206,
+          "line": 356,
           "call_type": "method_call"
         }
       ]
@@ -48658,7 +48686,7 @@
     {
       "name": "ai_consultation_progress",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 210,
+      "line": 360,
       "language": "python",
       "docstring": "Context manager for AI consultation with progress feedback.\n\nAutomatically handles progress lifecycle: start, update (Phase 5), and completion.\nEnsures cleanup even if exceptions occur.\n\nUsage:\n    with ai_consultation_progress(\"gemini\", timeout=90) as progress:\n        response = execute_tool(\"gemini\", prompt)\n        progress.complete(response)\n\nArgs:\n    tool: Tool name (\"gemini\", \"codex\", \"cursor-agent\")\n    timeout: Expected timeout in seconds (default 90)\n    callback: Optional progress callback (defaults to no-op)\n    update_interval: Optional custom update interval in seconds (auto-calculated if None)\n    **context: Additional context for progress display (model, prompt_length, etc.)\n\nYields:\n    ProgressTracker: Progress tracker object with complete() method",
       "parameters": [
@@ -48696,91 +48724,91 @@
         {
           "name": "on_start",
           "file": "unknown",
-          "line": 251,
+          "line": 401,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 253,
+          "line": 403,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 255,
+          "line": 405,
           "call_type": "method_call"
         },
         {
           "name": "_calculate_update_interval",
           "file": "unknown",
-          "line": 258,
+          "line": 408,
           "call_type": "function_call"
         },
         {
           "name": "Thread",
           "file": "unknown",
-          "line": 259,
+          "line": 409,
           "call_type": "method_call"
         },
         {
           "name": "start",
           "file": "unknown",
-          "line": 266,
+          "line": 416,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 276,
+          "line": 426,
           "call_type": "method_call"
         },
         {
           "name": "on_complete",
           "file": "unknown",
-          "line": 278,
+          "line": 428,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 282,
+          "line": 432,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 286,
+          "line": 436,
           "call_type": "method_call"
         },
         {
           "name": "is_alive",
           "file": "unknown",
-          "line": 296,
+          "line": 446,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 297,
+          "line": 447,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 301,
+          "line": 451,
           "call_type": "method_call"
         },
         {
           "name": "on_complete",
           "file": "unknown",
-          "line": 303,
+          "line": 453,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 310,
+          "line": 460,
           "call_type": "method_call"
         }
       ]
@@ -48788,7 +48816,7 @@
     {
       "name": "_batch_update_worker",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 365,
+      "line": 515,
       "language": "python",
       "docstring": "Background worker thread for periodic batch progress updates.\n\nArgs:\n    tracker: BatchProgressTracker to monitor\n    interval: Update interval in seconds",
       "parameters": [
@@ -48814,37 +48842,37 @@
         {
           "name": "sleep",
           "file": "unknown",
-          "line": 376,
+          "line": 526,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 384,
+          "line": 534,
           "call_type": "method_call"
         },
         {
           "name": "on_update",
           "file": "unknown",
-          "line": 390,
+          "line": 540,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 395,
+          "line": 545,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 396,
+          "line": 546,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 400,
+          "line": 550,
           "call_type": "method_call"
         }
       ]
@@ -48852,7 +48880,7 @@
     {
       "name": "batch_consultation_progress",
       "file": "src/claude_skills/claude_skills/common/tui_progress.py",
-      "line": 404,
+      "line": 554,
       "language": "python",
       "docstring": "Context manager for batch AI consultation with progress feedback.\n\nHandles parallel tool execution with per-tool and aggregate progress tracking.\n\nUsage:\n    with batch_consultation_progress([\"gemini\", \"codex\"], timeout=120) as progress:\n        multi_response = execute_tools_parallel(...)\n        for tool, response in multi_response.responses.items():\n            progress.mark_complete(tool, response)\n\nArgs:\n    tools: List of tool names to execute\n    timeout: Per-tool timeout in seconds (default 90)\n    callback: Optional progress callback (defaults to no-op)\n    update_interval: Optional custom update interval in seconds (auto-calculated if None)\n    **context: Additional context for progress display\n\nYields:\n    BatchProgressTracker: Batch progress tracker with mark_complete() method",
       "parameters": [
@@ -48890,79 +48918,79 @@
         {
           "name": "on_batch_start",
           "file": "unknown",
-          "line": 444,
+          "line": 594,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 446,
+          "line": 596,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 451,
+          "line": 601,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 453,
+          "line": 603,
           "call_type": "method_call"
         },
         {
           "name": "_calculate_update_interval",
           "file": "unknown",
-          "line": 456,
+          "line": 606,
           "call_type": "function_call"
         },
         {
           "name": "Thread",
           "file": "unknown",
-          "line": 457,
+          "line": 607,
           "call_type": "method_call"
         },
         {
           "name": "start",
           "file": "unknown",
-          "line": 464,
+          "line": 614,
           "call_type": "method_call"
         },
         {
           "name": "is_alive",
           "file": "unknown",
-          "line": 474,
+          "line": 624,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 475,
+          "line": 625,
           "call_type": "method_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 478,
+          "line": 628,
           "call_type": "method_call"
         },
         {
           "name": "on_batch_complete",
           "file": "unknown",
-          "line": 480,
+          "line": 630,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 481,
+          "line": 631,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 488,
+          "line": 638,
           "call_type": "method_call"
         }
       ]
@@ -131300,6 +131328,7 @@
       "time",
       "threading",
       "logging",
+      "queue",
       "ai_tools.ToolStatus",
       "ai_tools.ToolResponse",
       "ai_tools.MultiToolResponse"

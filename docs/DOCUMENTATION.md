@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 07:42:07
+**Generated:** 2025-11-07 07:45:33
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 243
-- **Total Lines:** 85880
-- **Total Classes:** 348
+- **Total Lines:** 86031
+- **Total Classes:** 349
 - **Total Functions:** 876
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
@@ -145,7 +145,7 @@ the required abstract methods.
 ### `BatchProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:314`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:464`
 
 **Description:**
 > Tracks progress for batch consultations.
@@ -1564,7 +1564,7 @@ Example:
 ### `NoOpProgressCallback`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:97`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:98`
 
 **Description:**
 > No-op implementation for environments without TUI support.
@@ -1982,7 +1982,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Protocol`
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:21`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:22`
 
 **Description:**
 > Protocol for progress feedback callbacks.
@@ -2035,7 +2035,7 @@ Provides a simple update() method for advancing progress.
 ### `ProgressTracker`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:139`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:289`
 
 **Description:**
 > Tracks progress state within context manager.
@@ -2093,6 +2093,46 @@ Attributes:
 
 **Description:**
 > Represents a query result with metadata.
+
+---
+
+### `QueuedProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:139`
+
+**Description:**
+> Thread-safe progress callback wrapper using queue.Queue.
+
+Wraps a ProgressCallback and routes all calls through a queue,
+making it safe to call from multiple worker threads in parallel
+consultations. A consumer thread processes the queue and forwards
+calls to the underlying callback.
+
+Usage:
+    # Create queued wrapper
+    queued = QueuedProgressCallback(callback)
+    queued.start()  # Start consumer thread
+
+    # Use from multiple threads
+    queued.on_start("tool", 90)
+    queued.on_complete("tool", ToolStatus.SUCCESS, 45.0)
+
+    # Cleanup
+    queued.stop()  # Stop consumer thread
+
+**Methods:**
+- `__init__()`
+- `start()`
+- `stop()`
+- `_consume_queue()`
+- `_enqueue()`
+- `on_start()`
+- `on_update()`
+- `on_complete()`
+- `on_batch_start()`
+- `on_tool_complete()`
+- `on_batch_complete()`
 
 ---
 
@@ -6756,7 +6796,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_batch_update_worker(tracker, interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:365`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:515`
 **Complexity:** 4
 
 **Description:**
@@ -7158,7 +7198,7 @@ Raises:
 ### `_calculate_update_interval(timeout, custom_interval) -> float`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:74`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:75`
 **Complexity:** 4
 
 **Description:**
@@ -8908,7 +8948,7 @@ Returns:
 ### `_update_worker(tracker, interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:178`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:328`
 **Complexity:** 4
 
 **Description:**
@@ -9429,7 +9469,7 @@ Examples:
 ### `ai_consultation_progress(tool, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:210`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:360`
 ⚠️ **Complexity:** 11 (High)
 
 **Decorators:** `@contextmanager`
@@ -9938,7 +9978,7 @@ Example:
 ### `batch_consultation_progress(tools, timeout, callback, update_interval) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:404`
+**Defined in:** `src/claude_skills/claude_skills/common/tui_progress.py:554`
 **Complexity:** 6
 
 **Decorators:** `@contextmanager`
@@ -25295,6 +25335,7 @@ Returns:
 - `dataclasses.field`
 - `enum.Enum`
 - `logging`
+- `queue`
 - `threading`
 - `time`
 - `typing.Any`

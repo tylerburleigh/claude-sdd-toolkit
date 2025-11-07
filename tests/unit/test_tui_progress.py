@@ -16,7 +16,8 @@ from claude_skills.common.tui_progress import (
     QueuedProgressCallback,
     ProgressTracker,
     BatchProgressTracker,
-    ProgressCallback
+    ProgressCallback,
+    format_progress_message
 )
 from claude_skills.common.ai_tools import ToolStatus, ToolResponse
 
@@ -1052,3 +1053,52 @@ class TestQueuedProgressCallback:
 
         time.sleep(0.2)
         queued.stop()
+
+
+class TestProgressMessageFormatting:
+    """Test progress message formatting helper."""
+
+    def test_basic_message_format(self):
+        """format_progress_message creates basic status message."""
+        message = format_progress_message("gemini", 30.5)
+        assert message == "Waiting for gemini... 30.5s"
+
+    def test_message_with_timeout(self):
+        """format_progress_message includes timeout when provided."""
+        message = format_progress_message("gemini", 30.5, 90)
+        assert message == "Waiting for gemini... 30.5s / 90s"
+
+    def test_message_without_timeout_display(self):
+        """format_progress_message excludes timeout when include_timeout=False."""
+        message = format_progress_message("codex", 125.7, 300, include_timeout=False)
+        assert message == "Waiting for codex... 125.7s"
+
+    def test_formats_decimal_places(self):
+        """format_progress_message formats elapsed time to 1 decimal place."""
+        message = format_progress_message("gemini", 45.678)
+        assert message == "Waiting for gemini... 45.7s"
+
+    def test_formats_integer_elapsed(self):
+        """format_progress_message handles integer elapsed time."""
+        message = format_progress_message("gemini", 45)
+        assert message == "Waiting for gemini... 45.0s"
+
+    def test_formats_different_tool_names(self):
+        """format_progress_message works with different tool names."""
+        message1 = format_progress_message("gemini", 10.0)
+        message2 = format_progress_message("codex", 20.0)
+        message3 = format_progress_message("cursor-agent", 30.0)
+
+        assert "gemini" in message1
+        assert "codex" in message2
+        assert "cursor-agent" in message3
+
+    def test_formats_long_elapsed_times(self):
+        """format_progress_message handles long elapsed times."""
+        message = format_progress_message("gemini", 725.3, 900)
+        assert message == "Waiting for gemini... 725.3s / 900s"
+
+    def test_formats_zero_elapsed(self):
+        """format_progress_message handles zero elapsed time."""
+        message = format_progress_message("gemini", 0.0)
+        assert message == "Waiting for gemini... 0.0s"

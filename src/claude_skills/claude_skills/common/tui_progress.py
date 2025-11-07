@@ -95,6 +95,48 @@ def _calculate_update_interval(timeout: int, custom_interval: Optional[float] = 
         return 10.0  # Long operations: update every 10s
 
 
+def format_progress_message(
+    tool: str,
+    elapsed: float,
+    timeout: Optional[int] = None,
+    include_timeout: bool = True
+) -> str:
+    """
+    Format a progress status message for display.
+
+    Args:
+        tool: Tool name (e.g., "gemini", "codex")
+        elapsed: Elapsed time in seconds
+        timeout: Optional timeout in seconds
+        include_timeout: Whether to include timeout in message
+
+    Returns:
+        Formatted message like "Waiting for gemini... 30.5s" or
+        "Waiting for gemini... 30.5s / 90s"
+
+    Examples:
+        >>> format_progress_message("gemini", 30.5)
+        'Waiting for gemini... 30.5s'
+
+        >>> format_progress_message("gemini", 30.5, 90)
+        'Waiting for gemini... 30.5s / 90s'
+
+        >>> format_progress_message("codex", 125.7, 300, include_timeout=False)
+        'Waiting for codex... 125.7s'
+    """
+    # Format elapsed time (1 decimal place)
+    elapsed_str = f"{elapsed:.1f}s"
+
+    # Base message
+    message = f"Waiting for {tool}... {elapsed_str}"
+
+    # Add timeout if requested
+    if include_timeout and timeout is not None:
+        message += f" / {timeout}s"
+
+    return message
+
+
 class NoOpProgressCallback:
     """No-op implementation for environments without TUI support."""
 
@@ -646,4 +688,5 @@ __all__ = [
     "batch_consultation_progress",
     "ProgressTracker",
     "BatchProgressTracker",
+    "format_progress_message",
 ]
