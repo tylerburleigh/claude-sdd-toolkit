@@ -818,3 +818,80 @@ class TestCheckDepsCLI:
         assert output_data["can_start"] == False
         assert len(output_data["blocked_by"]) == 1
         assert output_data["blocked_by"][0]["id"] == "task-1"
+
+    def test_check_deps_json_no_ansi_codes(self, tmp_path):
+        """Test that JSON output contains no ANSI escape codes."""
+        import re
+
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        # Create spec with tasks with different dependency statuses that might trigger colored output
+        spec_data = {
+            "metadata": {
+                "title": "ANSI Test Check Deps",
+                "version": "1.0.0"
+            },
+            "hierarchy": {
+                "task-1": {
+                    "type": "task",
+                    "title": "Completed Prerequisite",
+                    "status": "completed",
+                    "dependencies": {"blocks": ["task-2", "task-3"], "blocked_by": [], "depends": []}
+                },
+                "task-2": {
+                    "type": "task",
+                    "title": "In Progress Task",
+                    "status": "in_progress",
+                    "dependencies": {"blocks": ["task-4"], "blocked_by": ["task-1"], "depends": []}
+                },
+                "task-3": {
+                    "type": "task",
+                    "title": "Pending Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": [], "blocked_by": ["task-1"], "depends": []}
+                },
+                "task-4": {
+                    "type": "task",
+                    "title": "Blocked Task",
+                    "status": "pending",
+                    "dependencies": {"blocks": [], "blocked_by": ["task-2"], "depends": []}
+                }
+            }
+        }
+
+        (active_dir / "ansi-deps-001.json").write_text(json.dumps(spec_data))
+
+        # Run check-deps with JSON output on a task with mixed dependency statuses
+        result = run_cli("check-deps", "--path", str(specs_dir), "ansi-deps-001", "task-2", "--json",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # ANSI escape code pattern: ESC [ followed by parameters and a final byte
+        ansi_pattern = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
+
+        # Verify no ANSI codes in output
+        assert not ansi_pattern.search(result.stdout), \
+            "JSON output should not contain ANSI escape codes"
+
+        # Verify it's valid JSON (would fail if ANSI codes present)
+        output_data = json.loads(result.stdout)
+        assert isinstance(output_data, dict)
+
+        # Verify no ANSI codes in any string values (recursively check nested structures)
+        def check_for_ansi(obj, path=""):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    check_for_ansi(value, f"{path}.{key}")
+            elif isinstance(obj, list):
+                for i, item in enumerate(obj):
+                    check_for_ansi(item, f"{path}[{i}]")
+            elif isinstance(obj, str):
+                assert not ansi_pattern.search(obj), \
+                    f"Field '{path}' contains ANSI codes: {obj}"
+
+        check_for_ansi(output_data, "root")

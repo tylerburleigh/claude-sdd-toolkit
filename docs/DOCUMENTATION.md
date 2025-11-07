@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-06 19:34:01
+**Generated:** 2025-11-07 06:32:53
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 242
-- **Total Lines:** 85167
-- **Total Classes:** 343
+- **Total Lines:** 85305
+- **Total Classes:** 344
 - **Total Functions:** 871
 - **Avg Complexity:** 5.78
 - **Max Complexity:** 45
@@ -2758,6 +2758,22 @@ Attributes:
 - `test_check_dependencies_nonexistent_task()`
 - `test_check_dependencies_includes_blocks()`
 - `test_check_dependencies_resolved_when_complete()`
+
+---
+
+### `TestCheckDepsCLI`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_list_commands.py:686`
+
+**Description:**
+> Tests for check-deps command with Rich.Tree output.
+
+**Methods:**
+- `test_check_deps_help()`
+- `test_check_deps_text_output()`
+- `test_check_deps_json_output()`
+- `test_check_deps_with_blocked_task()`
 
 ---
 

@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T11:32:22.175067Z",
+  "last_updated": "2025-11-07T11:34:32.130869Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 36,
+    "progress_percentage": 37,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 32,
+      "completed_tasks": 33,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 18,
+      "completed_tasks": 19,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -686,7 +686,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -704,8 +704,12 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 18,
-      "metadata": {}
+      "completed_tasks": 19,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-07T11:34:32.105788Z",
+        "journaled_at": "2025-11-07T11:34:32.130695Z"
+      }
     },
     "task-2-1": {
       "type": "task",
@@ -1135,7 +1139,7 @@
     "task-2-6": {
       "type": "task",
       "title": "tests/integration/test_list_commands.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-6-1",
@@ -1156,7 +1160,7 @@
         "depends": []
       },
       "total_tasks": 6,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "file_path": "tests/integration/test_list_commands.py",
         "task_category": "implementation",
@@ -1278,7 +1282,7 @@
     "task-2-6-6": {
       "type": "subtask",
       "title": "Test check-deps JSON output",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-6",
       "children": [],
       "dependencies": {
@@ -1287,9 +1291,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-07T11:33:04.797863Z",
+        "completed_at": "2025-11-07T11:34:32.105688Z",
+        "needs_journaling": false,
+        "actual_hours": 0.024,
+        "journaled_at": "2025-11-07T11:34:32.119545Z"
       }
     },
     "phase-2-verify": {
@@ -3223,6 +3232,24 @@
       "content": "Successfully added TestCheckDepsCLI test class with 4 comprehensive tests for check-deps command. Tests cover: 1) Help text display, 2) Rich.Tree output format with --no-json flag (verifies tree structure indicators like \u2514\u2500\u2500 and \u251c\u2500\u2500), 3) JSON output format validation, 4) Blocked task dependency checking. All 21 tests in the file pass including the new check-deps tests. Tests verify both text/Rich.Tree output and JSON output formats work correctly.",
       "metadata": {},
       "task_id": "task-2-6-5"
+    },
+    {
+      "timestamp": "2025-11-07T11:34:32.119528Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Test check-deps JSON output",
+      "author": "claude-code",
+      "content": "Successfully added test_check_deps_json_no_ansi_codes test to TestCheckDepsCLI class. Test verifies check-deps command with --json flag produces valid JSON without ANSI escape codes. Test creates spec with tasks in different dependency statuses (completed prerequisite, in_progress, pending, blocked) and validates: 1) No ANSI codes in raw JSON output, 2) Output is valid parseable JSON dict, 3) No ANSI codes in any string field values using recursive checking for nested structures (handles both dict and list types). All 22 tests in the file pass including the new check-deps ANSI test.",
+      "metadata": {},
+      "task_id": "task-2-6-6"
+    },
+    {
+      "timestamp": "2025-11-07T11:34:32.130675Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
     }
   ]
 }
