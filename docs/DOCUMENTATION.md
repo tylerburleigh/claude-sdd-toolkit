@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 09:46:31
+**Generated:** 2025-11-07 09:48:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86933
+- **Total Lines:** 86939
 - **Total Classes:** 354
 - **Total Functions:** 882
 - **Avg Complexity:** 5.81
@@ -8138,7 +8138,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:199`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:205`
 **Complexity:** 10
 
 **Description:**
@@ -8407,7 +8407,7 @@ Args:
 **Complexity:** 1
 
 **Description:**
-> Generate JSON output format.
+> Generate JSON output format using FidelityReport.
 
 **Parameters:**
 - `args`: None
@@ -19447,7 +19447,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:415`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:421`
 **Complexity:** 3
 
 **Description:**
@@ -20447,7 +20447,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:397`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:403`
 **Complexity:** 1
 
 **Description:**
@@ -20506,7 +20506,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:274`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:280`
 **Complexity:** 1
 
 **Description:**
@@ -20551,7 +20551,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:373`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:379`
 **Complexity:** 1
 
 **Description:**

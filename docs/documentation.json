@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-07T14:46:31.373357Z",
+    "generated_at": "2025-11-07T14:48:03.147191Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 244,
-    "total_lines": 86933,
+    "total_lines": 86939,
     "total_classes": 354,
     "total_functions": 882,
     "avg_complexity": 5.81,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 244,
-        "lines": 86933,
+        "lines": 86939,
         "classes": 354,
         "functions": 882,
         "avg_complexity": 5.81
@@ -2325,7 +2325,7 @@
         "claude_skills.common.ai_tools.check_tool_available"
       ],
       "exports": [],
-      "lines": 453
+      "lines": 459
     },
     {
       "name": "consultation",
@@ -12639,10 +12639,18 @@
           "context": [
             "_output_text"
           ]
+        },
+        {
+          "instantiator": "_output_json",
+          "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+          "line": 199,
+          "context": [
+            "_output_json"
+          ]
         }
       ],
       "imported_by": [],
-      "instantiation_count": 1
+      "instantiation_count": 2
     },
     {
       "name": "FidelityReviewer",
@@ -20851,7 +20859,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -31779,7 +31787,7 @@
         {
           "name": "_handle_list_review_tools",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 214,
+          "line": 220,
           "call_type": "function_call"
         },
         {
@@ -51244,7 +51252,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -52426,7 +52434,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -53547,7 +53555,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -54313,7 +54321,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -60069,7 +60077,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -71182,7 +71190,7 @@
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
       "line": 187,
       "language": "python",
-      "docstring": "Generate JSON output format.",
+      "docstring": "Generate JSON output format using FidelityReport.",
       "parameters": [
         {
           "name": "args",
@@ -71228,37 +71236,25 @@
         {
           "name": "len",
           "file": "unknown",
-          "line": 191,
+          "line": 192,
           "call_type": "function_call"
         },
         {
-          "name": "to_dict",
+          "name": "generate_json",
           "file": "unknown",
-          "line": 192,
-          "call_type": "method_call"
-        },
-        {
-          "name": "to_dict",
-          "file": "unknown",
-          "line": 193,
-          "call_type": "method_call"
-        },
-        {
-          "name": "to_dict",
-          "file": "unknown",
-          "line": 194,
+          "line": 200,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 196,
+          "line": 202,
           "call_type": "function_call"
         },
         {
           "name": "dumps",
           "file": "unknown",
-          "line": 196,
+          "line": 202,
           "call_type": "method_call"
         }
       ],
@@ -71267,7 +71263,7 @@
     {
       "name": "_handle_list_review_tools",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 199,
+      "line": 205,
       "language": "python",
       "docstring": "Handle list-review-tools command execution.\n\nDetects and displays available AI consultation tools with their status.\n\nArgs:\n    args: Parsed command-line arguments\n    printer: Optional PrettyPrinter instance (for unified CLI compatibility)\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
       "parameters": [
@@ -71293,59 +71289,29 @@
         {
           "name": "detect_available_tools",
           "file": "unknown",
-          "line": 214,
+          "line": 220,
           "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 222,
+          "line": 228,
           "call_type": "method_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 229,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 234,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
           "line": 235,
           "call_type": "function_call"
         },
         {
-          "name": "print",
-          "file": "unknown",
-          "line": 237,
-          "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 237,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 239,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
+          "name": "len",
           "file": "unknown",
           "line": 240,
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "len",
           "file": "unknown",
           "line": 241,
           "call_type": "function_call"
@@ -71353,55 +71319,43 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 242,
+          "line": 243,
+          "call_type": "function_call"
+        },
+        {
+          "name": "dumps",
+          "file": "unknown",
+          "line": 243,
+          "call_type": "method_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 245,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 250,
+          "line": 246,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 252,
+          "line": 247,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 253,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 253,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
-          "file": "unknown",
-          "line": 253,
+          "line": 248,
           "call_type": "function_call"
         },
         {
           "name": "print",
-          "file": "unknown",
-          "line": 254,
-          "call_type": "function_call"
-        },
-        {
-          "name": "len",
           "file": "unknown",
           "line": 256,
-          "call_type": "function_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 257,
           "call_type": "function_call"
         },
         {
@@ -71411,7 +71365,19 @@
           "call_type": "function_call"
         },
         {
-          "name": "hasattr",
+          "name": "print",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
+          "file": "unknown",
+          "line": 259,
+          "call_type": "function_call"
+        },
+        {
+          "name": "len",
           "file": "unknown",
           "line": 259,
           "call_type": "function_call"
@@ -71423,15 +71389,33 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "len",
           "file": "unknown",
-          "line": 261,
+          "line": 262,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 262,
+          "line": 263,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 264,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 265,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 266,
           "call_type": "function_call"
         },
         {
@@ -71441,15 +71425,27 @@
           "call_type": "function_call"
         },
         {
-          "name": "hasattr",
+          "name": "print",
           "file": "unknown",
           "line": 268,
           "call_type": "function_call"
         },
         {
+          "name": "print",
+          "file": "unknown",
+          "line": 273,
+          "call_type": "function_call"
+        },
+        {
+          "name": "hasattr",
+          "file": "unknown",
+          "line": 274,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_exc",
           "file": "unknown",
-          "line": 270,
+          "line": 276,
           "call_type": "method_call"
         }
       ]
@@ -71457,7 +71453,7 @@
     {
       "name": "register_fidelity_review_command",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 274,
+      "line": 280,
       "language": "python",
       "docstring": "Register the fidelity-review command.",
       "parameters": [
@@ -71482,7 +71478,7 @@
         {
           "name": "register_commands",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 411,
+          "line": 417,
           "call_type": "function_call"
         }
       ],
@@ -71490,29 +71486,17 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 277,
+          "line": 283,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
-          "file": "unknown",
-          "line": 286,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_mutually_exclusive_group",
           "file": "unknown",
           "line": 292,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 293,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
+          "name": "add_mutually_exclusive_group",
           "file": "unknown",
           "line": 298,
           "call_type": "method_call"
@@ -71520,55 +71504,61 @@
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 303,
+          "line": 299,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 311,
+          "line": 304,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 318,
+          "line": 309,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 323,
+          "line": 317,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 327,
+          "line": 324,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 336,
+          "line": 329,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 341,
+          "line": 333,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 346,
+          "line": 342,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 355,
+          "line": 347,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 352,
           "call_type": "method_call"
         },
         {
@@ -71578,9 +71568,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 367,
+          "call_type": "method_call"
+        },
+        {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 370,
+          "line": 376,
           "call_type": "method_call"
         }
       ],
@@ -71589,7 +71585,7 @@
     {
       "name": "register_list_review_tools_command",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 373,
+      "line": 379,
       "language": "python",
       "docstring": "Register the list-review-tools command.",
       "parameters": [
@@ -71614,7 +71610,7 @@
         {
           "name": "register_commands",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 412,
+          "line": 418,
           "call_type": "function_call"
         }
       ],
@@ -71622,19 +71618,19 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 376,
+          "line": 382,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 385,
+          "line": 391,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 394,
+          "line": 400,
           "call_type": "method_call"
         }
       ],
@@ -71643,7 +71639,7 @@
     {
       "name": "register_commands",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 397,
+      "line": 403,
       "language": "python",
       "docstring": "Register all fidelity review commands with the main CLI parser.\n\nThis function will be called by the main SDD CLI to register\nfidelity review commands as subcommands.\n\nArgs:\n    subparsers: The subparser object from the main argument parser\n    parent_parser: Parent parser with global options to inherit (optional)\n\nNote:\n    Registers both fidelity-review and list-review-tools commands.",
       "parameters": [
@@ -71668,7 +71664,7 @@
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 435,
+          "line": 441,
           "call_type": "function_call"
         }
       ],
@@ -71676,13 +71672,13 @@
         {
           "name": "register_fidelity_review_command",
           "file": "unknown",
-          "line": 411,
+          "line": 417,
           "call_type": "function_call"
         },
         {
           "name": "register_list_review_tools_command",
           "file": "unknown",
-          "line": 412,
+          "line": 418,
           "call_type": "function_call"
         }
       ],
@@ -71691,7 +71687,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-      "line": 415,
+      "line": 421,
       "language": "python",
       "docstring": "Main entry point for standalone CLI execution.\n\nReturns:\n    Exit code (0 for success, non-zero for error)",
       "parameters": [],
@@ -71753,7 +71749,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {
@@ -71791,55 +71787,55 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 422,
+          "line": 428,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 427,
+          "line": 433,
           "call_type": "method_call"
         },
         {
           "name": "add_subparsers",
           "file": "unknown",
-          "line": 434,
+          "line": 440,
           "call_type": "method_call"
         },
         {
           "name": "register_commands",
           "file": "unknown",
-          "line": 435,
+          "line": 441,
           "call_type": "function_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 437,
+          "line": 443,
           "call_type": "method_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 440,
+          "line": 446,
           "call_type": "method_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 444,
+          "line": 450,
           "call_type": "function_call"
         },
         {
           "name": "func",
           "file": "unknown",
-          "line": 445,
+          "line": 451,
           "call_type": "method_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 447,
+          "line": 453,
           "call_type": "method_call"
         }
       ],
@@ -83083,7 +83079,7 @@
         {
           "name": "_handle_list_review_tools",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 214,
+          "line": 220,
           "call_type": "function_call"
         },
         {
@@ -84107,7 +84103,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
-          "line": 453,
+          "line": 459,
           "call_type": "function_call"
         },
         {

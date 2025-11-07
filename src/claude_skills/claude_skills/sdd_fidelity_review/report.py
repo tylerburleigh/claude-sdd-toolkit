@@ -467,32 +467,7 @@ class FidelityReport:
 
         # Individual responses (if verbose)
         if verbose:
-            parsed_responses_list = self._convert_to_dict(self.parsed_responses)
-            if parsed_responses_list:
-                console.print("[bold]INDIVIDUAL MODEL RESPONSES[/bold]")
-                console.print()
-
-                for i, response in enumerate(parsed_responses_list, 1):
-                    verdict = response.get("verdict", "unknown")
-                    issues = response.get("issues", [])
-                    recommendations = response.get("recommendations", [])
-
-                    # Create table for model response
-                    table = Table(show_header=False, box=None, padding=(0, 1))
-                    table.add_column("Field", style="bold")
-                    table.add_column("Value")
-
-                    table.add_row("Verdict", verdict.upper())
-                    table.add_row("Issues", str(len(issues)))
-                    table.add_row("Recommendations", str(len(recommendations)))
-
-                    panel = Panel(
-                        table,
-                        title=f"Model {i}",
-                        border_style="dim"
-                    )
-                    console.print(panel)
-                    console.print()
+            self._print_model_comparison_table(console)
 
     def _print_consensus_matrix(
         self,
@@ -566,6 +541,104 @@ class FidelityReport:
 
         console.print(table)
         console.print()
+
+    def _print_model_comparison_table(self, console: Console) -> None:
+        """
+        Print side-by-side comparison table of all model responses.
+
+        Args:
+            console: Rich Console instance for output
+        """
+        parsed_responses_list = self._convert_to_dict(self.parsed_responses)
+        if not parsed_responses_list or len(parsed_responses_list) == 0:
+            return
+
+        console.print("[bold]MODEL RESPONSE COMPARISON[/bold]")
+        console.print("[dim]Side-by-side comparison of all AI model assessments[/dim]")
+        console.print()
+
+        # Create comparison table
+        table = Table(show_header=True, box=None, padding=(0, 1))
+
+        # Add columns: Metric | Model 1 | Model 2 | Model 3 | ...
+        table.add_column("Metric", style="bold", min_width=20)
+
+        for i in range(len(parsed_responses_list)):
+            table.add_column(f"Model {i+1}", justify="left", style="cyan")
+
+        # Row 1: Verdict
+        verdicts = []
+        for response in parsed_responses_list:
+            verdict = response.get("verdict", "unknown")
+            verdict_upper = verdict.upper() if isinstance(verdict, str) else str(verdict).upper()
+
+            # Color-code verdict
+            if verdict_upper == "PASS":
+                verdicts.append(f"[green]{verdict_upper}[/green]")
+            elif verdict_upper == "FAIL":
+                verdicts.append(f"[red]{verdict_upper}[/red]")
+            elif verdict_upper == "PARTIAL":
+                verdicts.append(f"[yellow]{verdict_upper}[/yellow]")
+            else:
+                verdicts.append(verdict_upper)
+
+        table.add_row("Verdict", *verdicts)
+
+        # Row 2: Issue Count
+        issue_counts = []
+        for response in parsed_responses_list:
+            issues = response.get("issues", [])
+            count = len(issues)
+
+            # Color-code based on count
+            if count == 0:
+                issue_counts.append("[green]0[/green]")
+            elif count <= 2:
+                issue_counts.append(f"[yellow]{count}[/yellow]")
+            else:
+                issue_counts.append(f"[red]{count}[/red]")
+
+        table.add_row("Issues Found", *issue_counts)
+
+        # Row 3: Recommendation Count
+        rec_counts = []
+        for response in parsed_responses_list:
+            recommendations = response.get("recommendations", [])
+            count = len(recommendations)
+            rec_counts.append(str(count))
+
+        table.add_row("Recommendations", *rec_counts)
+
+        # Row 4: Confidence (if available)
+        if any("confidence" in response for response in parsed_responses_list):
+            confidences = []
+            for response in parsed_responses_list:
+                confidence = response.get("confidence", "N/A")
+                if confidence != "N/A":
+                    confidences.append(f"{confidence}%")
+                else:
+                    confidences.append("N/A")
+            table.add_row("Confidence", *confidences)
+
+        console.print(table)
+        console.print()
+
+        # Show top issues from each model
+        console.print("[bold dim]Top Issues by Model:[/bold dim]")
+        console.print()
+
+        for i, response in enumerate(parsed_responses_list, 1):
+            issues = response.get("issues", [])
+            if issues:
+                console.print(f"[bold cyan]Model {i}:[/bold cyan]")
+                for j, issue in enumerate(issues[:3], 1):  # Show top 3 issues
+                    issue_text = issue if isinstance(issue, str) else str(issue)
+                    if len(issue_text) > 60:
+                        issue_text = issue_text[:57] + "..."
+                    console.print(f"  {j}. {issue_text}")
+                if len(issues) > 3:
+                    console.print(f"  [dim]... and {len(issues) - 3} more[/dim]")
+                console.print()
 
     def save_to_file(self, output_path: Path, format: str = "markdown") -> None:
         """
