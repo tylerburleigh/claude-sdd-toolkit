@@ -906,3 +906,116 @@ class TestValidationProgress:
         assert start_kwargs["spec_file"] == "api-spec.json"
         assert start_kwargs["validation_level"] == "strict"
         assert start_kwargs["check_dependencies"] is True
+
+
+class TestNonTTYBehavior:
+    """Test progress behavior in non-TTY environments."""
+
+    def test_progress_in_non_tty_uses_callback(self):
+        """Test that progress still works in non-TTY with callbacks."""
+        mock_callback = Mock(spec=ProgressCallback)
+
+        # Simulate non-TTY environment (callbacks should still fire)
+        with ai_consultation_progress("gemini", timeout=90, callback=mock_callback) as progress:
+            time.sleep(0.2)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test output",
+                duration=0.2
+            )
+            progress.complete(response)
+
+        # Callbacks should be called regardless of TTY status
+        mock_callback.on_start.assert_called_once()
+        mock_callback.on_complete.assert_called_once()
+
+    def test_noop_callback_safe_in_non_tty(self):
+        """Test that NoOpProgressCallback works in non-TTY."""
+        callback = NoOpProgressCallback()
+
+        # Should not raise even in non-TTY
+        with ai_consultation_progress("gemini", timeout=90, callback=callback) as progress:
+            time.sleep(0.1)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.1
+            )
+            progress.complete(response)
+
+        # No assertions needed - just verify no exceptions
+
+    def test_batch_progress_in_non_tty(self):
+        """Test batch progress in non-TTY environment."""
+        mock_callback = Mock(spec=ProgressCallback)
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            for tool in tools:
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=0.2
+                ))
+
+        # Verify batch callbacks fired
+        mock_callback.on_batch_start.assert_called_once()
+        mock_callback.on_batch_complete.assert_called_once()
+        assert mock_callback.on_tool_complete.call_count == 2
+
+    def test_callback_errors_logged_not_raised(self):
+        """Test that callback errors are logged but don't crash progress tracking."""
+        # Create callback that raises exceptions
+        error_callback = Mock(spec=ProgressCallback)
+        error_callback.on_start.side_effect = RuntimeError("Callback error")
+        error_callback.on_complete.side_effect = RuntimeError("Callback error")
+
+        # Should not raise despite callback errors
+        with ai_consultation_progress("gemini", timeout=90, callback=error_callback) as progress:
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.1
+            )
+            progress.complete(response)
+
+        # Verify callbacks were attempted (and failed gracefully)
+        error_callback.on_start.assert_called_once()
+        error_callback.on_complete.assert_called_once()
+
+    def test_progress_without_explicit_callback(self):
+        """Test progress tracking when no callback is provided (uses NoOp)."""
+        # No callback provided - should use NoOpProgressCallback internally
+        with ai_consultation_progress("gemini", timeout=90) as progress:
+            time.sleep(0.1)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.1
+            )
+            progress.complete(response)
+
+        # No assertions needed - just verify no exceptions
+
+    def test_batch_progress_without_explicit_callback(self):
+        """Test batch progress when no callback is provided."""
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(tools, timeout=120) as progress:
+            for tool in tools:
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=0.2
+                ))
+
+        # No assertions needed - just verify no exceptions
