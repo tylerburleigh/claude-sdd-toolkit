@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 06:32:53
+**Generated:** 2025-11-07 06:35:02
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 242
-- **Total Lines:** 85305
+- **Total Lines:** 85382
 - **Total Classes:** 344
 - **Total Functions:** 871
 - **Avg Complexity:** 5.78
@@ -2774,6 +2774,7 @@ Attributes:
 - `test_check_deps_text_output()`
 - `test_check_deps_json_output()`
 - `test_check_deps_with_blocked_task()`
+- `test_check_deps_json_no_ansi_codes()`
 
 ---
 

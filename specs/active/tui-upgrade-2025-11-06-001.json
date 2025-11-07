@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T11:34:32.130869Z",
+  "last_updated": "2025-11-07T11:36:10.920559Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -31,7 +31,7 @@
     },
     "status": "active",
     "activated_date": "2025-11-06T21:26:22.742712Z",
-    "progress_percentage": 37,
+    "progress_percentage": 38,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -53,7 +53,7 @@
         "depends": []
       },
       "total_tasks": 88,
-      "completed_tasks": 33,
+      "completed_tasks": 34,
       "metadata": {
         "description": "Comprehensive TUI upgrade using Rich library for AI-agent-optimized CLI"
       }
@@ -676,7 +676,7 @@
         "depends": []
       },
       "total_tasks": 22,
-      "completed_tasks": 19,
+      "completed_tasks": 20,
       "metadata": {
         "purpose": "Convert all list/query commands to Rich tables with JSON mode",
         "risk_level": "low",
@@ -1304,7 +1304,7 @@
     "phase-2-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "verify-2-1",
@@ -1319,13 +1319,13 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "verify-2-1": {
       "type": "verify",
       "title": "Integration tests pass for all list commands",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -1334,11 +1334,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "command": "pytest tests/integration/test_list_commands.py -v",
-        "expected": "All list commands render Rich tables and JSON correctly"
+        "expected": "All list commands render Rich tables and JSON correctly",
+        "started_at": "2025-11-07T11:35:15.549476Z",
+        "completed_at": "2025-11-07T11:36:10.902856Z",
+        "needs_journaling": false,
+        "actual_hours": 0.015,
+        "journaled_at": "2025-11-07T11:36:10.915680Z"
       }
     },
     "verify-2-2": {
@@ -3250,6 +3255,15 @@
       "content": "All child tasks in group phase-2-files have been completed.",
       "metadata": {},
       "task_id": "phase-2-files"
+    },
+    {
+      "timestamp": "2025-11-07T11:36:10.915664Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Integration tests pass for all list commands",
+      "author": "claude-code",
+      "content": "Integration tests pass for all list commands. All 22 tests passed successfully covering list-specs (9 tests), query-tasks (8 tests), and check-deps (5 tests). Verified Rich table rendering, JSON output format, ANSI code stripping, format flag handling, empty result handling, and filtering capabilities. Test execution time: 7.60 seconds with 100% pass rate.",
+      "metadata": {},
+      "task_id": "verify-2-1"
     }
   ]
 }
