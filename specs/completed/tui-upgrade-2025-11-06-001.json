@@ -2,7 +2,7 @@
   "spec_id": "tui-upgrade-2025-11-06-001",
   "version": "1.0.0",
   "generated": "2025-11-06T00:00:00Z",
-  "last_updated": "2025-11-07T17:31:41.371917Z",
+  "last_updated": "2025-11-07T17:31:44.963752Z",
   "status": "pending",
   "metadata": {
     "title": "AI-Agent-First TUI Upgrade",
@@ -32,7 +32,9 @@
     "status": "completed",
     "activated_date": "2025-11-06T21:26:22.742712Z",
     "progress_percentage": 100,
-    "current_phase": "phase-5"
+    "current_phase": "phase-5",
+    "completed_date": "2025-11-07T17:31:44.961361Z",
+    "actual_hours": 0.011
   },
   "hierarchy": {
     "spec-root": {
