@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 11:59:10
+**Generated:** 2025-11-07 12:10:29
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 245
-- **Total Lines:** 87561
+- **Total Lines:** 87564
 - **Total Classes:** 354
 - **Total Functions:** 889
 - **Avg Complexity:** 5.81
@@ -8141,7 +8141,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:205`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:208`
 **Complexity:** 10
 
 **Description:**
@@ -8406,7 +8406,7 @@ Args:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:187`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:190`
 **Complexity:** 1
 
 **Description:**
@@ -8424,7 +8424,7 @@ Args:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:164`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:167`
 **Complexity:** 5
 
 **Description:**
@@ -8442,7 +8442,7 @@ Args:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:146`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:149`
 **Complexity:** 1
 
 **Description:**
@@ -19592,7 +19592,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:421`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:424`
 **Complexity:** 3
 
 **Description:**
@@ -20611,7 +20611,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:403`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:406`
 **Complexity:** 1
 
 **Description:**
@@ -20670,7 +20670,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:280`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:283`
 **Complexity:** 1
 
 **Description:**
@@ -20715,7 +20715,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:379`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:382`
 **Complexity:** 1
 
 **Description:**
