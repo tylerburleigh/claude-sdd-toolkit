@@ -7,6 +7,12 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
+from rich.console import Console
+from rich.columns import Columns
+from rich.panel import Panel
+from rich.text import Text
+from rich.table import Table
+
 
 @dataclass
 class FieldChange:
@@ -262,3 +268,156 @@ def _format_value(value: Any) -> str:
     if isinstance(value, str):
         return value
     return str(value)
+
+
+def display_diff_side_by_side(
+    report: DiffReport,
+    spec_id: str = "unknown",
+    console: Optional[Console] = None
+) -> None:
+    """
+    Display diff report as side-by-side comparison using Rich.Columns and Panel.
+
+    Shows before/after values in parallel columns with color coding for changes.
+
+    Args:
+        report: DiffReport with changes to display
+        spec_id: Spec identifier for display
+        console: Optional Rich Console instance (creates one if not provided)
+    """
+    if console is None:
+        console = Console()
+
+    # Header
+    console.print()
+    console.print(f"[bold]Spec Fix Comparison:[/bold] {spec_id}", style="cyan")
+    console.print(f"[dim]Total Changes: {report.total_changes}[/dim]")
+    console.print()
+
+    if not report.total_changes:
+        console.print("[green]✓ No changes detected[/green]")
+        return
+
+    # Group changes by location
+    changes_by_location: Dict[str, List[FieldChange]] = {}
+    for change in report.changes:
+        if change.location not in changes_by_location:
+            changes_by_location[change.location] = []
+        changes_by_location[change.location].append(change)
+
+    # Display changes grouped by location
+    for location in sorted(changes_by_location.keys()):
+        changes = changes_by_location[location]
+
+        # Location header
+        console.print(f"\n[bold cyan]Location:[/bold cyan] {location}")
+
+        for change in changes:
+            # Create before/after panels
+            before_content = _create_value_display(
+                change.field_path,
+                change.old_value,
+                change.change_type,
+                is_before=True
+            )
+            after_content = _create_value_display(
+                change.field_path,
+                change.new_value,
+                change.change_type,
+                is_before=False
+            )
+
+            # Style panels based on change type
+            if change.change_type == "added":
+                before_style = "dim"
+                after_style = "green"
+                before_title = "Before (not present)"
+                after_title = "After (added)"
+            elif change.change_type == "removed":
+                before_style = "red"
+                after_style = "dim"
+                before_title = "Before (removed)"
+                after_title = "After (not present)"
+            else:  # modified
+                before_style = "yellow"
+                after_style = "green"
+                before_title = "Before"
+                after_title = "After"
+
+            before_panel = Panel(
+                before_content,
+                title=before_title,
+                border_style=before_style,
+                padding=(0, 1)
+            )
+            after_panel = Panel(
+                after_content,
+                title=after_title,
+                border_style=after_style,
+                padding=(0, 1)
+            )
+
+            # Display side-by-side
+            columns = Columns([before_panel, after_panel], equal=True, expand=True)
+            console.print(columns)
+            console.print()  # Spacing between changes
+
+    # Display added/removed nodes
+    if report.nodes_added or report.nodes_removed:
+        console.print()
+
+    if report.nodes_added:
+        console.print("[bold green]Nodes Added:[/bold green]")
+        for node_id in sorted(report.nodes_added):
+            console.print(f"  [green]+ {node_id}[/green]")
+        console.print()
+
+    if report.nodes_removed:
+        console.print("[bold red]Nodes Removed:[/bold red]")
+        for node_id in sorted(report.nodes_removed):
+            console.print(f"  [red]- {node_id}[/red]")
+        console.print()
+
+
+def _create_value_display(
+    field_path: str,
+    value: Any,
+    change_type: str,
+    is_before: bool
+) -> Text:
+    """
+    Create formatted text display for a value in the diff.
+
+    Args:
+        field_path: Path to the field (e.g., "status", "metadata.file_path")
+        value: Value to display
+        change_type: Type of change ("added", "removed", "modified")
+        is_before: True if this is the "before" column, False for "after"
+
+    Returns:
+        Rich Text object with formatted content
+    """
+    text = Text()
+
+    # Field name
+    text.append(f"{field_path}\n", style="bold")
+
+    # Value display
+    if value is None:
+        if (change_type == "added" and is_before) or (change_type == "removed" and not is_before):
+            text.append("(not present)", style="dim italic")
+        else:
+            text.append("null", style="dim")
+    elif isinstance(value, (list, dict)):
+        # Format complex values with indentation
+        formatted = json.dumps(value, indent=2)
+        text.append(formatted, style="cyan")
+    elif isinstance(value, bool):
+        text.append(str(value).lower(), style="magenta")
+    elif isinstance(value, (int, float)):
+        text.append(str(value), style="cyan")
+    else:
+        # String values
+        text.append(str(value), style="white")
+
+    return text
