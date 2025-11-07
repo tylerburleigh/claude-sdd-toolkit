@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 09:32:48
+**Generated:** 2025-11-07 09:37:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 244
-- **Total Lines:** 86645
+- **Total Lines:** 86745
 - **Total Classes:** 354
-- **Total Functions:** 880
-- **Avg Complexity:** 5.8
+- **Total Functions:** 882
+- **Avg Complexity:** 5.81
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -632,7 +632,7 @@ Attributes:
 ### `DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:28`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:29`
 
 **Description:**
 > Complete diff report between before and after states.
@@ -907,7 +907,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 ### `FieldChange`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:18`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:19`
 
 **Description:**
 > Represents a single field change.
@@ -7402,7 +7402,7 @@ Args:
 ### `_compare_dicts(node_id, dict_name, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:148`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:149`
 **Complexity:** 5
 
 **Description:**
@@ -7419,7 +7419,7 @@ Args:
 ### `_compare_nodes(node_id, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:95`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:96`
 **Complexity:** 6
 
 **Description:**
@@ -7511,14 +7511,14 @@ Returns:
 
 ---
 
-### `_create_value_display(field_path, value, change_type, is_before) -> Text`
+### `_create_value_display(field_path, value, change_type, is_before) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:382`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:463`
+**Complexity:** 10
 
 **Description:**
-> Create formatted text display for a value in the diff.
+> Create formatted display for a value in the diff.
 
 Args:
     field_path: Path to the field (e.g., "status", "metadata.file_path")
@@ -7527,7 +7527,7 @@ Args:
     is_before: True if this is the "before" column, False for "after"
 
 Returns:
-    Rich Text object with formatted content
+    Rich Text or Syntax object with formatted content
 
 **Parameters:**
 - `field_path`: str
@@ -7559,6 +7559,28 @@ Returns:
 - `task_title`: str
 - `actual_hours`: Optional[float]
 - `note`: Optional[str]
+
+---
+
+### `_detect_code_language(field_path, value) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:274`
+⚠️ **Complexity:** 17 (High)
+
+**Description:**
+> Detect programming language from field path or value content.
+
+Args:
+    field_path: Field path like "metadata.command" or "verification.script"
+    value: Value to analyze for language detection
+
+Returns:
+    Language identifier for Rich.Syntax or None if not code
+
+**Parameters:**
+- `field_path`: str
+- `value`: Any
 
 ---
 
@@ -7887,7 +7909,7 @@ Returns:
 ### `_format_value(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:262`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:263`
 **Complexity:** 4
 
 **Description:**
@@ -8960,6 +8982,28 @@ Returns:
 **Parameters:**
 - `file_path`: Path
 - `exclude_patterns`: List[str]
+
+---
+
+### `_should_use_syntax_highlighting(value, language) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:331`
+**Complexity:** 6
+
+**Description:**
+> Determine if value should use syntax highlighting.
+
+Args:
+    value: Value to check
+    language: Detected language or None
+
+Returns:
+    True if syntax highlighting should be used
+
+**Parameters:**
+- `value`: Any
+- `language`: Optional[str]
 
 ---
 
@@ -12895,7 +12939,7 @@ Returns:
 ### `compute_diff(before, after) -> DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:36`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:37`
 **Complexity:** 6
 
 **Description:**
@@ -13871,7 +13915,7 @@ Returns:
 ### `display_diff_side_by_side(report, spec_id, console) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:273`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:354`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -15535,7 +15579,7 @@ Returns:
 ### `format_diff_json(report) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:240`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:241`
 **Complexity:** 2
 
 **Description:**
@@ -15549,7 +15593,7 @@ Returns:
 ### `format_diff_markdown(report, spec_id) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:177`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:178`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -26750,6 +26794,7 @@ Returns:
 - `rich.columns.Columns`
 - `rich.console.Console`
 - `rich.panel.Panel`
+- `rich.syntax.Syntax`
 - `rich.table.Table`
 - `rich.text.Text`
 - `typing.Any`

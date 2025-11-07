@@ -10,6 +10,10 @@ from datetime import datetime
 import json
 import sys
 
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
 
 class PrettyPrinter:
     """
@@ -362,6 +366,129 @@ class FidelityReport:
                     print(f"Recommendations: {len(recommendations)}")
 
         print()  # Final newline
+
+    def print_console_rich(self, verbose: bool = False) -> None:
+        """
+        Print formatted report to console using Rich panels with visual categorization.
+
+        Displays issues grouped by severity in color-coded panels for better
+        visual scanning. Uses Rich library for enhanced terminal output.
+
+        Args:
+            verbose: Include individual model responses (default: False)
+
+        Example:
+            >>> report = FidelityReport(review_results)
+            >>> report.print_console_rich(verbose=False)
+        """
+        console = Console()
+
+        # Get consensus data
+        consensus_dict = self._convert_to_dict(self.consensus)
+        consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
+        agreement_rate = consensus_dict.get("agreement_rate", 0.0)
+        consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
+
+        # Header
+        console.print()
+        console.print("[bold cyan]IMPLEMENTATION FIDELITY REVIEW[/bold cyan]")
+        console.print(f"[dim]Spec: {self.spec_id}[/dim]")
+        console.print(f"[dim]Consulted {self.models_consulted} AI model(s)[/dim]")
+        console.print()
+
+        # Consensus verdict with styling
+        verdict_upper = consensus_verdict.upper()
+        if consensus_verdict.lower() == "pass":
+            verdict_style = "bold green"
+        elif consensus_verdict.lower() == "fail":
+            verdict_style = "bold red"
+        elif consensus_verdict.lower() == "partial":
+            verdict_style = "bold yellow"
+        else:
+            verdict_style = "bold"
+
+        console.print(f"[{verdict_style}]Consensus Verdict: {verdict_upper}[/{verdict_style}]")
+        console.print(f"Agreement Rate: {agreement_rate:.1%}")
+        console.print()
+
+        # Group issues by severity
+        categorized_issues_list = self._convert_to_dict(self.categorized_issues)
+        if categorized_issues_list:
+            issues_by_severity = {
+                "critical": [],
+                "high": [],
+                "medium": [],
+                "low": []
+            }
+
+            for cat_issue in categorized_issues_list:
+                severity = cat_issue.get("severity", "unknown").lower()
+                issue_text = cat_issue.get("issue", "")
+                if severity in issues_by_severity:
+                    issues_by_severity[severity].append(issue_text)
+
+            # Display issues in severity panels
+            severity_config = {
+                "critical": {"title": "CRITICAL ISSUES", "style": "red", "icon": "🔴"},
+                "high": {"title": "HIGH PRIORITY ISSUES", "style": "yellow", "icon": "🟡"},
+                "medium": {"title": "MEDIUM PRIORITY ISSUES", "style": "blue", "icon": "🔵"},
+                "low": {"title": "LOW PRIORITY ISSUES", "style": "cyan", "icon": "⚪"}
+            }
+
+            for severity in ["critical", "high", "medium", "low"]:
+                issues = issues_by_severity[severity]
+                if issues:
+                    config = severity_config[severity]
+
+                    # Create panel content
+                    issue_lines = "\n\n".join([f"• {issue}" for issue in issues])
+
+                    # Create panel
+                    panel = Panel(
+                        issue_lines,
+                        title=f"{config['icon']} {config['title']} ({len(issues)})",
+                        border_style=config["style"],
+                        padding=(1, 2)
+                    )
+                    console.print(panel)
+                    console.print()
+
+        # Recommendations section
+        if consensus_recommendations:
+            console.print("[bold]RECOMMENDATIONS[/bold]")
+            console.print()
+            for rec in consensus_recommendations:
+                console.print(f"• {rec}")
+            console.print()
+
+        # Individual responses (if verbose)
+        if verbose:
+            parsed_responses_list = self._convert_to_dict(self.parsed_responses)
+            if parsed_responses_list:
+                console.print("[bold]INDIVIDUAL MODEL RESPONSES[/bold]")
+                console.print()
+
+                for i, response in enumerate(parsed_responses_list, 1):
+                    verdict = response.get("verdict", "unknown")
+                    issues = response.get("issues", [])
+                    recommendations = response.get("recommendations", [])
+
+                    # Create table for model response
+                    table = Table(show_header=False, box=None, padding=(0, 1))
+                    table.add_column("Field", style="bold")
+                    table.add_column("Value")
+
+                    table.add_row("Verdict", verdict.upper())
+                    table.add_row("Issues", str(len(issues)))
+                    table.add_row("Recommendations", str(len(recommendations)))
+
+                    panel = Panel(
+                        table,
+                        title=f"Model {i}",
+                        border_style="dim"
+                    )
+                    console.print(panel)
+                    console.print()
 
     def save_to_file(self, output_path: Path, format: str = "markdown") -> None:
         """
