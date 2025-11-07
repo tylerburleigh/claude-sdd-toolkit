@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 13:22:44
+**Generated:** 2025-11-07 13:36:09
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 88647
+- **Total Lines:** 88809
 - **Total Classes:** 355
-- **Total Functions:** 903
-- **Avg Complexity:** 5.82
+- **Total Functions:** 904
+- **Avg Complexity:** 5.83
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -210,6 +210,7 @@ Usage:
 - `set()`
 - `delete()`
 - `clear()`
+- `_matches_filters()`
 - `get_stats()`
 - `cleanup_expired()`
 
@@ -19043,10 +19044,36 @@ Returns:
 
 ---
 
-### `handle_cache_info(args, printer) -> None`
+### `handle_cache_clear(args, printer) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:19`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Handle 'sdd cache clear' command.
+
+Clears cache entries with optional filters:
+- --spec: Clear only entries for a specific spec ID
+- --type: Clear only entries of a specific review type (fidelity, plan)
+
+Args:
+    args: Parsed command-line arguments
+    printer: PrettyPrinter instance for formatted output
+
+Returns:
+    Exit code (0 for success, 1 for error)
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
+### `handle_cache_info(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:93`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -20982,7 +21009,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_cache(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:109`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:183`
 **Complexity:** 1
 
 **Description:**
