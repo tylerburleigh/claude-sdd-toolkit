@@ -26,6 +26,7 @@ from claude_skills.common.ai_tools import (
     detect_available_tools,
     check_tool_available
 )
+from claude_skills.common.progress import ProgressEmitter
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -87,12 +88,18 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             tool_list = ', '.join(ai_tools) if ai_tools else 'all available'
             print(f"Consulting AI tools: {tool_list}", file=sys.stderr)
 
+        # Create ProgressEmitter if --stream-progress flag is set
+        progress_emitter = None
+        if hasattr(args, 'stream_progress') and args.stream_progress:
+            progress_emitter = ProgressEmitter(enabled=True, auto_detect_tty=False)
+
         try:
             responses = consult_multiple_ai_on_fidelity(
                 prompt=prompt,
                 tools=args.ai_tools if hasattr(args, 'ai_tools') else None,
                 model=args.model if hasattr(args, 'model') else None,
-                timeout=args.timeout
+                timeout=args.timeout,
+                progress_emitter=progress_emitter
             )
         except NoToolsAvailableError as e:
             print(f"Error: {e}", file=sys.stderr)
@@ -339,6 +346,11 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         default=120,
         metavar="SECONDS",
         help="Timeout for AI consultation (default: 120)"
+    )
+    parser.add_argument(
+        "--stream-progress",
+        action="store_true",
+        help="Enable structured JSON progress events during AI consultation"
     )
 
     # Review options
