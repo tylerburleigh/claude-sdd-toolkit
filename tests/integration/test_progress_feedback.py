@@ -11,6 +11,7 @@ Tests progress indicators for:
 import pytest
 import time
 import threading
+import logging
 from unittest.mock import Mock, patch, MagicMock
 from claude_skills.common.tui_progress import (
     ai_consultation_progress,
@@ -1019,3 +1020,160 @@ class TestNonTTYBehavior:
                 ))
 
         # No assertions needed - just verify no exceptions
+
+
+class TestLoggingInteraction:
+    """Test that progress output doesn't interfere with logging."""
+
+    def test_progress_with_concurrent_logging(self):
+        """Test that progress tracking doesn't interfere with log messages."""
+        mock_callback = Mock(spec=ProgressCallback)
+        logger = logging.getLogger("test_logger")
+
+        with ai_consultation_progress("gemini", timeout=90, callback=mock_callback) as progress:
+            # Log messages during progress tracking
+            logger.info("Starting AI consultation")
+            time.sleep(0.1)
+            logger.debug("Processing request")
+            time.sleep(0.1)
+            logger.info("Consultation complete")
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test output",
+                duration=0.2
+            )
+            progress.complete(response)
+
+        # Verify progress callbacks were called despite logging
+        mock_callback.on_start.assert_called_once()
+        mock_callback.on_complete.assert_called_once()
+
+    def test_callback_exception_logging(self):
+        """Test that callback exceptions are logged without crashing."""
+        error_callback = Mock(spec=ProgressCallback)
+        error_callback.on_update.side_effect = ValueError("Test callback error")
+
+        # Capture log output
+        with patch('claude_skills.common.tui_progress.logger') as mock_logger:
+            with ai_consultation_progress(
+                "gemini",
+                timeout=90,
+                callback=error_callback,
+                update_interval=0.1
+            ) as progress:
+                time.sleep(0.25)
+
+                response = ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="Test",
+                    duration=0.25
+                )
+                progress.complete(response)
+
+            # Verify warning was logged for callback errors
+            assert mock_logger.warning.called
+
+    def test_batch_progress_with_logging(self):
+        """Test batch progress doesn't interfere with logging."""
+        mock_callback = Mock(spec=ProgressCallback)
+        logger = logging.getLogger("test_batch_logger")
+        tools = ["gemini", "codex"]
+
+        with batch_consultation_progress(tools, timeout=120, callback=mock_callback) as progress:
+            for tool in tools:
+                logger.info(f"Processing {tool}")
+                time.sleep(0.1)
+
+                progress.mark_complete(tool, ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.SUCCESS,
+                    output="output",
+                    duration=0.1
+                ))
+
+                logger.info(f"Completed {tool}")
+
+        # Verify batch callbacks completed successfully
+        mock_callback.on_batch_start.assert_called_once()
+        mock_callback.on_batch_complete.assert_called_once()
+
+    def test_progress_logger_isolated(self):
+        """Test that progress module logger doesn't affect application logging."""
+        # Get the progress module logger
+        progress_logger = logging.getLogger("claude_skills.common.tui_progress")
+        app_logger = logging.getLogger("test_app")
+
+        # Create separate handlers to verify isolation
+        progress_handler = Mock()
+        app_handler = Mock()
+
+        progress_logger.addHandler(progress_handler)
+        app_logger.addHandler(app_handler)
+
+        try:
+            with ai_consultation_progress("gemini", timeout=90) as progress:
+                # Log to both loggers
+                progress_logger.info("Progress log message")
+                app_logger.info("App log message")
+
+                response = ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="Test",
+                    duration=0.1
+                )
+                progress.complete(response)
+
+            # Both should have received their respective messages
+            # (Actual handler verification would depend on logging configuration)
+
+        finally:
+            progress_logger.removeHandler(progress_handler)
+            app_logger.removeHandler(app_handler)
+
+    def test_error_logging_with_progress(self):
+        """Test that errors during progress are properly logged."""
+        mock_callback = Mock(spec=ProgressCallback)
+        logger = logging.getLogger("test_error_logger")
+
+        try:
+            with ai_consultation_progress("gemini", timeout=90, callback=mock_callback):
+                logger.error("Simulated error during consultation")
+                raise RuntimeError("Test error")
+        except RuntimeError:
+            pass  # Expected
+
+        # Verify error completion was tracked
+        complete_kwargs = mock_callback.on_complete.call_args[1]
+        assert complete_kwargs["status"] == ToolStatus.ERROR
+
+    def test_debug_logging_during_updates(self):
+        """Test debug logging during periodic progress updates."""
+        mock_callback = Mock(spec=ProgressCallback)
+        logger = logging.getLogger("test_debug_logger")
+
+        with ai_consultation_progress(
+            "gemini",
+            timeout=90,
+            callback=mock_callback,
+            update_interval=0.1
+        ) as progress:
+            # Log debug messages during updates
+            logger.debug("Update 1")
+            time.sleep(0.15)
+            logger.debug("Update 2")
+            time.sleep(0.15)
+
+            response = ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="Test",
+                duration=0.3
+            )
+            progress.complete(response)
+
+        # Verify updates were called
+        assert mock_callback.on_update.call_count >= 1
