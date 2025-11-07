@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-07 15:07:25
+**Generated:** 2025-11-07 15:12:59
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89252
+- **Total Lines:** 89315
 - **Total Classes:** 356
 - **Total Functions:** 904
 - **Avg Complexity:** 5.84
@@ -216,6 +216,7 @@ Usage:
 - `get_incremental_state()`
 - `save_incremental_state()`
 - `compare_file_hashes()`
+- `merge_results()`
 
 ---
 

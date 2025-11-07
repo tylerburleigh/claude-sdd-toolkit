@@ -52,7 +52,9 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         if args.verbose:
             print(f"Loading specification: {args.spec_id}", file=sys.stderr)
 
-        reviewer = FidelityReviewer(args.spec_id)
+        # Check if incremental mode is requested
+        incremental = args.incremental if hasattr(args, 'incremental') else False
+        reviewer = FidelityReviewer(args.spec_id, incremental=incremental)
 
         if reviewer.spec_data is None:
             print(f"Error: Failed to load specification {args.spec_id}", file=sys.stderr)
@@ -370,6 +372,11 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
         default=2,
         metavar="N",
         help="Minimum models that must agree for consensus (default: 2)"
+    )
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="Enable incremental mode (only review changed files since last run)"
     )
 
     # Output options
