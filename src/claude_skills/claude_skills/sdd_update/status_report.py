@@ -301,15 +301,16 @@ def create_status_layout(spec_data: Dict[str, Any]) -> Layout:
     return layout
 
 
-def print_status_report(spec_data: Dict[str, Any], title: Optional[str] = None) -> None:
+def print_status_report(spec_data: Dict[str, Any], title: Optional[str] = None, ui=None) -> None:
     """
     Print a dashboard-style status report to console.
 
     Args:
         spec_data: Loaded JSON spec data
         title: Optional title for the report
+        ui: UI instance for console output (optional)
     """
-    console = Console()
+    console = ui.console if ui else Console()
 
     # Print title if provided
     if title:

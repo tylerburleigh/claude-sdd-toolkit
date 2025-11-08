@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:55:57
+**Generated:** 2025-11-08 18:56:33
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89645
+- **Total Lines:** 89647
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -8731,10 +8731,10 @@ Returns:
 
 ---
 
-### `_print_phases_table(phases) -> None`
+### `_print_phases_table(phases, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:98`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:100`
 **Complexity:** 5
 
 **Description:**
@@ -8742,6 +8742,7 @@ Returns:
 
 **Parameters:**
 - `phases`: List[Dict[str, Any]]
+- `ui`: None
 
 ---
 
@@ -16255,7 +16256,7 @@ Args:
 
 ---
 
-### `format_phases_table(spec_id, specs_dir, printer) -> Optional[List[Dict]]`
+### `format_phases_table(spec_id, specs_dir, printer, ui) -> Optional[List[Dict]]`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:49`
@@ -16268,6 +16269,7 @@ Args:
     spec_id: Specification ID
     specs_dir: Path to specs directory
     printer: Optional printer for output
+    ui: UI instance for console output (optional)
 
 Returns:
     List of phase dictionaries, or None on error
@@ -16276,6 +16278,7 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+- `ui`: None
 
 ---
 
