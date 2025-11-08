@@ -385,7 +385,7 @@ def cmd_context(args, printer):
             # Simplified output: just percentage as whole number
             context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
             simplified = {"context_percentage_used": round(context_pct)}
-            output_json(simplified, compact=True)
+            output_json(simplified, compact=args.compact)
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
@@ -527,7 +527,7 @@ when running multiple concurrent Claude Code sessions.
         # Note: main() doesn't have --verbose flag, so always use simplified output
         context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
         simplified = {"context_percentage_used": round(context_pct)}
-        output_json(simplified, compact=True)
+        output_json(simplified, compact=getattr(args, 'compact', True))
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 

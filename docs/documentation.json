@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T15:20:07.952123Z",
+    "generated_at": "2025-11-08T15:28:35.125704Z",
     "languages": [
       "python"
     ],
@@ -73721,6 +73721,12 @@
           "file": "unknown",
           "line": 228,
           "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
+          "file": "unknown",
+          "line": 228,
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -73783,6 +73789,12 @@
         },
         {
           "name": "output_json",
+          "file": "unknown",
+          "line": 269,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
           "file": "unknown",
           "line": 269,
           "call_type": "function_call"
