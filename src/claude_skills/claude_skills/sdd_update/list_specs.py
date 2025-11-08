@@ -8,6 +8,7 @@ from rich.table import Table
 from rich.console import Console
 
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
+from claude_skills.common.json_output import output_json
 
 
 def _create_progress_bar(percentage: int, width: int = 10) -> str:
@@ -132,10 +133,7 @@ def list_specs(
 
     # Output results
     if output_format == "json":
-        if compact:
-            print(json.dumps(specs_info, separators=(',', ':')))
-        else:
-            print(json.dumps(specs_info, indent=2))
+        output_json(specs_info, compact=compact)
     else:
         _print_specs_text(specs_info, verbose, printer)
 

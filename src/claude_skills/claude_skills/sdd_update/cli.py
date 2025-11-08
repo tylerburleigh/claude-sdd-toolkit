@@ -18,6 +18,7 @@ from claude_skills.common import find_specs_directory, PrettyPrinter
 from claude_skills.common import execute_verify_task, load_json_spec
 from claude_skills.common.spec import update_node, save_json_spec
 from claude_skills.common.sdd_config import get_default_format
+from claude_skills.common.json_output import output_json
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -51,20 +52,6 @@ from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
-
-
-def output_json(data, compact=False):
-    """
-    Output JSON data with formatting based on compact flag.
-
-    Args:
-        data: Data to serialize to JSON
-        compact: If True, output compact JSON; if False, pretty-print with indent
-    """
-    if compact:
-        print(json.dumps(data, separators=(',', ':')))
-    else:
-        print(json.dumps(data, indent=2))
 
 
 def cmd_execute_verify(args, printer):

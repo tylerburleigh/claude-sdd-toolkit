@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T13:17:25.744299Z",
+    "generated_at": "2025-11-08T13:21:33.628872Z",
     "languages": [
       "python"
     ],
@@ -41856,6 +41856,72 @@
       "is_public": true,
       "callers": [
         {
+          "name": "cmd_verify_tools",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 272,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_init_env",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 605,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_validate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 845,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_pattern",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 882,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_detect_project",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 903,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_tests",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 942,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_check_environment",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 976,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_circular_deps",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1025,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_related_files",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1057,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_validate_paths",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1094,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_spec_stats",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1121,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_add_assumption",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 329,
@@ -42008,7 +42074,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 23
+      "call_count": 34
     },
     {
       "name": "print_json_output",
@@ -75703,16 +75769,10 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 272,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 272,
-          "call_type": "method_call"
         },
         {
           "name": "action",
@@ -76884,16 +76944,10 @@
           "call_type": "method_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 605,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 605,
-          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -77400,16 +77454,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 845,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 845,
-          "call_type": "method_call"
         },
         {
           "name": "result",
@@ -77524,16 +77572,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 882,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 882,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -77606,16 +77648,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 903,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 903,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -77790,16 +77826,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 942,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 942,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -77920,16 +77950,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 976,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 976,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -78098,16 +78122,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 1025,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 1025,
-          "call_type": "method_call"
         },
         {
           "name": "error",
@@ -78228,16 +78246,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 1057,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 1057,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -78382,16 +78394,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 1094,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 1094,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -78494,16 +78500,10 @@
           "call_type": "function_call"
         },
         {
-          "name": "print",
+          "name": "output_json",
           "file": "unknown",
           "line": 1121,
           "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 1121,
-          "call_type": "method_call"
         },
         {
           "name": "success",
@@ -94583,6 +94583,72 @@
       "is_public": true,
       "callers": [
         {
+          "name": "cmd_verify_tools",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 272,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_init_env",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 605,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_validate_spec",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 845,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_pattern",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 882,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_detect_project",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 903,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_tests",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 942,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_check_environment",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 976,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_circular_deps",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1025,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_find_related_files",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1057,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_validate_paths",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1094,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_spec_stats",
+          "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
+          "line": 1121,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_add_assumption",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
           "line": 329,
@@ -94747,7 +94813,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 23
+      "call_count": 34
     },
     {
       "name": "cmd_execute_verify",
