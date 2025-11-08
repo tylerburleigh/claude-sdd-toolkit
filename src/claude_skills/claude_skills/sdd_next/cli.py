@@ -252,15 +252,31 @@ def format_execution_plan(spec_id: str, task_id: str, specs_dir: Path) -> str:
 
 def cmd_verify_tools(args, printer):
     """Verify required tools are available."""
-    printer.action("Checking required tools...")
+    # Collect data
+    required_tools = {"python": True}  # Always available since we're running
+    optional_tools_status = {}
 
-    # Python is obviously available since we're running
-    printer.success("Python 3 is available")
-
-    # Check for optional tools
     optional_tools = ["git", "grep", "cat"]
     for tool in optional_tools:
-        if os.system(f"command -v {tool} > /dev/null 2>&1") == 0:
+        is_available = os.system(f"command -v {tool} > /dev/null 2>&1") == 0
+        optional_tools_status[tool] = is_available
+
+    # JSON output mode
+    if args.json:
+        output = {
+            "required": required_tools,
+            "optional": optional_tools_status,
+            "all_available": all(optional_tools_status.values())
+        }
+        print(json.dumps(output, indent=2))
+        return 0
+
+    # Rich UI mode
+    printer.action("Checking required tools...")
+    printer.success("Python 3 is available")
+
+    for tool, available in optional_tools_status.items():
+        if available:
             printer.success(f"{tool} is available")
         else:
             printer.warning(f"{tool} not found (optional)")
@@ -481,7 +497,7 @@ def cmd_check_deps(args, printer):
 
         # Build and render the dependency tree
         tree = _build_dependency_tree(deps, args.task_id)
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
         console.print(tree)
 
     return 0
@@ -518,7 +534,7 @@ def _check_all_task_deps(spec_data, args, printer):
         print()  # Blank line for spacing
 
         # Use Rich Console for colored output
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
 
         if ready:
             console.print("\n✅ [bold green]Ready to start:[/bold green]")

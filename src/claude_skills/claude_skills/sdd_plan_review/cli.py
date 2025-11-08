@@ -183,8 +183,6 @@ def cmd_review(args, printer):
 
 def cmd_list_tools(args, printer):
     """List available AI CLI tools."""
-    printer.header("AI CLI Tools for Reviews")
-
     tools_to_check = ["gemini", "codex", "cursor-agent"]
 
     available = []
@@ -196,6 +194,23 @@ def cmd_list_tools(args, printer):
             available.append(tool)
         else:
             unavailable.append(tool)
+
+    # JSON output mode
+    if args.json:
+        output = {
+            "available": available,
+            "unavailable": unavailable,
+            "total": len(tools_to_check),
+            "available_count": len(available)
+        }
+        print(json.dumps(output, indent=2))
+        if len(available) == 0:
+            return 1
+        else:
+            return 0
+
+    # Rich UI mode
+    printer.header("AI CLI Tools for Reviews")
 
     if available:
         printer.success(f"\n✓ Available ({len(available)}):")

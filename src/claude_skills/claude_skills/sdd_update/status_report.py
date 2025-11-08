@@ -309,7 +309,7 @@ def print_status_report(spec_data: Dict[str, Any], title: Optional[str] = None) 
         spec_data: Loaded JSON spec data
         title: Optional title for the report
     """
-    console = Console()
+    console = Console(width=20000, force_terminal=True)
 
     # Print title if provided
     if title:

@@ -48,6 +48,7 @@ def list_specs(
     output_format: str = "text",
     verbose: bool = False,
     printer: Optional[PrettyPrinter] = None,
+    compact: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     List specification files with optional filtering.
@@ -131,7 +132,10 @@ def list_specs(
 
     # Output results
     if output_format == "json":
-        print(json.dumps(specs_info, indent=2))
+        if compact:
+            print(json.dumps(specs_info, separators=(',', ':')))
+        else:
+            print(json.dumps(specs_info, indent=2))
     else:
         _print_specs_text(specs_info, verbose, printer)
 
@@ -150,7 +154,7 @@ def _print_specs_text(
         return
 
     # Create Rich console
-    console = Console()
+    console = Console(width=20000, force_terminal=True)
 
     # Create Rich.Table with specified columns
     table = Table(
@@ -162,12 +166,12 @@ def _print_specs_text(
     )
 
     # Add columns: ID, Title, Progress, Status, Phase, Updated
-    table.add_column("ID", style="cyan", no_wrap=True, min_width=30)
-    table.add_column("Title", style="white", min_width=25)
-    table.add_column("Progress", justify="right", style="yellow", min_width=12)
-    table.add_column("Status", justify="center", style="green", min_width=10)
-    table.add_column("Phase", style="blue", min_width=10)
-    table.add_column("Updated", style="dim", min_width=10)
+    table.add_column("ID", style="cyan", no_wrap=True, overflow="ignore", min_width=30)
+    table.add_column("Title", style="white", no_wrap=True, overflow="ignore", min_width=25)
+    table.add_column("Progress", justify="right", style="yellow", no_wrap=True, overflow="ignore", min_width=12)
+    table.add_column("Status", justify="center", style="green", no_wrap=True, overflow="ignore", min_width=10)
+    table.add_column("Phase", style="blue", no_wrap=True, overflow="ignore", min_width=10)
+    table.add_column("Updated", style="dim", no_wrap=True, overflow="ignore", min_width=10)
 
     # Add rows for each spec
     for spec in specs_info:

@@ -111,12 +111,12 @@ def _print_tasks_table(
     """Print tasks using Rich.Table for structured output."""
 
     if not matches:
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
         console.print("[yellow]No tasks found matching the specified filters.[/yellow]")
         return
 
     # Create Rich console
-    console = Console()
+    console = Console(width=20000, force_terminal=True)
 
     # Build title with filter info
     title_parts = ["📋 Tasks"]
@@ -137,11 +137,11 @@ def _print_tasks_table(
     )
 
     # Add columns: Task ID, Status, Title, Dependencies, File
-    table.add_column("Task ID", style="cyan", no_wrap=True, min_width=12)
-    table.add_column("Status", justify="center", style="white", min_width=12)
-    table.add_column("Title", style="white", min_width=25)
-    table.add_column("Dependencies", style="yellow", min_width=12)
-    table.add_column("File", style="dim", min_width=15)
+    table.add_column("Task ID", style="cyan", no_wrap=True, overflow="ignore", min_width=12)
+    table.add_column("Status", justify="center", style="white", no_wrap=True, overflow="ignore", min_width=12)
+    table.add_column("Title", style="white", no_wrap=True, overflow="ignore", min_width=25)
+    table.add_column("Dependencies", style="yellow", no_wrap=True, overflow="ignore", min_width=12)
+    table.add_column("File", style="dim", no_wrap=True, overflow="ignore", min_width=15)
 
     # Add filter info if filters are active
     if status_filter or type_filter or parent_filter:

@@ -497,7 +497,13 @@ def cmd_report(args, printer):
     with open(output_path, "w") as f:
         f.write(report)
 
-    printer.success(f"Report saved to: {output_path}")
+    # Only print file location in non-JSON mode
+    if args.format != "json":
+        printer.success(f"Report saved to: {output_path}")
+    else:
+        # In JSON mode, output the report to stdout as well
+        print(report)
+
     return 0
 
 

@@ -546,7 +546,7 @@ your-project/
 │   └── .human-readable/     # Rendered markdown (gitignored)
 │
 ├── .claude/                 # Project settings (optional)
-│   └── settings.json        # Permissions
+│   └── settings.local.json  # Permissions
 │
 └── docs/                    # Generated docs (optional)
     ├── documentation.json   # Machine-readable
@@ -568,7 +568,7 @@ Run the setup command in your project:
 ```
 
 This automatically:
-- Creates `.claude/settings.json` in your project
+- Creates `.claude/settings.local.json` in your project
 - Adds all required permissions for SDD skills and tools
 - Prepares your project for spec-driven development
 
@@ -576,7 +576,7 @@ You only need to run this once per project.
 
 ### What Gets Configured
 
-The setup creates `.claude/settings.json` with permissions like:
+The setup creates `.claude/settings.local.json` with permissions like:
 
 ```json
 {

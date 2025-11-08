@@ -239,21 +239,32 @@ def generate_report(all_results: Dict[str, Dict], output_path: Path = None):
     for rank, (format_name, avg_tokens) in enumerate(format_rankings, 1):
         report_lines.append(f"{rank}. **{format_name}**: {avg_tokens:,.0f} tokens (average)")
 
+    if format_rankings:
+        report_lines.extend([
+            "",
+            "### Recommendations",
+            "",
+            "**For API/LLM Consumption:**",
+            f"- Best format: **{format_rankings[0][0]}** ({format_rankings[0][1]:,.0f} tokens avg)",
+            "- Most token-efficient for programmatic processing",
+            "",
+            "**For Human Reading:**",
+            "- Use Rich TUI format for interactive terminals",
+            "- Provides best readability with syntax highlighting",
+            "",
+            "**For CI/CD Pipelines:**",
+            "- Use Plain text or compact JSON",
+            "- Avoids ANSI codes and unnecessary formatting",
+        ])
+    else:
+        report_lines.extend([
+            "",
+            "### Recommendations",
+            "",
+            "⚠️ **No successful test results** - all formats failed. Please check the errors above.",
+        ])
+
     report_lines.extend([
-        "",
-        "### Recommendations",
-        "",
-        "**For API/LLM Consumption:**",
-        f"- Best format: **{format_rankings[0][0]}** ({format_rankings[0][1]:,.0f} tokens avg)",
-        "- Most token-efficient for programmatic processing",
-        "",
-        "**For Human Reading:**",
-        "- Use Rich TUI format for interactive terminals",
-        "- Provides best readability with syntax highlighting",
-        "",
-        "**For CI/CD Pipelines:**",
-        "- Use Plain text or compact JSON",
-        "- Avoids ANSI codes and unnecessary formatting",
         "",
         "---",
         "",
@@ -290,16 +301,28 @@ def main():
     spec_id = args.spec_id
     if not spec_id:
         print("Finding active spec...")
-        output, code, _ = run_command(["sdd", "find-specs"])
+        output, code, _ = run_command(["sdd", "list-specs", "--json"])
         if code == 0 and output:
-            # Try to extract first spec ID from output
-            lines = [l.strip() for l in output.split('\n') if l.strip()]
-            for line in lines:
-                if len(line) > 10 and '-' in line:
-                    # Looks like a spec ID
-                    spec_id = line.split()[0]
-                    print(f"Using spec: {spec_id}")
-                    break
+            try:
+                # Try to parse JSON output
+                specs_data = json.loads(output)
+                if isinstance(specs_data, list) and len(specs_data) > 0:
+                    # Get first spec ID
+                    spec_id = specs_data[0].get('spec_id')
+                    if spec_id:
+                        print(f"Using spec: {spec_id}")
+            except json.JSONDecodeError:
+                # Fallback: try to extract from text output
+                lines = [l.strip() for l in output.split('\n') if l.strip()]
+                for line in lines:
+                    # Look for lines that look like spec IDs (contains date pattern)
+                    if '-2025-' in line or '-2024-' in line:
+                        # Extract the spec ID (first word on the line)
+                        parts = line.split()
+                        if parts:
+                            spec_id = parts[0].strip('│').strip()
+                            print(f"Using spec: {spec_id}")
+                            break
 
     if not spec_id:
         print("Error: No spec ID provided and could not find active spec")
@@ -310,31 +333,31 @@ def main():
     formats = {
         "Text (Rich)": {
             "env_vars": {},
-            "flags": ["--format", "text"]
+            "flags": []
         },
         "Text (Plain)": {
             "env_vars": {"FORCE_PLAIN_UI": "1"},
-            "flags": ["--format", "text"]
+            "flags": []
         },
         "JSON (Compact)": {
             "env_vars": {},
-            "flags": ["--format", "json", "--compact"]
+            "flags": ["--json", "--compact"]
         },
         "JSON (Pretty)": {
             "env_vars": {},
-            "flags": ["--format", "json", "--no-compact"]
+            "flags": ["--json", "--no-compact"]
         }
     }
 
     # Commands to benchmark
     commands = {
+        "sdd list-specs": (
+            ["sdd", "list-specs"],
+            "List all specs with details"
+        ),
         "sdd progress": (
             ["sdd", "progress", spec_id],
             f"Overall spec progress for {spec_id}"
-        ),
-        "sdd find-specs": (
-            ["sdd", "find-specs", "--verbose"],
-            "List all specs with details"
         ),
         "sdd list-phases": (
             ["sdd", "list-phases", spec_id],

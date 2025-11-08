@@ -1,0 +1,1509 @@
+{
+  "spec_id": "json-output-standardization-2025-11-08-001",
+  "generated": "2025-11-08T00:00:00Z",
+  "last_updated": "2025-11-08T13:03:42.572740Z",
+  "metadata": {
+    "title": "JSON Output Format Standardization",
+    "description": "Standardize compact/pretty JSON formatting across all SDD toolkit CLI commands",
+    "status": "active",
+    "priority": "high",
+    "estimated_hours": 20,
+    "complexity": "medium",
+    "objectives": [
+      "Create centralized JSON output helper in common/json_output.py",
+      "Replace all hardcoded json.dumps calls across 7 CLI modules",
+      "Ensure consistent behavior with config and flag precedence",
+      "Add comprehensive testing infrastructure",
+      "Update user and developer documentation"
+    ],
+    "activated_date": "2025-11-08T13:01:59.714647Z",
+    "progress_percentage": 2,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "JSON Output Format Standardization",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6"
+      ],
+      "total_tasks": 41,
+      "completed_tasks": 1,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Foundation & Shared Infrastructure",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Create the centralized output_json() helper function that all modules will use",
+        "risk_level": "low",
+        "estimated_hours": 3
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Analyze existing sdd_update/cli.py implementation",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "description": "Review the existing output_json() implementation in sdd_update/cli.py to understand the pattern before creating the shared version",
+        "started_at": "2025-11-08T13:03:15.584851Z",
+        "completed_at": "2025-11-08T13:03:42.560423Z",
+        "needs_journaling": false,
+        "actual_hours": 0.007,
+        "journaled_at": "2025-11-08T13:03:42.568749Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/json_output.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-3"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/json_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Create output_json() function with type hints",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Implement output_json(data: Any, compact: bool = False) with proper type annotations"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Add comprehensive docstrings with examples",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-2-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Document function behavior, parameters, and include compact vs pretty examples"
+      }
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Implement compact and pretty-print logic",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-2-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Use json.dumps with separators=(',', ':') for compact, indent=2 for pretty"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "tests/test_json_output.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_json_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Create unit tests for output_json() covering compact, pretty, and edge cases"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Unit tests pass for json_output module",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest tests/test_json_output.py -v",
+        "expected": "All tests pass, both compact and pretty modes work correctly"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "High Priority Modules",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update modules with the most JSON output calls and highest user impact",
+        "risk_level": "medium",
+        "estimated_hours": 5
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Identify all json.dumps calls in high-priority modules",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-3",
+          "task-2-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "description": "Grep for json.dumps in sdd_next, sdd_update, sdd_validate to locate all instances to replace"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2",
+        "task-2-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "description": "Replace 10 json.dumps instances with output_json() calls"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add import for output_json",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "from claude_skills.common.json_output import output_json"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Replace all 10 json.dumps calls with output_json",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-2-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Pattern: print(json.dumps(X, indent=2)) \u2192 output_json(X, args.compact)"
+      }
+    },
+    "task-2-2-3": {
+      "type": "subtask",
+      "title": "Verify args.compact is available in all functions",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-2-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Ensure all command handlers have access to args.compact from global parser"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1",
+        "task-2-3-2",
+        "task-2-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1,
+        "description": "Replace 2 missed json.dumps instances and update existing output_json to use shared version"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Update import to use shared json_output module",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Change from local output_json to from claude_skills.common.json_output import output_json"
+      }
+    },
+    "task-2-3-2": {
+      "type": "subtask",
+      "title": "Remove local output_json() definition",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-3-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Delete the local implementation now that we use the shared version"
+      }
+    },
+    "task-2-3-3": {
+      "type": "subtask",
+      "title": "Replace 2 missed json.dumps instances",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-3-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Find and replace any remaining hardcoded json.dumps calls"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-4-1",
+        "task-2-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1.5,
+        "description": "Replace 4 json.dumps instances with output_json() calls"
+      }
+    },
+    "task-2-4-1": {
+      "type": "subtask",
+      "title": "Add import and replace json.dumps calls",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Import output_json and replace all 4 instances"
+      }
+    },
+    "task-2-4-2": {
+      "type": "subtask",
+      "title": "Remove command-specific --format flags if present",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-2-4-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Check for and remove deprecated --format json flags, use global --json instead"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test sdd_next commands with compact/pretty flags",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd next-task --json --compact | wc -l && sdd next-task --json --no-compact | grep '^  '",
+        "expected": "Compact outputs single line, pretty has indentation"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Test sdd_validate commands with compact/pretty flags",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd validate --json --compact | python -m json.tool",
+        "expected": "Valid JSON in both compact and pretty modes"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Medium Priority Modules",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update modules with moderate JSON output usage",
+        "risk_level": "low",
+        "estimated_hours": 3.5
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/cache/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/cache/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1.5,
+        "description": "Replace 5 json.dumps instances in cache commands"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Add import and replace json.dumps calls",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Import output_json and replace all 5 instances in cache list/get/stats commands"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Verify args.compact available in cache commands",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-3-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_fidelity_review/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1,
+        "description": "Replace 2 json.dumps instances"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add import and replace json.dumps calls",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 0.5,
+        "description": "Replace 1 json.dumps instance"
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Add import and replace json.dumps call",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Test medium priority commands with compact/pretty",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd cache list --json --compact && sdd fidelity-review --json --no-compact",
+        "expected": "Commands work with both compact and pretty flags"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Low Priority Modules",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update remaining modules for completeness",
+        "risk_level": "very_low",
+        "estimated_hours": 1.5
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ]
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/context_tracker/cli.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/context_tracker/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1,
+        "description": "Replace 3 json.dumps instances"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Add import and replace json.dumps calls",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Test context_tracker commands",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-4-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Test context_tracker with compact/pretty",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd context --json --compact && sdd context --json --no-compact",
+        "expected": "Both modes work correctly"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing Infrastructure & Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create automated tests and comprehensive verification",
+        "risk_level": "low",
+        "estimated_hours": 4.5
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "scripts/test_compact_json.sh",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "scripts/test_compact_json.sh",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Create comprehensive automated test script for all commands"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Create test script structure",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Set up test framework with command list and test matrix"
+      }
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Add tests for all 7 modules",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-5-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Test compact/pretty/config/flag for each command"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "tests/integration/test_json_output_integration.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/integration/test_json_output_integration.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "description": "Create pytest integration tests for key commands"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Verify config precedence and flag overrides",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-5-1",
+          "task-5-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "description": "Test that flags override config correctly"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Run automated test script",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "bash scripts/test_compact_json.sh",
+        "expected": "90%+ pass rate on all command tests"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Phase 5 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-5",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Documentation & Finalization",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update documentation and create user/developer guides",
+        "risk_level": "very_low",
+        "estimated_hours": 2.5
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ]
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "docs/OUTPUT_MODES.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-1-1",
+        "task-6-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/OUTPUT_MODES.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Create user documentation for JSON output modes"
+      }
+    },
+    "task-6-1-1": {
+      "type": "subtask",
+      "title": "Document compact vs pretty-print usage",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-1-2": {
+      "type": "subtask",
+      "title": "Add examples and configuration guide",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-6-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "docs/CONTRIBUTING.md",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/CONTRIBUTING.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Update developer documentation with JSON output guidelines"
+      }
+    },
+    "task-6-2-1": {
+      "type": "subtask",
+      "title": "Add section on adding JSON output to commands",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "Update TCOMPACT.md status",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "TCOMPACT.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Mark original planning document as completed and reference spec"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Final verification checklist",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All 7 modules updated, tests pass, docs complete, no regressions",
+        "command": ""
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "Phase 6 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-6",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-08T13:03:42.568728Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Analyze existing sdd_update/cli.py implementation",
+      "author": "claude-code",
+      "content": "Successfully analyzed the output_json() implementation in sdd_update/cli.py (lines 56-67).\n\nKey findings:\n1. Function signature: output_json(data, compact=False)\n2. Takes data to serialize and optional compact flag\n3. Uses json.dumps() with conditional formatting:\n   - Compact mode: separators=(',', ':') for minimal whitespace\n   - Pretty mode: indent=2 for human-readable output\n4. Outputs directly to stdout via print()\n5. Used throughout the file (19 occurrences) for JSON output in commands\n6. Pattern is clean and reusable - perfect candidate for extraction to shared module\n7. No error handling in current implementation (should add in shared version)\n\nThis analysis confirms the pattern is suitable for standardization. Ready to create the shared common/json_output.py module in task-1-2.",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ]
+}

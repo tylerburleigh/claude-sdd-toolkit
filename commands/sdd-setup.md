@@ -9,7 +9,7 @@ This command performs first-time setup for the SDD (Spec-Driven Development) too
 
 ## What This Does
 
-1. Configures `.claude/settings.json` with the necessary permissions for SDD skills and tools
+1. Configures `.claude/settings.local.json` with the necessary permissions for SDD skills and tools
 2. **Interactively prompts for git/GitHub CLI permissions** with clear risk warnings
 3. Optionally configures `.claude/git_config.json` for git integration features (branches, commits, AI-powered PRs)
 4. Creates `.claude/sdd_config.json` for SDD CLI output formatting preferences (if missing)
@@ -80,7 +80,7 @@ sdd skills-dev setup-permissions update .
 ```
 
 This will:
-- Create `.claude/settings.json` if it doesn't exist
+- Create `.claude/settings.local.json` if it doesn't exist
 - Prompt for SDD CLI output preferences (if not already configured)
 - Add all required SDD permissions to the `allow` list
 - **Interactively prompt for git integration permissions** (see Git Permission Prompts below)
@@ -405,7 +405,7 @@ Next steps:
 
 ## What Gets Configured
 
-### Permissions (`.claude/settings.json`)
+### Permissions (`.claude/settings.local.json`)
 
 The setup adds these permissions:
 
@@ -452,9 +452,9 @@ During the interactive setup, you'll be prompted to enable git integration permi
 - GitHub CLI: `gh pr view`
 
 **If you skip git setup:**
-- No git permissions added (you can manually add them to `.claude/settings.json` later)
+- No git permissions added (you can manually add them to `.claude/settings.local.json` later)
 
-All git permissions are added to the `allow` list for automated workflows. If you prefer to be prompted before each git operation, manually edit `.claude/settings.json` and move the permissions from `allow` to `ask`.
+All git permissions are added to the `allow` list for automated workflows. If you prefer to be prompted before each git operation, manually edit `.claude/settings.local.json` and move the permissions from `allow` to `ask`.
 
 ### Git Integration (`.claude/git_config.json`)
 
@@ -534,7 +534,7 @@ For detailed information, see `docs/SDD_CONFIG_README.md` in the toolkit.
 **Permissions:**
 - Setup is **non-destructive** - only adds permissions, never removes existing ones
 - Can be run multiple times safely (idempotent)
-- Permissions are project-specific (stored in project's `.claude/settings.json`)
+- Permissions are project-specific (stored in project's `.claude/settings.local.json`)
 
 **Git Configuration:**
 - Git setup is optional - you can skip and configure later

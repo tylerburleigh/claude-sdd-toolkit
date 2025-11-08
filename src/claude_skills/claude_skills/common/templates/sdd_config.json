@@ -1,8 +1,6 @@
 {
   "output": {
-    "json": true,
-    "compact": true,
-    "default_format": "text",
-    "text_renderer": "auto"
+    "default_mode": "text",
+    "json_compact": true
   }
 }

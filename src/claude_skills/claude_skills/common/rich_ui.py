@@ -86,7 +86,7 @@ class RichUi:
             messages = ui.get_messages()
             ui.render_all()
         """
-        self.console = console or Console()
+        self.console = console or Console(width=20000, force_terminal=True)
         self._collecting = collect_messages
         self._messages: List[Message] = []
         self._context_stack: List[Dict[str, Any]] = []
@@ -150,7 +150,7 @@ class RichUi:
 
         # Add columns
         for col in columns:
-            table.add_column(col, overflow="fold")
+            table.add_column(col, overflow="ignore", no_wrap=True)
 
         # Add rows
         for row_data in data:

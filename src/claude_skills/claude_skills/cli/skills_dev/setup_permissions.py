@@ -1,7 +1,7 @@
 """
 Setup Project Permissions Commands
 
-Configures .claude/settings.json with required SDD tool permissions.
+Configures .claude/settings.local.json with required SDD tool permissions.
 Used by /sdd-begin command and sdd-plan skill to ensure proper permissions.
 """
 
@@ -102,30 +102,40 @@ def _prompt_for_config(printer: PrettyPrinter) -> dict:
     printer.info("Let's configure your default output preferences for SDD commands.")
     printer.info("")
 
-    # Prompt for JSON output preference
-    printer.info("Output Format:")
-    printer.info("  • JSON: Machine-readable format (good for automation)")
-    printer.info("  • Human-readable: Easy-to-read terminal output")
+    # Prompt for output mode preference with benchmark data
+    printer.info("Output Format Options:")
+    printer.info("  • json:     Machine-readable format (RECOMMENDED)")
+    printer.info("              ⚡ 76% more efficient for AI agents (859 vs 3,601 tokens avg)")
+    printer.info("              📊 Best for: Claude Code, automation, LLM consumption")
+    printer.info("")
+    printer.info("  • text:     Rich TUI with colors, tables, and progress bars")
+    printer.info("              📺 Best for: Human reading, interactive terminals")
+    printer.info("")
+    printer.info("  • markdown: Human-readable markdown output")
+    printer.info("              📝 Best for: Documentation, reports")
     printer.info("")
 
     while True:
-        json_pref = input("Default to JSON output? [Y/n]: ").strip().lower()
-        if json_pref in ['', 'y', 'yes']:
-            use_json = True
+        mode_pref = input("Default output mode? [json/text/markdown] (default: json): ").strip().lower()
+        if mode_pref in ['', 'j', 'json']:
+            default_mode = 'json'
             break
-        elif json_pref in ['n', 'no']:
-            use_json = False
+        elif mode_pref in ['t', 'text']:
+            default_mode = 'text'
+            break
+        elif mode_pref in ['m', 'md', 'markdown']:
+            default_mode = 'markdown'
             break
         else:
-            printer.warning("Please enter 'y' for yes or 'n' for no")
+            printer.warning("Please enter 'json', 'text', or 'markdown'")
 
     # Only ask about compact if JSON is enabled
     use_compact = True  # default
-    if use_json:
+    if default_mode == 'json':
         printer.info("")
         printer.info("JSON Formatting:")
-        printer.info("  • Compact: Single-line JSON (smaller output)")
-        printer.info("  • Pretty: Multi-line JSON (more readable)")
+        printer.info("  • Compact: Single-line JSON (smaller output, recommended)")
+        printer.info("  • Pretty:  Multi-line JSON (more readable)")
         printer.info("")
 
         while True:
@@ -141,8 +151,8 @@ def _prompt_for_config(printer: PrettyPrinter) -> dict:
 
     return {
         "output": {
-            "json": use_json,
-            "compact": use_compact
+            "default_mode": default_mode,
+            "json_compact": use_compact
         }
     }
 
@@ -172,9 +182,11 @@ def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter
         printer.success(f"✅ Created configuration file: {config_file}")
         printer.info("")
         printer.info("Your preferences:")
-        printer.info(f"  • JSON output: {'enabled' if config['output']['json'] else 'disabled'}")
-        if config['output']['json']:
-            printer.info(f"  • JSON format: {'compact' if config['output']['compact'] else 'pretty-printed'}")
+        default_mode = config['output'].get('default_mode', 'text')
+        printer.info(f"  • Default output mode: {default_mode}")
+        if default_mode == 'json':
+            json_compact = config['output'].get('json_compact', True)
+            printer.info(f"  • JSON format: {'compact' if json_compact else 'pretty-printed'}")
         printer.info("")
 
         return True
@@ -213,7 +225,7 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
         elif response in ['n', 'no']:
             printer.info("")
             printer.info("⊘ Skipping git integration setup")
-            printer.info("  You can manually add git permissions to .claude/settings.json later")
+            printer.info("  You can manually add git permissions to .claude/settings.local.json later")
             printer.info("")
             return permissions_to_add
         else:
@@ -254,9 +266,9 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
 
 
 def cmd_update(args, printer: PrettyPrinter) -> int:
-    """Update .claude/settings.json with SDD permissions."""
+    """Update .claude/settings.local.json with SDD permissions."""
     project_path = Path(args.project_root).resolve()
-    settings_file = project_path / ".claude" / "settings.json"
+    settings_file = project_path / ".claude" / "settings.local.json"
 
     # Create .claude directory if it doesn't exist
     settings_file.parent.mkdir(parents=True, exist_ok=True)
@@ -370,7 +382,7 @@ def categorize_missing_permissions(missing: list) -> dict:
 def cmd_check(args, printer: PrettyPrinter) -> int:
     """Check if SDD permissions are configured."""
     project_path = Path(args.project_root).resolve()
-    settings_file = project_path / ".claude" / "settings.json"
+    settings_file = project_path / ".claude" / "settings.local.json"
 
     if not settings_file.exists():
         result = {
@@ -483,7 +495,7 @@ def register_setup_permissions(subparsers, parent_parser):
         'setup-permissions',
         parents=[parent_parser],
         help='Configure SDD project permissions',
-        description='Configure .claude/settings.json with required SDD tool permissions'
+        description='Configure .claude/settings.local.json with required SDD tool permissions'
     )
 
     # Create subparsers for setup-permissions commands

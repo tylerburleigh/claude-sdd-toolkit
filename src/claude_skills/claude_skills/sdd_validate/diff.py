@@ -367,7 +367,7 @@ def display_diff_side_by_side(
         console: Optional Rich Console instance (creates one if not provided)
     """
     if console is None:
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
 
     # Header
     console.print()

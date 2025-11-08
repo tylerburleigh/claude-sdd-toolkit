@@ -22,10 +22,13 @@ logger = logging.getLogger(__name__)
 # Default SDD configuration (fallback if config file not found)
 DEFAULT_SDD_CONFIG = {
     "output": {
-        "json": True,  # Output JSON by default for automation-friendly behavior
-        "compact": True,  # Use compact JSON formatting by default
-        "default_format": "text",  # Default output format: "text" (TUI), "json", or "markdown"
-        "text_renderer": "auto",  # Text rendering backend: "auto" (intelligent), "rich" (TUI), or "plain" (simple text)
+        "default_mode": "text",  # Unified output format: "text" (TUI), "json", or "markdown"
+        "json_compact": True,  # Use compact JSON formatting (only affects JSON output)
+
+        # Deprecated (kept for backward compatibility - will be removed in future version)
+        "json": None,  # DEPRECATED: Use default_mode="json" instead
+        "compact": None,  # DEPRECATED: Use json_compact instead
+        "default_format": None,  # DEPRECATED: Use default_mode instead
     }
 }
 
@@ -83,6 +86,8 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
     Ensures all configuration values have correct types and valid values.
     Invalid values are replaced with defaults and warnings are logged.
 
+    Handles migration from old config format (json/default_format) to new format (default_mode).
+
     Args:
         config: Raw configuration dictionary
 
@@ -90,59 +95,76 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
         Validated configuration dictionary
     """
     import copy
-    validated = copy.deepcopy(DEFAULT_SDD_CONFIG)
+    validated = {"output": {}}
 
     # Validate output section
     if "output" in config and isinstance(config["output"], dict):
         output = config["output"]
 
-        # Validate boolean fields
-        if "json" in output:
-            value = output["json"]
-            if isinstance(value, bool):
-                validated["output"]["json"] = value
+        # MIGRATION LOGIC: Convert old config format to new unified format
+        if "default_mode" not in output:
+            # Old config detected - migrate to new format
+            if "json" in output and output["json"] is True:
+                # Old config had json:true, use JSON mode
+                validated["output"]["default_mode"] = "json"
+                logger.debug("Migrated config: output.json=true -> output.default_mode='json'")
+            elif "default_format" in output and output["default_format"] in ["text", "json", "markdown"]:
+                # Use old default_format value
+                validated["output"]["default_mode"] = output["default_format"]
+                logger.debug(f"Migrated config: output.default_format='{output['default_format']}' -> output.default_mode='{output['default_format']}'")
+            else:
+                # Neither setting found or valid, use default
+                validated["output"]["default_mode"] = "text"
+        else:
+            # New config with default_mode
+            value = output["default_mode"]
+            allowed_modes = ["text", "json", "markdown"]
+            if isinstance(value, str) and value in allowed_modes:
+                validated["output"]["default_mode"] = value
             else:
                 logger.warning(
-                    f"Invalid type for sdd config 'output.json': expected bool, got {type(value).__name__}. "
-                    f"Using default: {DEFAULT_SDD_CONFIG['output']['json']}"
+                    f"Invalid value for sdd config 'output.default_mode': expected one of {allowed_modes}, "
+                    f"got {value!r}. Using default: 'text'"
                 )
+                validated["output"]["default_mode"] = "text"
 
-        if "compact" in output:
+        # Validate json_compact field (new name for compact)
+        if "json_compact" in output:
+            value = output["json_compact"]
+            if isinstance(value, bool):
+                validated["output"]["json_compact"] = value
+            else:
+                logger.warning(
+                    f"Invalid type for sdd config 'output.json_compact': expected bool, got {type(value).__name__}. "
+                    f"Using default: True"
+                )
+                validated["output"]["json_compact"] = True
+        elif "compact" in output:
+            # Old config - migrate compact -> json_compact
             value = output["compact"]
             if isinstance(value, bool):
-                validated["output"]["compact"] = value
+                validated["output"]["json_compact"] = value
+                logger.debug(f"Migrated config: output.compact={value} -> output.json_compact={value}")
             else:
-                logger.warning(
-                    f"Invalid type for sdd config 'output.compact': expected bool, got {type(value).__name__}. "
-                    f"Using default: {DEFAULT_SDD_CONFIG['output']['compact']}"
-                )
+                validated["output"]["json_compact"] = True
+        else:
+            validated["output"]["json_compact"] = True
 
-        # Validate default_format field
-        if "default_format" in output:
-            value = output["default_format"]
-            allowed_formats = ["text", "json", "markdown"]
-            if isinstance(value, str) and value in allowed_formats:
-                validated["output"]["default_format"] = value
-            else:
-                logger.warning(
-                    f"Invalid value for sdd config 'output.default_format': expected one of {allowed_formats}, "
-                    f"got {value!r}. Using default: {DEFAULT_SDD_CONFIG['output']['default_format']}"
-                )
+        # Store deprecated values for backward compatibility (set to None to mark as deprecated)
+        validated["output"]["json"] = None
+        validated["output"]["compact"] = None
+        validated["output"]["default_format"] = None
 
-        # Validate text_renderer field
-        if "text_renderer" in output:
-            value = output["text_renderer"]
-            allowed_renderers = ["auto", "rich", "plain"]
-            if isinstance(value, str) and value in allowed_renderers:
-                validated["output"]["text_renderer"] = value
-            else:
-                logger.warning(
-                    f"Invalid value for sdd config 'output.text_renderer': expected one of {allowed_renderers}, "
-                    f"got {value!r}. Using default: {DEFAULT_SDD_CONFIG['output']['text_renderer']}"
-                )
+    else:
+        # No output section - use all defaults
+        validated["output"]["default_mode"] = "text"
+        validated["output"]["json_compact"] = True
+        validated["output"]["json"] = None
+        validated["output"]["compact"] = None
+        validated["output"]["default_format"] = None
 
     # Warn about unknown keys (but don't fail)
-    known_keys = set(DEFAULT_SDD_CONFIG.keys())
+    known_keys = {"output"}
     unknown_keys = set(config.keys()) - known_keys
     if unknown_keys:
         logger.warning(
@@ -246,6 +268,9 @@ def get_sdd_setting(
 def get_default_format(project_path: Optional[Path] = None) -> str:
     """Get the default output format from configuration.
 
+    Uses the unified default_mode setting. For backward compatibility,
+    also checks the deprecated default_format setting.
+
     Args:
         project_path: Path to project root (optional)
 
@@ -256,20 +281,20 @@ def get_default_format(project_path: Optional[Path] = None) -> str:
         default_format = get_default_format()
         parser.add_argument('--format', default=default_format, ...)
     """
-    return get_sdd_setting("output.default_format", project_path, default="text")
+    return get_sdd_setting("output.default_mode", project_path, default="text")
 
 
-def get_text_renderer(project_path: Optional[Path] = None) -> str:
-    """Get the text renderer preference from configuration.
+def get_json_compact(project_path: Optional[Path] = None) -> bool:
+    """Get the JSON compact formatting preference from configuration.
 
     Args:
         project_path: Path to project root (optional)
 
     Returns:
-        Text renderer string: "auto" (intelligent detection), "rich" (TUI), or "plain" (simple text)
+        Boolean indicating whether to use compact JSON formatting
 
     Example:
-        renderer = get_text_renderer()
-        ui = create_ui(force_plain=(renderer == "plain"), force_rich=(renderer == "rich"))
+        compact = get_json_compact()
+        json.dumps(data, indent=None if compact else 2)
     """
-    return get_sdd_setting("output.text_renderer", project_path, default="auto")
+    return get_sdd_setting("output.json_compact", project_path, default=True)

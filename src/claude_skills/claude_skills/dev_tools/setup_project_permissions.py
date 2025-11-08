@@ -2,7 +2,7 @@
 """
 Setup Project Permissions Script
 
-Configures .claude/settings.json with required SDD tool permissions.
+Configures .claude/settings.local.json with required SDD tool permissions.
 Used by /sdd-begin command and sdd-plan skill to ensure proper permissions.
 """
 
@@ -111,7 +111,7 @@ def _prompt_for_git_permissions() -> list:
         elif response in ['n', 'no']:
             print("", file=sys.stderr)
             print("⊘ Skipping git integration setup", file=sys.stderr)
-            print("  You can manually add git permissions to .claude/settings.json later", file=sys.stderr)
+            print("  You can manually add git permissions to .claude/settings.local.json later", file=sys.stderr)
             print("", file=sys.stderr)
             return permissions_to_add
         else:
@@ -151,9 +151,9 @@ def _prompt_for_git_permissions() -> list:
 
 
 def update_permissions(project_root):
-    """Update .claude/settings.json with SDD permissions."""
+    """Update .claude/settings.local.json with SDD permissions."""
     project_path = Path(project_root).resolve()
-    settings_file = project_path / ".claude" / "settings.json"
+    settings_file = project_path / ".claude" / "settings.local.json"
 
     # Create .claude directory if it doesn't exist
     settings_file.parent.mkdir(parents=True, exist_ok=True)
@@ -224,7 +224,7 @@ def update_permissions(project_root):
 def check_permissions(project_root):
     """Check if SDD permissions are configured."""
     project_path = Path(project_root).resolve()
-    settings_file = project_path / ".claude" / "settings.json"
+    settings_file = project_path / ".claude" / "settings.local.json"
 
     if not settings_file.exists():
         result = {

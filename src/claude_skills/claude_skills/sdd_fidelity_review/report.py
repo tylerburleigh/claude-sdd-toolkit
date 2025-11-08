@@ -381,7 +381,7 @@ class FidelityReport:
             >>> report = FidelityReport(review_results)
             >>> report.print_console_rich(verbose=False)
         """
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
 
         # Get consensus data
         consensus_dict = self._convert_to_dict(self.consensus)
@@ -504,7 +504,7 @@ class FidelityReport:
         table = Table(show_header=True, box=None, padding=(0, 1))
 
         # Add columns: Issue | Model 1 | Model 2 | Model 3 | ... | Agreement %
-        table.add_column("Issue", style="bold", max_width=50)
+        table.add_column("Issue", style="bold", overflow="ignore", no_wrap=True)
 
         num_models = len(parsed_responses_list)
         for i in range(1, num_models + 1):
@@ -762,9 +762,9 @@ class FidelityReport:
 
         # Create aggregation table
         table = Table(show_header=True, box=None, padding=(0, 1))
-        table.add_column("Issue", style="bold", max_width=60)
-        table.add_column("Count", justify="center", style="cyan")
-        table.add_column("Models", justify="center", style="green")
+        table.add_column("Issue", style="bold", overflow="ignore", no_wrap=True)
+        table.add_column("Count", justify="center", style="cyan", overflow="ignore", no_wrap=True)
+        table.add_column("Models", justify="center", style="green", overflow="ignore", no_wrap=True)
 
         for issue_text, count in sorted_issues:
             # Truncate if too long

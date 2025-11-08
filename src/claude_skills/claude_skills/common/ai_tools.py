@@ -371,7 +371,7 @@ def build_tool_command(
         return cmd
 
     elif tool == "codex":
-        cmd = ["codex"]
+        cmd = ["codex", "exec"]
         if model:
             cmd.extend(["-m", model])
         cmd.append(prompt)

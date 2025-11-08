@@ -72,7 +72,7 @@ def format_phases_table(
 
     if not phases:
         if printer:
-            console = Console()
+            console = Console(width=20000, force_terminal=True)
             console.print("[yellow]No phases found in spec.[/yellow]")
         return []
 
@@ -99,12 +99,12 @@ def _print_phases_table(phases: List[Dict[str, Any]]) -> None:
     """Print phases using Rich.Table for structured output."""
 
     if not phases:
-        console = Console()
+        console = Console(width=20000, force_terminal=True)
         console.print("[yellow]No phases to display.[/yellow]")
         return
 
     # Create Rich console
-    console = Console()
+    console = Console(width=20000, force_terminal=True)
 
     # Create Rich.Table with specified columns
     table = Table(
@@ -116,11 +116,11 @@ def _print_phases_table(phases: List[Dict[str, Any]]) -> None:
     )
 
     # Add columns: Phase, Status, Tasks, Progress, Dependencies
-    table.add_column("Phase", style="cyan", no_wrap=True, min_width=15)
-    table.add_column("Status", justify="center", style="white", min_width=12)
-    table.add_column("Tasks", justify="center", style="yellow", min_width=10)
-    table.add_column("Progress", justify="left", style="white", min_width=18)
-    table.add_column("Dependencies", style="yellow", min_width=12)
+    table.add_column("Phase", style="cyan", no_wrap=True, overflow="ignore", min_width=15)
+    table.add_column("Status", justify="center", style="white", no_wrap=True, overflow="ignore", min_width=12)
+    table.add_column("Tasks", justify="center", style="yellow", no_wrap=True, overflow="ignore", min_width=10)
+    table.add_column("Progress", justify="left", style="white", no_wrap=True, overflow="ignore", min_width=18)
+    table.add_column("Dependencies", style="yellow", no_wrap=True, overflow="ignore", min_width=12)
 
     # Add rows for each phase
     for phase in phases:

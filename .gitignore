@@ -49,3 +49,9 @@ specs/.reports/
 specs/.reviews/
 specs/.backups/
 specs/.human-readable/
+
+# ModelChorus configuration
+.modelchorusrc
+.modelchorusrc.yaml
+.modelchorusrc.yml
+.modelchorusrc.json

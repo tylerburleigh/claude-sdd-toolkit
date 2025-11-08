@@ -163,7 +163,6 @@ def synthesize_with_ai(
         cmd = [
             "gemini",
             "-m", "gemini-2.5-pro",
-            "--telemetry", "false",
             "-p", prompt
         ]
 
