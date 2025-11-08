@@ -858,6 +858,71 @@ With this config, all commands output pretty-print JSON by default, but you can 
 
 For complete configuration options, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
+### Practical Examples: Seeing the Difference
+
+Here's a real-world example showing the difference between compact and pretty-print modes:
+
+**Command:**
+```bash
+sdd progress json-output-standardization-2025-11-08-001 --json
+```
+
+**Compact output (`--compact`):**
+```json
+{"node_id":"spec-root","spec_id":"json-output-standardization-2025-11-08-001","title":"JSON Output Format Standardization","type":"spec","status":"in_progress","total_tasks":41,"completed_tasks":36,"percentage":87,"remaining_tasks":5,"current_phase":{"id":"phase-6","title":"Documentation & Finalization","completed":1,"total":6}}
+```
+**Tokens:** ~84 tokens
+
+**Pretty-print output (`--no-compact`):**
+```json
+{
+  "node_id": "spec-root",
+  "spec_id": "json-output-standardization-2025-11-08-001",
+  "title": "JSON Output Format Standardization",
+  "type": "spec",
+  "status": "in_progress",
+  "total_tasks": 41,
+  "completed_tasks": 36,
+  "percentage": 87,
+  "remaining_tasks": 5,
+  "current_phase": {
+    "id": "phase-6",
+    "title": "Documentation & Finalization",
+    "completed": 1,
+    "total": 6
+  }
+}
+```
+**Tokens:** ~120 tokens
+
+**Result:** Compact saves ~36 tokens (30% reduction) while delivering identical data.
+
+**Quick Comparison:**
+
+| Aspect | Compact | Pretty-Print |
+|--------|---------|--------------|
+| **Format** | Single line | Multi-line with indentation |
+| **Tokens** | ~84 | ~120 |
+| **Savings** | 30% reduction | - |
+| **Best for** | Agent workflows, automation | Human review, debugging |
+| **Readability** | Low (for humans) | High (for humans) |
+| **Parse speed** | Same | Same |
+
+**Testing Your Configuration:**
+
+To verify your configuration is working:
+
+```bash
+# Check what your current config produces
+sdd progress YOUR-SPEC-ID --json
+
+# Explicitly test compact mode
+sdd progress YOUR-SPEC-ID --json --compact
+
+# Explicitly test pretty-print mode
+sdd progress YOUR-SPEC-ID --json --no-compact
+```
+
 ## Prerequisites
 
 ### Required
