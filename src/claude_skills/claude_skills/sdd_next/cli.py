@@ -33,6 +33,7 @@ from claude_skills.common import (
     # JSON output formatting
     print_json_output,
 )
+from claude_skills.common.json_output import output_json
 from claude_skills.common.completion import format_completion_prompt
 
 # Import from sdd_next module
