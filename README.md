@@ -600,14 +600,14 @@ The SDD CLI supports optional configuration files that control output formatting
 - Global: `~/.claude/sdd_config.json`
 
 **What it configures:**
-- `output.default_mode` - Default output format (`"json"` or `"text"`)
+- `output.default_mode` - Default output format: `"rich"` (formatted with colors), `"plain"` (simple text), or `"json"` (structured JSON)
 - `output.json_compact` - Use compact JSON formatting (`true` or `false`)
 
 **Example configuration:**
 ```json
 {
   "output": {
-    "default_mode": "json",
+    "default_mode": "rich",
     "json_compact": true
   }
 }
@@ -848,7 +848,7 @@ Output formatting follows this precedence chain (highest to lowest):
 ```json
 {
   "output": {
-    "default_mode": "json",
+    "default_mode": "rich",
     "json_compact": false
   }
 }
