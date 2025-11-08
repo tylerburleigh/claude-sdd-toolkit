@@ -1118,7 +1118,7 @@ def cmd_spec_stats(args, printer):
     stats = spec_stats(spec_file, json_spec_file)
 
     if args.json:
-        output_json(stats)
+        output_json(stats, args.compact)
     else:
         if stats['exists']:
             printer.success("Spec file analyzed")
