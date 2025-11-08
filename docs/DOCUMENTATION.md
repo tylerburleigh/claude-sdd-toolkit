@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 09:55:46
+**Generated:** 2025-11-08 09:59:41
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89627
+- **Total Lines:** 89628
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -11702,7 +11702,7 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:300`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:301`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -12569,7 +12569,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:284`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:285`
 **Complexity:** 1
 
 **Description:**
@@ -15481,7 +15481,7 @@ Returns:
 ### `find_transcript_by_specific_marker(cwd, marker, max_retries) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:47`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:48`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -16187,7 +16187,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:223`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:224`
 **Complexity:** 2
 
 **Description:**
@@ -16208,11 +16208,11 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:257`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:258`
 **Complexity:** 2
 
 **Description:**
-> Format token metrics as JSON.
+> Format and output token metrics as JSON.
 
 Args:
     metrics: TokenMetrics object
@@ -16229,7 +16229,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:218`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:219`
 **Complexity:** 1
 
 **Description:**
@@ -17360,7 +17360,7 @@ Returns:
 ### `generate_session_marker() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:33`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:34`
 **Complexity:** 1
 
 **Description:**
@@ -19100,7 +19100,7 @@ Returns:
 ### `get_transcript_path(args) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:177`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:178`
 **Complexity:** 8
 
 **Description:**
@@ -19126,7 +19126,7 @@ Returns:
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:148`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:149`
 **Complexity:** 4
 
 **Description:**
@@ -20057,7 +20057,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:451`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:452`
 **Complexity:** 5
 
 **Description:**
@@ -21210,7 +21210,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:409`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:410`
 **Complexity:** 1
 
 **Description:**
@@ -21414,7 +21414,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:391`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:392`
 **Complexity:** 1
 
 **Description:**
@@ -26433,6 +26433,7 @@ Returns:
 
 - `argparse`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.json_output.output_json`
 - `claude_skills.context_tracker.parser.parse_transcript`
 - `json`
 - `os`

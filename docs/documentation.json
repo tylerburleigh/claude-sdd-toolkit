@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T14:55:46.648352Z",
+    "generated_at": "2025-11-08T14:59:41.313808Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89627,
+    "total_lines": 89628,
     "total_classes": 356,
     "total_functions": 907,
     "avg_complexity": 5.87,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89627,
+        "lines": 89628,
         "classes": 356,
         "functions": 907,
         "avg_complexity": 5.87
@@ -1819,10 +1819,11 @@
         "time",
         "pathlib.Path",
         "claude_skills.context_tracker.parser.parse_transcript",
-        "claude_skills.common.PrettyPrinter"
+        "claude_skills.common.PrettyPrinter",
+        "claude_skills.common.json_output.output_json"
       ],
       "exports": [],
-      "lines": 534
+      "lines": 535
     },
     {
       "name": "parser",
@@ -21049,7 +21050,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -41921,6 +41922,24 @@
           "call_type": "function_call"
         },
         {
+          "name": "format_metrics_json",
+          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
+          "line": 282,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_context",
+          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
+          "line": 387,
+          "call_type": "function_call"
+        },
+        {
+          "name": "main",
+          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
+          "line": 529,
+          "call_type": "function_call"
+        },
+        {
           "name": "cmd_verify_tools",
           "file": "src/claude_skills/claude_skills/sdd_next/cli.py",
           "line": 272,
@@ -42169,7 +42188,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 44
+      "call_count": 47
     },
     {
       "name": "print_json_output",
@@ -52301,7 +52320,7 @@
     {
       "name": "generate_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 33,
+      "line": 34,
       "language": "python",
       "docstring": "Generate a unique random session marker.\n\nUses a short 8-character hex string for easier reproduction and lower\nchance of transcription errors.\n\nReturns:\n    The generated marker string (e.g., \"SESSION_MARKER_abc12345\")",
       "parameters": [],
@@ -52315,7 +52334,7 @@
         {
           "name": "cmd_session_marker",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         }
       ],
@@ -52323,7 +52342,7 @@
         {
           "name": "token_hex",
           "file": "unknown",
-          "line": 43,
+          "line": 44,
           "call_type": "method_call"
         }
       ],
@@ -52332,7 +52351,7 @@
     {
       "name": "find_transcript_by_specific_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 47,
+      "line": 48,
       "language": "python",
       "docstring": "Search transcripts for a specific SESSION_MARKER to identify current session.\n\nThis function searches all .jsonl transcript files in the project directory\nfor a specific marker string. The transcript containing that exact marker\nis the current session's transcript.\n\nTo handle race conditions where the marker may not be flushed to disk yet,\nthis function will retry with exponential backoff if the marker is not found\non the first attempt.\n\nTranscripts are searched in reverse chronological order (most recently modified\nfirst) to prioritize active sessions over historical ones.\n\nIf the exact CWD-based transcript directory doesn't exist, this function will\nsearch parent directories as a fallback to handle cases where commands are run\nfrom subdirectories of the project root.\n\nArgs:\n    cwd: Current working directory (used to find project-specific transcripts)\n    marker: Specific marker to search for (e.g., \"SESSION_MARKER_abc12345\")\n    max_retries: Maximum number of retry attempts (default: 10)\n\nReturns:\n    Path to transcript containing the marker, or None if not found",
       "parameters": [
@@ -52362,7 +52381,7 @@
         {
           "name": "get_transcript_path",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 197,
+          "line": 198,
           "call_type": "function_call"
         }
       ],
@@ -52370,115 +52389,115 @@
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 79,
+          "line": 80,
           "call_type": "method_call"
         },
         {
           "name": "replace",
           "file": "unknown",
-          "line": 81,
+          "line": 82,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 81,
+          "line": 82,
           "call_type": "function_call"
         },
         {
           "name": "home",
           "file": "unknown",
-          "line": 82,
+          "line": 83,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 84,
+          "line": 85,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 85,
+          "line": 86,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 88,
+          "line": 89,
           "call_type": "function_call"
         },
         {
           "name": "min",
           "file": "unknown",
-          "line": 97,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "range",
           "file": "unknown",
-          "line": 97,
+          "line": 98,
           "call_type": "function_call"
         },
         {
           "name": "range",
           "file": "unknown",
-          "line": 99,
+          "line": 100,
           "call_type": "function_call"
         },
         {
           "name": "time",
           "file": "unknown",
-          "line": 100,
+          "line": 101,
           "call_type": "method_call"
         },
         {
           "name": "glob",
           "file": "unknown",
-          "line": 107,
+          "line": 108,
           "call_type": "method_call"
         },
         {
           "name": "stat",
           "file": "unknown",
-          "line": 109,
+          "line": 110,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 113,
+          "line": 114,
           "call_type": "method_call"
         },
         {
           "name": "sort",
           "file": "unknown",
-          "line": 119,
+          "line": 120,
           "call_type": "method_call"
         },
         {
           "name": "open",
           "file": "unknown",
-          "line": 125,
+          "line": 126,
           "call_type": "function_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 128,
+          "line": 129,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 138,
+          "line": 139,
           "call_type": "function_call"
         },
         {
           "name": "sleep",
           "file": "unknown",
-          "line": 143,
+          "line": 144,
           "call_type": "method_call"
         }
       ],
@@ -52487,7 +52506,7 @@
     {
       "name": "get_transcript_path_from_stdin",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 148,
+      "line": 149,
       "language": "python",
       "docstring": "Read transcript path from stdin JSON (hook mode).\n\nExpected JSON format:\n{\n    \"transcript_path\": \"/path/to/transcript.jsonl\",\n    \"session_id\": \"...\",\n    \"cwd\": \"...\",\n    ...\n}\n\nReturns:\n    Transcript path from stdin, or None if stdin is a TTY or parsing fails",
       "parameters": [],
@@ -52501,7 +52520,7 @@
         {
           "name": "get_transcript_path",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 211,
+          "line": 212,
           "call_type": "function_call"
         }
       ],
@@ -52509,31 +52528,31 @@
         {
           "name": "isatty",
           "file": "unknown",
-          "line": 163,
+          "line": 164,
           "call_type": "method_call"
         },
         {
           "name": "read",
           "file": "unknown",
-          "line": 167,
+          "line": 168,
           "call_type": "method_call"
         },
         {
           "name": "strip",
           "file": "unknown",
-          "line": 168,
+          "line": 169,
           "call_type": "method_call"
         },
         {
           "name": "loads",
           "file": "unknown",
-          "line": 171,
+          "line": 172,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 172,
+          "line": 173,
           "call_type": "method_call"
         }
       ],
@@ -52542,7 +52561,7 @@
     {
       "name": "get_transcript_path",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 177,
+      "line": 178,
       "language": "python",
       "docstring": "Get transcript path from multiple sources (priority order).\n\nPriority:\n1. Session marker discovery (if --session-marker provided)\n2. Explicit CLI argument (--transcript-path)\n3. Environment variable (CLAUDE_TRANSCRIPT_PATH)\n4. stdin JSON (hook mode)\n\nArgs:\n    args: Parsed CLI arguments\n\nReturns:\n    Transcript path string, or None if not found",
       "parameters": [
@@ -52562,13 +52581,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 308,
+          "line": 309,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 496,
+          "line": 497,
           "call_type": "function_call"
         }
       ],
@@ -52576,37 +52595,37 @@
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 195,
+          "line": 196,
           "call_type": "function_call"
         },
         {
           "name": "cwd",
           "file": "unknown",
-          "line": 196,
+          "line": 197,
           "call_type": "method_call"
         },
         {
           "name": "find_transcript_by_specific_marker",
           "file": "unknown",
-          "line": 197,
+          "line": 198,
           "call_type": "function_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 202,
+          "line": 203,
           "call_type": "function_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 206,
+          "line": 207,
           "call_type": "method_call"
         },
         {
           "name": "get_transcript_path_from_stdin",
           "file": "unknown",
-          "line": 211,
+          "line": 212,
           "call_type": "function_call"
         }
       ],
@@ -52615,7 +52634,7 @@
     {
       "name": "format_number",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 218,
+      "line": 219,
       "language": "python",
       "docstring": "Format a number with thousands separators.",
       "parameters": [
@@ -52635,19 +52654,13 @@
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 245,
+          "line": 246,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 245,
-          "call_type": "function_call"
-        },
-        {
-          "name": "format_metrics_human",
-          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 248,
+          "line": 246,
           "call_type": "function_call"
         },
         {
@@ -52667,6 +52680,12 @@
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
           "line": 251,
           "call_type": "function_call"
+        },
+        {
+          "name": "format_metrics_human",
+          "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
+          "line": 252,
+          "call_type": "function_call"
         }
       ],
       "calls": [],
@@ -52675,7 +52694,7 @@
     {
       "name": "format_metrics_human",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 223,
+      "line": 224,
       "language": "python",
       "docstring": "Format token metrics for human-readable output.\n\nArgs:\n    metrics: TokenMetrics object\n    max_context: Maximum context window size\n    transcript_path: Optional path to transcript file (for display)",
       "parameters": [
@@ -52705,23 +52724,17 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 388,
+          "line": 389,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 530,
+          "line": 531,
           "call_type": "function_call"
         }
       ],
       "calls": [
-        {
-          "name": "append",
-          "file": "unknown",
-          "line": 235,
-          "call_type": "method_call"
-        },
         {
           "name": "append",
           "file": "unknown",
@@ -52737,13 +52750,13 @@
         {
           "name": "append",
           "file": "unknown",
-          "line": 242,
+          "line": 238,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 244,
+          "line": 243,
           "call_type": "method_call"
         },
         {
@@ -52751,24 +52764,24 @@
           "file": "unknown",
           "line": 245,
           "call_type": "method_call"
-        },
-        {
-          "name": "format_number",
-          "file": "unknown",
-          "line": 245,
-          "call_type": "function_call"
-        },
-        {
-          "name": "format_number",
-          "file": "unknown",
-          "line": 245,
-          "call_type": "function_call"
         },
         {
           "name": "append",
           "file": "unknown",
           "line": 246,
           "call_type": "method_call"
+        },
+        {
+          "name": "format_number",
+          "file": "unknown",
+          "line": 246,
+          "call_type": "function_call"
+        },
+        {
+          "name": "format_number",
+          "file": "unknown",
+          "line": 246,
+          "call_type": "function_call"
         },
         {
           "name": "append",
@@ -52781,12 +52794,6 @@
           "file": "unknown",
           "line": 248,
           "call_type": "method_call"
-        },
-        {
-          "name": "format_number",
-          "file": "unknown",
-          "line": 248,
-          "call_type": "function_call"
         },
         {
           "name": "append",
@@ -52831,9 +52838,21 @@
           "call_type": "method_call"
         },
         {
+          "name": "format_number",
+          "file": "unknown",
+          "line": 252,
+          "call_type": "function_call"
+        },
+        {
+          "name": "append",
+          "file": "unknown",
+          "line": 253,
+          "call_type": "method_call"
+        },
+        {
           "name": "join",
           "file": "unknown",
-          "line": 254,
+          "line": 255,
           "call_type": "method_call"
         }
       ],
@@ -52842,9 +52861,9 @@
     {
       "name": "format_metrics_json",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 257,
+      "line": 258,
       "language": "python",
-      "docstring": "Format token metrics as JSON.\n\nArgs:\n    metrics: TokenMetrics object\n    max_context: Maximum context window size\n    transcript_path: Optional path to transcript file (for metadata)",
+      "docstring": "Format and output token metrics as JSON.\n\nArgs:\n    metrics: TokenMetrics object\n    max_context: Maximum context window size\n    transcript_path: Optional path to transcript file (for metadata)",
       "parameters": [
         {
           "name": "metrics",
@@ -52872,7 +52891,7 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 381,
+          "line": 382,
           "call_type": "function_call"
         }
       ],
@@ -52880,14 +52899,14 @@
         {
           "name": "round",
           "file": "unknown",
-          "line": 270,
+          "line": 271,
           "call_type": "function_call"
         },
         {
-          "name": "dumps",
+          "name": "output_json",
           "file": "unknown",
-          "line": 281,
-          "call_type": "method_call"
+          "line": 282,
+          "call_type": "function_call"
         }
       ],
       "call_count": 1
@@ -52895,7 +52914,7 @@
     {
       "name": "cmd_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 284,
+      "line": 285,
       "language": "python",
       "docstring": "Handler for 'sdd session-marker' command.\n\nGenerates and outputs a unique session marker that can be used\nto identify the current session's transcript.\n\nArgs:\n    args: Parsed arguments from ArgumentParser\n    printer: PrettyPrinter instance for output",
       "parameters": [
@@ -52921,13 +52940,13 @@
         {
           "name": "generate_session_marker",
           "file": "unknown",
-          "line": 295,
+          "line": 296,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 297,
+          "line": 298,
           "call_type": "function_call"
         }
       ]
@@ -52935,7 +52954,7 @@
     {
       "name": "cmd_context",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 300,
+      "line": 301,
       "language": "python",
       "docstring": "Handler for 'sdd context' command.\n\nArgs:\n    args: Parsed arguments from ArgumentParser\n    printer: PrettyPrinter instance for output",
       "parameters": [
@@ -52961,68 +52980,62 @@
         {
           "name": "get_transcript_path",
           "file": "unknown",
-          "line": 308,
+          "line": 309,
           "call_type": "function_call"
         },
         {
           "name": "hasattr",
           "file": "unknown",
-          "line": 312,
+          "line": 313,
           "call_type": "function_call"
         },
         {
           "name": "cwd",
           "file": "unknown",
-          "line": 313,
+          "line": 314,
           "call_type": "method_call"
         },
         {
           "name": "resolve",
           "file": "unknown",
-          "line": 317,
+          "line": 318,
           "call_type": "method_call"
         },
         {
           "name": "replace",
           "file": "unknown",
-          "line": 319,
+          "line": 320,
           "call_type": "method_call"
         },
         {
           "name": "str",
           "file": "unknown",
-          "line": 319,
+          "line": 320,
           "call_type": "function_call"
         },
         {
           "name": "home",
           "file": "unknown",
-          "line": 320,
+          "line": 321,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 321,
+          "line": 322,
           "call_type": "method_call"
         },
         {
           "name": "append",
           "file": "unknown",
-          "line": 322,
+          "line": 323,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 323,
+          "line": 324,
           "call_type": "function_call"
-        },
-        {
-          "name": "error",
-          "file": "unknown",
-          "line": 327,
-          "call_type": "method_call"
         },
         {
           "name": "error",
@@ -53093,41 +53106,41 @@
         {
           "name": "error",
           "file": "unknown",
-          "line": 340,
+          "line": 339,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
+          "file": "unknown",
+          "line": 341,
           "call_type": "method_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 340,
+          "line": 341,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 340,
+          "line": 341,
           "call_type": "function_call"
         },
         {
           "name": "len",
           "file": "unknown",
-          "line": 342,
+          "line": 343,
           "call_type": "function_call"
         },
         {
           "name": "list",
           "file": "unknown",
-          "line": 342,
+          "line": 343,
           "call_type": "function_call"
         },
         {
           "name": "glob",
-          "file": "unknown",
-          "line": 342,
-          "call_type": "method_call"
-        },
-        {
-          "name": "error",
           "file": "unknown",
           "line": 343,
           "call_type": "method_call"
@@ -53135,7 +53148,7 @@
         {
           "name": "error",
           "file": "unknown",
-          "line": 345,
+          "line": 344,
           "call_type": "method_call"
         },
         {
@@ -53177,7 +53190,7 @@
         {
           "name": "error",
           "file": "unknown",
-          "line": 353,
+          "line": 352,
           "call_type": "method_call"
         },
         {
@@ -53229,87 +53242,81 @@
           "call_type": "method_call"
         },
         {
-          "name": "exit",
+          "name": "error",
           "file": "unknown",
           "line": 362,
           "call_type": "method_call"
         },
         {
-          "name": "exists",
+          "name": "exit",
           "file": "unknown",
-          "line": 365,
+          "line": 363,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "exists",
           "file": "unknown",
           "line": 366,
           "call_type": "method_call"
         },
         {
-          "name": "exit",
+          "name": "error",
           "file": "unknown",
           "line": 367,
           "call_type": "method_call"
         },
         {
+          "name": "exit",
+          "file": "unknown",
+          "line": 368,
+          "call_type": "method_call"
+        },
+        {
           "name": "parse_transcript",
           "file": "unknown",
-          "line": 370,
+          "line": 371,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 373,
+          "line": 374,
           "call_type": "method_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 374,
+          "line": 375,
           "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 381,
-          "call_type": "function_call"
         },
         {
           "name": "format_metrics_json",
           "file": "unknown",
-          "line": 381,
+          "line": 382,
           "call_type": "function_call"
         },
         {
           "name": "round",
           "file": "unknown",
-          "line": 385,
+          "line": 386,
+          "call_type": "function_call"
+        },
+        {
+          "name": "output_json",
+          "file": "unknown",
+          "line": 387,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 386,
-          "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 386,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 388,
+          "line": 389,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 388,
+          "line": 389,
           "call_type": "function_call"
         }
       ]
@@ -53317,7 +53324,7 @@
     {
       "name": "register_session_marker",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 391,
+      "line": 392,
       "language": "python",
       "docstring": "Register 'session-marker' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -53350,13 +53357,13 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 399,
+          "line": 400,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 406,
+          "line": 407,
           "call_type": "method_call"
         }
       ],
@@ -53365,7 +53372,7 @@
     {
       "name": "register_context",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 409,
+      "line": 410,
       "language": "python",
       "docstring": "Register 'context' subcommand for unified SDD CLI.\n\nArgs:\n    subparsers: ArgumentParser subparsers object\n    parent_parser: Parent parser with global options",
       "parameters": [
@@ -53398,31 +53405,31 @@
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 417,
+          "line": 418,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 424,
+          "line": 425,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 430,
+          "line": 431,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 436,
+          "line": 437,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 448,
+          "line": 449,
           "call_type": "method_call"
         }
       ],
@@ -53431,7 +53438,7 @@
     {
       "name": "main",
       "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-      "line": 451,
+      "line": 452,
       "language": "python",
       "docstring": "Main CLI entry point.",
       "parameters": [],
@@ -53457,7 +53464,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -53531,50 +53538,44 @@
         {
           "name": "ArgumentParser",
           "file": "unknown",
-          "line": 453,
+          "line": 454,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 474,
+          "line": 475,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 480,
+          "line": 481,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 487,
+          "line": 488,
           "call_type": "method_call"
         },
         {
           "name": "parse_args",
           "file": "unknown",
-          "line": 493,
+          "line": 494,
           "call_type": "method_call"
         },
         {
           "name": "get_transcript_path",
           "file": "unknown",
-          "line": 496,
+          "line": 497,
           "call_type": "function_call"
         },
         {
           "name": "print_help",
           "file": "unknown",
-          "line": 499,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
           "line": 500,
-          "call_type": "function_call"
+          "call_type": "method_call"
         },
         {
           "name": "print",
@@ -53625,75 +53626,75 @@
           "call_type": "function_call"
         },
         {
-          "name": "exit",
+          "name": "print",
           "file": "unknown",
           "line": 509,
+          "call_type": "function_call"
+        },
+        {
+          "name": "exit",
+          "file": "unknown",
+          "line": 510,
           "call_type": "method_call"
         },
         {
           "name": "exists",
           "file": "unknown",
-          "line": 512,
+          "line": 513,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 513,
+          "line": 514,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 514,
+          "line": 515,
           "call_type": "method_call"
         },
         {
           "name": "parse_transcript",
           "file": "unknown",
-          "line": 517,
+          "line": 518,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 520,
+          "line": 521,
           "call_type": "function_call"
         },
         {
           "name": "exit",
           "file": "unknown",
-          "line": 521,
+          "line": 522,
           "call_type": "method_call"
         },
         {
           "name": "round",
           "file": "unknown",
-          "line": 527,
+          "line": 528,
+          "call_type": "function_call"
+        },
+        {
+          "name": "output_json",
+          "file": "unknown",
+          "line": 529,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 528,
-          "call_type": "function_call"
-        },
-        {
-          "name": "dumps",
-          "file": "unknown",
-          "line": 528,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
-          "line": 530,
+          "line": 531,
           "call_type": "function_call"
         },
         {
           "name": "format_metrics_human",
           "file": "unknown",
-          "line": 530,
+          "line": 531,
           "call_type": "function_call"
         }
       ],
@@ -53789,13 +53790,13 @@
         {
           "name": "cmd_context",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 370,
+          "line": 371,
           "call_type": "function_call"
         },
         {
           "name": "main",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 517,
+          "line": 518,
           "call_type": "function_call"
         }
       ],
@@ -54639,7 +54640,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -55760,7 +55761,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -56526,7 +56527,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -62312,7 +62313,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -74182,7 +74183,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -86755,7 +86756,7 @@
         {
           "name": "<module>",
           "file": "src/claude_skills/claude_skills/context_tracker/cli.py",
-          "line": 534,
+          "line": 535,
           "call_type": "function_call"
         },
         {
@@ -135432,7 +135433,8 @@
       "time",
       "pathlib.Path",
       "claude_skills.context_tracker.parser.parse_transcript",
-      "claude_skills.common.PrettyPrinter"
+      "claude_skills.common.PrettyPrinter",
+      "claude_skills.common.json_output.output_json"
     ],
     "src/claude_skills/claude_skills/context_tracker/parser.py": [
       "json",
