@@ -269,7 +269,7 @@ def cmd_verify_tools(args, printer):
             "optional": optional_tools_status,
             "all_available": all(optional_tools_status.values())
         }
-        print(json.dumps(output, indent=2))
+        output_json(output)
         return 0
 
     # Rich UI mode
@@ -602,7 +602,7 @@ def cmd_init_env(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(env, indent=2))
+        output_json(env)
     elif args.export:
         # Output as shell export statements
         print(f"export SPECS_DIR='{env['specs_dir']}'")
@@ -842,7 +842,7 @@ def cmd_validate_spec(args, printer):
     validation = validate_spec(spec_file)
 
     if args.json:
-        print(json.dumps(validation, indent=2))
+        output_json(validation)
     else:
         printer.result("Validating", validation['spec_file'])
 
@@ -879,7 +879,7 @@ def cmd_find_pattern(args, printer):
     matches = find_pattern(args.pattern, directory)
 
     if args.json:
-        print(json.dumps({"pattern": args.pattern, "matches": matches}, indent=2))
+        output_json({"pattern": args.pattern, "matches": matches})
     else:
         if matches:
             printer.success(f"Found {len(matches)} file(s) matching '{args.pattern}'")
@@ -900,7 +900,7 @@ def cmd_detect_project(args, printer):
     project = detect_project(directory)
 
     if args.json:
-        print(json.dumps(project, indent=2))
+        output_json(project)
     else:
         printer.success("Project analyzed")
         printer.result("Project Type", project['project_type'])
@@ -939,7 +939,7 @@ def cmd_find_tests(args, printer):
     tests = find_tests(directory, args.source_file)
 
     if args.json:
-        print(json.dumps(tests, indent=2))
+        output_json(tests)
     else:
         if tests['test_framework']:
             printer.success("Tests discovered")
@@ -973,7 +973,7 @@ def cmd_check_environment(args, printer):
     env = check_environment(directory, required_deps)
 
     if args.json:
-        print(json.dumps(env, indent=2))
+        output_json(env)
     else:
         if env['valid']:
             printer.success("Environment is valid")
@@ -1022,7 +1022,7 @@ def cmd_find_circular_deps(args, printer):
     circular = find_circular_deps(spec_data)
 
     if args.json:
-        print(json.dumps(circular, indent=2))
+        output_json(circular)
     else:
         if circular['has_circular']:
             printer.error("Circular dependencies detected!")
@@ -1054,7 +1054,7 @@ def cmd_find_related_files(args, printer):
     related = find_related_files(args.file, directory)
 
     if args.json:
-        print(json.dumps(related, indent=2))
+        output_json(related)
     else:
         printer.success("Related files found")
         printer.result("Source", related['source_file'])
@@ -1091,7 +1091,7 @@ def cmd_validate_paths(args, printer):
     validation = validate_paths(paths, base_dir)
 
     if args.json:
-        print(json.dumps(validation, indent=2))
+        output_json(validation)
     else:
         if validation['valid_paths']:
             printer.success(f"Valid Paths ({len(validation['valid_paths'])})")
@@ -1118,7 +1118,7 @@ def cmd_spec_stats(args, printer):
     stats = spec_stats(spec_file, json_spec_file)
 
     if args.json:
-        print(json.dumps(stats, indent=2))
+        output_json(stats)
     else:
         if stats['exists']:
             printer.success("Spec file analyzed")
