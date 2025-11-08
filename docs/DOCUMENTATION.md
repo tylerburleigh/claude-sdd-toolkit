@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 16:43:15
+**Generated:** 2025-11-08 16:47:54
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89645
+- **Total Lines:** 89636
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -13855,7 +13855,7 @@ Returns:
 ### `create_ui(force_plain, force_rich, collect_messages, quiet, project_path) -> Ui`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:137`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:132`
 **Complexity:** 9
 
 **Description:**
@@ -13866,7 +13866,6 @@ Automatically selects RichUi or PlainUi based on:
 - TTY availability
 - CI environment detection
 - Explicit force flags
-- Environment variables
 
 Args:
     force_plain: Force PlainUi backend (overrides auto-detection)
@@ -13901,10 +13900,9 @@ Examples:
 Decision Flow:
     1. Check force_rich/force_plain flags
     2. Check user config (output.text_renderer)
-    3. Check FORCE_PLAIN_UI environment variable
-    4. Check TTY availability
-    5. Check CI environment
-    6. Default to RichUi for interactive terminals
+    3. Check TTY availability
+    4. Check CI environment
+    5. Default to RichUi for interactive terminals
 
 **Parameters:**
 - `force_plain`: bool
@@ -13918,7 +13916,7 @@ Decision Flow:
 ### `create_ui_from_args(args) -> Ui`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:235`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:228`
 **Complexity:** 1
 
 **Description:**
@@ -15622,7 +15620,7 @@ Returns:
 ### `format_backend_info() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:291`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:284`
 **Complexity:** 1
 
 **Description:**
@@ -15641,7 +15639,6 @@ Example:
     Backend Selection Info:
     - TTY Available: Yes
     - CI Environment: No
-    - Force Plain: No
     - Selected Backend: RichUi
 
 ---
@@ -17554,7 +17551,7 @@ Returns:
 ### `get_backend_name(ui) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:273`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:266`
 **Complexity:** 1
 
 **Description:**
@@ -22516,17 +22513,16 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:90`
-**Complexity:** 5
+**Complexity:** 4
 
 **Description:**
 > Determine if PlainUi should be used instead of RichUi.
 
 Decision logic:
 1. If force_plain=True → Use PlainUi
-2. If FORCE_PLAIN_UI env var set → Use PlainUi
-3. If not TTY (piped/redirected) → Use PlainUi
-4. If CI environment detected → Use PlainUi
-5. Otherwise → Use RichUi
+2. If not TTY (piped/redirected) → Use PlainUi
+3. If CI environment detected → Use PlainUi
+4. Otherwise → Use RichUi
 
 Args:
     force_plain: Explicitly force PlainUi backend
@@ -24770,7 +24766,7 @@ Example:
 ### `ui(force_plain, collect_messages, quiet) -> Ui`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:322`
+**Defined in:** `src/claude_skills/claude_skills/common/ui_factory.py:313`
 **Complexity:** 1
 
 **Description:**

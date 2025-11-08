@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T21:43:15.190675Z",
+    "generated_at": "2025-11-08T21:47:54.589462Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89645,
+    "total_lines": 89636,
     "total_classes": 356,
     "total_functions": 907,
     "avg_complexity": 5.87,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89645,
+        "lines": 89636,
         "classes": 356,
         "functions": 907,
         "avg_complexity": 5.87
@@ -1693,7 +1693,7 @@
       "name": "ui_factory",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
       "language": "python",
-      "docstring": "UI backend factory with automatic TTY detection.\n\nThis module provides intelligent backend selection logic that automatically\nchooses between RichUi (interactive TTY) and PlainUi (non-TTY/CI) based on\nthe runtime environment.\n\nKey Features:\n- Automatic TTY detection via sys.stdout.isatty()\n- CI/CD environment detection (GITHUB_ACTIONS, CI, etc.)\n- Force backend selection via --plain flag or FORCE_PLAIN_UI env var\n- Consistent API regardless of backend\n\nUsage:\n    from claude_skills.common.ui_factory import create_ui\n\n    # Automatic selection\n    ui = create_ui()\n\n    # Force plain mode\n    ui = create_ui(force_plain=True)\n\n    # With collection mode\n    ui = create_ui(collect_messages=True)",
+      "docstring": "UI backend factory with automatic TTY detection.\n\nThis module provides intelligent backend selection logic that automatically\nchooses between RichUi (interactive TTY) and PlainUi (non-TTY/CI) based on\nthe runtime environment.\n\nKey Features:\n- Automatic TTY detection via sys.stdout.isatty()\n- CI/CD environment detection (GITHUB_ACTIONS, CI, etc.)\n- Force backend selection via --plain flag or config settings\n- Consistent API regardless of backend\n\nUsage:\n    from claude_skills.common.ui_factory import create_ui\n\n    # Automatic selection\n    ui = create_ui()\n\n    # Force plain mode\n    ui = create_ui(force_plain=True)\n\n    # With collection mode\n    ui = create_ui(collect_messages=True)",
       "classes": [],
       "functions": [
         "is_tty_available",
@@ -1715,7 +1715,7 @@
         "plain_ui.PlainUi"
       ],
       "exports": [],
-      "lines": 349
+      "lines": 340
     },
     {
       "name": "ui_protocol",
@@ -8701,7 +8701,7 @@
         {
           "instantiator": "create_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 223,
+          "line": 216,
           "context": [
             "create_ui"
           ]
@@ -9899,7 +9899,7 @@
         {
           "instantiator": "create_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 229,
+          "line": 222,
           "context": [
             "create_ui"
           ]
@@ -51510,13 +51510,13 @@
         {
           "name": "should_use_plain_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 126,
+          "line": 121,
           "call_type": "function_call"
         },
         {
           "name": "format_backend_info",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 313,
+          "line": 305,
           "call_type": "function_call"
         },
         {
@@ -51565,13 +51565,13 @@
         {
           "name": "should_use_plain_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 130,
+          "line": 125,
           "call_type": "function_call"
         },
         {
           "name": "format_backend_info",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 314,
+          "line": 306,
           "call_type": "function_call"
         },
         {
@@ -51644,7 +51644,7 @@
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
       "line": 90,
       "language": "python",
-      "docstring": "Determine if PlainUi should be used instead of RichUi.\n\nDecision logic:\n1. If force_plain=True \u2192 Use PlainUi\n2. If FORCE_PLAIN_UI env var set \u2192 Use PlainUi\n3. If not TTY (piped/redirected) \u2192 Use PlainUi\n4. If CI environment detected \u2192 Use PlainUi\n5. Otherwise \u2192 Use RichUi\n\nArgs:\n    force_plain: Explicitly force PlainUi backend\n\nReturns:\n    True if PlainUi should be used, False for RichUi\n\nExample:\n    # Check decision logic\n    if should_use_plain_ui():\n        print(\"Will use PlainUi\")\n    else:\n        print(\"Will use RichUi\")\n\n    # Force plain mode\n    should_use_plain_ui(force_plain=True)  # \u2192 True",
+      "docstring": "Determine if PlainUi should be used instead of RichUi.\n\nDecision logic:\n1. If force_plain=True \u2192 Use PlainUi\n2. If not TTY (piped/redirected) \u2192 Use PlainUi\n3. If CI environment detected \u2192 Use PlainUi\n4. Otherwise \u2192 Use RichUi\n\nArgs:\n    force_plain: Explicitly force PlainUi backend\n\nReturns:\n    True if PlainUi should be used, False for RichUi\n\nExample:\n    # Check decision logic\n    if should_use_plain_ui():\n        print(\"Will use PlainUi\")\n    else:\n        print(\"Will use RichUi\")\n\n    # Force plain mode\n    should_use_plain_ui(force_plain=True)  # \u2192 True",
       "parameters": [
         {
           "name": "force_plain",
@@ -51653,7 +51653,7 @@
         }
       ],
       "return_type": "bool",
-      "complexity": 5,
+      "complexity": 4,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -51662,19 +51662,19 @@
         {
           "name": "create_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 216,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "create_ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 219,
+          "line": 212,
           "call_type": "function_call"
         },
         {
           "name": "format_backend_info",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 316,
+          "line": 307,
           "call_type": "function_call"
         },
         {
@@ -51710,21 +51710,15 @@
       ],
       "calls": [
         {
-          "name": "getenv",
-          "file": "unknown",
-          "line": 122,
-          "call_type": "method_call"
-        },
-        {
           "name": "is_tty_available",
           "file": "unknown",
-          "line": 126,
+          "line": 121,
           "call_type": "function_call"
         },
         {
           "name": "is_ci_environment",
           "file": "unknown",
-          "line": 130,
+          "line": 125,
           "call_type": "function_call"
         }
       ],
@@ -51733,9 +51727,9 @@
     {
       "name": "create_ui",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-      "line": 137,
+      "line": 132,
       "language": "python",
-      "docstring": "Create appropriate UI backend based on environment and configuration.\n\nAutomatically selects RichUi or PlainUi based on:\n- User configuration (output.text_renderer in .claude/sdd_config.json)\n- TTY availability\n- CI environment detection\n- Explicit force flags\n- Environment variables\n\nArgs:\n    force_plain: Force PlainUi backend (overrides auto-detection)\n    force_rich: Force RichUi backend (overrides auto-detection)\n    collect_messages: Enable message collection mode\n    quiet: Enable quiet mode (errors only, PlainUi only)\n    project_path: Path to project root for config loading (optional)\n    **kwargs: Additional backend-specific options\n\nReturns:\n    Ui implementation (RichUi or PlainUi)\n\nRaises:\n    ValueError: If both force_plain and force_rich are True\n\nExamples:\n    # Automatic selection (recommended)\n    ui = create_ui()\n\n    # Force plain mode (for testing)\n    ui = create_ui(force_plain=True)\n\n    # Force rich mode (for demos)\n    ui = create_ui(force_rich=True)\n\n    # Collection mode with automatic backend\n    ui = create_ui(collect_messages=True)\n\n    # Quiet mode for scripts\n    ui = create_ui(quiet=True)\n\nDecision Flow:\n    1. Check force_rich/force_plain flags\n    2. Check user config (output.text_renderer)\n    3. Check FORCE_PLAIN_UI environment variable\n    4. Check TTY availability\n    5. Check CI environment\n    6. Default to RichUi for interactive terminals",
+      "docstring": "Create appropriate UI backend based on environment and configuration.\n\nAutomatically selects RichUi or PlainUi based on:\n- User configuration (output.text_renderer in .claude/sdd_config.json)\n- TTY availability\n- CI environment detection\n- Explicit force flags\n\nArgs:\n    force_plain: Force PlainUi backend (overrides auto-detection)\n    force_rich: Force RichUi backend (overrides auto-detection)\n    collect_messages: Enable message collection mode\n    quiet: Enable quiet mode (errors only, PlainUi only)\n    project_path: Path to project root for config loading (optional)\n    **kwargs: Additional backend-specific options\n\nReturns:\n    Ui implementation (RichUi or PlainUi)\n\nRaises:\n    ValueError: If both force_plain and force_rich are True\n\nExamples:\n    # Automatic selection (recommended)\n    ui = create_ui()\n\n    # Force plain mode (for testing)\n    ui = create_ui(force_plain=True)\n\n    # Force rich mode (for demos)\n    ui = create_ui(force_rich=True)\n\n    # Collection mode with automatic backend\n    ui = create_ui(collect_messages=True)\n\n    # Quiet mode for scripts\n    ui = create_ui(quiet=True)\n\nDecision Flow:\n    1. Check force_rich/force_plain flags\n    2. Check user config (output.text_renderer)\n    3. Check TTY availability\n    4. Check CI environment\n    5. Default to RichUi for interactive terminals",
       "parameters": [
         {
           "name": "force_plain",
@@ -51779,13 +51773,13 @@
         {
           "name": "create_ui_from_args",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 266,
+          "line": 259,
           "call_type": "function_call"
         },
         {
           "name": "ui",
           "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-          "line": 345,
+          "line": 336,
           "call_type": "function_call"
         },
         {
@@ -51853,19 +51847,19 @@
         {
           "name": "get_text_renderer",
           "file": "unknown",
-          "line": 208,
+          "line": 201,
           "call_type": "function_call"
         },
         {
           "name": "should_use_plain_ui",
           "file": "unknown",
-          "line": 216,
+          "line": 209,
           "call_type": "function_call"
         },
         {
           "name": "should_use_plain_ui",
           "file": "unknown",
-          "line": 219,
+          "line": 212,
           "call_type": "function_call"
         }
       ],
@@ -51874,7 +51868,7 @@
     {
       "name": "create_ui_from_args",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-      "line": 235,
+      "line": 228,
       "language": "python",
       "docstring": "Create UI backend from parsed CLI arguments.\n\nConvenience function for CLI commands that use argparse.\nExpects args object with optional attributes:\n- plain: bool (force plain mode)\n- quiet: bool (suppress output)\n- collect: bool (collection mode)\n\nArgs:\n    args: argparse.Namespace with CLI arguments\n\nReturns:\n    Ui implementation based on CLI flags\n\nExample:\n    import argparse\n\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--plain\", action=\"store_true\")\n    parser.add_argument(\"--quiet\", action=\"store_true\")\n    args = parser.parse_args()\n\n    ui = create_ui_from_args(args)\n    ui.print_status(\"Processing...\", MessageLevel.ACTION)",
       "parameters": [
@@ -51914,25 +51908,25 @@
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 262,
+          "line": 255,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 263,
+          "line": 256,
           "call_type": "function_call"
         },
         {
           "name": "getattr",
           "file": "unknown",
-          "line": 264,
+          "line": 257,
           "call_type": "function_call"
         },
         {
           "name": "create_ui",
           "file": "unknown",
-          "line": 266,
+          "line": 259,
           "call_type": "function_call"
         }
       ],
@@ -51941,7 +51935,7 @@
     {
       "name": "get_backend_name",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-      "line": 273,
+      "line": 266,
       "language": "python",
       "docstring": "Get the name of the UI backend.\n\nArgs:\n    ui: Ui instance\n\nReturns:\n    \"RichUi\" or \"PlainUi\"\n\nExample:\n    ui = create_ui()\n    print(f\"Using {get_backend_name(ui)} backend\")\n    # Output: \"Using RichUi backend\" or \"Using PlainUi backend\"",
       "parameters": [
@@ -51977,9 +51971,9 @@
     {
       "name": "format_backend_info",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-      "line": 291,
+      "line": 284,
       "language": "python",
-      "docstring": "Get formatted information about backend selection.\n\nReturns diagnostic information about the runtime environment\nand which backend would be selected.\n\nReturns:\n    Formatted string with backend selection details\n\nExample:\n    print(format_backend_info())\n\n    Output:\n    Backend Selection Info:\n    - TTY Available: Yes\n    - CI Environment: No\n    - Force Plain: No\n    - Selected Backend: RichUi",
+      "docstring": "Get formatted information about backend selection.\n\nReturns diagnostic information about the runtime environment\nand which backend would be selected.\n\nReturns:\n    Formatted string with backend selection details\n\nExample:\n    print(format_backend_info())\n\n    Output:\n    Backend Selection Info:\n    - TTY Available: Yes\n    - CI Environment: No\n    - Selected Backend: RichUi",
       "parameters": [],
       "return_type": "str",
       "complexity": 1,
@@ -52005,31 +51999,25 @@
         {
           "name": "is_tty_available",
           "file": "unknown",
-          "line": 313,
+          "line": 305,
           "call_type": "function_call"
         },
         {
           "name": "is_ci_environment",
           "file": "unknown",
-          "line": 314,
+          "line": 306,
           "call_type": "function_call"
-        },
-        {
-          "name": "getenv",
-          "file": "unknown",
-          "line": 315,
-          "call_type": "method_call"
         },
         {
           "name": "should_use_plain_ui",
           "file": "unknown",
-          "line": 316,
+          "line": 307,
           "call_type": "function_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 318,
+          "line": 309,
           "call_type": "method_call"
         }
       ],
@@ -52038,7 +52026,7 @@
     {
       "name": "ui",
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
-      "line": 322,
+      "line": 313,
       "language": "python",
       "docstring": "Shorthand for create_ui().\n\nArgs:\n    force_plain: Force PlainUi backend\n    collect_messages: Enable collection mode\n    quiet: Enable quiet mode\n\nReturns:\n    Ui implementation\n\nExample:\n    from claude_skills.common.ui_factory import ui\n\n    # Quick usage\n    terminal = ui()\n    terminal.print_status(\"Ready\", MessageLevel.SUCCESS)",
       "parameters": [
@@ -52088,7 +52076,7 @@
         {
           "name": "create_ui",
           "file": "unknown",
-          "line": 345,
+          "line": 336,
           "call_type": "function_call"
         }
       ],

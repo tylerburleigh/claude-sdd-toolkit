@@ -141,7 +141,7 @@ def create_ui(
     Create appropriate UI backend based on environment and configuration.
 
     Automatically selects RichUi or PlainUi based on:
-    - User configuration (output.text_renderer in .claude/sdd_config.json)
+    - User configuration (output.default_mode in .claude/sdd_config.json)
     - TTY availability
     - CI environment detection
     - Explicit force flags
@@ -178,7 +178,7 @@ def create_ui(
 
     Decision Flow:
         1. Check force_rich/force_plain flags
-        2. Check user config (output.text_renderer)
+        2. Check user config (output.default_mode: "plain"→PlainUi, "rich"/"json"→RichUi)
         3. Check TTY availability
         4. Check CI environment
         5. Default to RichUi for interactive terminals
@@ -197,15 +197,15 @@ def create_ui(
     else:
         # Check user config preference
         try:
-            from .sdd_config import get_text_renderer
-            renderer_pref = get_text_renderer(project_path)
+            from .sdd_config import get_default_format
+            default_mode = get_default_format(project_path)
 
-            if renderer_pref == "plain":
+            if default_mode == "plain":
                 use_plain = True
-            elif renderer_pref == "rich":
+            elif default_mode in ("rich", "json"):
                 use_plain = False
-            # else: "auto" - fall through to auto-detection
             else:
+                # Unknown value - fall back to auto-detection
                 use_plain = should_use_plain_ui()
         except (ImportError, Exception):
             # If config loading fails, fall back to auto-detection
