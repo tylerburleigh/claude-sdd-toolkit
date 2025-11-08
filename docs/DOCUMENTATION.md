@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 08:21:33
+**Generated:** 2025-11-08 08:23:01
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89638
+- **Total Lines:** 89623
 - **Total Classes:** 356
-- **Total Functions:** 908
-- **Avg Complexity:** 5.86
+- **Total Functions:** 907
+- **Avg Complexity:** 5.87
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -7605,7 +7605,7 @@ Returns:
 ### `_create_progress_bar(percentage, width) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:13`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:14`
 **Complexity:** 4
 
 **Description:**
@@ -8760,7 +8760,7 @@ Returns:
 ### `_print_specs_text(specs_info, verbose, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:145`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:143`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -11281,7 +11281,7 @@ Example:
 ### `cmd_activate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:651`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:638`
 **Complexity:** 4
 
 **Description:**
@@ -11296,7 +11296,7 @@ Example:
 ### `cmd_add_assumption(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:290`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:277`
 **Complexity:** 7
 
 **Description:**
@@ -11311,7 +11311,7 @@ Example:
 ### `cmd_add_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:244`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:231`
 **Complexity:** 3
 
 **Description:**
@@ -11326,7 +11326,7 @@ Example:
 ### `cmd_add_revision(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:268`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:255`
 **Complexity:** 3
 
 **Description:**
@@ -11341,7 +11341,7 @@ Example:
 ### `cmd_add_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:452`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:439`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -11356,7 +11356,7 @@ Example:
 ### `cmd_add_verification(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:577`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:564`
 **Complexity:** 3
 
 **Description:**
@@ -11438,7 +11438,7 @@ Returns:
 ### `cmd_audit_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:748`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:735`
 **Complexity:** 5
 
 **Description:**
@@ -11453,7 +11453,7 @@ Returns:
 ### `cmd_bulk_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1051`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1038`
 **Complexity:** 4
 
 **Description:**
@@ -11528,7 +11528,7 @@ Returns:
 ### `cmd_check_complete(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:906`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:893`
 **Complexity:** 5
 
 **Description:**
@@ -11603,7 +11603,7 @@ Returns:
 ### `cmd_check_journaling(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1011`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:998`
 **Complexity:** 8
 
 **Description:**
@@ -11648,7 +11648,7 @@ Returns:
 ### `cmd_complete_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:673`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:660`
 **Complexity:** 3
 
 **Description:**
@@ -11663,7 +11663,7 @@ Returns:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1152`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1139`
 **Complexity:** 6
 
 **Description:**
@@ -11779,7 +11779,7 @@ Returns:
 ### `cmd_create_task_commit(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1078`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1065`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -11845,7 +11845,7 @@ Returns:
 ### `cmd_execute_verify(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:70`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:57`
 ⚠️ **Complexity:** 29 (High)
 
 **Description:**
@@ -12031,7 +12031,7 @@ Returns:
 ### `cmd_format_verification_summary(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:602`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:589`
 **Complexity:** 6
 
 **Description:**
@@ -12073,7 +12073,7 @@ Returns:
 ### `cmd_get_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:844`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:831`
 **Complexity:** 7
 
 **Description:**
@@ -12103,7 +12103,7 @@ Returns:
 ### `cmd_get_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:820`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:807`
 **Complexity:** 6
 
 **Description:**
@@ -12148,7 +12148,7 @@ Returns:
 ### `cmd_list_assumptions(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:338`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:325`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -12163,7 +12163,7 @@ Returns:
 ### `cmd_list_blockers(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:953`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:940`
 **Complexity:** 6
 
 **Description:**
@@ -12214,7 +12214,7 @@ Returns:
 ### `cmd_list_phases(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:873`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:860`
 **Complexity:** 6
 
 **Description:**
@@ -12229,7 +12229,7 @@ Returns:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1185`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1172`
 **Complexity:** 3
 
 **Description:**
@@ -12259,7 +12259,7 @@ Returns:
 ### `cmd_mark_blocked(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:200`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:187`
 **Complexity:** 3
 
 **Description:**
@@ -12289,7 +12289,7 @@ Returns:
 ### `cmd_move_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:635`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:622`
 **Complexity:** 1
 
 **Description:**
@@ -12347,7 +12347,7 @@ Returns:
 ### `cmd_phase_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:930`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:917`
 **Complexity:** 6
 
 **Description:**
@@ -12429,7 +12429,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_query_tasks(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:770`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:757`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -12444,7 +12444,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_reconcile_state(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:975`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:962`
 **Complexity:** 7
 
 **Description:**
@@ -12474,7 +12474,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_remove_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:505`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:492`
 **Complexity:** 9
 
 **Description:**
@@ -12650,7 +12650,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_status_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:726`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:713`
 **Complexity:** 6
 
 **Description:**
@@ -12665,7 +12665,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1207`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1194`
 **Complexity:** 3
 
 **Description:**
@@ -12710,7 +12710,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_time_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:697`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:684`
 **Complexity:** 6
 
 **Description:**
@@ -12755,7 +12755,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_unblock_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:223`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:210`
 **Complexity:** 3
 
 **Description:**
@@ -12785,7 +12785,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_estimate(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:405`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:392`
 **Complexity:** 10
 
 **Description:**
@@ -12800,7 +12800,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_frontmatter(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:553`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:540`
 **Complexity:** 1
 
 **Description:**
@@ -12815,7 +12815,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_status(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:177`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:164`
 **Complexity:** 3
 
 **Description:**
@@ -12830,7 +12830,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1226`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1213`
 ⚠️ **Complexity:** 27 (High)
 
 **Description:**
@@ -19837,8 +19837,8 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:44`
-⚠️ **Complexity:** 12 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:45`
+⚠️ **Complexity:** 11 (High)
 
 **Description:**
 > List specification files with optional filtering.
@@ -20412,25 +20412,6 @@ Notes:
 **Parameters:**
 - `data`: Any
 - `compact`: bool
-
----
-
-### `output_json(data, compact) -> None`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:56`
-**Complexity:** 2
-
-**Description:**
-> Output JSON data with formatting based on compact flag.
-
-Args:
-    data: Data to serialize to JSON
-    compact: If True, output compact JSON; if False, pretty-print with indent
-
-**Parameters:**
-- `data`: None
-- `compact`: None
 
 ---
 
@@ -21501,7 +21482,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1306`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1293`
 **Complexity:** 1
 
 **Description:**
@@ -27339,6 +27320,7 @@ Returns:
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.execute_verify_task`
 - `claude_skills.common.find_specs_directory`
+- `claude_skills.common.json_output.output_json`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.sdd_config.get_default_format`
 - `claude_skills.common.spec.save_json_spec`
@@ -27465,6 +27447,7 @@ Returns:
 
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.find_specs_directory`
+- `claude_skills.common.json_output.output_json`
 - `claude_skills.common.load_json_spec`
 - `json`
 - `pathlib.Path`
