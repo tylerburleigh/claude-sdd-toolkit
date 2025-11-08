@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 17:59:51
+**Generated:** 2025-11-08 18:51:09
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89636
+- **Total Lines:** 89638
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -268,7 +268,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:783`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:785`
 
 **Description:**
 > Issue with assigned severity category.
@@ -427,7 +427,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:637`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:639`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -10714,7 +10714,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:805`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:807`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10748,7 +10748,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:913`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:915`
 **Complexity:** 1
 
 **Description:**
@@ -13134,7 +13134,7 @@ Args:
     tool: Specific tool to use (gemini, codex, cursor-agent).
           If None, uses first available tool.
     model: Model to request (optional, tool-specific)
-    timeout: Timeout in seconds (default: 120)
+    timeout: Timeout in seconds (default: 600)
 
 Returns:
     ToolResponse object with consultation results
@@ -13999,7 +13999,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:677`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:679`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -17826,7 +17826,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:414`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:416`
 **Complexity:** 3
 
 **Description:**
@@ -20487,7 +20487,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:613`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:615`
 **Complexity:** 1
 
 **Description:**
@@ -20594,7 +20594,7 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:473`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:475`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**

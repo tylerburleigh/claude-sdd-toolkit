@@ -72,7 +72,7 @@ def format_phases_table(
 
     if not phases:
         if printer:
-            console = Console(width=20000, force_terminal=True)
+            console = Console()
             console.print("[yellow]No phases found in spec.[/yellow]")
         return []
 
@@ -99,12 +99,12 @@ def _print_phases_table(phases: List[Dict[str, Any]]) -> None:
     """Print phases using Rich.Table for structured output."""
 
     if not phases:
-        console = Console(width=20000, force_terminal=True)
+        console = Console()
         console.print("[yellow]No phases to display.[/yellow]")
         return
 
     # Create Rich console
-    console = Console(width=20000, force_terminal=True)
+    console = Console()
 
     # Create Rich.Table with specified columns
     table = Table(

@@ -50,6 +50,7 @@ def list_specs(
     verbose: bool = False,
     printer: Optional[PrettyPrinter] = None,
     compact: bool = False,
+    ui=None,
 ) -> List[Dict[str, Any]]:
     """
     List specification files with optional filtering.
@@ -60,6 +61,7 @@ def list_specs(
         output_format: Output format (text or json)
         verbose: Include detailed information
         printer: PrettyPrinter instance for output
+        ui: UI instance for console output (optional)
 
     Returns:
         List of spec info dictionaries
@@ -135,7 +137,7 @@ def list_specs(
     if output_format == "json":
         output_json(specs_info, compact=compact)
     else:
-        _print_specs_text(specs_info, verbose, printer)
+        _print_specs_text(specs_info, verbose, printer, ui)
 
     return specs_info
 
@@ -144,6 +146,7 @@ def _print_specs_text(
     specs_info: List[Dict[str, Any]],
     verbose: bool,
     printer: PrettyPrinter,
+    ui=None,
 ) -> None:
     """Print specs using Rich.Table for structured output."""
 
@@ -151,8 +154,8 @@ def _print_specs_text(
         printer.info("No specifications found.")
         return
 
-    # Create Rich console
-    console = Console(width=20000, force_terminal=True)
+    # Use provided UI console or create default
+    console = ui.console if ui else Console()
 
     # Create Rich.Table with specified columns
     table = Table(

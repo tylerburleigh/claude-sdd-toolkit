@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# PreToolUse hook to block reading .json spec files
+# Forces use of sdd-next skill instead of direct file reading
+
+set -euo pipefail
+
+# Read JSON input from stdin
+input=$(cat)
+
+# Extract file_path from tool_input using jq (or fall back to grep/sed if jq unavailable)
+if command -v jq &> /dev/null; then
+    file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty')
+else
+    # Fallback: simple extraction using grep/sed
+    file_path=$(echo "$input" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+fi
+
+# If no file_path found, allow (might be a different Read operation)
+if [ -z "$file_path" ]; then
+    exit 0
+fi
+
+# Check if file path matches **/specs/**/*.json pattern
+if [[ "$file_path" == *"/specs/"*".json" ]]; then
+    # Block the read with helpful error message
+    cat >&2 <<'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                    ⛔ JSON SPEC READ BLOCKED                           ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+WHAT: You attempted to read a .json specification file directly.
+
+WHY: JSON specs are often very large (50KB+) and waste context tokens.
+     The SDD toolkit provides optimized tools for working with specs.
+
+HOW TO FIX:
+  1. Use the `sdd-next` skill to get the next task from the spec
+  2. Use `sdd skills-dev start-helper -- format-output` for summaries
+  3. Use `sdd-update` skill to update task progress
+
+EXAMPLE:
+  Instead of: Read(specs/active/my-spec.json)
+  Use: Skill(sdd-next)
+
+This hook enforces proper SDD workflow and prevents token waste.
+
+EOF
+    exit 2
+fi
+
+# Allow the read for non-spec .json files
+exit 0

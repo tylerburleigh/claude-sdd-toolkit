@@ -111,12 +111,12 @@ def _print_tasks_table(
     """Print tasks using Rich.Table for structured output."""
 
     if not matches:
-        console = Console(width=20000, force_terminal=True)
+        console = Console()
         console.print("[yellow]No tasks found matching the specified filters.[/yellow]")
         return
 
     # Create Rich console
-    console = Console(width=20000, force_terminal=True)
+    console = Console()
 
     # Build title with filter info
     title_parts = ["📋 Tasks"]

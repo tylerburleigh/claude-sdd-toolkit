@@ -498,7 +498,7 @@ def cmd_check_deps(args, printer):
 
         # Build and render the dependency tree
         tree = _build_dependency_tree(deps, args.task_id)
-        console = Console(width=20000, force_terminal=True)
+        console = Console()
         console.print(tree)
 
     return 0
@@ -535,7 +535,7 @@ def _check_all_task_deps(spec_data, args, printer):
         print()  # Blank line for spacing
 
         # Use Rich Console for colored output
-        console = Console(width=20000, force_terminal=True)
+        console = Console()
 
         if ready:
             console.print("\n✅ [bold green]Ready to start:[/bold green]")

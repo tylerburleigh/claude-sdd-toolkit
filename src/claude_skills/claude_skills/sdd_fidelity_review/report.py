@@ -381,7 +381,7 @@ class FidelityReport:
             >>> report = FidelityReport(review_results)
             >>> report.print_console_rich(verbose=False)
         """
-        console = Console(width=20000, force_terminal=True)
+        console = Console()
 
         # Get consensus data
         consensus_dict = self._convert_to_dict(self.consensus)

@@ -18,12 +18,12 @@ models:
     flags: []
   codex:
     priority:
-    - cheetah
+    - gpt-5-codex
     flags:
     - --skip-git-repo-check
   cursor-agent:
     priority:
-    - cheetah
+    - composer-1
     flags: []
   overrides: []
 consensus:
@@ -43,4 +43,4 @@ consensus:
     missing_functionality: discovery-focus
     cross_file: discovery-focus
 consultation:
-  timeout_seconds: 360
+  timeout_seconds: 600

@@ -104,7 +104,7 @@ def consult_ai_on_fidelity(
     prompt: str,
     tool: Optional[str] = None,
     model: Optional[str] = None,
-    timeout: int = 120
+    timeout: int = 600
 ) -> ToolResponse:
     """
     Consult an AI tool for implementation fidelity review.
@@ -117,7 +117,7 @@ def consult_ai_on_fidelity(
         tool: Specific tool to use (gemini, codex, cursor-agent).
               If None, uses first available tool.
         model: Model to request (optional, tool-specific)
-        timeout: Timeout in seconds (default: 120)
+        timeout: Timeout in seconds (default: 600)
 
     Returns:
         ToolResponse object with consultation results
@@ -189,7 +189,7 @@ def consult_multiple_ai_on_fidelity(
     prompt: str,
     tools: Optional[List[str]] = None,
     model: Optional[str] = None,
-    timeout: int = 120,
+    timeout: int = 600,
     require_all_success: bool = False,
     cache_key_params: Optional[Dict[str, Any]] = None,
     use_cache: Optional[bool] = None,
@@ -320,12 +320,14 @@ def consult_multiple_ai_on_fidelity(
         # Execute consultations in parallel
         # Convert single model string to models dict if provided
         models_dict = {tool: model for tool in available_tools} if model else None
-        responses = execute_tools_parallel(
+        multi_response = execute_tools_parallel(
             tools=available_tools,
             prompt=prompt,
             models=models_dict,
             timeout=timeout
         )
+        # Extract list of responses from MultiToolResponse dataclass
+        responses = list(multi_response.responses.values())
 
         # Emit model_response events for each response
         if progress_emitter:

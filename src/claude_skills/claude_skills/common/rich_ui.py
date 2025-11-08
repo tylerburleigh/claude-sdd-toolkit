@@ -86,7 +86,7 @@ class RichUi:
             messages = ui.get_messages()
             ui.render_all()
         """
-        self.console = console or Console(width=20000, force_terminal=True)
+        self.console = console or Console()
         self._collecting = collect_messages
         self._messages: List[Message] = []
         self._context_stack: List[Dict[str, Any]] = []

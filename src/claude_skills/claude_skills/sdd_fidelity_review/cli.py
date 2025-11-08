@@ -129,8 +129,8 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             return 1
 
         # Step 4: Parse responses
-        # Extract list of ToolResponse objects from MultiToolResponse
-        response_list = list(responses.responses.values())
+        # responses is already a list of ToolResponse objects
+        response_list = responses
 
         if args.verbose:
             print(f"Parsing {len(response_list)} AI responses...", file=sys.stderr)
