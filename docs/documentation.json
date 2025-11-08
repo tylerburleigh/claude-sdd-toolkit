@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T23:58:08.944567Z",
+    "generated_at": "2025-11-08T23:58:57.796817Z",
     "languages": [
       "python"
     ],
@@ -76741,6 +76741,11 @@
           "name": "printer",
           "type": null,
           "default": null
+        },
+        {
+          "name": "ui",
+          "type": null,
+          "default": null
         }
       ],
       "return_type": null,
@@ -76856,6 +76861,11 @@
         },
         {
           "name": "printer",
+          "type": null,
+          "default": null
+        },
+        {
+          "name": "ui",
           "type": null,
           "default": null
         }

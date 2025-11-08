@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:58:08
+**Generated:** 2025-11-08 18:58:57
 
 ---
 
@@ -7432,7 +7432,7 @@ Returns:
 
 ---
 
-### `_check_all_task_deps(spec_data, args, printer) -> None`
+### `_check_all_task_deps(spec_data, args, printer, ui) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:507`
@@ -7445,6 +7445,7 @@ Returns:
 - `spec_data`: None
 - `args`: None
 - `printer`: None
+- `ui`: None
 
 ---
 
@@ -11543,7 +11544,7 @@ Returns:
 
 ---
 
-### `cmd_check_deps(args, printer) -> None`
+### `cmd_check_deps(args, printer, ui) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:468`
@@ -11555,6 +11556,7 @@ Returns:
 **Parameters:**
 - `args`: None
 - `printer`: None
+- `ui`: None
 
 ---
 
