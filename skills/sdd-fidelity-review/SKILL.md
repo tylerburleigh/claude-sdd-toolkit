@@ -17,7 +17,7 @@ This skill is part of the **Spec-Driven Development** quality assurance family:
 - **Implementation** - Code is written
 - **sdd-update-subagent** - Updates progress
 - **Skill(sdd-toolkit:sdd-fidelity-review)** (this skill) - Reviews implementation fidelity
-- **Skill(sdd-toolkit:run-tests)** - Runs tests
+- **run-tests-subagent** - Runs tests
 
 ## When to Use This Skill
 
@@ -50,53 +50,6 @@ Use this skill when you need to:
 **Best practice:** Use for high-risk tasks (auth, data handling, API contracts)
 
 **Note:** For full spec reviews, run phase-by-phase reviews for better manageability and quality.
-
-## Invocation
-
-### For Automated Workflows
-
-**Metadata in verification task:**
-```json
-{
-  "verification_type": "fidelity",
-  "agent": "sdd-fidelity-review",
-  "scope": "phase",
-  "target": "phase-1"
-}
-```
-
-**Invocation from sdd-next:**
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review implementation fidelity for spec {spec-id}. [Details about scope/target]",
-  description: "Review spec fidelity"
-)
-```
-
-### For Direct User Requests
-
-```
-Skill(sdd-toolkit:sdd-fidelity-review)
-```
-
-Then provide the spec ID and review scope when prompted.
-
-### Understanding the Naming
-
-- `metadata.agent = "sdd-fidelity-review"` → What to execute (routing identifier)
-- `Task(subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent")` → How to invoke (orchestration)
-- `Skill(sdd-toolkit:sdd-fidelity-review)` → Direct skill invocation (user-facing)
-
-## Required Information
-
-### For Phase Review
-- ✅ `spec_id` - Valid specification ID
-- ✅ `phase_id` - Phase to review (e.g., "phase-1")
-
-### For Task Review
-- ✅ `spec_id` - Valid specification ID
-- ✅ `task_id` - Valid task ID within the spec
 
 ## Spec Reading Best Practices
 
@@ -344,7 +297,7 @@ Based on review findings, provide recommendations for spec updates:
    - Technical debt introduced by deviations
    - Impacts on future phases or dependent tasks
 
-**Note:** This skill generates recommendations only. Actual spec modifications are handled by `sdd-modify-subagent` through the `sdd-next` orchestration workflow.
+**Note:** This skill generates recommendations only.
 
 ## Report Structure
 
