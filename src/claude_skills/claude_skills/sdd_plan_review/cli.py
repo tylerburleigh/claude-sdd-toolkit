@@ -204,7 +204,7 @@ def cmd_list_tools(args, printer):
             "total": len(tools_to_check),
             "available_count": len(available)
         }
-        output_json(output)
+        output_json(output, args.compact)
         if len(available) == 0:
             return 1
         else:

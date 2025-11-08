@@ -36,7 +36,7 @@ def handle_cache_clear(args, printer: PrettyPrinter):
         # Check if caching is enabled
         if not is_cache_enabled():
             if getattr(args, 'json', None):
-                output_json({"error": "Cache is disabled in configuration"})
+                output_json({"error": "Cache is disabled in configuration"}, args.compact)
             else:
                 printer.warning("Cache is disabled in configuration")
                 printer.info("To enable caching, check .claude/config.json")
@@ -62,7 +62,7 @@ def handle_cache_clear(args, printer: PrettyPrinter):
                 result["filters"]["spec_id"] = spec_id
             if review_type:
                 result["filters"]["review_type"] = review_type
-            output_json(result)
+            output_json(result, args.compact)
         else:
             # Human-readable output
             if count == 0:
@@ -109,7 +109,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Check if caching is enabled
         if not is_cache_enabled():
             if getattr(args, 'json', None):
-                output_json({"error": "Cache is disabled in configuration"})
+                output_json({"error": "Cache is disabled in configuration"}, args.compact)
             else:
                 printer.warning("Cache is disabled in configuration")
                 printer.info("To enable caching, check .claude/config.json")
@@ -124,7 +124,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Handle error case
         if "error" in stats:
             if getattr(args, 'json', None):
-                output_json({"error": stats['error']})
+                output_json({"error": stats['error']}, args.compact)
             else:
                 printer.error(f"Failed to get cache stats: {stats['error']}")
             return 1
@@ -134,7 +134,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         json_output = getattr(args, 'json', None)
         if json_output:
             # JSON output mode
-            output_json(stats)
+            output_json(stats, args.compact)
             return 0
 
         # Human-readable output

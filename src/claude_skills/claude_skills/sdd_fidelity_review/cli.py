@@ -225,7 +225,7 @@ def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues
     report = FidelityReport(review_results)
     result = report.generate_json()
 
-    output_json(result)
+    output_json(result, getattr(args, 'compact', False))
 
 
 def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
@@ -266,7 +266,7 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
                 "available_count": len(available_tools),
                 "total_count": len(all_tools)
             }
-            output_json(result)
+            output_json(result, getattr(args, 'compact', False))
         else:  # text format
             print("\n" + "=" * 60)
             print("AI CONSULTATION TOOLS STATUS")

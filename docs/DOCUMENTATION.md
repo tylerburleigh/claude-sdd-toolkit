@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 10:03:04
+**Generated:** 2025-11-08 10:20:07
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89629
+- **Total Lines:** 89631
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -8220,7 +8220,7 @@ Returns:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:33`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:34`
 ⚠️ **Complexity:** 23 (High)
 
 **Description:**
@@ -8249,7 +8249,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:230`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:231`
 **Complexity:** 10
 
 **Description:**
@@ -8558,7 +8558,7 @@ Returns:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:212`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:213`
 **Complexity:** 1
 
 **Description:**
@@ -8576,7 +8576,7 @@ Returns:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:189`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:190`
 **Complexity:** 5
 
 **Description:**
@@ -8594,7 +8594,7 @@ Returns:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:171`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:172`
 **Complexity:** 1
 
 **Description:**
@@ -12244,7 +12244,7 @@ Returns:
 ### `cmd_list_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:184`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:185`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -12530,7 +12530,7 @@ Returns:
 ### `cmd_review(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:31`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:32`
 ⚠️ **Complexity:** 20 (High)
 
 **Description:**
@@ -20108,7 +20108,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:465`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:466`
 **Complexity:** 3
 
 **Description:**
@@ -21187,7 +21187,7 @@ Args:
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:447`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:448`
 **Complexity:** 1
 
 **Description:**
@@ -21246,7 +21246,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:305`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:306`
 **Complexity:** 1
 
 **Description:**
@@ -21291,7 +21291,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:418`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:419`
 **Complexity:** 2
 
 **Description:**
@@ -21351,7 +21351,7 @@ Args:
 ### `register_plan_review(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:257`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:258`
 **Complexity:** 1
 
 **Description:**
@@ -26664,6 +26664,7 @@ Returns:
 - `argparse`
 - `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.json_output.output_json`
 - `claude_skills.common.progress.ProgressEmitter`
 - `claude_skills.common.sdd_config.get_default_format`
 - `consultation.ConsultationError`
@@ -26902,6 +26903,7 @@ Returns:
 - `claude_skills.common.ensure_reviews_directory`
 - `claude_skills.common.find_spec_file`
 - `claude_skills.common.find_specs_directory`
+- `claude_skills.common.json_output.output_json`
 - `claude_skills.common.load_json_spec`
 - `claude_skills.sdd_plan_review.check_tool_available`
 - `claude_skills.sdd_plan_review.detect_available_tools`
