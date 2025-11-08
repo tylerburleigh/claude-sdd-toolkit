@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 08:23:01
+**Generated:** 2025-11-08 08:29:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89623
+- **Total Lines:** 89626
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -674,7 +674,7 @@ Attributes:
 ### `DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:29`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:31`
 
 **Description:**
 > Complete diff report between before and after states.
@@ -957,7 +957,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 ### `FieldChange`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:19`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:21`
 
 **Description:**
 > Represents a single field change.
@@ -2420,7 +2420,7 @@ Example:
 ### `SpecStatistics`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:13`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:15`
 
 **Description:**
 > Calculated statistics for a spec file.
@@ -7515,7 +7515,7 @@ Args:
 ### `_compare_dicts(node_id, dict_name, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:149`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:151`
 **Complexity:** 5
 
 **Description:**
@@ -7532,7 +7532,7 @@ Args:
 ### `_compare_nodes(node_id, before, after) -> List[FieldChange]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:96`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:98`
 **Complexity:** 6
 
 **Description:**
@@ -7627,7 +7627,7 @@ Returns:
 ### `_create_value_display(field_path, value, change_type, is_before) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:463`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:465`
 **Complexity:** 10
 
 **Description:**
@@ -7653,7 +7653,7 @@ Returns:
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:95`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:96`
 **Complexity:** 2
 
 **Parameters:**
@@ -7678,7 +7678,7 @@ Returns:
 ### `_detect_code_language(field_path, value) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:274`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:276`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -7935,7 +7935,7 @@ Returns:
 ### `_filter_actions_by_selection(actions, selection_criteria) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:130`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:131`
 **Complexity:** 6
 
 **Description:**
@@ -8022,7 +8022,7 @@ Returns:
 ### `_format_value(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:263`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:265`
 **Complexity:** 4
 
 **Description:**
@@ -8342,7 +8342,7 @@ Note:
 ### `_interactive_select_fixes(actions, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:148`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:149`
 **Complexity:** 10
 
 **Description:**
@@ -8547,7 +8547,7 @@ Returns:
 ### `_normalized_to_dict(normalized) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:107`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:108`
 **Complexity:** 1
 
 **Parameters:**
@@ -9032,7 +9032,7 @@ Returns:
 ### `_resolve_spec_file(spec_name_or_path, printer) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:47`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:48`
 **Complexity:** 7
 
 **Description:**
@@ -9077,7 +9077,7 @@ Returns:
 ### `_serialize_fix_action(action) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:111`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:112`
 **Complexity:** 1
 
 **Parameters:**
@@ -9145,7 +9145,7 @@ Returns:
 ### `_should_use_syntax_highlighting(value, language) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:331`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:333`
 **Complexity:** 6
 
 **Description:**
@@ -9187,7 +9187,7 @@ Returns:
 ### `_stats_to_dict(stats) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:91`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:92`
 **Complexity:** 1
 
 **Parameters:**
@@ -9198,7 +9198,7 @@ Returns:
 ### `_status_to_exit_code(status) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:122`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:123`
 **Complexity:** 3
 
 **Parameters:**
@@ -10646,7 +10646,7 @@ Returns:
 ### `calculate_statistics(spec_data) -> SpecStatistics`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:29`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:31`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -11558,7 +11558,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:536`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:537`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -11986,7 +11986,7 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:310`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:311`
 ⚠️ **Complexity:** 34 (High)
 
 **Description:**
@@ -12515,7 +12515,7 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:443`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:444`
 **Complexity:** 10
 
 **Description:**
@@ -12635,7 +12635,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:510`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:511`
 **Complexity:** 4
 
 **Description:**
@@ -12857,7 +12857,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:193`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:194`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -13098,7 +13098,7 @@ Returns:
 ### `compute_diff(before, after) -> DiffReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:37`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:39`
 **Complexity:** 6
 
 **Description:**
@@ -14207,7 +14207,7 @@ Returns:
 ### `display_diff_side_by_side(report, spec_id, console) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:354`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:356`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -15871,7 +15871,7 @@ Returns:
 ### `format_diff_json(report) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:241`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:243`
 **Complexity:** 2
 
 **Description:**
@@ -15885,7 +15885,7 @@ Returns:
 ### `format_diff_markdown(report, spec_id) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:178`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:180`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -17288,7 +17288,7 @@ Returns:
 ### `generate_report(result) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/reporting.py:11`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/reporting.py:12`
 ⚠️ **Complexity:** 40 (High)
 
 **Description:**
@@ -21501,7 +21501,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:592`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:593`
 **Complexity:** 2
 
 **Description:**
@@ -21623,7 +21623,7 @@ Raises:
 ### `render_statistics(stats) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:104`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/stats.py:106`
 **Complexity:** 6
 
 **Description:**
@@ -27612,6 +27612,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_validate/diff.py`
 
 - `__future__.annotations`
+- `claude_skills.common.json_output.format_json_output`
 - `copy`
 - `dataclasses.dataclass`
 - `dataclasses.field`
@@ -27678,6 +27679,7 @@ Returns:
 
 - `__future__.annotations`
 - `claude_skills.common.JsonSpecValidationResult`
+- `claude_skills.common.json_output.format_json_output`
 - `claude_skills.sdd_validate.formatting.NormalizedValidationResult`
 - `claude_skills.sdd_validate.formatting.normalize_validation_result`
 - `typing.Any`
@@ -27687,6 +27689,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_validate/stats.py`
 
 - `__future__.annotations`
+- `claude_skills.common.json_output.format_json_output`
 - `dataclasses.dataclass`
 - `pathlib.Path`
 - `typing.Any`
