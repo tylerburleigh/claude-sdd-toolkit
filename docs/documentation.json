@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T15:28:35.125704Z",
+    "generated_at": "2025-11-08T15:29:38.133743Z",
     "languages": [
       "python"
     ],
@@ -53706,6 +53706,12 @@
         },
         {
           "name": "output_json",
+          "file": "unknown",
+          "line": 530,
+          "call_type": "function_call"
+        },
+        {
+          "name": "getattr",
           "file": "unknown",
           "line": 530,
           "call_type": "function_call"
