@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 16:47:54
+**Generated:** 2025-11-08 16:59:33
 
 ---
 
@@ -13862,7 +13862,7 @@ Returns:
 > Create appropriate UI backend based on environment and configuration.
 
 Automatically selects RichUi or PlainUi based on:
-- User configuration (output.text_renderer in .claude/sdd_config.json)
+- User configuration (output.default_mode in .claude/sdd_config.json)
 - TTY availability
 - CI environment detection
 - Explicit force flags
@@ -13899,7 +13899,7 @@ Examples:
 
 Decision Flow:
     1. Check force_rich/force_plain flags
-    2. Check user config (output.text_renderer)
+    2. Check user config (output.default_mode: "plain"→PlainUi, "rich"/"json"→RichUi)
     3. Check TTY availability
     4. Check CI environment
     5. Default to RichUi for interactive terminals

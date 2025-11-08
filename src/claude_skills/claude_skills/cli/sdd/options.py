@@ -40,7 +40,7 @@ def add_global_options(parser, config=None):
 
     # JSON output - use mutually exclusive group for proper default handling
     # Check new config format first, then fall back to deprecated keys
-    default_mode = config['output'].get('default_mode', config['output'].get('default_format', 'text'))
+    default_mode = config['output'].get('default_mode', config['output'].get('default_format', 'rich'))
     is_json_default = default_mode == 'json'
 
     json_group = parser.add_mutually_exclusive_group()

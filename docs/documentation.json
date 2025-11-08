@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T21:47:54.589462Z",
+    "generated_at": "2025-11-08T21:59:33.500134Z",
     "languages": [
       "python"
     ],
@@ -47703,6 +47703,12 @@
       "is_public": true,
       "callers": [
         {
+          "name": "create_ui",
+          "file": "src/claude_skills/claude_skills/common/ui_factory.py",
+          "line": 201,
+          "call_type": "function_call"
+        },
+        {
           "name": "register_doc_query",
           "file": "src/claude_skills/claude_skills/doc_query/cli.py",
           "line": 1073,
@@ -47759,7 +47765,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 8
+      "call_count": 9
     },
     {
       "name": "get_json_compact",
@@ -51729,7 +51735,7 @@
       "file": "src/claude_skills/claude_skills/common/ui_factory.py",
       "line": 132,
       "language": "python",
-      "docstring": "Create appropriate UI backend based on environment and configuration.\n\nAutomatically selects RichUi or PlainUi based on:\n- User configuration (output.text_renderer in .claude/sdd_config.json)\n- TTY availability\n- CI environment detection\n- Explicit force flags\n\nArgs:\n    force_plain: Force PlainUi backend (overrides auto-detection)\n    force_rich: Force RichUi backend (overrides auto-detection)\n    collect_messages: Enable message collection mode\n    quiet: Enable quiet mode (errors only, PlainUi only)\n    project_path: Path to project root for config loading (optional)\n    **kwargs: Additional backend-specific options\n\nReturns:\n    Ui implementation (RichUi or PlainUi)\n\nRaises:\n    ValueError: If both force_plain and force_rich are True\n\nExamples:\n    # Automatic selection (recommended)\n    ui = create_ui()\n\n    # Force plain mode (for testing)\n    ui = create_ui(force_plain=True)\n\n    # Force rich mode (for demos)\n    ui = create_ui(force_rich=True)\n\n    # Collection mode with automatic backend\n    ui = create_ui(collect_messages=True)\n\n    # Quiet mode for scripts\n    ui = create_ui(quiet=True)\n\nDecision Flow:\n    1. Check force_rich/force_plain flags\n    2. Check user config (output.text_renderer)\n    3. Check TTY availability\n    4. Check CI environment\n    5. Default to RichUi for interactive terminals",
+      "docstring": "Create appropriate UI backend based on environment and configuration.\n\nAutomatically selects RichUi or PlainUi based on:\n- User configuration (output.default_mode in .claude/sdd_config.json)\n- TTY availability\n- CI environment detection\n- Explicit force flags\n\nArgs:\n    force_plain: Force PlainUi backend (overrides auto-detection)\n    force_rich: Force RichUi backend (overrides auto-detection)\n    collect_messages: Enable message collection mode\n    quiet: Enable quiet mode (errors only, PlainUi only)\n    project_path: Path to project root for config loading (optional)\n    **kwargs: Additional backend-specific options\n\nReturns:\n    Ui implementation (RichUi or PlainUi)\n\nRaises:\n    ValueError: If both force_plain and force_rich are True\n\nExamples:\n    # Automatic selection (recommended)\n    ui = create_ui()\n\n    # Force plain mode (for testing)\n    ui = create_ui(force_plain=True)\n\n    # Force rich mode (for demos)\n    ui = create_ui(force_rich=True)\n\n    # Collection mode with automatic backend\n    ui = create_ui(collect_messages=True)\n\n    # Quiet mode for scripts\n    ui = create_ui(quiet=True)\n\nDecision Flow:\n    1. Check force_rich/force_plain flags\n    2. Check user config (output.default_mode: \"plain\"\u2192PlainUi, \"rich\"/\"json\"\u2192RichUi)\n    3. Check TTY availability\n    4. Check CI environment\n    5. Default to RichUi for interactive terminals",
       "parameters": [
         {
           "name": "force_plain",
@@ -51845,7 +51851,7 @@
       ],
       "calls": [
         {
-          "name": "get_text_renderer",
+          "name": "get_default_format",
           "file": "unknown",
           "line": 201,
           "call_type": "function_call"
