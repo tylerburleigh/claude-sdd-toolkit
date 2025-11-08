@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:51:09
+**Generated:** 2025-11-08 18:55:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89638
+- **Total Lines:** 89641
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -8757,10 +8757,10 @@ Returns:
 
 ---
 
-### `_print_specs_text(specs_info, verbose, printer) -> None`
+### `_print_specs_text(specs_info, verbose, printer, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:143`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:145`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -8770,6 +8770,7 @@ Returns:
 - `specs_info`: List[Dict[str, Any]]
 - `verbose`: bool
 - `printer`: PrettyPrinter
+- `ui`: None
 
 ---
 
@@ -19848,6 +19849,7 @@ Args:
     output_format: Output format (text or json)
     verbose: Include detailed information
     printer: PrettyPrinter instance for output
+    ui: UI instance for console output (optional)
 
 Returns:
     List of spec info dictionaries

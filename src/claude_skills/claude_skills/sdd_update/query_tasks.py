@@ -21,7 +21,8 @@ def format_tasks_table(
     task_type: Optional[str] = None,
     parent: Optional[str] = None,
     printer: Optional[PrettyPrinter] = None,
-    limit: Optional[int] = 20
+    limit: Optional[int] = 20,
+    ui=None
 ) -> Optional[List[Dict]]:
     """
     Query and display tasks using Rich.Table format.
@@ -34,6 +35,7 @@ def format_tasks_table(
         parent: Filter by parent node ID
         printer: Optional printer for output
         limit: Maximum number of results to return (default 20, use 0 for unlimited)
+        ui: UI instance for console output (optional)
 
     Returns:
         List of matching task dictionaries, or None on error
@@ -93,7 +95,8 @@ def format_tasks_table(
             status_filter=status,
             type_filter=task_type,
             parent_filter=parent,
-            limit=limit
+            limit=limit,
+            ui=ui
         )
 
     return matches
@@ -106,17 +109,18 @@ def _print_tasks_table(
     status_filter: Optional[str],
     type_filter: Optional[str],
     parent_filter: Optional[str],
-    limit: Optional[int]
+    limit: Optional[int],
+    ui=None
 ) -> None:
     """Print tasks using Rich.Table for structured output."""
 
     if not matches:
-        console = Console()
+        console = ui.console if ui else Console()
         console.print("[yellow]No tasks found matching the specified filters.[/yellow]")
         return
 
     # Create Rich console
-    console = Console()
+    console = ui.console if ui else Console()
 
     # Build title with filter info
     title_parts = ["📋 Tasks"]
