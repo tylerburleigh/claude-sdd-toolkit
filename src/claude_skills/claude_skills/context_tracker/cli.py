@@ -255,7 +255,7 @@ def format_metrics_human(metrics, max_context: int = 160000, transcript_path: st
     return "\n".join(output)
 
 
-def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str = None):
+def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str = None, compact: bool = False):
     """
     Format and output token metrics as JSON.
 
@@ -263,6 +263,7 @@ def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str
         metrics: TokenMetrics object
         max_context: Maximum context window size
         transcript_path: Optional path to transcript file (for metadata)
+        compact: Whether to use compact JSON formatting (default: False)
     """
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
 
@@ -279,7 +280,7 @@ def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str
     if transcript_path:
         result["transcript_path"] = transcript_path
 
-    output_json(result, compact=False)
+    output_json(result, compact=compact)
 
 
 def cmd_session_marker(args, printer):
@@ -379,7 +380,7 @@ def cmd_context(args, printer):
         # Check if verbose mode is requested (inherited from global --verbose flag)
         if args.verbose:
             # Full output with all fields
-            format_metrics_json(metrics, args.max_context, transcript_path)
+            format_metrics_json(metrics, args.max_context, transcript_path, compact=args.compact)
         else:
             # Simplified output: just percentage as whole number
             context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
