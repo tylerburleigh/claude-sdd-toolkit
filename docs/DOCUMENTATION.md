@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:55:18
+**Generated:** 2025-11-08 18:55:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89641
+- **Total Lines:** 89645
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -8774,10 +8774,10 @@ Returns:
 
 ---
 
-### `_print_tasks_table(matches, total_count, limited, status_filter, type_filter, parent_filter, limit) -> None`
+### `_print_tasks_table(matches, total_count, limited, status_filter, type_filter, parent_filter, limit, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:102`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:105`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -8791,6 +8791,7 @@ Returns:
 - `type_filter`: Optional[str]
 - `parent_filter`: Optional[str]
 - `limit`: Optional[int]
+- `ui`: None
 
 ---
 
@@ -16586,7 +16587,7 @@ Args:
 
 ---
 
-### `format_tasks_table(spec_id, specs_dir, status, task_type, parent, printer, limit) -> Optional[List[Dict]]`
+### `format_tasks_table(spec_id, specs_dir, status, task_type, parent, printer, limit, ui) -> Optional[List[Dict]]`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:17`
@@ -16603,6 +16604,7 @@ Args:
     parent: Filter by parent node ID
     printer: Optional printer for output
     limit: Maximum number of results to return (default 20, use 0 for unlimited)
+    ui: UI instance for console output (optional)
 
 Returns:
     List of matching task dictionaries, or None on error
@@ -16615,6 +16617,7 @@ Returns:
 - `parent`: Optional[str]
 - `printer`: Optional[PrettyPrinter]
 - `limit`: Optional[int]
+- `ui`: None
 
 ---
 

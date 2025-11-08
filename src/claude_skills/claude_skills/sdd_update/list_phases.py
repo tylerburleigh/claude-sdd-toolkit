@@ -49,7 +49,8 @@ def _create_progress_bar(percentage: int, width: int = 10) -> str:
 def format_phases_table(
     spec_id: str,
     specs_dir: Path,
-    printer: Optional[PrettyPrinter] = None
+    printer: Optional[PrettyPrinter] = None,
+    ui=None
 ) -> Optional[List[Dict]]:
     """
     List all phases using Rich.Table format.
@@ -58,6 +59,7 @@ def format_phases_table(
         spec_id: Specification ID
         specs_dir: Path to specs directory
         printer: Optional printer for output
+        ui: UI instance for console output (optional)
 
     Returns:
         List of phase dictionaries, or None on error
@@ -72,7 +74,7 @@ def format_phases_table(
 
     if not phases:
         if printer:
-            console = Console()
+            console = ui.console if ui else Console()
             console.print("[yellow]No phases found in spec.[/yellow]")
         return []
 
@@ -90,21 +92,21 @@ def format_phases_table(
 
     # Display using Rich.Table
     if printer:
-        _print_phases_table(phases)
+        _print_phases_table(phases, ui)
 
     return phases
 
 
-def _print_phases_table(phases: List[Dict[str, Any]]) -> None:
+def _print_phases_table(phases: List[Dict[str, Any]], ui=None) -> None:
     """Print phases using Rich.Table for structured output."""
 
     if not phases:
-        console = Console()
+        console = ui.console if ui else Console()
         console.print("[yellow]No phases to display.[/yellow]")
         return
 
     # Create Rich console
-    console = Console()
+    console = ui.console if ui else Console()
 
     # Create Rich.Table with specified columns
     table = Table(
