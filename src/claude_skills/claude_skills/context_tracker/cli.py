@@ -28,6 +28,7 @@ from pathlib import Path
 
 from claude_skills.context_tracker.parser import parse_transcript
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.json_output import output_json
 
 
 def generate_session_marker() -> str:
@@ -256,7 +257,7 @@ def format_metrics_human(metrics, max_context: int = 160000, transcript_path: st
 
 def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str = None):
     """
-    Format token metrics as JSON.
+    Format and output token metrics as JSON.
 
     Args:
         metrics: TokenMetrics object
@@ -278,7 +279,7 @@ def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str
     if transcript_path:
         result["transcript_path"] = transcript_path
 
-    return json.dumps(result, indent=2)
+    output_json(result, compact=False)
 
 
 def cmd_session_marker(args, printer):
@@ -378,12 +379,12 @@ def cmd_context(args, printer):
         # Check if verbose mode is requested (inherited from global --verbose flag)
         if args.verbose:
             # Full output with all fields
-            print(format_metrics_json(metrics, args.max_context, transcript_path))
+            format_metrics_json(metrics, args.max_context, transcript_path)
         else:
             # Simplified output: just percentage as whole number
             context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
             simplified = {"context_percentage_used": round(context_pct)}
-            print(json.dumps(simplified))
+            output_json(simplified, compact=True)
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
@@ -525,7 +526,7 @@ when running multiple concurrent Claude Code sessions.
         # Note: main() doesn't have --verbose flag, so always use simplified output
         context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
         simplified = {"context_percentage_used": round(context_pct)}
-        print(json.dumps(simplified))
+        output_json(simplified, compact=True)
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
