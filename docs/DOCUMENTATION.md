@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 08:02:59
+**Generated:** 2025-11-08 08:05:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89602
+- **Total Lines:** 89637
 - **Total Classes:** 356
-- **Total Functions:** 907
-- **Avg Complexity:** 5.87
+- **Total Functions:** 908
+- **Avg Complexity:** 5.86
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -20378,6 +20378,46 @@ Example:
 ### `output_json(data, compact) -> None`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:179`
+**Complexity:** 1
+
+**Description:**
+> Output JSON data with formatting based on compact flag.
+
+This is the standard output function used across SDD toolkit commands.
+Provides a simple, consistent interface for JSON output.
+
+Args:
+    data: Data to serialize to JSON (must be JSON-serializable)
+    compact: If True, output compact JSON; if False, pretty-print with indent (default: False)
+
+Returns:
+    None (prints to stdout)
+
+Examples:
+    >>> output_json({"status": "success", "count": 42})
+    {
+      "status": "success",
+      "count": 42
+    }
+
+    >>> output_json({"status": "success"}, compact=True)
+    {"status":"success"}
+
+Notes:
+    - This function name matches the pattern used in sdd_update/cli.py
+    - Internally delegates to format_json_output() for consistent formatting
+    - Output goes to stdout for easy piping and redirection
+
+**Parameters:**
+- `data`: Any
+- `compact`: bool
+
+---
+
+### `output_json(data, compact) -> None`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:56`
 **Complexity:** 2
 
@@ -20753,7 +20793,7 @@ Returns:
 ### `print_json_output(data, compact, sort_keys) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:179`
+**Defined in:** `src/claude_skills/claude_skills/common/json_output.py:212`
 **Complexity:** 1
 
 **Description:**
@@ -25957,6 +25997,7 @@ Returns:
 - `json_output.CommandType`
 - `json_output.format_compact_output`
 - `json_output.format_json_output`
+- `json_output.output_json`
 - `json_output.print_json_output`
 - `metrics.capture_metrics`
 - `metrics.get_metrics_file_path`

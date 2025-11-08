@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T13:02:59.936072Z",
+    "generated_at": "2025-11-08T13:05:57.576450Z",
     "languages": [
       "python"
     ],
@@ -10,10 +10,10 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89602,
+    "total_lines": 89637,
     "total_classes": 356,
-    "total_functions": 907,
-    "avg_complexity": 5.87,
+    "total_functions": 908,
+    "avg_complexity": 5.86,
     "max_complexity": 45,
     "high_complexity_functions": [
       "complete_task_workflow (45)",
@@ -25,10 +25,10 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89602,
+        "lines": 89637,
         "classes": 356,
-        "functions": 907,
-        "avg_complexity": 5.87
+        "functions": 908,
+        "avg_complexity": 5.86
       }
     }
   },
@@ -850,6 +850,7 @@
         "contracts.extract_check_deps_contract",
         "contracts.extract_progress_contract",
         "contracts.extract_next_task_contract",
+        "json_output.output_json",
         "json_output.format_json_output",
         "json_output.format_compact_output",
         "json_output.print_json_output",
@@ -862,7 +863,7 @@
         "sdd_config.get_sdd_setting"
       ],
       "exports": [],
-      "lines": 331
+      "lines": 333
     },
     {
       "name": "ai_config",
@@ -1316,12 +1317,13 @@
       "functions": [
         "format_json_output",
         "format_compact_output",
+        "output_json",
         "print_json_output"
       ],
       "imports": [
         "json",
-        "typing.Dict",
         "typing.Any",
+        "typing.Dict",
         "typing.Optional",
         "typing.Literal",
         "logging",
@@ -1332,7 +1334,7 @@
         "claude_skills.common.contracts.extract_next_task_contract"
       ],
       "exports": [],
-      "lines": 227
+      "lines": 260
     },
     {
       "name": "metrics",
@@ -33442,9 +33444,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -33522,7 +33530,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "_strip_ansi_recursive",
@@ -41687,9 +41695,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -41761,7 +41775,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "format_compact_output",
@@ -41816,9 +41830,189 @@
       ]
     },
     {
-      "name": "print_json_output",
+      "name": "output_json",
       "file": "src/claude_skills/claude_skills/common/json_output.py",
       "line": 179,
+      "language": "python",
+      "docstring": "Output JSON data with formatting based on compact flag.\n\nThis is the standard output function used across SDD toolkit commands.\nProvides a simple, consistent interface for JSON output.\n\nArgs:\n    data: Data to serialize to JSON (must be JSON-serializable)\n    compact: If True, output compact JSON; if False, pretty-print with indent (default: False)\n\nReturns:\n    None (prints to stdout)\n\nExamples:\n    >>> output_json({\"status\": \"success\", \"count\": 42})\n    {\n      \"status\": \"success\",\n      \"count\": 42\n    }\n\n    >>> output_json({\"status\": \"success\"}, compact=True)\n    {\"status\":\"success\"}\n\nNotes:\n    - This function name matches the pattern used in sdd_update/cli.py\n    - Internally delegates to format_json_output() for consistent formatting\n    - Output goes to stdout for easy piping and redirection",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Any",
+          "default": null
+        },
+        {
+          "name": "compact",
+          "type": "bool",
+          "default": null
+        }
+      ],
+      "return_type": "None",
+      "complexity": 1,
+      "decorators": [],
+      "is_async": false,
+      "is_exported": false,
+      "is_public": true,
+      "callers": [
+        {
+          "name": "cmd_add_assumption",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 329,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_list_assumptions",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 365,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_list_assumptions",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 382,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_update_estimate",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 443,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_add_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 496,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_remove_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 544,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_time_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 715,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_time_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 718,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_status_report",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 743,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_audit_spec",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 765,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_query_tasks",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 815,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_get_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 839,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_get_journal",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 868,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_list_phases",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 894,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_check_complete",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 925,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_phase_time",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 948,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_list_blockers",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 970,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_reconcile_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 985,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_reconcile_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 999,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_reconcile_state",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 1004,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_check_journaling",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 1031,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_create_task_commit",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 1147,
+          "call_type": "function_call"
+        },
+        {
+          "name": "cmd_complete_task",
+          "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
+          "line": 1179,
+          "call_type": "function_call"
+        }
+      ],
+      "calls": [
+        {
+          "name": "format_json_output",
+          "file": "unknown",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
+          "name": "print",
+          "file": "unknown",
+          "line": 209,
+          "call_type": "function_call"
+        }
+      ],
+      "call_count": 23
+    },
+    {
+      "name": "print_json_output",
+      "file": "src/claude_skills/claude_skills/common/json_output.py",
+      "line": 212,
       "language": "python",
       "docstring": "Format and print JSON output to stdout.\n\nConvenience wrapper around format_json_output() that prints the result\nto stdout. Simplifies CLI command implementations by combining formatting\nand output in a single function call.\n\nArgs:\n    data: Dictionary data to format as JSON\n    compact: If True, output minified JSON. If False (default), pretty-print.\n    sort_keys: If True, sort dictionary keys in output. Default False.\n\nReturns:\n    None (prints to stdout)\n\nExamples:\n    >>> data = {\"task_id\": \"task-1-1\", \"status\": \"pending\"}\n\n    >>> # Pretty-print to stdout\n    >>> print_json_output(data)\n    {\n      \"task_id\": \"task-1-1\",\n      \"status\": \"pending\"\n    }\n\n    >>> # Compact output to stdout\n    >>> print_json_output(data, compact=True)\n    {\"task_id\":\"task-1-1\",\"status\":\"pending\"}\n\nUsage in CLI commands:\n    Instead of:\n        output = format_json_output(data, compact=args.compact)\n        print(output)\n\n    Use:\n        print_json_output(data, compact=args.compact)\n\nNotes:\n    - Output goes to stdout for easy piping and redirection\n    - No trailing newline is added (print() adds it automatically)\n    - For error messages, use stderr instead (logger.error, print to sys.stderr)",
       "parameters": [
@@ -41892,13 +42086,13 @@
         {
           "name": "format_json_output",
           "file": "unknown",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 227,
+          "line": 260,
           "call_type": "function_call"
         }
       ],
@@ -63903,9 +64097,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -63971,7 +64171,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "find_refactor_candidates",
@@ -65289,9 +65489,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -65357,7 +65563,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "trace_data_lifecycle",
@@ -66700,9 +66906,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -66768,7 +66980,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "trace_execution_flow",
@@ -67613,9 +67825,15 @@
           "call_type": "function_call"
         },
         {
+          "name": "output_json",
+          "file": "src/claude_skills/claude_skills/common/json_output.py",
+          "line": 208,
+          "call_type": "function_call"
+        },
+        {
           "name": "print_json_output",
           "file": "src/claude_skills/claude_skills/common/json_output.py",
-          "line": 226,
+          "line": 259,
           "call_type": "function_call"
         },
         {
@@ -67681,7 +67899,7 @@
           "call_type": "method_call"
         }
       ],
-      "call_count": 11
+      "call_count": 12
     },
     {
       "name": "_dump_json",
@@ -134860,6 +135078,7 @@
       "contracts.extract_check_deps_contract",
       "contracts.extract_progress_contract",
       "contracts.extract_next_task_contract",
+      "json_output.output_json",
       "json_output.format_json_output",
       "json_output.format_compact_output",
       "json_output.print_json_output",
@@ -135032,8 +135251,8 @@
     ],
     "src/claude_skills/claude_skills/common/json_output.py": [
       "json",
-      "typing.Dict",
       "typing.Any",
+      "typing.Dict",
       "typing.Optional",
       "typing.Literal",
       "logging",
