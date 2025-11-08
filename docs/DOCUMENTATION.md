@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 16:29:03
+**Generated:** 2025-11-08 16:43:15
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89631
+- **Total Lines:** 89645
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -9309,7 +9309,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:83`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 19 (High)
 
 **Description:**
 > Validate and sanitize SDD configuration values.
@@ -17879,7 +17879,7 @@ Returns:
 ### `get_default_format(project_path) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:268`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:282`
 **Complexity:** 1
 
 **Description:**
@@ -17892,7 +17892,7 @@ Args:
     project_path: Path to project root (optional)
 
 Returns:
-    Default format string: "text", "json", or "markdown"
+    Default format string: "rich", "plain", or "json"
 
 Example:
     default_format = get_default_format()
@@ -18099,7 +18099,7 @@ Returns:
 ### `get_json_compact(project_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:287`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:301`
 **Complexity:** 1
 
 **Description:**
@@ -18536,7 +18536,7 @@ Notes:
 ### `get_sdd_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:228`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:242`
 **Complexity:** 8
 
 **Description:**
@@ -20000,7 +20000,7 @@ Returns:
 ### `load_sdd_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:177`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:191`
 **Complexity:** 6
 
 **Description:**

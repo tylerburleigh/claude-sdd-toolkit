@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T21:29:03.602480Z",
+    "generated_at": "2025-11-08T21:43:15.190675Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89631,
+    "total_lines": 89645,
     "total_classes": 356,
     "total_functions": 907,
     "avg_complexity": 5.87,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89631,
+        "lines": 89645,
         "classes": 356,
         "functions": 907,
         "avg_complexity": 5.87
@@ -1589,7 +1589,7 @@
         "typing.Any"
       ],
       "exports": [],
-      "lines": 300
+      "lines": 314
     },
     {
       "name": "spec",
@@ -31369,7 +31369,7 @@
         {
           "name": "load_sdd_config",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 192,
+          "line": 206,
           "call_type": "function_call"
         }
       ],
@@ -34667,7 +34667,7 @@
         {
           "name": "load_sdd_config",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 192,
+          "line": 206,
           "call_type": "function_call"
         }
       ],
@@ -37131,7 +37131,7 @@
         {
           "name": "load_sdd_config",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 192,
+          "line": 206,
           "call_type": "function_call"
         }
       ],
@@ -47283,7 +47283,7 @@
         {
           "name": "load_sdd_config",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 192,
+          "line": 206,
           "call_type": "function_call"
         }
       ],
@@ -47359,7 +47359,7 @@
         }
       ],
       "return_type": "Dict[str, Any]",
-      "complexity": 15,
+      "complexity": 19,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -47368,7 +47368,7 @@
         {
           "name": "load_sdd_config",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 209,
+          "line": 223,
           "call_type": "function_call"
         }
       ],
@@ -47388,73 +47388,91 @@
         {
           "name": "debug",
           "file": "unknown",
-          "line": 114,
+          "line": 116,
+          "call_type": "method_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 119,
+          "call_type": "method_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 130,
+          "call_type": "method_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 133,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 122,
+          "line": 136,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 125,
+          "line": 139,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 134,
+          "line": 148,
           "call_type": "function_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 137,
+          "line": 151,
           "call_type": "method_call"
         },
         {
           "name": "type",
           "file": "unknown",
-          "line": 138,
+          "line": 152,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 145,
+          "line": 159,
           "call_type": "function_call"
         },
         {
           "name": "debug",
           "file": "unknown",
-          "line": 147,
+          "line": 161,
           "call_type": "method_call"
         },
         {
           "name": "set",
           "file": "unknown",
-          "line": 168,
+          "line": 182,
           "call_type": "function_call"
         },
         {
           "name": "keys",
           "file": "unknown",
-          "line": 168,
+          "line": 182,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 170,
+          "line": 184,
           "call_type": "method_call"
         },
         {
           "name": "join",
           "file": "unknown",
-          "line": 171,
+          "line": 185,
           "call_type": "method_call"
         }
       ],
@@ -47463,7 +47481,7 @@
     {
       "name": "load_sdd_config",
       "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-      "line": 177,
+      "line": 191,
       "language": "python",
       "docstring": "Load SDD configuration from file with fallback to defaults.\n\nAttempts to load configuration from:\n1. Project-local config ({project_path}/.claude/sdd_config.json)\n2. Global config (~/.claude/sdd_config.json)\n3. Built-in defaults (DEFAULT_SDD_CONFIG)\n\nArgs:\n    project_path: Path to project root (optional). If not provided,\n                 will attempt to find project root.\n\nReturns:\n    Dict with complete SDD configuration (validated and merged with defaults)",
       "parameters": [
@@ -47501,7 +47519,7 @@
         {
           "name": "get_sdd_setting",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 244,
+          "line": 258,
           "call_type": "function_call"
         }
       ],
@@ -47509,55 +47527,7 @@
         {
           "name": "get_config_path",
           "file": "unknown",
-          "line": 192,
-          "call_type": "function_call"
-        },
-        {
-          "name": "debug",
-          "file": "unknown",
-          "line": 196,
-          "call_type": "method_call"
-        },
-        {
-          "name": "copy",
-          "file": "unknown",
-          "line": 197,
-          "call_type": "method_call"
-        },
-        {
-          "name": "open",
-          "file": "unknown",
-          "line": 200,
-          "call_type": "function_call"
-        },
-        {
-          "name": "load",
-          "file": "unknown",
-          "line": 201,
-          "call_type": "method_call"
-        },
-        {
-          "name": "isinstance",
-          "file": "unknown",
-          "line": 203,
-          "call_type": "function_call"
-        },
-        {
-          "name": "warning",
-          "file": "unknown",
-          "line": 205,
-          "call_type": "method_call"
-        },
-        {
-          "name": "copy",
-          "file": "unknown",
           "line": 206,
-          "call_type": "method_call"
-        },
-        {
-          "name": "_validate_sdd_config",
-          "file": "unknown",
-          "line": 209,
           "call_type": "function_call"
         },
         {
@@ -47567,27 +47537,75 @@
           "call_type": "method_call"
         },
         {
-          "name": "warning",
+          "name": "copy",
+          "file": "unknown",
+          "line": 211,
+          "call_type": "method_call"
+        },
+        {
+          "name": "open",
+          "file": "unknown",
+          "line": 214,
+          "call_type": "function_call"
+        },
+        {
+          "name": "load",
           "file": "unknown",
           "line": 215,
           "call_type": "method_call"
         },
         {
+          "name": "isinstance",
+          "file": "unknown",
+          "line": 217,
+          "call_type": "function_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 219,
+          "call_type": "method_call"
+        },
+        {
           "name": "copy",
           "file": "unknown",
-          "line": 218,
+          "line": 220,
+          "call_type": "method_call"
+        },
+        {
+          "name": "_validate_sdd_config",
+          "file": "unknown",
+          "line": 223,
+          "call_type": "function_call"
+        },
+        {
+          "name": "debug",
+          "file": "unknown",
+          "line": 224,
           "call_type": "method_call"
         },
         {
           "name": "warning",
           "file": "unknown",
-          "line": 222,
+          "line": 229,
           "call_type": "method_call"
         },
         {
           "name": "copy",
           "file": "unknown",
-          "line": 225,
+          "line": 232,
+          "call_type": "method_call"
+        },
+        {
+          "name": "warning",
+          "file": "unknown",
+          "line": 236,
+          "call_type": "method_call"
+        },
+        {
+          "name": "copy",
+          "file": "unknown",
+          "line": 239,
           "call_type": "method_call"
         }
       ],
@@ -47596,7 +47614,7 @@
     {
       "name": "get_sdd_setting",
       "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-      "line": 228,
+      "line": 242,
       "language": "python",
       "docstring": "Get a specific SDD configuration setting with validation.\n\nArgs:\n    key: Configuration key to retrieve (supports nested keys with dots, e.g., 'output.json')\n    project_path: Path to project root (optional)\n    default: Default value to return if key not found (optional).\n            If not provided, uses DEFAULT_SDD_CONFIG default.\n\nReturns:\n    Configuration value for the specified key",
       "parameters": [
@@ -47626,13 +47644,13 @@
         {
           "name": "get_default_format",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 284,
+          "line": 298,
           "call_type": "function_call"
         },
         {
           "name": "get_json_compact",
           "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-          "line": 300,
+          "line": 314,
           "call_type": "function_call"
         }
       ],
@@ -47640,25 +47658,25 @@
         {
           "name": "load_sdd_config",
           "file": "unknown",
-          "line": 244,
+          "line": 258,
           "call_type": "function_call"
         },
         {
           "name": "split",
           "file": "unknown",
-          "line": 247,
+          "line": 261,
           "call_type": "method_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 250,
+          "line": 264,
           "call_type": "function_call"
         },
         {
           "name": "isinstance",
           "file": "unknown",
-          "line": 259,
+          "line": 273,
           "call_type": "function_call"
         }
       ],
@@ -47667,9 +47685,9 @@
     {
       "name": "get_default_format",
       "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-      "line": 268,
+      "line": 282,
       "language": "python",
-      "docstring": "Get the default output format from configuration.\n\nUses the unified default_mode setting. For backward compatibility,\nalso checks the deprecated default_format setting.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Default format string: \"text\", \"json\", or \"markdown\"\n\nExample:\n    default_format = get_default_format()\n    parser.add_argument('--format', default=default_format, ...)",
+      "docstring": "Get the default output format from configuration.\n\nUses the unified default_mode setting. For backward compatibility,\nalso checks the deprecated default_format setting.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Default format string: \"rich\", \"plain\", or \"json\"\n\nExample:\n    default_format = get_default_format()\n    parser.add_argument('--format', default=default_format, ...)",
       "parameters": [
         {
           "name": "project_path",
@@ -47737,7 +47755,7 @@
         {
           "name": "get_sdd_setting",
           "file": "unknown",
-          "line": 284,
+          "line": 298,
           "call_type": "function_call"
         }
       ],
@@ -47746,7 +47764,7 @@
     {
       "name": "get_json_compact",
       "file": "src/claude_skills/claude_skills/common/sdd_config.py",
-      "line": 287,
+      "line": 301,
       "language": "python",
       "docstring": "Get the JSON compact formatting preference from configuration.\n\nArgs:\n    project_path: Path to project root (optional)\n\nReturns:\n    Boolean indicating whether to use compact JSON formatting\n\nExample:\n    compact = get_json_compact()\n    json.dumps(data, indent=None if compact else 2)",
       "parameters": [
@@ -47767,7 +47785,7 @@
         {
           "name": "get_sdd_setting",
           "file": "unknown",
-          "line": 300,
+          "line": 314,
           "call_type": "function_call"
         }
       ]
