@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Default SDD configuration (fallback if config file not found)
 DEFAULT_SDD_CONFIG = {
     "output": {
-        "default_mode": "text",  # Unified output format: "text" (TUI), "json", or "markdown"
+        "default_mode": "rich",  # Unified output format: "rich" (formatted), "plain" (simple text), or "json"
         "json_compact": True,  # Use compact JSON formatting (only affects JSON output)
 
         # Deprecated (kept for backward compatibility - will be removed in future version)
@@ -109,24 +109,38 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
                 validated["output"]["default_mode"] = "json"
                 logger.debug("Migrated config: output.json=true -> output.default_mode='json'")
             elif "default_format" in output and output["default_format"] in ["text", "json", "markdown"]:
-                # Use old default_format value
-                validated["output"]["default_mode"] = output["default_format"]
-                logger.debug(f"Migrated config: output.default_format='{output['default_format']}' -> output.default_mode='{output['default_format']}'")
+                # Use old default_format value, migrating old mode names
+                old_format = output["default_format"]
+                if old_format == "text" or old_format == "markdown":
+                    validated["output"]["default_mode"] = "rich"
+                    logger.debug(f"Migrated config: output.default_format='{old_format}' -> output.default_mode='rich'")
+                else:  # json
+                    validated["output"]["default_mode"] = old_format
+                    logger.debug(f"Migrated config: output.default_format='{old_format}' -> output.default_mode='{old_format}'")
             else:
                 # Neither setting found or valid, use default
-                validated["output"]["default_mode"] = "text"
+                validated["output"]["default_mode"] = "rich"
         else:
             # New config with default_mode
             value = output["default_mode"]
-            allowed_modes = ["text", "json", "markdown"]
+
+            # Migrate old mode names to new ones
+            if value == "text":
+                value = "rich"
+                logger.debug("Migrated config: output.default_mode='text' -> 'rich'")
+            elif value == "markdown":
+                value = "rich"
+                logger.debug("Migrated config: output.default_mode='markdown' -> 'rich'")
+
+            allowed_modes = ["rich", "plain", "json"]
             if isinstance(value, str) and value in allowed_modes:
                 validated["output"]["default_mode"] = value
             else:
                 logger.warning(
                     f"Invalid value for sdd config 'output.default_mode': expected one of {allowed_modes}, "
-                    f"got {value!r}. Using default: 'text'"
+                    f"got {value!r}. Using default: 'rich'"
                 )
-                validated["output"]["default_mode"] = "text"
+                validated["output"]["default_mode"] = "rich"
 
         # Validate json_compact field (new name for compact)
         if "json_compact" in output:
@@ -157,7 +171,7 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
 
     else:
         # No output section - use all defaults
-        validated["output"]["default_mode"] = "text"
+        validated["output"]["default_mode"] = "rich"
         validated["output"]["json_compact"] = True
         validated["output"]["json"] = None
         validated["output"]["compact"] = None
@@ -275,13 +289,13 @@ def get_default_format(project_path: Optional[Path] = None) -> str:
         project_path: Path to project root (optional)
 
     Returns:
-        Default format string: "text", "json", or "markdown"
+        Default format string: "rich", "plain", or "json"
 
     Example:
         default_format = get_default_format()
         parser.add_argument('--format', default=default_format, ...)
     """
-    return get_sdd_setting("output.default_mode", project_path, default="text")
+    return get_sdd_setting("output.default_mode", project_path, default="rich")
 
 
 def get_json_compact(project_path: Optional[Path] = None) -> bool:

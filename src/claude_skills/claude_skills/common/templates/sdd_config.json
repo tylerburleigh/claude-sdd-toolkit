@@ -1,6 +1,6 @@
 {
   "output": {
-    "default_mode": "text",
+    "default_mode": "rich",
     "json_compact": true
   }
 }
