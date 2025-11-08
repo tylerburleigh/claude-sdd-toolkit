@@ -1,7 +1,7 @@
 {
   "spec_id": "json-output-standardization-2025-11-08-001",
   "generated": "2025-11-08T00:00:00Z",
-  "last_updated": "2025-11-08T13:20:03.186393Z",
+  "last_updated": "2025-11-08T13:20:20.747121Z",
   "metadata": {
     "title": "JSON Output Format Standardization",
     "description": "Standardize compact/pretty JSON formatting across all SDD toolkit CLI commands",
@@ -17,7 +17,7 @@
       "Update user and developer documentation"
     ],
     "activated_date": "2025-11-08T13:01:59.714647Z",
-    "progress_percentage": 24,
+    "progress_percentage": 26,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -35,7 +35,7 @@
         "phase-6"
       ],
       "total_tasks": 41,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {}
     },
     "phase-1": {
@@ -335,7 +335,7 @@
         "depends": []
       },
       "total_tasks": 12,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Update modules with the most JSON output calls and highest user impact",
         "risk_level": "medium",
@@ -354,7 +354,7 @@
         "task-2-4"
       ],
       "total_tasks": 9,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -393,7 +393,7 @@
     "task-2-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-2-1",
@@ -408,12 +408,15 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
         "task_category": "refactoring",
         "estimated_hours": 2,
-        "description": "Replace 10 json.dumps instances with output_json() calls"
+        "description": "Replace 10 json.dumps instances with output_json() calls",
+        "completed_at": "2025-11-08T13:20:20.734089Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-08T13:20:20.740236Z"
       }
     },
     "task-2-2-1": {
@@ -1668,6 +1671,15 @@
       "content": "Successfully replaced all 11 json.dumps calls with output_json in sdd_next/cli.py. All instances of 'print(json.dumps(X, indent=2))' have been replaced with 'output_json(X)'. Verified with grep - no json.dumps calls remain in the file. The standardized output_json function provides consistent JSON formatting across all commands.",
       "metadata": {},
       "task_id": "task-2-2-2"
+    },
+    {
+      "timestamp": "2025-11-08T13:20:20.740210Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/sdd_next/cli.py",
+      "author": "claude-code",
+      "content": "Successfully completed all subtasks for sdd_next/cli.py. Added output_json import and replaced all 11 json.dumps calls with standardized output_json function. File now uses consistent JSON formatting via the common json_output module. All changes verified with grep.",
+      "metadata": {},
+      "task_id": "task-2-2"
     }
   ]
 }
