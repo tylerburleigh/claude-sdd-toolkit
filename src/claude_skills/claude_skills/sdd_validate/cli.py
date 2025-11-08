@@ -26,6 +26,7 @@ try:
         ensure_reports_directory,
     )
     from claude_skills.common.sdd_config import get_default_format
+    from claude_skills.common.json_output import output_json
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -252,7 +253,7 @@ def cmd_validate(args, printer):
         if args.verbose:
             payload["issues"] = normalized.issues
 
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         if not args.quiet:
             print()
@@ -355,7 +356,7 @@ def cmd_fix(args, printer):
                 "skipped": len(actions),
                 "status": "preview",
             }
-            print(json.dumps(payload, indent=2))
+            output_json(payload)
         else:
             printer.info(f"Found {len(actions)} auto-fixable issue(s):")
             print()
@@ -409,7 +410,7 @@ def cmd_fix(args, printer):
         }
         if migration_actions:
             payload["migrated_tasks"] = [a.id.replace("file_path.remove_placeholder:", "") for a in migration_actions]
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         if report.applied_actions:
             printer.success(f"Applied {len(report.applied_actions)} fix(es)")
@@ -558,7 +559,7 @@ def cmd_check_deps(args, printer):
             "bottlenecks": analysis.bottlenecks,
             "status": analysis.status,
         }
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         printer.success("Dependency Analysis:")
         if analysis.cycles:

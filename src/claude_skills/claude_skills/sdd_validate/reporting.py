@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from claude_skills.common import JsonSpecValidationResult
+from claude_skills.common.json_output import format_json_output
 from claude_skills.sdd_validate.formatting import NormalizedValidationResult, normalize_validation_result
 
 
@@ -51,7 +52,7 @@ def generate_report(
             "stats": stats or {},
             "dependencies": deps,
         }
-        return json.dumps(payload, indent=2)
+        return format_json_output(payload)
 
     lines = [
         "# Validation Report",

@@ -14,6 +14,8 @@ from rich.syntax import Syntax
 from rich.text import Text
 from rich.table import Table
 
+from claude_skills.common.json_output import format_json_output
+
 
 @dataclass
 class FieldChange:
@@ -257,7 +259,7 @@ def format_diff_json(report: DiffReport) -> str:
         "nodes_removed": report.nodes_removed,
     }
 
-    return json.dumps(payload, indent=2)
+    return format_json_output(payload)
 
 
 def _format_value(value: Any) -> str:
@@ -265,7 +267,7 @@ def _format_value(value: Any) -> str:
     if value is None:
         return "null"
     if isinstance(value, (list, dict)):
-        return json.dumps(value)
+        return format_json_output(value, compact=True)
     if isinstance(value, str):
         return value
     return str(value)
@@ -492,7 +494,7 @@ def _create_value_display(
         return text
     elif isinstance(value, (list, dict)):
         # Format complex values with indentation
-        formatted = json.dumps(value, indent=2)
+        formatted = format_json_output(value)
         text.append(formatted, style="cyan")
         return text
     elif isinstance(value, bool):

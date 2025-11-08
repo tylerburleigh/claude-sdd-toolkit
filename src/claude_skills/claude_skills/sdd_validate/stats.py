@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
+from claude_skills.common.json_output import format_json_output
+
 STATUS_FIELDS = {"pending", "in_progress", "completed", "blocked"}
 
 
@@ -105,9 +107,7 @@ def render_statistics(stats: SpecStatistics, *, json_output: bool = False) -> st
     """Render statistics for display."""
 
     if json_output:
-        import json
-
-        return json.dumps(
+        return format_json_output(
             {
                 "spec_id": stats.spec_id,
                 "title": stats.title,
@@ -120,8 +120,7 @@ def render_statistics(stats: SpecStatistics, *, json_output: bool = False) -> st
                 "verification_coverage": stats.verification_coverage,
                 "progress": stats.progress,
                 "file_size_kb": stats.file_size_kb,
-            },
-            indent=2,
+            }
         )
 
     lines = [
