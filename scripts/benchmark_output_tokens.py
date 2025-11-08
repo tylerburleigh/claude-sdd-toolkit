@@ -333,11 +333,11 @@ def main():
     formats = {
         "Text (Rich)": {
             "env_vars": {},
-            "flags": []
+            "flags": ["--no-json"]
         },
         "Text (Plain)": {
             "env_vars": {"FORCE_PLAIN_UI": "1"},
-            "flags": []
+            "flags": ["--no-json"]
         },
         "JSON (Compact)": {
             "env_vars": {},

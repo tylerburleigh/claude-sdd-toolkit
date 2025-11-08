@@ -19,10 +19,10 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 8,503 | 18,786 | 51 | 0.522 | 100.0% |
-| Text (Plain) | 8,503 | 18,786 | 51 | 0.642 | 100.0% |
-| JSON (Compact) | 2,192 | 7,270 | 278 | 0.518 | 387.9% ⚡ |
-| JSON (Pretty) | 2,192 | 7,270 | 278 | 0.367 | 387.9% ⚡ |
+| Text (Rich) | 8,851 | 19,551 | 53 | 0.778 | 100.0% |
+| Text (Plain) | 8,851 | 19,551 | 53 | 0.427 | 100.0% |
+| JSON (Compact) | 1,551 | 6,015 | 1 | 0.363 | 570.7% ⚡ |
+| JSON (Pretty) | 2,288 | 7,600 | 290 | 0.363 | 386.8% ⚡ |
 
 ### Sample Output (Text (Rich))
 
@@ -37,10 +37,10 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 58 | 221 | 4 | 0.341 | 100.0% |
-| Text (Plain) | 58 | 221 | 4 | 0.353 | 100.0% |
-| JSON (Compact) | 70 | 280 | 1 | 0.339 | 82.9% 📈 |
-| JSON (Pretty) | 100 | 321 | 12 | 0.309 | 58.0% 📈 |
+| Text (Rich) | 58 | 221 | 4 | 0.354 | 100.0% |
+| Text (Plain) | 58 | 221 | 4 | 0.368 | 100.0% |
+| JSON (Compact) | 70 | 280 | 1 | 0.336 | 82.9% 📈 |
+| JSON (Pretty) | 100 | 321 | 12 | 0.390 | 58.0% 📈 |
 
 ### Sample Output (Text (Rich))
 
@@ -57,10 +57,10 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 2,242 | 4,123 | 18 | 0.330 | 100.0% |
-| Text (Plain) | 2,242 | 4,123 | 18 | 0.297 | 100.0% |
-| JSON (Compact) | 315 | 1,018 | 50 | 0.291 | 711.7% ⚡ |
-| JSON (Pretty) | 315 | 1,018 | 50 | 0.396 | 711.7% ⚡ |
+| Text (Rich) | 2,242 | 4,123 | 18 | 0.377 | 100.0% |
+| Text (Plain) | 2,242 | 4,123 | 18 | 0.346 | 100.0% |
+| JSON (Compact) | 183 | 765 | 1 | 0.343 | 1225.1% ⚡ |
+| JSON (Pretty) | 315 | 1,018 | 50 | 0.355 | 711.7% ⚡ |
 
 ### Sample Output (Text (Rich))
 
@@ -76,15 +76,15 @@ This report compares token counts across different output formats for high-frequ
 
 ### Token Efficiency Ranking
 
-1. **JSON (Compact)**: 859 tokens (average)
-2. **JSON (Pretty)**: 869 tokens (average)
-3. **Text (Rich)**: 3,601 tokens (average)
-4. **Text (Plain)**: 3,601 tokens (average)
+1. **JSON (Compact)**: 601 tokens (average)
+2. **JSON (Pretty)**: 901 tokens (average)
+3. **Text (Rich)**: 3,717 tokens (average)
+4. **Text (Plain)**: 3,717 tokens (average)
 
 ### Recommendations
 
 **For API/LLM Consumption:**
-- Best format: **JSON (Compact)** (859 tokens avg)
+- Best format: **JSON (Compact)** (601 tokens avg)
 - Most token-efficient for programmatic processing
 
 **For Human Reading:**
