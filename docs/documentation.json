@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T23:56:33.423885Z",
+    "generated_at": "2025-11-08T23:57:03.076204Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89647,
+    "total_lines": 89648,
     "total_classes": 356,
     "total_functions": 907,
     "avg_complexity": 5.87,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89647,
+        "lines": 89648,
         "classes": 356,
         "functions": 907,
         "avg_complexity": 5.87
@@ -4163,7 +4163,7 @@
         "rich.text.Text"
       ],
       "exports": [],
-      "lines": 397
+      "lines": 398
     },
     {
       "name": "time_tracking",
@@ -106289,7 +106289,7 @@
         {
           "name": "print_status_report",
           "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-          "line": 321,
+          "line": 322,
           "call_type": "function_call"
         }
       ],
@@ -106350,7 +106350,7 @@
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
       "line": 304,
       "language": "python",
-      "docstring": "Print a dashboard-style status report to console.\n\nArgs:\n    spec_data: Loaded JSON spec data\n    title: Optional title for the report",
+      "docstring": "Print a dashboard-style status report to console.\n\nArgs:\n    spec_data: Loaded JSON spec data\n    title: Optional title for the report\n    ui: UI instance for console output (optional)",
       "parameters": [
         {
           "name": "spec_data",
@@ -106360,6 +106360,11 @@
         {
           "name": "title",
           "type": "Optional[str]",
+          "default": null
+        },
+        {
+          "name": "ui",
+          "type": null,
           "default": null
         }
       ],
@@ -106374,12 +106379,6 @@
         {
           "name": "print",
           "file": "unknown",
-          "line": 316,
-          "call_type": "method_call"
-        },
-        {
-          "name": "print",
-          "file": "unknown",
           "line": 317,
           "call_type": "method_call"
         },
@@ -106390,21 +106389,27 @@
           "call_type": "method_call"
         },
         {
+          "name": "print",
+          "file": "unknown",
+          "line": 319,
+          "call_type": "method_call"
+        },
+        {
           "name": "create_status_layout",
           "file": "unknown",
-          "line": 321,
+          "line": 322,
           "call_type": "function_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 322,
+          "line": 323,
           "call_type": "method_call"
         },
         {
           "name": "print",
           "file": "unknown",
-          "line": 323,
+          "line": 324,
           "call_type": "method_call"
         }
       ]
@@ -106412,7 +106417,7 @@
     {
       "name": "get_status_summary",
       "file": "src/claude_skills/claude_skills/sdd_update/status_report.py",
-      "line": 326,
+      "line": 327,
       "language": "python",
       "docstring": "Get a dictionary summary of status metrics.\n\nUseful for programmatic access to status data without printing.\n\nArgs:\n    spec_data: Loaded JSON spec data\n\nReturns:\n    Dictionary with status metrics:\n    - total_tasks: Total number of tasks\n    - completed_tasks: Number of completed tasks\n    - in_progress_tasks: Number of in-progress tasks\n    - blocked_tasks: Number of blocked tasks\n    - phases: List of phase summaries\n    - blockers: List of blocked task details",
       "parameters": [
@@ -106433,17 +106438,11 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 344,
+          "line": 345,
           "call_type": "method_call"
         },
         {
           "name": "items",
-          "file": "unknown",
-          "line": 352,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
           "file": "unknown",
           "line": 353,
           "call_type": "method_call"
@@ -106451,31 +106450,31 @@
         {
           "name": "get",
           "file": "unknown",
-          "line": 356,
+          "line": 354,
+          "call_type": "method_call"
+        },
+        {
+          "name": "get",
+          "file": "unknown",
+          "line": 357,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 366,
-          "call_type": "method_call"
-        },
-        {
-          "name": "get",
-          "file": "unknown",
           "line": 367,
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 368,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
-          "line": 370,
+          "line": 369,
           "call_type": "method_call"
         },
         {
@@ -106497,13 +106496,13 @@
           "call_type": "method_call"
         },
         {
-          "name": "items",
+          "name": "get",
           "file": "unknown",
-          "line": 378,
+          "line": 374,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "items",
           "file": "unknown",
           "line": 379,
           "call_type": "method_call"
@@ -106527,15 +106526,15 @@
           "call_type": "method_call"
         },
         {
-          "name": "append",
+          "name": "get",
           "file": "unknown",
           "line": 383,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "append",
           "file": "unknown",
-          "line": 385,
+          "line": 384,
           "call_type": "method_call"
         },
         {
@@ -106551,9 +106550,15 @@
           "call_type": "method_call"
         },
         {
+          "name": "get",
+          "file": "unknown",
+          "line": 388,
+          "call_type": "method_call"
+        },
+        {
           "name": "sorted",
           "file": "unknown",
-          "line": 395,
+          "line": 396,
           "call_type": "function_call"
         }
       ]

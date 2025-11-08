@@ -356,7 +356,7 @@ def _should_use_syntax_highlighting(value: Any, language: Optional[str]) -> bool
 def display_diff_side_by_side(
     report: DiffReport,
     spec_id: str = "unknown",
-    console: Optional[Console] = None
+    ui=None
 ) -> None:
     """
     Display diff report as side-by-side comparison using Rich.Columns and Panel.
@@ -366,10 +366,9 @@ def display_diff_side_by_side(
     Args:
         report: DiffReport with changes to display
         spec_id: Spec identifier for display
-        console: Optional Rich Console instance (creates one if not provided)
+        ui: UI instance for console output (optional)
     """
-    if console is None:
-        console = Console()
+    console = ui.console if ui else Console()
 
     # Header
     console.print()

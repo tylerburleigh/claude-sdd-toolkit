@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:56:33
+**Generated:** 2025-11-08 18:57:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89647
+- **Total Lines:** 89648
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -18767,7 +18767,7 @@ Returns:
 ### `get_status_summary(spec_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:326`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:327`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -20862,7 +20862,7 @@ Args:
 
 ---
 
-### `print_status_report(spec_data, title) -> None`
+### `print_status_report(spec_data, title, ui) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:304`
@@ -20874,10 +20874,12 @@ Args:
 Args:
     spec_data: Loaded JSON spec data
     title: Optional title for the report
+    ui: UI instance for console output (optional)
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `title`: Optional[str]
+- `ui`: None
 
 ---
 
