@@ -201,11 +201,6 @@ The command returns simplified JSON with just the percentage as a whole number:
 {"context_percentage_used": 78}
 ```
 
-To get full metrics output, add `--verbose` flag:
-```bash
-sdd context --session-marker "SESSION_MARKER_<hash>" --json --verbose
-```
-
 **CRITICAL REQUIREMENTS:**
 
 1. ✅ **Run as TWO SEPARATE commands** - Use separate Bash tool calls

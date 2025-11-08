@@ -8,7 +8,7 @@ the runtime environment.
 Key Features:
 - Automatic TTY detection via sys.stdout.isatty()
 - CI/CD environment detection (GITHUB_ACTIONS, CI, etc.)
-- Force backend selection via --plain flag or FORCE_PLAIN_UI env var
+- Force backend selection via --plain flag or config settings
 - Consistent API regardless of backend
 
 Usage:
@@ -93,10 +93,9 @@ def should_use_plain_ui(force_plain: bool = False) -> bool:
 
     Decision logic:
     1. If force_plain=True → Use PlainUi
-    2. If FORCE_PLAIN_UI env var set → Use PlainUi
-    3. If not TTY (piped/redirected) → Use PlainUi
-    4. If CI environment detected → Use PlainUi
-    5. Otherwise → Use RichUi
+    2. If not TTY (piped/redirected) → Use PlainUi
+    3. If CI environment detected → Use PlainUi
+    4. Otherwise → Use RichUi
 
     Args:
         force_plain: Explicitly force PlainUi backend
@@ -118,19 +117,15 @@ def should_use_plain_ui(force_plain: bool = False) -> bool:
     if force_plain:
         return True
 
-    # 2. Environment variable override
-    if os.getenv("FORCE_PLAIN_UI"):
-        return True
-
-    # 3. No TTY available (piped, redirected, file)
+    # 2. No TTY available (piped, redirected, file)
     if not is_tty_available():
         return True
 
-    # 4. Running in CI/CD
+    # 3. Running in CI/CD
     if is_ci_environment():
         return True
 
-    # 5. Default to RichUi for interactive terminals
+    # 4. Default to RichUi for interactive terminals
     return False
 
 
@@ -150,7 +145,6 @@ def create_ui(
     - TTY availability
     - CI environment detection
     - Explicit force flags
-    - Environment variables
 
     Args:
         force_plain: Force PlainUi backend (overrides auto-detection)
@@ -185,10 +179,9 @@ def create_ui(
     Decision Flow:
         1. Check force_rich/force_plain flags
         2. Check user config (output.text_renderer)
-        3. Check FORCE_PLAIN_UI environment variable
-        4. Check TTY availability
-        5. Check CI environment
-        6. Default to RichUi for interactive terminals
+        3. Check TTY availability
+        4. Check CI environment
+        5. Default to RichUi for interactive terminals
     """
     # Validate flags
     if force_plain and force_rich:
@@ -305,14 +298,12 @@ def format_backend_info() -> str:
         Backend Selection Info:
         - TTY Available: Yes
         - CI Environment: No
-        - Force Plain: No
         - Selected Backend: RichUi
     """
     lines = [
         "Backend Selection Info:",
         f"  - TTY Available: {'Yes' if is_tty_available() else 'No'}",
         f"  - CI Environment: {'Yes' if is_ci_environment() else 'No'}",
-        f"  - Force Plain (env): {'Yes' if os.getenv('FORCE_PLAIN_UI') else 'No'}",
         f"  - Selected Backend: {'PlainUi' if should_use_plain_ui() else 'RichUi'}",
     ]
     return "\n".join(lines)
