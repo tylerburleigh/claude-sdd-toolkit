@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 09:59:41
+**Generated:** 2025-11-08 10:03:04
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89628
+- **Total Lines:** 89629
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -11702,7 +11702,7 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:301`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:302`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -12569,7 +12569,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:285`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:286`
 **Complexity:** 1
 
 **Description:**
@@ -16205,7 +16205,7 @@ Args:
 
 ---
 
-### `format_metrics_json(metrics, max_context, transcript_path) -> None`
+### `format_metrics_json(metrics, max_context, transcript_path, compact) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:258`
@@ -16218,11 +16218,13 @@ Args:
     metrics: TokenMetrics object
     max_context: Maximum context window size
     transcript_path: Optional path to transcript file (for metadata)
+    compact: Whether to use compact JSON formatting (default: False)
 
 **Parameters:**
 - `metrics`: None
 - `max_context`: int
 - `transcript_path`: str
+- `compact`: bool
 
 ---
 
@@ -20057,7 +20059,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:452`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:453`
 **Complexity:** 5
 
 **Description:**
@@ -21210,7 +21212,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:410`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:411`
 **Complexity:** 1
 
 **Description:**
@@ -21414,7 +21416,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:392`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:393`
 **Complexity:** 1
 
 **Description:**

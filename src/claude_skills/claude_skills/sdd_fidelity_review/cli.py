@@ -28,6 +28,7 @@ from claude_skills.common.ai_tools import (
 )
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common.sdd_config import get_default_format
+from claude_skills.common.json_output import output_json
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -224,7 +225,7 @@ def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues
     report = FidelityReport(review_results)
     result = report.generate_json()
 
-    print(json.dumps(result, indent=2))
+    output_json(result)
 
 
 def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
@@ -265,7 +266,7 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
                 "available_count": len(available_tools),
                 "total_count": len(all_tools)
             }
-            print(json.dumps(result, indent=2))
+            output_json(result)
         else:  # text format
             print("\n" + "=" * 60)
             print("AI CONSULTATION TOOLS STATUS")
