@@ -153,6 +153,7 @@ from .contracts import (
 
 # JSON output formatting
 from .json_output import (
+    output_json,
     format_json_output,
     format_compact_output,
     print_json_output,
@@ -314,6 +315,7 @@ __all__ = [
     "extract_next_task_contract",
 
     # JSON output formatting
+    "output_json",
     "format_json_output",
     "format_compact_output",
     "print_json_output",

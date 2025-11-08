@@ -20,7 +20,7 @@ Usage:
 """
 
 import json
-from typing import Dict, Any, Optional, Literal
+from typing import Any, Dict, Optional, Literal
 import logging
 
 # Import contract extractors
@@ -174,6 +174,39 @@ def format_compact_output(
 
     # Format as compact JSON
     return format_json_output(contract, compact=True)
+
+
+def output_json(data: Any, compact: bool = False) -> None:
+    """
+    Output JSON data with formatting based on compact flag.
+
+    This is the standard output function used across SDD toolkit commands.
+    Provides a simple, consistent interface for JSON output.
+
+    Args:
+        data: Data to serialize to JSON (must be JSON-serializable)
+        compact: If True, output compact JSON; if False, pretty-print with indent (default: False)
+
+    Returns:
+        None (prints to stdout)
+
+    Examples:
+        >>> output_json({"status": "success", "count": 42})
+        {
+          "status": "success",
+          "count": 42
+        }
+
+        >>> output_json({"status": "success"}, compact=True)
+        {"status":"success"}
+
+    Notes:
+        - This function name matches the pattern used in sdd_update/cli.py
+        - Internally delegates to format_json_output() for consistent formatting
+        - Output goes to stdout for easy piping and redirection
+    """
+    output = format_json_output(data, compact=compact, sort_keys=False)
+    print(output)
 
 
 def print_json_output(
