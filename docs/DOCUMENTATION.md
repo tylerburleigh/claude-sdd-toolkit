@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:57:03
+**Generated:** 2025-11-08 18:57:37
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89648
+- **Total Lines:** 89647
 - **Total Classes:** 356
 - **Total Functions:** 907
 - **Avg Complexity:** 5.87
@@ -7627,7 +7627,7 @@ Returns:
 ### `_create_value_display(field_path, value, change_type, is_before) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:465`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:464`
 **Complexity:** 10
 
 **Description:**
@@ -14205,11 +14205,11 @@ Returns:
 
 ---
 
-### `display_diff_side_by_side(report, spec_id, console) -> None`
+### `display_diff_side_by_side(report, spec_id, ui) -> None`
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_validate/diff.py:356`
-⚠️ **Complexity:** 15 (High)
+⚠️ **Complexity:** 14 (High)
 
 **Description:**
 > Display diff report as side-by-side comparison using Rich.Columns and Panel.
@@ -14219,12 +14219,12 @@ Shows before/after values in parallel columns with color coding for changes.
 Args:
     report: DiffReport with changes to display
     spec_id: Spec identifier for display
-    console: Optional Rich Console instance (creates one if not provided)
+    ui: UI instance for console output (optional)
 
 **Parameters:**
 - `report`: DiffReport
 - `spec_id`: str
-- `console`: Optional[Console]
+- `ui`: None
 
 ---
 

@@ -367,7 +367,7 @@ class FidelityReport:
 
         print()  # Final newline
 
-    def print_console_rich(self, verbose: bool = False) -> None:
+    def print_console_rich(self, verbose: bool = False, ui=None) -> None:
         """
         Print formatted report to console using Rich panels with visual categorization.
 
@@ -376,12 +376,13 @@ class FidelityReport:
 
         Args:
             verbose: Include individual model responses (default: False)
+            ui: UI instance for console output (optional)
 
         Example:
             >>> report = FidelityReport(review_results)
             >>> report.print_console_rich(verbose=False)
         """
-        console = Console()
+        console = ui.console if ui else Console()
 
         # Get consensus data
         consensus_dict = self._convert_to_dict(self.consensus)
