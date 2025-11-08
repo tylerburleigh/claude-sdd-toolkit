@@ -18,6 +18,17 @@ Project-local settings override global settings, and command-line arguments over
 
 ## Configuration Structure
 
+**Current format** (recommended):
+```json
+{
+  "output": {
+    "default_mode": "json",
+    "json_compact": true
+  }
+}
+```
+
+**Legacy format** (still supported):
 ```json
 {
   "output": {
@@ -29,63 +40,93 @@ Project-local settings override global settings, and command-line arguments over
 
 ### Configuration Options
 
-#### `output.json` (boolean, default: `true`)
+#### `output.default_mode` (string, default: `"text"`)
 
-Controls whether commands output JSON format by default.
+Controls the default output format for commands.
 
-- `true`: Commands output JSON format (automation-friendly)
-- `false`: Commands output human-readable format
-
-**Example:**
-```json
-{
-  "output": {
-    "json": true
-  }
-}
-```
-
-#### `output.compact` (boolean, default: `true`)
-
-Controls whether JSON output uses compact formatting (single line) or pretty-printed formatting.
-
-- `true`: Compact JSON (single line, smaller output)
-- `false`: Pretty-printed JSON (multi-line, more readable)
+- `"json"`: Commands output JSON format by default (automation-friendly)
+- `"text"`: Commands output human-readable text format by default
 
 **Example:**
 ```json
 {
   "output": {
-    "compact": false
+    "default_mode": "json"
   }
 }
 ```
+
+**Legacy equivalent:** `output.json` (boolean) - still supported for backward compatibility
+
+#### `output.json_compact` (boolean, default: `true`)
+
+Controls whether JSON output uses compact formatting (single line) or pretty-printed formatting (multi-line with indentation).
+
+- `true`: Compact JSON - single line, no whitespace (optimized for tokens)
+- `false`: Pretty-print JSON - multi-line with 2-space indentation (optimized for readability)
+
+**Example:**
+```json
+{
+  "output": {
+    "json_compact": false
+  }
+}
+```
+
+**Legacy equivalent:** `output.compact` (boolean) - still supported for backward compatibility
 
 ## Precedence Rules
 
 Settings are applied in this order (later sources override earlier):
 
-1. **Built-in defaults** (`json: true`, `compact: true`)
+1. **Built-in defaults** (`default_mode: "text"`, `json_compact: true`)
 2. **Global config** (`~/.claude/sdd_config.json`)
 3. **Project config** (`./.claude/sdd_config.json`)
-4. **CLI arguments** (`--json`, `--compact`, `--no-json`, etc.)
+4. **CLI arguments** (`--json`, `--no-json`, `--compact`, `--no-compact`)
+
+**CLI flags always have highest priority** and override all configuration file settings.
+
+### CLI Flags
+
+**Output format flags:**
+- `--json` - Force JSON output (overrides config)
+- `--no-json` - Force text output (overrides config)
+
+**JSON formatting flags:**
+- `--compact` - Force compact JSON output (overrides config)
+- `--no-compact` - Force pretty-print JSON output (overrides config)
+
+**Example usage:**
+```bash
+# Override config to use pretty-print
+sdd progress spec-id --json --no-compact
+
+# Override config to use compact
+sdd progress spec-id --json --compact
+```
 
 ### Example Precedence Scenarios
 
-**Scenario 1: Project overrides global**
-- Global config: `{"output": {"json": false}}`
-- Project config: `{"output": {"json": true}}`
-- Result: `json: true` (project wins)
+**Scenario 1: Project config overrides global**
+- Global config: `{"output": {"default_mode": "text"}}`
+- Project config: `{"output": {"default_mode": "json"}}`
+- Result: JSON output (project config wins)
 
-**Scenario 2: CLI argument overrides all**
-- Config: `{"output": {"json": true}}`
-- Command: `sdd prepare-task spec-id --no-json`
-- Result: Human-readable output (CLI flag wins)
+**Scenario 2: CLI flag overrides all configs**
+- Config: `{"output": {"json_compact": true}}`
+- Command: `sdd progress spec-id --json --no-compact`
+- Result: Pretty-print JSON (CLI flag wins)
 
-**Scenario 3: Partial configuration**
-- Config: `{"output": {"compact": false}}`
-- Missing setting: `json` not specified
-- Result: `json: true` (from defaults), `compact: false` (from config)
+**Scenario 3: Partial configuration uses defaults**
+- Config: `{"output": {"json_compact": false}}`
+- Missing setting: `default_mode` not specified
+- Result: `default_mode: "text"` (from defaults), `json_compact: false` (from config)
+
+**Scenario 4: Config sets pretty-print, flag overrides to compact**
+- Config: `{"output": {"json_compact": false}}`
+- Command: `sdd progress spec-id --json --compact`
+- Result: Compact JSON (CLI flag overrides config)
 
 ## Creating a Configuration File
 
@@ -127,40 +168,68 @@ EOF
 
 ### Use Case 1: Automation Scripts
 
-For scripts that parse JSON output, ensure JSON is always enabled:
+For scripts that parse JSON output, ensure JSON is always enabled with compact formatting:
 
 ```json
 {
   "output": {
-    "json": true,
-    "compact": true
+    "default_mode": "json",
+    "json_compact": true
   }
 }
 ```
+
+This configuration ensures all commands return compact, single-line JSON by default - perfect for automated parsing and token efficiency.
 
 ### Use Case 2: Human-Readable Defaults
 
-For interactive terminal use with readable output:
+For interactive terminal use with readable text output:
 
 ```json
 {
   "output": {
-    "json": false
+    "default_mode": "text"
   }
 }
 ```
 
-### Use Case 3: Debugging with Pretty JSON
+With this config, commands return human-readable text by default. You can still get JSON when needed with `--json` flag.
 
-For development/debugging with readable JSON:
+### Use Case 3: Debugging with Pretty-Print JSON
+
+For development/debugging with readable, well-formatted JSON:
 
 ```json
 {
   "output": {
-    "json": true,
-    "compact": false
+    "default_mode": "json",
+    "json_compact": false
   }
 }
+```
+
+This outputs multi-line, indented JSON that's easy to read and inspect during debugging sessions.
+
+### Use Case 4: Mixed Workflow (Recommended)
+
+For developers who want JSON by default but with flexibility:
+
+```json
+{
+  "output": {
+    "default_mode": "json",
+    "json_compact": true
+  }
+}
+```
+
+Then use CLI flags when you need different formatting:
+```bash
+# Get pretty-print when debugging
+sdd progress spec-id --no-compact
+
+# Get text output when you need it
+sdd progress spec-id --no-json
 ```
 
 ## Validation and Error Handling

@@ -600,10 +600,22 @@ The SDD CLI supports optional configuration files that control output formatting
 - Global: `~/.claude/sdd_config.json`
 
 **What it configures:**
-- `output.json` - Default to JSON output (true/false)
-- `output.compact` - Use compact JSON formatting (true/false)
+- `output.default_mode` - Default output format (`"json"` or `"text"`)
+- `output.json_compact` - Use compact JSON formatting (`true` or `false`)
 
 **Example configuration:**
+```json
+{
+  "output": {
+    "default_mode": "json",
+    "json_compact": true
+  }
+}
+```
+
+This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
+
+**Legacy format** (still supported for backward compatibility):
 ```json
 {
   "output": {
@@ -612,8 +624,6 @@ The SDD CLI supports optional configuration files that control output formatting
   }
 }
 ```
-
-This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
 
 For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
@@ -773,24 +783,30 @@ sdd skills-dev setup-permissions -- update .   # Set up permissions
 sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
 ```
 
-### Compact JSON Output (`--compact` flag)
+### Compact vs Pretty-Print JSON Output
 
-Many SDD CLI commands support a `--compact` flag that reduces output size for agent workflows. This is particularly useful when Claude Code agents invoke these commands repeatedly, as compact output significantly reduces token consumption.
+SDD CLI commands support both **compact** (single-line) and **pretty-print** (multi-line indented) JSON output formatting. This flexibility allows you to optimize for either token efficiency (compact) or human readability (pretty-print).
 
-**Commands with `--compact` support:**
-- `sdd prepare-task <spec-id> [task-id] --compact`
-- `sdd task-info <spec-id> <task-id> --compact`
-- `sdd check-deps <spec-id> <task-id> --compact`
-- `sdd progress <spec-id> --compact`
-- `sdd next-task <spec-id> --compact`
+**Output Modes:**
+- **Compact**: Single-line JSON with no whitespace or indentation - optimized for token efficiency
+- **Pretty-Print**: Multi-line JSON with 2-space indentation - optimized for human readability
 
-**Example:**
+**Commands with JSON output formatting:**
+- `sdd prepare-task`, `sdd task-info`, `sdd check-deps`, `sdd progress`, `sdd next-task`
+- `sdd list-phases`, `sdd query-tasks`, `sdd check-complete`
+- `sdd cache info`, `sdd list-plan-review-tools`
+- And all other commands that support `--json` output
+
+**CLI Flags:**
 ```bash
-# Normal output (verbose, human-readable)
-sdd prepare-task my-spec-001 task-1-1
+# Compact output (single-line, minified)
+sdd progress my-spec-001 --json --compact
 
-# Compact output (minified, optimized for agents)
-sdd prepare-task my-spec-001 task-1-1 --compact
+# Pretty-print output (multi-line, indented)
+sdd progress my-spec-001 --json --no-compact
+
+# Default behavior (uses config setting, or compact if no config)
+sdd progress my-spec-001 --json
 ```
 
 **Token Savings:**
@@ -807,19 +823,40 @@ Compact output achieves approximately **30% token reduction** across commands (m
 
 *Measured across 3 different spec types (in-progress, pending, completed) with minimal variance (~3.5%), confirming consistency.*
 
-**When to use `--compact`:**
+**When to use each mode:**
+
+**Use Compact (`--compact`) for:**
 - ✅ Agent workflows (sdd-next, sdd-plan, automated tools)
-- ✅ Programmatic parsing of JSON output
+- ✅ Programmatic parsing where whitespace doesn't matter
 - ✅ High-volume command execution (reduces context consumption)
-- ❌ Manual debugging or inspection (use normal output for readability)
+- ✅ CI/CD pipelines and automation scripts
 
-**What gets reduced:**
-- Whitespace removed (JSON minification)
-- Redundant metadata fields omitted
-- Nested structures flattened where possible
-- Field names preserved (full contract compatibility)
+**Use Pretty-Print (`--no-compact`) for:**
+- ✅ Manual debugging and inspection
+- ✅ Development and testing
+- ✅ When you need to visually verify JSON structure
+- ✅ Logging output that humans will read
 
-**Backward compatibility:** The `--compact` flag is opt-in. All commands continue to return verbose, human-readable output by default.
+**Configuration Precedence:**
+
+Output formatting follows this precedence chain (highest to lowest):
+1. **CLI flags** - `--compact` or `--no-compact` (overrides everything)
+2. **Config file** - `.claude/sdd_config.json` settings
+3. **Built-in defaults** - Compact mode
+
+**Example configuration** (`.claude/sdd_config.json`):
+```json
+{
+  "output": {
+    "default_mode": "json",
+    "json_compact": false
+  }
+}
+```
+
+With this config, all commands output pretty-print JSON by default, but you can still override with `--compact` flag when needed.
+
+For complete configuration options, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
 ## Prerequisites
 
