@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-08T23:57:37.819907Z",
+    "generated_at": "2025-11-08T23:58:08.944567Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89647,
+    "total_lines": 89648,
     "total_classes": 356,
     "total_functions": 907,
     "avg_complexity": 5.87,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89647,
+        "lines": 89648,
         "classes": 356,
         "functions": 907,
         "avg_complexity": 5.87
@@ -2531,7 +2531,7 @@
         "rich.table.Table"
       ],
       "exports": [],
-      "lines": 830
+      "lines": 831
     },
     {
       "name": "review",

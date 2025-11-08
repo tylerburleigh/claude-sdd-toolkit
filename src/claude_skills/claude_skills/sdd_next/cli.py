@@ -465,7 +465,7 @@ def _build_dependency_tree(deps: Dict[str, Any], task_id: str) -> Tree:
     return root
 
 
-def cmd_check_deps(args, printer):
+def cmd_check_deps(args, printer, ui=None):
     """Check task dependencies."""
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
@@ -478,7 +478,7 @@ def cmd_check_deps(args, printer):
 
     # If no task_id provided, check all tasks
     if args.task_id is None:
-        return _check_all_task_deps(spec_data, args, printer)
+        return _check_all_task_deps(spec_data, args, printer, ui)
 
     # Single task check (existing behavior)
     if not args.json:
@@ -498,13 +498,13 @@ def cmd_check_deps(args, printer):
 
         # Build and render the dependency tree
         tree = _build_dependency_tree(deps, args.task_id)
-        console = Console()
+        console = ui.console if ui else Console()
         console.print(tree)
 
     return 0
 
 
-def _check_all_task_deps(spec_data, args, printer):
+def _check_all_task_deps(spec_data, args, printer, ui=None):
     """Check dependencies for all tasks in the spec."""
     if not args.json:
         printer.action("Checking dependencies for all tasks...")
@@ -535,7 +535,7 @@ def _check_all_task_deps(spec_data, args, printer):
         print()  # Blank line for spacing
 
         # Use Rich Console for colored output
-        console = Console()
+        console = ui.console if ui else Console()
 
         if ready:
             console.print("\n✅ [bold green]Ready to start:[/bold green]")
