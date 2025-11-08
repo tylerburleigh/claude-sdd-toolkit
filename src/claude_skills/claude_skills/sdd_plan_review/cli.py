@@ -26,6 +26,7 @@ from claude_skills.sdd_plan_review.reporting import (
     generate_markdown_report,
     generate_json_report,
 )
+from claude_skills.common.json_output import output_json
 
 
 def cmd_review(args, printer):
@@ -203,7 +204,7 @@ def cmd_list_tools(args, printer):
             "total": len(tools_to_check),
             "available_count": len(available)
         }
-        print(json.dumps(output, indent=2))
+        output_json(output)
         if len(available) == 0:
             return 1
         else:
