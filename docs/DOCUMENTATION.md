@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 20:10:22
+**Generated:** 2025-11-08 20:13:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 251
-- **Total Lines:** 90302
+- **Total Lines:** 90315
 - **Total Classes:** 358
 - **Total Functions:** 916
-- **Avg Complexity:** 5.89
+- **Avg Complexity:** 5.88
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -7644,21 +7644,23 @@ Returns:
 
 ---
 
-### `_create_progress_bar(percentage, width) -> str`
+### `_create_progress_bar_plain(percentage, width) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:15`
-**Complexity:** 4
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:12`
+**Complexity:** 1
 
 **Description:**
 > Create a visual progress bar using block characters.
+
+Works with both Rich and plain text backends.
 
 Args:
     percentage: Completion percentage (0-100)
     width: Width of the progress bar in characters
 
 Returns:
-    Rich markup string with colored progress bar
+    Progress bar string using block characters (no color codes)
 
 **Parameters:**
 - `percentage`: int
@@ -8806,11 +8808,14 @@ Returns:
 ### `_print_specs_text(specs_info, verbose, printer, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:146`
-⚠️ **Complexity:** 19 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:136`
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
-> Print specs using Rich.Table for structured output.
+> Print specs using unified UI protocol (works with RichUi and PlainUi).
+
+Prepares table data as a list of dictionaries, then renders using
+the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 
 **Parameters:**
 - `specs_info`: List[Dict[str, Any]]
@@ -20000,7 +20005,7 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:46`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:36`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -27699,8 +27704,6 @@ Returns:
 - `claude_skills.common.ui_factory.create_ui`
 - `json`
 - `pathlib.Path`
-- `rich.console.Console`
-- `rich.table.Table`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
