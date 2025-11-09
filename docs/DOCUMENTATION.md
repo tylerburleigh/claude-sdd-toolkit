@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 20:13:57
+**Generated:** 2025-11-08 20:15:15
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 251
-- **Total Lines:** 90315
+- **Total Lines:** 90312
 - **Total Classes:** 358
 - **Total Functions:** 916
 - **Avg Complexity:** 5.88
@@ -12885,7 +12885,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1213`
-⚠️ **Complexity:** 27 (High)
+⚠️ **Complexity:** 25 (High)
 
 **Description:**
 > Update task metadata fields.
@@ -21700,7 +21700,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1293`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1291`
 **Complexity:** 1
 
 **Description:**

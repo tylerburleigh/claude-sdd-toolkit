@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-09T01:13:57.992123Z",
+    "generated_at": "2025-11-09T01:15:15.253989Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 251,
-    "total_lines": 90315,
+    "total_lines": 90312,
     "total_classes": 358,
     "total_functions": 916,
     "avg_complexity": 5.88,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 251,
-        "lines": 90315,
+        "lines": 90312,
         "classes": 358,
         "functions": 916,
         "avg_complexity": 5.88
@@ -3889,7 +3889,7 @@
         "claude_skills.sdd_spec_mod.task_operations.remove_task"
       ],
       "exports": [],
-      "lines": 1617
+      "lines": 1614
     },
     {
       "name": "git_commit",
@@ -48750,7 +48750,7 @@
         {
           "name": "cmd_update_task_metadata",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-          "line": 1249,
+          "line": 1247,
           "call_type": "function_call"
         },
         {
@@ -49941,7 +49941,7 @@
         {
           "name": "cmd_update_task_metadata",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-          "line": 1280,
+          "line": 1278,
           "call_type": "function_call"
         },
         {
@@ -50696,7 +50696,7 @@
         {
           "name": "cmd_update_task_metadata",
           "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-          "line": 1275,
+          "line": 1273,
           "call_type": "function_call"
         },
         {
@@ -99087,7 +99087,7 @@
         }
       ],
       "return_type": null,
-      "complexity": 27,
+      "complexity": 25,
       "decorators": [],
       "is_async": false,
       "is_exported": false,
@@ -99167,135 +99167,129 @@
           "call_type": "function_call"
         },
         {
-          "name": "hasattr",
-          "file": "unknown",
-          "line": 1240,
-          "call_type": "function_call"
-        },
-        {
           "name": "error",
           "file": "unknown",
-          "line": 1245,
+          "line": 1243,
           "call_type": "method_call"
         },
         {
           "name": "load_json_spec",
           "file": "unknown",
-          "line": 1249,
+          "line": 1247,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 1251,
+          "line": 1249,
           "call_type": "method_call"
         },
         {
           "name": "get",
+          "file": "unknown",
+          "line": 1253,
+          "call_type": "method_call"
+        },
+        {
+          "name": "error",
           "file": "unknown",
           "line": 1255,
           "call_type": "method_call"
         },
         {
-          "name": "error",
+          "name": "get",
           "file": "unknown",
-          "line": 1257,
+          "line": 1260,
+          "call_type": "method_call"
+        },
+        {
+          "name": "info",
+          "file": "unknown",
+          "line": 1263,
           "call_type": "method_call"
         },
         {
           "name": "get",
           "file": "unknown",
-          "line": 1262,
+          "line": 1263,
           "call_type": "method_call"
         },
         {
           "name": "info",
+          "file": "unknown",
+          "line": 1264,
+          "call_type": "method_call"
+        },
+        {
+          "name": "items",
           "file": "unknown",
           "line": 1265,
           "call_type": "method_call"
         },
         {
           "name": "get",
-          "file": "unknown",
-          "line": 1265,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
           "file": "unknown",
           "line": 1266,
           "call_type": "method_call"
         },
         {
-          "name": "items",
+          "name": "detail",
           "file": "unknown",
           "line": 1267,
           "call_type": "method_call"
         },
         {
-          "name": "get",
+          "name": "info",
           "file": "unknown",
           "line": 1268,
           "call_type": "method_call"
         },
         {
-          "name": "detail",
-          "file": "unknown",
-          "line": 1269,
-          "call_type": "method_call"
-        },
-        {
-          "name": "info",
-          "file": "unknown",
-          "line": 1270,
-          "call_type": "method_call"
-        },
-        {
           "name": "update_node",
           "file": "unknown",
-          "line": 1275,
+          "line": 1273,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 1276,
+          "line": 1274,
           "call_type": "method_call"
         },
         {
           "name": "save_json_spec",
           "file": "unknown",
-          "line": 1280,
+          "line": 1278,
           "call_type": "function_call"
         },
         {
           "name": "error",
           "file": "unknown",
-          "line": 1281,
+          "line": 1279,
           "call_type": "method_call"
         },
         {
           "name": "success",
           "file": "unknown",
-          "line": 1285,
+          "line": 1283,
           "call_type": "method_call"
         },
         {
           "name": "info",
           "file": "unknown",
-          "line": 1286,
+          "line": 1284,
           "call_type": "method_call"
         },
         {
           "name": "items",
           "file": "unknown",
-          "line": 1287,
+          "line": 1285,
           "call_type": "method_call"
         },
         {
           "name": "detail",
           "file": "unknown",
-          "line": 1288,
+          "line": 1286,
           "call_type": "method_call"
         }
       ]
@@ -99303,7 +99297,7 @@
     {
       "name": "register_update",
       "file": "src/claude_skills/claude_skills/sdd_update/cli.py",
-      "line": 1293,
+      "line": 1291,
       "language": "python",
       "docstring": "Register 'update' subcommands for unified CLI.\n\nArgs:\n    subparsers: The subparsers object to add commands to\n    parent_parser: Parent parser with global options (--json, --quiet, --verbose, etc.)",
       "parameters": [
@@ -99336,6 +99330,18 @@
         {
           "name": "add_parser",
           "file": "unknown",
+          "line": 1300,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1301,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
           "line": 1302,
           "call_type": "method_call"
         },
@@ -99364,25 +99370,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1307,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1310,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1308,
+          "line": 1311,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1309,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1312,
           "call_type": "method_call"
@@ -99412,25 +99418,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1317,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1320,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1318,
+          "line": 1321,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1319,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1322,
           "call_type": "method_call"
@@ -99448,25 +99454,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1325,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1328,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1326,
+          "line": 1329,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1327,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1330,
           "call_type": "method_call"
@@ -99502,25 +99508,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1336,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1339,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1337,
+          "line": 1340,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1338,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1341,
           "call_type": "method_call"
@@ -99538,25 +99544,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1344,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1347,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1345,
+          "line": 1348,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1346,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1349,
           "call_type": "method_call"
@@ -99598,25 +99604,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1356,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1359,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1357,
+          "line": 1360,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1358,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1361,
           "call_type": "method_call"
@@ -99628,55 +99634,55 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1363,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1364,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1365,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1368,
+          "line": 1366,
           "call_type": "method_call"
         },
         {
           "name": "add_mutually_exclusive_group",
           "file": "unknown",
+          "line": 1367,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1368,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
           "line": 1369,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1370,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1371,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 1372,
+          "line": 1370,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
+          "file": "unknown",
+          "line": 1373,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1374,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
           "file": "unknown",
           "line": 1375,
           "call_type": "method_call"
@@ -99688,25 +99694,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1377,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1380,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1378,
+          "line": 1381,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1379,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1382,
           "call_type": "method_call"
@@ -99724,103 +99730,103 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1385,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1388,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1386,
+          "line": 1389,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1387,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1390,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1391,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1394,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1392,
+          "line": 1395,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1393,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1396,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1400,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1397,
+          "line": 1401,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1398,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1402,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1405,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1403,
+          "line": 1406,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1404,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1407,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1410,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1408,
+          "line": 1411,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1409,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1412,
           "call_type": "method_call"
@@ -99850,25 +99856,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1417,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1420,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1418,
+          "line": 1421,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1419,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1422,
           "call_type": "method_call"
@@ -99880,67 +99886,67 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1424,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1427,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1425,
+          "line": 1428,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1426,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1429,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1430,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1433,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1431,
+          "line": 1434,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1432,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1435,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1438,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1436,
+          "line": 1439,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1437,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_mutually_exclusive_group",
           "file": "unknown",
           "line": 1440,
           "call_type": "method_call"
@@ -99952,115 +99958,115 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_mutually_exclusive_group",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1442,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1443,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1446,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1444,
+          "line": 1447,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1445,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1448,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1449,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1452,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1450,
+          "line": 1453,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1451,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1454,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1457,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1455,
+          "line": 1458,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1456,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1459,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1460,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1463,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1461,
+          "line": 1464,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
-          "file": "unknown",
-          "line": 1462,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1465,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1468,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1466,
+          "line": 1469,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1467,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1470,
           "call_type": "method_call"
@@ -100084,25 +100090,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1474,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1477,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1475,
+          "line": 1478,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1476,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1479,
           "call_type": "method_call"
@@ -100126,49 +100132,49 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1483,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1486,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1484,
+          "line": 1487,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1485,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1488,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1489,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1492,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1490,
+          "line": 1493,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1491,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1494,
           "call_type": "method_call"
@@ -100192,25 +100198,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1498,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1501,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1499,
+          "line": 1502,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1500,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1503,
           "call_type": "method_call"
@@ -100252,25 +100258,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1510,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1513,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1511,
+          "line": 1514,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1512,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1515,
           "call_type": "method_call"
@@ -100288,25 +100294,25 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1518,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1521,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1519,
+          "line": 1522,
           "call_type": "method_call"
         },
         {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1520,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
+          "name": "add_argument",
           "file": "unknown",
           "line": 1523,
           "call_type": "method_call"
@@ -100330,27 +100336,27 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1527,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1528,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1529,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1532,
+          "line": 1530,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1535,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1536,
           "call_type": "method_call"
         },
         {
@@ -100366,27 +100372,27 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1539,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1540,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1541,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1544,
+          "line": 1542,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1547,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1548,
           "call_type": "method_call"
         },
         {
@@ -100422,19 +100428,19 @@
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1554,
+          "line": 1559,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1555,
+          "line": 1564,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1561,
+          "line": 1565,
           "call_type": "method_call"
         },
         {
@@ -100444,87 +100450,87 @@
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1567,
           "call_type": "method_call"
         },
         {
+          "name": "add_parser",
+          "file": "unknown",
+          "line": 1570,
+          "call_type": "method_call"
+        },
+        {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1568,
+          "line": 1575,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1580,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 1569,
+          "line": 1585,
           "call_type": "method_call"
         },
         {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1572,
+          "line": 1588,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1577,
+          "line": 1589,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
-          "file": "unknown",
-          "line": 1582,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1587,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_parser",
           "file": "unknown",
           "line": 1590,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
+          "name": "set_defaults",
           "file": "unknown",
           "line": 1591,
           "call_type": "method_call"
         },
         {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1592,
-          "call_type": "method_call"
-        },
-        {
-          "name": "set_defaults",
-          "file": "unknown",
-          "line": 1593,
-          "call_type": "method_call"
-        },
-        {
           "name": "add_parser",
           "file": "unknown",
-          "line": 1596,
+          "line": 1594,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1601,
+          "line": 1599,
           "call_type": "method_call"
         },
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1602,
+          "line": 1600,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1603,
+          "call_type": "method_call"
+        },
+        {
+          "name": "add_argument",
+          "file": "unknown",
+          "line": 1604,
           "call_type": "method_call"
         },
         {
@@ -100560,31 +100566,13 @@
         {
           "name": "add_argument",
           "file": "unknown",
-          "line": 1610,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1611,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
           "line": 1612,
-          "call_type": "method_call"
-        },
-        {
-          "name": "add_argument",
-          "file": "unknown",
-          "line": 1615,
           "call_type": "method_call"
         },
         {
           "name": "set_defaults",
           "file": "unknown",
-          "line": 1617,
+          "line": 1614,
           "call_type": "method_call"
         }
       ],
