@@ -144,7 +144,7 @@ Nested CLI commands for code documentation and testing.
 - **Commands:** query (default)
 - **Completed:** 2025-11-09
 
-### - [ ] run-tests
+### - [x] run-tests
 **Description:** Comprehensive pytest testing and debugging framework
 - **CLI:** `/src/claude_skills/claude_skills/run_tests/cli.py`
 - **SKILL.md:** `/skills/run-tests/SKILL.md`
@@ -152,6 +152,7 @@ Nested CLI commands for code documentation and testing.
 - **Priority:** High
 - **Namespace:** `sdd test run`
 - **Commands:** run (default), debug, investigate
+- **Completed:** 2025-11-09
 
 ---
 
@@ -159,21 +160,23 @@ Nested CLI commands for code documentation and testing.
 
 Support utilities for context tracking and cache management.
 
-### - [ ] context
+### - [x] context
 **Description:** Context tracking for spec-driven workflows
 - **CLI:** `/src/claude_skills/claude_skills/context_tracker/cli.py`
 - **SKILL.md:** N/A (utility command)
 - **Audit:** `docs/research/context/cli-output-audit-context.md`
 - **Priority:** Low
 - **Commands:** context, session-marker
+- **Completed:** 2025-11-09
 
-### - [ ] cache
+### - [x] cache
 **Description:** Cache management for fidelity reviews and plan reviews
 - **CLI:** `/src/claude_skills/claude_skills/common/cache/cli.py`
 - **SKILL.md:** N/A (utility command)
 - **Audit:** `docs/research/cache/cli-output-audit-cache.md`
 - **Priority:** Low
 - **Commands:** cache-info, cache-clear, cache-stats
+- **Completed:** 2025-11-09
 
 ---
 
@@ -265,5 +268,5 @@ After completing all audits:
 
 **Last Updated:** 2025-11-09
 **Total Modules:** 18
-**Completed:** 11
-**Remaining:** 7
+**Completed:** 14
+**Remaining:** 4
