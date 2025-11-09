@@ -4,6 +4,14 @@ All notable changes to the SDD Toolkit will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
 
+## [Unreleased]
+
+### Added
+- Unit tests for the CLI registry to verify optional module handling and logging.
+
+### Fixed
+- `_try_register_optional()` helper ensures `sdd_render` and `sdd_fidelity_review` imports fail gracefully, preventing `sdd` CLI startup crashes when optional skills are absent.
+
 ## [0.4.5] - 2025-11-05
 
 ### Added

@@ -20,28 +20,17 @@ This document tracks the comprehensive audit of all CLI modules in the SDD toolk
      description="Audit sdd-<module-name> CLI output",
      prompt="""Follow SKILL_REVIEW_INSTRUCTIONS.md to audit sdd-<module-name>...
 
-     Save your complete analysis to: docs/research/cli-output-audit-sdd-<module-name>.md"""
+     Save your complete analysis to: docs/research/<module-name>/cli-output-audit-sdd-<module-name>.md"""
    )
    ```
 
-2. Review the generated audit in `docs/research/`
+2. Review the generated audit in `docs/research/<module-name>/`
 3. Mark the checkbox below as complete: `- [x]`
 4. Add completion date and link to audit file
 
 ### Where Results Are Saved
 
-All audit reports are saved to: **`docs/research/cli-output-audit-<module-name>.md`**
-
----
-
-## Progress Summary
-
-| Status | Count | Percentage |
-|--------|-------|------------|
-| ✅ Completed | 0 | 0% |
-| 🔄 In Progress | 0 | 0% |
-| ⏳ Not Started | 18 | 100% |
-| **TOTAL** | **18** | **100%** |
+All audit reports are saved to: **`docs/research/<module-name>/cli-output-audit-<module-name>.md`**
 
 ---
 
@@ -49,51 +38,55 @@ All audit reports are saved to: **`docs/research/cli-output-audit-<module-name>.
 
 These are the main workflow commands users interact with most frequently.
 
-### - [ ] sdd-update
+### - [DONE] sdd-update
 **Description:** Progress tracking and documentation for spec-driven development
 - **CLI:** `/src/claude_skills/claude_skills/sdd_update/cli.py`
 - **SKILL.md:** `/skills/sdd-update/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-update.md`
+- **Audit:** `docs/research/sdd-update/cli-output-audit-sdd-update.md`
 - **Priority:** High
 - **Commands:** update-status, mark-blocked, unblock-task, add-journal, complete-task, complete-spec, activate-spec, add-verification, execute-verify, move-spec, time-report, status-report, audit-spec, query-tasks, get-task, list-phases, check-complete, list-blockers, reconcile-state, check-journaling, bulk-journal, sync-metadata, update-task-metadata, create-task-commit, list-specs, add-revision, add-assumption, list-assumptions, update-estimate, add-task, remove-task
 
-### - [ ] sdd-validate
+### - [x] sdd-validate
 **Description:** Spec validation and auto-fix capabilities
 - **CLI:** `/src/claude_skills/claude_skills/sdd_validate/cli.py`
 - **SKILL.md:** `/skills/sdd-validate/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-validate.md`
+- **Audit:** `docs/research/sdd-validate/cli-output-audit-sdd-validate.md`
 - **Priority:** High
 - **Commands:** validate, fix, validate-file
+- **Completed:** 2025-11-09
 
-### - [ ] sdd-next
+### - [x] sdd-next
 **Description:** Task preparation and next-task selection
 - **CLI:** `/src/claude_skills/claude_skills/sdd_next/cli.py`
 - **SKILL.md:** `/skills/sdd-next/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-next.md`
+- **Audit:** `docs/research/sdd-next/cli-output-audit-sdd-next.md`
 - **Priority:** High
 - **Commands:** next-task, prepare-task, list-tasks, show-dependencies, validate-spec, detect-project, list-files, show-context, update-context, reset-context, get-next-verify, gather-context, show-prompt
+- **Completed:** 2025-11-09
 
-### - [ ] sdd-plan
+### - [x] sdd-plan
 **Description:** Specification creation and planning
 - **CLI:** `/src/claude_skills/claude_skills/sdd_plan/cli.py`
 - **SKILL.md:** `/skills/sdd-plan/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-plan.md`
+- **Audit:** `docs/research/sdd-plan/cli-output-audit-sdd-plan.md`
 - **Priority:** High
 - **Commands:** create, interactive, from-template, list-templates
+- **Completed:** 2025-11-09
 
-### - [ ] sdd-plan-review
+### - [x] sdd-plan-review
 **Description:** Multi-model specification review
 - **CLI:** `/src/claude_skills/claude_skills/sdd_plan_review/cli.py`
 - **SKILL.md:** `/skills/sdd-plan-review/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-plan-review.md`
+- **Audit:** `docs/research/sdd-plan-review/cli-output-audit-sdd-plan-review.md`
 - **Priority:** High
 - **Commands:** review, review-file
+- **Completed:** 2025-11-09
 
 ### - [ ] sdd-render
 **Description:** Render JSON specs to human-readable markdown
 - **CLI:** `/src/claude_skills/claude_skills/sdd_render/cli.py`
 - **SKILL.md:** `/skills/sdd-render/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-render.md`
+- **Audit:** `docs/research/sdd-render/cli-output-audit-sdd-render.md`
 - **Priority:** Medium
 - **Commands:** render, render-file
 
@@ -101,7 +94,7 @@ These are the main workflow commands users interact with most frequently.
 **Description:** AI-powered pull request creation
 - **CLI:** `/src/claude_skills/claude_skills/sdd_pr/cli.py`
 - **SKILL.md:** `/skills/sdd-pr/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-pr.md`
+- **Audit:** `docs/research/sdd-pr/cli-output-audit-sdd-pr.md`
 - **Priority:** Medium
 - **Commands:** create, create-from-spec
 
@@ -109,7 +102,7 @@ These are the main workflow commands users interact with most frequently.
 **Description:** Compare implementation against spec requirements
 - **CLI:** `/src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 - **SKILL.md:** `/skills/sdd-fidelity-review/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-fidelity-review.md`
+- **Audit:** `docs/research/sdd-fidelity-review/cli-output-audit-sdd-fidelity-review.md`
 - **Priority:** High
 - **Commands:** fidelity-review, task-review, phase-review
 
@@ -117,7 +110,7 @@ These are the main workflow commands users interact with most frequently.
 **Description:** Systematic spec modification and review feedback application
 - **CLI:** `/src/claude_skills/claude_skills/sdd_spec_mod/cli.py`
 - **SKILL.md:** `/skills/sdd-modify/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-sdd-modify.md`
+- **Audit:** `docs/research/sdd-modify/cli-output-audit-sdd-modify.md`
 - **Priority:** Medium
 - **Commands:** apply-modifications, parse-review
 
@@ -131,7 +124,7 @@ Nested CLI commands for code documentation and testing.
 **Description:** Multi-language codebase documentation generation
 - **CLI:** `/src/claude_skills/claude_skills/code_doc/cli.py`
 - **SKILL.md:** `/skills/code-doc/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-code-doc.md`
+- **Audit:** `docs/research/code-doc/cli-output-audit-code-doc.md`
 - **Priority:** Medium
 - **Namespace:** `sdd doc generate`
 - **Commands:** generate (default)
@@ -140,7 +133,7 @@ Nested CLI commands for code documentation and testing.
 **Description:** Query machine-readable codebase documentation
 - **CLI:** `/src/claude_skills/claude_skills/doc_query/cli.py`
 - **SKILL.md:** `/skills/doc-query/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-doc-query.md`
+- **Audit:** `docs/research/doc-query/cli-output-audit-doc-query.md`
 - **Priority:** Medium
 - **Namespace:** `sdd doc query`
 - **Commands:** query (default)
@@ -149,7 +142,7 @@ Nested CLI commands for code documentation and testing.
 **Description:** Comprehensive pytest testing and debugging framework
 - **CLI:** `/src/claude_skills/claude_skills/run_tests/cli.py`
 - **SKILL.md:** `/skills/run-tests/SKILL.md`
-- **Audit:** `docs/research/cli-output-audit-run-tests.md`
+- **Audit:** `docs/research/run-tests/cli-output-audit-run-tests.md`
 - **Priority:** High
 - **Namespace:** `sdd test run`
 - **Commands:** run (default), debug, investigate
@@ -164,7 +157,7 @@ Support utilities for context tracking and cache management.
 **Description:** Context tracking for spec-driven workflows
 - **CLI:** `/src/claude_skills/claude_skills/context_tracker/cli.py`
 - **SKILL.md:** N/A (utility command)
-- **Audit:** `docs/research/cli-output-audit-context.md`
+- **Audit:** `docs/research/context/cli-output-audit-context.md`
 - **Priority:** Low
 - **Commands:** context, session-marker
 
@@ -172,47 +165,9 @@ Support utilities for context tracking and cache management.
 **Description:** Cache management for fidelity reviews and plan reviews
 - **CLI:** `/src/claude_skills/claude_skills/common/cache/cli.py`
 - **SKILL.md:** N/A (utility command)
-- **Audit:** `docs/research/cli-output-audit-cache.md`
+- **Audit:** `docs/research/cache/cli-output-audit-cache.md`
 - **Priority:** Low
 - **Commands:** cache-info, cache-clear, cache-stats
-
----
-
-## Priority 4: Development Commands (4 modules)
-
-Internal development utilities (lower priority for YAGNI/KISS audit).
-
-### - [ ] skills-dev start-helper
-**Description:** Start Claude Code helper process
-- **CLI:** `/src/claude_skills/claude_skills/cli/skills_dev/start_helper.py`
-- **SKILL.md:** N/A (internal dev tool)
-- **Audit:** `docs/research/cli-output-audit-skills-dev-start-helper.md`
-- **Priority:** Low
-- **Namespace:** `sdd skills-dev start-helper`
-
-### - [ ] skills-dev setup-permissions
-**Description:** Setup project permissions for skills
-- **CLI:** `/src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py`
-- **SKILL.md:** N/A (internal dev tool)
-- **Audit:** `docs/research/cli-output-audit-skills-dev-setup-permissions.md`
-- **Priority:** Low
-- **Namespace:** `sdd skills-dev setup-permissions`
-
-### - [ ] skills-dev gendocs
-**Description:** Generate documentation for skills
-- **CLI:** `/src/claude_skills/claude_skills/cli/skills_dev/gendocs.py`
-- **SKILL.md:** N/A (internal dev tool)
-- **Audit:** `docs/research/cli-output-audit-skills-dev-gendocs.md`
-- **Priority:** Low
-- **Namespace:** `sdd skills-dev gendocs`
-
-### - [ ] skills-dev migrate
-**Description:** Data migration utilities
-- **CLI:** `/src/claude_skills/claude_skills/cli/skills_dev/migrate.py`
-- **SKILL.md:** N/A (internal dev tool)
-- **Audit:** `docs/research/cli-output-audit-skills-dev-migrate.md`
-- **Priority:** Low
-- **Namespace:** `sdd skills-dev migrate`
 
 ---
 
@@ -292,7 +247,7 @@ These are not part of the main SDD workflow and are used primarily by developers
 
 After completing all audits:
 
-- [ ] Review all 18 audit reports for common patterns
+- [ ] Review all audit reports for common patterns
 - [ ] Create a consolidated findings document
 - [ ] Identify toolkit-wide verbosity patterns
 - [ ] Prioritize fixes by impact vs. effort
@@ -302,7 +257,7 @@ After completing all audits:
 
 ---
 
-**Last Updated:** 2025-01-08
+**Last Updated:** 2025-11-09
 **Total Modules:** 18
-**Completed:** 0
-**Remaining:** 18
+**Completed:** 5
+**Remaining:** 13

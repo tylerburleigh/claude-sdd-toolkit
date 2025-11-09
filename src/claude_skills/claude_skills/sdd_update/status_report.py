@@ -7,12 +7,9 @@ Provides dashboard-style status reports for SDD workflows with:
 - Blockers and dependencies panel
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from rich.console import Console
-from rich.layout import Layout
-from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
 from claude_skills.common.ui_factory import create_ui
 
 
@@ -44,15 +41,15 @@ def create_progress_bar(percentage: float, width: int = 20) -> str:
         return f"[dim]{bar}[/dim]"
 
 
-def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
+def _prepare_phases_table_data(spec_data: Dict[str, Any]) -> Tuple[List[Dict[str, str]], int]:
     """
-    Create a panel showing all phases with status indicators.
+    Prepare phases data for table display.
 
     Args:
         spec_data: Loaded JSON spec data
 
     Returns:
-        Rich Panel with phases table
+        Tuple of (table_data, phase_count) where table_data is a list of row dicts
     """
     hierarchy = spec_data.get("hierarchy", {})
 
@@ -63,26 +60,13 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
             phases[node_id] = node_data
 
     if not phases:
-        return Panel(
-            "[dim]No phases defined[/dim]",
-            title="📋 Phases",
-            subtitle="0 total",
-            border_style="blue",
-            title_align="left",
-            subtitle_align="right",
-            padding=(1, 2),
-            expand=True
-        )
-
-    # Create phases table
-    table = Table(show_header=True, box=None, padding=(0, 1))
-    table.add_column("Phase", style="bold", width=18)
-    table.add_column("Status", justify="center", width=11)
-    table.add_column("Progress", justify="left", no_wrap=True)
+        return [], 0
 
     # Sort phases by ID
     sorted_phases = sorted(phases.items(), key=lambda x: x[0])
 
+    # Prepare table data
+    table_data = []
     for phase_id, phase_data in sorted_phases:
         # Extract phase info
         title = phase_data.get("title", phase_id)
@@ -92,13 +76,13 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
 
         # Status indicator
         if status == "completed":
-            status_indicator = "[green]✓ Complete[/green]"
+            status_indicator = "✓ Complete"
         elif status == "in_progress":
-            status_indicator = "[yellow]● In Progress[/yellow]"
+            status_indicator = "● In Progress"
         elif status == "blocked":
-            status_indicator = "[red]⚠ Blocked[/red]"
+            status_indicator = "⚠ Blocked"
         else:  # pending
-            status_indicator = "[dim]○ Pending[/dim]"
+            status_indicator = "○ Pending"
 
         # Progress with visual bar
         if total_tasks > 0:
@@ -109,32 +93,27 @@ def create_phases_panel(spec_data: Dict[str, Any]) -> Panel:
             progress_text = "—"
 
         # Truncate title if too long
-        if len(title) > 18:
-            title = title[:15] + "..."
+        if len(title) > 50:
+            title = title[:47] + "..."
 
-        table.add_row(title, status_indicator, progress_text)
+        table_data.append({
+            "Phase": title,
+            "Status": status_indicator,
+            "Progress": progress_text
+        })
 
-    return Panel(
-        table,
-        title="📋 Phases",
-        subtitle=f"{len(phases)} total",
-        border_style="blue",
-        title_align="left",
-        subtitle_align="right",
-        padding=(1, 2),
-        expand=True
-    )
+    return table_data, len(phases)
 
 
-def create_progress_panel(spec_data: Dict[str, Any]) -> Panel:
+def _prepare_progress_data(spec_data: Dict[str, Any]) -> Tuple[List[Dict[str, str]], str]:
     """
-    Create a panel showing overall and phase-specific progress metrics.
+    Prepare progress metrics data for table display.
 
     Args:
         spec_data: Loaded JSON spec data
 
     Returns:
-        Rich Panel with progress metrics
+        Tuple of (table_data, subtitle) where table_data is a list of metric dicts
     """
     hierarchy = spec_data.get("hierarchy", {})
 
@@ -156,45 +135,32 @@ def create_progress_panel(spec_data: Dict[str, Any]) -> Panel:
             elif status == "blocked":
                 blocked_tasks += 1
 
-    # Create metrics table
-    table = Table(show_header=False, box=None, padding=(0, 1))
-    table.add_column("Metric", style="bold", width=18)
-    table.add_column("Value", justify="right")
-
-    # Overall progress
+    # Prepare table data
+    table_data = []
     if total_tasks > 0:
         percentage = (completed_tasks / total_tasks) * 100
-        table.add_row("Overall", f"[cyan]{percentage:.1f}%[/cyan]")
-        table.add_row("Completed", f"[green]{completed_tasks}[/green]")
-        table.add_row("In Progress", f"[yellow]{in_progress_tasks}[/yellow]")
-        table.add_row("Blocked", f"[red]{blocked_tasks}[/red]" if blocked_tasks > 0 else "[dim]0[/dim]")
-        table.add_row("Remaining", f"{total_tasks - completed_tasks}")
+        table_data.append({"Metric": "Overall", "Value": f"{percentage:.1f}%"})
+        table_data.append({"Metric": "Completed", "Value": str(completed_tasks)})
+        table_data.append({"Metric": "In Progress", "Value": str(in_progress_tasks)})
+        table_data.append({"Metric": "Blocked", "Value": str(blocked_tasks) if blocked_tasks > 0 else "0"})
+        table_data.append({"Metric": "Remaining", "Value": str(total_tasks - completed_tasks)})
         subtitle_text = f"{percentage:.0f}% complete"
     else:
-        table.add_row("Overall", "[dim]No tasks[/dim]")
+        table_data.append({"Metric": "Overall", "Value": "No tasks"})
         subtitle_text = "No tasks"
 
-    return Panel(
-        table,
-        title="📊 Progress",
-        subtitle=subtitle_text,
-        border_style="green",
-        title_align="left",
-        subtitle_align="right",
-        padding=(1, 2),
-        expand=True
-    )
+    return table_data, subtitle_text
 
 
-def create_blockers_panel(spec_data: Dict[str, Any]) -> Panel:
+def _prepare_blockers_data(spec_data: Dict[str, Any]) -> Tuple[str, int]:
     """
-    Create a panel showing blocked tasks with reasons.
+    Prepare blockers data for panel display.
 
     Args:
         spec_data: Loaded JSON spec data
 
     Returns:
-        Rich Panel with blockers list
+        Tuple of (content_text, blocker_count) where content_text is formatted string
     """
     hierarchy = spec_data.get("hierarchy", {})
 
@@ -206,16 +172,7 @@ def create_blockers_panel(spec_data: Dict[str, Any]) -> Panel:
             blocked_tasks.append((node_id, node_data))
 
     if not blocked_tasks:
-        return Panel(
-            "[green]✓ No blockers[/green]",
-            title="🚧 Blockers",
-            subtitle="None",
-            border_style="green",
-            title_align="left",
-            subtitle_align="right",
-            padding=(1, 2),
-            expand=True
-        )
+        return "✓ No blockers", 0
 
     # Create blockers content
     lines = []
@@ -233,100 +190,198 @@ def create_blockers_panel(spec_data: Dict[str, Any]) -> Panel:
         blocked_by = dependencies.get("blocked_by", [])
 
         if blocker_reason:
-            reason_text = f"[dim]{blocker_reason}[/dim]"
+            reason_text = blocker_reason
         elif blocked_by:
-            reason_text = f"[dim]Depends on: {', '.join(blocked_by[:3])}[/dim]"
+            reason_text = f"Depends on: {', '.join(blocked_by[:3])}"
         else:
-            reason_text = "[dim]Reason not specified[/dim]"
+            reason_text = "Reason not specified"
 
-        lines.append(f"[bold]{task_id}[/bold]: {title}")
+        lines.append(f"{task_id}: {title}")
         lines.append(f"  {reason_text}")
         lines.append("")  # Blank line
 
     content = "\n".join(lines).rstrip()
-
-    return Panel(
-        content,
-        title="🚧 Blockers",
-        subtitle=f"{len(blocked_tasks)} blocked",
-        border_style="red",
-        title_align="left",
-        subtitle_align="right",
-        padding=(1, 2),
-        expand=True
-    )
+    return content, len(blocked_tasks)
 
 
-def create_status_layout(spec_data: Dict[str, Any]) -> Layout:
+def _print_status_dashboard(spec_data: Dict[str, Any], ui) -> None:
     """
-    Create a Rich.Layout with multiple panels for status dashboard.
+    Print status dashboard using UI protocol (supports both RichUi and PlainUi).
 
-    Layout structure:
-    ┌─────────────────────────┬──────────────┐
-    │                         │              │
-    │   Phases Panel          │   Progress   │
-    │                         │   Panel      │
-    │                         │              │
-    ├─────────────────────────┴──────────────┤
-    │                                         │
-    │   Blockers Panel                        │
-    │                                         │
-    └─────────────────────────────────────────┘
+    Instead of creating a Rich.Layout, we print panels and tables sequentially,
+    which works in both rich and plain modes.
 
     Args:
         spec_data: Loaded JSON spec data
-
-    Returns:
-        Rich Layout with populated panels
+        ui: UI instance for console output
     """
-    # Create main layout
-    layout = Layout()
+    # Prepare all data
+    phases_data, phases_count = _prepare_phases_table_data(spec_data)
+    progress_data, progress_subtitle = _prepare_progress_data(spec_data)
+    blockers_content, blockers_count = _prepare_blockers_data(spec_data)
 
-    # Split into top and bottom
-    layout.split_column(
-        Layout(name="top", ratio=2),
-        Layout(name="bottom", ratio=1)
-    )
+    # Print based on backend type
+    if ui.console is None:
+        # PlainUi backend - use native UI protocol methods
 
-    # Split top into left and right
-    layout["top"].split_row(
-        Layout(name="phases", ratio=2),
-        Layout(name="progress", ratio=1)
-    )
+        # Phases table
+        if phases_data:
+            ui.print_table(
+                data=phases_data,
+                columns=["Phase", "Status", "Progress"],
+                title=f"📋 Phases ({phases_count} total)"
+            )
+        else:
+            ui.print_panel(
+                content="No phases defined",
+                title="📋 Phases (0 total)",
+                style="default"
+            )
 
-    # Populate panels
-    layout["phases"].update(create_phases_panel(spec_data))
-    layout["progress"].update(create_progress_panel(spec_data))
-    layout["bottom"].update(create_blockers_panel(spec_data))
+        print()  # Spacing
 
-    return layout
+        # Progress table
+        ui.print_table(
+            data=progress_data,
+            columns=["Metric", "Value"],
+            title=f"📊 Progress ({progress_subtitle})"
+        )
+
+        print()  # Spacing
+
+        # Blockers panel
+        if blockers_count > 0:
+            ui.print_panel(
+                content=blockers_content,
+                title=f"🚧 Blockers ({blockers_count} blocked)",
+                style="warning"
+            )
+        else:
+            ui.print_panel(
+                content=blockers_content,
+                title="🚧 Blockers (None)",
+                style="success"
+            )
+    else:
+        # RichUi backend - use Rich.Table and Rich.Panel for enhanced display
+        console = ui.console
+
+        # Phases table
+        if phases_data:
+            phases_table = Table(
+                title=f"📋 Phases ({phases_count} total)",
+                show_header=True,
+                header_style="bold cyan",
+                border_style="blue",
+                title_style="bold magenta"
+            )
+            phases_table.add_column("Phase", style="bold", no_wrap=True)
+            phases_table.add_column("Status", justify="center", no_wrap=True)
+            phases_table.add_column("Progress", justify="left", no_wrap=True)
+
+            for row in phases_data:
+                phases_table.add_row(row["Phase"], row["Status"], row["Progress"])
+
+            console.print(phases_table)
+        else:
+            from rich.panel import Panel
+            console.print(Panel(
+                "[dim]No phases defined[/dim]",
+                title="📋 Phases (0 total)",
+                border_style="blue"
+            ))
+
+        console.print()  # Spacing
+
+        # Progress table
+        progress_table = Table(
+            title=f"📊 Progress ({progress_subtitle})",
+            show_header=False,
+            border_style="green",
+            title_style="bold magenta"
+        )
+        progress_table.add_column("Metric", style="bold", width=18)
+        progress_table.add_column("Value", justify="right")
+
+        for row in progress_data:
+            # Add Rich markup for colored values
+            metric = row["Metric"]
+            value = row["Value"]
+
+            if metric == "Overall":
+                value = f"[cyan]{value}[/cyan]"
+            elif metric == "Completed":
+                value = f"[green]{value}[/green]"
+            elif metric == "In Progress":
+                value = f"[yellow]{value}[/yellow]"
+            elif metric == "Blocked" and value != "0":
+                value = f"[red]{value}[/red]"
+            elif metric == "Blocked" and value == "0":
+                value = f"[dim]{value}[/dim]"
+
+            progress_table.add_row(metric, value)
+
+        console.print(progress_table)
+        console.print()  # Spacing
+
+        # Blockers panel
+        from rich.panel import Panel
+        if blockers_count > 0:
+            # Add Rich markup to blockers content
+            formatted_content = blockers_content.replace("\n  ", "\n  [dim]").replace("[dim]", "[dim]", 1)
+            # Bold task IDs
+            import re
+            formatted_content = re.sub(r'^([\w-]+):', r'[bold]\1[/bold]:', formatted_content, flags=re.MULTILINE)
+
+            console.print(Panel(
+                formatted_content,
+                title=f"🚧 Blockers ({blockers_count} blocked)",
+                border_style="red"
+            ))
+        else:
+            console.print(Panel(
+                "[green]✓ No blockers[/green]",
+                title="🚧 Blockers (None)",
+                border_style="green"
+            ))
 
 
 def print_status_report(spec_data: Dict[str, Any], title: Optional[str] = None, ui=None) -> None:
     """
     Print a dashboard-style status report to console.
 
+    Works with both RichUi (rich formatting) and PlainUi (plain text) backends.
+
     Args:
         spec_data: Loaded JSON spec data
         title: Optional title for the report
         ui: UI instance for console output (optional)
     """
-    # Skip Rich visualization if using PlainUi (console would be None)
-    if ui and ui.console is None:
-        return
-
-    console = ui.console if ui else create_ui(force_rich=True).console
+    # Ensure we have a UI instance
+    if ui is None:
+        ui = create_ui()
 
     # Print title if provided
     if title:
-        console.print()
-        console.print(f"[bold cyan]{title}[/bold cyan]")
-        console.print()
+        if ui.console is None:
+            # PlainUi
+            print()
+            print(title)
+            print()
+        else:
+            # RichUi
+            ui.console.print()
+            ui.console.print(f"[bold cyan]{title}[/bold cyan]")
+            ui.console.print()
 
-    # Create and print layout
-    layout = create_status_layout(spec_data)
-    console.print(layout)
-    console.print()
+    # Print dashboard using UI protocol
+    _print_status_dashboard(spec_data, ui)
+
+    # Print closing newline
+    if ui.console is None:
+        print()
+    else:
+        ui.console.print()
 
 
 def get_status_summary(spec_data: Dict[str, Any]) -> Dict[str, Any]:

@@ -53,7 +53,7 @@ Provide a complete analysis similar to what was done for sdd-update, including:
 - Root cause explanation
 - Final verdict (Appropriate/Minor issues/Too verbose)
 
-Save your complete analysis to: docs/research/cli-output-audit-sdd-next.md"""
+Save your complete analysis to: docs/research/sdd-next/cli-output-audit-sdd-next.md"""
 )
 ```
 
@@ -100,9 +100,9 @@ All audit results must be saved to a consistent location with descriptive filena
 
 ### Directory
 
-**Location:** `docs/research/`
+**Location:** `docs/research/<command-name>/`
 
-This directory contains all research outputs, analysis documents, and audit reports. It is separate from:
+This directory will contain all research outputs, analysis documents, and audit reports. It is separate from:
 - `docs/` - Production documentation for users
 - `specs/` - Specification files for active development
 
@@ -131,7 +131,7 @@ prompt="""Follow SKILL_REVIEW_INSTRUCTIONS.md to audit sdd-next...
 
 [...rest of prompt...]
 
-Save your complete analysis to: docs/research/cli-output-audit-sdd-next.md"""
+Save your complete analysis to: docs/research/sdd-next/cli-output-audit-sdd-next.md"""
 ```
 
 This ensures agents know exactly where to save their output and maintains consistency across all audits.

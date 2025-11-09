@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 20:31:06
+**Generated:** 2025-11-09 08:09:40
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 251
-- **Total Lines:** 90321
+- **Total Files:** 252
+- **Total Lines:** 90518
 - **Total Classes:** 358
-- **Total Functions:** 916
-- **Avg Complexity:** 5.89
+- **Total Functions:** 921
+- **Avg Complexity:** 5.87
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -7622,21 +7622,23 @@ Returns:
 
 ---
 
-### `_create_progress_bar(percentage, width) -> str`
+### `_create_progress_bar_plain(percentage, width) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:19`
-**Complexity:** 4
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:18`
+**Complexity:** 1
 
 **Description:**
 > Create a visual progress bar using block characters.
+
+Works with both Rich and plain text backends.
 
 Args:
     percentage: Completion percentage (0-100)
     width: Width of the progress bar in characters
 
 Returns:
-    Rich markup string with colored progress bar
+    Progress bar string using block characters (no color codes)
 
 **Parameters:**
 - `percentage`: int
@@ -8063,6 +8065,26 @@ Returns:
 
 ---
 
+### `_format_task_row(task) -> Dict[str, str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:128`
+**Complexity:** 7
+
+**Description:**
+> Format a single task into a table row dictionary.
+
+Args:
+    task: Task data dictionary
+
+Returns:
+    Dictionary with columns as keys and formatted values
+
+**Parameters:**
+- `task`: Dict[str, Any]
+
+---
+
 ### `_format_value(value) -> str`
 
 **Language:** python
@@ -8211,6 +8233,21 @@ Returns:
 
 **Parameters:**
 - `score`: float
+
+---
+
+### `_get_table_columns() -> tuple`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:106`
+**Complexity:** 1
+
+**Description:**
+> Get table column definitions.
+
+Returns:
+    Tuple of (column_list, column_config) where column_list is a list of column names
+    and column_config is a dict with Rich-specific styling options.
 
 ---
 
@@ -8493,6 +8530,14 @@ Args:
 - `specs_dir`: Path
 - `author`: str
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `_make_cli_parsers() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_registry.py:17`
+**Complexity:** 1
 
 ---
 
@@ -8781,11 +8826,14 @@ Returns:
 ### `_print_phases_table(phases, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:106`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:94`
+**Complexity:** 10
 
 **Description:**
-> Print phases using Rich.Table for structured output.
+> Print phases using unified UI protocol (works with RichUi and PlainUi).
+
+Prepares table data as a list of dictionaries, then renders using
+the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 
 **Parameters:**
 - `phases`: List[Dict[str, Any]]
@@ -8828,11 +8876,14 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_print_tasks_table(matches, total_count, limited, status_filter, type_filter, parent_filter, limit, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:106`
-⚠️ **Complexity:** 22 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/query_tasks.py:192`
+⚠️ **Complexity:** 23 (High)
 
 **Description:**
-> Print tasks using Rich.Table for structured output.
+> Print tasks using unified UI protocol (works with RichUi and PlainUi).
+
+Prepares table data as a list of dictionaries, then renders using
+the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 
 **Parameters:**
 - `matches`: List[Dict[str, Any]]
@@ -9013,7 +9064,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:73`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:66`
 **Complexity:** 1
 
 **Description:**
@@ -9028,7 +9079,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:111`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:104`
 **Complexity:** 1
 
 **Description:**
@@ -9043,7 +9094,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:93`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:86`
 **Complexity:** 1
 
 **Description:**
@@ -10496,11 +10547,11 @@ Raises:
 
 Example:
     >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
-    ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']
+    ['gemini', '-m', 'gemini-exp-1114', '--output-format', 'json', '-p', 'Analyze code']
     >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
-    ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']
+    ['codex', 'exec', '--sandbox', 'read-only', '--ask-for-approval', 'never', '--json', '-m', 'claude-3.7-sonnet', 'Fix bug']
     >>> build_tool_command("cursor-agent", "Review code")
-    ['cursor-agent', '--print', 'Review code']
+    ['cursor-agent', '--print', '--json', 'Review code']
 
 **Parameters:**
 - `tool`: str
@@ -11506,7 +11557,7 @@ Returns:
 ### `cmd_bulk_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1038`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1047`
 **Complexity:** 4
 
 **Description:**
@@ -11581,7 +11632,7 @@ Returns:
 ### `cmd_check_complete(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:893`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:902`
 **Complexity:** 5
 
 **Description:**
@@ -11657,7 +11708,7 @@ Returns:
 ### `cmd_check_journaling(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:998`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1007`
 **Complexity:** 8
 
 **Description:**
@@ -11717,7 +11768,7 @@ Returns:
 ### `cmd_complete_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1139`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1148`
 **Complexity:** 6
 
 **Description:**
@@ -11833,7 +11884,7 @@ Returns:
 ### `cmd_create_task_commit(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1065`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1074`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -12127,7 +12178,7 @@ Returns:
 ### `cmd_get_journal(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:831`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:834`
 **Complexity:** 7
 
 **Description:**
@@ -12157,7 +12208,7 @@ Returns:
 ### `cmd_get_task(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:807`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:810`
 **Complexity:** 6
 
 **Description:**
@@ -12217,7 +12268,7 @@ Returns:
 ### `cmd_list_blockers(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:940`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:949`
 **Complexity:** 6
 
 **Description:**
@@ -12268,7 +12319,7 @@ Returns:
 ### `cmd_list_phases(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:860`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:863`
 **Complexity:** 6
 
 **Description:**
@@ -12283,7 +12334,7 @@ Returns:
 ### `cmd_list_specs(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1172`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1181`
 **Complexity:** 3
 
 **Description:**
@@ -12401,7 +12452,7 @@ Returns:
 ### `cmd_phase_time(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:917`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:926`
 **Complexity:** 6
 
 **Description:**
@@ -12498,7 +12549,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_reconcile_state(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:962`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:971`
 **Complexity:** 7
 
 **Description:**
@@ -12719,7 +12770,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1194`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1203`
 **Complexity:** 3
 
 **Description:**
@@ -12884,7 +12935,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1213`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1222`
 ⚠️ **Complexity:** 25 (High)
 
 **Description:**
@@ -14687,7 +14738,7 @@ Example:
 ### `execute_tool(tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:393`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:409`
 **Complexity:** 7
 
 **Description:**
@@ -14721,7 +14772,7 @@ Example:
 ### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:526`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:542`
 **Complexity:** 5
 
 **Description:**
@@ -16361,11 +16412,13 @@ Args:
 ### `format_phases_table(spec_id, specs_dir, printer, ui) -> Optional[List[Dict]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:50`
-**Complexity:** 9
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_phases.py:42`
+**Complexity:** 6
 
 **Description:**
-> List all phases using Rich.Table format.
+> List all phases using unified UI protocol.
+
+Works with both RichUi and PlainUi backends.
 
 Args:
     spec_id: Specification ID
@@ -21326,8 +21379,8 @@ Args:
 ### `register_all_subcommands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:7`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:8`
+**Complexity:** 2
 
 **Description:**
 > Register all subcommands from skill modules.
@@ -21700,7 +21753,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1291`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1300`
 **Complexity:** 1
 
 **Description:**
@@ -24698,6 +24751,30 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_optional_modules_missing_are_logged_and_skipped(monkeypatch, caplog) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_registry.py:24`
+**Complexity:** 2
+
+**Parameters:**
+- `monkeypatch`: None
+- `caplog`: None
+
+---
+
+### `test_optional_modules_register_when_available(monkeypatch, caplog) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_registry.py:46`
+**Complexity:** 3
+
+**Parameters:**
+- `monkeypatch`: None
+- `caplog`: None
+
+---
+
 ### `test_render_statistics_json() -> None`
 
 **Language:** python
@@ -25880,6 +25957,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/cli/sdd/registry.py`
 
+- `importlib`
 - `logging`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py`
@@ -27687,9 +27765,8 @@ Returns:
 - `claude_skills.common.load_json_spec`
 - `claude_skills.common.progress.list_phases`
 - `claude_skills.common.ui_factory.create_ui`
+- `claude_skills.common.ui_protocol.MessageLevel`
 - `pathlib.Path`
-- `rich.console.Console`
-- `rich.table.Table`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
@@ -28158,6 +28235,16 @@ Returns:
 - `unittest.mock.Mock`
 - `unittest.mock.mock_open`
 - `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_cli_registry.py`
+
+- `argparse`
+- `claude_skills.cli.sdd.registry`
+- `importlib`
+- `logging`
+- `pytest`
+- `sys`
+- `types`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py`
 

@@ -862,6 +862,8 @@ def cmd_get_journal(args, printer):
 
 def cmd_list_phases(args, printer):
     """List all phases."""
+    from claude_skills.common.ui_factory import create_ui
+
     # Use global --json/--no-json flag to determine output format
     json_mode = getattr(args, 'json', False)
 
@@ -883,11 +885,15 @@ def cmd_list_phases(args, printer):
         if phases:
             output_json(phases, args.compact)
     else:
-        # Use Rich.Table formatter for text output
+        # Create UI instance (respects FORCE_PLAIN environment variable)
+        ui = create_ui()
+
+        # Use unified table formatter for text output (works with both RichUi and PlainUi)
         phases = format_phases_table(
             spec_id=args.spec_id,
             specs_dir=specs_dir,
-            printer=printer
+            printer=printer,
+            ui=ui
         )
 
     return 0 if phases is not None else 1
