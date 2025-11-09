@@ -1235,8 +1235,6 @@ def cmd_update_task_metadata(args, printer):
         metadata_updates['status_note'] = args.status_note
     if hasattr(args, 'verification_type') and args.verification_type:
         metadata_updates['verification_type'] = args.verification_type
-    if hasattr(args, 'skill') and args.skill:
-        metadata_updates['skill'] = args.skill
     if hasattr(args, 'command') and args.command:
         metadata_updates['command'] = args.command
 
@@ -1601,14 +1599,13 @@ def register_update(subparsers, parent_parser):
     p_update_meta.add_argument("spec_id", help="Specification ID")
     p_update_meta.add_argument("task_id", help="Task ID to update")
 
-    # The 8 metadata field flags
+    # The metadata field flags
     p_update_meta.add_argument("--file-path", dest="file_path", help="File path for this task")
     p_update_meta.add_argument("--description", help="Task description")
     p_update_meta.add_argument("--task-category", dest="task_category", help="Task category (implementation, testing, etc.)")
     p_update_meta.add_argument("--actual-hours", dest="actual_hours", type=float, help="Actual hours spent on task")
     p_update_meta.add_argument("--status-note", dest="status_note", help="Status note or completion note")
     p_update_meta.add_argument("--verification-type", dest="verification_type", help="Verification type (auto, manual, none)")
-    p_update_meta.add_argument("--skill", help="Skill or tool used")
     p_update_meta.add_argument("--command", help="Command executed")
 
     # Standard flags
