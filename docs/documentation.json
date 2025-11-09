@@ -2,16 +2,16 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-09T00:04:59.287519Z",
+    "generated_at": "2025-11-09T00:05:30.987123Z",
     "languages": [
       "python"
     ],
     "schema_version": "2.0"
   },
   "statistics": {
-    "total_files": 250,
-    "total_lines": 89740,
-    "total_classes": 357,
+    "total_files": 251,
+    "total_lines": 89845,
+    "total_classes": 358,
     "total_functions": 909,
     "avg_complexity": 5.86,
     "max_complexity": 45,
@@ -24,9 +24,9 @@
     ],
     "by_language": {
       "python": {
-        "files": 250,
-        "lines": 89740,
-        "classes": 357,
+        "files": 251,
+        "lines": 89845,
+        "classes": 358,
         "functions": 909,
         "avg_complexity": 5.86
       }
@@ -5063,6 +5063,30 @@
       ],
       "exports": [],
       "lines": 47
+    },
+    {
+      "name": "test_ui_config_integration",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+      "language": "python",
+      "docstring": "Integration tests for UI configuration settings.\n\nTests the complete flow of reading config settings and creating appropriate UI backend.",
+      "classes": [
+        "TestUIConfigIntegration"
+      ],
+      "functions": [],
+      "imports": [
+        "pytest",
+        "json",
+        "tempfile",
+        "pathlib.Path",
+        "unittest.mock.patch",
+        "unittest.mock.MagicMock",
+        "claude_skills.common.ui_factory.create_ui",
+        "claude_skills.common.ui_factory.create_ui_from_args",
+        "claude_skills.common.rich_ui.RichUi",
+        "claude_skills.common.plain_ui.PlainUi"
+      ],
+      "exports": [],
+      "lines": 105
     },
     {
       "name": "test_unified_cli",
@@ -16824,6 +16848,30 @@
         "test_non_interactive_behavior",
         "test_command_hint_displayed",
         "test_incomplete_spec_no_completion_message"
+      ],
+      "properties": [],
+      "is_exported": false,
+      "is_public": true,
+      "instantiated_by": [],
+      "imported_by": []
+    },
+    {
+      "name": "TestUIConfigIntegration",
+      "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+      "line": 18,
+      "language": "python",
+      "docstring": "Integration tests for UI configuration.",
+      "bases": [],
+      "methods": [
+        "test_create_ui_respects_config_plain_mode",
+        "test_create_ui_respects_config_rich_mode",
+        "test_create_ui_from_args_with_plain_flag",
+        "test_plain_ui_maintains_consistent_api",
+        "test_rich_ui_maintains_consistent_api",
+        "test_plain_ui_output_methods_dont_crash",
+        "test_rich_ui_output_methods_dont_crash",
+        "test_ui_backend_switch_is_seamless",
+        "test_ui_config_backward_compatible"
       ],
       "properties": [],
       "is_exported": false,
@@ -51826,6 +51874,60 @@
           "call_type": "function_call"
         },
         {
+          "name": "test_create_ui_respects_config_plain_mode",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 24,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_create_ui_respects_config_rich_mode",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 30,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_plain_ui_maintains_consistent_api",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 45,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rich_ui_maintains_consistent_api",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 55,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_plain_ui_output_methods_dont_crash",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 65,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_rich_ui_output_methods_dont_crash",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 75,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ui_backend_switch_is_seamless",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 86,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ui_backend_switch_is_seamless",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 90,
+          "call_type": "function_call"
+        },
+        {
+          "name": "test_ui_config_backward_compatible",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 102,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_should_use_plain_ui_with_config_file",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
           "line": 106,
@@ -51948,7 +52050,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 20
+      "call_count": 29
     },
     {
       "name": "create_ui_from_args",
@@ -51970,6 +52072,12 @@
       "is_exported": false,
       "is_public": true,
       "callers": [
+        {
+          "name": "test_create_ui_from_args_with_plain_flag",
+          "file": "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py",
+          "line": 40,
+          "call_type": "function_call"
+        },
         {
           "name": "test_create_ui_from_args_with_plain_flag",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
@@ -52015,7 +52123,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 3
+      "call_count": 4
     },
     {
       "name": "get_backend_name",
@@ -137022,6 +137130,18 @@
       "subprocess",
       "sys",
       "pathlib.Path"
+    ],
+    "src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py": [
+      "pytest",
+      "json",
+      "tempfile",
+      "pathlib.Path",
+      "unittest.mock.patch",
+      "unittest.mock.MagicMock",
+      "claude_skills.common.ui_factory.create_ui",
+      "claude_skills.common.ui_factory.create_ui_from_args",
+      "claude_skills.common.rich_ui.RichUi",
+      "claude_skills.common.plain_ui.PlainUi"
     ],
     "src/claude_skills/claude_skills/tests/integration/test_unified_cli.py": [
       "sys",

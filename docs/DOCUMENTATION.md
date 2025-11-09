@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 19:04:59
+**Generated:** 2025-11-08 19:05:30
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 250
-- **Total Lines:** 89740
-- **Total Classes:** 357
+- **Total Files:** 251
+- **Total Lines:** 89845
+- **Total Classes:** 358
 - **Total Functions:** 909
 - **Avg Complexity:** 5.86
 - **Max Complexity:** 45
@@ -6341,6 +6341,27 @@ Attributes:
 - `test_parse_enum()`
 - `test_parse_generic_function()`
 - `test_parse_tsx_component()`
+
+---
+
+### `TestUIConfigIntegration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py:18`
+
+**Description:**
+> Integration tests for UI configuration.
+
+**Methods:**
+- `test_create_ui_respects_config_plain_mode()`
+- `test_create_ui_respects_config_rich_mode()`
+- `test_create_ui_from_args_with_plain_flag()`
+- `test_plain_ui_maintains_consistent_api()`
+- `test_rich_ui_maintains_consistent_api()`
+- `test_plain_ui_output_methods_dont_crash()`
+- `test_rich_ui_output_methods_dont_crash()`
+- `test_ui_backend_switch_is_seamless()`
+- `test_ui_config_backward_compatible()`
 
 ---
 
@@ -27931,6 +27952,19 @@ Returns:
 - `pathlib.Path`
 - `subprocess`
 - `sys`
+
+### `src/claude_skills/claude_skills/tests/integration/test_ui_config_integration.py`
+
+- `claude_skills.common.plain_ui.PlainUi`
+- `claude_skills.common.rich_ui.RichUi`
+- `claude_skills.common.ui_factory.create_ui`
+- `claude_skills.common.ui_factory.create_ui_from_args`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `tempfile`
+- `unittest.mock.MagicMock`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/integration/test_unified_cli.py`
 
