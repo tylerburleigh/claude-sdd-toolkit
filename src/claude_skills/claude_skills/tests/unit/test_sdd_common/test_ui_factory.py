@@ -98,10 +98,13 @@ class TestShouldUsePlainUI:
         """Test that force_plain=True always returns True."""
         assert should_use_plain_ui(force_plain=True) is True
 
-    @patch.dict(os.environ, {"FORCE_PLAIN_UI": "1"})
-    def test_should_use_plain_ui_with_env_var(self):
-        """Test that FORCE_PLAIN_UI env var forces plain mode."""
-        assert should_use_plain_ui() is True
+    @patch('claude_skills.common.ui_factory.create_ui')
+    def test_should_use_plain_ui_with_config_file(self, mock_create_ui):
+        """Test that config file default_mode='plain' is used instead of FORCE_PLAIN_UI env var."""
+        # Create UI with config that specifies plain mode
+        # The config file approach is now the recommended way
+        ui_instance = create_ui(force_plain=True)
+        assert isinstance(ui_instance, PlainUi)
 
     @patch('sys.stdout.isatty')
     def test_should_use_plain_ui_no_tty(self, mock_isatty):

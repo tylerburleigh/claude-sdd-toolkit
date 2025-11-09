@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 18:58:57
+**Generated:** 2025-11-08 19:03:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89648
+- **Total Lines:** 89689
 - **Total Classes:** 356
-- **Total Functions:** 907
-- **Avg Complexity:** 5.87
+- **Total Functions:** 909
+- **Avg Complexity:** 5.86
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -268,7 +268,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:785`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:822`
 
 **Description:**
 > Issue with assigned severity category.
@@ -427,7 +427,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:639`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:676`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -454,7 +454,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:88`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:108`
 
 **Description:**
 > Base exception for consultation errors.
@@ -476,7 +476,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:98`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:118`
 
 **Description:**
 > Raised when consultation times out.
@@ -947,7 +947,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:36`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:56`
 
 **Description:**
 > Overall fidelity verdict from AI review.
@@ -1253,7 +1253,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:44`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:64`
 
 **Description:**
 > Severity level for identified issues.
@@ -1633,7 +1633,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:93`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:113`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -1752,7 +1752,7 @@ Example:
 ### `ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:54`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:74`
 
 **Description:**
 > Structured representation of AI review response.
@@ -8221,7 +8221,7 @@ Returns:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:34`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:35`
 ⚠️ **Complexity:** 23 (High)
 
 **Description:**
@@ -8250,7 +8250,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:231`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:232`
 **Complexity:** 10
 
 **Description:**
@@ -8559,7 +8559,7 @@ Returns:
 ### `_output_json(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:213`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:214`
 **Complexity:** 1
 
 **Description:**
@@ -8577,7 +8577,7 @@ Returns:
 ### `_output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:190`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:191`
 **Complexity:** 5
 
 **Description:**
@@ -8595,7 +8595,7 @@ Returns:
 ### `_output_text(args, reviewer, parsed_responses, consensus, categorized_issues) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:172`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:173`
 **Complexity:** 1
 
 **Description:**
@@ -10718,7 +10718,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:807`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:844`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -10752,7 +10752,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:915`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:952`
 **Complexity:** 1
 
 **Description:**
@@ -13125,7 +13125,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:103`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:123`
 **Complexity:** 8
 
 **Description:**
@@ -13236,8 +13236,8 @@ Returns:
 ### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success, cache_key_params, use_cache, progress_emitter) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:188`
-⚠️ **Complexity:** 32 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:208`
+⚠️ **Complexity:** 33 (High)
 
 **Description:**
 > Consult multiple AI tools in parallel for fidelity review.
@@ -14004,7 +14004,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:679`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:716`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -17835,7 +17835,7 @@ Returns:
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:416`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:453`
 **Complexity:** 3
 
 **Description:**
@@ -17960,6 +17960,19 @@ Returns:
 
 ---
 
+### `get_enabled_fidelity_tools() -> Dict[str, Dict]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:47`
+**Complexity:** 1
+
+**Description:**
+> Get enabled tools from config.
+
+Returns dictionary of tools where enabled: true in config.
+
+---
+
 ### `get_enabled_tools(skill_name) -> Dict[str, Dict]`
 
 **Language:** python
@@ -17977,6 +17990,19 @@ Returns:
 
 **Parameters:**
 - `skill_name`: str
+
+---
+
+### `get_fidelity_review_timeout() -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:38`
+**Complexity:** 1
+
+**Description:**
+> Get consultation timeout from config.
+
+Returns timeout in seconds from config file (defaults to 600).
 
 ---
 
@@ -20115,7 +20141,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:466`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:470`
 **Complexity:** 3
 
 **Description:**
@@ -20497,7 +20523,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:615`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:652`
 **Complexity:** 1
 
 **Description:**
@@ -20604,7 +20630,7 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:475`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:512`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -21196,7 +21222,7 @@ Args:
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:448`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:452`
 **Complexity:** 1
 
 **Description:**
@@ -21255,7 +21281,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:306`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:307`
 **Complexity:** 1
 
 **Description:**
@@ -21300,7 +21326,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:419`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:423`
 **Complexity:** 2
 
 **Description:**
@@ -26670,6 +26696,7 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 
 - `argparse`
+- `claude_skills.common.ai_config`
 - `claude_skills.common.ai_tools.check_tool_available`
 - `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.json_output.output_json`
@@ -26691,6 +26718,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py`
 
+- `claude_skills.common.ai_config`
 - `claude_skills.common.ai_tools.ToolResponse`
 - `claude_skills.common.ai_tools.ToolStatus`
 - `claude_skills.common.ai_tools.check_tool_available`
