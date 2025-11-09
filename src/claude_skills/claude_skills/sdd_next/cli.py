@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 import os
 
-from rich.tree import Tree
 from rich.console import Console
 
 # Clean imports - no sys.path manipulation needed!
@@ -412,117 +411,98 @@ def _print_dependency_tree(deps: Dict[str, Any], task_id: str, ui) -> None:
     Print dependency tree visualization using UI abstraction.
 
     Supports both RichUi (Rich.Tree with colors) and PlainUi (plain text tree).
+    Uses ui.print_tree() abstraction for backend-agnostic rendering.
 
     Args:
         deps: Dependency information dictionary from check_dependencies()
         task_id: The task ID being analyzed
         ui: UI instance for console output
     """
-    # Determine backend type
+    # Prepare tree data in nested dict format for ui.print_tree()
+    tree_data: Dict[str, Any] = {}
+
+    # Determine if we're in Rich mode for conditional markup
     use_rich = ui.console is not None
 
+    # Add blocked_by dependencies (hard blockers)
+    if deps.get('blocked_by'):
+        if use_rich:
+            blocked_key = "✗ [red bold]Blocked by[/red bold]"
+        else:
+            blocked_key = "✗ Blocked by"
+
+        tree_data[blocked_key] = {}
+        for dep in deps['blocked_by']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            dep_status = dep.get('status', 'unknown')
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+
+            if use_rich:
+                tree_data[blocked_key][f"[red]{dep_id}[/red]"] = f"{dep_title} [dim]({dep_status})[/dim]"
+            else:
+                tree_data[blocked_key][dep_id] = f"{dep_title} ({dep_status})"
+
+    # Add soft dependencies (recommended pre-work)
+    if deps.get('soft_depends'):
+        if use_rich:
+            soft_key = "⚠️  [yellow bold]Soft dependencies[/yellow bold]"
+        else:
+            soft_key = "⚠️  Soft dependencies"
+
+        tree_data[soft_key] = {}
+        for dep in deps['soft_depends']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            dep_status = dep.get('status', 'unknown')
+            status_mark = "✓" if dep_status == 'completed' else "○"
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+
+            if use_rich:
+                tree_data[soft_key][f"{status_mark} [yellow]{dep_id}[/yellow]"] = f"{dep_title} [dim]({dep_status})[/dim]"
+            else:
+                tree_data[soft_key][f"{status_mark} {dep_id}"] = f"{dep_title} ({dep_status})"
+
+    # Add blocks (tasks blocked by this one)
+    if deps.get('blocks'):
+        if use_rich:
+            blocks_key = "⏳ [blue bold]This task blocks[/blue bold]"
+        else:
+            blocks_key = "⏳ This task blocks"
+
+        tree_data[blocks_key] = {}
+        for dep in deps['blocks']:
+            dep_id = dep.get('id', 'unknown')
+            dep_title = dep.get('title', 'Untitled')
+            # Truncate long titles
+            if len(dep_title) > 60:
+                dep_title = dep_title[:57] + "..."
+
+            if use_rich:
+                tree_data[blocks_key][f"[blue]{dep_id}[/blue]"] = dep_title
+            else:
+                tree_data[blocks_key][dep_id] = dep_title
+
+    # If no dependencies at all, add a note
+    if not tree_data:
+        if use_rich:
+            tree_data["[dim]No dependencies[/dim]"] = {}
+        else:
+            tree_data["No dependencies"] = {}
+
+    # Build root label with status indicator
+    can_start_indicator = "✅" if deps.get('can_start') else "🚫"
     if use_rich:
-        # RichUi backend - use Rich.Tree for enhanced display
-        can_start_indicator = "✅" if deps.get('can_start') else "🚫"
-        root = Tree(f"{can_start_indicator} [bold]{task_id}[/bold]")
-
-        # Add blocked_by dependencies (hard blockers)
-        if deps.get('blocked_by'):
-            blocked_branch = root.add("✗ [red bold]Blocked by[/red bold]")
-            for dep in deps['blocked_by']:
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                dep_status = dep.get('status', 'unknown')
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                blocked_branch.add(f"[red]{dep_id}[/red]: {dep_title} [dim]({dep_status})[/dim]")
-
-        # Add soft dependencies (recommended pre-work)
-        if deps.get('soft_depends'):
-            soft_branch = root.add("⚠️  [yellow bold]Soft dependencies[/yellow bold]")
-            for dep in deps['soft_depends']:
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                dep_status = dep.get('status', 'unknown')
-                # Show checkmark if completed
-                status_mark = "✓" if dep_status == 'completed' else "○"
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                soft_branch.add(f"{status_mark} [yellow]{dep_id}[/yellow]: {dep_title} [dim]({dep_status})[/dim]")
-
-        # Add blocks (tasks blocked by this one)
-        if deps.get('blocks'):
-            blocks_branch = root.add("⏳ [blue bold]This task blocks[/blue bold]")
-            for dep in deps['blocks']:
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                blocks_branch.add(f"[blue]{dep_id}[/blue]: {dep_title}")
-
-        # If no dependencies at all, add a note
-        if not deps.get('blocked_by') and not deps.get('soft_depends') and not deps.get('blocks'):
-            root.add("[dim]No dependencies[/dim]")
-
-        # Print the Rich tree
-        ui.console.print(root)
+        root_label = f"{can_start_indicator} [bold]{task_id}[/bold]"
     else:
-        # PlainUi backend - build plain text tree
-        can_start_indicator = "✅" if deps.get('can_start') else "🚫"
-        lines = [f"{can_start_indicator} {task_id}"]
+        root_label = f"{can_start_indicator} {task_id}"
 
-        # Add blocked_by dependencies (hard blockers)
-        if deps.get('blocked_by'):
-            lines.append("└── ✗ Blocked by")
-            for i, dep in enumerate(deps['blocked_by']):
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                dep_status = dep.get('status', 'unknown')
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                is_last = (i == len(deps['blocked_by']) - 1) and not deps.get('soft_depends') and not deps.get('blocks')
-                prefix = "    └── " if is_last else "    ├── "
-                lines.append(f"{prefix}{dep_id}: {dep_title} ({dep_status})")
-
-        # Add soft dependencies (recommended pre-work)
-        if deps.get('soft_depends'):
-            lines.append("└── ⚠️  Soft dependencies")
-            for i, dep in enumerate(deps['soft_depends']):
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                dep_status = dep.get('status', 'unknown')
-                status_mark = "✓" if dep_status == 'completed' else "○"
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                is_last = (i == len(deps['soft_depends']) - 1) and not deps.get('blocks')
-                prefix = "    └── " if is_last else "    ├── "
-                lines.append(f"{prefix}{status_mark} {dep_id}: {dep_title} ({dep_status})")
-
-        # Add blocks (tasks blocked by this one)
-        if deps.get('blocks'):
-            lines.append("└── ⏳ This task blocks")
-            for i, dep in enumerate(deps['blocks']):
-                dep_id = dep.get('id', 'unknown')
-                dep_title = dep.get('title', 'Untitled')
-                # Truncate long titles
-                if len(dep_title) > 60:
-                    dep_title = dep_title[:57] + "..."
-                is_last = i == len(deps['blocks']) - 1
-                prefix = "    └── " if is_last else "    ├── "
-                lines.append(f"{prefix}{dep_id}: {dep_title}")
-
-        # If no dependencies at all, add a note
-        if not deps.get('blocked_by') and not deps.get('soft_depends') and not deps.get('blocks'):
-            lines.append("└── No dependencies")
-
-        # Print the plain text tree
-        for line in lines:
-            print(line)
+    # Use ui.print_tree() abstraction instead of manual rendering
+    ui.print_tree(tree_data, label=root_label)
 
 
 def cmd_check_deps(args, printer, ui=None):
