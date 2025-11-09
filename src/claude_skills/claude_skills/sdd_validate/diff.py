@@ -360,30 +360,46 @@ def display_diff_side_by_side(
     ui=None
 ) -> None:
     """
-    Display diff report as side-by-side comparison using Rich.Columns and Panel.
+    Display diff report using UI abstraction.
 
-    Shows before/after values in parallel columns with color coding for changes.
+    Shows before/after values in parallel columns (RichUi) or sequentially (PlainUi).
 
     Args:
         report: DiffReport with changes to display
         spec_id: Spec identifier for display
         ui: UI instance for console output (optional)
     """
-    # Skip Rich visualization if using PlainUi (console would be None)
-    if ui and ui.console is None:
-        return
+    # Create UI if not provided
+    if ui is None:
+        ui = create_ui(force_rich=True)
 
-    console = ui.console if ui else create_ui(force_rich=True).console
+    # Determine backend type
+    use_rich = ui.console is not None
+
+    if use_rich:
+        console = ui.console
+    else:
+        console = None
 
     # Header
-    console.print()
-    console.print(f"[bold]Spec Fix Comparison:[/bold] {spec_id}", style="cyan")
-    console.print(f"[dim]Total Changes: {report.total_changes}[/dim]")
-    console.print()
+    if use_rich:
+        console.print()
+        console.print(f"[bold]Spec Fix Comparison:[/bold] {spec_id}", style="cyan")
+        console.print(f"[dim]Total Changes: {report.total_changes}[/dim]")
+        console.print()
 
-    if not report.total_changes:
-        console.print("[green]✓ No changes detected[/green]")
-        return
+        if not report.total_changes:
+            console.print("[green]✓ No changes detected[/green]")
+            return
+    else:
+        print()
+        print(f"===== Spec Fix Comparison: {spec_id} =====")
+        print(f"Total Changes: {report.total_changes}")
+        print()
+
+        if not report.total_changes:
+            print("✓ No changes detected")
+            return
 
     # Group changes by location
     changes_by_location: Dict[str, List[FieldChange]] = {}
@@ -397,10 +413,13 @@ def display_diff_side_by_side(
         changes = changes_by_location[location]
 
         # Location header
-        console.print(f"\n[bold cyan]Location:[/bold cyan] {location}")
+        if use_rich:
+            console.print(f"\n[bold cyan]Location:[/bold cyan] {location}")
+        else:
+            print(f"\nLocation: {location}")
 
         for change in changes:
-            # Create before/after panels
+            # Create before/after content
             before_content = _create_value_display(
                 change.field_path,
                 change.old_value,
@@ -414,7 +433,7 @@ def display_diff_side_by_side(
                 is_before=False
             )
 
-            # Style panels based on change type
+            # Style and titles based on change type
             if change.change_type == "added":
                 before_style = "dim"
                 after_style = "green"
@@ -431,39 +450,64 @@ def display_diff_side_by_side(
                 before_title = "Before"
                 after_title = "After"
 
-            before_panel = Panel(
-                before_content,
-                title=before_title,
-                border_style=before_style,
-                padding=(0, 1)
-            )
-            after_panel = Panel(
-                after_content,
-                title=after_title,
-                border_style=after_style,
-                padding=(0, 1)
-            )
+            if use_rich:
+                # RichUi: Display side-by-side with Columns
+                before_panel = Panel(
+                    before_content,
+                    title=before_title,
+                    border_style=before_style,
+                    padding=(0, 1)
+                )
+                after_panel = Panel(
+                    after_content,
+                    title=after_title,
+                    border_style=after_style,
+                    padding=(0, 1)
+                )
 
-            # Display side-by-side
-            columns = Columns([before_panel, after_panel], equal=True, expand=True)
-            console.print(columns)
-            console.print()  # Spacing between changes
+                # Display side-by-side
+                columns = Columns([before_panel, after_panel], equal=True, expand=True)
+                console.print(columns)
+                console.print()  # Spacing between changes
+            else:
+                # PlainUi: Display sequentially
+                print(f"\n  Field: {change.field_path}")
+                print(f"  {before_title}:")
+                print(f"    {_format_plain_value(change.old_value)}")
+                print(f"  {after_title}:")
+                print(f"    {_format_plain_value(change.new_value)}")
+                print()  # Spacing between changes
 
     # Display added/removed nodes
     if report.nodes_added or report.nodes_removed:
-        console.print()
+        if use_rich:
+            console.print()
+        else:
+            print()
 
     if report.nodes_added:
-        console.print("[bold green]Nodes Added:[/bold green]")
-        for node_id in sorted(report.nodes_added):
-            console.print(f"  [green]+ {node_id}[/green]")
-        console.print()
+        if use_rich:
+            console.print("[bold green]Nodes Added:[/bold green]")
+            for node_id in sorted(report.nodes_added):
+                console.print(f"  [green]+ {node_id}[/green]")
+            console.print()
+        else:
+            print("Nodes Added:")
+            for node_id in sorted(report.nodes_added):
+                print(f"  + {node_id}")
+            print()
 
     if report.nodes_removed:
-        console.print("[bold red]Nodes Removed:[/bold red]")
-        for node_id in sorted(report.nodes_removed):
-            console.print(f"  [red]- {node_id}[/red]")
-        console.print()
+        if use_rich:
+            console.print("[bold red]Nodes Removed:[/bold red]")
+            for node_id in sorted(report.nodes_removed):
+                console.print(f"  [red]- {node_id}[/red]")
+            console.print()
+        else:
+            print("Nodes Removed:")
+            for node_id in sorted(report.nodes_removed):
+                print(f"  - {node_id}")
+            print()
 
 
 def _create_value_display(
@@ -527,3 +571,23 @@ def _create_value_display(
             # Plain string without syntax highlighting
             text.append(str(value), style="white")
             return text
+
+
+def _format_plain_value(value: Any) -> str:
+    """
+    Format a value for plain text display.
+
+    Args:
+        value: Value to format
+
+    Returns:
+        Formatted string representation
+    """
+    if value is None:
+        return "(not present)"
+    elif isinstance(value, (list, dict)):
+        return format_json_output(value)
+    elif isinstance(value, bool):
+        return str(value).lower()
+    else:
+        return str(value)
