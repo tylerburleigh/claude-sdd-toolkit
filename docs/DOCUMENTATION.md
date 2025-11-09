@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 19:04:26
+**Generated:** 2025-11-08 19:04:59
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89692
-- **Total Classes:** 356
+- **Total Lines:** 89740
+- **Total Classes:** 357
 - **Total Functions:** 909
 - **Avg Complexity:** 5.86
 - **Max Complexity:** 45
@@ -5172,6 +5172,23 @@ Attributes:
 **Methods:**
 - `test_quiet_mode_suppresses_output()`
 - `test_quiet_mode_shows_errors()`
+
+---
+
+### `TestPlainVsRichOutput`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:290`
+
+**Description:**
+> Tests that verify plain and rich UI produce different outputs.
+
+**Methods:**
+- `test_plain_and_rich_ui_different_output()`
+- `test_plain_ui_print_methods_exist()`
+- `test_rich_ui_print_methods_exist()`
+- `test_plain_ui_uses_plain_console()`
+- `test_rich_ui_has_console()`
 
 ---
 
