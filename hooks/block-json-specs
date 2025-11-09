@@ -35,13 +35,31 @@ WHY: JSON specs are often very large (50KB+) and waste context tokens.
      The SDD toolkit provides optimized tools for working with specs.
 
 HOW TO FIX:
-  1. Use the `sdd-next` skill to get the next task from the spec
-  2. Use `sdd skills-dev start-helper -- format-output` for summaries
-  3. Use `sdd-update` skill to update task progress
+  Use sdd CLI commands to query spec information without reading the JSON file.
+  Efficient alternatives depend on what you need:
+
+  - Get the next task to work on:
+    Bash(sdd next-task <spec-id>)
+
+  - Query tasks by status, type, or parent:
+    Bash(sdd query-tasks <spec-id> --status pending --limit 5)
+
+  - Get detailed info on a specific task:
+    Bash(sdd get-task <spec-id> <task-id> --include-journal)
+
+  - Check overall progress:
+    Bash(sdd progress <spec-id>)
+
+  - Get spec statistics and structure:
+    Bash(sdd spec-stats <path-to-spec.md>)
+
+  - View decision journal:
+    Bash(sdd get-journal <spec-id>)
 
 EXAMPLE:
   Instead of: Read(specs/active/my-spec.json)
-  Use: Skill(sdd-next)
+  Use: Bash(sdd next-task plain-mode-support-2025-11-08)
+  Or:  Skill(sdd-next) [alternative option]
 
 This hook enforces proper SDD workflow and prevents token waste.
 
