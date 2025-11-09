@@ -134,7 +134,7 @@ Nested CLI commands for code documentation and testing.
 - **Commands:** generate (default)
 - **Completed:** 2025-11-09
 
-### - [ ] doc-query
+### - [x] doc-query
 **Description:** Query machine-readable codebase documentation
 - **CLI:** `/src/claude_skills/claude_skills/doc_query/cli.py`
 - **SKILL.md:** `/skills/doc-query/SKILL.md`
@@ -142,6 +142,7 @@ Nested CLI commands for code documentation and testing.
 - **Priority:** Medium
 - **Namespace:** `sdd doc query`
 - **Commands:** query (default)
+- **Completed:** 2025-11-09
 
 ### - [ ] run-tests
 **Description:** Comprehensive pytest testing and debugging framework
@@ -264,5 +265,5 @@ After completing all audits:
 
 **Last Updated:** 2025-11-09
 **Total Modules:** 18
-**Completed:** 10
-**Remaining:** 8
+**Completed:** 11
+**Remaining:** 7
