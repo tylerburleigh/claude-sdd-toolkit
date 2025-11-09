@@ -49,6 +49,7 @@ specs/.reports/
 specs/.reviews/
 specs/.backups/
 specs/.human-readable/
+specs/.fidelity-reviews/
 
 # ModelChorus configuration
 .modelchorusrc

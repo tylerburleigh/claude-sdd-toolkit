@@ -46,6 +46,80 @@ DEFAULT_MODELS = {
 }
 
 
+def get_global_config_path() -> Path:
+    """Get the path to the global AI configuration file.
+
+    Searches in multiple locations:
+    1. .claude/ai_config.yaml in current working directory
+    2. .claude/ai_config.yaml relative to project root
+
+    Returns:
+        Path to global ai_config.yaml (may not exist)
+    """
+    possible_paths = [
+        Path.cwd() / ".claude" / "ai_config.yaml",
+        Path(__file__).parent.parent.parent.parent / ".claude" / "ai_config.yaml",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            return path
+
+    # Return first path even if it doesn't exist
+    return possible_paths[0]
+
+
+def load_global_config() -> Dict:
+    """Load the global AI configuration file.
+
+    Returns:
+        Dictionary with global configuration, or empty dict if file doesn't exist
+    """
+    config_path = get_global_config_path()
+
+    try:
+        if not config_path.exists():
+            return {}
+
+        with open(config_path, 'r') as f:
+            config_data = yaml.safe_load(f)
+
+        if not config_data:
+            return {}
+
+        return config_data
+
+    except (yaml.YAMLError, IOError) as e:
+        # Error loading global config, continue without it
+        return {}
+
+
+def merge_configs(base: Dict, override: Dict) -> Dict:
+    """Deep merge override configuration into base configuration.
+
+    Arrays in override completely replace arrays in base (not merged).
+    Nested dictionaries are merged recursively.
+
+    Args:
+        base: Base configuration dictionary
+        override: Override configuration dictionary
+
+    Returns:
+        Merged configuration dictionary
+    """
+    result = base.copy()
+
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            # Recursively merge nested dictionaries
+            result[key] = merge_configs(result[key], value)
+        else:
+            # Override with value from override config (including arrays)
+            result[key] = value
+
+    return result
+
+
 def get_config_path(skill_name: str) -> Path:
     """Get the path to the config.yaml file for a skill.
 
@@ -75,35 +149,49 @@ def get_config_path(skill_name: str) -> Path:
 
 
 def load_skill_config(skill_name: str) -> Dict:
-    """Load full configuration from config.yaml with fallback to defaults.
+    """Load configuration from centralized global config with skill-specific overrides.
+
+    All AI configuration is centralized in .claude/ai_config.yaml.
+    This function extracts global defaults and merges in skill-specific settings.
+
+    Configuration hierarchy:
+    1. Code defaults (DEFAULT_TOOLS, DEFAULT_MODELS)
+    2. Global settings from .claude/ai_config.yaml (shared across all skills)
+    3. Skill-specific overrides from global config (keyed by skill_name)
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
 
     Returns:
-        Dict with complete configuration
+        Dict with complete merged configuration for the skill
     """
-    config_path = get_config_path(skill_name)
-
     try:
-        if not config_path.exists():
-            # Config file doesn't exist, use defaults
-            return {
-                "tools": DEFAULT_TOOLS.copy(),
-                "models": DEFAULT_MODELS.copy()
-            }
+        # Start with code defaults
+        result = {
+            "tools": DEFAULT_TOOLS.copy(),
+            "models": DEFAULT_MODELS.copy()
+        }
 
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
+        # Load global config
+        global_config = load_global_config()
+        if not global_config:
+            return result
 
-        if not config_data:
-            # Empty config, use defaults
-            return {
-                "tools": DEFAULT_TOOLS.copy(),
-                "models": DEFAULT_MODELS.copy()
-            }
+        # Extract global defaults (tools, models, consensus, consultation, rendering, enhancement)
+        # These are top-level keys that apply to all skills
+        global_defaults = {k: v for k, v in global_config.items() if k not in [
+            'run-tests', 'sdd-fidelity-review', 'sdd-render'
+        ]}
 
-        return config_data
+        # Merge global defaults into result
+        result = merge_configs(result, global_defaults)
+
+        # Extract and merge skill-specific config if it exists in global config
+        if skill_name in global_config:
+            skill_specific = global_config[skill_name]
+            result = merge_configs(result, skill_specific)
+
+        return result
 
     except (yaml.YAMLError, IOError, KeyError) as e:
         # Error loading config, fall back to defaults

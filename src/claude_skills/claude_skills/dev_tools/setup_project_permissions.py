@@ -150,6 +150,50 @@ def _prompt_for_git_permissions() -> list:
     return permissions_to_add
 
 
+def ensure_gitignore_pattern(project_root, pattern):
+    """Add a pattern to .gitignore if not already present.
+
+    Args:
+        project_root: Root directory of the project
+        pattern: Pattern to add to .gitignore (e.g., "specs/.fidelity-reviews/")
+
+    Returns:
+        Tuple of (success: bool, message: str, already_present: bool)
+    """
+    project_path = Path(project_root).resolve()
+    gitignore_file = project_path / ".gitignore"
+
+    try:
+        # Read existing .gitignore if it exists
+        if gitignore_file.exists():
+            gitignore_content = gitignore_file.read_text()
+            # Check if pattern already exists
+            if pattern in gitignore_content:
+                return True, f"Pattern already in .gitignore: {pattern}", True
+        else:
+            gitignore_content = ""
+
+        # Ensure pattern ends with newline for consistency
+        pattern_to_add = pattern if pattern.endswith('\n') else pattern + '\n'
+
+        # Add pattern if not present
+        if pattern not in gitignore_content:
+            # Add a comment explaining the pattern
+            if "SDD Toolkit" not in gitignore_content:
+                new_content = gitignore_content + "\n# SDD Toolkit\n" + pattern_to_add
+            else:
+                # If SDD Toolkit section exists, add pattern there
+                new_content = gitignore_content + pattern_to_add
+
+            gitignore_file.write_text(new_content)
+            return True, f"Added pattern to .gitignore: {pattern}", False
+        else:
+            return True, f"Pattern already in .gitignore: {pattern}", True
+
+    except (OSError, PermissionError) as e:
+        return False, f"Could not update .gitignore: {e}", False
+
+
 def update_permissions(project_root):
     """Update .claude/settings.local.json with SDD permissions."""
     project_path = Path(project_root).resolve()
@@ -202,12 +246,22 @@ def update_permissions(project_root):
         json.dump(settings, f, indent=2)
         f.write('\n')  # Add trailing newline
 
+    # Update .gitignore to include specs/.fidelity-reviews/
+    gitignore_success, gitignore_msg, already_present = ensure_gitignore_pattern(
+        project_path, "specs/.fidelity-reviews/"
+    )
+
     result = {
         "success": True,
         "settings_file": str(settings_file),
         "permissions_added": len(new_permissions),
         "total_permissions": len(settings["permissions"]["allow"]),
-        "new_permissions": new_permissions
+        "new_permissions": new_permissions,
+        "gitignore": {
+            "success": gitignore_success,
+            "message": gitignore_msg,
+            "already_present": already_present
+        }
     }
 
     print(json.dumps(result, indent=2))
@@ -217,6 +271,14 @@ def update_permissions(project_root):
         print(f"\n✅ Added {len(new_permissions)} new SDD permissions to {settings_file}", file=sys.stderr)
     else:
         print(f"\n✅ All SDD permissions already configured in {settings_file}", file=sys.stderr)
+
+    if gitignore_success:
+        if already_present:
+            print(f"✅ {gitignore_msg}", file=sys.stderr)
+        else:
+            print(f"✅ {gitignore_msg}", file=sys.stderr)
+    else:
+        print(f"⚠️  {gitignore_msg}", file=sys.stderr)
 
     return 0
 

@@ -30,6 +30,7 @@ from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.common.json_output import output_json
 from claude_skills.common import ai_config
+from claude_skills.common.paths import find_specs_directory, ensure_fidelity_reviews_directory
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -145,20 +146,42 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         # Step 6: Categorize issues
         categorized_issues = categorize_issues(consensus.consensus_issues)
 
-        # Step 7: Generate output
+        # Step 7: Determine output path (automatic by default)
+        output_path = None
+        if hasattr(args, 'output') and args.output:
+            # Use explicitly specified output path
+            output_path = Path(args.output)
+        else:
+            # Automatically determine path based on review scope
+            specs_dir = find_specs_directory()
+            if specs_dir:
+                fidelity_dir = ensure_fidelity_reviews_directory(specs_dir)
+
+                # Build filename based on review scope
+                if task_id:
+                    filename = f"{args.spec_id}-task-{task_id}-fidelity-review.md"
+                elif phase_id:
+                    filename = f"{args.spec_id}-phase-{phase_id}-fidelity-review.md"
+                else:
+                    # No specific scope - don't use automatic path
+                    filename = None
+
+                if filename:
+                    output_path = fidelity_dir / filename
+
+        # Step 8: Generate output
         output_format = args.format if hasattr(args, 'format') else 'text'
 
         if output_format == 'json':
-            _output_json(args, reviewer, parsed_responses, consensus, categorized_issues)
+            _output_json(args, reviewer, parsed_responses, consensus, categorized_issues, output_path)
         elif output_format == 'markdown':
-            _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues)
+            _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues, output_path)
         else:  # text
-            _output_text(args, reviewer, parsed_responses, consensus, categorized_issues)
+            _output_text(args, reviewer, parsed_responses, consensus, categorized_issues, output_path)
 
-        # If output file specified, write to file
-        if hasattr(args, 'output') and args.output:
+        if output_path:
             if args.verbose:
-                print(f"\nResults saved to: {args.output}", file=sys.stderr)
+                print(f"\nResults saved to: {output_path}", file=sys.stderr)
 
         return 0
 
@@ -170,7 +193,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         return 1
 
 
-def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues):
+def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues, output_path=None):
     """Generate text output format using Rich panels and formatting."""
     # Create review results dictionary for FidelityReport
     review_results = {
@@ -185,10 +208,19 @@ def _output_text(args, reviewer, parsed_responses, consensus, categorized_issues
     report = FidelityReport(review_results)
 
     # Use Rich console output with enhanced visuals
-    report.print_console_rich(verbose=args.verbose if hasattr(args, 'verbose') else False)
+    if output_path:
+        # For text format with file output, use markdown representation and save to file
+        result = report.generate_markdown()
+        try:
+            output_path.write_text(result)
+        except (OSError, PermissionError) as e:
+            print(f"Error writing to {output_path}: {e}", file=sys.stderr)
+    else:
+        # Print to console with Rich formatting
+        report.print_console_rich(verbose=args.verbose if hasattr(args, 'verbose') else False)
 
 
-def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues):
+def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_issues, output_path=None):
     """Generate markdown output format."""
     output = []
     output.append("# Implementation Fidelity Review\n")
@@ -208,10 +240,17 @@ def _output_markdown(args, reviewer, parsed_responses, consensus, categorized_is
             output.append(f"- {rec}\n")
 
     result = "".join(output)
-    print(result)
+
+    if output_path:
+        try:
+            output_path.write_text(result)
+        except (OSError, PermissionError) as e:
+            print(f"Error writing to {output_path}: {e}", file=sys.stderr)
+    else:
+        print(result)
 
 
-def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues):
+def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues, output_path=None):
     """Generate JSON output format using FidelityReport."""
     # Create review results dictionary for FidelityReport
     review_results = {
@@ -226,7 +265,14 @@ def _output_json(args, reviewer, parsed_responses, consensus, categorized_issues
     report = FidelityReport(review_results)
     result = report.generate_json()
 
-    output_json(result, getattr(args, 'compact', False))
+    if output_path:
+        try:
+            import json
+            output_path.write_text(json.dumps(result, indent=2) if not getattr(args, 'compact', False) else json.dumps(result))
+        except (OSError, PermissionError) as e:
+            print(f"Error writing to {output_path}: {e}", file=sys.stderr)
+    else:
+        output_json(result, getattr(args, 'compact', False))
 
 
 def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:

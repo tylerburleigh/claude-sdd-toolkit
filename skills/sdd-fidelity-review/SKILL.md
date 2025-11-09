@@ -90,8 +90,10 @@ sdd fidelity-review <spec-id> --task <task-id>
 sdd fidelity-review <spec-id> --phase <phase-id>
 ```
 
-**Optional flags:**
-- `--output <file>` - Write report to file instead of stdout
+**Output Location (Automatic):**
+- Task reviews: `specs/.fidelity-reviews/<spec-id>-task-<task-id>-fidelity-review.md`
+- Phase reviews: `specs/.fidelity-reviews/<spec-id>-phase-<phase-id>-fidelity-review.md`
+- Custom location: `--output <file>` (optional override)
 
 ### Step 3: Execute CLI Command
 
@@ -346,6 +348,7 @@ A successful fidelity review:
 - ✅ Assesses impact of deviations
 - ✅ Provides actionable recommendations
 - ✅ Generates clear, structured report
+- ✅ Automatically saves to `specs/.fidelity-reviews/` directory
 - ✅ Documents findings for future reference
 
 ---
