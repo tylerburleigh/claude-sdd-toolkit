@@ -309,11 +309,6 @@ sdd doc analyze-with-ai <directory> [options]
 - `ARCHITECTURE.md` - Synthesized architecture docs
 - `AI_CONTEXT.md` - Synthesized AI assistant quick reference
 
-**AI Tools:**
-- **cursor-agent with cheetah** (preferred) - 1M context, excellent for large codebases
-- **gemini** - Fast, good for structured analysis
-- **codex** - Good for code understanding
-
 **Multi-Agent Mode (Default):**
 - Consults 2 AI models in parallel for comprehensive analysis
 - Uses priority order: cursor-agent → gemini → codex
@@ -825,7 +820,7 @@ Documentation generated for the remaining 43 valid files."
 **Report AI model errors transparently:**
 ```
 "⚠️ AI model consultation encountered an error:
-- cursor-agent failed (model 'cheetah' not available)
+- cursor-agent failed (model 'gpt-5' not available)
 - gemini succeeded
 
 Documentation was generated successfully using gemini's analysis.

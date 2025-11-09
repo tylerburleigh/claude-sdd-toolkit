@@ -154,7 +154,7 @@ def demo_single_tool_error():
         "cursor-agent",
         timeout=60,
         callback=callback,
-        model="cheetah"
+        model="composer-1"
     ) as progress:
         # Simulate execution with error
         time.sleep(0.5)
@@ -167,7 +167,7 @@ def demo_single_tool_error():
             error="Connection refused: Unable to reach cursor-agent service",
             duration=0.5,
             timestamp=datetime.now().isoformat(),
-            model="cheetah",
+            model="composer-1",
             prompt="Sample prompt"
         )
 
@@ -188,7 +188,7 @@ def demo_batch_execution():
         tools,
         timeout=120,
         callback=callback,
-        models={"gemini": "gemini-2.5-pro", "codex": "gpt-5-codex", "cursor-agent": "cheetah"}
+        models={"gemini": "gemini-2.5-pro", "codex": "gpt-5-codex", "cursor-agent": "composer-1"}
     ) as progress:
         # Simulate parallel execution with staggered completion
 
@@ -201,7 +201,7 @@ def demo_batch_execution():
             error=None,
             duration=0.8,
             timestamp=datetime.now().isoformat(),
-            model="cheetah",
+            model="composer-1",
             prompt="Sample prompt"
         )
         progress.mark_complete("cursor-agent", response1)

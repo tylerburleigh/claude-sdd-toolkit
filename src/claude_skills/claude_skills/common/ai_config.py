@@ -36,8 +36,8 @@ DEFAULT_MODELS = {
         "flags": ["-m", "gemini-2.5-pro", "-p"]
     },
     "cursor-agent": {
-        "priority": ["cheetah"],
-        "flags": ["-p", "--model", "cheetah"]
+        "priority": ["composer-1"],
+        "flags": ["-p", "--model", "composer-1"]
     },
     "codex": {
         "priority": ["gpt-5-codex"],

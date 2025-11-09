@@ -72,11 +72,11 @@ models:
     flags: []
 
   codex:
-    priority: [cheetah]
+    priority: [composer-1]
     flags: [--skip-git-repo-check]
 
   cursor-agent:
-    priority: [cheetah]
+    priority: [composer-1]
     flags: []
 ```
 
@@ -159,7 +159,7 @@ consultation:
 - Good for deviation impact analysis and recommendations
 
 **Code-level verification:**
-- Use cheetah (codex/cursor-agent) for detailed implementation checks
+- Use composer-1 (codex/cursor-agent) for detailed implementation checks
 - Good for line-by-line spec compliance
 
 ### Consensus Configuration

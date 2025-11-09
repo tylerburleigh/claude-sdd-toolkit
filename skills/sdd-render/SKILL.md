@@ -708,7 +708,7 @@ Enhanced mode uses external CLI tools for AI processing:
 
 **Tool Priority Order:**
 1. **gemini** (gemini-2.5-pro) - Primary for strategic analysis and summaries
-2. **cursor-agent** (cheetah) - Secondary for repository-wide context
+2. **cursor-agent** (composer-1) - Secondary for repository-wide context
 3. **codex** (gpt-5-codex) - Tertiary for code-level insights (disabled by default)
 
 **Automatic Fallback:**
@@ -1641,7 +1641,7 @@ sdd render my-spec-001 --enhancement-level full --output docs/comprehensive.md
 **AI Tooling:**
 AI enhancements use external CLI tools via subprocess. The default priority order is:
 1. **gemini** (gemini-2.5-pro model) - Primary for strategic analysis and summaries
-2. **cursor-agent** (cheetah model) - Secondary for repository-wide context
+2. **cursor-agent** (composer-1 model) - Secondary for repository-wide context
 3. **codex** (gpt-5-codex model) - Tertiary for code-level insights (disabled by default)
 
 **Automatic Fallback:**

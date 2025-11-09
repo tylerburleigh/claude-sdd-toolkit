@@ -32,9 +32,9 @@ from claude_skills.common.ai_tools import (
 # CONFIGURATION
 # =============================================================================
 
-# Default models - cursor-agent with cheetah for fast analysis
+# Default models - cursor-agent with composer-1 for fast analysis
 DEFAULT_MODELS = {
-    "cursor-agent": "cheetah",        # Fast model for analysis
+    "cursor-agent": "composer-1",        # Fast model for analysis
     "gemini": "gemini-2.5-pro",       # Good for structured analysis
     "codex": "gpt-5-codex",           # Good for code understanding
 }
