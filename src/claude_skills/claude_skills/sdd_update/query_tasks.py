@@ -214,7 +214,7 @@ def _print_tasks_table(
             ui.console.print("[yellow]No tasks found matching the specified filters.[/yellow]")
         else:
             # PlainUi: use plain text
-            ui.print("No tasks found matching the specified filters.")
+            print("No tasks found matching the specified filters.")
         return
 
     # Ensure we have a UI instance
@@ -233,15 +233,15 @@ def _print_tasks_table(
     # Print filter info if filters are active (for both backends)
     if status_filter or type_filter or parent_filter:
         if ui.console is None:
-            # PlainUi
-            ui.print("\nActive Filters:")
+            # PlainUi - use standard print
+            print("\nActive Filters:")
             if status_filter:
-                ui.print(f"  Status: {status_filter}")
+                print(f"  Status: {status_filter}")
             if type_filter:
-                ui.print(f"  Type: {type_filter}")
+                print(f"  Type: {type_filter}")
             if parent_filter:
-                ui.print(f"  Parent: {parent_filter}")
-            ui.print()
+                print(f"  Parent: {parent_filter}")
+            print()
         else:
             # RichUi
             ui.console.print("\n[bold]Active Filters:[/bold]")
