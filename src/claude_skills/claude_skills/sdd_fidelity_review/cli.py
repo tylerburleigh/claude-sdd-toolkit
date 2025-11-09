@@ -53,7 +53,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
     """
     try:
         # Step 1: Initialize FidelityReviewer
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             print(f"Loading specification: {args.spec_id}", file=sys.stderr)
 
         # Check if incremental mode is requested
@@ -65,7 +65,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             return 1
 
         # Step 2: Generate review prompt
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             print("Generating review prompt...", file=sys.stderr)
 
         task_id = args.task if hasattr(args, 'task') and args.task else None
@@ -89,7 +89,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             return 0
 
         # Step 3: Consult AI tools
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             ai_tools = args.ai_tools if hasattr(args, 'ai_tools') and args.ai_tools else None
             tool_list = ', '.join(ai_tools) if ai_tools else 'all available'
             print(f"Consulting AI tools: {tool_list}", file=sys.stderr)
@@ -134,7 +134,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         # responses is already a list of ToolResponse objects
         response_list = responses
 
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             print(f"Parsing {len(response_list)} AI responses...", file=sys.stderr)
 
         parsed_responses = parse_multiple_responses(response_list)
@@ -180,14 +180,15 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             _output_text(args, reviewer, parsed_responses, consensus, categorized_issues, output_path)
 
         if output_path:
-            if args.verbose:
-                print(f"\nResults saved to: {output_path}", file=sys.stderr)
+            print(f"\nFidelity review saved to: {output_path}", file=sys.stderr)
+            if hasattr(args, 'verbose') and args.verbose:
+                print(f"Full path: {output_path.absolute()}", file=sys.stderr)
 
         return 0
 
     except Exception as e:
         print(f"Unexpected error: {e}", file=sys.stderr)
-        if args.verbose:
+        if hasattr(args, 'verbose') and args.verbose:
             import traceback
             traceback.print_exc()
         return 1

@@ -770,6 +770,8 @@ def cmd_query_tasks(args, printer):
 
     # Use Rich.Table formatter for text mode (default)
     if not json_mode and not simple_mode:
+        from claude_skills.common.ui_factory import create_ui
+        ui = create_ui()
         results = format_tasks_table(
             spec_id=args.spec_id,
             specs_dir=specs_dir,
@@ -777,7 +779,8 @@ def cmd_query_tasks(args, printer):
             task_type=args.type,
             parent=args.parent,
             printer=printer,
-            limit=args.limit
+            limit=args.limit,
+            ui=ui
         )
     else:
         # For simple or JSON mode, use original query_tasks

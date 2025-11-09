@@ -357,29 +357,45 @@ def build_tool_command(
 
     Example:
         >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
-        ['gemini', '-m', 'gemini-exp-1114', '-p', 'Analyze code']
+        ['gemini', '-m', 'gemini-exp-1114', '--output-format', 'json', '-p', 'Analyze code']
         >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
-        ['codex', '-m', 'claude-3.7-sonnet', 'Fix bug']
+        ['codex', 'exec', '--sandbox', 'read-only', '--ask-for-approval', 'never', '--json', '-m', 'claude-3.7-sonnet', 'Fix bug']
         >>> build_tool_command("cursor-agent", "Review code")
-        ['cursor-agent', '--print', 'Review code']
+        ['cursor-agent', '--print', '--json', 'Review code']
     """
     if tool == "gemini":
         cmd = ["gemini"]
         if model:
             cmd.extend(["-m", model])
+        # SECURITY: We intentionally do NOT add --yolo flag here
+        # In non-interactive mode without --yolo, Gemini defaults to read-only tools only
+        # IMPROVEMENT: Request JSON output for structured parsing
+        cmd.extend(["--output-format", "json"])
         cmd.extend(["-p", prompt])
         return cmd
 
     elif tool == "codex":
         cmd = ["codex", "exec"]
+        # SECURITY: Enforce read-only sandbox mode (critical for fidelity review)
+        cmd.extend(["--sandbox", "read-only"])
+        # SECURITY: Disable approval prompts for non-interactive operation
+        cmd.extend(["--ask-for-approval", "never"])
+        # IMPROVEMENT: Request JSON output for structured parsing
+        cmd.append("--json")
         if model:
             cmd.extend(["-m", model])
         cmd.append(prompt)
         return cmd
 
     elif tool == "cursor-agent":
+        # SECURITY: We intentionally do NOT add --force flag here
+        # Without --force, Cursor Agent operates in propose-only mode (read-only)
+        # IMPROVEMENT: Request JSON output for structured parsing
+        cmd = ["cursor-agent", "--print"]
+        cmd.append("--json")
+        cmd.append(prompt)
         # cursor-agent doesn't support model selection
-        return ["cursor-agent", "--print", prompt]
+        return cmd
 
     else:
         raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent")

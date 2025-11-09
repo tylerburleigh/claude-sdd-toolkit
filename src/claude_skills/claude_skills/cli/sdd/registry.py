@@ -25,7 +25,6 @@ def register_all_subcommands(subparsers, parent_parser):
     from claude_skills.sdd_validate.cli import register_validate
     from claude_skills.sdd_plan.cli import register_plan
     from claude_skills.sdd_plan_review.cli import register_plan_review
-    from claude_skills.sdd_render.cli import register_render
     from claude_skills.sdd_pr.cli import register_pr
     from claude_skills.context_tracker.cli import register_context, register_session_marker
     from claude_skills.sdd_fidelity_review.cli import register_commands as register_fidelity_review
@@ -38,7 +37,6 @@ def register_all_subcommands(subparsers, parent_parser):
     register_validate(subparsers, parent_parser)
     register_plan(subparsers, parent_parser)
     register_plan_review(subparsers, parent_parser)
-    register_render(subparsers, parent_parser)
     register_pr(subparsers, parent_parser)
     register_context(subparsers, parent_parser)
     register_session_marker(subparsers, parent_parser)
@@ -50,6 +48,16 @@ def register_all_subcommands(subparsers, parent_parser):
     _register_doc_cli(subparsers, parent_parser)
     _register_test_cli(subparsers, parent_parser)
     _register_skills_dev_cli(subparsers, parent_parser)
+
+    # Optional: register sdd_render (may have import issues during development)
+    try:
+        from claude_skills.sdd_render.cli import register_render
+        register_render(subparsers, parent_parser)
+        logger.debug("sdd_render registered")
+    except (ImportError, ModuleNotFoundError) as e:
+        logger.debug(f"sdd_render not available: {e}")
+        # This is fine - render skill can be added later if needed
+        pass
 
     # Optional: register workflow orchestration (may not exist in Phase 1)
     try:
