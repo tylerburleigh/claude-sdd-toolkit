@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-09 08:16:14
+**Generated:** 2025-11-09 08:20:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 252
-- **Total Lines:** 90581
+- **Total Lines:** 90643
 - **Total Classes:** 358
 - **Total Functions:** 921
 - **Avg Complexity:** 5.88
@@ -879,7 +879,7 @@ Example:
 ### `FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:135`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:134`
 
 **Description:**
 > Generate structured reports from fidelity review results.
@@ -1936,7 +1936,7 @@ Attributes:
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:19`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/report.py:18`
 
 **Description:**
 > Pretty printer for console output with optional color support.
@@ -27024,7 +27024,6 @@ Returns:
 - `json`
 - `pathlib.Path`
 - `rich.console.Console`
-- `rich.panel.Panel`
 - `rich.table.Table`
 - `sys`
 - `typing.Any`

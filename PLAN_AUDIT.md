@@ -100,21 +100,23 @@ These are the main workflow commands users interact with most frequently.
 - **Commands:** create, create-from-spec
 - **Completed:** 2025-11-09
 
-### - [ ] sdd-fidelity-review
+### - [x] sdd-fidelity-review
 **Description:** Compare implementation against spec requirements
 - **CLI:** `/src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
 - **SKILL.md:** `/skills/sdd-fidelity-review/SKILL.md`
 - **Audit:** `docs/research/sdd-fidelity-review/cli-output-audit-sdd-fidelity-review.md`
 - **Priority:** High
 - **Commands:** fidelity-review, task-review, phase-review
+- **Completed:** 2025-11-09
 
-### - [ ] sdd-modify
+### - [x] sdd-modify
 **Description:** Systematic spec modification and review feedback application
 - **CLI:** `/src/claude_skills/claude_skills/sdd_spec_mod/cli.py`
 - **SKILL.md:** `/skills/sdd-modify/SKILL.md`
 - **Audit:** `docs/research/sdd-modify/cli-output-audit-sdd-modify.md`
 - **Priority:** Medium
 - **Commands:** apply-modifications, parse-review
+- **Completed:** 2025-11-09
 
 ---
 
@@ -122,7 +124,7 @@ These are the main workflow commands users interact with most frequently.
 
 Nested CLI commands for code documentation and testing.
 
-### - [ ] code-doc
+### - [x] code-doc
 **Description:** Multi-language codebase documentation generation
 - **CLI:** `/src/claude_skills/claude_skills/code_doc/cli.py`
 - **SKILL.md:** `/skills/code-doc/SKILL.md`
@@ -130,6 +132,7 @@ Nested CLI commands for code documentation and testing.
 - **Priority:** Medium
 - **Namespace:** `sdd doc generate`
 - **Commands:** generate (default)
+- **Completed:** 2025-11-09
 
 ### - [ ] doc-query
 **Description:** Query machine-readable codebase documentation
@@ -261,5 +264,5 @@ After completing all audits:
 
 **Last Updated:** 2025-11-09
 **Total Modules:** 18
-**Completed:** 7
-**Remaining:** 11
+**Completed:** 10
+**Remaining:** 8

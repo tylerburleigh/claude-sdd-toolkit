@@ -13,6 +13,9 @@ from claude_skills.common.dependency_analysis import find_circular_dependencies
 from claude_skills.common.hierarchy_validation import validate_spec_hierarchy
 from claude_skills.common.completion import check_spec_completion
 
+# Import panel-based status report
+from claude_skills.sdd_update.status_report import print_status_report
+
 
 def validate_spec(
     spec_id: str,
@@ -130,34 +133,23 @@ def get_status_report(
 
     # Only print if printer was provided (not in JSON mode)
     if printer:
-        # Display report
-        printer.header(f"Status Report: {progress['title']}")
+        # Use the new panel-based status report display
+        title = f"Status Report: {progress['title']}"
+        print_status_report(spec_data, title=title)
 
-        printer.result("Overall Progress", f"{progress['completed_tasks']}/{progress['total_tasks']} ({progress['percentage']}%)")
-        printer.result("Status", progress["status"])
-
-        printer.info("\nTask Status:")
-        for status, count in task_counts.items():
-            printer.detail(f"{status}: {count}")
-
-        # Show journaling warning if needed
+        # Add journaling warning if needed (not part of main dashboard)
         if unjournaled_count > 0:
-            printer.info("\n⚠️  Journaling:")
-            printer.warning(f"  {unjournaled_count} completed task(s) need journal entries")
-            printer.detail(f"  Run 'check-journaling {spec_id}' for details")
+            printer.warning(f"⚠️  {unjournaled_count} completed task(s) need journal entries")
+            printer.detail(f"    Run 'check-journaling {spec_id}' for details")
+            print()
 
-        printer.info("\nPhases:")
-        for phase in phases:
-            status_symbol = {"completed": "✓", "in_progress": "→", "pending": "○", "blocked": "✗"}.get(phase["status"], "?")
-            printer.detail(f"{status_symbol} {phase['title']}: {phase['completed_tasks']}/{phase['total_tasks']} ({phase['percentage']}%)")
-
-        # Display completion status if relevant
+        # Display completion status if relevant (not part of main dashboard)
         if completion_result["is_complete"]:
-            printer.success("\n✅ Spec is complete! All tasks finished.")
+            printer.success("✅ Spec is complete! All tasks finished.")
             printer.detail("  Run 'sdd complete-spec' command to finalize and move to completed folder")
         elif completion_result["percentage"] >= 90:
             remaining = len(completion_result["incomplete_tasks"])
-            printer.info(f"\n⏳ Almost there! {remaining} task(s) remaining")
+            printer.info(f"⏳ Almost there! {remaining} task(s) remaining")
 
     return report
 
