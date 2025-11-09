@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-09 08:09:40
+**Generated:** 2025-11-09 08:16:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 252
-- **Total Lines:** 90518
+- **Total Lines:** 90581
 - **Total Classes:** 358
 - **Total Functions:** 921
-- **Avg Complexity:** 5.87
+- **Avg Complexity:** 5.88
 - **Max Complexity:** 45
 - **High Complexity Functions:**
   - complete_task_workflow (45)
@@ -8798,6 +8798,68 @@ Returns:
 
 ---
 
+### `_prepare_blockers_data(spec_data) -> Tuple[str, int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:160`
+**Complexity:** 9
+
+**Description:**
+> Prepare blockers data for panel display.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Tuple of (content_text, blocker_count) where content_text is formatted string
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
+### `_prepare_phases_table_data(spec_data, use_markup) -> Tuple[List[Dict[str, str]], int]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:48`
+**Complexity:** 10
+
+**Description:**
+> Prepare phases data for table display.
+
+Args:
+    spec_data: Loaded JSON spec data
+    use_markup: Whether to include Rich markup tags (True for RichUi, False for PlainUi)
+
+Returns:
+    Tuple of (table_data, phase_count) where table_data is a list of row dicts
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+- `use_markup`: bool
+
+---
+
+### `_prepare_progress_data(spec_data) -> Tuple[List[Dict[str, str]], str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:113`
+**Complexity:** 7
+
+**Description:**
+> Prepare progress metrics data for table display.
+
+Args:
+    spec_data: Loaded JSON spec data
+
+Returns:
+    Tuple of (table_data, subtitle) where table_data is a list of metric dicts
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
+
+---
+
 ### `_print_diff(diff, printer) -> None`
 
 **Language:** python
@@ -8869,6 +8931,28 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 - `specs_info`: List[Dict[str, Any]]
 - `verbose`: bool
 - `printer`: PrettyPrinter
+- `ui`: None
+
+---
+
+### `_print_status_dashboard(spec_data, ui) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:212`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Print status dashboard using UI protocol (supports both RichUi and PlainUi).
+
+Instead of creating a Rich.Layout, we print panels and tables sequentially,
+which works in both rich and plain modes.
+
+Args:
+    spec_data: Loaded JSON spec data
+    ui: UI instance for console output
+
+**Parameters:**
+- `spec_data`: Dict[str, Any]
 - `ui`: None
 
 ---
@@ -13485,26 +13569,6 @@ Example:
 
 ---
 
-### `create_blockers_panel(spec_data) -> Panel`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:189`
-**Complexity:** 9
-
-**Description:**
-> Create a panel showing blocked tasks with reasons.
-
-Args:
-    spec_data: Loaded JSON spec data
-
-Returns:
-    Rich Panel with blockers list
-
-**Parameters:**
-- `spec_data`: Dict[str, Any]
-
----
-
 ### `create_commit_from_staging(repo_root, spec_id, task_id, printer) -> Tuple[bool, Optional[str], Optional[str]]`
 
 **Language:** python
@@ -13639,26 +13703,6 @@ Returns:
 
 ---
 
-### `create_phases_panel(spec_data) -> Panel`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:47`
-**Complexity:** 10
-
-**Description:**
-> Create a panel showing all phases with status indicators.
-
-Args:
-    spec_data: Loaded JSON spec data
-
-Returns:
-    Rich Panel with phases table
-
-**Parameters:**
-- `spec_data`: Dict[str, Any]
-
----
-
 ### `create_pr_with_ai_description(repo_root, branch_name, base_branch, pr_title, pr_body, spec_data, spec_id, specs_dir, printer) -> bool`
 
 **Language:** python
@@ -13701,11 +13745,11 @@ Returns:
 
 ---
 
-### `create_progress_bar(percentage, width) -> str`
+### `create_progress_bar(percentage, width, use_markup) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:19`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:16`
+**Complexity:** 4
 
 **Description:**
 > Create a visual progress bar using Unicode box characters.
@@ -13713,33 +13757,15 @@ Returns:
 Args:
     percentage: Progress percentage (0-100)
     width: Width of progress bar in characters
+    use_markup: Whether to include Rich markup tags (True for RichUi, False for PlainUi)
 
 Returns:
-    Formatted progress bar string with color coding
+    Formatted progress bar string with optional color coding
 
 **Parameters:**
 - `percentage`: float
 - `width`: int
-
----
-
-### `create_progress_panel(spec_data) -> Panel`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:129`
-**Complexity:** 7
-
-**Description:**
-> Create a panel showing overall and phase-specific progress metrics.
-
-Args:
-    spec_data: Loaded JSON spec data
-
-Returns:
-    Rich Panel with progress metrics
-
-**Parameters:**
-- `spec_data`: Dict[str, Any]
+- `use_markup`: bool
 
 ---
 
@@ -13890,38 +13916,6 @@ Returns:
 - `template`: str
 - `specs_dir`: Path
 - `default_category`: Optional[str]
-
----
-
-### `create_status_layout(spec_data) -> Layout`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:260`
-**Complexity:** 1
-
-**Description:**
-> Create a Rich.Layout with multiple panels for status dashboard.
-
-Layout structure:
-┌─────────────────────────┬──────────────┐
-│                         │              │
-│   Phases Panel          │   Progress   │
-│                         │   Panel      │
-│                         │              │
-├─────────────────────────┴──────────────┤
-│                                         │
-│   Blockers Panel                        │
-│                                         │
-└─────────────────────────────────────────┘
-
-Args:
-    spec_data: Loaded JSON spec data
-
-Returns:
-    Rich Layout with populated panels
-
-**Parameters:**
-- `spec_data`: Dict[str, Any]
 
 ---
 
@@ -18982,7 +18976,7 @@ Returns:
 ### `get_status_summary(spec_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:332`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:395`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -21127,11 +21121,13 @@ Args:
 ### `print_status_report(spec_data, title, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:305`
-**Complexity:** 4
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/status_report.py:357`
+**Complexity:** 5
 
 **Description:**
 > Print a dashboard-style status report to console.
+
+Works with both RichUi (rich formatting) and PlainUi (plain text) backends.
 
 Args:
     spec_data: Loaded JSON spec data
@@ -27832,14 +27828,12 @@ Returns:
 
 - `claude_skills.common.ui_factory.create_ui`
 - `rich.console.Console`
-- `rich.layout.Layout`
-- `rich.panel.Panel`
 - `rich.table.Table`
-- `rich.text.Text`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+- `typing.Tuple`
 
 ### `src/claude_skills/claude_skills/sdd_update/time_tracking.py`
 

@@ -13,16 +13,17 @@ from rich.table import Table
 from claude_skills.common.ui_factory import create_ui
 
 
-def create_progress_bar(percentage: float, width: int = 20) -> str:
+def create_progress_bar(percentage: float, width: int = 20, use_markup: bool = True) -> str:
     """
     Create a visual progress bar using Unicode box characters.
 
     Args:
         percentage: Progress percentage (0-100)
         width: Width of progress bar in characters
+        use_markup: Whether to include Rich markup tags (True for RichUi, False for PlainUi)
 
     Returns:
-        Formatted progress bar string with color coding
+        Formatted progress bar string with optional color coding
     """
     filled_width = int((percentage / 100) * width)
     empty_width = width - filled_width
@@ -32,21 +33,25 @@ def create_progress_bar(percentage: float, width: int = 20) -> str:
 
     bar = filled_char * filled_width + empty_char * empty_width
 
-    # Color based on progress
-    if percentage >= 100:
-        return f"[green]{bar}[/green]"
-    elif percentage > 0:
-        return f"[yellow]{bar}[/yellow]"
+    # Color based on progress (only if markup enabled)
+    if use_markup:
+        if percentage >= 100:
+            return f"[green]{bar}[/green]"
+        elif percentage > 0:
+            return f"[yellow]{bar}[/yellow]"
+        else:
+            return f"[dim]{bar}[/dim]"
     else:
-        return f"[dim]{bar}[/dim]"
+        return bar
 
 
-def _prepare_phases_table_data(spec_data: Dict[str, Any]) -> Tuple[List[Dict[str, str]], int]:
+def _prepare_phases_table_data(spec_data: Dict[str, Any], use_markup: bool = True) -> Tuple[List[Dict[str, str]], int]:
     """
     Prepare phases data for table display.
 
     Args:
         spec_data: Loaded JSON spec data
+        use_markup: Whether to include Rich markup tags (True for RichUi, False for PlainUi)
 
     Returns:
         Tuple of (table_data, phase_count) where table_data is a list of row dicts
@@ -87,7 +92,7 @@ def _prepare_phases_table_data(spec_data: Dict[str, Any]) -> Tuple[List[Dict[str
         # Progress with visual bar
         if total_tasks > 0:
             percentage = (completed_tasks / total_tasks) * 100
-            progress_bar = create_progress_bar(percentage, width=15)
+            progress_bar = create_progress_bar(percentage, width=15, use_markup=use_markup)
             progress_text = f"{progress_bar} {percentage:.0f}%"
         else:
             progress_text = "—"
@@ -215,8 +220,11 @@ def _print_status_dashboard(spec_data: Dict[str, Any], ui) -> None:
         spec_data: Loaded JSON spec data
         ui: UI instance for console output
     """
+    # Determine if we should use markup based on UI backend
+    use_markup = ui.console is not None  # True for RichUi, False for PlainUi
+
     # Prepare all data
-    phases_data, phases_count = _prepare_phases_table_data(spec_data)
+    phases_data, phases_count = _prepare_phases_table_data(spec_data, use_markup=use_markup)
     progress_data, progress_subtitle = _prepare_progress_data(spec_data)
     blockers_content, blockers_count = _prepare_blockers_data(spec_data)
 

@@ -82,21 +82,23 @@ These are the main workflow commands users interact with most frequently.
 - **Commands:** review, review-file
 - **Completed:** 2025-11-09
 
-### - [ ] sdd-render
+### - [x] sdd-render
 **Description:** Render JSON specs to human-readable markdown
 - **CLI:** `/src/claude_skills/claude_skills/sdd_render/cli.py`
 - **SKILL.md:** `/skills/sdd-render/SKILL.md`
 - **Audit:** `docs/research/sdd-render/cli-output-audit-sdd-render.md`
 - **Priority:** Medium
 - **Commands:** render, render-file
+- **Completed:** 2025-11-09
 
-### - [ ] sdd-pr
+### - [x] sdd-pr
 **Description:** AI-powered pull request creation
 - **CLI:** `/src/claude_skills/claude_skills/sdd_pr/cli.py`
 - **SKILL.md:** `/skills/sdd-pr/SKILL.md`
 - **Audit:** `docs/research/sdd-pr/cli-output-audit-sdd-pr.md`
 - **Priority:** Medium
 - **Commands:** create, create-from-spec
+- **Completed:** 2025-11-09
 
 ### - [ ] sdd-fidelity-review
 **Description:** Compare implementation against spec requirements
@@ -259,5 +261,5 @@ After completing all audits:
 
 **Last Updated:** 2025-11-09
 **Total Modules:** 18
-**Completed:** 5
-**Remaining:** 13
+**Completed:** 7
+**Remaining:** 11

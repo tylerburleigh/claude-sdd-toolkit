@@ -11,7 +11,6 @@ import json
 import sys
 
 from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 from claude_skills.common.ui_factory import create_ui
 
@@ -370,10 +369,11 @@ class FidelityReport:
 
     def print_console_rich(self, verbose: bool = False, ui=None) -> None:
         """
-        Print formatted report to console using Rich panels with visual categorization.
+        Print formatted report to console with visual categorization.
 
-        Displays issues grouped by severity in color-coded panels for better
-        visual scanning. Uses Rich library for enhanced terminal output.
+        Works with both RichUi (rich formatting) and PlainUi (plain text) backends.
+        Displays issues grouped by severity in color-coded panels (Rich) or bordered
+        sections (Plain) for better visual scanning.
 
         Args:
             verbose: Include individual model responses (default: False)
@@ -383,11 +383,13 @@ class FidelityReport:
             >>> report = FidelityReport(review_results)
             >>> report.print_console_rich(verbose=False)
         """
-        # Skip Rich visualization if using PlainUi (console would be None)
-        if ui and ui.console is None:
-            return
+        # Ensure we have a UI instance
+        if ui is None:
+            ui = create_ui()
 
-        console = ui.console if ui else create_ui(force_rich=True).console
+        # Determine backend type
+        is_rich_ui = ui.console is not None
+        console = ui.console if is_rich_ui else None
 
         # Get consensus data
         consensus_dict = self._convert_to_dict(self.consensus)
@@ -396,26 +398,40 @@ class FidelityReport:
         consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
 
         # Header
-        console.print()
-        console.print("[bold cyan]IMPLEMENTATION FIDELITY REVIEW[/bold cyan]")
-        console.print(f"[dim]Spec: {self.spec_id}[/dim]")
-        console.print(f"[dim]Consulted {self.models_consulted} AI model(s)[/dim]")
-        console.print()
+        if is_rich_ui:
+            console.print()
+            console.print("[bold cyan]IMPLEMENTATION FIDELITY REVIEW[/bold cyan]")
+            console.print(f"[dim]Spec: {self.spec_id}[/dim]")
+            console.print(f"[dim]Consulted {self.models_consulted} AI model(s)[/dim]")
+            console.print()
 
-        # Consensus verdict with styling
-        verdict_upper = consensus_verdict.upper()
-        if consensus_verdict.lower() == "pass":
-            verdict_style = "bold green"
-        elif consensus_verdict.lower() == "fail":
-            verdict_style = "bold red"
-        elif consensus_verdict.lower() == "partial":
-            verdict_style = "bold yellow"
+            # Consensus verdict with styling
+            verdict_upper = consensus_verdict.upper()
+            if consensus_verdict.lower() == "pass":
+                verdict_style = "bold green"
+            elif consensus_verdict.lower() == "fail":
+                verdict_style = "bold red"
+            elif consensus_verdict.lower() == "partial":
+                verdict_style = "bold yellow"
+            else:
+                verdict_style = "bold"
+
+            console.print(f"[{verdict_style}]Consensus Verdict: {verdict_upper}[/{verdict_style}]")
+            console.print(f"Agreement Rate: {agreement_rate:.1%}")
+            console.print()
         else:
-            verdict_style = "bold"
+            # PlainUi
+            print()
+            print("IMPLEMENTATION FIDELITY REVIEW")
+            print(f"Spec: {self.spec_id}")
+            print(f"Consulted {self.models_consulted} AI model(s)")
+            print()
 
-        console.print(f"[{verdict_style}]Consensus Verdict: {verdict_upper}[/{verdict_style}]")
-        console.print(f"Agreement Rate: {agreement_rate:.1%}")
-        console.print()
+            # Consensus verdict
+            verdict_upper = consensus_verdict.upper()
+            print(f"Consensus Verdict: {verdict_upper}")
+            print(f"Agreement Rate: {agreement_rate:.1%}")
+            print()
 
         # Group issues by severity
         categorized_issues_list = self._convert_to_dict(self.categorized_issues)
@@ -449,40 +465,57 @@ class FidelityReport:
                     # Create panel content
                     issue_lines = "\n\n".join([f"• {issue}" for issue in issues])
 
-                    # Create panel
-                    panel = Panel(
-                        issue_lines,
-                        title=f"{config['icon']} {config['title']} ({len(issues)})",
-                        border_style=config["style"],
-                        padding=(1, 2)
-                    )
-                    console.print(panel)
-                    console.print()
+                    # Print panel based on backend
+                    if is_rich_ui:
+                        # RichUi: use Rich.Panel for enhanced display
+                        from rich.panel import Panel
+                        panel = Panel(
+                            issue_lines,
+                            title=f"{config['icon']} {config['title']} ({len(issues)})",
+                            border_style=config["style"],
+                            padding=(1, 2)
+                        )
+                        console.print(panel)
+                        console.print()
+                    else:
+                        # PlainUi: use ui.print_panel()
+                        ui.print_panel(
+                            content=issue_lines,
+                            title=f"{config['icon']} {config['title']} ({len(issues)})",
+                            style=config["style"]
+                        )
+                        print()
 
         # Recommendations section with consensus indicators
         parsed_responses_list = self._convert_to_dict(self.parsed_responses)
         if parsed_responses_list and len(parsed_responses_list) > 1:
             # Use consensus-aware display for multiple models
-            self._print_recommendation_consensus(console, parsed_responses_list)
+            self._print_recommendation_consensus(console, parsed_responses_list, is_rich_ui, ui)
         elif consensus_recommendations:
             # Fallback to simple list for single model or consensus-only data
-            console.print("[bold]RECOMMENDATIONS[/bold]")
-            console.print()
-            for rec in consensus_recommendations:
-                console.print(f"• {rec}")
-            console.print()
+            if is_rich_ui:
+                console.print("[bold]RECOMMENDATIONS[/bold]")
+                console.print()
+                for rec in consensus_recommendations:
+                    console.print(f"• {rec}")
+                console.print()
+            else:
+                print("RECOMMENDATIONS")
+                print()
+                for rec in consensus_recommendations:
+                    print(f"• {rec}")
+                print()
 
-        # Consensus matrix showing AI model agreement
-        if categorized_issues_list and len(categorized_issues_list) > 0:
+        # Consensus matrix showing AI model agreement (Rich mode only for now)
+        if is_rich_ui and categorized_issues_list and len(categorized_issues_list) > 0:
             self._print_consensus_matrix(console, categorized_issues_list)
 
-        # Issue aggregation panel showing common concerns
-        parsed_responses_list = self._convert_to_dict(self.parsed_responses)
-        if parsed_responses_list and len(parsed_responses_list) > 1:
+        # Issue aggregation panel showing common concerns (Rich mode only for now)
+        if is_rich_ui and parsed_responses_list and len(parsed_responses_list) > 1:
             self._print_issue_aggregation_panel(console, parsed_responses_list)
 
-        # Individual responses (if verbose)
-        if verbose:
+        # Individual responses (if verbose, Rich mode only for now)
+        if is_rich_ui and verbose:
             self._print_model_comparison_table(console)
 
     def _print_consensus_matrix(
@@ -658,8 +691,10 @@ class FidelityReport:
 
     def _print_recommendation_consensus(
         self,
-        console: Console,
-        parsed_responses: List[Dict[str, Any]]
+        console: Optional[Console],
+        parsed_responses: List[Dict[str, Any]],
+        is_rich_ui: bool = True,
+        ui=None
     ) -> None:
         """
         Print recommendations with consensus indicators showing agreement levels.
@@ -668,8 +703,10 @@ class FidelityReport:
         with visual indicators showing how many models agreed on each.
 
         Args:
-            console: Rich Console instance for output
+            console: Rich Console instance for output (None for PlainUi)
             parsed_responses: List of parsed model responses
+            is_rich_ui: Whether using RichUi backend
+            ui: UI instance for PlainUi output
         """
         # Collect all recommendations from all models
         all_recommendations = []
@@ -692,36 +729,61 @@ class FidelityReport:
         if not sorted_recs:
             return
 
-        console.print("[bold]RECOMMENDATIONS (with consensus)[/bold]")
-        console.print("[dim]Recommendations with agreement levels from AI models[/dim]")
-        console.print()
-
         # Calculate total models for percentage
         num_models = len(parsed_responses)
 
-        # Display recommendations with consensus indicators
-        for rec_text, count in sorted_recs:
-            # Calculate percentage of models that made this recommendation
-            percentage = (count / num_models) * 100
+        if is_rich_ui:
+            # RichUi: use Rich markup
+            console.print("[bold]RECOMMENDATIONS (with consensus)[/bold]")
+            console.print("[dim]Recommendations with agreement levels from AI models[/dim]")
+            console.print()
 
-            # Create consensus indicator symbols
-            if count >= num_models:
-                # All models agree
-                indicator = "[bold green]✓✓✓[/bold green]"
-                consensus_label = f"[green]{percentage:.0f}%[/green]"
-            elif count >= num_models * 0.66:
-                # Majority agreement (66%+)
-                indicator = "[yellow]✓✓[/yellow]"
-                consensus_label = f"[yellow]{percentage:.0f}%[/yellow]"
-            else:
-                # Minority (less than 66%)
-                indicator = "[cyan]✓[/cyan]"
-                consensus_label = f"[cyan]{percentage:.0f}%[/cyan]"
+            # Display recommendations with consensus indicators
+            for rec_text, count in sorted_recs:
+                # Calculate percentage of models that made this recommendation
+                percentage = (count / num_models) * 100
 
-            # Display recommendation with consensus indicator
-            console.print(f"{indicator} {consensus_label} • {rec_text}")
+                # Create consensus indicator symbols
+                if count >= num_models:
+                    # All models agree
+                    indicator = "[bold green]✓✓✓[/bold green]"
+                    consensus_label = f"[green]{percentage:.0f}%[/green]"
+                elif count >= num_models * 0.66:
+                    # Majority agreement (66%+)
+                    indicator = "[yellow]✓✓[/yellow]"
+                    consensus_label = f"[yellow]{percentage:.0f}%[/yellow]"
+                else:
+                    # Minority (less than 66%)
+                    indicator = "[cyan]✓[/cyan]"
+                    consensus_label = f"[cyan]{percentage:.0f}%[/cyan]"
 
-        console.print()
+                # Display recommendation with consensus indicator
+                console.print(f"{indicator} {consensus_label} • {rec_text}")
+
+            console.print()
+        else:
+            # PlainUi: use plain text
+            print("RECOMMENDATIONS (with consensus)")
+            print("Recommendations with agreement levels from AI models")
+            print()
+
+            # Display recommendations with consensus indicators
+            for rec_text, count in sorted_recs:
+                # Calculate percentage of models that made this recommendation
+                percentage = (count / num_models) * 100
+
+                # Create consensus indicator symbols (plain)
+                if count >= num_models:
+                    indicator = "✓✓✓"
+                elif count >= num_models * 0.66:
+                    indicator = "✓✓"
+                else:
+                    indicator = "✓"
+
+                # Display recommendation with consensus indicator
+                print(f"{indicator} {percentage:.0f}% • {rec_text}")
+
+            print()
 
     def _print_issue_aggregation_panel(
         self,
