@@ -12,6 +12,7 @@ from rich.table import Table
 from rich.console import Console
 
 from claude_skills.common import load_json_spec, PrettyPrinter
+from claude_skills.common.ui_factory import create_ui
 
 
 def format_tasks_table(
@@ -114,13 +115,21 @@ def _print_tasks_table(
 ) -> None:
     """Print tasks using Rich.Table for structured output."""
 
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        if matches:
+            # At least show that matches were found
+            for match in matches[:limit] if limit else matches:
+                print(f"{match.get('id', 'N/A')}: {match.get('title', match.get('summary', 'N/A'))}")
+        return
+
     if not matches:
-        console = ui.console if ui else Console()
+        console = ui.console if ui else create_ui(force_rich=True).console
         console.print("[yellow]No tasks found matching the specified filters.[/yellow]")
         return
 
     # Create Rich console
-    console = ui.console if ui else Console()
+    console = ui.console if ui else create_ui(force_rich=True).console
 
     # Build title with filter info
     title_parts = ["📋 Tasks"]

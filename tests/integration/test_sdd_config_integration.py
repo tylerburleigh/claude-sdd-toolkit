@@ -27,7 +27,7 @@ class TestCLIConfigIntegration:
         config_path = tmp_path / ".claude" / "sdd_config.json"
         config_path.parent.mkdir(parents=True)
         config_path.write_text(json.dumps({
-            'output': {'json': False, 'compact': False}
+            'output': {'default_mode': 'rich', 'json_compact': False}
         }))
 
         # Run command with --json flag
@@ -85,14 +85,14 @@ class TestCLIConfigIntegration:
 
             global_config.parent.mkdir(parents=True, exist_ok=True)
             global_config.write_text(json.dumps({
-                'output': {'json': True, 'compact': True}
+                'output': {'default_mode': 'json', 'json_compact': True}
             }))
 
             # Create project config with different settings
             project_config = tmp_path / ".claude" / "sdd_config.json"
             project_config.parent.mkdir(parents=True)
             project_config.write_text(json.dumps({
-                'output': {'json': False, 'compact': False}
+                'output': {'default_mode': 'rich', 'json_compact': False}
             }))
 
             # Project config should override global
@@ -183,8 +183,8 @@ class TestConfigBehavior:
         config_path = tmp_path / ".claude" / "sdd_config.json"
         config_path.parent.mkdir(parents=True)
         config_path.write_text(json.dumps({
-            'output': {'json': False}
-            # 'compact' not specified, should use default
+            'output': {'default_mode': 'json'}
+            # 'json_compact' not specified, should use default
         }))
 
         # CLI should work, merging config with defaults

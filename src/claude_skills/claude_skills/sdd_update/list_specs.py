@@ -9,6 +9,7 @@ from rich.console import Console
 
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
 from claude_skills.common.json_output import output_json
+from claude_skills.common.ui_factory import create_ui
 
 
 def _create_progress_bar(percentage: int, width: int = 10) -> str:
@@ -154,8 +155,13 @@ def _print_specs_text(
         printer.info("No specifications found.")
         return
 
-    # Use provided UI console or create default
-    console = ui.console if ui else Console()
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        printer.info("Rich table visualization not available in plain mode. Use --json for structured output.")
+        return
+
+    # Use provided UI console or create Rich console for table rendering
+    console = ui.console if ui else create_ui(force_rich=True).console
 
     # Create Rich.Table with specified columns
     table = Table(

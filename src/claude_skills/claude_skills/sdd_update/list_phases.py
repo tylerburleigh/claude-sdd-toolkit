@@ -13,6 +13,7 @@ from rich.console import Console
 
 from claude_skills.common import load_json_spec, PrettyPrinter
 from claude_skills.common.progress import list_phases as get_phases_list
+from claude_skills.common.ui_factory import create_ui
 
 
 def _create_progress_bar(percentage: int, width: int = 10) -> str:
@@ -74,9 +75,14 @@ def format_phases_table(
 
     if not phases:
         if printer:
-            console = ui.console if ui else Console()
-            console.print("[yellow]No phases found in spec.[/yellow]")
+            printer.info("No phases found in spec.")
         return []
+
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        if printer:
+            printer.info("Rich table visualization not available in plain mode. Use --json for structured output.")
+        return phases
 
     # Get hierarchy for dependency analysis
     hierarchy = spec_data.get("hierarchy", {})
@@ -100,13 +106,17 @@ def format_phases_table(
 def _print_phases_table(phases: List[Dict[str, Any]], ui=None) -> None:
     """Print phases using Rich.Table for structured output."""
 
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        return
+
     if not phases:
-        console = ui.console if ui else Console()
+        console = ui.console if ui else create_ui(force_rich=True).console
         console.print("[yellow]No phases to display.[/yellow]")
         return
 
     # Create Rich console
-    console = ui.console if ui else Console()
+    console = ui.console if ui else create_ui(force_rich=True).console
 
     # Create Rich.Table with specified columns
     table = Table(

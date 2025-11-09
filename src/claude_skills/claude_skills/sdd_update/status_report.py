@@ -13,6 +13,7 @@ from rich.layout import Layout
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from claude_skills.common.ui_factory import create_ui
 
 
 def create_progress_bar(percentage: float, width: int = 20) -> str:
@@ -310,7 +311,11 @@ def print_status_report(spec_data: Dict[str, Any], title: Optional[str] = None, 
         title: Optional title for the report
         ui: UI instance for console output (optional)
     """
-    console = ui.console if ui else Console()
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        return
+
+    console = ui.console if ui else create_ui(force_rich=True).console
 
     # Print title if provided
     if title:

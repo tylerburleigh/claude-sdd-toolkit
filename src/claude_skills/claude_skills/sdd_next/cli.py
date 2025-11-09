@@ -33,6 +33,7 @@ from claude_skills.common import (
     # JSON output formatting
     print_json_output,
 )
+from claude_skills.common.ui_factory import create_ui
 from claude_skills.common.json_output import output_json
 from claude_skills.common.completion import format_completion_prompt
 
@@ -498,8 +499,12 @@ def cmd_check_deps(args, printer, ui=None):
 
         # Build and render the dependency tree
         tree = _build_dependency_tree(deps, args.task_id)
-        console = ui.console if ui else Console()
-        console.print(tree)
+        # Skip Rich visualization if using PlainUi (console would be None)
+        if ui and ui.console is None:
+            printer.info("Dependency tree visualization not available in plain mode.")
+        else:
+            console = ui.console if ui else create_ui(force_rich=True).console
+            console.print(tree)
 
     return 0
 
@@ -535,7 +540,12 @@ def _check_all_task_deps(spec_data, args, printer, ui=None):
         print()  # Blank line for spacing
 
         # Use Rich Console for colored output
-        console = ui.console if ui else Console()
+        # Skip Rich visualization if using PlainUi (console would be None)
+        if ui and ui.console is None:
+            printer.info("Colored dependency visualization not available in plain mode.")
+            return 0
+
+        console = ui.console if ui else create_ui(force_rich=True).console
 
         if ready:
             console.print("\n✅ [bold green]Ready to start:[/bold green]")

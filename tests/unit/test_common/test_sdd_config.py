@@ -18,13 +18,16 @@ class TestConfigDefaults:
     def test_default_config_structure(self):
         """Verify DEFAULT_SDD_CONFIG has correct structure."""
         assert 'output' in DEFAULT_SDD_CONFIG
-        assert 'json' in DEFAULT_SDD_CONFIG['output']
-        assert 'compact' in DEFAULT_SDD_CONFIG['output']
+        assert 'default_mode' in DEFAULT_SDD_CONFIG['output']
+        assert 'json_compact' in DEFAULT_SDD_CONFIG['output']
 
     def test_default_values(self):
         """Verify default values are correct."""
-        assert DEFAULT_SDD_CONFIG['output']['json'] is True
-        assert DEFAULT_SDD_CONFIG['output']['compact'] is True
+        assert DEFAULT_SDD_CONFIG['output']['default_mode'] == 'rich'
+        assert DEFAULT_SDD_CONFIG['output']['json_compact'] is True
+        # Deprecated fields should be None
+        assert DEFAULT_SDD_CONFIG['output']['json'] is None
+        assert DEFAULT_SDD_CONFIG['output']['compact'] is None
 
 
 class TestConfigLoading:
@@ -38,32 +41,32 @@ class TestConfigLoading:
         config = load_sdd_config()
 
         assert config == DEFAULT_SDD_CONFIG
-        assert config['output']['json'] is True
-        assert config['output']['compact'] is True
+        assert config['output']['default_mode'] == 'rich'
+        assert config['output']['json_compact'] is True
 
     @patch('claude_skills.common.sdd_config.get_config_path')
-    @patch('builtins.open', new_callable=mock_open, read_data='{"output": {"json": false, "compact": false}}')
+    @patch('builtins.open', new_callable=mock_open, read_data='{"output": {"default_mode": "json", "json_compact": false}}')
     def test_load_with_custom_config(self, mock_file, mock_get_path):
         """Test loading with custom configuration."""
         mock_get_path.return_value = Path('/fake/.claude/sdd_config.json')
 
         config = load_sdd_config()
 
-        assert config['output']['json'] is False
-        assert config['output']['compact'] is False
+        assert config['output']['default_mode'] == 'json'
+        assert config['output']['json_compact'] is False
 
     @patch('claude_skills.common.sdd_config.get_config_path')
-    @patch('builtins.open', new_callable=mock_open, read_data='{"output": {"json": false}}')
+    @patch('builtins.open', new_callable=mock_open, read_data='{"output": {"default_mode": "json"}}')
     def test_load_with_partial_config(self, mock_file, mock_get_path):
         """Test loading with partial configuration - missing fields use defaults."""
         mock_get_path.return_value = Path('/fake/.claude/sdd_config.json')
 
         config = load_sdd_config()
 
-        # json is overridden
-        assert config['output']['json'] is False
-        # compact falls back to default
-        assert config['output']['compact'] is True
+        # default_mode is overridden
+        assert config['output']['default_mode'] == 'json'
+        # json_compact falls back to default
+        assert config['output']['json_compact'] is True
 
     @patch('pathlib.Path.exists')
     @patch('pathlib.Path.cwd')
@@ -84,40 +87,43 @@ class TestConfigValidation:
     """Test configuration validation and error handling."""
 
     def test_validate_with_valid_config(self):
-        """Test validation with valid configuration."""
+        """Test validation with valid configuration using current format."""
         config = {
             'output': {
-                'json': True,
-                'compact': False
+                'default_mode': 'json',
+                'json_compact': False
             }
         }
 
         validated = _validate_sdd_config(config)
 
-        assert validated['output']['json'] is True
-        assert validated['output']['compact'] is False
+        assert validated['output']['default_mode'] == 'json'
+        assert validated['output']['json_compact'] is False
+        # Deprecated fields should be None after validation
+        assert validated['output']['json'] is None
+        assert validated['output']['compact'] is None
 
     def test_validate_with_invalid_types(self):
         """Test validation with invalid types - should use defaults."""
         config = {
             'output': {
-                'json': 'true',  # Should be bool, not string
-                'compact': 1  # Should be bool, not int
+                'default_mode': 'invalid_mode',  # Should be 'rich', 'plain', or 'json'
+                'json_compact': 'true'  # Should be bool, not string
             }
         }
 
         validated = _validate_sdd_config(config)
 
         # Invalid types fall back to defaults
-        assert validated['output']['json'] is True  # Default
-        assert validated['output']['compact'] is True  # Default
+        assert validated['output']['default_mode'] == 'rich'  # Default
+        assert validated['output']['json_compact'] is True  # Default
 
     def test_validate_with_unknown_keys(self):
         """Test validation with unknown keys - should be ignored."""
         config = {
             'output': {
-                'json': True,
-                'compact': True
+                'default_mode': 'json',
+                'json_compact': True
             },
             'unknown_key': 'value'
         }
@@ -125,7 +131,7 @@ class TestConfigValidation:
         validated = _validate_sdd_config(config)
 
         # Known keys are validated
-        assert validated['output']['json'] is True
+        assert validated['output']['default_mode'] == 'json'
         # Unknown keys are not in result
         assert 'unknown_key' not in validated
 
@@ -169,18 +175,18 @@ class TestGetSddSetting:
     @patch('claude_skills.common.sdd_config.load_sdd_config')
     def test_get_simple_setting(self, mock_load):
         """Test getting a simple nested setting."""
-        mock_load.return_value = {'output': {'json': True, 'compact': False}}
+        mock_load.return_value = {'output': {'default_mode': 'json', 'json_compact': False}}
 
-        value = get_sdd_setting('output.json')
+        value = get_sdd_setting('output.default_mode')
 
-        assert value is True
+        assert value == 'json'
 
     @patch('claude_skills.common.sdd_config.load_sdd_config')
     def test_get_nested_setting(self, mock_load):
         """Test getting deeply nested setting."""
-        mock_load.return_value = {'output': {'json': False, 'compact': True}}
+        mock_load.return_value = {'output': {'default_mode': 'rich', 'json_compact': True}}
 
-        value = get_sdd_setting('output.compact')
+        value = get_sdd_setting('output.json_compact')
 
         assert value is True
 
@@ -196,12 +202,12 @@ class TestGetSddSetting:
     @patch('claude_skills.common.sdd_config.load_sdd_config')
     def test_get_missing_setting_without_default(self, mock_load):
         """Test getting missing setting falls back to DEFAULT_SDD_CONFIG."""
-        mock_load.return_value = {'output': {'json': False}}
+        mock_load.return_value = {'output': {'default_mode': 'json'}}
 
-        # 'compact' is missing, should get from DEFAULT_SDD_CONFIG
-        value = get_sdd_setting('output.compact')
+        # 'json_compact' is missing, should get from DEFAULT_SDD_CONFIG
+        value = get_sdd_setting('output.json_compact')
 
-        assert value == DEFAULT_SDD_CONFIG['output']['compact']
+        assert value == DEFAULT_SDD_CONFIG['output']['json_compact']
 
 
 class TestConfigPath:

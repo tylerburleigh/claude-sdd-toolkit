@@ -91,6 +91,19 @@ class PlainUi:
         self._messages: List[Message] = []
         self._context_stack: List[Dict[str, Any]] = []
 
+    @property
+    def console(self) -> None:
+        """
+        Compatibility property for code that accesses ui.console.
+
+        PlainUi does not use Rich Console - it outputs plain text directly.
+        This property returns None to maintain interface compatibility with RichUi.
+
+        Returns:
+            None (PlainUi does not use Rich Console)
+        """
+        return None
+
     # ================================================================
     # Output Methods (Ui Protocol Implementation)
     # ================================================================

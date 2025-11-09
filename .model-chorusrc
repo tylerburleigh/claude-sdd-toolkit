@@ -8,6 +8,8 @@ default_provider: gemini
 providers:
   claude:
     model: sonnet
+  cursor-agent:
+    model: composer-1
   gemini:
     model: gemini-2.5-flash
   codex:
@@ -22,27 +24,32 @@ workflows:
   chat:
     fallback_providers:
       - gemini
-      - claude
+      - cursor-agent
       - codex
+      #- claude
   argument:
     fallback_providers:
       - gemini
-      - claude
+      - cursor-agent
       - codex
+      #- claude
   thinkdeep:
     thinking_mode: medium
     fallback_providers:
       - gemini
-      - claude
+      - cursor-agent
       - codex
+      #- claude
   ideate:
     fallback_providers:
       - gemini
-      - claude
+      - cursor-agent
       - codex
+      #- claude
   consensus:
     providers:
       - gemini
-      - claude
+      - cursor-agent
       - codex
+      #- claude
     strategy: all_responses

@@ -15,6 +15,7 @@ from rich.text import Text
 from rich.table import Table
 
 from claude_skills.common.json_output import format_json_output
+from claude_skills.common.ui_factory import create_ui
 
 
 @dataclass
@@ -368,7 +369,11 @@ def display_diff_side_by_side(
         spec_id: Spec identifier for display
         ui: UI instance for console output (optional)
     """
-    console = ui.console if ui else Console()
+    # Skip Rich visualization if using PlainUi (console would be None)
+    if ui and ui.console is None:
+        return
+
+    console = ui.console if ui else create_ui(force_rich=True).console
 
     # Header
     console.print()

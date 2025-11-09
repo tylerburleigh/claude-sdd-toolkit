@@ -52,7 +52,4 @@ specs/.human-readable/
 specs/.fidelity-reviews/
 
 # ModelChorus configuration
-.modelchorusrc
-.modelchorusrc.yaml
-.modelchorusrc.yml
-.modelchorusrc.json
+.model-chorusrc

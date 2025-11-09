@@ -13,6 +13,7 @@ import sys
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from claude_skills.common.ui_factory import create_ui
 
 
 class PrettyPrinter:
@@ -382,7 +383,11 @@ class FidelityReport:
             >>> report = FidelityReport(review_results)
             >>> report.print_console_rich(verbose=False)
         """
-        console = ui.console if ui else Console()
+        # Skip Rich visualization if using PlainUi (console would be None)
+        if ui and ui.console is None:
+            return
+
+        console = ui.console if ui else create_ui(force_rich=True).console
 
         # Get consensus data
         consensus_dict = self._convert_to_dict(self.consensus)
