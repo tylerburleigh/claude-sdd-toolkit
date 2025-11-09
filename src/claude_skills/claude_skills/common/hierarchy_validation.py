@@ -593,8 +593,8 @@ def validate_metadata(hierarchy: Dict) -> Tuple[bool, List[str], List[str]]:
                 if 'target' not in metadata:
                     warnings.append(f"⚠️  WARNING: Verify node '{node_id}' with fidelity type missing metadata.target")
 
-        # Task nodes should have file_path based on task_category
-        if node_type == 'task':
+        # Task and subtask nodes should have file_path based on task_category
+        if node_type in ('task', 'subtask'):
             # Define allowed task categories
             allowed_categories = ['investigation', 'implementation', 'refactoring', 'decision', 'research']
 

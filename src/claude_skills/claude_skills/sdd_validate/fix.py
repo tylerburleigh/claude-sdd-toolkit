@@ -233,8 +233,14 @@ def _build_metadata_action(error: EnhancedError, spec_data: Dict[str, Any]) -> O
             metadata.setdefault("file_path", f"{node_id}.md")
         if node_type == "verify":
             metadata.setdefault("verification_type", "manual")
-            metadata.setdefault("command", "")
-            metadata.setdefault("expected", "")
+            # Set agent for fidelity verification
+            verification_type = metadata.get("verification_type")
+            if verification_type == "fidelity":
+                metadata.setdefault("agent", "sdd-fidelity-review")
+            else:
+                # For auto/manual verification
+                metadata.setdefault("command", "")
+                metadata.setdefault("expected", "")
 
     return FixAction(
         id=f"metadata.ensure:{node_id}",

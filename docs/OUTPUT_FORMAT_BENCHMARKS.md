@@ -19,16 +19,17 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 8,851 | 19,551 | 53 | 0.778 | 100.0% |
-| Text (Plain) | 8,851 | 19,551 | 53 | 0.427 | 100.0% |
-| JSON (Compact) | 1,551 | 6,015 | 1 | 0.363 | 570.7% ⚡ |
-| JSON (Pretty) | 2,288 | 7,600 | 290 | 0.363 | 386.8% ⚡ |
+| Text (Rich) | 618 | 2,578 | 31 | 0.162 | 100.0% |
+| Text (Plain) | 618 | 2,578 | 31 | 0.153 | 100.0% |
+| JSON (Compact) | 1,659 | 6,418 | 2 | 0.140 | 37.3% 📈 |
+| JSON (Pretty) | 2,427 | 8,069 | 303 | 0.130 | 25.5% 📈 |
 
 ### Sample Output (Text (Rich))
 
 ```
-[1;35m                                                                                    📋 Specifications                                                                                     [0m
-[3...
+                                       📋 Specifications                        
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ ID                             ┃ Titl...
 ```
 
 ---
@@ -37,18 +38,19 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 58 | 221 | 4 | 0.354 | 100.0% |
-| Text (Plain) | 58 | 221 | 4 | 0.368 | 100.0% |
-| JSON (Compact) | 70 | 280 | 1 | 0.336 | 82.9% 📈 |
-| JSON (Pretty) | 100 | 321 | 12 | 0.390 | 58.0% 📈 |
+| Text (Rich) | 69 | 247 | 5 | 0.121 | 100.0% |
+| Text (Plain) | 69 | 247 | 5 | 0.118 | 100.0% |
+| JSON (Compact) | 82 | 319 | 1 | 0.140 | 84.1% |
+| JSON (Pretty) | 127 | 387 | 17 | 0.121 | 54.3% 📈 |
 
 ### Sample Output (Text (Rich))
 
 ```
 [ACTION] Calculating progress...
 [SUCCESS] Progress calculated
-[RESULT] Spec: Add Pending Folder Support for Spec Workflow Management (add-pending-folder-support-for-2025-10-30-0847)
-[RESULT] Progress...
+[RESULT] Spec: Plain Text Output Configuration (plain-text-output-config-2025-11-08-001)
+[RESULT] Progress: 28/29 tasks (96%)
+[RESULT] Cu...
 ```
 
 ---
@@ -57,17 +59,18 @@ This report compares token counts across different output formats for high-frequ
 
 | Format | Tokens | Characters | Lines | Time (s) | Efficiency |
 |--------|--------|------------|-------|----------|------------|
-| Text (Rich) | 2,242 | 4,123 | 18 | 0.377 | 100.0% |
-| Text (Plain) | 2,242 | 4,123 | 18 | 0.346 | 100.0% |
-| JSON (Compact) | 183 | 765 | 1 | 0.343 | 1225.1% ⚡ |
-| JSON (Pretty) | 315 | 1,018 | 50 | 0.355 | 711.7% ⚡ |
+| Text (Rich) | 282 | 914 | 12 | 0.123 | 100.0% |
+| Text (Plain) | 282 | 914 | 12 | 0.122 | 100.0% |
+| JSON (Compact) | 94 | 394 | 1 | 0.125 | 300.0% ⚡ |
+| JSON (Pretty) | 160 | 521 | 26 | 0.122 | 176.2% ⚡ |
 
 ### Sample Output (Text (Rich))
 
 ```
 [ACTION] Listing phases...
-[1;35m                                             📋 Phases                                              [0m
-[34m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━...
+                                           📋 Phases                            
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┳
+┃ Phase     ...
 ```
 
 ---
@@ -76,15 +79,15 @@ This report compares token counts across different output formats for high-frequ
 
 ### Token Efficiency Ranking
 
-1. **JSON (Compact)**: 601 tokens (average)
-2. **JSON (Pretty)**: 901 tokens (average)
-3. **Text (Rich)**: 3,717 tokens (average)
-4. **Text (Plain)**: 3,717 tokens (average)
+1. **Text (Rich)**: 323 tokens (average)
+2. **Text (Plain)**: 323 tokens (average)
+3. **JSON (Compact)**: 612 tokens (average)
+4. **JSON (Pretty)**: 905 tokens (average)
 
 ### Recommendations
 
 **For API/LLM Consumption:**
-- Best format: **JSON (Compact)** (601 tokens avg)
+- Best format: **Text (Rich)** (323 tokens avg)
 - Most token-efficient for programmatic processing
 
 **For Human Reading:**
