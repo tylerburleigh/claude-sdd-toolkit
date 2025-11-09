@@ -29,6 +29,7 @@ from claude_skills.common.ai_tools import (
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.common.json_output import output_json
+from claude_skills.common import ai_config
 
 
 def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
@@ -305,6 +306,9 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
 
 def register_fidelity_review_command(subparsers: argparse._SubParsersAction, parent_parser: Optional[argparse.ArgumentParser] = None) -> None:
     """Register the fidelity-review command."""
+    # Load default timeout from config
+    default_timeout = ai_config.get_timeout('sdd-fidelity-review', 'consultation')
+
     parents = [parent_parser] if parent_parser is not None else []
     parser = subparsers.add_parser(
         "fidelity-review",
@@ -359,9 +363,9 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
     parser.add_argument(
         "--timeout",
         type=int,
-        default=120,
+        default=default_timeout,
         metavar="SECONDS",
-        help="Timeout for AI consultation (default: 120)"
+        help=f"Timeout for AI consultation (default: {default_timeout} from config)"
     )
     parser.add_argument(
         "--no-stream-progress",
