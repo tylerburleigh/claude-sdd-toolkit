@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-08 19:03:27
+**Generated:** 2025-11-08 19:04:26
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 250
-- **Total Lines:** 89689
+- **Total Lines:** 89692
 - **Total Classes:** 356
 - **Total Functions:** 909
 - **Avg Complexity:** 5.86
@@ -3456,7 +3456,7 @@ Attributes:
 ### `TestCreateUI`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:132`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:135`
 
 **Description:**
 > Tests for create_ui factory function.
@@ -3476,7 +3476,7 @@ Attributes:
 ### `TestCreateUIFromArgs`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:193`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:196`
 
 **Description:**
 > Tests for create_ui_from_args convenience function.
@@ -3920,7 +3920,7 @@ Attributes:
 ### `TestFormatBackendInfo`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:248`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:251`
 
 **Description:**
 > Tests for format_backend_info utility.
@@ -4064,7 +4064,7 @@ Attributes:
 ### `TestGetBackendName`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:231`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:234`
 
 **Description:**
 > Tests for get_backend_name utility.
@@ -6022,7 +6022,7 @@ Attributes:
 
 **Methods:**
 - `test_should_use_plain_ui_with_force_flag()`
-- `test_should_use_plain_ui_with_env_var()`
+- `test_should_use_plain_ui_with_config_file()`
 - `test_should_use_plain_ui_no_tty()`
 - `test_should_use_plain_ui_in_ci()`
 - `test_should_use_plain_ui_interactive_terminal()`
@@ -6330,7 +6330,7 @@ Attributes:
 ### `TestUIShorthand`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:267`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py:270`
 
 **Description:**
 > Tests for ui() shorthand function.

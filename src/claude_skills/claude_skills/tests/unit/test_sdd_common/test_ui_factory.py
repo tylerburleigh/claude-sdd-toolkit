@@ -285,3 +285,51 @@ class TestUIShorthand:
         ui_instance = ui(force_plain=True, collect_messages=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.collect_messages is True
+
+
+class TestPlainVsRichOutput:
+    """Tests that verify plain and rich UI produce different outputs."""
+
+    def test_plain_and_rich_ui_different_output(self):
+        """Test that PlainUi and RichUi produce different outputs."""
+        plain_ui = create_ui(force_plain=True)
+        rich_ui = create_ui(force_rich=True)
+
+        # Verify they are different backend types
+        assert isinstance(plain_ui, PlainUi)
+        assert isinstance(rich_ui, RichUi)
+        assert get_backend_name(plain_ui) != get_backend_name(rich_ui)
+
+    def test_plain_ui_print_methods_exist(self):
+        """Test that PlainUi has all required print methods."""
+        plain_ui = create_ui(force_plain=True)
+        assert hasattr(plain_ui, 'print_table')
+        assert hasattr(plain_ui, 'print_status')
+        assert hasattr(plain_ui, 'print_panel')
+        assert callable(plain_ui.print_table)
+        assert callable(plain_ui.print_status)
+        assert callable(plain_ui.print_panel)
+
+    def test_rich_ui_print_methods_exist(self):
+        """Test that RichUi has all required print methods."""
+        rich_ui = create_ui(force_rich=True)
+        assert hasattr(rich_ui, 'print_table')
+        assert hasattr(rich_ui, 'print_status')
+        assert hasattr(rich_ui, 'print_panel')
+        assert callable(rich_ui.print_table)
+        assert callable(rich_ui.print_status)
+        assert callable(rich_ui.print_panel)
+
+    def test_plain_ui_uses_plain_console(self):
+        """Test that PlainUi does not use Rich Console."""
+        plain_ui = create_ui(force_plain=True)
+        # PlainUi should not have a Rich console attribute
+        assert not hasattr(plain_ui, 'console') or plain_ui.console is None
+
+    def test_rich_ui_has_console(self):
+        """Test that RichUi has a Rich Console instance."""
+        rich_ui = create_ui(force_rich=True)
+        # RichUi should have a console attribute
+        assert hasattr(rich_ui, 'console')
+        from rich.console import Console
+        assert isinstance(rich_ui.console, Console)

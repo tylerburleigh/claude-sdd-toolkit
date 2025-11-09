@@ -2,7 +2,7 @@
   "metadata": {
     "project_name": "src",
     "version": "1.0.0",
-    "generated_at": "2025-11-09T00:03:27.322138Z",
+    "generated_at": "2025-11-09T00:04:26.934495Z",
     "languages": [
       "python"
     ],
@@ -10,7 +10,7 @@
   },
   "statistics": {
     "total_files": 250,
-    "total_lines": 89689,
+    "total_lines": 89692,
     "total_classes": 356,
     "total_functions": 909,
     "avg_complexity": 5.86,
@@ -25,7 +25,7 @@
     "by_language": {
       "python": {
         "files": 250,
-        "lines": 89689,
+        "lines": 89692,
         "classes": 356,
         "functions": 909,
         "avg_complexity": 5.86
@@ -5906,7 +5906,7 @@
         "claude_skills.common.plain_ui.PlainUi"
       ],
       "exports": [],
-      "lines": 284
+      "lines": 287
     },
     {
       "name": "test_ui_protocol",
@@ -19364,7 +19364,7 @@
       "bases": [],
       "methods": [
         "test_should_use_plain_ui_with_force_flag",
-        "test_should_use_plain_ui_with_env_var",
+        "test_should_use_plain_ui_with_config_file",
         "test_should_use_plain_ui_no_tty",
         "test_should_use_plain_ui_in_ci",
         "test_should_use_plain_ui_interactive_terminal"
@@ -19378,7 +19378,7 @@
     {
       "name": "TestCreateUI",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-      "line": 132,
+      "line": 135,
       "language": "python",
       "docstring": "Tests for create_ui factory function.",
       "bases": [],
@@ -19401,7 +19401,7 @@
     {
       "name": "TestCreateUIFromArgs",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-      "line": 193,
+      "line": 196,
       "language": "python",
       "docstring": "Tests for create_ui_from_args convenience function.",
       "bases": [],
@@ -19419,7 +19419,7 @@
     {
       "name": "TestGetBackendName",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-      "line": 231,
+      "line": 234,
       "language": "python",
       "docstring": "Tests for get_backend_name utility.",
       "bases": [],
@@ -19436,7 +19436,7 @@
     {
       "name": "TestFormatBackendInfo",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-      "line": 248,
+      "line": 251,
       "language": "python",
       "docstring": "Tests for format_backend_info utility.",
       "bases": [],
@@ -19453,7 +19453,7 @@
     {
       "name": "TestUIShorthand",
       "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-      "line": 267,
+      "line": 270,
       "language": "python",
       "docstring": "Tests for ui() shorthand function.",
       "bases": [],
@@ -51712,27 +51712,21 @@
           "call_type": "function_call"
         },
         {
-          "name": "test_should_use_plain_ui_with_env_var",
-          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 104,
-          "call_type": "function_call"
-        },
-        {
           "name": "test_should_use_plain_ui_no_tty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 113,
+          "line": 116,
           "call_type": "function_call"
         },
         {
           "name": "test_should_use_plain_ui_in_ci",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 121,
+          "line": 124,
           "call_type": "function_call"
         },
         {
           "name": "test_should_use_plain_ui_interactive_terminal",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 129,
+          "line": 132,
           "call_type": "function_call"
         }
       ],
@@ -51750,7 +51744,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 8
+      "call_count": 7
     },
     {
       "name": "create_ui",
@@ -51811,63 +51805,69 @@
           "call_type": "function_call"
         },
         {
+          "name": "test_should_use_plain_ui_with_config_file",
+          "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
+          "line": 106,
+          "call_type": "function_call"
+        },
+        {
           "name": "test_create_ui_returns_ui_instance",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 137,
+          "line": 140,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_force_plain",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 145,
+          "line": 148,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_force_rich",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 152,
+          "line": 155,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_conflicting_flags_raises_error",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 158,
+          "line": 161,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_with_collect_messages",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 164,
+          "line": 167,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_with_quiet_mode",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 172,
+          "line": 175,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_auto_selects_rich_for_tty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 181,
+          "line": 184,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_auto_selects_plain_for_non_tty",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 189,
+          "line": 192,
           "call_type": "function_call"
         },
         {
           "name": "test_get_backend_name_rich",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 239,
+          "line": 242,
           "call_type": "function_call"
         },
         {
           "name": "test_get_backend_name_plain",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 244,
+          "line": 247,
           "call_type": "function_call"
         }
       ],
@@ -51891,7 +51891,7 @@
           "call_type": "function_call"
         }
       ],
-      "call_count": 13
+      "call_count": 14
     },
     {
       "name": "create_ui_from_args",
@@ -51916,19 +51916,19 @@
         {
           "name": "test_create_ui_from_args_with_plain_flag",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 204,
+          "line": 207,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_from_args_with_quiet_flag",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 214,
+          "line": 217,
           "call_type": "function_call"
         },
         {
           "name": "test_create_ui_from_args_missing_attributes",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 227,
+          "line": 230,
           "call_type": "function_call"
         }
       ],
@@ -51983,13 +51983,13 @@
         {
           "name": "test_get_backend_name_rich",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 240,
+          "line": 243,
           "call_type": "function_call"
         },
         {
           "name": "test_get_backend_name_plain",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 245,
+          "line": 248,
           "call_type": "function_call"
         }
       ],
@@ -52013,13 +52013,13 @@
         {
           "name": "test_format_backend_info_returns_string",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 253,
+          "line": 256,
           "call_type": "function_call"
         },
         {
           "name": "test_format_backend_info_contains_key_info",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 258,
+          "line": 261,
           "call_type": "function_call"
         }
       ],
@@ -52084,19 +52084,19 @@
         {
           "name": "test_ui_shorthand_creates_instance",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 272,
+          "line": 275,
           "call_type": "function_call"
         },
         {
           "name": "test_ui_shorthand_with_force_plain",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 277,
+          "line": 280,
           "call_type": "function_call"
         },
         {
           "name": "test_ui_shorthand_with_collect_messages",
           "file": "src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_ui_factory.py",
-          "line": 282,
+          "line": 285,
           "call_type": "function_call"
         }
       ],
