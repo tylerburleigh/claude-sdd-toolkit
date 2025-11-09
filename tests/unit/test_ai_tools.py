@@ -262,28 +262,28 @@ def test_build_tool_command_gemini():
     """build_tool_command should build gemini command correctly."""
     cmd = build_tool_command("gemini", "test prompt", model="gemini-exp-1114")
 
-    assert cmd == ["gemini", "-m", "gemini-exp-1114", "-p", "test prompt"]
+    assert cmd == ["gemini", "-m", "gemini-exp-1114", "--output-format", "json", "-p", "test prompt"]
 
 
 def test_build_tool_command_gemini_no_model():
     """build_tool_command should handle gemini without model."""
     cmd = build_tool_command("gemini", "test prompt")
 
-    assert cmd == ["gemini", "-p", "test prompt"]
+    assert cmd == ["gemini", "--output-format", "json", "-p", "test prompt"]
 
 
 def test_build_tool_command_codex():
     """build_tool_command should build codex command correctly."""
     cmd = build_tool_command("codex", "test prompt", model="claude-3.7-sonnet")
 
-    assert cmd == ["codex", "-m", "claude-3.7-sonnet", "test prompt"]
+    assert cmd == ["codex", "exec", "--sandbox", "read-only", "--ask-for-approval", "never", "--json", "-m", "claude-3.7-sonnet", "test prompt"]
 
 
 def test_build_tool_command_cursor_agent():
     """build_tool_command should build cursor-agent command correctly."""
     cmd = build_tool_command("cursor-agent", "test prompt")
 
-    assert cmd == ["cursor-agent", "--print", "test prompt"]
+    assert cmd == ["cursor-agent", "--print", "--json", "test prompt"]
 
 
 def test_build_tool_command_unknown_tool():

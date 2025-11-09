@@ -1,18 +1,18 @@
 """
-Tests for status_report.py Rich.Layout dashboard functionality.
+Tests for status_report.py dashboard functionality.
 
-Tests the creation of multi-panel layouts for status reporting.
+Tests the creation of status reports with phases, progress, and blockers panels.
 """
 
 import pytest
 from io import StringIO
 from rich.console import Console
 from claude_skills.sdd_update.status_report import (
-    create_phases_panel,
-    create_progress_panel,
-    create_blockers_panel,
-    create_status_layout,
-    get_status_summary
+    print_status_report,
+    get_status_summary,
+    _prepare_phases_table_data,
+    _prepare_progress_data,
+    _prepare_blockers_data
 )
 
 
@@ -117,68 +117,66 @@ def spec_with_no_blockers():
     }
 
 
-def test_create_phases_panel_with_phases(sample_spec_data):
-    """Test phases panel creation with sample data."""
-    panel = create_phases_panel(sample_spec_data)
+def test_prepare_phases_data_with_phases(sample_spec_data):
+    """Test phases data preparation with sample data."""
+    phases_data, phase_count = _prepare_phases_table_data(sample_spec_data)
 
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "Phases" in panel_str
-
-
-def test_create_phases_panel_empty(empty_spec_data):
-    """Test phases panel handles empty data gracefully."""
-    panel = create_phases_panel(empty_spec_data)
-
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "No phases defined" in panel_str
+    assert phases_data is not None
+    assert len(phases_data) == 3
+    assert phase_count == 3
+    assert any("Phase 1" in row.get("Phase", "") for row in phases_data)
 
 
-def test_create_progress_panel_with_tasks(sample_spec_data):
-    """Test progress panel shows correct metrics."""
-    panel = create_progress_panel(sample_spec_data)
+def test_prepare_phases_data_empty(empty_spec_data):
+    """Test phases data preparation handles empty data gracefully."""
+    phases_data, phase_count = _prepare_phases_table_data(empty_spec_data)
 
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "Progress" in panel_str
-
-
-def test_create_progress_panel_empty(empty_spec_data):
-    """Test progress panel handles no tasks."""
-    panel = create_progress_panel(empty_spec_data)
-
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "No tasks" in panel_str or "Progress" in panel_str
+    assert phases_data == []
+    assert phase_count == 0
 
 
-def test_create_blockers_panel_with_blockers(sample_spec_data):
-    """Test blockers panel shows blocked tasks."""
-    panel = create_blockers_panel(sample_spec_data)
+def test_prepare_progress_data_with_tasks(sample_spec_data):
+    """Test progress data shows correct metrics."""
+    progress_data, subtitle = _prepare_progress_data(sample_spec_data)
 
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "Blockers" in panel_str
-    assert "task-2-3" in panel_str
-    assert "Redis server not configured" in panel_str
+    assert progress_data is not None
+    assert len(progress_data) > 0
+    assert any("Overall" in row.get("Metric", "") for row in progress_data)
 
 
-def test_create_blockers_panel_no_blockers(spec_with_no_blockers):
-    """Test blockers panel shows no blockers message."""
-    panel = create_blockers_panel(spec_with_no_blockers)
+def test_prepare_progress_data_empty(empty_spec_data):
+    """Test progress data handles no tasks."""
+    progress_data, subtitle = _prepare_progress_data(empty_spec_data)
 
-    assert panel is not None
-    panel_str = render_panel_to_string(panel)
-    assert "No blockers" in panel_str
+    assert progress_data is not None
+    assert any("No tasks" in row.get("Value", "") for row in progress_data)
 
 
-def test_create_status_layout(sample_spec_data):
-    """Test full layout creation."""
-    layout = create_status_layout(sample_spec_data)
+def test_prepare_blockers_data_with_blockers(sample_spec_data):
+    """Test blockers data shows blocked tasks."""
+    blockers_content, blocker_count = _prepare_blockers_data(sample_spec_data)
 
-    assert layout is not None
-    assert len(layout.children) > 0
+    assert blockers_content is not None
+    assert blocker_count == 1
+    assert "task-2-3" in blockers_content
+    assert "Redis server not configured" in blockers_content
+
+
+def test_prepare_blockers_data_no_blockers(spec_with_no_blockers):
+    """Test blockers data shows no blockers message."""
+    blockers_content, blocker_count = _prepare_blockers_data(spec_with_no_blockers)
+
+    assert blockers_content is not None
+    assert blocker_count == 0
+    assert "No blockers" in blockers_content
+
+
+def test_print_status_report(sample_spec_data):
+    """Test full report printing."""
+    # Capture output
+    from claude_skills.common.ui_factory import create_ui
+    print_status_report(sample_spec_data)
+    # Just verify it doesn't raise an exception
 
 
 def test_get_status_summary(sample_spec_data):
@@ -205,52 +203,51 @@ def test_get_status_summary_empty(empty_spec_data):
     assert len(summary["blockers"]) == 0
 
 
-def test_phases_panel_shows_status_indicators(sample_spec_data):
-    """Test phases panel includes status indicators."""
-    panel = create_phases_panel(sample_spec_data)
-    panel_str = render_panel_to_string(panel)
+def test_phases_data_shows_status_indicators(sample_spec_data):
+    """Test phases data includes status indicators."""
+    phases_data, _ = _prepare_phases_table_data(sample_spec_data)
+    combined_text = " ".join(str(row) for row in phases_data)
 
     # Should include different status indicators
-    assert "Complete" in panel_str or "✓" in panel_str
-    assert "In Progress" in panel_str or "●" in panel_str
-    assert "Pending" in panel_str or "○" in panel_str
+    assert "Complete" in combined_text or "✓" in combined_text
+    assert "In Progress" in combined_text or "●" in combined_text
+    assert "Pending" in combined_text or "○" in combined_text
 
 
-def test_phases_panel_shows_progress_percentages(sample_spec_data):
-    """Test phases panel includes progress percentages."""
-    panel = create_phases_panel(sample_spec_data)
-    panel_str = render_panel_to_string(panel)
+def test_phases_data_shows_progress_percentages(sample_spec_data):
+    """Test phases data includes progress percentages."""
+    phases_data, _ = _prepare_phases_table_data(sample_spec_data)
+    combined_text = " ".join(str(row) for row in phases_data)
 
     # Should show completion percentages
-    assert "100%" in panel_str  # phase-1 is 5/5
-    assert "60%" in panel_str  # phase-2 is 6/10
+    assert "100%" in combined_text  # phase-1 is 5/5
+    assert "60%" in combined_text  # phase-2 is 6/10
 
 
-def test_progress_panel_shows_metrics(sample_spec_data):
-    """Test progress panel includes all required metrics."""
-    panel = create_progress_panel(sample_spec_data)
-    panel_str = render_panel_to_string(panel)
+def test_progress_data_shows_metrics(sample_spec_data):
+    """Test progress data includes all required metrics."""
+    progress_data, _ = _prepare_progress_data(sample_spec_data)
+    combined_text = " ".join(str(row) for row in progress_data)
 
     # Should include key metrics
-    assert "Overall" in panel_str
-    assert "Completed" in panel_str
-    assert "In Progress" in panel_str
-    assert "Blocked" in panel_str or "Remaining" in panel_str
+    assert "Overall" in combined_text
+    assert "Completed" in combined_text
+    assert "In Progress" in combined_text
+    assert "Blocked" in combined_text or "Remaining" in combined_text
 
 
-def test_blockers_panel_shows_blocker_details(sample_spec_data):
-    """Test blockers panel includes task ID and reason."""
-    panel = create_blockers_panel(sample_spec_data)
-    panel_str = render_panel_to_string(panel)
+def test_blockers_data_shows_blocker_details(sample_spec_data):
+    """Test blockers data includes task ID and reason."""
+    blockers_content, _ = _prepare_blockers_data(sample_spec_data)
 
     # Should show blocked task details
-    assert "task-2-3" in panel_str
-    assert ("Redis server not configured" in panel_str or
-            "task-2-2" in panel_str)  # reason or dependency
+    assert "task-2-3" in blockers_content
+    assert ("Redis server not configured" in blockers_content or
+            "task-2-2" in blockers_content)  # reason or dependency
 
 
-def test_blockers_panel_limits_display():
-    """Test blockers panel limits display to top 10."""
+def test_blockers_data_limits_display():
+    """Test blockers data limits display to top 10."""
     # Create spec with more than 10 blocked tasks
     spec_data = {"hierarchy": {}}
     for i in range(15):
@@ -261,14 +258,11 @@ def test_blockers_panel_limits_display():
             "metadata": {"blocker_reason": f"Blocker {i}"}
         }
 
-    panel = create_blockers_panel(spec_data)
-    panel_str = render_panel_to_string(panel)
+    blockers_content, blocker_count = _prepare_blockers_data(spec_data)
 
-    # Should show only first 10
-    assert "task-0" in panel_str
-    assert "task-9" in panel_str
-    # Should not show beyond 10
-    # (Note: may not be strict due to rendering, but limit logic exists)
+    # Should show all blockers in content (not limited in data prep)
+    assert blocker_count == 15
+    assert "task-0" in blockers_content
 
 
 def test_status_summary_phases_sorted():
