@@ -317,7 +317,7 @@ Create `.claude/sdd_config.json` with recommended defaults:
 
 This can be done by copying the template:
 ```bash
-cp /Users/tylerburleigh/Documents/claude-sdd-toolkit/docs/sdd_config.json.template .claude/sdd_config.json
+cp ~/.claude/plugins/cache/sdd-toolkit/docs/sdd_config.json.template .claude/sdd_config.json
 ```
 
 Or creating it directly with Write tool.

@@ -2,7 +2,7 @@
 
 > Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-0.4.5-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.5.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -81,7 +81,9 @@ Want to see a complete workflow from start to finish? Check out [docs/examples/c
 
 ## Latest Updates
 
-**Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+**Version 0.5.0** introduces Plain UI mode for better terminal compatibility, modernizes the configuration system with `default_mode` (rich/plain/json) and centralized AI config in `.claude/ai_config.yaml`, and adds optional JSON Schema validation. Includes workflow guardrails with pre-tool hooks that enforce structured CLI usage, preventing direct spec JSON access. Test suite reorganized to package namespace with comprehensive integration coverage. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage.
 
 **Version 0.4.2** introduces compact mode with estimated 30% token savings from `sdd` command output. Configure via `.claude/sdd_config.json` or use `--compact`/`--no-compact` flags.
 
@@ -972,4 +974,4 @@ Ready to get started?
 
 ---
 
-**Version**: 0.4.5 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.5.0 | **License**: MIT | **Author**: Tyler Burleigh

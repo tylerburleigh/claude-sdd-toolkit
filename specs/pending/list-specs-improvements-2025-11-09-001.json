@@ -1,0 +1,800 @@
+{
+  "spec_id": "list-specs-improvements-2025-11-09-001",
+  "title": "list-specs Output Improvements & Command Parity Analysis",
+  "generated": "2025-11-09T00:00:00Z",
+  "last_updated": "2025-11-10T02:16:03.612571Z",
+  "metadata": {
+    "description": "Fix list-specs output inconsistencies (no limit, no sorting, field parity mismatch) and investigate similar issues in other commands to establish standardized output patterns.",
+    "estimated_hours": 18,
+    "owner": "Tyler Burleigh",
+    "assumptions": [
+      "Benchmark data from benchmark_output_tokens.py is accurate (Text: 611 tokens, JSON Compact: 1743 tokens, JSON Pretty: 2573 tokens)",
+      "Text mode should show minimum viable fields (ID, Title, Progress, Status)",
+      "Default limit should be 10-20 specs with --all flag to show everything",
+      "Changes maintain backward compatibility with existing integrations"
+    ]
+  },
+  "hierarchy": {
+    "spec-root": {
+      "id": "spec-root",
+      "type": "spec",
+      "title": "list-specs Output Improvements & Command Parity Analysis",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 23,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {}
+    },
+    "phase-1": {
+      "id": "phase-1",
+      "type": "phase",
+      "title": "Investigation & Analysis",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "phase-2"
+        ]
+      },
+      "metadata": {
+        "purpose": "Document current list-specs behavior, identify parity issues in other commands, and define output standards",
+        "estimated_hours": 6,
+        "risk_level": "low"
+      }
+    },
+    "phase-1-files": {
+      "id": "phase-1-files",
+      "type": "group",
+      "title": "Investigation Tasks",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "phase-1-verify"
+        ]
+      },
+      "metadata": {}
+    },
+    "task-1-1": {
+      "id": "task-1-1",
+      "type": "task",
+      "title": "Document list-specs current behavior",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "task-1-2"
+        ]
+      },
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-1-1": {
+      "id": "task-1-1-1",
+      "type": "subtask",
+      "title": "Analyze text vs JSON output field counts",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Document that text mode shows 2 fields (ID, Title) while JSON shows 10 fields (spec_id, status, title, total_tasks, completed_tasks, progress_percentage, current_phase, version, created_at, updated_at)"
+      }
+    },
+    "task-1-1-2": {
+      "id": "task-1-1-2",
+      "type": "subtask",
+      "title": "Document no limit/sorting behavior",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Confirm list-specs returns all 27+ specs with no default limit, sorted only alphabetically by filename"
+      }
+    },
+    "task-1-1-3": {
+      "id": "task-1-1-3",
+      "type": "subtask",
+      "title": "Review benchmark token analysis",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Analyze why JSON uses 3x more tokens than text (1743 vs 611 tokens) - document that it's primarily due to 10 fields \u00d7 27 specs with many null values"
+      }
+    },
+    "task-1-2": {
+      "id": "task-1-2",
+      "type": "task",
+      "title": "Inventory other commands with similar patterns",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": [],
+        "blocks": [
+          "task-1-3"
+        ]
+      },
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-2-1": {
+      "id": "task-1-2-1",
+      "type": "subtask",
+      "title": "Check list-phases for field parity",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/query_operations.py",
+        "description": "Compare text vs JSON field counts in list-phases output"
+      }
+    },
+    "task-1-2-2": {
+      "id": "task-1-2-2",
+      "type": "subtask",
+      "title": "Check query-tasks for field parity",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/query_operations.py",
+        "description": "Compare text vs JSON field counts in query-tasks output"
+      }
+    },
+    "task-1-2-3": {
+      "id": "task-1-2-3",
+      "type": "subtask",
+      "title": "Document limit/sorting support across commands",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Check which commands support --limit, --sort-by, or similar flags"
+      }
+    },
+    "task-1-3": {
+      "id": "task-1-3",
+      "type": "task",
+      "title": "Define output standards",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2",
+        "task-1-3-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "task_category": "decision",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-3-1": {
+      "id": "task-1-3-1",
+      "type": "subtask",
+      "title": "Define minimum viable fields for text mode",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Decide which fields text mode must show by default: ID, Title, Progress (%), Status (recommended minimum)"
+      }
+    },
+    "task-1-3-2": {
+      "id": "task-1-3-2",
+      "type": "subtask",
+      "title": "Define verbosity level behavior",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Define what -v and -vv should add: -v adds phase/version/dates, -vv adds description/author/file_path"
+      }
+    },
+    "task-1-3-3": {
+      "id": "task-1-3-3",
+      "type": "subtask",
+      "title": "Define default limit and sorting strategy",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "description": "Set default limit (10-20 specs), sorting options (by updated, by status, alphabetical), and --all flag behavior"
+      }
+    },
+    "phase-1-verify": {
+      "id": "phase-1-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "id": "verify-1-1",
+      "type": "verify",
+      "title": "Standards document complete and approved",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Clear documentation of field requirements, verbosity levels, limit/sort behavior ready for implementation",
+        "command": ""
+      }
+    },
+    "phase-2": {
+      "id": "phase-2",
+      "type": "phase",
+      "title": "Implementation (list-specs)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": [],
+        "blocks": [
+          "phase-3"
+        ]
+      },
+      "metadata": {
+        "purpose": "Implement defined standards for list-specs command",
+        "estimated_hours": 8,
+        "risk_level": "medium"
+      }
+    },
+    "phase-2-files": {
+      "id": "phase-2-files",
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "phase-2-verify"
+        ]
+      },
+      "metadata": {}
+    },
+    "task-2-1": {
+      "id": "task-2-1",
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py - Add default limit",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "task-2-2",
+          "task-2-5"
+        ]
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add --limit flag (default 20) and --all flag to show all specs. Update list_specs() function to apply limit after sorting."
+      }
+    },
+    "task-2-2": {
+      "id": "task-2-2",
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py - Add sorting options",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": [],
+        "blocks": [
+          "task-2-5"
+        ]
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Add --sort-by flag with options: updated (default), created, status, alphabetical. Implement sorting logic before limit is applied."
+      }
+    },
+    "task-2-3": {
+      "id": "task-2-3",
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py - Expand text output fields",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "task-2-4",
+          "task-2-5"
+        ]
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Update _print_specs_text() to show Progress (%) and Status columns in addition to ID and Title. Adjust table layout for readability."
+      }
+    },
+    "task-2-4": {
+      "id": "task-2-4",
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/cli.py - Implement verbosity levels",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": [],
+        "blocks": [
+          "task-2-5"
+        ]
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "description": "Add --verbose/-v and -vv support. -v adds current_phase, version, updated_at columns. -vv adds description, author, file_path."
+      }
+    },
+    "task-2-5": {
+      "id": "task-2-5",
+      "type": "task",
+      "title": "tests/unit/test_sdd_update/test_list_specs.py - Update tests",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1",
+          "task-2-2",
+          "task-2-3",
+          "task-2-4"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add tests for limit, sorting, new fields, and verbosity levels. Ensure backward compatibility with existing tests."
+      }
+    },
+    "phase-2-verify": {
+      "id": "phase-2-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4",
+        "verify-2-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "id": "verify-2-1",
+      "type": "verify",
+      "title": "Default limit works correctly",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd list-specs | wc -l",
+        "expected": "Output shows max 20 specs by default, --all shows all specs"
+      }
+    },
+    "verify-2-2": {
+      "id": "verify-2-2",
+      "type": "verify",
+      "title": "Sorting options work",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Verify --sort-by updated, created, status, alphabetical all produce correct order",
+        "command": ""
+      }
+    },
+    "verify-2-3": {
+      "id": "verify-2-3",
+      "type": "verify",
+      "title": "Text output shows new fields",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd list-specs --no-json",
+        "expected": "Table shows ID, Title, Progress (%), Status columns"
+      }
+    },
+    "verify-2-4": {
+      "id": "verify-2-4",
+      "type": "verify",
+      "title": "Verbosity levels work",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Default shows 4 fields, -v adds 3 more, -vv adds 3 more (total 10 matching JSON)",
+        "command": ""
+      }
+    },
+    "verify-2-5": {
+      "id": "verify-2-5",
+      "type": "verify",
+      "title": "All tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_list_specs.py -v",
+        "expected": "All tests pass including new tests for limit, sorting, fields, verbosity"
+      }
+    },
+    "phase-3": {
+      "id": "phase-3",
+      "type": "phase",
+      "title": "Validation & Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "purpose": "Validate improvements with benchmarks and document the pattern for other commands",
+        "estimated_hours": 4,
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "id": "phase-3-files",
+      "type": "group",
+      "title": "Validation Tasks",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "phase-3-verify"
+        ]
+      },
+      "metadata": {}
+    },
+    "task-3-1": {
+      "id": "task-3-1",
+      "type": "task",
+      "title": "Run benchmark to verify token improvements",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": [
+          "task-3-2"
+        ]
+      },
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "description": "Run scripts/benchmark_output_tokens.py to verify text output token reduction from showing additional fields. Document new baseline."
+      }
+    },
+    "task-3-2": {
+      "id": "task-3-2",
+      "type": "task",
+      "title": "Document output pattern for other commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "task_category": "implementation",
+        "file_path": "docs/OUTPUT_STANDARDS.md",
+        "estimated_hours": 2,
+        "description": "Create documentation describing the output pattern (default fields, verbosity, limit, sorting) that other commands should follow"
+      }
+    },
+    "phase-3-verify": {
+      "id": "phase-3-verify",
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "id": "verify-3-1",
+      "type": "verify",
+      "title": "Implementation fidelity review for entire spec",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "dependencies": {
+        "blocked_by": [],
+        "depends": [],
+        "blocks": []
+      },
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "spec-root",
+        "description": "Comprehensive review comparing implementation against all spec requirements",
+        "agent": "sdd-fidelity-review"
+      }
+    }
+  }
+}

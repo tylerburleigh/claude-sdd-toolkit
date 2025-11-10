@@ -4,18 +4,79 @@ All notable changes to the SDD Toolkit will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
 
-## [Unreleased]
+## [0.5.0] - 2025-11-09
 
 ### Added
-- Unit tests for the CLI registry to verify optional module handling and logging.
-- `claude_skills.common.schema_loader.load_json_schema()` utility with test coverage and CLI integration hooks.
-- Optional `validation` dependency group (`jsonschema>=4.0.0`) to enable full Draft 07 spec validation.
-
-### Fixed
-- `_try_register_optional()` helper ensures `sdd_render` and `sdd_fidelity_review` imports fail gracefully, preventing `sdd` CLI startup crashes when optional skills are absent.
+- **Plain UI Mode** - Terminal-agnostic plain text output mode alongside Rich mode
+  - `default_mode` config option: `rich`, `plain`, or `json`
+  - Automatic CI/CD environment detection (`FORCE_PLAIN_UI`)
+  - Consistent rendering across all CLI commands
+- **Centralized JSON Output** - `json_output.py` helper module with config-aware formatting
+  - Unified JSON printing across all commands
+  - Respects `default_mode` and `json_compact` configuration
+- **Schema Validation Infrastructure** - Optional JSON Schema validation with Draft 07 support
+  - Cached schema loader with environment variable overrides
+  - Optional `validation` dependency group (`jsonschema>=4.0.0`)
+  - Schema errors surfaced in `sdd validate` CLI output
+- **Workflow Guardrails** - Security and workflow enforcement
+  - Pre-tool hook (`hooks/block-json-specs`) blocks direct spec JSON reads
+  - Tool invocations enforce read-only sandbox mode
+  - Forces usage of structured `sdd` CLI commands
+- **Directory Scaffolding** - `.fidelity-reviews/` directory with README template
+- **Documentation** - `docs/OUTPUT_FORMAT_BENCHMARKS.md` with token savings analysis
+- **Testing Infrastructure** - Comprehensive integration and unit test coverage
+  - New CLI runner helpers (`tests/integration/cli_runner.py`)
+  - Cache operation tests covering CRUD, TTL, statistics, key generation
+  - All tests relocated to `src/claude_skills/claude_skills/tests`
 
 ### Changed
-- `sdd validate` now runs JSON Schema checks before structural analysis, reporting schema issues (or warnings when the validator is unavailable) alongside existing hierarchy diagnostics.
+- **Configuration System Modernization**
+  - Replaced `output.json` boolean with `output.default_mode` enum (rich/plain/json)
+  - Replaced `output.compact` with `output.json_compact` for clarity
+  - Legacy format still supported for backward compatibility
+- **AI Configuration Consolidation**
+  - Skills load AI settings from `.claude/ai_config.yaml` (centralized)
+  - Removed per-skill `config.yaml` files
+  - Added merge helpers and safe defaults for tool invocation
+  - Added `CLAUDE_SKILLS_TOOL_PATH` environment override for PATH resolution
+- **CLI Registry Improvements**
+  - `_try_register_optional()` ensures graceful degradation when optional modules missing
+  - Prevents CLI startup crashes when `sdd_render` or `sdd_fidelity_review` unavailable
+  - Enhanced logging for module registration
+- **Validation Workflow Enhancement**
+  - `sdd validate` runs schema validation before structural analysis
+  - Schema messages routed through CLI output system
+  - Diff views respect UI abstraction (Rich/Plain parity)
+- **UI Abstraction Layer**
+  - `ui_factory.py` creates appropriate UI based on mode
+  - Status dashboard refactored for Plain/Rich parity
+  - Path utilities moved to `paths.py`
+- **Test Suite Organization**
+  - All tests migrated from top-level `tests/` to `src/claude_skills/claude_skills/tests`
+  - pytest discovery configured for package namespace
+  - Removed duplicate legacy test files
+
+### Removed
+- **Legacy Documentation** - ~50,000 lines of research artifacts and design docs removed
+- **Per-Skill Configuration** - Individual `skills/*/config.yaml` files (replaced by centralized AI config)
+- **Top-Level Tests** - Removed `tests/` directory after migration to package namespace
+- **Duplicate Test Files** - Cleaned up obsolete test artifacts
+
+### Security
+- Tool invocations enforce read-only sandbox mode and JSON output
+- Pre-tool hooks prevent direct spec JSON access (forces CLI workflow)
+- Environment-based retries with PATH override capability
+
+### Breaking Changes
+- **Schema Validation** - Specs missing required metadata will now fail validation
+- **Hook Enforcement** - Direct reads of `specs/*.json` files exit with failure; scripts must use CLI commands (`sdd next-task`, `sdd query-tasks`, etc.)
+- **Config Migration** - Projects using `output.json`/`output.compact` should migrate to `output.default_mode`/`output.json_compact` (legacy format still supported)
+- **Optional Dependencies** - Schema validation requires `pip install ".[validation]"`; warnings shown when unavailable
+
+### Notes
+- All 36 cache tests passing
+- Plain mode verified in CI/CD environments
+- Config precedence: CLI flags → project config → global config → defaults
 
 ## [0.4.5] - 2025-11-05
 

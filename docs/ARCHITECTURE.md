@@ -1,541 +1,325 @@
-# Claude SDD Toolkit - Architecture Documentation
+# Architecture Documentation
 
-**Version:** 0.4.2
-**Generated:** 2025-11-04
+**Project**: claude-skills
+**Version**: 0.5.0
+**Generated**: 2025-11-09
 
-This document provides a comprehensive architectural overview of the Claude SDD Toolkit, synthesized from multiple AI model analyses (Gemini and Codex).
+> This architecture documentation was generated using AI-enhanced analysis with gemini.
+> **Note**: codex was attempted but failed due to requiring an interactive terminal (TTY). Error: "stdout is not a terminal"
 
 ---
 
-## System Overview
+## 1. System Overview
 
-The Claude SDD Toolkit is a Python-based command-line interface designed to facilitate **Spec-Driven Development (SDD)**—a methodology that structures the entire software development lifecycle around machine-readable JSON specification files. The toolkit provides a suite of modular "skills" that enable developers, particularly those working with the Claude AI assistant, to adopt a systematic, plan-first approach to software development.
+The **Claude SDD Toolkit** is a Python-based CLI toolkit designed to facilitate "Spec-Driven Development" (SDD). It provides a suite of commands that guide developers through the entire software development lifecycle, from planning and code analysis to implementation, testing, and pull request creation.
 
-### Core Purpose
-
-The toolkit solves the problem of unstructured, ad-hoc development by:
-- **Enforcing explicit task definitions** with dependencies and status tracking
-- **Maintaining a single source of truth** through version-controlled JSON specs
-- **Providing AI-assisted insights** via integration with external AI models
-- **Automating documentation** and codebase analysis
-- **Tracking progress** with detailed journaling and metrics
+The toolkit is heavily integrated with external AI command-line tools (like Gemini, Codex, and Cursor) to automate and assist with complex tasks such as documentation generation, plan reviews, and debugging.
 
 ### Target Users
+Software developers, especially those who use AI assistants for coding.
 
-Software developers using Claude AI who want to:
-- Maintain high organization and structure in their development process
-- Leverage AI assistance within defined "guardrails"
-- Track tasks, dependencies, and progress systematically
-- Generate and maintain comprehensive code documentation
+### Problem Solved
+The toolkit addresses the challenge of keeping AI-assisted development structured, systematic, and trackable by enforcing a "plan-first" workflow based on machine-readable JSON specification files.
 
 ---
 
-## High-Level Architecture
+## 2. Component Architecture
 
-### Architectural Style
+The system is architected as a collection of modular **"skills"**, each corresponding to a CLI subcommand group. All skills are built upon a shared `common` library.
 
-The toolkit follows a **modular CLI architecture** with:
-- **Unified entry point** (`sdd` command) that dispatches to specialized skills
-- **Plugin-style registry** for extensible skill loading
-- **File-based state management** using JSON specs on the filesystem
-- **External AI tool integration** via subprocess orchestration
+### Core Components
 
-### Key Architectural Decisions
+#### **`sdd_plan` (`sdd create`)**
+- **Responsibility**: Entry point of the workflow
+- **Function**: Creates new SDD specification files from predefined templates (simple, medium, complex)
+- **Location**: `src/claude_skills/claude_skills/sdd_plan/`
 
-1. **JSON as Single Source of Truth**
-   - All task information centralized in version-controlled JSON files
-   - Minimizes ambiguity and makes state changes explicit and auditable
-   - Enables git-based collaboration and change tracking
+#### **`sdd_plan_review` (`sdd review`)**
+- **Responsibility**: Quality assurance for planning phase
+- **Function**: Orchestrates consultations with multiple AI tools to review specs for feasibility, completeness, and potential issues before implementation
+- **AI Integration**: Multi-agent consensus approach
+- **Location**: `src/claude_skills/claude_skills/sdd_plan_review/`
 
-2. **Modular "Skills" Architecture**
-   - Each skill is a self-contained module with its own CLI
-   - New capabilities can be added without disrupting existing functionality
-   - Clear separation of concerns across the toolkit
+#### **`code_doc` & `doc_query` (`sdd doc`, `sdd doc-query`)**
+- **Responsibility**: Codebase intelligence and analysis
+- **Functions**:
+  - `code_doc`: Performs static analysis to generate `documentation.json` containing structural information
+  - `doc_query`: Provides CLI to query the JSON file (find code, analyze complexity, understand dependencies)
+- **Location**: `src/claude_skills/claude_skills/code_doc/`, `src/claude_skills/claude_skills/doc_query/`
 
-3. **Filesystem-Based State Management**
-   - No database required—all state lives in the filesystem
-   - Specs can be versioned alongside code in git
-   - Directory conventions (`specs/active/`, `specs/completed/`) enforce workflow structure
-   - Trade-off: Potential merge conflicts in concurrent scenarios
+#### **`sdd_next` (`sdd next-task`, `sdd prepare-task`)**
+- **Responsibility**: Core workflow engine
+- **Function**:
+  - Reads active spec
+  - Determines next unblocked task
+  - Checks dependencies
+  - Prepares execution plan
+  - Uses `doc_query` to automatically provide relevant codebase context
+- **Location**: `src/claude_skills/claude_skills/sdd_next/`
 
-4. **Delegation to External AI Tools**
-   - Orchestrates external AI CLIs (gemini, codex, cursor-agent) rather than implementing AI internally
-   - Focuses on workflow management as core competency
-   - Allows leveraging specialized, powerful AI tools
-   - Opportunistic integration: Commands detect available tools and gracefully degrade
+#### **`run_tests` (`sdd test`)**
+- **Responsibility**: Smart test runner and debugging assistant
+- **Function**: Wrapper for `pytest` with presets for common scenarios and AI "consult" feature for diagnosing test failures
+- **Location**: `src/claude_skills/claude_skills/run_tests/`
 
-5. **Append-Only Metrics and Telemetry**
-   - Durability-focused approach using JSONL format
-   - Test environment suppression to avoid noise
-   - Rotation and cleanup for long-running systems
+#### **`sdd_fidelity_review` (`sdd fidelity-review`)**
+- **Responsibility**: Post-implementation verification
+- **Function**: Compares code changes (`git diff`) against original task specification to ensure implementation fidelity
+- **AI Integration**: Uses AI tools to perform review
+- **Location**: `src/claude_skills/claude_skills/sdd_fidelity_review/`
 
----
+#### **`sdd_pr` (`sdd create-pr`)**
+- **Responsibility**: Pull request generation
+- **Function**: Final workflow step that gathers context from spec, git history, and task journals to generate comprehensive PR descriptions
+- **AI Integration**: AI-assisted description generation with user approval
+- **Location**: `src/claude_skills/claude_skills/sdd_pr/`
 
-## Component Architecture
+#### **`common`**
+- **Responsibility**: Shared internal library
+- **Functions**:
+  - Spec loading and validation
+  - AI tool interaction
+  - Caching
+  - Configuration management
+  - CLI output (`PrettyPrinter`)
+- **Location**: `src/claude_skills/claude_skills/common/`
+- **Underpins**: All other components
 
-### 1. CLI Layer
+### Component Relationships
 
-**Location:** `src/claude_skills/claude_skills/cli/sdd/`
+The components form a clear, sequential workflow:
 
-**Key Files:**
-- `__init__.py:16` - Main entry point, reorders global flags and dispatches to subcommands
-- `registry.py:18` - Registers all skills into nested subparsers
-
-**Responsibilities:**
-- Unified command dispatch via `sdd` CLI
-- Argument parsing and validation
-- Pretty-printing configuration
-- Telemetry logging
-
-**Design Patterns:**
-- **Facade Pattern:** Single interface to rich underlying functionality
-- **Command Pattern:** Each subcommand encapsulates a specific action
-- **Plugin Registry:** Modular skill loading via `register_*` hooks
-
----
-
-### 2. Core Skills
-
-#### **sdd-plan** - Specification Creation
-
-**Location:** `src/claude_skills/claude_skills/sdd_plan/`
-
-**Purpose:** Create new development specifications from templates
-
-**Key Operations:**
-- `sdd create <feature-name>` - Bootstrap new spec in `specs/pending/`
-- Template-based spec generation
-- Entry point for all new development work
-
-**Data Flow:**
-1. User invokes `sdd create`
-2. Template loaded from common templates
-3. New JSON spec written to `specs/pending/`
-4. Spec ID returned to user
-
----
-
-#### **sdd-validate** - Specification Validation
-
-**Location:** `src/claude_skills/claude_skills/sdd_validate/`
-
-**Purpose:** Ensure spec integrity and prevent workflow-breaking errors
-
-**Key Operations:**
-- Schema validation against JSON schema
-- Circular dependency detection
-- Hierarchy consistency checks
-- Auto-fix capabilities for common issues
-
-**Design Pattern:** **Validator Pattern** with configurable rules
-
----
-
-#### **sdd-next** - Task Discovery and Preparation
-
-**Location:** `src/claude_skills/claude_skills/sdd_next/`
-
-**Key Files:**
-- `cli.py:600` - `next-task` command
-- `cli.py:709` - `prepare-task` command with doc integration
-
-**Purpose:** Identify the next actionable task and provide execution context
-
-**Key Operations:**
-- Analyze dependencies to find unblocked tasks
-- Aggregate spec data, dependency analysis, and codebase context
-- Generate detailed implementation guidance
-
-**Data Flow:**
-1. Read active spec from `specs/active/`
-2. Compute dependency graph
-3. Filter for pending/in-progress tasks with satisfied dependencies
-4. Optionally query `doc-query` for relevant codebase context
-5. Return structured execution plan
-
-**Integration:** Deep integration with `doc-query` for context enrichment
-
----
-
-#### **sdd-update** - State Management
-
-**Location:** `src/claude_skills/claude_skills/sdd_update/`
-
-**Key Files:**
-- `cli.py:50` - Main update operations
-- `cli.py:166` - Spec mutation workflows
-
-**Purpose:** Manage spec lifecycle and task state transitions
-
-**Key Operations:**
-- `update-status` - Change task status (pending → in_progress → completed)
-- `add-journal` - Append decision logs and notes
-- `activate-spec` - Move spec from pending to active
-- `complete-spec` - Archive completed spec
-- `list-specs` - List specs by status
-- `execute-verify` - Run verification tasks
-
-**Workflow Pattern:**
 ```
-specs/pending/ → [activate-spec] → specs/active/ → [complete-spec] → specs/completed/
+sdd_plan → sdd_plan_review → sdd_next → implementation (using run_tests) → sdd_fidelity_review → sdd_pr
+                                ↓
+                           code_doc/doc_query (provides context)
 ```
 
 ---
 
-#### **sdd-render** - Specification Rendering
+## 3. Data Flow & State Management
 
-**Location:** `src/claude_skills/claude_skills/sdd_render/`
+### State Management Strategy
 
-**Key Features:**
-- Three rendering modes: basic (fast), enhanced (AI-powered)
-- Three enhancement levels: summary, standard, full
-- AI-powered executive summaries
-- Dependency graph visualization (Mermaid)
-- Progressive disclosure with collapsible sections
-- Complexity scoring and priority ranking
+**Primary State**: Managed in the filesystem within the `specs/` directory with subdirectories:
+- `pending/` - Specs not yet started
+- `active/` - Currently in-progress specs
+- `completed/` - Finished specs
+- `archived/` - Old/deprecated specs
 
-**Architecture:**
-- **Orchestrator Pattern:** `AIEnhancedRenderer` coordinates 4-stage pipeline
-- **Strategy Pattern:** Pluggable rendering strategies (basic vs. enhanced)
-- Multi-agent AI consultation for comprehensive analysis
+**Project Status**: Determined by:
+1. Location of spec file in directory structure
+2. `status` field of tasks within the spec (e.g., `"status": "pending"`)
 
----
+**Benefits**: Entire development state is easily versionable with Git
 
-#### **sdd-plan-review** - AI-Assisted Spec Review
+### Request/Response Lifecycle
 
-**Location:** `src/claude_skills/claude_skills/sdd_plan_review/`
+1. **User initiates command** (e.g., `sdd next-task <spec-id>`)
+2. **Tool loads JSON spec** from `specs/` directory
+3. **Business logic execution**:
+   - Find next task with `status: "pending"` and no unmet dependencies
+4. **AI integration** (for AI-integrated commands like `review`, `consult`):
+   - Construct detailed prompt with context from spec/codebase
+   - Execute external AI CLI tools as subprocesses
+   - Capture and parse `stdout` from AI tools
+5. **Result synthesis**:
+   - Detect consensus among models (for multi-agent commands)
+   - Present results to user or save report (e.g., in `specs/.reviews/`)
 
-**Purpose:** Multi-model spec review for quality assurance
+### Caching Strategy
 
-**Key Operations:**
-- Parallel consultation with 2+ AI models
-- Architecture, security, and feasibility analysis
-- Actionable feedback generation
+**Purpose**: Improve performance and reduce cost of AI consultations
 
-**Design Pattern:** **Strategy Pattern** with AI tool selection
-
----
-
-### 3. Documentation System
-
-#### **code-doc** - Documentation Generation
-
-**Location:** `src/claude_skills/claude_skills/code_doc/`
-
-**Key Files:**
-- `cli.py:108` - Main documentation commands
-- `generator.py:36` - Multi-language parser orchestration
-- `generator.py:60` - Statistics computation
-- `generator.py:113` - Markdown/JSON persistence
-
-**Purpose:** Generate structural and AI-enhanced codebase documentation
-
-**Supported Languages:**
-- Python, JavaScript/TypeScript, Go, HTML, CSS
-
-**Outputs:**
-- `DOCUMENTATION.md` - Human-readable reference
-- `documentation.json` - Machine-readable data
-- `ARCHITECTURE.md` - AI-synthesized architecture docs (with `analyze-with-ai`)
-- `AI_CONTEXT.md` - AI assistant quick reference (with `analyze-with-ai`)
-
-**Architecture:**
-- **Factory Pattern:** Language-specific parser selection
-- **Orchestrator Pattern:** Multi-stage documentation pipeline
-- **Multi-agent AI consultation** for enhanced documentation
+**Implementation**: `CacheManager` in `common` module handles:
+- Storing AI consultation results
+- Retrieving cached results based on inputs
+- TTL-based expiration
 
 ---
 
-#### **doc-query** - Documentation Query Engine
+## 4. Design Patterns
 
-**Location:** `src/claude_skills/claude_skills/doc_query/`
+### Command Pattern
+- **Usage**: Entire application architecture
+- **Implementation**: `argparse` maps subcommands to handler functions
+- **Examples**: `create` → `cmd_create`, `review` → `cmd_review`
+- **Benefits**: Modular, easily extensible CLI
 
-**Key Files:**
-- `cli.py:58` - Query operation dispatch
-- `cli.py:69` - Freshness checks
-- `cli.py:90` - Auto-regeneration
-- `cli.py:100` - Structured result formatting
+### Facade Pattern
+- **Usage**: Commands that simplify complex operations
+- **Example**: `sdd prepare-task` acts as facade for:
+  - Load spec
+  - Find next task
+  - Check dependencies
+  - Gather code context
+- **Benefits**: Single user action for complex series of operations
 
-**Purpose:** Query generated documentation to provide context for development tasks
+### Strategy Pattern
+- **Usage**: AI consultation logic
+- **Implementation**: Multiple strategies for AI tool selection:
+  - Specific tool: `--tool gemini`
+  - Auto-routing: `consult_with_auto_routing` selects best-suited tool
+- **Location**: `run_tests/consultation.py`
+- **Benefits**: Flexible AI tool selection based on problem type
 
-**Key Operations:**
-- Search classes, functions, modules
-- Find high-complexity code
-- Trace dependencies
-- Gather feature area context
-
-**Design Pattern:** **Proxy Pattern** - Ensures doc freshness by regenerating when stale
-
-**Integration Point:** Critical for `sdd-next` context enrichment
-
----
-
-### 4. Testing Infrastructure
-
-#### **run-tests** - Test Execution and AI Debugging
-
-**Location:** `src/claude_skills/claude_skills/run_tests/`
-
-**Key Files:**
-- `cli.py:55` - Test runner coordination
-- `cli.py:67` - AI consultation for debugging
-
-**Purpose:** pytest integration with AI-assisted failure analysis
-
-**Features:**
-- Test discovery and preset management
-- Parallel AI consultation for debugging
-- Systematic failure investigation
+### Factory Pattern
+- **Usage**: Language parser instantiation
+- **Implementation**: `create_parser_factory` in `claude_skills.code_doc.parsers`
+- **Benefits**: Decouples documentation generator from language-specific parsing (Python, JavaScript, etc.)
 
 ---
 
-### 5. Support Systems
+## 5. Technology Stack
 
-#### **context-tracker** - Token Usage Monitoring
+### Core Technology
+**Python 3** (≥ 3.9)
+- Strong scripting support
+- Excellent file I/O capabilities
+- Vast ecosystem of libraries
 
-**Location:** `src/claude_skills/claude_skills/context_tracker/`
+### Key Dependencies
 
-**Key Files:**
-- `cli.py:142` - Transcript analysis
+#### CLI & Output
+- **`argparse`**: Standard library for CLI interface
+- **`rich`**: User-friendly terminal output (colors, tables, trees)
+  - Evident in `PrettyPrinter` usage
+  - Markup: `[red bold]...[/red bold]`
 
-**Purpose:** Monitor Claude AI token usage to prevent context window overflow
+#### Data Validation
+- **`jsonschema`**: Validates `documentation.json` structure
+  - Ensures data integrity in code documentation
 
-**Data Source:** Claude transcript JSONL files from `~/.claude`
+#### Code Analysis
+- **`tree-sitter`** family:
+  - `tree-sitter-python`
+  - `tree-sitter-javascript`
+  - `tree-sitter-typescript`
+  - `tree-sitter-go`
+  - `tree-sitter-html`
+  - `tree-sitter-css`
 
----
+#### External Tool Orchestration
+**AI CLI Tools**:
+- `gemini`
+- `codex` (Note: Requires interactive terminal - not compatible with subprocess capture)
+- `cursor-agent`
 
-#### **Common Utilities**
-
-**Location:** `src/claude_skills/claude_skills/common/`
-
-**Key Modules:**
-- `__init__.py:10` - Shared exports
-- `printer.py:12` - `PrettyPrinter` facade for consistent output styling
-- `metrics.py:74` - Telemetry and usage tracking
-- `spec.py` - Spec file I/O operations
-- `validation.py` - Shared validation logic
-- `ai_config.py` - Unified AI tool configuration (NEW in v0.4.0)
-- `paths.py` - Path discovery utilities
-- `dependency_analysis.py` - Dependency graph operations
-
-**Design Pattern:** **Facade Pattern** (`PrettyPrinter`) centralizes output formatting
-
----
-
-## Data Flow Architecture
-
-### Primary Workflow: Spec-Driven Development Lifecycle
-
-```
-1. CREATE
-   sdd create → specs/pending/<spec-id>.json
-
-2. VALIDATE & REVIEW
-   sdd validate → Check integrity
-   sdd plan-review → AI quality assurance
-
-3. ACTIVATE
-   sdd activate-spec → Move to specs/active/
-
-4. EXECUTE LOOP
-   while tasks remaining:
-     sdd next-task → Identify next task
-     sdd prepare-task → Get context (integrates doc-query)
-     [Developer implements]
-     sdd complete-task → Update status + journal
-
-5. COMPLETE
-   sdd complete-spec → Move to specs/completed/
-```
-
-### Secondary Workflow: Documentation-Driven Context
-
-```
-1. GENERATE DOCS
-   sdd doc analyze-with-ai → Parallel AI consultation
-     ↓
-   DOCUMENTATION.md + documentation.json (structural)
-   ARCHITECTURE.md + AI_CONTEXT.md (synthesized)
-
-2. QUERY DOCS
-   sdd doc <query-cmd> → Fast lookups
-     ↓
-   Used by sdd-next for task context enrichment
-```
-
-### Data Persistence
-
-- **Specs:** `specs/[pending|active|completed]/<spec-id>.json`
-- **Documentation:** `docs/DOCUMENTATION.md`, `docs/documentation.json`
-- **Rendered Specs:** `.human-readable/<spec-id>.md`
-- **Reviews:** `.reviews/<spec-id>-review-<timestamp>.md`
-- **Metrics:** `~/.claude-skills/metrics.jsonl` (append-only)
-- **Transcripts:** `~/.claude/sessions/<session-id>/transcript_*`
+**Design Decision**: Orchestrate existing AI CLIs rather than integrate with APIs directly
+- **Benefits**:
+  - Decouples toolkit from specific API SDKs
+  - Reuses user's existing tool configurations
+- **Trade-offs**:
+  - Dependency on user environment having tools installed/configured
+  - Some tools (like codex) may not support non-interactive mode
 
 ---
 
-## Design Patterns Summary
+## 6. Architectural Decisions
 
-| Pattern | Location | Purpose |
-|---------|----------|---------|
-| **Command** | CLI layer | Encapsulate actions as subcommands |
-| **Facade** | `PrettyPrinter` | Unified output interface |
-| **Factory** | `code_doc` parsers | Language-specific parser creation |
-| **Orchestrator** | `code_doc`, `sdd_render` | Multi-stage pipeline coordination |
-| **Strategy** | `sdd_render`, `sdd_plan_review` | Pluggable algorithms (rendering modes, AI tools) |
-| **Proxy** | `doc_query` | Lazy doc regeneration with freshness checks |
-| **Plugin Registry** | Skill registration | Modular skill loading |
-| **Decorator** | Metrics collection | Non-invasive telemetry wrapping |
+### 1. Filesystem as the "Database"
 
----
+**Decision**: Store all state in version-controllable JSON files
 
-## Technology Stack
+**Benefits**:
+- Simple and transparent
+- Portable (no database server needed)
+- Version-controllable with Git
+- Easy to inspect and debug
 
-### Core Technologies
+**Trade-offs**:
+- No support for concurrent multi-user editing
+- Potentially slower queries on large number of specs
+- Manual file corruption risk
 
-- **Python 3.9+** - Primary implementation language
-- **argparse** - CLI framework
-- **pathlib** - Modern path handling
-- **json** / **jsonschema** - Spec and doc validation
+### 2. Orchestration over Integration
 
-### Optional Dependencies
+**Decision**: Shell out to external CLI tools for AI and Git operations instead of native Python libraries
 
-- **tree-sitter** family - Multi-language AST parsing
-  - `tree-sitter-python`, `tree-sitter-javascript`, `tree-sitter-typescript`
-  - `tree-sitter-go`, `tree-sitter-html`, `tree-sitter-css`
-- **pytest** - Test framework integration
-- **External AI CLIs:**
-  - `gemini` - Fast structured analysis
-  - `codex` - Code understanding
-  - `cursor-agent` (with cheetah model) - Large codebase analysis (1M context)
+**Benefits**:
+- Simplifies development
+- Reuses existing, robust tools
+- Leverages user's configured environments
 
-### Rationale
+**Trade-offs**:
+- Dependency on user's environment
+- Tools must be installed and configured
+- Subprocess overhead
+- **Tool compatibility issues**: Some tools (codex) require TTY and don't support piped I/O
 
-- **Python:** Ideal for CLI tooling, strong standard library, excellent for developer tools
-- **JSON:** Machine-readable, human-editable, language-agnostic, git-friendly
-- **Filesystem state:** Simplifies architecture, eliminates database dependency, enables version control
-- **External AI integration:** Leverages specialized tools, maintains focus on workflow management
-- **tree-sitter:** Robust, language-agnostic AST parsing
+### 3. Multi-Agent Consensus
 
----
+**Decision**: For critical feedback tasks (plan reviews, fidelity reviews), query multiple AI models and synthesize responses
 
-## Architectural Trade-offs
+**Use Cases**:
+- Plan reviews
+- Fidelity reviews
 
-### Strengths
+**Benefits**:
+- Higher quality AI-generated feedback
+- More reliable results through consensus
+- Multiple perspectives reduce bias
 
-✅ **Simplicity:** No database, no server, pure filesystem operations
-✅ **Version control friendly:** Specs live alongside code in git
-✅ **Extensibility:** Plugin architecture for easy skill additions
-✅ **Portability:** Pure Python, runs anywhere with Python 3.9+
-✅ **Offline-capable:** Core functionality works without network (AI features optional)
-✅ **Explicit state:** JSON specs make all task information visible and auditable
+**Trade-offs**:
+- Slower execution
+- Higher cost (multiple API calls)
+- **Mitigation**: Caching to reduce repeated costs
 
-### Limitations
+### 4. Separation of Analysis and Workflow
 
-⚠️ **Concurrency:** File-based state may conflict with multiple simultaneous users (requires git merge discipline)
-⚠️ **AI dependency:** Enhanced features require external AI CLI tools to be installed and configured
-⚠️ **Directory conventions:** Enforced structure (`specs/active/`, etc.) must be adopted
-⚠️ **Workflow rigidity:** SDD methodology adds overhead, trading flexibility for structure
-⚠️ **External tool quality:** AI features depend entirely on third-party tool performance
+**Decision**: Decouple `code_doc`/`doc_query` from main `sdd` workflow tools
+
+**Benefits**:
+- Static code analysis can run independently
+- Results consumed by multiple components
+- More modular architecture
+- Clear separation of concerns
+
+**Example**: `sdd_next` uses `doc_query` to gather context, but `code_doc` can be used standalone
 
 ---
 
-## Extension Points
+## Codebase Statistics
 
-### Adding New Skills
+- **Total Files**: 159 Python files
+- **Total Lines**: 61,192
+- **Total Classes**: 114
+- **Total Functions**: 749
+- **Average Complexity**: 7.09 (Good - within acceptable range)
+- **Max Complexity**: 55
 
-1. Create skill directory: `src/claude_skills/claude_skills/<skill_name>/`
-2. Implement `cli.py` with `register_<skill_name>(subparsers)` function
-3. Add registration call in `cli/sdd/registry.py:register_all_subcommands`
-4. Follow common patterns:
-   - Use `PrettyPrinter` for output
-   - Emit metrics via `@track_command_usage` decorator
-   - Leverage common utilities (`spec.py`, `validation.py`, etc.)
+### High-Complexity Functions (Refactoring Candidates)
 
-### Adding AI Tool Support
+1. `generate_report` - Complexity: 55
+2. `complete_task_workflow` - Complexity: 45
+3. `update_task_status` - Complexity: 42
+4. `execute_verify_task` - Complexity: 39
+5. `format_execution_plan` - Complexity: 39
 
-1. Add tool configuration in `common/ai_config.py`
-2. Implement subprocess orchestration following existing patterns
-3. Add fallback logic for tool unavailability
-4. Document tool requirements in skill documentation
-
-### Adding Language Support (code-doc)
-
-1. Add tree-sitter language dependency
-2. Create parser in `code_doc/parsers/<language>.py`
-3. Register in parser factory (`code_doc/parsers/factory.py`)
-4. Follow `BaseParser` interface
+These functions exceed the recommended complexity threshold of 20 and should be considered for refactoring.
 
 ---
 
-## Security and Reliability
+## Known Issues & Limitations
 
-### Security Measures
+### AI Tool Compatibility
 
-- **No code execution from specs:** Specs are declarative data, not executable code
-- **Subprocess sandboxing:** External tools invoked with timeouts
-- **Path validation:** All file operations validate paths are within project
-- **Schema validation:** JSON specs validated before processing
+**Codex CLI Issue**:
+- **Problem**: codex requires interactive terminal (TTY) and fails with "stdout is not a terminal" error when used in subprocess mode
+- **Impact**: Cannot be used in `sdd doc analyze-with-ai` multi-agent consultation
+- **Workaround**: Use gemini or cursor-agent instead
+- **Solution**: Request codex maintainers add non-interactive mode support
 
-### Reliability Features
+### Recommendations
 
-- **Auto-fix validation:** `sdd-validate` can repair common spec errors
-- **Graceful degradation:** AI features fall back to structural-only output
-- **Append-only metrics:** Durable telemetry with rotation
-- **Test coverage:** Unit and integration tests for core functionality
-
----
-
-## Performance Characteristics
-
-### Fast Operations (< 1s)
-
-- Spec validation
-- Task status updates
-- Documentation queries (with cached docs)
-- Next task identification
-
-### Moderate Operations (1-30s)
-
-- Basic spec rendering
-- Code documentation generation (small projects)
-- Test execution (depends on test suite)
-
-### Slow Operations (30s - 5min)
-
-- AI-enhanced rendering (standard: ~60s, full: ~90s)
-- AI-assisted code documentation (multi-agent: ~5min)
-- Multi-model spec reviews (parallel, ~2-3min)
-
-### Optimization Strategies
-
-- **Caching:** Documentation queries check freshness, avoid unnecessary regeneration
-- **Parallel AI consultation:** Multiple models queried simultaneously
-- **Progressive enhancement:** Three rendering levels (summary/standard/full) balance speed vs. features
-- **Lazy loading:** Context only gathered when explicitly requested
+For AI-enhanced documentation generation:
+- **Recommended tools**: gemini (fast, reliable) or cursor-agent (1M context for large codebases)
+- **Avoid**: codex until non-interactive mode is supported
 
 ---
 
-## Future Architectural Considerations
+## Summary
 
-### Potential Enhancements
+The SDD Toolkit represents a well-architected, modular CLI system that brings structure and rigor to AI-assisted development. Its filesystem-based state management, orchestration of external tools, and multi-agent AI consultation patterns create a unique approach to spec-driven development that is both transparent and powerful.
 
-- **Concurrent access:** File-locking or operational transformation for multi-user scenarios
-- **Cloud sync:** Optional backend for team collaboration
-- **Web UI:** Visual spec editor and dashboard
-- **Webhook integration:** CI/CD pipeline triggers
-- **Plugin marketplace:** Community-contributed skills
-
-### Backward Compatibility
-
-- JSON schema versioning for spec evolution
-- Graceful handling of legacy spec formats
-- Deprecation warnings for old CLI flags
-
----
-
-## Conclusion
-
-The Claude SDD Toolkit's architecture reflects a deliberate choice to prioritize **simplicity, portability, and extensibility** over complex infrastructure. By embracing filesystem-based state, modular skills, and external AI tool orchestration, the toolkit provides a powerful yet accessible framework for spec-driven development that scales from individual developers to small teams.
-
-The plugin-style architecture ensures that new capabilities can be added without disrupting existing workflows, while the JSON-based specs provide a clear, version-controllable contract between planning and execution. This architecture enables developers to harness AI assistance within well-defined guardrails, maintaining both structure and flexibility throughout the development lifecycle.
+The separation of concerns (analysis vs. workflow), clear command patterns, and extensive use of external tool orchestration make the system both maintainable and extensible, while the multi-agent consensus approach ensures high-quality AI assistance throughout the development lifecycle.

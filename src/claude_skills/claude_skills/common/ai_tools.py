@@ -387,8 +387,8 @@ def build_tool_command(
     Example:
         >>> build_tool_command("gemini", "Analyze code", model="gemini-exp-1114")
         ['gemini', '-m', 'gemini-exp-1114', '--output-format', 'json', '-p', 'Analyze code']
-        >>> build_tool_command("codex", "Fix bug", model="claude-3.7-sonnet")
-        ['codex', 'exec', '--sandbox', 'read-only', '--ask-for-approval', 'never', '--json', '-m', 'claude-3.7-sonnet', 'Fix bug']
+        >>> build_tool_command("codex", "Fix bug", model="o1")
+        ['codex', 'exec', '--sandbox', 'read-only', '--json', '-m', 'o1', 'Fix bug']
         >>> build_tool_command("cursor-agent", "Review code")
         ['cursor-agent', '--print', '--json', 'Review code']
     """
@@ -406,9 +406,8 @@ def build_tool_command(
     elif tool == "codex":
         cmd = ["codex", "exec"]
         # SECURITY: Enforce read-only sandbox mode (critical for fidelity review)
+        # NOTE: --sandbox read-only in exec mode runs non-interactively without approval prompts
         cmd.extend(["--sandbox", "read-only"])
-        # SECURITY: Disable approval prompts for non-interactive operation
-        cmd.extend(["--ask-for-approval", "never"])
         # IMPROVEMENT: Request JSON output for structured parsing
         cmd.append("--json")
         if model:

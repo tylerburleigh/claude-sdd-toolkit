@@ -58,8 +58,8 @@ def add_global_options(parser, config=None):
         dest='json',
         help='Disable JSON output (override config)'
     )
-    # Set default based on config - important: use actual boolean, not None!
-    parser.set_defaults(json=is_json_default)
+    # Don't set default here - will be set after config reload in main()
+    parser.set_defaults(json=None)
 
     # Compact formatting - use mutually exclusive group
     # Check new config format first, then fall back to deprecated key
@@ -80,8 +80,8 @@ def add_global_options(parser, config=None):
         dest='compact',
         help='Disable compact formatting (override config)'
     )
-    # Set default based on config - important: use actual boolean, not None!
-    parser.set_defaults(compact=json_compact)
+    # Don't set default here - will be set after config reload in main()
+    parser.set_defaults(compact=None)
     parser.add_argument(
         '--path',
         type=str,
