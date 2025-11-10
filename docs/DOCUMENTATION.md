@@ -1,21 +1,21 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-10 18:19:36
+**Generated:** 2025-11-10 18:23:23
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 293
-- **Total Lines:** 101529
+- **Total Lines:** 101557
 - **Total Classes:** 406
-- **Total Functions:** 1213
+- **Total Functions:** 1214
 - **Avg Complexity:** 5.02
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
-  - parse_review_response (51)
+  - parse_review_response (54)
   - _handle_fidelity_review (46)
   - complete_task_workflow (45)
   - update_task_status (42)
@@ -281,7 +281,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1443`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1451`
 
 **Description:**
 > Issue with assigned severity category.
@@ -440,7 +440,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1281`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1289`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -12548,7 +12548,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1465`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1473`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12582,7 +12582,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1573`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1581`
 **Complexity:** 1
 
 **Description:**
@@ -15939,7 +15939,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1321`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1329`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -22694,7 +22694,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1257`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1265`
 **Complexity:** 1
 
 **Description:**
@@ -22802,7 +22802,7 @@ Raises:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1031`
-⚠️ **Complexity:** 51 (High)
+⚠️ **Complexity:** 54 (High)
 
 **Description:**
 > Parse AI tool response to extract structured review information.
@@ -26300,7 +26300,7 @@ a decision needs to be made about what to implement.
 ### `test_categorize_issues_assigns_severity() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:398`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:418`
 **Complexity:** 1
 
 ---
@@ -26959,7 +26959,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_majority() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:366`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:386`
 **Complexity:** 1
 
 ---
@@ -26967,7 +26967,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_preserves_original_text() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:377`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:397`
 **Complexity:** 1
 
 ---
@@ -28709,7 +28709,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_multiple_responses() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:355`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:375`
 **Complexity:** 1
 
 ---
@@ -28717,7 +28717,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_defaults_to_unknown() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:349`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:369`
 **Complexity:** 1
 
 ---
@@ -28741,7 +28741,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_findings_heading_with_bullets() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:315`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:335`
 **Complexity:** 1
 
 ---
@@ -28749,7 +28749,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_numbered_findings_section() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:287`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:307`
 **Complexity:** 1
 
 ---
@@ -28757,7 +28757,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_keeps_full_first_paragraph_summary() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:336`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:356`
 **Complexity:** 1
 
 ---
@@ -28765,7 +28765,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_parses_json_code_block_entries() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:263`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:283`
 **Complexity:** 1
 
 ---
@@ -28774,6 +28774,14 @@ a decision needs to be made about what to implement.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:200`
+**Complexity:** 1
+
+---
+
+### `test_parse_review_response_parses_nested_response_field() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:263`
 **Complexity:** 1
 
 ---

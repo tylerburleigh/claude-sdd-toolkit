@@ -93,6 +93,7 @@ class ParsedReviewResponse:
     summary: str = ""
     raw_response: str = ""
     confidence: Optional[float] = None
+    structured_response: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -102,7 +103,8 @@ class ParsedReviewResponse:
             "recommendations": self.recommendations,
             "summary": self.summary,
             "raw_response": self.raw_response,
-            "confidence": self.confidence
+            "confidence": self.confidence,
+            "structured_response": self.structured_response
         }
 
 
