@@ -12,7 +12,6 @@ from claude_skills.run_tests.pytest_parser import (
     ProgressInfo,
     PytestOutputParser,
     PytestProgressDisplay,
-    TestResult,
     TestStatus,
     format_progress_summary,
 )
@@ -22,7 +21,6 @@ pytestmark = pytest.mark.unit
 
 # Prevent pytest from treating imported helper classes as tests.
 TestStatus.__test__ = False  # type: ignore[attr-defined]
-TestResult.__test__ = False  # type: ignore[attr-defined]
 
 
 class TestPytestOutputParser:

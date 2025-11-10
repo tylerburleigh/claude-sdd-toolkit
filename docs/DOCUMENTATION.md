@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-09 19:00:45
+**Generated:** 2025-11-09 19:04:59
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 281
-- **Total Lines:** 97259
-- **Total Classes:** 379
+- **Total Files:** 283
+- **Total Lines:** 97943
+- **Total Classes:** 382
 - **Total Functions:** 1169
 - **Avg Complexity:** 4.99
 - **Max Complexity:** 55
@@ -4177,6 +4177,24 @@ Attributes:
 
 ---
 
+### `TestFormatProgressSummary`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser_legacy.py:267`
+
+**Description:**
+> Test suite for format_progress_summary.
+
+**Methods:**
+- `test_format_all_passed()`
+- `test_format_mixed_results()`
+- `test_format_with_errors()`
+- `test_format_with_xfail_xpass()`
+- `test_format_without_percentage()`
+- `test_format_no_tests()`
+
+---
+
 ### `TestFormatVerificationSummary`
 
 **Language:** python
@@ -5670,6 +5688,61 @@ Attributes:
 - `test_format_architecture_prompt_key_files()`
 - `test_format_ai_context_prompt_structure()`
 - `test_format_ai_context_prompt_concise()`
+
+---
+
+### `TestPytestOutputParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser_legacy.py:26`
+
+**Description:**
+> Test suite for PytestOutputParser.
+
+**Methods:**
+- `test_parse_passed_test()`
+- `test_parse_failed_test()`
+- `test_parse_skipped_test()`
+- `test_parse_error_test()`
+- `test_parse_xfail_test()`
+- `test_parse_xpass_test()`
+- `test_parse_test_without_percentage()`
+- `test_parse_parametrized_test()`
+- `test_parse_class_method()`
+- `test_parse_nested_path()`
+- `test_parse_non_test_line()`
+- `test_parse_with_ansi_codes()`
+- `test_count_tracking_multiple_tests()`
+- `test_count_tracking_with_errors()`
+- `test_count_tracking_with_xfail_xpass()`
+- `test_get_progress_empty()`
+- `test_reset()`
+- `test_percentage_retained_across_lines()`
+
+---
+
+### `TestPytestProgressDisplay`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser_legacy.py:382`
+
+**Description:**
+> Test suite for PytestProgressDisplay.
+
+**Methods:**
+- `test_init_with_total()`
+- `test_init_without_total()`
+- `test_update_with_passed_tests()`
+- `test_update_with_mixed_results()`
+- `test_update_without_total()`
+- `test_update_with_errors()`
+- `test_finish_with_total()`
+- `test_finish_without_total()`
+- `test_color_formatting_in_description()`
+- `test_update_with_current_file()`
+- `test_update_retains_last_file()`
+- `test_update_changes_file()`
+- `test_update_filename_only_not_path()`
 
 ---
 
@@ -31821,6 +31894,17 @@ Returns:
 - `claude_skills.sdd_spec_mod.revision.rollback_to_version`
 - `datetime.datetime`
 - `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser_legacy.py`
+
+- `__future__.annotations`
+- `claude_skills.run_tests.pytest_parser.ProgressInfo`
+- `claude_skills.run_tests.pytest_parser.PytestOutputParser`
+- `claude_skills.run_tests.pytest_parser.PytestProgressDisplay`
+- `claude_skills.run_tests.pytest_parser.TestStatus`
+- `claude_skills.run_tests.pytest_parser.format_progress_summary`
+- `pytest`
+- `unittest.mock.Mock`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_sdd_common/test_cli_utils.py`
 
