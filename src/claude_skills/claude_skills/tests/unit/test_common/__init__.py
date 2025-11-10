@@ -7,4 +7,5 @@ __all__ = [
     "test_ai_tools_legacy",
     "test_cache_cli_legacy",
     "test_config_legacy",
+    "test_tui_progress_legacy",
 ]

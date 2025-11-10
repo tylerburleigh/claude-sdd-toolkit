@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-09 19:04:59
+**Generated:** 2025-11-09 19:09:07
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 283
-- **Total Lines:** 97943
-- **Total Classes:** 382
+- **Total Files:** 284
+- **Total Lines:** 99335
+- **Total Classes:** 393
 - **Total Functions:** 1169
 - **Avg Complexity:** 4.99
 - **Max Complexity:** 55
@@ -2819,6 +2819,55 @@ Attributes:
 
 ---
 
+### `TestBatchConsultationContextManager`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:191`
+
+**Description:**
+> Test context manager for batch tool consultations.
+
+**Methods:**
+- `test_calls_on_batch_start_when_entering()`
+- `test_calls_on_tool_complete_for_each_tool()`
+- `test_tracks_success_and_failure_counts()`
+- `test_tracks_max_duration()`
+- `test_prevents_double_marking_same_tool()`
+- `test_calls_on_batch_complete_when_exiting()`
+- `test_uses_no_op_callback_by_default()`
+
+---
+
+### `TestBatchElapsedTimeTracking`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:637`
+
+**Description:**
+> Test elapsed time tracking for batch operations.
+
+**Methods:**
+- `test_batch_on_update_called_periodically()`
+- `test_batch_on_update_includes_batch_context()`
+- `test_batch_update_thread_stops_on_all_complete()`
+- `test_batch_update_thread_stops_on_context_exit()`
+
+---
+
+### `TestBatchProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:403`
+
+**Description:**
+> Test BatchProgressTracker dataclass directly.
+
+**Methods:**
+- `test_initializes_with_empty_completed_list()`
+- `test_updates_counts_correctly()`
+
+---
+
 ### `TestBuildGenerationPrompt`
 
 **Language:** python
@@ -3824,6 +3873,28 @@ Attributes:
 **Methods:**
 - `test_enum_values()`
 - `test_enum_comparison()`
+
+---
+
+### `TestElapsedTimeTracking`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:463`
+
+**Description:**
+> Test elapsed time tracking and periodic update callbacks.
+
+**Methods:**
+- `test_on_update_called_periodically()`
+- `test_on_update_receives_elapsed_time()`
+- `test_update_thread_stops_on_completion()`
+- `test_update_thread_stops_on_context_exit()`
+- `test_update_thread_stops_on_exception()`
+- `test_no_race_condition_on_completion()`
+- `test_update_interval_calculation_short_timeout()`
+- `test_update_interval_calculation_medium_timeout()`
+- `test_update_interval_calculation_long_timeout()`
+- `test_custom_update_interval_override()`
 
 ---
 
@@ -5090,6 +5161,24 @@ Attributes:
 
 ---
 
+### `TestNoOpProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:29`
+
+**Description:**
+> Test that NoOp callback never crashes.
+
+**Methods:**
+- `test_on_start_no_crash()`
+- `test_on_update_no_crash()`
+- `test_on_complete_no_crash()`
+- `test_on_batch_start_no_crash()`
+- `test_on_tool_complete_no_crash()`
+- `test_on_batch_complete_no_crash()`
+
+---
+
 ### `TestParentNodeJournaling`
 
 **Language:** python
@@ -5594,6 +5683,27 @@ Attributes:
 
 ---
 
+### `TestProgressBarCleanup`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:1135`
+
+**Description:**
+> Test progress bar cleanup on completion and error.
+
+**Methods:**
+- `test_cleanup_on_successful_completion()`
+- `test_cleanup_on_exception()`
+- `test_cleanup_without_explicit_complete_call()`
+- `test_batch_cleanup_on_completion()`
+- `test_batch_cleanup_on_exception()`
+- `test_cleanup_stops_update_callbacks()`
+- `test_cleanup_is_idempotent()`
+- `test_queued_callback_cleanup()`
+- `test_queued_callback_cleanup_after_exception()`
+
+---
+
 ### `TestProgressCommand`
 
 **Language:** python
@@ -5618,6 +5728,39 @@ Attributes:
 
 **Methods:**
 - `test_complete_workflow_progress_tracking()`
+
+---
+
+### `TestProgressMessageFormatting`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:1345`
+
+**Description:**
+> Test progress message formatting helper.
+
+**Methods:**
+- `test_basic_message_format()`
+- `test_message_with_timeout()`
+- `test_message_without_timeout_display()`
+- `test_formats_decimal_places()`
+- `test_formats_integer_elapsed()`
+- `test_formats_different_tool_names()`
+- `test_formats_long_elapsed_times()`
+- `test_formats_zero_elapsed()`
+
+---
+
+### `TestProgressTracker`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:374`
+
+**Description:**
+> Test ProgressTracker dataclass directly.
+
+**Methods:**
+- `test_tracks_completion_state()`
 
 ---
 
@@ -5899,6 +6042,33 @@ Attributes:
 - `test_query_tasks_format_simple()`
 - `test_query_tasks_json_output()`
 - `test_query_tasks_invalid_spec()`
+
+---
+
+### `TestQueuedProgressCallback`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:839`
+
+**Description:**
+> Test queue-based progress callback wrapper for parallel consultations.
+
+**Methods:**
+- `test_forwards_on_start_to_wrapped_callback()`
+- `test_handles_large_queue_bursts()`
+- `test_stop_waits_for_pending_queue_items()`
+- `test_restart_after_stop()`
+- `test_queue_preserves_update_sequence()`
+- `test_queue_with_mixed_callback_types()`
+- `test_forwards_on_update_to_wrapped_callback()`
+- `test_forwards_on_complete_to_wrapped_callback()`
+- `test_handles_multiple_parallel_calls()`
+- `test_stops_cleanly()`
+- `test_ignores_duplicate_start()`
+- `test_processes_queued_calls_in_order()`
+- `test_handles_wrapped_callback_exceptions()`
+- `test_forwards_batch_callbacks()`
+- `test_can_be_used_with_no_op_callback()`
 
 ---
 
@@ -6394,6 +6564,25 @@ Attributes:
 
 ---
 
+### `TestSingleConsultationContextManager`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:83`
+
+**Description:**
+> Test context manager for single tool consultations.
+
+**Methods:**
+- `test_calls_on_start_when_entering()`
+- `test_calls_on_complete_when_complete_called()`
+- `test_auto_completes_if_user_forgets()`
+- `test_handles_exception_during_execution()`
+- `test_prevents_double_completion()`
+- `test_passes_context_to_callbacks()`
+- `test_uses_no_op_callback_by_default()`
+
+---
+
 ### `TestSpecAnalyzer`
 
 **Language:** python
@@ -6684,6 +6873,20 @@ Attributes:
 - `test_list_templates_returns_dict()`
 - `test_get_template_valid()`
 - `test_get_template_invalid()`
+
+---
+
+### `TestThreadSafety`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py:767`
+
+**Description:**
+> Test thread safety of progress tracking.
+
+**Methods:**
+- `test_concurrent_completion_is_safe()`
+- `test_batch_concurrent_marking_is_safe()`
 
 ---
 
@@ -31851,6 +32054,25 @@ Returns:
 - `io.StringIO`
 - `json`
 - `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/test_common/test_tui_progress_legacy.py`
+
+- `__future__.annotations`
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.tui_progress.BatchProgressTracker`
+- `claude_skills.common.tui_progress.NoOpProgressCallback`
+- `claude_skills.common.tui_progress.ProgressCallback`
+- `claude_skills.common.tui_progress.ProgressTracker`
+- `claude_skills.common.tui_progress.QueuedProgressCallback`
+- `claude_skills.common.tui_progress.ai_consultation_progress`
+- `claude_skills.common.tui_progress.batch_consultation_progress`
+- `claude_skills.common.tui_progress.format_progress_message`
+- `pytest`
+- `threading`
+- `time`
+- `unittest.mock.Mock`
+- `unittest.mock.call`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_dev_tools/test_sdd_start_helper.py`
 
