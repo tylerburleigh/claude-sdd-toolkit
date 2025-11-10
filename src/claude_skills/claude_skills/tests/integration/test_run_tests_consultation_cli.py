@@ -165,7 +165,7 @@ def test_consult_prompt_mode_respects_dry_run(mock_tool_env: dict[str, str]) -> 
         env=mock_tool_env,
     )
     assert result.returncode == 0
-    assert "gemini -m gemini-2.5-pro" in result.stdout
+    assert "gemini -m gemini-2.5-pro --output-format" in result.stdout
     assert "prompt with" in result.stdout.lower()
 
 
@@ -211,7 +211,7 @@ def test_consult_reports_invalid_tool(sample_test_error: str, sample_hypothesis:
     )
     assert result.returncode != 0
     combined = result.stdout + result.stderr
-    assert "No tools available from selected pair" in combined
+    assert "No tools available for multi-agent consultation" in combined
 
 
 def test_consult_skips_when_no_tools_available(sample_test_error: str, sample_hypothesis: str) -> None:
@@ -230,7 +230,7 @@ def test_consult_skips_when_no_tools_available(sample_test_error: str, sample_hy
     )
     assert result.returncode != 0
     combined = result.stdout + result.stderr
-    assert "No tools available from selected pair" in combined
+    assert "No tools available for multi-agent consultation" in combined
 
 
 def test_consult_with_test_code(
@@ -371,7 +371,7 @@ def test_run_help_command() -> None:
 def test_run_list_presets_command() -> None:
     result = run_cli("test", "run", "--list")
     assert result.returncode in (0, 1)
-    assert "Preset" in result.stdout or "preset" in result.stdout.lower()
+    assert "ci           CI-friendly output" in result.stdout
 
 
 def test_run_help_mentions_quick_preset() -> None:

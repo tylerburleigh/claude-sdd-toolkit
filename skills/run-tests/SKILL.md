@@ -198,11 +198,11 @@ Use multi-agent consultation for:
 - Uncertain between multiple approaches
 
 ```bash
-# Auto-selects best two agents
+# Auto-selects configured consensus agents
 sdd test consult assertion --error "..." --hypothesis "..." --multi-agent
 
-# Select specific agent pair
-sdd test consult exception --error "..." --hypothesis "..." --multi-agent --pair code-focus
+# Override which agents participate (comma-separated list)
+sdd test consult exception --error "..." --hypothesis "..." --multi-agent --agents gemini,codex
 ```
 
 ### Effective Prompting

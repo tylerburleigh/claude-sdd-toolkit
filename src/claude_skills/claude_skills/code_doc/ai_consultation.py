@@ -18,15 +18,18 @@ This module provides documentation-specific functionality:
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 from claude_skills.common.ai_tools import (
     detect_available_tools,
     build_tool_command,
-    execute_tools_parallel
+    execute_tools_parallel,
+    execute_tool,
+    ToolStatus,
 )
+from claude_skills.common import ai_config
 
 # =============================================================================
 # CONFIGURATION
@@ -52,13 +55,6 @@ DOC_TYPE_ROUTING = {
     "ai_context": ("gemini", "cursor-agent"),     # gemini good for quick context
     "developer_guide": ("codex", "gemini"),       # codex good for code examples
 }
-
-# Multi-agent pairs for parallel consultation
-MULTI_AGENT_PAIRS = {
-    "default": ["cursor-agent", "gemini"],        # Best for comprehensive analysis
-    "fast": ["gemini", "codex"],                   # Faster, less context
-}
-
 
 def get_available_tools() -> List[str]:
     """
@@ -454,7 +450,7 @@ def run_consultation(
 def consult_multi_agent(
     doc_type: str,
     prompt: str,
-    pair: str = "default",
+    agents: Optional[Sequence[str]] = None,
     dry_run: bool = False,
     verbose: bool = False,
     printer: Optional['PrettyPrinter'] = None
@@ -465,7 +461,8 @@ def consult_multi_agent(
     Args:
         doc_type: Documentation type (architecture, ai_context)
         prompt: Formatted prompt
-        pair: Which multi-agent pair to use
+        agents: Optional sequence of agent names to consult. Defaults to the
+            configured consensus agent list for code-doc.
         dry_run: If True, show what would run
         verbose: Enable verbose output
         printer: Optional PrettyPrinter for consistent output (falls back to print if None)
@@ -473,51 +470,75 @@ def consult_multi_agent(
     Returns:
         Dictionary with synthesis results
     """
-    if pair not in MULTI_AGENT_PAIRS:
+    configured_agents = ai_config.get_consensus_agents("code-doc")
+    available_tools = get_available_tools()
+
+    if not available_tools:
         return {
             "success": False,
-            "error": f"Unknown multi-agent pair: {pair}",
+            "error": "No AI tools available",
             "responses": []
         }
 
-    tools_to_use = MULTI_AGENT_PAIRS[pair]
-    available_tools = get_available_tools()
-    available_from_pair = [t for t in tools_to_use if t in available_tools][:2]  # Cap at 2 models
+    if agents:
+        override_list: List[str] = []
+        seen = set()
+        for entry in agents:
+            for token in str(entry).split(","):
+                token = token.strip()
+                if token and token not in seen:
+                    override_list.append(token)
+                    seen.add(token)
+        candidate_agents = override_list or configured_agents
+    else:
+        candidate_agents = configured_agents
 
-    # If predefined pair doesn't have 2 tools, find ANY 2 available tools
-    if len(available_from_pair) < 2:
-        if len(available_tools) >= 2:
-            # Use priority order to pick best 2 available tools
-            priority_order = ["cursor-agent", "gemini", "codex"]
-            available_from_pair = [t for t in priority_order if t in available_tools][:2]
-        elif len(available_tools) == 1:
-            # Fallback to single tool
-            success, output = run_consultation(available_tools[0], prompt, dry_run, verbose, printer)
-            return {
+    selected_agents = [tool for tool in candidate_agents if tool in available_tools]
+
+    if not selected_agents:
+        selected_agents = [tool for tool in available_tools]
+
+    if len(selected_agents) < 2 and len(available_tools) >= 2:
+        supplemental = [tool for tool in available_tools if tool not in selected_agents]
+        selected_agents.extend(supplemental[: 2 - len(selected_agents)])
+
+    # Deduplicate while preserving order
+    seen_agents: set[str] = set()
+    ordered_agents: List[str] = []
+    for tool in selected_agents:
+        if tool not in seen_agents:
+            seen_agents.add(tool)
+            ordered_agents.append(tool)
+
+    if len(ordered_agents) < 2:
+        # Fall back to single-tool consultation
+        single_tool = ordered_agents[0]
+        success, output = run_consultation(
+            single_tool,
+            prompt,
+            dry_run=dry_run,
+            verbose=verbose,
+            printer=printer
+        )
+        return {
+            "success": success,
+            "primary_tool": single_tool,
+            "output": output,
+            "responses": [{
+                "tool": single_tool,
                 "success": success,
-                "primary_tool": available_tools[0],
-                "output": output,
-                "responses": [{
-                    "tool": available_tools[0],
-                    "success": success,
-                    "output": output
-                }]
-            }
-        else:
-            return {
-                "success": False,
-                "error": "No AI tools available",
-                "responses": []
-            }
+                "output": output
+            }]
+        }
 
     if dry_run:
         if printer:
-            printer.detail(f"Would consult {len(available_from_pair)} tools in parallel:")
-            for tool in available_from_pair:
+            printer.detail(f"Would consult {len(ordered_agents)} tools in parallel:")
+            for tool in ordered_agents:
                 printer.detail(f"  - {tool}")
         else:
-            print(f"Would consult {len(available_from_pair)} tools in parallel:")
-            for tool in available_from_pair:
+            print(f"Would consult {len(ordered_agents)} tools in parallel:")
+            for tool in ordered_agents:
                 print(f"  - {tool}")
             sys.stdout.flush()
         return {"success": True, "responses": []}
@@ -531,14 +552,14 @@ def consult_multi_agent(
 
     # Print status message before running (this may take a while)
     if printer:
-        printer.detail(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
-        printer.detail(f"   Tools: {', '.join(available_from_pair)}")
+        printer.detail(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
+        printer.detail(f"   Tools: {', '.join(ordered_agents)}")
         printer.detail(f"   Analyzing: {task_areas}")
         if verbose:
             printer.info("=" * 60)
     else:
-        print(f"\n🤖 Consulting {len(available_from_pair)} AI models in parallel for {task_desc}...")
-        print(f"   Tools: {', '.join(available_from_pair)}")
+        print(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
+        print(f"   Tools: {', '.join(ordered_agents)}")
         print(f"   Analyzing: {task_areas}")
         if verbose:
             print("=" * 60)
@@ -547,7 +568,7 @@ def consult_multi_agent(
     # Use shared utility for parallel execution
     start_time = time.time()
     multi_response = execute_tools_parallel(
-        tools=available_from_pair,
+        tools=ordered_agents,
         prompt=prompt
     )
     total_duration = time.time() - start_time
@@ -642,7 +663,7 @@ def generate_architecture_docs(
     prompt = format_architecture_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("architecture", prompt, "default", dry_run, verbose, printer)
+        result = consult_multi_agent("architecture", prompt, agents=None, dry_run=dry_run, verbose=verbose, printer=printer)
         return result["success"], result
     else:
         if tool == "auto":
@@ -683,7 +704,7 @@ def generate_ai_context_docs(
     prompt = format_ai_context_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("ai_context", prompt, "default", dry_run, verbose, printer)
+        result = consult_multi_agent("ai_context", prompt, agents=None, dry_run=dry_run, verbose=verbose, printer=printer)
         return result["success"], result
     else:
         if tool == "auto":

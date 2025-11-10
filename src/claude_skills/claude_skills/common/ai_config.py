@@ -10,7 +10,9 @@ This module provides a common interface for all skills to load their AI tool con
 
 import yaml
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Sequence
+
+from claude_skills.common.ai_tools import build_tool_command
 
 
 # Default tool configuration (fallback if config file not found)
@@ -34,18 +36,45 @@ DEFAULT_TOOLS = {
 
 DEFAULT_MODELS = {
     "gemini": {
-        "priority": ["gemini-2.5-pro"],
-        "flags": ["-m", "gemini-2.5-pro", "-p"]
+        "priority": ["gemini-2.5-pro"]
     },
     "cursor-agent": {
-        "priority": ["composer-1"],
-        "flags": ["-p", "--model", "composer-1"]
+        "priority": ["composer-1"]
     },
     "codex": {
-        "priority": ["gpt-5-codex"],
-        "flags": ["exec", "--model", "gpt-5-codex", "--skip-git-repo-check"]
+        "priority": ["gpt-5-codex"]
     }
 }
+
+
+DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex"]
+
+DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
+    "default": False,
+    "assertion": True,
+    "exception": True,
+    "fixture": True,
+    "import": False,
+    "timeout": True,
+    "flaky": False,
+    "multi-file": True,
+}
+
+
+def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
+    """Remove duplicates while preserving the original order."""
+    seen: set[str] = set()
+    result: List[str] = []
+    for item in items:
+        if not item or not isinstance(item, str):
+            continue
+        normalized = item.strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        result.append(normalized)
+    return result
+
 
 
 def get_global_config_path() -> Path:
@@ -268,20 +297,22 @@ def get_agent_command(skill_name: str, agent_name: str, prompt: str) -> List[str
     config = load_skill_config(skill_name)
     models = config.get('models', DEFAULT_MODELS)
 
-    if agent_name not in models:
-        # Fallback to basic command
+    model_priority: Sequence[str] = ()
+    model_config = models.get(agent_name)
+    if isinstance(model_config, dict):
+        priority_value = model_config.get('priority')
+        if isinstance(priority_value, (list, tuple)):
+            model_priority = priority_value
+    elif isinstance(model_config, (list, tuple)):
+        model_priority = model_config
+
+    preferred_model = model_priority[0] if model_priority else None
+
+    try:
+        return build_tool_command(agent_name, prompt, model=preferred_model)
+    except ValueError:
+        # Unknown tool - fall back to minimal command to maintain backwards compatibility
         return [agent_name, prompt]
-
-    model_config = models[agent_name]
-    flags = model_config.get('flags', [])
-
-    # Build command: [agent_name, *flags, prompt]
-    # Note: Command is already in flags for most tools
-    # Extract command from first flag if it's the tool name
-    if flags and flags[0] != agent_name:
-        return [agent_name] + flags + [prompt]
-    else:
-        return [agent_name] + flags[1:] + [prompt] if len(flags) > 1 else [agent_name, prompt]
 
 
 def get_timeout(skill_name: str, timeout_type: str = 'default') -> int:
@@ -343,114 +374,69 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
     return tool_config.get('enabled', True)
 
 
-def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
-    """Get multi-agent pair configurations for consensus-based consultation.
+def _normalize_auto_trigger_value(value: object) -> bool:
+    """Convert legacy or malformed auto-trigger values into booleans."""
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    if isinstance(value, str):
+        stripped = value.strip().lower()
+        if stripped in {"", "false", "0", "no", "off", "none"}:
+            return False
+        # Legacy configs used pair names; any non-empty string should be treated as enabled.
+        return True
+    if isinstance(value, (int, float)):
+        return bool(value)
+    return bool(value)
 
-    Loads agent pair definitions from `.claude/ai_config.yaml` under the skill's
-    `consensus.pairs` section. Each pair defines which agents should be consulted together
-    for multi-agent analysis.
 
-    Args:
-        skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
+def get_consensus_agents(skill_name: str) -> List[str]:
+    """Return the prioritized list of agents to use for consensus consultations.
 
-    Returns:
-        Dict mapping pair name to list of agent names. For example:
-        {
-            "default": ["gemini", "cursor-agent"],
-            "code-focus": ["codex", "gemini"],
-            "discovery-focus": ["cursor-agent", "gemini"]
-        }
-
-    Examples:
-        >>> pairs = get_multi_agent_pairs('run-tests')
-        >>> pairs['default']
-        ['cursor-agent', 'gemini']
-
-        >>> pairs = get_multi_agent_pairs('nonexistent-skill')
-        >>> pairs['default']  # Falls back to sensible defaults
-        ['gemini', 'cursor-agent']
-
-    Notes:
-        - If `.claude/ai_config.yaml` is missing or doesn't have a `consensus.pairs`
-          section for the skill, returns sensible default pairs
-        - Each pair should contain exactly 2 agents for optimal consensus analysis
-        - Agent names must correspond to tools defined in the `tools` section
+    Reads the flat `consensus.agents` list from `.claude/ai_config.yaml`.
+    Falls back to legacy pair definitions (flattened) or built-in defaults
+    when the configuration is missing or malformed.
     """
     config = load_skill_config(skill_name)
+    consensus_config = config.get("consensus", {})
 
-    # Try to load from consensus section
-    if 'consensus' in config:
-        consensus_config = config['consensus']
-        if 'pairs' in consensus_config:
-            pairs = consensus_config['pairs']
-            # Validate that pairs is a dict and contains lists
-            if isinstance(pairs, dict):
-                return pairs
+    agents = consensus_config.get("agents")
+    if isinstance(agents, (list, tuple)):
+        agent_list = _dedupe_preserve_order(agents)
+        if agent_list:
+            return agent_list
 
-    # Return sensible defaults if not found or malformed
-    return {
-        "default": ["gemini", "cursor-agent"],
-        "code-focus": ["codex", "gemini"],
-        "discovery-focus": ["cursor-agent", "gemini"]
-    }
+    # Legacy support: flatten pairs into a single list while preserving order.
+    pairs = consensus_config.get("pairs")
+    if isinstance(pairs, dict):
+        flattened: List[str] = []
+        for pair_members in pairs.values():
+            if isinstance(pair_members, (list, tuple)):
+                flattened.extend(str(agent) for agent in pair_members)
+        flattened_agents = _dedupe_preserve_order(flattened)
+        if flattened_agents:
+            return flattened_agents
+
+    return DEFAULT_CONSENSUS_AGENTS.copy()
 
 
-def get_routing_config(skill_name: str) -> Dict[str, str]:
-    """Get routing configuration that maps failure types to multi-agent pairs.
+def get_routing_config(skill_name: str) -> Dict[str, bool]:
+    """Return the auto-trigger configuration for multi-agent consensus.
 
-    Loads auto-trigger routing rules from `.claude/ai_config.yaml` under the skill's
-    `consensus.auto_trigger` section. These rules determine which agent pair should be used
-    for different types of test failures or analysis scenarios.
-
-    Args:
-        skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
-
-    Returns:
-        Dict mapping failure/scenario type to pair name. For example:
-        {
-            "default": "default",
-            "fixture": "code-focus",
-            "exception": "code-focus",
-            "timeout": "default",
-            "flaky": "default",
-            "multi-file": "discovery-focus"
-        }
-
-    Examples:
-        >>> routing = get_routing_config('run-tests')
-        >>> routing['fixture']
-        'code-focus'
-
-        >>> routing = get_routing_config('nonexistent-skill')
-        >>> routing['default']  # Falls back to sensible defaults
-        'default'
-
-    Notes:
-        - If `.claude/ai_config.yaml` is missing or doesn't have `consensus.auto_trigger`
-          for the skill, returns sensible default routing rules
-        - The pair names in routing values should correspond to keys in the
-          pairs configuration from `get_multi_agent_pairs()`
-        - The `default` key is used as fallback when no specific rule matches
+    The configuration is stored under `consensus.auto_trigger` in `.claude/ai_config.yaml`
+    as a map of failure type -> boolean. Legacy configurations that map failure types to
+    pair names are coerced to `True` so consensus still triggers automatically.
     """
     config = load_skill_config(skill_name)
+    consensus_config = config.get("consensus", {})
 
-    # Try to load from consensus section
-    if 'consensus' in config:
-        consensus_config = config['consensus']
-        if 'auto_trigger' in consensus_config:
-            routing = consensus_config['auto_trigger']
-            # Validate that routing is a dict
-            if isinstance(routing, dict):
-                return routing
+    routing_config = DEFAULT_AUTO_TRIGGER_RULES.copy()
 
-    # Return sensible defaults if not found or malformed
-    return {
-        "default": "default",
-        "assertion": "code-focus",
-        "exception": "code-focus",
-        "fixture": "code-focus",
-        "import": "default",
-        "timeout": "default",
-        "flaky": "default",
-        "multi-file": "discovery-focus"
-    }
+    auto_trigger = consensus_config.get("auto_trigger")
+    if isinstance(auto_trigger, dict):
+        for key, value in auto_trigger.items():
+            normalized = _normalize_auto_trigger_value(value)
+            routing_config[key] = normalized
+
+    return routing_config

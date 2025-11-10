@@ -163,7 +163,7 @@ Using consensus pair: default
 | Line | Type | Content | Decision |
 |------|------|---------|----------|
 | 1 | info | `Auto-triggering multi-agent...` | ❌ Remove (internal decision) |
-| 2 | info | `Using consensus pair: default` | ❌ Remove (internal operation) |
+| 2 | info | `Consulting agents: cursor-agent, gemini, codex` | ❌ Remove (internal operation) |
 | 3 | blank | (spacing) | ❌ Remove |
 | 4 | separator | `============================================================` | ⚠️ Questionable |
 | 5+ | tool output | [actual consultation output] | ✅ Keep (user-requested) |

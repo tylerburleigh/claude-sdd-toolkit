@@ -6,7 +6,7 @@ debugging. Provides auto-routing based on failure type and prompt formatting.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, NamedTuple
+from typing import Dict, List, Optional, Tuple, NamedTuple, Sequence
 import time
 
 # Add parent directory to path to import sdd_common
@@ -96,107 +96,47 @@ def get_flags_for_tool(tool: str) -> List[str]:
 
 
 # =============================================================================
-# CONSENSUS CONFIGURATION LOADING
+# CONSENSUS CONFIGURATION
 # =============================================================================
 
-def load_consensus_config() -> Dict:
+def _resolve_consensus_agents(agents_override: Optional[Sequence[str]] = None) -> List[str]:
     """
-    Load consensus configuration from `.claude/ai_config.yaml` using the shared ai_config module.
+    Determine the ordered list of agents to use for consensus consultation.
+
+    Args:
+        agents_override: Optional explicit agent order supplied by the caller.
 
     Returns:
-        Dict with consensus configuration (pairs and auto_trigger)
+        List of agent names in consultation order.
     """
-    config = ai_config.load_skill_config('run-tests')
-    return config.get('consensus', {})
+    if agents_override:
+        normalized = _dedupe_preserve_order(list(agents_override))
+        if normalized:
+            return normalized
+
+    configured_agents = ai_config.get_consensus_agents('run-tests')
+    if configured_agents:
+        return configured_agents
+
+    return ai_config.DEFAULT_CONSENSUS_AGENTS.copy()
 
 
 def should_auto_trigger_consensus(failure_type: str) -> bool:
     """
     Check if a failure type should automatically trigger multi-agent consensus.
 
-    Checks in order:
-    1. Explicit entry for failure_type
-    2. Default setting for undefined types
-    3. Fallback to False (single-agent)
-
     Args:
         failure_type: Type of test failure
 
     Returns:
-        True if consensus should be auto-triggered, False otherwise
+        True if consensus should be auto-triggered, False otherwise.
+        Uses the boolean map defined in `consensus.auto_trigger`, falling back
+        to the default entry when a specific failure type is not present.
     """
-    consensus_config = load_consensus_config()
-
-    if not consensus_config or 'auto_trigger' not in consensus_config:
-        return False
-
-    auto_trigger = consensus_config['auto_trigger']
-
-    # Check for explicit entry first
-    if failure_type in auto_trigger:
-        return auto_trigger[failure_type] is not None
-
-    # Check for default setting
-    if 'default' in auto_trigger:
-        return auto_trigger['default'] is not None
-
-    # No config, no auto-trigger
-    return False
-
-
-def get_consensus_pair_for_failure(failure_type: str) -> str:
-    """
-    Get the consensus pair to use for a specific failure type.
-
-    Checks in order:
-    1. Explicit entry for failure_type
-    2. Default setting for undefined types
-    3. Fallback to "default" pair
-
-    Args:
-        failure_type: Type of test failure
-
-    Returns:
-        Pair name (e.g., 'default', 'code-focus', 'discovery-focus')
-        Returns 'default' if not configured
-    """
-    consensus_config = load_consensus_config()
-
-    if not consensus_config or 'auto_trigger' not in consensus_config:
-        return "default"
-
-    auto_trigger = consensus_config['auto_trigger']
-
-    # Check for explicit entry first
-    if failure_type in auto_trigger:
-        pair = auto_trigger[failure_type]
-        return pair if pair is not None else "default"
-
-    # Check for default setting
-    if 'default' in auto_trigger:
-        pair = auto_trigger['default']
-        return pair if pair is not None else "default"
-
-    # Fallback
-    return "default"
-
-
-def get_consensus_pairs() -> Dict[str, List[str]]:
-    """
-    Get defined consensus pairs from configuration.
-
-    Falls back to hardcoded MULTI_AGENT_PAIRS if not configured.
-
-    Returns:
-        Dict mapping pair names to lists of tools
-    """
-    consensus_config = load_consensus_config()
-
-    if not consensus_config or 'pairs' not in consensus_config:
-        # Fallback to hardcoded MULTI_AGENT_PAIRS (defined below)
-        return MULTI_AGENT_PAIRS
-
-    return consensus_config['pairs']
+    routing = ai_config.get_routing_config('run-tests')
+    if failure_type in routing:
+        return routing[failure_type]
+    return routing.get("default", False)
 
 
 def get_consultation_timeout() -> int:
@@ -227,14 +167,6 @@ TOOL_FLAGS = {
     "gemini": [],                     # Additional flags for gemini CLI
     "codex": ["--skip-git-repo-check"],  # Additional flags for codex CLI
     "cursor-agent": [],               # Additional flags for cursor-agent CLI
-}
-
-# Multi-agent consultation pairs
-# Defines which tool combinations to use for multi-agent analysis
-MULTI_AGENT_PAIRS = {
-    "default": ["gemini", "cursor-agent"],       # Strategic + discovery focus
-    "code-focus": ["codex", "gemini"],           # Code review + strategic validation
-    "discovery-focus": ["cursor-agent", "gemini"], # Pattern discovery + strategic analysis
 }
 
 
@@ -660,7 +592,7 @@ def consult_with_auto_routing(
     available_tools = detect_available_tools()
 
     if not available_tools:
-        printer.error("No tools available from selected pair")
+        printer.error("No tools available for consultation")
         if routing_plan:
             print(f"Needed: {', '.join(routing_plan)}")
         else:
@@ -672,7 +604,7 @@ def consult_with_auto_routing(
     if tool == "auto":
         selected_tool = get_best_tool(failure_type, available_tools)
         if not selected_tool:
-            printer.error("No tools available from selected pair")
+            printer.error("No tools available for consultation")
             if routing_plan:
                 print(f"Needed: {', '.join(routing_plan)}")
             else:
@@ -682,7 +614,7 @@ def consult_with_auto_routing(
     else:
         selected_tool = tool
         if selected_tool not in available_tools:
-            printer.error("No tools available from selected pair")
+            printer.error("No tools available for consultation")
             print(f"Needed: {selected_tool}")
             print(f"Available: {', '.join(available_tools)}")
             return 1
@@ -993,7 +925,7 @@ def consult_multi_agent(
     impl_code_path: Optional[str] = None,
     context: Optional[str] = None,
     question: Optional[str] = None,
-    pair: str = "default",
+    agents: Optional[Sequence[str]] = None,
     dry_run: bool = False,
     printer: Optional[PrettyPrinter] = None
 ) -> int:
@@ -1001,63 +933,69 @@ def consult_multi_agent(
     Consult multiple agents in parallel and synthesize their responses.
 
     Args:
-        failure_type: Type of test failure
-        error_message: Error message from pytest
-        hypothesis: Your hypothesis about the root cause
-        test_code_path: Path to test code file (optional)
-        impl_code_path: Path to implementation code file (optional)
-        context: Additional context (optional)
-        question: Specific question (optional)
-        pair: Which multi-agent pair to use (default, code-focus, discovery-focus)
-        dry_run: If True, show what would be run without running
-        printer: PrettyPrinter instance (creates default if None)
+        failure_type: Type of test failure.
+        error_message: Error message from pytest.
+        hypothesis: Your hypothesis about the root cause.
+        test_code_path: Path to test code file (optional).
+        impl_code_path: Path to implementation code file (optional).
+        context: Additional context (optional).
+        question: Specific question (optional).
+        agents: Optional explicit list of agents to consult. When omitted, the
+            configured consensus agent order from `.claude/ai_config.yaml` is
+            used, falling back to built-in defaults if necessary.
+        dry_run: If True, show what would be run without executing.
+        printer: PrettyPrinter instance (creates default if None).
 
     Returns:
-        Exit code (0 if at least one consultation succeeded)
+        Exit code (0 if at least one consultation succeeded).
     """
     if printer is None:
         printer = PrettyPrinter()
 
-    # Get the tool pair to use from configuration
-    consensus_pairs = get_consensus_pairs()
+    configured_agents = _resolve_consensus_agents(agents)
+    available_tools = detect_available_tools()
 
-    if pair not in consensus_pairs:
-        printer.error(f"Unknown multi-agent pair '{pair}'")
-        printer.info(f"Available pairs: {', '.join(consensus_pairs.keys())}")
+    if not available_tools:
+        printer.error("No tools available for multi-agent consultation")
+        printer.info(f"Configured agents: {', '.join(configured_agents) if configured_agents else 'none'}")
+        printer.info("Available: none")
         return 1
 
-    tools_to_use = consensus_pairs[pair]
+    agents_to_consult = _dedupe_preserve_order(
+        [tool for tool in configured_agents if tool in available_tools]
+    )
 
-    # Check which tools are available
-    available_tools = detect_available_tools()
-    available_from_pair = [t for t in tools_to_use if t in available_tools]
+    if not agents_to_consult:
+        agents_to_consult = _dedupe_preserve_order(list(available_tools))
 
-    if len(available_from_pair) < 2:
-        printer.warning(f"Only {len(available_from_pair)} tool(s) available from '{pair}' pair")
-        if len(available_from_pair) == 0:
-            printer.error("No tools available from selected pair")
-            printer.info(f"Needed: {', '.join(tools_to_use)}")
-            printer.info(f"Available: {', '.join(available_tools) if available_tools else 'none'}")
-            return 1
-        elif len(available_tools) >= 2:
-            # Use first two available tools
-            available_from_pair = available_tools[:2]
-            printer.info(f"Using available tools instead: {', '.join(available_from_pair)}")
-        else:
-            printer.info("Falling back to single-agent consultation")
-            # Use the single available tool
-            return consult_with_auto_routing(
-                failure_type=failure_type,
-                error_message=error_message,
-                hypothesis=hypothesis,
-                test_code_path=test_code_path,
-                impl_code_path=impl_code_path,
-                context=context,
-                question=question,
-                tool=available_from_pair[0],
-                dry_run=dry_run,
-                printer=printer
-            )
+    if len(agents_to_consult) < 2 and len(available_tools) >= 2:
+        # Supplement with additional available tools to reach at least two agents
+        supplemental = [
+            tool for tool in available_tools
+            if tool not in agents_to_consult
+        ]
+        agents_to_consult.extend(supplemental[: (2 - len(agents_to_consult))])
+        agents_to_consult = _dedupe_preserve_order(agents_to_consult)
+
+    if len(agents_to_consult) < 2 and len(available_tools) > len(agents_to_consult):
+        # As a final fallback, include all available tools
+        agents_to_consult = _dedupe_preserve_order(list(available_tools))
+
+    if len(agents_to_consult) < 2:
+        printer.info("Falling back to single-agent consultation")
+        single_tool = agents_to_consult[0]
+        return consult_with_auto_routing(
+            failure_type=failure_type,
+            error_message=error_message,
+            hypothesis=hypothesis,
+            test_code_path=test_code_path,
+            impl_code_path=impl_code_path,
+            context=context,
+            question=question,
+            tool=single_tool,
+            dry_run=dry_run,
+            printer=printer
+        )
 
     # Read code files if paths provided
     test_code = None
@@ -1085,26 +1023,26 @@ def consult_multi_agent(
     )
 
     if dry_run:
-        printer.info(f"Would consult {len(available_from_pair)} agents in parallel:")
-        for tool in available_from_pair:
+        printer.info(f"Would consult {len(agents_to_consult)} agents in parallel:")
+        for tool in agents_to_consult:
             print(f"  • {tool}")
         print()
         print(f"Prompt length: {len(prompt)} characters")
         return 0
 
     # Run consultations in parallel using shared implementation
-    printer.action(f"Consulting {len(available_from_pair)} agents in parallel...")
-    print(f"Tools: {', '.join(available_from_pair)}")
+    printer.action(f"Consulting {len(agents_to_consult)} agents in parallel...")
+    print(f"Agents: {', '.join(agents_to_consult)}")
     print("=" * 60)
     print()
 
     # Build models dict for each tool
-    models = {tool: get_model_for_tool(tool, failure_type) for tool in available_from_pair}
+    models = {tool: get_model_for_tool(tool, failure_type) for tool in agents_to_consult}
     timeout = get_consultation_timeout()
 
     # Use shared execute_tools_parallel() implementation
     multi_response = execute_tools_parallel(
-        tools=available_from_pair,
+        tools=agents_to_consult,
         prompt=prompt,
         models=models,
         timeout=timeout

@@ -11,15 +11,14 @@ from typing import Any, Dict, List, Optional
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.ai_tools import detect_available_tools
+from claude_skills.common import ai_config
 from claude_skills.run_tests.consultation import (
     consult_with_auto_routing,
     consult_multi_agent,
     run_consultation,
     print_routing_matrix,
     should_auto_trigger_consensus,
-    get_consensus_pair_for_failure,
     FAILURE_TYPES as CONSULT_FAILURE_TYPES,
-    MULTI_AGENT_PAIRS,
 )
 from claude_skills.run_tests.test_discovery import print_discovery_report
 from claude_skills.run_tests.pytest_runner import (
@@ -107,15 +106,29 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         return 1
 
     auto_triggered = False
-    consensus_pair = args.pair
+
+    agents_override: Optional[List[str]] = None
+    if args.agents:
+        # Support comma-separated list or repeated flag usage
+        raw_values: List[str] = []
+        for value in args.agents:
+            raw_values.extend([part.strip() for part in value.split(",")])
+        agents_override = [agent for agent in raw_values if agent]
+        if agents_override and not args.multi_agent:
+            args.multi_agent = True
+
     if not args.multi_agent and should_auto_trigger_consensus(args.failure_type):
         auto_triggered = True
-        consensus_pair = get_consensus_pair_for_failure(args.failure_type)
+        consensus_agents = agents_override or ai_config.get_consensus_agents('run-tests')
         printer.info(f"Auto-triggering multi-agent consensus for '{args.failure_type}' failure")
-        printer.info(f"Using consensus pair: {consensus_pair}")
+        printer.info(f"Consulting agents: {', '.join(consensus_agents)}")
         printer.blank()
 
     if args.multi_agent or auto_triggered:
+        consensus_agents = agents_override or ai_config.get_consensus_agents('run-tests')
+        if agents_override or not auto_triggered:
+            printer.info(f"Multi-agent consultation order: {', '.join(consensus_agents)}")
+            printer.blank()
         return consult_multi_agent(
             failure_type=args.failure_type,
             error_message=args.error,
@@ -124,7 +137,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             impl_code_path=args.impl_code,
             context=args.context,
             question=args.question,
-            pair=consensus_pair,
+            agents=agents_override,
             dry_run=args.dry_run,
             printer=printer,
         )
@@ -221,7 +234,12 @@ Failure types:
     consult_parser.add_argument("--dry-run", action="store_true", help="Show what would be run without executing")
     consult_parser.add_argument("--list-routing", action="store_true", help="Show the routing matrix")
     consult_parser.add_argument("--multi-agent", action="store_true", help="Consult multiple agents in parallel")
-    consult_parser.add_argument("--pair", choices=list(MULTI_AGENT_PAIRS.keys()), default="default", help="Multi-agent pair to use")
+    consult_parser.add_argument(
+        "--agents",
+        action="append",
+        metavar="AGENTS",
+        help="Comma-separated list specifying agents to consult (implies --multi-agent)",
+    )
     consult_parser.set_defaults(func=cmd_consult)
 
     discover_parser = subparsers.add_parser(

@@ -261,40 +261,30 @@ models:
   gemini:
     priority:
       - gemini-2.5-pro
-    flags:
-      - -m
-      - gemini-2.5-pro
-      - -p
   cursor-agent:
     priority:
-      - composer-1
-    flags:
-      - -p
-      - --model
       - composer-1
   codex:
     priority:
       - gpt-5-codex
-    flags:
-      - exec
-      - --model
-      - gpt-5-codex
-      - --skip-git-repo-check
 
 consensus:
-  pairs:
-    default:
+    agents:
       - cursor-agent
       - gemini
-    code-focus:
       - codex
-      - gemini
-    discovery-focus:
-      - cursor-agent
-      - gemini
+    auto_trigger:
+      default: false
+      assertion: true
+      exception: true
+      fixture: true
+      import: false
+      timeout: true
+      flaky: false
+      multi-file: true
 
 consultation:
-  timeout_seconds: 90
+    timeout_seconds: 600
 """
             ai_config_file.write_text(minimal_config)
             return True, f"Created minimal ai_config.yaml at {ai_config_file}", True
