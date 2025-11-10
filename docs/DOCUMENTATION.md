@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-10 18:23:23
+**Generated:** 2025-11-10 18:23:55
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 293
-- **Total Lines:** 101557
+- **Total Lines:** 101559
 - **Total Classes:** 406
 - **Total Functions:** 1214
 - **Avg Complexity:** 5.02
@@ -281,7 +281,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1451`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1453`
 
 **Description:**
 > Issue with assigned severity category.
@@ -440,7 +440,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1289`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1291`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -467,7 +467,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:109`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:111`
 
 **Description:**
 > Base exception for consultation errors.
@@ -489,7 +489,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:119`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:121`
 
 **Description:**
 > Raised when consultation times out.
@@ -1677,7 +1677,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:114`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:116`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -8377,7 +8377,7 @@ Returns:
 ### `_classify_heading(heading) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:274`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:276`
 **Complexity:** 4
 
 **Description:**
@@ -8391,7 +8391,7 @@ Returns:
 ### `_classify_list_item(text, section_hint) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:597`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:599`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -8428,7 +8428,7 @@ Args:
 ### `_coerce_confidence_value(value) -> Optional[float]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:458`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:460`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -8442,7 +8442,7 @@ Args:
 ### `_coerce_issue_entry(entry) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:417`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:419`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -8456,7 +8456,7 @@ Args:
 ### `_coerce_recommendation_entry(entry) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:443`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:445`
 **Complexity:** 7
 
 **Description:**
@@ -8481,7 +8481,7 @@ Args:
 ### `_coerce_verdict(value) -> Optional[FidelityVerdict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:401`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:403`
 **Complexity:** 3
 
 **Description:**
@@ -8983,7 +8983,7 @@ Returns dict with keys: critical, high, medium, low
 ### `_extract_list_items(section_text) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:318`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:320`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9060,7 +9060,7 @@ Returns:
 ### `_extract_structured_json_insights(payload, add_issue, add_recommendation) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:521`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:523`
 ⚠️ **Complexity:** 36 (High)
 
 **Parameters:**
@@ -9659,7 +9659,7 @@ Returns:
 ### `_is_negative_status(text) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:503`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:505`
 **Complexity:** 5
 
 **Parameters:**
@@ -9670,7 +9670,7 @@ Returns:
 ### `_is_positive_status(text) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:514`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:516`
 **Complexity:** 3
 
 **Parameters:**
@@ -9741,7 +9741,7 @@ Args:
 ### `_load_json_from_text(text) -> Optional[Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:371`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:373`
 **Complexity:** 10
 
 **Description:**
@@ -9946,7 +9946,7 @@ Returns:
 ### `_normalize_for_matching(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:267`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:269`
 **Complexity:** 2
 
 **Description:**
@@ -10767,7 +10767,7 @@ Returns:
 ### `_score_keywords(text, keywords) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:498`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:500`
 **Complexity:** 1
 
 **Description:**
@@ -10903,7 +10903,7 @@ Returns:
 ### `_split_sections_by_heading(text) -> List[Tuple[Optional[str], str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:286`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:288`
 **Complexity:** 6
 
 **Description:**
@@ -10965,7 +10965,7 @@ Returns:
 ### `_strip_code_fences(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:355`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:357`
 **Complexity:** 4
 
 **Description:**
@@ -10979,7 +10979,7 @@ Returns:
 ### `_strip_markdown_emphasis(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:255`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:257`
 **Complexity:** 2
 
 **Description:**
@@ -12548,7 +12548,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1473`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1475`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12582,7 +12582,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1581`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1583`
 **Complexity:** 1
 
 **Description:**
@@ -14968,7 +14968,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:642`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:644`
 **Complexity:** 8
 
 **Description:**
@@ -15082,7 +15082,7 @@ Returns:
 ### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success, cache_key_params, use_cache, progress_emitter) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:727`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:729`
 ⚠️ **Complexity:** 33 (High)
 
 **Description:**
@@ -15939,7 +15939,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1329`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1331`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -19854,7 +19854,7 @@ when the configuration is missing or malformed.
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:972`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:974`
 **Complexity:** 3
 
 **Description:**
@@ -22694,7 +22694,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1265`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1267`
 **Complexity:** 1
 
 **Description:**
@@ -22801,7 +22801,7 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1031`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1033`
 ⚠️ **Complexity:** 54 (High)
 
 **Description:**
