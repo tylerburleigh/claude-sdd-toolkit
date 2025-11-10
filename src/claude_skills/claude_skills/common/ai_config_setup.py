@@ -2,9 +2,9 @@
 Utilities for bootstrapping `.claude/ai_config.yaml` during project setup.
 
 This helper centralises the logic for copying the packaged AI configuration
-template (or falling back to a minimal default) into a target project. Both
-the legacy `dev_tools.setup_project_permissions` script and the unified CLI
-delegate to this module so we guarantee `ai_config.yaml` is always created.
+template (or falling back to a minimal default) into a target project. The
+unified CLI delegates to this module to guarantee `ai_config.yaml` is always
+created during setup.
 """
 
 from __future__ import annotations

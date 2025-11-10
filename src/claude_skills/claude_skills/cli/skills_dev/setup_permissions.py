@@ -23,6 +23,7 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
+    "Skill(sdd-toolkit:sdd-fidelity-review)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
 
@@ -54,10 +55,26 @@ SDD_PERMISSIONS = [
     "Bash(gemini:*)",
     "Bash(codex:*)",
 
+    # Testing permissions (for run-tests skill)
+    "Bash(pytest:*)",
+    "Bash(python -m pytest:*)",
+    "Bash(pip show:*)",  # Useful for debugging package issues
+
+    # System utilities (commonly needed for workflows)
+    "Bash(mkdir:*)",  # Creating directories
+    "Bash(find:*)",   # Finding files
+    "Bash(cat:*)",    # Quick file reads
+
+    # Web search for documentation and debugging
+    "WebSearch",
+
     # Note: Git/GitHub CLI permissions can be optionally configured during setup.
     # See GIT_READ_PERMISSIONS and GIT_WRITE_PERMISSIONS below for available options.
 
     # File access permissions
+    "Read(//**/specs/**)",  # Reading spec files
+    "Read(//tmp/**)",       # Temp file read access for testing
+    "Write(//tmp/**)",      # Temp file write access for testing/debugging
     "Write(//**/specs/active/**)",
     "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
@@ -73,21 +90,59 @@ GIT_READ_PERMISSIONS = [
     "Bash(git log:*)",
     "Bash(git branch:*)",
     "Bash(git diff:*)",
-    "Bash(git rev-parse:*)",
     "Bash(git show:*)",
     "Bash(git describe:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git ls-tree:*)",  # Inspect tree objects
     "Bash(gh pr view:*)",
 ]
 
-# Git write permissions (potentially destructive operations)
-# ⚠️ These allow Claude to modify repository state and push changes
+# Git write permissions (safe write operations)
+# These allow Claude to modify repository state with standard workflows
 GIT_WRITE_PERMISSIONS = [
     "Bash(git checkout:*)",
     "Bash(git add:*)",
     "Bash(git commit:*)",
-    "Bash(git push:*)",
+    "Bash(git push:*)",  # Note: Does not include --force variants
     "Bash(git rm:*)",
     "Bash(gh pr create:*)",
+    "Bash(git mv:*)",
+]
+
+# Git dangerous permissions (destructive operations requiring user approval)
+# ⚠️ These operations can cause data loss or rewrite history
+# Automatically added to ASK list when git write is enabled
+GIT_DANGEROUS_PERMISSIONS = [
+    # Force operations (can overwrite remote history or delete local files)
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git push --force-with-lease:*)",
+    "Bash(git clean -f:*)",
+    "Bash(git clean -fd:*)",
+    "Bash(git clean -fx:*)",
+
+    # History rewriting operations (can lose commits or changes)
+    "Bash(git reset --hard:*)",
+    "Bash(git reset --mixed:*)",
+    "Bash(git reset:*)",  # Covers all reset modes (defaults to --mixed)
+    "Bash(git rebase:*)",
+    "Bash(git commit --amend:*)",
+    "Bash(git filter-branch:*)",
+    "Bash(git filter-repo:*)",
+
+    # Deletion operations (can remove branches or tags)
+    "Bash(git branch -D:*)",
+    "Bash(git push origin --delete:*)",
+    "Bash(git tag -d:*)",
+
+    # Reflog and stash operations (can lose commit references)
+    "Bash(git reflog expire:*)",
+    "Bash(git reflog delete:*)",
+    "Bash(git stash drop:*)",
+    "Bash(git stash clear:*)",
+
+    # Aggressive garbage collection
+    "Bash(git gc --prune=now:*)",
 ]
 
 
@@ -196,13 +251,16 @@ def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter
         return False
 
 
-def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
+def _prompt_for_git_permissions(printer: PrettyPrinter) -> dict:
     """Prompt user about adding git/GitHub permissions.
 
     Returns:
-        List of git permissions to add (may include read-only, write, or both)
+        Dict with 'allow' and 'ask' keys containing permissions for each list
     """
-    permissions_to_add = []
+    permissions = {
+        "allow": [],
+        "ask": []
+    }
 
     printer.info("")
     printer.info("🔧 Git Integration Setup")
@@ -220,14 +278,14 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
             # Add read-only permissions automatically
             printer.info("")
             printer.info("✓ Adding read-only git permissions (status, log, diff, etc.)")
-            permissions_to_add.extend(GIT_READ_PERMISSIONS)
+            permissions["allow"].extend(GIT_READ_PERMISSIONS)
             break
         elif response in ['n', 'no']:
             printer.info("")
             printer.info("⊘ Skipping git integration setup")
             printer.info("  You can manually add git permissions to .claude/settings.local.json later")
             printer.info("")
-            return permissions_to_add
+            return permissions
         else:
             printer.warning("Please enter 'y' for yes or 'n' for no")
 
@@ -240,6 +298,7 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
     printer.info("  • Stage changes (git add)")
     printer.info("  • Create commits (git commit)")
     printer.info("  • Push to remote (git push)")
+    printer.info("  • Remove files (git rm)")
     printer.info("  • Create pull requests (gh pr create)")
     printer.info("")
     printer.warning("RISK: These operations can modify your repository and push changes.")
@@ -251,7 +310,19 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
         if response in ['y', 'yes']:
             printer.info("")
             printer.info("✓ Adding git write permissions")
-            permissions_to_add.extend(GIT_WRITE_PERMISSIONS)
+            permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
+
+            # Automatically add dangerous operations to ASK list
+            printer.info("✓ Adding dangerous git operations to ASK list (requires approval)")
+            printer.info("")
+            printer.info("  Dangerous operations requiring approval:")
+            printer.info("    • Force push (git push --force)")
+            printer.info("    • Hard reset (git reset --hard)")
+            printer.info("    • Rebase operations (git rebase)")
+            printer.info("    • History rewriting (git commit --amend)")
+            printer.info("    • Force deletion (git branch -D, git clean -f)")
+            printer.info("")
+            permissions["ask"].extend(GIT_DANGEROUS_PERMISSIONS)
             break
         elif response in ['n', 'no']:
             printer.info("")
@@ -262,7 +333,7 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
             printer.warning("Please enter 'y' for yes or 'n' for no")
 
     printer.info("")
-    return permissions_to_add
+    return permissions
 
 
 def cmd_update(args, printer: PrettyPrinter) -> int:
@@ -302,13 +373,18 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         settings["permissions"] = {"allow": [], "deny": [], "ask": []}
     if "allow" not in settings["permissions"]:
         settings["permissions"]["allow"] = []
+    if "ask" not in settings["permissions"]:
+        settings["permissions"]["ask"] = []
+
+    # Track existing permissions across both allow and ask lists
+    existing_allow = set(settings["permissions"]["allow"])
+    existing_ask = set(settings["permissions"]["ask"])
+    new_permissions = []
+    new_ask_permissions = []
 
     # Add SDD permissions (avoid duplicates)
-    existing_permissions = set(settings["permissions"]["allow"])
-    new_permissions = []
-
     for perm in SDD_PERMISSIONS:
-        if perm not in existing_permissions:
+        if perm not in existing_allow:
             new_permissions.append(perm)
             settings["permissions"]["allow"].append(perm)
 
@@ -326,12 +402,19 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
     if not args.json:
         git_permissions = _prompt_for_git_permissions(printer)
 
-        # Add git permissions (avoid duplicates)
-        for perm in git_permissions:
-            if perm not in existing_permissions:
+        # Add git permissions to allow list (avoid duplicates)
+        for perm in git_permissions["allow"]:
+            if perm not in existing_allow:
                 new_permissions.append(perm)
                 settings["permissions"]["allow"].append(perm)
-                existing_permissions.add(perm)
+                existing_allow.add(perm)
+
+        # Add dangerous git permissions to ask list (avoid duplicates)
+        for perm in git_permissions["ask"]:
+            if perm not in existing_ask:
+                new_ask_permissions.append(perm)
+                settings["permissions"]["ask"].append(perm)
+                existing_ask.add(perm)
 
     # Write updated settings
     with open(settings_file, 'w') as f:
@@ -342,15 +425,21 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         "success": True,
         "settings_file": str(settings_file),
         "permissions_added": len(new_permissions),
-        "total_permissions": len(settings["permissions"]["allow"]),
-        "new_permissions": new_permissions
+        "ask_permissions_added": len(new_ask_permissions),
+        "total_allow_permissions": len(settings["permissions"]["allow"]),
+        "total_ask_permissions": len(settings["permissions"]["ask"]),
+        "new_permissions": new_permissions,
+        "new_ask_permissions": new_ask_permissions
     }
 
     if args.json:
         print(json.dumps(result, indent=2))
     else:
-        if new_permissions:
-            printer.success(f"✅ Added {len(new_permissions)} new SDD permissions to {settings_file}")
+        total_added = len(new_permissions) + len(new_ask_permissions)
+        if total_added > 0:
+            printer.success(f"✅ Added {len(new_permissions)} new permissions to ALLOW list")
+            if new_ask_permissions:
+                printer.success(f"✅ Added {len(new_ask_permissions)} dangerous operations to ASK list (requires approval)")
         else:
             printer.success(f"✅ All SDD permissions already configured in {settings_file}")
 

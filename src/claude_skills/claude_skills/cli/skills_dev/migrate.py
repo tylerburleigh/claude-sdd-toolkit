@@ -11,13 +11,13 @@ MIGRATION_GUIDE = """
 Migration Guide: Legacy dev_tools to Unified CLI
 ═══════════════════════════════════════════════════
 
-The legacy Python scripts in dev_tools/ have been replaced with unified CLI commands:
+Legacy Python scripts in dev_tools/ have been replaced with unified CLI commands.
+All legacy scripts have been removed.
 
-OLD (Deprecated):
+OLD (Removed):
 ─────────────────
   python3 ~/.claude/scripts/sdd_start_helper.py check-permissions
   python3 ~/.claude/scripts/sdd_start_helper.py format-output
-  python3 ~/.claude/scripts/setup_project_permissions.py update .
   claude-skills-gendocs sdd-validate
 
 NEW (Current):
@@ -29,9 +29,8 @@ NEW (Current):
 
 Command Mappings:
 ─────────────────
-  sdd_start_helper.py       → sdd skills-dev start-helper --
-  setup_project_permissions → sdd skills-dev setup-permissions --
-  claude-skills-gendocs     → sdd skills-dev gendocs --
+  sdd_start_helper.py  → sdd skills-dev start-helper --
+  claude-skills-gendocs → sdd skills-dev gendocs --
 
 Available Commands:
 ───────────────────
