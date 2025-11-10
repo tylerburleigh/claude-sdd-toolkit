@@ -90,12 +90,6 @@ sdd fidelity-review <spec-id> --task <task-id>
 sdd fidelity-review <spec-id> --phase <phase-id>
 ```
 
-**Output Location (Automatic):**
-- The CLI writes a synthesized consensus Markdown report (not raw AI transcripts) to `specs/.fidelity-reviews/`. Each file captures the JSON summary you return—review scope, consensus findings, deviations, recommendations, and metadata—so downstream agents can inspect the full consensus context without rerunning the review.
-- Task reviews: `specs/.fidelity-reviews/<spec-id>-task-<task-id>-fidelity-review.md`
-- Phase reviews: `specs/.fidelity-reviews/<spec-id>-phase-<phase-id>-fidelity-review.md`
-- Always reference the auto-generated filename when reporting results so the caller can connect the CLI’s JSON output, your summarized response, and the persisted Markdown artifact.
-
 ### Step 3: Execute CLI Command
 
 Use the Bash tool to execute the constructed command:

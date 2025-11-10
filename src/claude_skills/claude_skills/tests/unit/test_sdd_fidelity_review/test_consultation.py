@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from textwrap import dedent
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -195,6 +196,68 @@ def test_parse_review_response_extracts_fail_with_issues() -> None:
     assert any("Missing validation" in issue for issue in parsed.issues)
 
 
+def test_parse_review_response_handles_numbered_findings_section() -> None:
+    raw = dedent(
+        """
+        VERDICT: FAIL
+
+        {
+          "response": "Detailed review summary:
+
+        1.  **Requirement Alignment:** The implementation does not match the specification requirements; the required template file is missing.
+        2.  **Success Criteria:** Not satisfied because nothing in the artifacts proves the templates were copied.
+
+        ### Recommendations
+        - Create the missing template files in src/claude_skills/claude_skills/common/templates/setup/.
+        - Add a smoke test that loads ALL_SETUP_TEMPLATES to confirm the files exist.
+        "
+        }
+        """
+    )
+    response = _make_response("gemini", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert parsed.verdict is FidelityVerdict.FAIL
+    assert any("Requirement Alignment" in issue for issue in parsed.issues)
+    assert any("Success Criteria" in issue for issue in parsed.issues)
+    assert any("missing template files" in rec.lower() for rec in parsed.recommendations)
+    assert len(parsed.recommendations) == 2
+
+
+def test_parse_review_response_handles_findings_heading_with_bullets() -> None:
+    raw = dedent(
+        """
+        ### Findings
+        - Blocking – Module exports constants for setup templates that are absent on disk, so consumers crash when iterating ALL_SETUP_TEMPLATES.
+        - Minor deviation – Documentation still references template names that no longer exist.
+
+        ### Recommendations
+        - Restore the missing template files under src/claude_skills/claude_skills/common/templates/setup/.
+        - Update the documentation to match the actual file names.
+        """
+    )
+    response = _make_response("gemini", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert any(issue.startswith("Blocking") for issue in parsed.issues)
+    assert len(parsed.issues) == 2
+    assert any(rec.startswith("Restore") for rec in parsed.recommendations)
+    assert len(parsed.recommendations) == 2
+
+
+def test_parse_review_response_keeps_full_first_paragraph_summary() -> None:
+    first_paragraph = (
+        "This is an intentionally long paragraph that should remain intact even when it exceeds two hundred characters. "
+        "It describes the overall fidelity review context including the fact that required template files are missing "
+        "and that downstream systems fail to load configuration defaults as a result."
+    )
+    raw = f"{first_paragraph}\n\n### Findings\n- Blocking – Missing template files prevent setup from completing."
+    response = _make_response("gemini", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert parsed.summary == first_paragraph
+
+
 def test_parse_review_response_defaults_to_unknown() -> None:
     response = _make_response("gemini", ToolStatus.SUCCESS, output="No verdict provided.")
     parsed = parse_review_response(response)
@@ -220,7 +283,28 @@ def test_detect_consensus_majority() -> None:
     ]
     consensus = detect_consensus(parsed, min_agreement=2)
     assert consensus.consensus_verdict is FidelityVerdict.FAIL
-    assert "bug" in consensus.consensus_issues
+    assert "Bug" in consensus.consensus_issues
+
+
+def test_detect_consensus_preserves_original_text() -> None:
+    parsed = [
+        ParsedReviewResponse(
+            verdict=FidelityVerdict.FAIL,
+            issues=["Blocking – Missing template files"],
+            recommendations=["Restore the missing template files"],
+        ),
+        ParsedReviewResponse(
+            verdict=FidelityVerdict.FAIL,
+            issues=["Blocking – Missing template files"],
+            recommendations=["Restore the missing template files"],
+        ),
+    ]
+    consensus = detect_consensus(parsed, min_agreement=2)
+
+    assert consensus.consensus_issues == ["Blocking – Missing template files"]
+    assert consensus.all_issues == ["Blocking – Missing template files"]
+    assert consensus.consensus_recommendations == ["Restore the missing template files"]
+    assert consensus.all_recommendations == ["Restore the missing template files"]
 
 
 def test_categorize_issues_assigns_severity() -> None:

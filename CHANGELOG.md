@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 - `ai_config_setup.ensure_ai_config()` helper shared by setup workflows to seed `.claude/ai_config.yaml` with packaged defaults.
+- `sdd fidelity-review` now auto-saves both Markdown and JSON reports when no output path is provided, making it easier to reuse results across tooling.
 
 ### Fixed
 - Updated CLI integration tests to opt into text output (`--no-json`) so completion prompts and human-facing messaging continue to be covered after switching to JSON-first defaults.

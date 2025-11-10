@@ -6,7 +6,7 @@ implementation fidelity review use cases. Provides simplified API with
 fidelity-review-specific defaults and error handling.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple, Set
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -118,6 +118,254 @@ class NoToolsAvailableError(ConsultationError):
 class ConsultationTimeoutError(ConsultationError):
     """Raised when consultation times out."""
     pass
+
+
+SECTION_HEADING_ISSUE_KEYWORDS = (
+    "issue",
+    "finding",
+    "concern",
+    "deviation",
+    "blocker",
+    "blocking",
+    "risk",
+    "problem",
+    "failure",
+)
+SECTION_HEADING_RECOMMENDATION_KEYWORDS = (
+    "recommendation",
+    "suggestion",
+    "next step",
+    "action",
+    "follow-up",
+    "remediation",
+    "mitigation",
+    "todo",
+    "fix",
+)
+ISSUE_KEYWORDS = (
+    "issue",
+    "problem",
+    "concern",
+    "bug",
+    "error",
+    "fail",
+    "failure",
+    "missing",
+    "absent",
+    "does not",
+    "not met",
+    "not satisfied",
+    "deviation",
+    "deviate",
+    "deviates",
+    "blocker",
+    "blocking",
+    "incomplete",
+    "incorrect",
+    "mismatch",
+    "violation",
+    "prevent",
+    "broken",
+    "lack",
+    "lacking",
+)
+RECOMMENDATION_KEYWORDS = (
+    "recommend",
+    "should",
+    "consider",
+    "suggest",
+    "ensure",
+    "add",
+    "implement",
+    "address",
+    "fix",
+    "resolve",
+    "mitigate",
+    "need to",
+    "must",
+    "propose",
+    "update",
+    "restore",
+    "provide",
+)
+ISSUE_PREFIXES = (
+    "blocking",
+    "critical",
+    "major",
+    "minor",
+    "deviation",
+    "issue",
+    "concern",
+    "failing",
+    "fails",
+    "failed",
+    "missing",
+    "broken",
+)
+RECOMMENDATION_PREFIXES = (
+    "recommend",
+    "recommendation",
+    "suggest",
+    "should",
+    "must",
+    "need to",
+    "consider",
+    "ensure",
+    "action",
+    "next step",
+)
+SHORT_RESPONSE_DENYLIST = {"yes", "no", "n/a", "none", "ok", "pass"}
+LIST_ITEM_PATTERN = re.compile(r'^\s*(?:[-*•‣▪◦]|\d+[.)])\s+(.*)$')
+HEADING_PATTERN = re.compile(r'^\s*(#{2,6})\s+(.+)$', re.MULTILINE)
+
+
+def _strip_markdown_emphasis(text: str) -> str:
+    """Remove common markdown emphasis markers without altering content casing."""
+    if not text:
+        return ""
+    cleaned = text.strip()
+    cleaned = cleaned.replace("**", "").replace("__", "")
+    cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)
+    cleaned = re.sub(r'\[(.+?)\]\((.*?)\)', r'\1', cleaned)
+    return re.sub(r'\s+', ' ', cleaned).strip()
+
+
+def _normalize_for_matching(text: str) -> str:
+    """Normalize text for deduplication and fuzzy matching."""
+    if not text:
+        return ""
+    return re.sub(r'\s+', ' ', text).strip().lower()
+
+
+def _classify_heading(heading: Optional[str]) -> Optional[str]:
+    """Classify section heading as issue or recommendation oriented."""
+    if not heading:
+        return None
+    heading_lower = heading.lower()
+    if any(keyword in heading_lower for keyword in SECTION_HEADING_ISSUE_KEYWORDS):
+        return "issue"
+    if any(keyword in heading_lower for keyword in SECTION_HEADING_RECOMMENDATION_KEYWORDS):
+        return "recommendation"
+    return None
+
+
+def _split_sections_by_heading(text: str) -> List[Tuple[Optional[str], str]]:
+    """
+    Split text into sections using markdown headings.
+
+    Returns list of (heading, section_text) pairs. Sections prior to the first
+    heading are returned with heading=None.
+    """
+    if not text.strip():
+        return []
+
+    sections: List[Tuple[Optional[str], str]] = []
+    matches = list(HEADING_PATTERN.finditer(text))
+
+    if not matches:
+        return [(None, text.strip())]
+
+    first_start = matches[0].start()
+    if first_start > 0:
+        preamble = text[:first_start].strip()
+        if preamble:
+            sections.append((None, preamble))
+
+    for index, match in enumerate(matches):
+        heading = match.group(2).strip()
+        section_start = match.end()
+        section_end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        section_text = text[section_start:section_end].strip()
+        sections.append((heading, section_text))
+
+    return sections
+
+
+def _extract_list_items(section_text: str) -> List[str]:
+    """
+    Extract bullet or numbered list items from section text.
+
+    Preserves multi-line items by joining continuation lines with spaces.
+    """
+    if not section_text:
+        return []
+
+    items: List[str] = []
+    current_parts: List[str] = []
+
+    for line in section_text.splitlines():
+        if not line.strip():
+            if current_parts:
+                items.append(" ".join(current_parts).strip())
+                current_parts = []
+            continue
+
+        match = LIST_ITEM_PATTERN.match(line)
+        if match:
+            if current_parts:
+                items.append(" ".join(current_parts).strip())
+            current_parts = [match.group(1).strip()]
+            continue
+
+        if current_parts and line.startswith((" ", "\t")):
+            current_parts.append(line.strip())
+        elif current_parts:
+            current_parts.append(line.strip())
+
+    if current_parts:
+        items.append(" ".join(current_parts).strip())
+
+    return [item for item in items if item]
+
+
+def _score_keywords(text: str, keywords: tuple[str, ...]) -> int:
+    """Count keyword matches within text for heuristic scoring."""
+    return sum(1 for keyword in keywords if keyword in text)
+
+
+def _classify_list_item(text: str, section_hint: Optional[str]) -> Optional[str]:
+    """
+    Classify list item as issue or recommendation using heuristics.
+
+    Considers section headings, severity prefixes, and keyword presence while
+    avoiding overly short benign responses.
+    """
+    normalized = _normalize_for_matching(text)
+    if not normalized:
+        return None
+    if len(normalized.replace(" ", "")) < 6:
+        return None
+    if normalized in SHORT_RESPONSE_DENYLIST:
+        return None
+
+    section_type = section_hint
+    issue_score = 0
+    recommendation_score = 0
+
+    if section_type == "issue":
+        issue_score += 2
+    elif section_type == "recommendation":
+        recommendation_score += 2
+
+    if any(normalized.startswith(prefix) for prefix in ISSUE_PREFIXES):
+        issue_score += 2
+    if any(normalized.startswith(prefix) for prefix in RECOMMENDATION_PREFIXES):
+        recommendation_score += 2
+
+    issue_score += _score_keywords(normalized, ISSUE_KEYWORDS)
+    recommendation_score += _score_keywords(normalized, RECOMMENDATION_KEYWORDS)
+
+    if issue_score == recommendation_score == 0:
+        if section_type and len(normalized.split()) >= 5:
+            return section_type
+        return None
+
+    if issue_score > recommendation_score:
+        return "issue"
+    if recommendation_score > issue_score:
+        return "recommendation"
+
+    return section_type or ("issue" if issue_score > 0 else None)
 
 
 def consult_ai_on_fidelity(
@@ -541,10 +789,29 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
 
     # Initialize with defaults
     verdict = FidelityVerdict.UNKNOWN
-    issues = []
-    recommendations = []
+    issues: List[str] = []
+    recommendations: List[str] = []
     summary = ""
     confidence = None
+
+    issue_seen: Set[str] = set()
+    recommendation_seen: Set[str] = set()
+
+    def add_issue(candidate: str) -> None:
+        cleaned_candidate = _strip_markdown_emphasis(candidate)
+        normalized_candidate = _normalize_for_matching(cleaned_candidate)
+        if not normalized_candidate or normalized_candidate in issue_seen:
+            return
+        issue_seen.add(normalized_candidate)
+        issues.append(cleaned_candidate)
+
+    def add_recommendation(candidate: str) -> None:
+        cleaned_candidate = _strip_markdown_emphasis(candidate)
+        normalized_candidate = _normalize_for_matching(cleaned_candidate)
+        if not normalized_candidate or normalized_candidate in recommendation_seen:
+            return
+        recommendation_seen.add(normalized_candidate)
+        recommendations.append(cleaned_candidate)
 
     # If response failed, return early with UNKNOWN verdict
     if not success:
@@ -586,44 +853,78 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             if any(keyword in output_lower for keyword in concern_keywords):
                 verdict = FidelityVerdict.PARTIAL
 
-    # Extract issues (look for common patterns)
+    normalized_output = output.replace("\r\n", "\n")
+
+    # Extract structured sections using headings and list heuristics
+    sections = _split_sections_by_heading(normalized_output)
+    for heading, section_text in sections:
+        section_hint = _classify_heading(heading)
+        items = _extract_list_items(section_text)
+
+        if not items and section_hint in {"issue", "recommendation"}:
+            # Split paragraph text into meaningful chunks when no explicit list exists
+            items = [
+                chunk.strip()
+                for chunk in re.split(r'\n\s*\n', section_text)
+                if chunk and chunk.strip()
+            ]
+
+        for item in items:
+            classification = _classify_list_item(item, section_hint)
+            if classification == "issue":
+                add_issue(item)
+            elif classification == "recommendation":
+                add_recommendation(item)
+
+    # Fallback to legacy regex extraction for backward compatibility
     issue_patterns = [
-        r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|$)',
-        r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|$)',
-        r'[-•*]\s*Issue:\s*(.+?)(?:\n|$)',
+        r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+        r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|\Z)',
+        r'[-•*]\s*Issue:\s*(.+?)(?:\n|\Z)',
     ]
 
     for pattern in issue_patterns:
-        matches = re.finditer(pattern, output, re.IGNORECASE | re.DOTALL)
+        matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
         for match in matches:
             issue_text = match.group(1).strip()
-            # Split on bullet points if multiple issues in one match
             sub_issues = re.split(r'\n[-•*]\s*', issue_text)
-            issues.extend([i.strip() for i in sub_issues if i.strip()])
+            for sub_issue in sub_issues:
+                if sub_issue.strip():
+                    add_issue(sub_issue)
 
-    # Extract recommendations (look for common patterns)
     rec_patterns = [
-        r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|$)',
-        r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|$)',
-        r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|$)',
+        r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+        r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|\Z)',
+        r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|\Z)',
     ]
 
     for pattern in rec_patterns:
-        matches = re.finditer(pattern, output, re.IGNORECASE | re.DOTALL)
+        matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
         for match in matches:
             rec_text = match.group(1).strip()
-            # Split on bullet points if multiple recommendations in one match
             sub_recs = re.split(r'\n[-•*]\s*', rec_text)
-            recommendations.extend([r.strip() for r in sub_recs if r.strip()])
+            for sub_rec in sub_recs:
+                if sub_rec.strip():
+                    add_recommendation(sub_rec)
 
-    # Extract summary (first paragraph or first 200 chars)
-    summary_match = re.match(r'^(.+?)(?:\n\n|\n#|$)', output, re.DOTALL)
-    if summary_match:
-        summary = summary_match.group(1).strip()
-        if len(summary) > 200:
-            summary = summary[:197] + "..."
+    # Extract summary (first paragraph with generous cap)
+    summary_segments = [
+        segment.strip()
+        for segment in re.split(r'\n\s*\n', normalized_output, maxsplit=1)
+        if segment and segment.strip()
+    ]
+    if summary_segments:
+        summary = summary_segments[0]
+        max_summary_length = 600
+        if len(summary) > max_summary_length:
+            summary = summary[: max_summary_length - 3].rstrip() + "..."
     else:
-        summary = output[:200] + "..." if len(output) > 200 else output
+        max_summary_length = 600
+        summary = (
+            normalized_output[: max_summary_length - 3].rstrip() + "..."
+            if len(normalized_output) > max_summary_length
+            else normalized_output
+        )
 
     # Extract confidence if mentioned (0-100% or 0.0-1.0)
     confidence_match = re.search(
@@ -776,35 +1077,51 @@ def detect_consensus(
 
     # 2. Collect all issues and count occurrences
     issue_counts: Dict[str, int] = {}
+    issue_order: List[str] = []
+    issue_originals: Dict[str, str] = {}
     for response in parsed_responses:
         for issue in response.issues:
-            # Normalize: lowercase and strip whitespace
-            normalized_issue = issue.lower().strip()
-            issue_counts[normalized_issue] = issue_counts.get(normalized_issue, 0) + 1
+            cleaned_issue = issue.strip()
+            normalized_issue = _normalize_for_matching(cleaned_issue)
+            if not normalized_issue:
+                continue
+            if normalized_issue not in issue_counts:
+                issue_counts[normalized_issue] = 0
+                issue_originals[normalized_issue] = cleaned_issue
+                issue_order.append(normalized_issue)
+            issue_counts[normalized_issue] += 1
 
     # 3. Identify consensus issues (mentioned by >= min_agreement models)
-    consensus_issues = []
-    all_issues = []
-    for issue, count in issue_counts.items():
-        if count >= min_agreement:
-            consensus_issues.append(issue)
-        all_issues.append(issue)
+    consensus_issues = [
+        issue_originals[norm]
+        for norm in issue_order
+        if issue_counts.get(norm, 0) >= min_agreement
+    ]
+    all_issues = [issue_originals[norm] for norm in issue_order]
 
     # 4. Collect all recommendations and count occurrences
     rec_counts: Dict[str, int] = {}
+    rec_order: List[str] = []
+    rec_originals: Dict[str, str] = {}
     for response in parsed_responses:
         for rec in response.recommendations:
-            # Normalize: lowercase and strip whitespace
-            normalized_rec = rec.lower().strip()
-            rec_counts[normalized_rec] = rec_counts.get(normalized_rec, 0) + 1
+            cleaned_rec = rec.strip()
+            normalized_rec = _normalize_for_matching(cleaned_rec)
+            if not normalized_rec:
+                continue
+            if normalized_rec not in rec_counts:
+                rec_counts[normalized_rec] = 0
+                rec_originals[normalized_rec] = cleaned_rec
+                rec_order.append(normalized_rec)
+            rec_counts[normalized_rec] += 1
 
     # 5. Identify consensus recommendations (mentioned by >= min_agreement models)
-    consensus_recommendations = []
-    all_recommendations = []
-    for rec, count in rec_counts.items():
-        if count >= min_agreement:
-            consensus_recommendations.append(rec)
-        all_recommendations.append(rec)
+    consensus_recommendations = [
+        rec_originals[norm]
+        for norm in rec_order
+        if rec_counts.get(norm, 0) >= min_agreement
+    ]
+    all_recommendations = [rec_originals[norm] for norm in rec_order]
 
     return ConsensusResult(
         consensus_verdict=consensus_verdict,

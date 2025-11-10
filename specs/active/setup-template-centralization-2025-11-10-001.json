@@ -1,7 +1,7 @@
 {
   "spec_id": "setup-template-centralization-2025-11-10-001",
   "generated": "2025-11-10T20:30:00Z",
-  "last_updated": "2025-11-10T21:56:18.370707Z",
+  "last_updated": "2025-11-10T22:36:41.757292Z",
   "metadata": {
     "title": "Setup Template Centralization",
     "description": "Centralize all setup-related configuration templates into a unified directory structure with a standard helper module for accessing them via importlib.resources",
@@ -11,7 +11,7 @@
       "Refactor all setup scripts to use the new helper module",
       "Ensure all setup commands use centralized templates with old files removed"
     ],
-    "progress_percentage": 4,
+    "progress_percentage": 6,
     "status": "active",
     "current_phase": "phase-1"
   },
@@ -28,7 +28,7 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "phase-1": {
@@ -41,7 +41,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "description": "Create the centralized template directory, helper module, and all template files"
       },
@@ -67,7 +67,7 @@
         "task-1-8"
       ],
       "total_tasks": 11,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -147,7 +147,7 @@
     "task-1-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/templates/setup/ai_config.yaml",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -159,12 +159,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/templates/setup/ai_config.yaml",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "description": "Create centralized ai_config.yaml template with default AI consultation settings"
+        "description": "Create centralized ai_config.yaml template with default AI consultation settings",
+        "started_at": "2025-11-10T22:35:20.546868Z",
+        "status_note": "Implementing centralized ai_config template",
+        "completed_at": "2025-11-10T22:36:41.750992Z",
+        "needs_journaling": false,
+        "actual_hours": 0.023,
+        "journaled_at": "2025-11-10T22:36:41.755709Z"
       }
     },
     "task-1-4": {
@@ -1422,6 +1428,15 @@
       "content": "Created package marker module for setup templates with filename constants for ai_config.yaml, git_config.json, sdd_config.json, and settings.local.json. No automated tests required.",
       "metadata": {},
       "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-10T22:36:41.755692Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/templates/setup/ai_config.yaml",
+      "author": "claude-code",
+      "content": "Created centralized ai_config.yaml template in claude_skills.common.templates.setup with default tools, models, consensus, and consultation settings. Verification: Not run (not applicable for template addition).",
+      "metadata": {},
+      "task_id": "task-1-3"
     }
   ]
 }

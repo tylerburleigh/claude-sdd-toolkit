@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from argparse import Namespace
 from types import SimpleNamespace
 from typing import Any, Dict, List
@@ -7,7 +8,10 @@ from typing import Any, Dict, List
 import pytest
 
 from claude_skills.common.ai_tools import ToolResponse, ToolStatus
-from claude_skills.sdd_fidelity_review.cli import _handle_fidelity_review
+from claude_skills.sdd_fidelity_review.cli import (
+    _handle_fidelity_review,
+    _build_output_basename,
+)
 
 
 pytestmark = pytest.mark.integration
@@ -73,10 +77,6 @@ def stubbed_reviewer(
         "claude_skills.sdd_fidelity_review.cli.find_specs_directory",
         lambda: None,
     )
-    monkeypatch.setattr(
-        "claude_skills.sdd_fidelity_review.cli.ensure_fidelity_reviews_directory",
-        lambda *_args, **_kwargs: None,
-    )
 
     return {"captured": captured, "cls": StubFidelityReviewer}
 
@@ -120,20 +120,32 @@ def _install_cli_stubs(monkeypatch: pytest.MonkeyPatch) -> Dict[str, Any]:
         captured["parsed_responses"] = list(responses)
         return []
 
+    class FakeConsensus(SimpleNamespace):
+        def __init__(self):
+            super().__init__(
+                consensus_verdict="pass",
+                agreement_rate=1.0,
+                consensus_issues=[],
+                consensus_recommendations=[],
+            )
+
+        def to_dict(self) -> Dict[str, Any]:
+            return {
+                "consensus_verdict": "pass",
+                "agreement_rate": 1.0,
+                "consensus_issues": [],
+                "consensus_recommendations": [],
+            }
+
     def fake_detect(parsed, min_agreement):
         captured["min_agreement"] = min_agreement
-        return SimpleNamespace(
-            consensus_verdict="pass",
-            agreement_rate=1.0,
-            consensus_issues=[],
-            consensus_recommendations=[],
-        )
+        return FakeConsensus()
 
     def fake_categorize(issues):
         captured["categorized"] = list(issues)
         return []
 
-    def fake_output_text(args, reviewer, parsed, consensus, categorized, output_path=None):
+    def fake_print_console_rich(self, verbose=False, ui=None):
         captured["output_called"] = True
 
     monkeypatch.setattr(
@@ -153,8 +165,8 @@ def _install_cli_stubs(monkeypatch: pytest.MonkeyPatch) -> Dict[str, Any]:
         fake_categorize,
     )
     monkeypatch.setattr(
-        "claude_skills.sdd_fidelity_review.cli._output_text",
-        fake_output_text,
+        "claude_skills.sdd_fidelity_review.cli.FidelityReport.print_console_rich",
+        fake_print_console_rich,
     )
 
     return captured
@@ -190,6 +202,41 @@ def test_fidelity_review_can_disable_streaming(
     assert exit_code == 0
     assert captured.get("output_called") is True
     assert captured.get("progress_emitter") is None
+
+
+def test_default_run_persists_markdown_and_json(
+    stubbed_reviewer: Dict[str, Any],
+    sample_json_spec_simple,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """By default the CLI should auto-save both markdown and JSON artifacts."""
+    captured = _install_cli_stubs(monkeypatch)
+
+    specs_dir = sample_json_spec_simple.parent.parent
+
+    monkeypatch.setattr(
+        "claude_skills.sdd_fidelity_review.cli.find_specs_directory",
+        lambda: specs_dir,
+    )
+
+    args = _make_args()
+    exit_code = _handle_fidelity_review(args)
+
+    assert exit_code == 0
+
+    base_name = _build_output_basename(args.spec_id, args.task, args.phase, args.files)
+    fidelity_dir = specs_dir / ".fidelity-reviews"
+    markdown_path = fidelity_dir / f"{base_name}.md"
+    json_path = fidelity_dir / f"{base_name}.json"
+
+    assert markdown_path.exists(), "Expected markdown artifact to be created"
+    assert json_path.exists(), "Expected JSON artifact to be created"
+    assert markdown_path.read_text().strip(), "Markdown artifact should not be empty"
+
+    saved_json = json.loads(json_path.read_text())
+    assert saved_json.get("spec_id") == args.spec_id
+
+    assert captured.get("output_called") is True
 
 
 def test_fidelity_review_respects_incremental_flag(
