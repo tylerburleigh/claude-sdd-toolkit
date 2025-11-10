@@ -41,7 +41,7 @@ settings.local.json
 settings.json
 .cache/
 .claude/
-.agents/
+#.agents/
 *.cache/
 
 # SDD Toolkit

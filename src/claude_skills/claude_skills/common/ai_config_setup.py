@@ -9,13 +9,14 @@ created during setup.
 
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-import shutil
 
+from .setup_templates import copy_template_to, get_template
 
-__all__ = ["AIConfigSetupResult", "ensure_ai_config"]
+__all__ = ["AIConfigSetupResult", "ensure_ai_config", "copy_ai_config_template"]
 
 
 _MINIMAL_TEMPLATE = """# Centralized AI Model Consultation Configuration
@@ -90,31 +91,12 @@ class AIConfigSetupResult:
         }
 
 
-def _find_packaged_template() -> Optional[Path]:
+def copy_ai_config_template(destination: Path | str, *, overwrite: bool = False) -> Path:
     """
-    Locate the packaged ai_config template, if available.
-
-    Returns:
-        Path to the template or None when not present in the install.
+    Copy the packaged ai_config.yaml template to ``destination``.
     """
-    # 1. Development/editable installs keep templates under src/claude_skills/.claude/
-    package_root = Path(__file__).resolve().parents[2]
-    candidate = package_root / ".claude" / "ai_config.yaml"
-    if candidate.exists():
-        return candidate
 
-    # 2. Installed wheel distributions place the package under site-packages/claude_skills/
-    try:
-        import claude_skills  # type: ignore
-
-        installed_root = Path(claude_skills.__file__).resolve().parent
-        candidate = installed_root.parent / ".claude" / "ai_config.yaml"
-        if candidate.exists():
-            return candidate
-    except (ImportError, AttributeError):
-        pass
-
-    return None
+    return copy_template_to("ai_config.yaml", destination, overwrite=overwrite)
 
 
 def ensure_ai_config(project_root: Path | str) -> AIConfigSetupResult:
@@ -142,7 +124,11 @@ def ensure_ai_config(project_root: Path | str) -> AIConfigSetupResult:
                 path=ai_config_path,
             )
 
-        template_path = _find_packaged_template()
+        try:
+            template_path = get_template("ai_config.yaml")
+        except FileNotFoundError:
+            template_path = None
+
         if template_path and template_path.exists():
             shutil.copy2(template_path, ai_config_path)
             return AIConfigSetupResult(

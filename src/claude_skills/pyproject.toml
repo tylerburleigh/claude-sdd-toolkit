@@ -45,7 +45,14 @@ where = ["."]
 include = ["claude_skills*"]
 
 [tool.setuptools.package-data]
-claude_skills = ["*.json", "**/*.json", "**/*.md", "common/templates/*.md"]
+claude_skills = [
+    "*.json",
+    "**/*.json",
+    "*.yaml",
+    "**/*.yaml",
+    "**/*.md",
+    "common/templates/*.md",
+]
 
 [tool.pytest.ini_options]
 # Mirror project-level pytest discovery so editable installs run the same suite.

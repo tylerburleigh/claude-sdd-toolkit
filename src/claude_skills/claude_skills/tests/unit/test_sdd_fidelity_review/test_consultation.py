@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from textwrap import dedent
 from unittest.mock import MagicMock, patch
 
@@ -194,6 +195,93 @@ def test_parse_review_response_extracts_fail_with_issues() -> None:
     parsed = parse_review_response(response)
     assert parsed.verdict is FidelityVerdict.FAIL
     assert any("Missing validation" in issue for issue in parsed.issues)
+
+
+def test_parse_review_response_parses_json_schema() -> None:
+    long_summary = (
+        "This summary intentionally exceeds six hundred characters to verify that JSON responses are not truncated by the parser. "
+        + ("Additional context ensures the length requirement is satisfied. " * 10)
+    ).strip()
+    payload = {
+        "verdict": "fail",
+        "summary": long_summary,
+        "requirement_alignment": {
+            "answer": "no",
+            "details": "Required setup template file was not created."
+        },
+        "success_criteria": {
+            "met": "no",
+            "details": "Primary success criterion (presence of __init__.py) not satisfied."
+        },
+        "deviations": [
+            {
+                "description": "Missing src/claude_skills/claude_skills/common/templates/setup/__init__.py.",
+                "severity": "blocking"
+            }
+        ],
+        "test_coverage": {
+            "status": "insufficient",
+            "details": "No tests were run to exercise template loading."
+        },
+        "code_quality": {
+            "issues": [
+                "ALL_SETUP_TEMPLATES references files that do not exist."
+            ],
+            "details": "Importers will raise FileNotFoundError when iterating exports."
+        },
+        "documentation": {
+            "status": "inadequate",
+            "details": "The README still references missing template files."
+        },
+        "issues": [
+            "Explicit issue entry: Missing setup template package marker."
+        ],
+        "recommendations": [
+            "Create src/claude_skills/claude_skills/common/templates/setup/__init__.py and populate the export tuple.",
+            "Add a regression test that imports ALL_SETUP_TEMPLATES."
+        ],
+        "confidence": 0.9,
+        "next_steps": [
+            "Document the new setup templates in the onboarding guide."
+        ]
+    }
+    raw = json.dumps(payload, indent=2)
+    response = _make_response("gemini", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert parsed.verdict is FidelityVerdict.FAIL
+    assert parsed.summary == long_summary
+    assert any("Missing setup template package marker" in issue for issue in parsed.issues)
+    assert any("Requirement alignment" in issue for issue in parsed.issues)
+    assert any("Code quality" in issue for issue in parsed.issues)
+    assert any("Create src/claude_skills/claude_skills/common/templates/setup/__init__.py" in rec for rec in parsed.recommendations)
+    assert any("regression test" in rec for rec in parsed.recommendations)
+    assert any("Document the new setup templates" in rec for rec in parsed.recommendations)
+    assert parsed.confidence == pytest.approx(0.9)
+
+
+def test_parse_review_response_parses_json_code_block_entries() -> None:
+    payload = {
+        "verdict": "partial",
+        "summary": "Implementation satisfies key requirements but lacks integration tests.",
+        "requirement_alignment": {"answer": "partial", "details": "Core logic aligned, tests missing."},
+        "issues": [
+            {"description": "Integration tests not provided for new template loader.", "severity": "High"}
+        ],
+        "recommendations": [
+            {"text": "Add integration tests covering template loader import paths."}
+        ],
+        "confidence": {"value": 72, "scale": "0-100"},
+    }
+    raw = f"```json\n{json.dumps(payload, indent=2)}\n```"
+    response = _make_response("cursor-agent", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert parsed.verdict is FidelityVerdict.PARTIAL
+    assert any("Integration tests not provided" in issue for issue in parsed.issues)
+    assert any("Core logic aligned" in issue for issue in parsed.issues)
+    assert any("Add integration tests covering template loader import paths." in rec for rec in parsed.recommendations)
+    assert parsed.confidence == pytest.approx(0.72)
 
 
 def test_parse_review_response_handles_numbered_findings_section() -> None:

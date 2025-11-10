@@ -1267,6 +1267,57 @@ class FidelityReviewer:
         prompt_parts.append("5. **Code Quality:** Are there any quality, maintainability, or security concerns?\n")
         prompt_parts.append("6. **Documentation:** Is the implementation properly documented?\n\n")
 
+        prompt_parts.append("### Required Response Format\n\n")
+        prompt_parts.append(
+            "Respond **only** with valid JSON matching the schema below. Do not include Markdown, prose, or additional commentary outside the JSON object.\n\n"
+        )
+        prompt_parts.append("```json\n")
+        prompt_parts.append(
+            '{\n'
+            '  "verdict": "pass|fail|partial|unknown",\n'
+            '  "summary": "Overall findings (any length).",\n'
+            '  "requirement_alignment": {\n'
+            '    "answer": "yes|no|partial",\n'
+            '    "details": "Explain how implementation aligns or diverges."\n'
+            '  },\n'
+            '  "success_criteria": {\n'
+            '    "met": "yes|no|partial",\n'
+            '    "details": "Call out verification steps passed or missing."\n'
+            '  },\n'
+            '  "deviations": [\n'
+            '    {\n'
+            '      "description": "Describe deviation from the spec.",\n'
+            '      "justification": "Optional rationale or evidence.",\n'
+            '      "severity": "blocking|major|minor"\n'
+            '    }\n'
+            '  ],\n'
+            '  "test_coverage": {\n'
+            '    "status": "sufficient|insufficient|not_applicable",\n'
+            '    "details": "Summarise test evidence or gaps."\n'
+            '  },\n'
+            '  "code_quality": {\n'
+            '    "issues": ["Describe each notable quality concern."],\n'
+            '    "details": "Optional supporting commentary."\n'
+            '  },\n'
+            '  "documentation": {\n'
+            '    "status": "adequate|inadequate|not_applicable",\n'
+            '    "details": "Note doc updates or omissions."\n'
+            '  },\n'
+            '  "issues": ["Concise list of primary issues for consensus logic."],\n'
+            '  "recommendations": ["Actionable next steps to resolve findings."],\n'
+            '  "confidence": 0.0\n'
+            '}\n'
+        )
+        prompt_parts.append("```\n\n")
+        prompt_parts.append(
+            "Rules:\n"
+            "- Use lowercase values shown for enumerated fields (e.g., `verdict`, status flags).\n"
+            "- Keep arrays as arrays (use `[]` when a section has nothing to report).\n"
+            "- `confidence` is a number between 0 and 1 (e.g., 0.85 for 85%).\n"
+            "- Populate `issues` and `recommendations` with the key takeaways you want surfaced downstream.\n"
+            "- Feel free to include additional keys if needed, but never omit the ones above.\n\n"
+        )
+
         prompt_parts.append("## IMPORTANT CONSTRAINTS\n\n")
         prompt_parts.append("**CRITICAL: This is a READ-ONLY review. You MUST NOT:**\n")
         prompt_parts.append("- Write, create, or modify ANY files on disk\n")

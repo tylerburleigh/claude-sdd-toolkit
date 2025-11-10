@@ -6,10 +6,11 @@ implementation fidelity review use cases. Provides simplified API with
 fidelity-review-specific defaults and error handling.
 """
 
-from typing import List, Optional, Dict, Any, Tuple, Set
+from typing import List, Optional, Dict, Any, Tuple, Set, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
+import json
 import re
 
 from claude_skills.common.ai_tools import (
@@ -217,6 +218,38 @@ RECOMMENDATION_PREFIXES = (
 SHORT_RESPONSE_DENYLIST = {"yes", "no", "n/a", "none", "ok", "pass"}
 LIST_ITEM_PATTERN = re.compile(r'^\s*(?:[-*•‣▪◦]|\d+[.)])\s+(.*)$')
 HEADING_PATTERN = re.compile(r'^\s*(#{2,6})\s+(.+)$', re.MULTILINE)
+NEGATIVE_STATUS_TOKENS = (
+    "no",
+    "not",
+    "fail",
+    "failed",
+    "failure",
+    "missing",
+    "insufficient",
+    "inadequate",
+    "partial",
+    "block",
+    "blocked",
+    "deviation",
+    "deviates",
+    "doesn't",
+    "does not",
+    "did not",
+    "unable",
+)
+POSITIVE_STATUS_TOKENS = (
+    "yes",
+    "pass",
+    "passes",
+    "passed",
+    "met",
+    "complete",
+    "completed",
+    "sufficient",
+    "adequate",
+    "true",
+    "aligned",
+)
 
 
 def _strip_markdown_emphasis(text: str) -> str:
@@ -224,7 +257,8 @@ def _strip_markdown_emphasis(text: str) -> str:
     if not text:
         return ""
     cleaned = text.strip()
-    cleaned = cleaned.replace("**", "").replace("__", "")
+    cleaned = re.sub(r'\*\*(.+?)\*\*', r'\1', cleaned)
+    cleaned = re.sub(r'\*(.+?)\*', r'\1', cleaned)
     cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)
     cleaned = re.sub(r'\[(.+?)\]\((.*?)\)', r'\1', cleaned)
     return re.sub(r'\s+', ' ', cleaned).strip()
@@ -318,9 +352,246 @@ def _extract_list_items(section_text: str) -> List[str]:
     return [item for item in items if item]
 
 
+def _strip_code_fences(text: str) -> str:
+    """Remove Markdown code fences if present."""
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return stripped
+
+    newline_index = stripped.find("\n")
+    if newline_index == -1:
+        return stripped.strip("`").strip()
+
+    content = stripped[newline_index + 1 :]
+    if content.endswith("```"):
+        content = content[:-3]
+    return content.strip()
+
+
+def _load_json_from_text(text: str) -> Optional[Any]:
+    """Attempt to parse JSON from the provided text or embedded code block."""
+    candidate = _strip_code_fences(text)
+
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt to parse first JSON object in text
+    start_obj = candidate.find("{")
+    end_obj = candidate.rfind("}")
+    if start_obj != -1 and end_obj != -1 and end_obj > start_obj:
+        try:
+            return json.loads(candidate[start_obj:end_obj + 1])
+        except json.JSONDecodeError:
+            pass
+
+    # Attempt to parse first JSON array
+    start_array = candidate.find("[")
+    end_array = candidate.rfind("]")
+    if start_array != -1 and end_array != -1 and end_array > start_array:
+        try:
+            return json.loads(candidate[start_array:end_array + 1])
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+
+def _coerce_verdict(value: Optional[str]) -> Optional[FidelityVerdict]:
+    """Convert a string verdict to the matching FidelityVerdict."""
+    if not value or not isinstance(value, str):
+        return None
+    normalized = value.strip().lower()
+    mapping = {
+        "pass": FidelityVerdict.PASS,
+        "fail": FidelityVerdict.FAIL,
+        "failed": FidelityVerdict.FAIL,
+        "failure": FidelityVerdict.FAIL,
+        "partial": FidelityVerdict.PARTIAL,
+        "unknown": FidelityVerdict.UNKNOWN,
+    }
+    return mapping.get(normalized)
+
+
+def _coerce_issue_entry(entry: Any) -> Optional[str]:
+    """Normalize issue entries from structured JSON responses."""
+    if isinstance(entry, str):
+        return entry.strip() or None
+
+    if isinstance(entry, dict):
+        candidate_fields = ["description", "detail", "text", "summary", "issue"]
+        text_value = None
+        for field in candidate_fields:
+            value = entry.get(field)
+            if isinstance(value, str) and value.strip():
+                text_value = value.strip()
+                break
+        if not text_value:
+            return None
+
+        severity = entry.get("severity")
+        if isinstance(severity, str) and severity.strip():
+            sev = severity.strip()
+            if not text_value.lower().startswith(sev.lower()):
+                text_value = f"{sev}: {text_value}"
+        return text_value
+
+    return None
+
+
+def _coerce_recommendation_entry(entry: Any) -> Optional[str]:
+    """Normalize recommendation entries from structured JSON responses."""
+    if isinstance(entry, str):
+        return entry.strip() or None
+
+    if isinstance(entry, dict):
+        candidate_fields = ["description", "detail", "text", "recommendation", "summary"]
+        for field in candidate_fields:
+            value = entry.get(field)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+    return None
+
+
+def _coerce_confidence_value(value: Any) -> Optional[float]:
+    """Normalize confidence to a float between 0.0 and 1.0."""
+    if value is None:
+        return None
+
+    if isinstance(value, (int, float)):
+        numeric = float(value)
+        return numeric / 100.0 if numeric > 1.0 else numeric
+
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return None
+        if text.endswith("%"):
+            text = text[:-1].strip()
+            try:
+                return float(text) / 100.0
+            except ValueError:
+                return None
+        try:
+            numeric = float(text)
+            return numeric / 100.0 if numeric > 1.0 else numeric
+        except ValueError:
+            return None
+
+    if isinstance(value, dict):
+        for key in ("value", "score", "confidence"):
+            if key in value:
+                normalized = _coerce_confidence_value(value[key])
+                if normalized is not None:
+                    return normalized
+        percentage = value.get("percent") or value.get("percentage")
+        if percentage is not None:
+            normalized = _coerce_confidence_value(percentage)
+            if normalized is not None:
+                return normalized
+
+    return None
+
+
 def _score_keywords(text: str, keywords: tuple[str, ...]) -> int:
     """Count keyword matches within text for heuristic scoring."""
     return sum(1 for keyword in keywords if keyword in text)
+
+
+def _is_negative_status(text: Optional[str]) -> bool:
+    if not text or not isinstance(text, str):
+        return False
+    lowered = text.strip().lower()
+    if any(token in lowered for token in NEGATIVE_STATUS_TOKENS):
+        return True
+    if any(token == lowered for token in POSITIVE_STATUS_TOKENS):
+        return False
+    return False
+
+
+def _is_positive_status(text: Optional[str]) -> bool:
+    if not text or not isinstance(text, str):
+        return False
+    lowered = text.strip().lower()
+    return any(token == lowered for token in POSITIVE_STATUS_TOKENS)
+
+
+def _extract_structured_json_insights(
+    payload: Dict[str, Any],
+    add_issue: Callable[[str], None],
+    add_recommendation: Callable[[str], None],
+) -> None:
+    def _combine_message(label: str, answer: Optional[str], details: Optional[str]) -> str:
+        parts = [label]
+        if isinstance(answer, str) and answer.strip():
+            parts.append(answer.strip())
+        if isinstance(details, str) and details.strip():
+            parts.append(details.strip())
+        return ": ".join(parts) if len(parts) > 1 else parts[0]
+
+    def _handle_section(label: str, section: Any, status_keys: Tuple[str, ...] = ("answer", "status", "met", "result")) -> None:
+        if not isinstance(section, dict):
+            return
+        answer = None
+        for key in status_keys:
+            if key in section:
+                candidate = section[key]
+                if isinstance(candidate, str) and candidate.strip():
+                    answer = candidate
+                    break
+        details = None
+        for key in ("details", "comment", "note", "explanation", "reason"):
+            if key in section and isinstance(section[key], str) and section[key].strip():
+                details = section[key]
+                break
+
+        if answer and _is_positive_status(answer):
+            return
+
+        candidate_texts = []
+        candidate_texts.append(_combine_message(label, answer, details))
+
+        if answer and _is_negative_status(answer):
+            add_issue(candidate_texts[-1])
+        elif details and _is_negative_status(details):
+            add_issue(candidate_texts[-1])
+
+    _handle_section("Requirement alignment", payload.get("requirement_alignment"))
+    _handle_section("Success criteria", payload.get("success_criteria"))
+    _handle_section("Test coverage", payload.get("test_coverage"))
+    _handle_section("Documentation", payload.get("documentation"))
+
+    code_quality = payload.get("code_quality")
+    if isinstance(code_quality, dict):
+        issues_list = code_quality.get("issues")
+        if isinstance(issues_list, list):
+            for entry in issues_list:
+                issue_text = _coerce_issue_entry(entry)
+                if issue_text:
+                    add_issue(issue_text)
+        cq_details = code_quality.get("details")
+        if isinstance(cq_details, str) and cq_details.strip() and _is_negative_status(cq_details):
+            add_issue(f"Code quality: {cq_details.strip()}")
+
+    deviations = payload.get("deviations")
+    if isinstance(deviations, list):
+        for entry in deviations:
+            issue_text = _coerce_issue_entry(entry)
+            if issue_text:
+                add_issue(issue_text)
+
+    follow_up_keys = ("next_steps", "actions", "follow_ups", "follow_up_actions", "remediations")
+    for key in follow_up_keys:
+        value = payload.get(key)
+        if isinstance(value, list):
+            for entry in value:
+                rec_text = _coerce_recommendation_entry(entry)
+                if rec_text:
+                    add_recommendation(rec_text)
+        elif isinstance(value, str) and value.strip():
+            add_recommendation(value.strip())
 
 
 def _classify_list_item(text: str, section_hint: Optional[str]) -> Optional[str]:
@@ -824,17 +1095,51 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             confidence=0.0
         )
 
-    # Extract verdict using pattern matching
-    verdict_patterns = [
-        (r'\b(PASS|PASSED|PASSES)\b', FidelityVerdict.PASS),
-        (r'\b(FAIL|FAILED|FAILS|FAILURE)\b', FidelityVerdict.FAIL),
-        (r'\b(PARTIAL|PARTIALLY)\b', FidelityVerdict.PARTIAL),
-    ]
+    json_payload = _load_json_from_text(output)
+    summary_provided = False
 
-    for pattern, verdict_value in verdict_patterns:
-        if re.search(pattern, output, re.IGNORECASE):
-            verdict = verdict_value
-            break
+    if isinstance(json_payload, dict):
+        verdict_from_json = _coerce_verdict(json_payload.get("verdict"))
+        if verdict_from_json is not None:
+            verdict = verdict_from_json
+
+        json_summary = json_payload.get("summary")
+        if isinstance(json_summary, str) and json_summary.strip():
+            summary = json_summary.strip()
+            summary_provided = True
+
+        json_issues = json_payload.get("issues")
+        if isinstance(json_issues, list):
+            for entry in json_issues:
+                issue_text = _coerce_issue_entry(entry)
+                if issue_text:
+                    add_issue(issue_text)
+
+        json_recommendations = json_payload.get("recommendations")
+        if isinstance(json_recommendations, list):
+            for entry in json_recommendations:
+                rec_text = _coerce_recommendation_entry(entry)
+                if rec_text:
+                    add_recommendation(rec_text)
+
+        _extract_structured_json_insights(json_payload, add_issue, add_recommendation)
+
+        json_confidence = _coerce_confidence_value(json_payload.get("confidence"))
+        if json_confidence is not None:
+            confidence = json_confidence
+
+    # Extract verdict using pattern matching
+    if verdict is FidelityVerdict.UNKNOWN:
+        verdict_patterns = [
+            (r'\b(PASS|PASSED|PASSES)\b', FidelityVerdict.PASS),
+            (r'\b(FAIL|FAILED|FAILS|FAILURE)\b', FidelityVerdict.FAIL),
+            (r'\b(PARTIAL|PARTIALLY)\b', FidelityVerdict.PARTIAL),
+        ]
+
+        for pattern, verdict_value in verdict_patterns:
+            if re.search(pattern, output, re.IGNORECASE):
+                verdict = verdict_value
+                break
 
     # Heuristic: If "PASS" appears but also mentions issues/concerns, mark as PARTIAL
     # But exclude phrases like "no issues", "no problems", etc.
@@ -857,88 +1162,87 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
 
     # Extract structured sections using headings and list heuristics
     sections = _split_sections_by_heading(normalized_output)
-    for heading, section_text in sections:
-        section_hint = _classify_heading(heading)
-        items = _extract_list_items(section_text)
+    allow_issue_extraction = not issues
+    allow_recommendation_extraction = not recommendations
+    if allow_issue_extraction or allow_recommendation_extraction:
+        for heading, section_text in sections:
+            section_hint = _classify_heading(heading)
+            items = _extract_list_items(section_text)
 
-        if not items and section_hint in {"issue", "recommendation"}:
-            # Split paragraph text into meaningful chunks when no explicit list exists
-            items = [
-                chunk.strip()
-                for chunk in re.split(r'\n\s*\n', section_text)
-                if chunk and chunk.strip()
-            ]
+            if not items and section_hint in {"issue", "recommendation"}:
+                # Split paragraph text into meaningful chunks when no explicit list exists
+                items = [
+                    chunk.strip()
+                    for chunk in re.split(r'\n\s*\n', section_text)
+                    if chunk and chunk.strip()
+                ]
 
-        for item in items:
-            classification = _classify_list_item(item, section_hint)
-            if classification == "issue":
-                add_issue(item)
-            elif classification == "recommendation":
-                add_recommendation(item)
+            for item in items:
+                classification = _classify_list_item(item, section_hint)
+                if allow_issue_extraction and classification == "issue":
+                    add_issue(item)
+                elif allow_recommendation_extraction and classification == "recommendation":
+                    add_recommendation(item)
 
     # Fallback to legacy regex extraction for backward compatibility
-    issue_patterns = [
-        r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
-        r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|\Z)',
-        r'[-•*]\s*Issue:\s*(.+?)(?:\n|\Z)',
-    ]
+    if not issues:
+        issue_patterns = [
+            r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+            r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|\Z)',
+            r'[-•*]\s*Issue:\s*(.+?)(?:\n|\Z)',
+        ]
 
-    for pattern in issue_patterns:
-        matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            issue_text = match.group(1).strip()
-            sub_issues = re.split(r'\n[-•*]\s*', issue_text)
-            for sub_issue in sub_issues:
-                if sub_issue.strip():
-                    add_issue(sub_issue)
+        for pattern in issue_patterns:
+            matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                issue_text = match.group(1).strip()
+                sub_issues = re.split(r'\n[-•*]\s*', issue_text)
+                for sub_issue in sub_issues:
+                    if sub_issue.strip():
+                        add_issue(sub_issue)
 
-    rec_patterns = [
-        r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
-        r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|\Z)',
-        r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|\Z)',
-    ]
+    if not recommendations:
+        rec_patterns = [
+            r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+            r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|\Z)',
+            r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|\Z)',
+        ]
 
-    for pattern in rec_patterns:
-        matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            rec_text = match.group(1).strip()
-            sub_recs = re.split(r'\n[-•*]\s*', rec_text)
-            for sub_rec in sub_recs:
-                if sub_rec.strip():
-                    add_recommendation(sub_rec)
+        for pattern in rec_patterns:
+            matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                rec_text = match.group(1).strip()
+                sub_recs = re.split(r'\n[-•*]\s*', rec_text)
+                for sub_rec in sub_recs:
+                    if sub_rec.strip():
+                        add_recommendation(sub_rec)
 
     # Extract summary (first paragraph with generous cap)
-    summary_segments = [
-        segment.strip()
-        for segment in re.split(r'\n\s*\n', normalized_output, maxsplit=1)
-        if segment and segment.strip()
-    ]
-    if summary_segments:
-        summary = summary_segments[0]
-        max_summary_length = 600
-        if len(summary) > max_summary_length:
-            summary = summary[: max_summary_length - 3].rstrip() + "..."
-    else:
-        max_summary_length = 600
-        summary = (
-            normalized_output[: max_summary_length - 3].rstrip() + "..."
-            if len(normalized_output) > max_summary_length
-            else normalized_output
-        )
+    if not summary_provided:
+        summary_segments = [
+            segment.strip()
+            for segment in re.split(r'\n\s*\n', normalized_output, maxsplit=1)
+            if segment and segment.strip()
+        ]
+        if summary_segments:
+            summary = summary_segments[0]
+        else:
+            summary = normalized_output.strip()
 
     # Extract confidence if mentioned (0-100% or 0.0-1.0)
-    confidence_match = re.search(
-        r'(?:confidence|certainty):\s*(\d+(?:\.\d+)?)\s*%?',
-        output,
-        re.IGNORECASE
-    )
-    if confidence_match:
-        conf_value = float(confidence_match.group(1))
-        # Normalize to 0.0-1.0 range
-        if conf_value > 1.0:
-            confidence = conf_value / 100.0
-        else:
-            confidence = conf_value
+    if confidence is None:
+        confidence_match = re.search(
+            r'(?:confidence|certainty):\s*(\d+(?:\.\d+)?)\s*%?',
+            output,
+            re.IGNORECASE
+        )
+        if confidence_match:
+            conf_value = float(confidence_match.group(1))
+            # Normalize to 0.0-1.0 range
+            if conf_value > 1.0:
+                confidence = conf_value / 100.0
+            else:
+                confidence = conf_value
 
     return ParsedReviewResponse(
         verdict=verdict,

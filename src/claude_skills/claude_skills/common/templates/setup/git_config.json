@@ -1,0 +1,25 @@
+{
+  "_comment": "Git Integration Configuration Template for SDD Toolkit",
+  "_description": "Copy this file to git_config.json and customize as needed. This file documents all available git integration settings.",
+  "_location_options": [
+    "Project-local: {project_root}/.claude/git_config.json (highest precedence)",
+    "Global: ~/.claude/git_config.json (fallback)"
+  ],
+  "enabled": false,
+  "_enabled_description": "Master switch for git integration. Set to true to enable automatic git operations. Default: false (disabled for safety)",
+  "auto_branch": true,
+  "_auto_branch_description": "Automatically create feature branches when starting work on a spec. Branch name format: 'feat/{spec-id}'. Default: true",
+  "auto_commit": true,
+  "_auto_commit_description": "Automatically commit changes when completing tasks. Commit message includes task ID and description. Default: true",
+  "auto_push": false,
+  "_auto_push_description": "Automatically push commits to remote repository. Requires user confirmation if false. Default: false (requires explicit push for safety)",
+  "auto_pr": false,
+  "_auto_pr_description": "Automatically create pull requests when specs are completed. Requires gh CLI. Default: false (requires explicit PR creation)",
+  "commit_cadence": "task",
+  "_commit_cadence_description": "When to create commits: 'task' (after each task), 'phase' (after each phase), 'manual' (user controls). Default: 'task'",
+  "_commit_cadence_options": [
+    "task",
+    "phase",
+    "manual"
+  ]
+}

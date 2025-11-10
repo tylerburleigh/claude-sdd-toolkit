@@ -1,24 +1,24 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-10 17:34:11
+**Generated:** 2025-11-10 18:15:52
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 291
-- **Total Lines:** 100628
+- **Total Files:** 293
+- **Total Lines:** 101373
 - **Total Classes:** 406
-- **Total Functions:** 1192
-- **Avg Complexity:** 4.97
+- **Total Functions:** 1210
+- **Avg Complexity:** 5.0
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
+  - parse_review_response (52)
   - _handle_fidelity_review (46)
   - complete_task_workflow (45)
   - update_task_status (42)
-  - execute_verify_task (39)
 
 
 
@@ -27,7 +27,7 @@
 ### `AIConfigSetupResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:73`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:74`
 
 **Description:**
 > Structured result describing ai_config bootstrap outcome.
@@ -281,7 +281,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1139`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1323`
 
 **Description:**
 > Issue with assigned severity category.
@@ -440,7 +440,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:977`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1161`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -467,7 +467,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `Exception`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:108`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:109`
 
 **Description:**
 > Base exception for consultation errors.
@@ -489,7 +489,7 @@ Attributes:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:118`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:119`
 
 **Description:**
 > Raised when consultation times out.
@@ -979,7 +979,7 @@ This class will be implemented in Phase 3 (Core Review Logic).
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:56`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:57`
 
 **Description:**
 > Overall fidelity verdict from AI review.
@@ -1285,7 +1285,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:64`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:65`
 
 **Description:**
 > Severity level for identified issues.
@@ -1677,7 +1677,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `ConsultationError`
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:113`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:114`
 
 **Description:**
 > Raised when no AI tools are available for consultation.
@@ -1796,7 +1796,7 @@ Example:
 ### `ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:74`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:75`
 
 **Description:**
 > Structured representation of AI review response.
@@ -8377,7 +8377,7 @@ Returns:
 ### `_classify_heading(heading) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:240`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:242`
 **Complexity:** 4
 
 **Description:**
@@ -8391,7 +8391,7 @@ Returns:
 ### `_classify_list_item(text, section_hint) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:326`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:471`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -8425,6 +8425,48 @@ Args:
 
 ---
 
+### `_coerce_confidence_value(value) -> Optional[float]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:426`
+⚠️ **Complexity:** 15 (High)
+
+**Description:**
+> Normalize confidence to a float between 0.0 and 1.0.
+
+**Parameters:**
+- `value`: Any
+
+---
+
+### `_coerce_issue_entry(entry) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:385`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Normalize issue entries from structured JSON responses.
+
+**Parameters:**
+- `entry`: Any
+
+---
+
+### `_coerce_recommendation_entry(entry) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:411`
+**Complexity:** 7
+
+**Description:**
+> Normalize recommendation entries from structured JSON responses.
+
+**Parameters:**
+- `entry`: Any
+
+---
+
 ### `_coerce_scalar(value) -> Any`
 
 **Language:** python
@@ -8433,6 +8475,20 @@ Args:
 
 **Parameters:**
 - `value`: str
+
+---
+
+### `_coerce_verdict(value) -> Optional[FidelityVerdict]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:369`
+**Complexity:** 3
+
+**Description:**
+> Convert a string verdict to the matching FidelityVerdict.
+
+**Parameters:**
+- `value`: Optional[str]
 
 ---
 
@@ -8517,19 +8573,11 @@ Args:
 ### `_create_config_file(project_path, config, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:215`
-**Complexity:** 3
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:202`
+**Complexity:** 6
 
 **Description:**
 > Create .claude/sdd_config.json with user preferences.
-
-Args:
-    project_path: Project root directory
-    config: Configuration dict to write
-    printer: PrettyPrinter instance
-
-Returns:
-    True if config was created successfully, False otherwise
 
 **Parameters:**
 - `project_path`: Path
@@ -8935,7 +8983,7 @@ Returns dict with keys: critical, high, medium, low
 ### `_extract_list_items(section_text) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:284`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:286`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9043,20 +9091,6 @@ Returns:
 **Parameters:**
 - `query`: Any
 - `entity_name`: str
-
----
-
-### `_find_packaged_template() -> Optional[Path]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:93`
-**Complexity:** 4
-
-**Description:**
-> Locate the packaged ai_config template, if available.
-
-Returns:
-    Path to the template or None when not present in the install.
 
 ---
 
@@ -9669,6 +9703,20 @@ Args:
 
 ---
 
+### `_load_json_from_text(text) -> Optional[Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:339`
+**Complexity:** 10
+
+**Description:**
+> Attempt to parse JSON from the provided text or embedded code block.
+
+**Parameters:**
+- `text`: str
+
+---
+
 ### `_make_args() -> Namespace`
 
 **Language:** python
@@ -9737,7 +9785,7 @@ Args:
 ### `_make_response(tool, status, output, error) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:28`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:29`
 **Complexity:** 1
 
 **Parameters:**
@@ -9863,7 +9911,7 @@ Returns:
 ### `_normalize_for_matching(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:233`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:235`
 **Complexity:** 2
 
 **Description:**
@@ -10246,7 +10294,7 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_prompt_for_config(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:149`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:138`
 **Complexity:** 9
 
 **Description:**
@@ -10263,17 +10311,25 @@ Returns:
 ### `_prompt_for_git_permissions(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:254`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:247`
 **Complexity:** 7
 
 **Description:**
 > Prompt user about adding git/GitHub permissions.
 
-Returns:
-    Dict with 'allow' and 'ask' keys containing permissions for each list
-
 **Parameters:**
 - `printer`: PrettyPrinter
+
+---
+
+### `_prompt_for_git_permissions() -> dict[str, list[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:129`
+**Complexity:** 7
+
+**Description:**
+> Prompt user about adding git/GitHub permissions.
 
 ---
 
@@ -10598,6 +10654,17 @@ Returns:
 
 ---
 
+### `_resolve_template_resource(template_name) -> resources.abc.Traversable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/setup_templates.py:32`
+**Complexity:** 2
+
+**Parameters:**
+- `template_name`: str
+
+---
+
 ### `_resolve_tool_executable(tool) -> Optional[str]`
 
 **Language:** python
@@ -10665,7 +10732,7 @@ Returns:
 ### `_score_keywords(text, keywords) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:321`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:466`
 **Complexity:** 1
 
 **Description:**
@@ -10801,7 +10868,7 @@ Returns:
 ### `_split_sections_by_heading(text) -> List[Tuple[Optional[str], str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:252`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:254`
 **Complexity:** 6
 
 **Description:**
@@ -10860,10 +10927,24 @@ Returns:
 
 ---
 
+### `_strip_code_fences(text) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:323`
+**Complexity:** 4
+
+**Description:**
+> Remove Markdown code fences if present.
+
+**Parameters:**
+- `text`: str
+
+---
+
 ### `_strip_markdown_emphasis(text) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:222`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:223`
 **Complexity:** 2
 
 **Description:**
@@ -12432,7 +12513,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1161`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1345`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12466,7 +12547,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1269`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1453`
 **Complexity:** 1
 
 **Description:**
@@ -12498,17 +12579,17 @@ Example:
 
 ---
 
-### `categorize_missing_permissions(missing) -> dict`
+### `categorize_missing_permissions(missing) -> dict[str, list[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:449`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:428`
 **Complexity:** 6
 
 **Description:**
 > Categorize missing permissions by type for better reporting.
 
 **Parameters:**
-- `missing`: list
+- `missing`: list[str]
 
 ---
 
@@ -12811,6 +12892,20 @@ Returns:
 
 **Parameters:**
 - `project_root`: None
+
+---
+
+### `check_permissions(project_root) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:320`
+**Complexity:** 2
+
+**Description:**
+> Check if SDD permissions are configured.
+
+**Parameters:**
+- `project_root`: Path | str
 
 ---
 
@@ -13230,7 +13325,7 @@ Returns:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:471`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:450`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -14488,8 +14583,8 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:339`
-⚠️ **Complexity:** 21 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:323`
+⚠️ **Complexity:** 19 (High)
 
 **Description:**
 > Update .claude/settings.local.json with SDD permissions.
@@ -14838,7 +14933,7 @@ Returns:
 ### `consult_ai_on_fidelity(prompt, tool, model, timeout) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:371`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:516`
 **Complexity:** 8
 
 **Description:**
@@ -14952,7 +15047,7 @@ Returns:
 ### `consult_multiple_ai_on_fidelity(prompt, tools, model, timeout, require_all_success, cache_key_params, use_cache, progress_emitter) -> List[ToolResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:456`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:601`
 ⚠️ **Complexity:** 33 (High)
 
 **Description:**
@@ -15043,6 +15138,39 @@ Returns:
 - `tool`: str
 - `dry_run`: bool
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `copy_ai_config_template(destination) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:94`
+**Complexity:** 1
+
+**Description:**
+> Copy the packaged ai_config.yaml template to ``destination``.
+
+**Parameters:**
+- `destination`: Path | str
+
+---
+
+### `copy_template_to(template_name, destination) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/setup_templates.py:78`
+**Complexity:** 5
+
+**Description:**
+> Copy a packaged template to ``destination``.
+
+``destination`` may be a directory (in which case the template filename is
+appended) or a full path to the target file.  When ``overwrite`` is False
+(the default) an existing file will raise ``FileExistsError``.
+
+**Parameters:**
+- `template_name`: str
+- `destination`: Path | str
 
 ---
 
@@ -15776,7 +15904,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1017`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1201`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -16167,8 +16295,8 @@ Note:
 ### `ensure_ai_config(project_root) -> AIConfigSetupResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:120`
-**Complexity:** 5
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config_setup.py:102`
+**Complexity:** 6
 
 **Description:**
 > Ensure `.claude/ai_config.yaml` exists within a project.
@@ -16300,6 +16428,21 @@ Example:
 
 **Parameters:**
 - `specs_dir`: Path
+
+---
+
+### `ensure_gitignore_pattern(project_root, pattern) -> tuple[bool, str, bool]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:191`
+**Complexity:** 6
+
+**Description:**
+> Add a pattern to .gitignore if not already present.
+
+**Parameters:**
+- `project_root`: Path | str
+- `pattern`: str
 
 ---
 
@@ -19676,7 +19819,7 @@ when the configuration is missing or malformed.
 ### `get_consultation_summary(responses) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:701`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:846`
 **Complexity:** 3
 
 **Description:**
@@ -19804,7 +19947,7 @@ Returns:
 ### `get_enabled_fidelity_tools() -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:47`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:48`
 **Complexity:** 1
 
 **Description:**
@@ -19837,7 +19980,7 @@ Returns:
 ### `get_fidelity_review_timeout() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:38`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:39`
 **Complexity:** 1
 
 **Description:**
@@ -20807,6 +20950,24 @@ Returns:
 - `task_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `get_template(template_name) -> Path`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/setup_templates.py:42`
+**Complexity:** 2
+
+**Description:**
+> Return a filesystem ``Path`` to the packaged template.
+
+The first time a template is requested it is materialised via
+``importlib.resources.as_file`` and cached so subsequent callers receive a
+stable path without repeatedly creating temporary files.
+
+**Parameters:**
+- `template_name`: str
 
 ---
 
@@ -21822,6 +21983,20 @@ Returns:
 
 ---
 
+### `load_json_template(template_name) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/setup_templates.py:58`
+**Complexity:** 1
+
+**Description:**
+> Load a JSON template into native Python data structures.
+
+**Parameters:**
+- `template_name`: str
+
+---
+
 ### `load_model_config() -> Dict`
 
 **Language:** python
@@ -21892,6 +22067,20 @@ Returns:
 
 ---
 
+### `load_yaml_template(template_name) -> Any`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/setup_templates.py:68`
+**Complexity:** 1
+
+**Description:**
+> Load a YAML template into native Python data structures.
+
+**Parameters:**
+- `template_name`: str
+
+---
+
 ### `main() -> None`
 
 **Language:** python
@@ -21932,6 +22121,14 @@ Returns:
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/dev_tools/sdd_start_helper.py:323`
 **Complexity:** 5
+
+---
+
+### `main() -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:359`
+**Complexity:** 3
 
 ---
 
@@ -22462,7 +22659,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:953`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1137`
 **Complexity:** 1
 
 **Description:**
@@ -22569,8 +22766,8 @@ Raises:
 ### `parse_review_response(response) -> ParsedReviewResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:760`
-⚠️ **Complexity:** 32 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:905`
+⚠️ **Complexity:** 52 (High)
 
 **Description:**
 > Parse AI tool response to extract structured review information.
@@ -23424,7 +23621,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:580`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:559`
 **Complexity:** 1
 
 **Description:**
@@ -26068,7 +26265,7 @@ a decision needs to be made about what to implement.
 ### `test_categorize_issues_assigns_severity() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:310`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:362`
 **Complexity:** 1
 
 ---
@@ -26347,7 +26544,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_auto_detects_available_tool() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:65`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:66`
 **Complexity:** 1
 
 ---
@@ -26355,7 +26552,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_raises_on_timeout() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:44`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:45`
 **Complexity:** 1
 
 ---
@@ -26363,7 +26560,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_raises_when_no_tools_available() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:32`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:33`
 **Complexity:** 1
 
 ---
@@ -26371,7 +26568,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_returns_response_on_success() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:54`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:55`
 **Complexity:** 1
 
 ---
@@ -26379,7 +26576,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_validates_requested_tool() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:38`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:39`
 **Complexity:** 1
 
 ---
@@ -26387,7 +26584,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_ai_on_fidelity_wraps_unexpected_errors() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:78`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:79`
 **Complexity:** 1
 
 ---
@@ -26451,7 +26648,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_multiple_ai_on_fidelity_cache_hit_short_circuits(monkeypatch) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:126`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:127`
 **Complexity:** 1
 
 **Parameters:**
@@ -26462,7 +26659,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_multiple_ai_on_fidelity_cache_save_failure_nonfatal(monkeypatch) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:147`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:148`
 **Complexity:** 1
 
 **Parameters:**
@@ -26473,7 +26670,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_multiple_ai_on_fidelity_handles_partial_failures() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:108`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:109`
 **Complexity:** 1
 
 ---
@@ -26481,7 +26678,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_multiple_ai_on_fidelity_raises_when_no_tools_available() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:102`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:103`
 **Complexity:** 1
 
 ---
@@ -26489,7 +26686,7 @@ a decision needs to be made about what to implement.
 ### `test_consult_multiple_ai_on_fidelity_returns_responses(_mock_enabled_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:85`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:86`
 **Complexity:** 1
 
 **Decorators:** `@patch('claude_skills.sdd_fidelity_review.consultation.get_enabled_fidelity_tools', return_value={'gemini': {}, 'codex': {}})`
@@ -26727,7 +26924,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_majority() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:278`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:330`
 **Complexity:** 1
 
 ---
@@ -26735,7 +26932,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_preserves_original_text() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:289`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:341`
 **Complexity:** 1
 
 ---
@@ -28477,7 +28674,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_multiple_responses() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:267`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:319`
 **Complexity:** 1
 
 ---
@@ -28485,7 +28682,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_defaults_to_unknown() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:261`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:313`
 **Complexity:** 1
 
 ---
@@ -28493,7 +28690,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_extracts_fail_with_issues() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:187`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:188`
 **Complexity:** 1
 
 ---
@@ -28501,7 +28698,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_extracts_pass_verdict() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:174`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:175`
 **Complexity:** 1
 
 ---
@@ -28509,7 +28706,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_findings_heading_with_bullets() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:227`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:279`
 **Complexity:** 1
 
 ---
@@ -28517,7 +28714,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_numbered_findings_section() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:199`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:251`
 **Complexity:** 1
 
 ---
@@ -28525,7 +28722,23 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_keeps_full_first_paragraph_summary() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:248`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:300`
+**Complexity:** 1
+
+---
+
+### `test_parse_review_response_parses_json_code_block_entries() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:229`
+**Complexity:** 1
+
+---
+
+### `test_parse_review_response_parses_json_schema() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:200`
 **Complexity:** 1
 
 ---
@@ -29260,6 +29473,20 @@ Returns:
 
 ---
 
+### `update_permissions(project_root) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:220`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Update `.claude/settings.local.json` with SDD permissions.
+
+**Parameters:**
+- `project_root`: Path | str
+
+---
+
 ### `update_task_counts(spec_data, node_id) -> Dict[str, Any]`
 
 **Language:** python
@@ -29926,10 +30153,13 @@ Returns:
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py`
 
+- `__future__.annotations`
 - `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.setup_templates.copy_template_to`
+- `claude_skills.common.setup_templates.load_json_template`
+- `copy.deepcopy`
 - `json`
 - `pathlib.Path`
-- `sys`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py`
 
@@ -30321,6 +30551,8 @@ Returns:
 - `__future__.annotations`
 - `dataclasses.dataclass`
 - `pathlib.Path`
+- `setup_templates.copy_template_to`
+- `setup_templates.get_template`
 - `shutil`
 - `typing.Optional`
 
@@ -30634,6 +30866,19 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 
+### `src/claude_skills/claude_skills/common/setup_templates.py`
+
+- `__future__.annotations`
+- `atexit`
+- `contextlib.ExitStack`
+- `importlib.resources`
+- `json`
+- `pathlib.Path`
+- `shutil`
+- `templates.SETUP_TEMPLATE_PACKAGE`
+- `typing.Any`
+- `yaml`
+
 ### `src/claude_skills/claude_skills/common/spec.py`
 
 - `datetime.datetime`
@@ -30766,6 +31011,18 @@ Returns:
 - `datetime.datetime`
 - `json`
 - `os`
+- `pathlib.Path`
+- `sys`
+
+### `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.common.ai_config_setup.ensure_ai_config`
+- `claude_skills.common.setup_templates.copy_template_to`
+- `claude_skills.common.setup_templates.load_json_template`
+- `copy.deepcopy`
+- `json`
 - `pathlib.Path`
 - `sys`
 
@@ -30986,6 +31243,7 @@ Returns:
 - `dataclasses.dataclass`
 - `dataclasses.field`
 - `enum.Enum`
+- `json`
 - `logging`
 - `re`
 - `typing.Any`
@@ -32725,6 +32983,7 @@ Returns:
 - `claude_skills.sdd_fidelity_review.consultation.detect_consensus`
 - `claude_skills.sdd_fidelity_review.consultation.parse_multiple_responses`
 - `claude_skills.sdd_fidelity_review.consultation.parse_review_response`
+- `json`
 - `pytest`
 - `textwrap.dedent`
 - `unittest.mock.MagicMock`
