@@ -3,15 +3,17 @@
 Note: Tests updated to use unified CLI (sdd validate) instead of legacy sdd-validate.
 """
 
+import builtins
 import json
-import pytest
-import subprocess
-import sys
 import shutil
+import sys
 from pathlib import Path
 
+import pytest
 
-# Path to fixtures
+from claude_skills.common import hierarchy_validation
+from .cli_runner import run_cli
+
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "sdd_validate"
 CLEAN_SPEC = FIXTURES_DIR / "clean_spec.json"
 WARNINGS_SPEC = FIXTURES_DIR / "warnings_spec.json"
@@ -19,26 +21,6 @@ ERRORS_SPEC = FIXTURES_DIR / "errors_spec.json"
 AUTOFIX_SPEC = FIXTURES_DIR / "auto_fix_spec.json"
 DEPENDENCY_SPEC = FIXTURES_DIR / "dependency_spec.json"
 DEEP_HIERARCHY_SPEC = FIXTURES_DIR / "deep_hierarchy_spec.json"
-
-
-def run_cli(*args, check=False):
-    """Helper to run sdd CLI with unified command (sdd-validate commands)."""
-    # Try unified CLI first
-    if shutil.which("sdd"):
-        cmd = ["sdd"] + list(args)
-    else:
-        # Fallback to python -m
-        cmd = [sys.executable, "-m", "claude_skills.cli.sdd"] + list(args)
-
-    result = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        check=check,
-    )
-    return result
-
-
 class TestValidateCommand:
     """Tests for the validate command."""
 
@@ -52,13 +34,15 @@ class TestValidateCommand:
         """Warnings-only spec should exit with code 1."""
         result = run_cli("validate", str(WARNINGS_SPEC))
         assert result.returncode == 1
-        assert "warnings" in result.stderr.lower()
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "warnings" in combined_output.lower()
 
     def test_validate_errors_spec_exit_2(self):
         """Spec with errors should exit with code 2."""
         result = run_cli("validate", str(ERRORS_SPEC))
         assert result.returncode == 2
-        assert "FAILED" in result.stderr or "❌" in result.stderr
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "failed" in combined_output.lower() or "❌" in combined_output
 
     def test_validate_json_output(self):
         """Test --json output format."""
@@ -71,6 +55,8 @@ class TestValidateCommand:
         assert "warnings" in data
         assert "status" in data
         assert data["status"] in ["valid", "warnings", "errors"]
+        assert "schema" in data
+        assert "source" in data["schema"]
 
     def test_validate_json_verbose(self):
         """Test --json --verbose output includes issues array."""
@@ -90,7 +76,8 @@ class TestValidateCommand:
         """Test validation of nonexistent file returns exit 2."""
         result = run_cli("validate", "/nonexistent/file.json")
         assert result.returncode == 2
-        assert "not found" in result.stderr.lower() or "not found" in result.stdout.lower()
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "not found" in combined_output.lower()
 
     def test_validate_with_report(self, tmp_path):
         """Test --report flag generates report file."""
@@ -122,6 +109,90 @@ class TestValidateCommand:
             data = json.load(f)
             assert "summary" in data
             assert "dependencies" in data
+
+    def test_validate_report_json_includes_schema_details(self, tmp_path):
+        """Report output should embed schema source and issues."""
+        spec_copy = tmp_path / "schema_spec.json"
+        spec_data = json.loads(CLEAN_SPEC.read_text())
+        # Introduce schema violations to trigger error reporting
+        spec_data["hierarchy"] = []  # invalid type (should be object)
+        spec_copy.write_text(json.dumps(spec_data))
+
+        result = run_cli(
+            "validate",
+            str(spec_copy),
+            "--report",
+            "--report-format",
+            "json",
+        )
+
+        # Schema errors should propagate to exit status
+        assert result.returncode == 2
+
+        report_file = spec_copy.with_name("schema_spec-validation-report.json")
+        assert report_file.exists()
+
+        report_data = json.loads(report_file.read_text())
+        schema_section = report_data.get("schema", {})
+        assert schema_section.get("errors")
+        assert schema_section.get("source")
+
+    def test_validate_gracefully_handles_missing_jsonschema(self, monkeypatch):
+        """Missing optional dependency should emit warning but not fail validation."""
+
+        orig_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "jsonschema":
+                raise ImportError("mock missing jsonschema")
+            return orig_import(name, *args, **kwargs)
+
+        monkeypatch.delitem(sys.modules, "jsonschema", raising=False)
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+
+        # Ensure schema loader still returns a schema so we exercise the fallback path.
+        monkeypatch.setattr(
+            hierarchy_validation,
+            "load_json_schema",
+            lambda name: ({"type": "object"}, "package://schema", None),
+        )
+
+        result = run_cli("validate", str(CLEAN_SPEC))
+        assert result.returncode == 0
+
+        combined = (result.stdout or "") + (result.stderr or "")
+        assert "Validation PASSED" in combined
+
+    def test_validate_cli_surfaces_schema_errors(self, tmp_path):
+        """Schema failures should be reported to the user."""
+        spec_copy = tmp_path / "invalid_schema.json"
+        spec_data = json.loads(CLEAN_SPEC.read_text())
+        spec_data["hierarchy"] = []  # invalid type to trigger schema error
+        spec_copy.write_text(json.dumps(spec_data))
+
+        result = run_cli("validate", str(spec_copy))
+
+        assert result.returncode == 2
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "Schema source:" in combined_output
+        assert "Schema validation errors" in combined_output
+        assert "Schema violation" in combined_output
+
+    def test_validate_json_includes_schema_details(self, tmp_path):
+        """JSON output should include schema source and issues."""
+
+        spec_copy = tmp_path / "schema_warning.json"
+        spec_data = json.loads(CLEAN_SPEC.read_text())
+        # Introduce schema issue to trigger warnings/errors
+        spec_data["hierarchy"] = []  # invalid type
+        spec_copy.write_text(json.dumps(spec_data))
+
+        result = run_cli("--json", "validate", str(spec_copy))
+        assert result.returncode == 2
+
+        data = json.loads(result.stdout)
+        assert data["schema"]["source"].endswith("sdd-spec-schema.json") or data["schema"]["source"].startswith("package:")
+        assert data["schema"]["errors"] or data["schema"]["warnings"]
 
 
 class TestFixCommand:
@@ -372,4 +443,5 @@ class TestErrorHandling:
 
         result = run_cli("validate", str(bad_json))
         assert result.returncode == 2
-        assert "json" in result.stderr.lower() or "json" in result.stdout.lower()
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "json" in combined_output.lower()

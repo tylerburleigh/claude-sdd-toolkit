@@ -336,7 +336,7 @@ def test_cli_list_review_tools(mock_tools_dir):
 
     with patch.dict('os.environ', {'PATH': str(mock_tools_dir)}):
         result = subprocess.run(
-            [sys.executable, "-m", "claude_skills.sdd_fidelity_review.cli", "list-review-tools", "--format", "json"],
+            [sys.executable, "-m", "claude_skills.sdd_fidelity_review.cli", "--json", "list-review-tools"],
             capture_output=True,
             text=True,
             timeout=10

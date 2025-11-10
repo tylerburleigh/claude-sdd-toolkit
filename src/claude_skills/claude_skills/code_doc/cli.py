@@ -40,6 +40,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.schema_loader import load_json_schema
 from claude_skills.common.metrics import track_metrics
 from claude_skills.code_doc.generator import DocumentationGenerator
 from claude_skills.code_doc.parsers import Language, create_parser_factory
@@ -77,6 +78,27 @@ BASE_EXCLUDES = [
     # OS
     '.DS_Store', 'Thumbs.db',
 ]
+
+_DOC_SCHEMA_NAME = "documentation-schema.json"
+_REQUIRED_DOC_KEYS = [
+    "metadata",
+    "statistics",
+    "modules",
+    "classes",
+    "functions",
+    "dependencies",
+]
+def _basic_doc_validation(doc: dict) -> list[str]:
+    if not isinstance(doc, dict):
+        return _REQUIRED_DOC_KEYS.copy()
+    return [key for key in _REQUIRED_DOC_KEYS if key not in doc]
+
+
+def _schema_warning(printer: PrettyPrinter, args: argparse.Namespace, message: str) -> None:
+    if getattr(args, "json", False):
+        return
+    printer.warning(message)
+
 
 
 def _dump_json(payload: object) -> None:
@@ -169,47 +191,94 @@ def cmd_validate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(message)
         return 1
 
-    schema_path = Path(__file__).parent.parent / 'documentation-schema.json'
-    if not schema_path.exists():
-        message = f"Schema file not found at '{schema_path}'"
-        if _print_if_json(args, {"status": "error", "message": message}, printer):
-            return 1
-        printer.error(message)
-        return 1
-
     try:
         with open(json_path, 'r', encoding='utf-8') as fh:
             doc = json.load(fh)
-        with open(schema_path, 'r', encoding='utf-8') as fh:
-            schema = json.load(fh)
-
-        try:
-            import jsonschema  # type: ignore  # pylint: disable=import-error
-
-            jsonschema.validate(doc, schema)
-            if _print_if_json(args, {"status": "ok", "message": "JSON documentation is valid"}, printer):
-                return 0
-            printer.success("JSON documentation is valid")
-            return 0
-        except ImportError:
-            required_keys = ['metadata', 'statistics', 'modules', 'classes', 'functions', 'dependencies']
-            missing = [key for key in required_keys if key not in doc]
-            if missing:
-                message = f"Missing required keys: {', '.join(missing)}"
-                if _print_if_json(args, {"status": "error", "message": message}, printer):
-                    return 1
-                printer.error(message)
-                return 1
-            message = "Basic validation passed (install jsonschema for full validation)"
-            if _print_if_json(args, {"status": "ok", "message": message}, printer):
-                return 0
-            printer.success(message)
-            return 0
-
     except json.JSONDecodeError as exc:
         return _handle_error(args, printer, exc)
     except Exception as exc:  # pylint: disable=broad-except
         return _handle_error(args, printer, exc)
+
+    schema, source, load_error = load_json_schema(_DOC_SCHEMA_NAME)
+    schema_info: dict[str, Optional[str] | list[str] | bool] = {
+        "source": source,
+        "warnings": [],
+        "errors": [],
+    }
+    if load_error:
+        schema_info["error"] = load_error
+
+    def _emit_payload(status: str, message: str, errors: Optional[list[str]] = None) -> int:
+        if errors is not None:
+            schema_info["errors"] = errors
+        payload = {"status": status, "message": message, "schema": schema_info}
+        if _print_if_json(args, payload, printer):
+            return 0 if status == "ok" else 1
+        if status == "ok":
+            printer.success(message)
+            return 0
+        printer.error(message)
+        return 1
+
+    def _emit_error(message: str, errors: Optional[list[str]] = None) -> int:
+        if errors is not None:
+            schema_info["errors"] = errors
+        payload = {"status": "error", "message": message, "schema": schema_info}
+        if _print_if_json(args, payload, printer):
+            return 1
+        printer.error(message)
+        return 1
+
+    if schema is None:
+        warning_message = load_error or "Documentation schema not found."
+        schema_info["warnings"].append(warning_message)
+        _schema_warning(printer, args, warning_message)
+        skip_message = "Schema validation skipped: documentation schema unavailable."
+        schema_info["warnings"].append(skip_message)
+        _schema_warning(printer, args, skip_message)
+        missing_keys = _basic_doc_validation(doc)
+        if missing_keys:
+            missing_message = f"Missing required keys: {', '.join(missing_keys)}"
+            return _emit_error(missing_message)
+        success_message = "Basic validation passed (schema unavailable)."
+        return _emit_payload("ok", success_message)
+
+    try:
+        import jsonschema  # type: ignore  # pylint: disable=import-error
+    except ImportError:
+        warning_message = (
+            "Schema validation skipped: install the 'jsonschema' package "
+            "or use optional dependency group 'validation' to enable Draft 7 validation."
+        )
+        schema_info["warnings"].append(warning_message)
+        _schema_warning(printer, args, warning_message)
+        missing_keys = _basic_doc_validation(doc)
+        if missing_keys:
+            missing_message = f"Missing required keys: {', '.join(missing_keys)}"
+            return _emit_error(missing_message)
+        success_message = "Basic validation passed (install jsonschema for full validation)."
+        return _emit_payload("ok", success_message)
+
+    validator = jsonschema.Draft7Validator(schema)  # type: ignore[attr-defined]
+    validation_errors = sorted(validator.iter_errors(doc), key=lambda err: list(err.path))  # type: ignore[attr-defined]
+
+    if validation_errors:
+        formatted = []
+        for error in validation_errors:
+            pointer = "/".join(str(part) for part in error.path) or "<root>"
+            formatted.append(f"{pointer}: {error.message}")
+        schema_info["errors"] = formatted
+        if not getattr(args, "json", False):
+            for item in formatted[:5]:
+                printer.error(f"Schema violation at {item}")
+            if len(formatted) > 5:
+                printer.error(f"... {len(formatted) - 5} more schema warnings (re-run with --json for details)")
+        return _emit_error("JSON documentation failed schema validation", formatted)
+
+    if source:
+        schema_info["validated"] = True
+
+    return _emit_payload("ok", "JSON documentation is valid")
 
 
 def cmd_analyze(args: argparse.Namespace, printer: PrettyPrinter) -> int:

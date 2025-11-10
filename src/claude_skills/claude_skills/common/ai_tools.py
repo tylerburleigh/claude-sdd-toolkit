@@ -8,6 +8,7 @@ error handling.
 See docs/AI_TOOL_INTERFACES_DESIGN.md for complete design documentation.
 """
 
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
@@ -246,6 +247,32 @@ class MultiToolResponse:
 # TOOL AVAILABILITY FUNCTIONS
 # =============================================================================
 
+_TOOL_PATH_ENV = "CLAUDE_SKILLS_TOOL_PATH"
+
+
+def _get_configured_tool_path() -> Optional[str]:
+    """
+    Return an explicit search path for tool discovery if configured.
+
+    When ``CLAUDE_SKILLS_TOOL_PATH`` is set, detection uses that value (a PATH-style
+    string) instead of the ambient ``PATH``. This allows tests to inject mock
+    binaries without leaking to the developer's real tools.
+    """
+    value = os.environ.get(_TOOL_PATH_ENV)
+    if value:
+        return value
+    return None
+
+
+def _resolve_tool_executable(tool: str) -> Optional[str]:
+    """
+    Resolve the executable path for a tool, honoring the configured search path.
+    """
+    configured_path = _get_configured_tool_path()
+    if configured_path is not None:
+        return shutil.which(tool, path=configured_path)
+    return shutil.which(tool)
+
 
 def check_tool_available(
     tool: str,
@@ -275,15 +302,17 @@ def check_tool_available(
         >>> check_tool_available("gemini", check_version=True)
         True
     """
+    executable = _resolve_tool_executable(tool)
+
     # Quick PATH check
-    if not shutil.which(tool):
+    if not executable:
         return False
 
     # Optional version check
     if check_version:
         try:
             result = subprocess.run(
-                [tool, "--version"],
+                [executable, "--version"],
                 capture_output=True,
                 timeout=timeout,
                 check=False
@@ -401,6 +430,56 @@ def build_tool_command(
         raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent")
 
 
+def _cursor_agent_json_flag_error(result: subprocess.CompletedProcess) -> bool:
+    """
+    Detect if cursor-agent failed because it does not support the --json flag.
+
+    Args:
+        result: CompletedProcess from subprocess.run
+
+    Returns:
+        True if diagnostics indicate --json is an unknown/unsupported option
+    """
+    if result.returncode == 0:
+        return False
+
+    diagnostics_parts = [result.stderr or "", result.stdout or ""]
+    diagnostics = " ".join(part for part in diagnostics_parts if part).lower()
+
+    if "--json" not in diagnostics:
+        return False
+
+    unsupported_indicators = [
+        "unrecognized option",
+        "unknown option",
+        "unrecognized argument",
+        "unknown argument",
+        "no such option",
+        "does not support",
+        "not support",
+        "flag provided but not defined",
+        "invalid option",
+    ]
+
+    return any(indicator in diagnostics for indicator in unsupported_indicators)
+
+
+def _remove_first_occurrence(items: list[str], token: str) -> tuple[list[str], bool]:
+    """
+    Remove the first occurrence of token from a list without mutating the original.
+
+    Returns a tuple of (new_list, removed_flag).
+    """
+    removed = False
+    new_items: list[str] = []
+    for item in items:
+        if item == token and not removed:
+            removed = True
+            continue
+        new_items.append(item)
+    return new_items, removed
+
+
 # =============================================================================
 # TOOL EXECUTION FUNCTIONS
 # =============================================================================
@@ -451,10 +530,9 @@ def execute_tool(
             check=False  # Don't raise on non-zero exit
         )
 
-        duration = time.time() - start_time
-
         # Check exit code
         if result.returncode == 0:
+            duration = time.time() - start_time
             return ToolResponse(
                 tool=tool,
                 status=ToolStatus.SUCCESS,
@@ -466,19 +544,76 @@ def execute_tool(
                 prompt=prompt,
                 exit_code=0
             )
-        else:
-            # Non-zero exit code
-            return ToolResponse(
-                tool=tool,
-                status=ToolStatus.ERROR,
-                output=result.stdout.strip(),
-                error=result.stderr.strip() or f"Tool exited with code {result.returncode}",
-                duration=duration,
-                timestamp=timestamp,
-                model=model,
-                prompt=prompt,
-                exit_code=result.returncode
-            )
+
+        # Retry cursor-agent once without --json if it appears unsupported
+        if (
+            tool == "cursor-agent"
+            and "--json" in command
+            and _cursor_agent_json_flag_error(result)
+        ):
+            fallback_command, removed = _remove_first_occurrence(command, "--json")
+
+            if removed:
+                fallback_result = subprocess.run(
+                    fallback_command,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    check=False
+                )
+
+                if fallback_result.returncode == 0:
+                    duration = time.time() - start_time
+                    return ToolResponse(
+                        tool=tool,
+                        status=ToolStatus.SUCCESS,
+                        output=fallback_result.stdout.strip(),
+                        error=None,
+                        duration=duration,
+                        timestamp=timestamp,
+                        model=model,
+                        prompt=prompt,
+                        exit_code=0,
+                        metadata={"cursor_agent_retry_without_json": True}
+                    )
+
+                duration = time.time() - start_time
+                first_error = result.stderr.strip() or result.stdout.strip() or f"Tool exited with code {result.returncode}"
+                second_error = fallback_result.stderr.strip() or fallback_result.stdout.strip() or f"Tool exited with code {fallback_result.returncode}"
+                combined_error = (
+                    "cursor-agent rejected '--json' flag "
+                    f"(exit code {result.returncode}): {first_error}. "
+                    "Retry without '--json' also failed "
+                    f"(exit code {fallback_result.returncode}): {second_error}"
+                )
+
+                return ToolResponse(
+                    tool=tool,
+                    status=ToolStatus.ERROR,
+                    output=fallback_result.stdout.strip() or result.stdout.strip(),
+                    error=combined_error,
+                    duration=duration,
+                    timestamp=timestamp,
+                    model=model,
+                    prompt=prompt,
+                    exit_code=fallback_result.returncode,
+                    metadata={"cursor_agent_retry_without_json": True}
+                )
+
+        duration = time.time() - start_time
+
+        # Non-zero exit code without retry
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.ERROR,
+            output=result.stdout.strip(),
+            error=result.stderr.strip() or f"Tool exited with code {result.returncode}",
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=result.returncode
+        )
 
     except subprocess.TimeoutExpired:
         duration = time.time() - start_time

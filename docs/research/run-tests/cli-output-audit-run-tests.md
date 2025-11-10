@@ -33,7 +33,7 @@ The run-tests module provides a sophisticated testing and debugging framework wi
 **Current Output Simulation:**
 
 ```
-$ sdd test run --debug tests/test_auth.py
+$ sdd test run --preset-debug tests/test_auth.py
 
 Running: pytest -vv -l -s tests/test_auth.py
 

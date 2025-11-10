@@ -91,9 +91,10 @@ sdd fidelity-review <spec-id> --phase <phase-id>
 ```
 
 **Output Location (Automatic):**
+- The CLI writes a synthesized consensus Markdown report (not raw AI transcripts) to `specs/.fidelity-reviews/`. Each file captures the JSON summary you return—review scope, consensus findings, deviations, recommendations, and metadata—so downstream agents can inspect the full consensus context without rerunning the review.
 - Task reviews: `specs/.fidelity-reviews/<spec-id>-task-<task-id>-fidelity-review.md`
 - Phase reviews: `specs/.fidelity-reviews/<spec-id>-phase-<phase-id>-fidelity-review.md`
-- Custom location: `--output <file>` (optional override)
+- Always reference the auto-generated filename when reporting results so the caller can connect the CLI’s JSON output, your summarized response, and the persisted Markdown artifact.
 
 ### Step 3: Execute CLI Command
 
@@ -106,6 +107,8 @@ sdd fidelity-review <spec-id> --task <task-id>
 - Read spec files with Read tool
 - Parse specs with Python or jq
 - Use cat/head/tail/grep on spec files
+
+This skill must only run `sdd fidelity-review` commands (with `--task` or `--phase` parameter). No other shell commands are required for fidelity review, and the agent should not execute additional tooling alongside the CLI.
 
 Your job is to execute the CLI command and parse its JSON output.
 
@@ -146,7 +149,7 @@ The CLI returns JSON output with the structure:
 }
 ```
 
-Parse this JSON and present findings to the user in a clear, organized format.
+Parse this JSON, surface the structured findings directly to the invoking workflow, and include a link or path to the stored Markdown consensus report. The agent’s responsibility is to faithfully relay the CLI’s assessed deviations, recommendations, consensus signals, and metadata—perform validation/formatting as needed, but do not introduce any new analysis beyond what the CLI returned. Do not open or read the saved Markdown artifact; simply point the caller to its location.
 
 ## Report Structure
 
@@ -233,26 +236,9 @@ Fidelity reviews can be triggered at multiple points in the development workflow
    - Verify changes align with original specification
    - Useful for reviewer context and validation
 
-### Handoff to Other Skills
+### Review Outcome Handling
 
-**From sdd-next:**
-- Triggered automatically during verification tasks
-- Verification task metadata specifies: `"agent": "sdd-fidelity-review"`
-- sdd-next passes context: spec_id, scope, and target
-
-**To sdd-update:**
-- Document undocumented deviations in journal retroactively
-- Add rationale for implementation choices
-- Pattern: Review identifies deviation → Recommend journal entry → sdd-update adds it
-
-**To run-tests:**
-- After finding deviations, verify functional correctness with tests
-- Ensure different approach still meets requirements
-- Pattern: Review finds major deviation → run-tests validates functionality
-
-**To sdd-modify:**
-- Via sdd-next orchestration (not directly)
-- Pattern: Review recommends spec updates → sdd-next presents options → User approves → sdd-modify applies changes
+The `sdd-fidelity-review` skill hands its synthesized results—JSON findings plus the saved Markdown report reference—directly back to the caller. The invoking workflow decides what to do next. Common follow-up actions the main agent may optionally consider include journaling deviations, planning remediation work, running regression tests, or proposing spec updates after stakeholder review. No automatic delegation occurs; the fidelity-review skill’s responsibility ends once it delivers the consensus results and report pointer.
 
 ### Report Handoff
 
@@ -260,13 +246,8 @@ Fidelity review generates a detailed report comparing implementation against spe
 
 **Usage Pattern:**
 1. Skill executes `sdd fidelity-review` CLI tool
-2. CLI analyzes implementation and generates report
-3. Skill parses and presents findings to user
-4. User can use findings to:
-   - Document deviations in task journal (via `sdd-update`)
-   - Fix implementation issues
-   - Approve deviations if they represent valid improvements
-   - Request spec modifications if plan assumptions were incorrect
+2. CLI analyzes implementation, generates JSON output, and saves the consensus Markdown report
+3. Skill parses the JSON, presents the summarized findings, and surfaces the stored report path to the caller
 
 ## Fidelity Assessment
 
@@ -301,6 +282,7 @@ Specified features not implemented:
 ✅ Highlight recommendations for remediation
 ✅ Note AI consensus from multiple tool perspectives
 ✅ Provide context from the fidelity assessment
+✅ Surface the saved Markdown report path so the caller can inspect the full consensus artifact
 
 ### DON'T
 ❌ Attempt to manually implement review logic (CLI handles it)
@@ -308,6 +290,8 @@ Specified features not implemented:
 ❌ Skip input validation
 ❌ Ignore the CLI tool's consensus analysis
 ❌ Make up review findings not from CLI output
+❌ Perform additional analysis beyond the CLI’s consensus results
+❌ Open the persisted Markdown report; reference its filepath instead
 
 ## Example Invocations
 

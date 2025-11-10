@@ -715,7 +715,7 @@ Enhanced mode uses external CLI tools for AI processing:
 - System detects available tools automatically
 - Tries tools in priority order
 - Falls back to basic rendering if no AI tools available
-- Configurable in `skills/sdd-render/config.yaml`
+- Configurable via `.claude/ai_config.yaml` (`sdd-render.tools` and `sdd-render.models`)
 
 ### Performance Considerations
 
@@ -1651,7 +1651,7 @@ AI enhancements use external CLI tools via subprocess. The default priority orde
 - No user intervention required
 
 **Configuration:**
-AI tool settings can be customized in `skills/sdd-render/config.yaml`
+AI tool settings can be customized in `.claude/ai_config.yaml` (`sdd-render` section)
 
 **Performance characteristics:**
 - AI processing is one-time per render (results embedded in markdown)

@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 - Unit tests for the CLI registry to verify optional module handling and logging.
+- `claude_skills.common.schema_loader.load_json_schema()` utility with test coverage and CLI integration hooks.
+- Optional `validation` dependency group (`jsonschema>=4.0.0`) to enable full Draft 07 spec validation.
 
 ### Fixed
 - `_try_register_optional()` helper ensures `sdd_render` and `sdd_fidelity_review` imports fail gracefully, preventing `sdd` CLI startup crashes when optional skills are absent.
+
+### Changed
+- `sdd validate` now runs JSON Schema checks before structural analysis, reporting schema issues (or warnings when the validator is unavailable) alongside existing hierarchy diagnostics.
 
 ## [0.4.5] - 2025-11-05
 

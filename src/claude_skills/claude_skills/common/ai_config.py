@@ -1,7 +1,9 @@
 """Shared AI configuration loader for skills.
 
-Loads configuration from config.yaml in skill directories (run-tests, sdd-render, etc.),
-with fallback to sensible defaults if config is missing or malformed.
+Loads configuration from the centralized `.claude/ai_config.yaml`, merging global defaults
+with any skill-specific overrides that live in the same file. The legacy per-skill
+`config.yaml` files have been retired and are only referenced for backwards compatibility
+checks.
 
 This module provides a common interface for all skills to load their AI tool configurations.
 """
@@ -121,16 +123,20 @@ def merge_configs(base: Dict, override: Dict) -> Dict:
 
 
 def get_config_path(skill_name: str) -> Path:
-    """Get the path to the config.yaml file for a skill.
+    """Locate the legacy per-skill `config.yaml` file if it still exists.
+
+    All live configuration now resides in `.claude/ai_config.yaml`; this helper is retained
+    for backwards compatibility with historical tooling that expected a file under
+    `skills/{skill_name}/config.yaml`.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
 
     Returns:
-        Path to config.yaml in the skill directory
+        Path to the historical config.yaml location for the skill (may not exist)
     """
     # This file is in src/claude_skills/claude_skills/common/ai_config.py
-    # We need to find skills/{skill_name}/config.yaml
+    # We need to find the legacy skills/{skill_name}/config.yaml path.
 
     # Try multiple possible locations
     possible_paths = [
@@ -340,9 +346,9 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
 def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
     """Get multi-agent pair configurations for consensus-based consultation.
 
-    Loads agent pair definitions from the skill's config.yaml file under the
-    'consensus.pairs' section. Each pair defines which agents should be consulted
-    together for multi-agent analysis.
+    Loads agent pair definitions from `.claude/ai_config.yaml` under the skill's
+    `consensus.pairs` section. Each pair defines which agents should be consulted together
+    for multi-agent analysis.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
@@ -365,10 +371,10 @@ def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
         ['gemini', 'cursor-agent']
 
     Notes:
-        - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
-          returns sensible default pairs
+        - If `.claude/ai_config.yaml` is missing or doesn't have a `consensus.pairs`
+          section for the skill, returns sensible default pairs
         - Each pair should contain exactly 2 agents for optimal consensus analysis
-        - Agent names must correspond to tools defined in the 'tools' section
+        - Agent names must correspond to tools defined in the `tools` section
     """
     config = load_skill_config(skill_name)
 
@@ -392,9 +398,9 @@ def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
 def get_routing_config(skill_name: str) -> Dict[str, str]:
     """Get routing configuration that maps failure types to multi-agent pairs.
 
-    Loads auto-trigger routing rules from the skill's config.yaml file under the
-    'consensus.auto_trigger' section. These rules determine which agent pair should
-    be used for different types of test failures or analysis scenarios.
+    Loads auto-trigger routing rules from `.claude/ai_config.yaml` under the skill's
+    `consensus.auto_trigger` section. These rules determine which agent pair should be used
+    for different types of test failures or analysis scenarios.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
@@ -420,11 +426,11 @@ def get_routing_config(skill_name: str) -> Dict[str, str]:
         'default'
 
     Notes:
-        - If config.yaml is missing or doesn't have 'consensus.auto_trigger',
-          returns sensible default routing rules
+        - If `.claude/ai_config.yaml` is missing or doesn't have `consensus.auto_trigger`
+          for the skill, returns sensible default routing rules
         - The pair names in routing values should correspond to keys in the
-          pairs configuration from get_multi_agent_pairs()
-        - The 'default' key is used as fallback when no specific rule matches
+          pairs configuration from `get_multi_agent_pairs()`
+        - The `default` key is used as fallback when no specific rule matches
     """
     config = load_skill_config(skill_name)
 

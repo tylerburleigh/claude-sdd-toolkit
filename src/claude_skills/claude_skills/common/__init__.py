@@ -68,6 +68,7 @@ from .validation import (
     validate_iso8601_date,
     normalize_message_text,
 )
+from .schema_loader import load_json_schema
 # Validation modules (comprehensive spec and state validation)
 from .hierarchy_validation import (
     validate_spec_hierarchy,
@@ -248,6 +249,7 @@ __all__ = [
     "validate_spec_id_format",
     "validate_iso8601_date",
     "normalize_message_text",
+    "load_json_schema",
 
     # Hierarchy validation
     "validate_spec_hierarchy",

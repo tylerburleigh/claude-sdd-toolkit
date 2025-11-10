@@ -24,8 +24,6 @@ def generate_report(
     normalized = normalize_validation_result(result)
 
     if format == "json":
-        import json
-
         # Normalize dependency analysis keys for JSON output
         deps = {}
         if dependency_analysis:
@@ -36,6 +34,12 @@ def generate_report(
                 "bottlenecks": dependency_analysis.get("bottlenecks") or [],
                 "status": dependency_analysis.get("status", "ok"),
             }
+
+        schema_info = {
+            "source": getattr(result, "schema_source", None),
+            "errors": list(getattr(result, "schema_errors", []) or []),
+            "warnings": list(getattr(result, "schema_warnings", []) or []),
+        }
 
         payload = {
             "summary": {
@@ -52,6 +56,10 @@ def generate_report(
             "stats": stats or {},
             "dependencies": deps,
         }
+
+        if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
+            payload["schema"] = schema_info
+
         return format_json_output(payload)
 
     lines = [
@@ -65,6 +73,12 @@ def generate_report(
         f"- Warnings: {normalized.warning_count}",
         f"- Auto-fixable: {normalized.auto_fixable_error_count + normalized.auto_fixable_warning_count}",
     ]
+
+    schema_info = {
+        "source": getattr(result, "schema_source", None),
+        "errors": list(getattr(result, "schema_errors", []) or []),
+        "warnings": list(getattr(result, "schema_warnings", []) or []),
+    }
 
     if normalized.issues:
         lines.append("")
@@ -129,6 +143,20 @@ def generate_report(
                 blocks = bottleneck.get('blocks', 0)
                 threshold = bottleneck.get('threshold', 'N/A')
                 lines.append(f"  - {task} blocks {blocks} tasks (threshold: {threshold})")
+
+    if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
+        lines.append("")
+        lines.append("## Schema Validation")
+        if schema_info["source"]:
+            lines.append(f"- Source: {schema_info['source']}")
+        if schema_info["errors"]:
+            lines.append("- Errors:")
+            for message in schema_info["errors"]:
+                lines.append(f"  - {message}")
+        if schema_info["warnings"]:
+            lines.append("- Warnings:")
+            for message in schema_info["warnings"]:
+                lines.append(f"  - {message}")
 
     return "\n".join(lines)
 

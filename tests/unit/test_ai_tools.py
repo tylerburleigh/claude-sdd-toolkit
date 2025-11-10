@@ -311,6 +311,26 @@ def test_execute_tool_success(mocker):
     assert response.exit_code == 0
 
 
+def test_execute_tool_cursor_agent_retries_without_json(mocker):
+    """execute_tool should retry cursor-agent without --json when unsupported."""
+    first_result = Mock(returncode=2, stdout="", stderr="Error: unrecognized option '--json'")
+    second_result = Mock(returncode=0, stdout="Cursor response to prompt", stderr="")
+    mock_run = mocker.patch("subprocess.run", side_effect=[first_result, second_result])
+
+    response = execute_tool("cursor-agent", "review code")
+
+    assert response.success is True
+    assert response.output == "Cursor response to prompt"
+    assert response.metadata.get("cursor_agent_retry_without_json") is True
+    assert mock_run.call_count == 2
+
+    first_command = mock_run.call_args_list[0].args[0]
+    second_command = mock_run.call_args_list[1].args[0]
+
+    assert "--json" in first_command
+    assert "--json" not in second_command
+
+
 def test_execute_tool_non_zero_exit(mocker):
     """execute_tool should return error response for non-zero exit."""
     mock_result = Mock(returncode=1, stdout="", stderr="error message")

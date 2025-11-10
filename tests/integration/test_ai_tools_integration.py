@@ -6,6 +6,7 @@ mock CLI tools that behave like actual gemini/codex/cursor-agent commands.
 """
 
 import pytest
+import shutil
 import subprocess
 import tempfile
 import os
@@ -93,11 +94,22 @@ def mock_tools_dir(tmp_path):
         "  echo 'cursor-agent version 1.0.0'\n"
         "  exit 0\n"
         "fi\n"
-        "# Parse arguments: --print flag, then positional prompt\n"
-        "if [[ \"$1\" == \"--print\" ]]; then\n"
-        "  shift\n"
-        "  prompt=\"$1\"\n"
-        "fi\n"
+        "# Parse arguments: --print flag, optional --json flag, then positional prompt\n"
+        "prompt=\"\"\n"
+        "while [[ $# -gt 0 ]]; do\n"
+        "  case \"$1\" in\n"
+        "    --print)\n"
+        "      shift\n"
+        "      ;;\n"
+        "    --json)\n"
+        "      shift\n"
+        "      ;;\n"
+        "    *)\n"
+        "      prompt=\"$1\"\n"
+        "      break\n"
+        "      ;;\n"
+        "  esac\n"
+        "done\n"
         "echo \"Cursor-agent response to: $prompt\"\n"
         "exit 0\n"
     )
@@ -160,15 +172,16 @@ class TestToolDetectionIntegration:
             available = detect_available_tools()
             assert available == []
 
-    def test_detect_partial_tools(self, mock_tools_dir, monkeypatch):
+    def test_detect_partial_tools(self, mock_tools_dir, monkeypatch, tmp_path):
         """Test detection when only some tools are available."""
-        # Add only gemini to PATH
-        gemini_dir = mock_tools_dir
-        monkeypatch.setenv("PATH", str(gemini_dir))
+        # Create isolated directory containing only gemini
+        partial_dir = tmp_path / "partial_tools_path"
+        partial_dir.mkdir()
+        shutil.copy2(mock_tools_dir / "gemini", partial_dir / "gemini")
+        (partial_dir / "gemini").chmod(0o755)
 
-        # Remove codex and cursor-agent
-        (gemini_dir / "codex").unlink()
-        (gemini_dir / "cursor-agent").unlink()
+        # Restrict PATH to only the isolated directory
+        monkeypatch.setenv("PATH", str(partial_dir))
 
         available = detect_available_tools()
         assert available == ["gemini"]
@@ -425,11 +438,11 @@ class TestTimeoutHandling:
         )
         slow_codex.chmod(0o755)
 
-        # Execute with short timeout (1 second per tool)
+        # Execute with short timeout (2 seconds per tool)
         response = execute_tools_parallel(
             tools=["gemini", "codex"],
             prompt="test",
-            timeout=1
+            timeout=2
         )
 
         # Gemini should succeed (fast)

@@ -1,7 +1,7 @@
 ---
 name: sdd-fidelity-review-subagent
 description: Review implementation fidelity against specifications, comparing actual code to spec requirements
-model: sonnet
+model: haiku
 required_information:
   phase_review:
     - spec_id (the specification ID)

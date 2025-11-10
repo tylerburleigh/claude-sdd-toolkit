@@ -146,6 +146,31 @@ def _filter_actions_by_selection(actions, selection_criteria):
     return selected
 
 
+def _emit_schema_messages(result, printer, *, verbose: bool) -> None:
+    """Surface schema validation findings in non-verbose CLI output."""
+
+    errors = getattr(result, "schema_errors", []) or []
+    warnings = getattr(result, "schema_warnings", []) or []
+
+    if verbose:
+        # Verbose output will list individual issues later.
+        return
+
+    if errors:
+        printer.error("Schema validation errors:")
+        for message in errors[:5]:
+            printer.error(f"  - {message}")
+        if len(errors) > 5:
+            printer.error(f"  - ... {len(errors) - 5} more (use --verbose for full details)")
+
+    if warnings:
+        printer.warning("Schema validation warnings:")
+        for message in warnings[:5]:
+            printer.warning(f"  - {message}")
+        if len(warnings) > 5:
+            printer.warning(f"  - ... {len(warnings) - 5} more (use --verbose for full details)")
+
+
 def _interactive_select_fixes(actions, printer):
     """Interactively prompt user to select fixes."""
     if not actions:
@@ -252,6 +277,13 @@ def cmd_validate(args, printer):
         }
         if args.verbose:
             payload["issues"] = normalized.issues
+        schema_info = {
+            "source": getattr(result, "schema_source", None),
+            "errors": getattr(result, "schema_errors", []),
+            "warnings": getattr(result, "schema_warnings", []),
+        }
+        if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
+            payload["schema"] = schema_info
 
         output_json(payload)
     else:
@@ -265,9 +297,15 @@ def cmd_validate(args, printer):
         else:
             printer.success("✅ Validation PASSED")
 
+        if not args.quiet and getattr(result, "schema_source", None):
+            printer.result("Schema source", result.schema_source)
+
         summary = format_validation_summary(normalized, verbose=args.verbose)
         if summary:
             print(summary)
+
+        if not args.quiet:
+            _emit_schema_messages(result, printer, verbose=args.verbose)
 
         # Generate report if requested
         if args.report:

@@ -223,17 +223,18 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
             result["errors"].append(f"Task {task_id} is manual verification - cannot auto-execute")
             return result
 
-        # Get agent or command
-        agent = metadata.get("agent")
+        # Get agent or command (support legacy 'skill' alias for compatibility)
+        agent = metadata.get("agent") or metadata.get("skill")
         command = metadata.get("command")
 
         if not agent and not command:
-            result["errors"].append(f"Task {task_id} has no agent or command specified")
+            result["errors"].append(f"Task {task_id} has no skill or command specified")
             return result
 
         # Execute based on type
         if agent:
             result["agent_used"] = agent
+            result["skill_used"] = agent
             execution_success = False
 
             # Agent registry - dispatch to appropriate handler
@@ -323,7 +324,7 @@ def execute_verify_task(spec_data: dict, task_id: str, spec_root: str = ".", ret
                         result["errors"].append(proc.stderr)
 
             else:
-                result["errors"].append(f"Unknown agent: {agent}")
+                result["errors"].append(f"Unknown skill '{agent}'")
                 execution_success = False
 
             result["success"] = execution_success

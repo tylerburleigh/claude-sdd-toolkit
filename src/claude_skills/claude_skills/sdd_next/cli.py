@@ -534,6 +534,12 @@ def cmd_check_deps(args, printer, ui=None):
         print_json_output(deps, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
+        readiness_message = (
+            "Task can start: no blocking dependencies detected."
+            if deps.get("can_start")
+            else "Task cannot start yet: resolve blocking dependencies."
+        )
+        printer.result("Readiness", readiness_message)
         print()  # Blank line for spacing
 
         # Print the dependency tree using UI abstraction

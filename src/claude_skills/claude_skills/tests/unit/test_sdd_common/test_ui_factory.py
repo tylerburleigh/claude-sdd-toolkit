@@ -111,10 +111,12 @@ class TestShouldUsePlainUI:
         """Test plain mode when no TTY available."""
         mock_isatty.return_value = False
         # Clear CI vars to isolate TTY test
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {}, clear=True), patch(
+            'claude_skills.common.ui_factory.is_ci_environment', return_value=False
+        ):
             # Will use plain because no TTY
             result = should_use_plain_ui()
-            assert isinstance(result, bool)
+            assert result is True
 
     @patch('sys.stdout.isatty')
     @patch.dict(os.environ, {"CI": "true"})
@@ -160,35 +162,37 @@ class TestCreateUI:
         with pytest.raises(ValueError, match="Cannot force both"):
             create_ui(force_plain=True, force_rich=True)
 
-    @patch('claude_skills.common.ui_factory.should_use_plain_ui')
-    def test_create_ui_with_collect_messages(self, mock_should_use):
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value="plain")
+    def test_create_ui_with_collect_messages(self, _mock_default_format):
         """Test creating UI with message collection."""
-        mock_should_use.return_value = True
         ui_instance = create_ui(collect_messages=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.collect_messages is True
 
-    @patch('claude_skills.common.ui_factory.should_use_plain_ui')
-    def test_create_ui_with_quiet_mode(self, mock_should_use):
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value="plain")
+    def test_create_ui_with_quiet_mode(self, _mock_default_format):
         """Test creating UI with quiet mode."""
-        mock_should_use.return_value = True
         ui_instance = create_ui(quiet=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.quiet is True
 
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value=None)
     @patch('sys.stdout.isatty')
     @patch.dict(os.environ, {}, clear=True)
-    def test_create_ui_auto_selects_rich_for_tty(self, mock_isatty):
+    def test_create_ui_auto_selects_rich_for_tty(self, _mock_default_format, mock_isatty):
         """Test that create_ui auto-selects RichUi for TTY."""
         mock_isatty.return_value = True
-        ui_instance = create_ui()
-        assert isinstance(ui_instance, RichUi)
+        with patch('claude_skills.common.ui_factory.is_ci_environment', return_value=False):
+            ui_instance = create_ui()
+            assert isinstance(ui_instance, RichUi)
 
     @patch('sys.stdout.isatty')
     def test_create_ui_auto_selects_plain_for_non_tty(self, mock_isatty):
         """Test that create_ui auto-selects PlainUi for non-TTY."""
         mock_isatty.return_value = False
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {}, clear=True), patch(
+            'claude_skills.common.ui_factory.is_ci_environment', return_value=False
+        ), patch('claude_skills.common.sdd_config.get_default_format', return_value=None):
             ui_instance = create_ui()
             assert isinstance(ui_instance, PlainUi)
 

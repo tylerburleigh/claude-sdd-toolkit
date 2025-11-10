@@ -3,160 +3,6 @@ name: sdd-plan
 description: Plan-first development methodology that creates detailed specifications before coding. Use when building features, refactoring code, or implementing complex changes. Creates structured plans with phases, file-level details, and verification steps to prevent drift and ensure production-ready code.
 ---
 
-# Spec-Driven Development: Plan Skill
-
-## Skill Family
-
-This skill is part of the **Spec-Driven Development** family:
-- **Skill(sdd-toolkit:sdd-plan)** (this skill) - Creates specifications and task hierarchies
-- **Skill(sdd-toolkit:sdd-next)** - Identifies next tasks and creates execution plans
-- **Skill(sdd-toolkit:sdd-update)** - Tracks progress and maintains documentation
-
-## Complete Workflow
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│            Spec-Driven Development Workflow                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────┐    ┌──────────┐    ┌─────────────┐    ┌─────────┐│
-│  │   PLAN   │───>│   NEXT   │───>│IMPLEMENTATION│───>│ UPDATE  ││
-│  └──────────┘    └──────────┘    └─────────────┘    └─────────┘│
-│       │               │                  │                │      │
-│   Creates JSON    Finds next        Writes actual    Updates     │
-│   spec file       actionable        code based on    status &    │
-│                   task, creates     execution plan   journals    │
-│                   execution plan                                  │
-│       │               │                  │                │      │
-│       └───────────────┴──────────────────┴────────────────┘      │
-│                              │                                    │
-│                         [Cycle repeats]                          │
-│                                                                   │
-│  Note: Implementation can be done by human developers,           │
-│        Claude with coding tools, or other AI assistants          │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Your Role (PLAN)**: Create the specification and initial task structure before any implementation begins.
-
-### Subagent Orchestration in the Workflow
-
-After creating a spec with this skill, you'll typically validate and review it using specialized subagents before beginning implementation. Here's the concrete workflow:
-
-**Complete Workflow Example:**
-
-```
-# Step 1: Create Specification
-# (This skill - sdd-plan - generates the JSON spec file)
-
-# Step 2: Validate Specification
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/pending/myspec.json. Check for structural errors, missing fields, and dependency issues.",
-  description: "Validate spec structure"
-)
-
-# Step 3: Review Specification (Optional but Recommended)
-Task(
-  subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
-  prompt: "Review specs/pending/myspec.json with full multi-model review. Evaluate architecture, security, and feasibility.",
-  description: "Multi-model spec review"
-)
-
-# Step 4: Address Review Findings
-# (Make any necessary revisions to the spec based on validation/review feedback)
-
-# Step 5: Final Validation
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/pending/myspec.json one final time before implementation.",
-  description: "Final validation"
-)
-
-# Step 6: Begin Implementation
-# (Use Skill(sdd-toolkit:sdd-next) to find and prepare tasks for implementation)
-```
-
-**Key Points:**
-- **Validation subagent**: Checks JSON structure, hierarchy integrity, and dependency validity
-- **Review subagent**: Multi-model evaluation of architecture, security, and implementation approach
-- **Task tool**: All subagents are invoked via the Task tool with `subagent_type` parameter
-- **Iterative**: You can validate/review/revise multiple times before implementation
-
-For detailed review workflow and metadata tracking, see the [Review Workflow](#review-workflow-using-sdd-plan-review-subagent) section below.
-
-**Planning Modes:**
-- **Staged (Recommended for complex features)**: Generate phase structure → user review → detailed tasks
-- **Direct (For simple features)**: Generate complete specification in one pass
-
-## Spec Lifecycle and Folder Management
-
-Specifications move through a defined lifecycle as they progress from initial planning to completion:
-
-### Folder Structure
-
-```
-specs/
-├── pending/      # New specs awaiting activation (backlog)
-├── active/       # Specs currently being worked on
-├── completed/    # Successfully completed specs
-└── archived/     # Deprecated or cancelled specs
-```
-
-### Lifecycle Stages
-
-**1. Pending (Backlog)**
-- New specs created by `sdd-plan` start here
-- Location: `specs/pending/{spec-id}.json`
-- Status: Waiting to be activated for implementation
-- Multiple specs can remain pending simultaneously
-
-**2. Active (In Progress)**
-- Specs currently being implemented
-- Location: `specs/active/{spec-id}.json`
-- Move here when ready to start work using `sdd activate-spec <spec-id>`
-- Multiple specs can be active simultaneously for parallel workstreams
-
-**3. Completed**
-- Successfully implemented and verified specs
-- Location: `specs/completed/{spec-id}.json`
-- Automatically moved by `sdd-update` when all tasks complete
-
-**4. Archived**
-- Cancelled, superseded, or deprecated specs
-- Location: `specs/archived/{spec-id}.json`
-- Manual archival for specs that won't be completed
-
-### Moving Between Stages
-
-**Pending → Active:**
-```bash
-# Interactive selection (recommended)
-/sdd-begin
-# or
-Skill(sdd-toolkit:sdd-next)
-
-# Direct activation
-sdd activate-spec <spec-id>
-```
-
-**Active → Completed:**
-- Automatic when `sdd-update` detects all tasks are completed
-- Validates spec integrity before moving
-
-**Active/Pending → Archived:**
-```bash
-Skill(sdd-toolkit:sdd-update) with prompt:
-"Archive spec <spec-id>. Move to archived folder as it's no longer needed."
-```
-
-### Best Practices
-
-- **Keep pending/ as your backlog**: Create specs when you plan features, activate when ready to implement
-- **Limit active specs**: While multiple active specs are supported, focus helps maintain context
-- **Validate before activating**: Run validation and review on pending specs before moving to active
-- **Clean completed regularly**: Archive old completed specs to keep the workspace manageable
-
 ## Core Philosophy
 
 **Plan First, Code Second**: Every development task begins with a detailed specification that acts as a contract between intent and implementation. This prevents the common failure mode where AI "works once and then falls apart" in real codebases.
@@ -170,7 +16,7 @@ Skill(sdd-toolkit:sdd-update) with prompt:
 - **Straightforward verification**: Each task has a focused scope and clear success criteria
 - **Easy rollback**: Changes can be reverted at the file level without affecting other work
 
-When a feature requires changes across multiple files, decompose it into multiple tasks with proper dependencies, or use subtasks to organize related file changes under a parent task. Never bundle multiple file changes into a single task. See [docs/BEST_PRACTICES.md](../../docs/BEST_PRACTICES.md) for detailed guidance on task decomposition.
+When a feature requires changes across multiple files, decompose it into multiple tasks with proper dependencies, or use subtasks to organize related file changes under a parent task. Never bundle multiple file changes into a single task. Always practice atomic task decomposition and verification.
 
 **Key Benefits:**
 - Reduces hallucinated APIs and misread intent
@@ -180,30 +26,9 @@ When a feature requires changes across multiple files, decompose it into multipl
 - Creates auditable development process
 - Early feedback checkpoint reduces rework (staged approach)
 
-## Tool Verification
-
-**Before using this skill**, verify the required tools are available:
-
-```bash
-# Verify sdd CLI is installed and accessible
-sdd --help
-```
-
-**Expected output**: Help text showing available commands (validate, fix, report, etc.)
-
-**IMPORTANT - Subagent-First Approach**:
-- ✅ **DO**: Use Task tool with subagents for validation and review (e.g., `sdd-validate-subagent`, `sdd-plan-review-subagent`)
-- ✅ **DO**: Use `sdd` CLI for utilities (e.g., `sdd render` for documentation generation)
-- ❌ **DO NOT**: Execute Python scripts directly (e.g., `python sdd_plan.py`, `bash python3 scripts/plan.py`)
-- ❌ **DO NOT**: Use CLI commands for operations that have subagent equivalents
-
-The CLI provides proper error handling, validation, argument parsing, and interface consistency. Direct script execution bypasses these safeguards and may fail. All spec operations should go through the CLI.
-
-If the verification command fails, ensure the SDD toolkit is properly installed and accessible in your environment.
-
 ## When to Use This Skill
 
-Use Skill(sdd-toolkit:sdd-plan) for:
+Use `Skill(sdd-toolkit:sdd-plan)` (this skill) for:
 - New features or significant functionality additions
 - Complex refactoring across multiple files
 - API integrations or external service connections
@@ -220,32 +45,16 @@ Use Skill(sdd-toolkit:sdd-plan) for:
 - Finding what to work on next (use Skill(sdd-toolkit:sdd-next))
 - Tracking task progress (use Skill(sdd-toolkit:sdd-update))
 
-## Skill Handoff Points
-
-**When to transition to other skills:**
-
-→ **To Skill(sdd-toolkit:sdd-next)**:
-  - After JSON spec file is created
-  - When ready to begin implementation
-  - User asks "what should I work on next?"
-  - Need to identify the first/next actionable task
-
-→ **To Skill(sdd-toolkit:sdd-update)**:
-  - Need to update task status during planning
-  - Must document a planning decision
-  - Spec needs to be moved between folders
-  - Progress metrics need updating
-
-→ **To Implementation**:
-  - Never directly - always go through Skill(sdd-toolkit:sdd-next) first
-  - Skill(sdd-toolkit:sdd-next) creates the execution plan
-  - Then implementation tools (coding assistants) execute it
-
 ## The Spec-Driven Development Process
 
 ### Phase 1: Specification Creation
 
 Create a detailed specification document before writing any code.
+
+Start by reading the JSON schema for the JSON you will be generating:
+`~/.claude/plugins/cache/sdd-toolkit/src/claude_skills/schemas/sdd-spec-schema.json`
+
+This will tell you what fields are required and optional in the specification, and what data types are expected for each field.
 
 #### 1.0 High-Level Phase Planning Stage (Recommended First Step)
 
@@ -479,7 +288,7 @@ When documentation is available, these commands accelerate codebase analysis and
 - **Pattern discovery:** `sdd doc context` → understand existing architectural patterns
 - **Codebase overview:** `sdd doc list-modules` + `sdd doc stats` → understand project structure
 
-#### 1.2.1 Using `Skill(sdd-toolkit:doc-query)` for Efficient Codebase Analysis (Recommended)
+#### 1.2.1 Using `Skill(sdd-toolkit:doc-query)` for Efficient Codebase Analysis
 
 **Proactive Documentation Generation**
 
@@ -625,21 +434,12 @@ sdd doc complexity --module auth.py
 # Understand existing auth complexity
 ```
 
-**Benefits of Using `Skill(sdd-toolkit:doc-query)`:**
-- ✅ **10x faster analysis** - Structured queries vs manual exploration
-- ✅ **More accurate specs** - Based on actual structure, not assumptions
-- ✅ **Better dependency awareness** - Understand impact upfront
-- ✅ **Pattern consistency** - Find and follow existing patterns
-- ✅ **Risk mitigation** - Identify breaking changes early
-- ✅ **Comprehensive context** - Nothing missed in analysis
-
 **When codebase documentation has not been generated:**
 Fall back to manual codebase exploration:
 - Use `Explore` to explore the codebase
 - Use `Glob` to find files: `**/*auth*.py`
 - Use `Grep` to search code: `class.*Service`
 - Use `Read` to examine files directly
-- **Recommend**: Generate documentation first for better planning
 
 **After Analysis:**
 Use gathered insights to create accurate, well-informed specifications in Phase 1.3.
@@ -762,8 +562,9 @@ Use this notation to plan your hierarchy, then translate it into JSON structure 
 [Group] Verification (0/verify_task_count tasks) {#phase-N-verify}
 ```
 - Two standard groups per phase: `-files` and `-verify`
-- File modifications group comes first
-- Verification group blocked by files group
+- Additional phase-specific groups (e.g., `{#phase-1-investigation}`) are allowed when useful—keep IDs in the `phase-N-*` format
+- File modifications group typically comes first
+- Verification group is usually blocked by the primary work groups
 
 **Task Level** (individual work units):
 ```
@@ -956,7 +757,7 @@ Task(
 
 **Examples:**
 ```
-{#spec-root}           - Root spec
+{#spec-root}          - Root spec
 {#phase-1}            - Phase 1
 {#phase-1-files}      - Phase 1 file modifications group
 {#task-1-1}           - Phase 1, task 1
@@ -989,7 +790,7 @@ Task(
   "spec_id": "user-auth-2025-10-18-001",
   "generated": "2025-10-18T10:00:00Z",
   "last_updated": "2025-10-18T10:00:00Z",
-  
+
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -1001,7 +802,7 @@ Task(
       "completed_tasks": 0,
       "metadata": {}
     },
-    
+
     "phase-1": {
       "type": "phase",
       "title": "Database Schema",
@@ -1012,7 +813,7 @@ Task(
       "completed_tasks": 0,
       "metadata": {}
     },
-    
+
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
@@ -1062,7 +863,7 @@ Task(
         "task_category": "implementation"
       }
     },
-    
+
     "task-1-1-1": {
       "type": "subtask",
       "title": "Create users table",
@@ -1078,7 +879,7 @@ Task(
       "completed_tasks": 0,
       "metadata": {}
     },
-    
+
     "phase-1-verify": {
       "type": "group",
       "title": "Verification",
@@ -1094,7 +895,7 @@ Task(
       "completed_tasks": 0,
       "metadata": {}
     },
-    
+
     "verify-1-1": {
       "type": "verify",
       "title": "Migration runs without errors",
@@ -1149,10 +950,11 @@ Task(
 2. All statuses initially "pending"
 3. All completed_tasks initially 0
 4. Parent-child relationships must be bidirectional
-5. Dependencies explicitly listed
-6. Metadata includes file_path for tasks (required for implementation/refactoring tasks)
-7. Metadata should include task_category to classify work type (optional but recommended)
+5. Include dependency objects when a node blocks or depends on others (omit when no relationships exist)
+6. Metadata should include `file_path` for tasks that target specific files (strongly recommended for implementation/refactoring work)
+7. Metadata should include `task_category` to classify work type (optional but recommended)
 8. Generated and last_updated timestamps at root
+9. `spec_id` must follow `{feature}-{YYYY-MM-DD}-{nnn}` (three-digit sequence) to satisfy schema validation
 
 **Critical:**
 - JSON spec file is the single source of truth
@@ -1176,11 +978,11 @@ Tasks should include a `task_category` field in their metadata to classify the t
 
 **Category Selection Guidelines:**
 
-| Category | When to Use | Typical Duration | Requires file_path |
-|----------|-------------|------------------|-------------------|
+| Category | When to Use | Typical Duration | Needs file_path? |
+|----------|-------------|------------------|-----------------|
 | `investigation` | Need to understand existing code before making changes | Short-Medium | No (optional) |
-| `implementation` | Creating new files, adding features, writing new code | Medium-Long | Yes (required) |
-| `refactoring` | Reorganizing existing code without changing behavior | Medium | Yes (required) |
+| `implementation` | Creating new files, adding features, writing new code | Medium-Long | Yes (strongly recommended) |
+| `refactoring` | Reorganizing existing code without changing behavior | Medium | Yes (strongly recommended) |
 | `decision` | Need to choose between approaches or make architectural decisions | Short | No |
 | `research` | Learning about external tools, reading specs, exploring patterns | Short-Medium | No |
 
@@ -1292,9 +1094,9 @@ When creating verification tasks with automated execution:
 ```
 
 **Important:**
-- Use `"agent"` field (base agent name)
-- Store: `"run-tests"`, `"sdd-fidelity-review"`
-- System invokes via: `Task(subagent_type: "sdd-toolkit:{agent}-subagent")`
+- Use the `"agent"` field (base agent name) whenever the verification will be run by an automation tool; purely manual checks can omit it
+- Supported automation agent values today: `"run-tests"`, `"sdd-fidelity-review"`
+- When `agent` is provided, the system invokes automation via `Task(subagent_type: "sdd-toolkit:{skill-name}-subagent")`
 
 **Setting Default Category (CLI):**
 
@@ -1335,8 +1137,8 @@ The `--category` flag is useful when most tasks in a spec will be the same type 
 **Other Guidelines:**
 - **Always specify category for tasks**: Helps with accurate time estimation and resource planning
 - **Optional for subtasks**: If a subtask's category is obvious from its parent, it can be omitted
-- **Use file_path for implementation/refactoring**: These categories require specific files to modify
-- **Skip file_path for investigation/decision/research**: These categories often span multiple files or are conceptual
+- **Add `file_path` for implementation/refactoring tasks whenever a single file is the focus**: This keeps downstream tools precise without blocking broader refactors
+- **Skip `file_path` for investigation/decision/research**: These categories often span multiple files or are conceptual
 
 ### Phase 2: Spec Validation
 
@@ -1444,131 +1246,6 @@ Task(
 
 **Note:** JSON remains the source of truth. Markdown reports generated via the subagent are helpful for review, but edits must be made in the JSON and re-rendered.
 
-### Phase 3: Rendering Specs to Human-Readable Markdown
-
-After creating and validating your JSON spec, you can generate comprehensive human-readable markdown documentation using the `sdd render` command. This is useful for:
-- Reviewing spec structure and progress
-- Sharing plans with team members
-- Creating documentation for project tracking
-- Generating readable versions for non-technical stakeholders
-
-#### 3.1 Using sdd render
-
-The `sdd render` command converts JSON specifications into well-formatted markdown with full hierarchy visualization, progress tracking, and status indicators.
-
-**Basic Usage:**
-
-```bash
-# Render by spec ID (searches specs directory)
-sdd render semantic-search-2025-10-24-001 --path specs
-
-# Render by direct file path
-sdd render specs/pending/my-spec.json
-
-# Custom output location
-sdd render my-spec --path specs -o documentation/my-spec.md
-```
-
-**Default Output Location:**
-
-By default, rendered markdown is saved to:
-```
-.specs/human-readable/<status>/<spec-id>.md
-```
-
-Where `<status>` is the spec's status (active, approved, completed, etc.) from the metadata.
-
-**Example:**
-```bash
-# Renders to: .specs/human-readable/approved/semantic-search-2025-10-24-001.md
-sdd render semantic-search-2025-10-24-001 --path specs
-```
-
-#### 3.2 Generated Markdown Format
-
-The rendered markdown includes:
-
-**Header Section:**
-- Spec ID and title
-- Status and progress (completed/total tasks, percentage)
-- Estimated effort and complexity
-- Description and objectives
-
-**Phase Sections:**
-- Phase title with progress tracking
-- Purpose, risk level, and estimated hours
-- Dependencies (blocked by, blocks)
-- File modifications grouped by type
-- Detailed task breakdown with subtasks
-- Verification steps with commands
-
-**Status Icons:**
-- ⏳ Pending tasks
-- 🔄 In progress
-- ✅ Completed
-- 🚫 Blocked
-- ❌ Failed
-
-**Example Output Structure:**
-```markdown
-# Semantic Search for Documentation Query
-
-**Spec ID:** `semantic-search-2025-10-24-001`
-**Status:** approved (5/62 tasks, 8%)
-**Estimated Effort:** 80 hours
-**Complexity:** high
-
-## Objectives
-- Enable semantic search for natural language code queries
-- Improve keyword search relevance with BM25
-...
-
-## Foundation & Configuration (2/8 tasks, 25%)
-
-**Purpose:** Set up dependencies and configuration
-**Risk Level:** low
-**Estimated Hours:** 6
-
-### File Modifications (2/6 tasks)
-
-#### ⏳ src/claude_skills/pyproject.toml
-
-**File:** `src/claude_skills/pyproject.toml`
-**Status:** pending
-**Changes:** Add optional dependency groups
-...
-```
-
-#### 3.3 When to Render Specs
-
-**Recommended Times:**
-- After initial spec creation for team review
-- Before starting implementation to confirm understanding
-- At phase boundaries to track progress
-- When presenting project status to stakeholders
-- For archival documentation of completed work
-
-**Integration with Workflow:**
-```
-# 1. Create spec (this skill)
-
-# 2. Validate with subagent
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/pending/my-spec.json",
-  description: "Validate spec"
-)
-
-# 3. Render for review (CLI command)
-sdd render my-spec --path specs
-
-# 4. Share rendered markdown for team feedback
-# 5. Update spec based on feedback
-# 6. Re-render after updates
-```
-
-**Note:** The `.specs/` directory (with dot prefix) is meant for generated artifacts, similar to build directories. Consider adding it to `.gitignore` if you don't want rendered documentation in version control.
-
 #### 2.2 Validation Checklist
 
 **Before sdd-next Usage:**
@@ -1633,139 +1310,6 @@ The subagent will automatically re-validate after applying fixes and report the 
 - **Think ahead**: Consider maintenance, testing, and documentation needs
 - **Stay grounded**: Base plans on actual codebase exploration, not assumptions
 
-### Review Workflow (Using sdd-plan-review Subagent)
-
-After creating and validating a spec, consider having it reviewed before implementation:
-
-**Review Status Flow:**
-```
-not_reviewed (default) → in_review → reviewed → approved → implementation
-                                        ↓
-                                     revise (if needed)
-```
-
-**Status Meanings:**
-- `not_reviewed`: Spec created but not yet reviewed
-- `in_review`: Review in progress
-- `reviewed`: Review complete, may have issues to address
-- `approved`: Review issues addressed, ready for implementation
-
-**Review Integration (Complete Multi-Skill Workflow):**
-1. **Create & Validate**: Create spec (this skill), then validate with sdd-validate-subagent (see example workflow below)
-2. **Review**: Use Task tool with `sdd-plan-review-subagent` to get multi-perspective feedback
-3. **Revise**: Address critical/high issues found in review
-4. **Track**: Review metadata automatically added to spec frontmatter
-5. **Link**: Revisions can reference the review that triggered them
-
-**Note on Subagent Pattern**: The review process uses the Task tool to invoke a specialized subagent (`sdd-plan-review-subagent`), similar to how validation uses `sdd-validate-subagent`. This allows Claude Code to run multi-model reviews in parallel using external AI tools. See the example workflow below for the exact invocation pattern.
-
-**Example Workflow:**
-```
-# 1. Create spec (done via sdd-plan skill - you're here after completing that)
-
-# 2. Validate JSON spec file with subagent
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/pending/myspec.json",
-  description: "Validate spec"
-)
-
-# 3. Review spec (use sdd-plan-review subagent)
-Task(
-  subagent_type: "sdd-toolkit:sdd-plan-review-subagent",
-  prompt: "Review specs/pending/myspec.json with full multi-model review",
-  description: "Review spec"
-)
-
-# 4. Address review findings, update spec metadata
-#    - Update revisions[] with context
-#    - Track review history in metadata.review.history[]
-
-# 5. Re-run validation before handoff
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/pending/myspec.json",
-  description: "Final validation"
-)
-
-# 6. Begin implementation with Skill(sdd-toolkit:sdd-next)
-```
-
-**Review Metadata Structure:**
-
-The `review` section tracks all reviews:
-- `status`: Current review status
-- `last_reviewed`: Most recent review timestamp
-- `reviewers`: List of models/tools that have reviewed
-- `total_reviews`: Count of reviews performed
-- `history`: Array of all review records with:
-  - Unique `review_id`
-  - Tools used and perspectives applied
-  - Issues found (by severity)
-  - Overall recommendation and scores
-  - Link to detailed report file
-  - Optional link to resulting revision
-
-**Benefits:**
-- **Audit trail**: Complete history of reviews and feedback
-- **Quality gate**: Catch issues before implementation starts
-- **Bi-directional links**: Review → Revision and Revision → Review
-- **Multi-round support**: Track re-reviews naturally
-- **Shared validation**: Review uses same validation as sdd-plan
-
-### Phase Design
-- **Logical units**: Each phase should be independently testable
-- **Clear boundaries**: Minimize overlap between phases
-- **Dependency management**: Later phases build on earlier ones
-- **Reasonable scope**: Each phase should be completable in one sitting
-
-### Task Decomposition
-
-**Atomic Task Principle**: Each task should modify exactly one file. When a feature requires changes across multiple files:
-
-1. **Create multiple tasks** (one per file) with explicit dependencies, OR
-2. **Use subtasks** under a parent task (parent coordinates, each subtask has its own `file_path`)
-
-**Example**:
-```
-Feature: Add User Authentication
-├─ Task 1: Create auth middleware (middleware/auth.js)
-├─ Task 2: Update user model (models/user.js)  [depends on task-1]
-└─ Task 3: Add auth routes (routes/auth.js)    [depends on task-1, task-2]
-```
-
-See [docs/BEST_PRACTICES.md](../../docs/BEST_PRACTICES.md) for detailed guidance on task granularity, special cases, and identifying atomic units.
-
-### Verification Rigor
-- **Automated where possible**: Prefer tests over manual checks
-- **Comprehensive coverage**: Test happy path AND edge cases
-- **Regression focus**: Existing functionality is sacred
-- **User validation**: When possible, confirm with actual usage
-
-### Communication
-- **Transparent**: Share the spec before implementing
-- **Collaborative**: Invite feedback and refinement
-- **Traceable**: Document deviations and decisions
-- **Educational**: Explain reasoning, don't just state conclusions
-
-## Working with the Skill Family
-
-**After Creating a Spec:**
-
-1. **Review with user** - Ensure spec meets expectations
-2. **Approve spec** - Update frontmatter status from "draft" to "approved"
-3. **Hand off to Skill(sdd-toolkit:sdd-next)** - Now ready for task identification
-4. **Skill(sdd-toolkit:sdd-next)** identifies first actionable task
-5. **Skill(sdd-toolkit:sdd-next)** creates execution plan for that task
-6. **Implementation happens** (human/AI executes the plan)
-7. **Skill(sdd-toolkit:sdd-update)** updates progress and status
-8. **Repeat** steps 4-7 until spec complete
-
-**If Spec Needs Changes:**
-- Use Skill(sdd-toolkit:sdd-update) to document the change decision
-- Use this skill to regenerate portions if major restructuring needed
-- Update spec version in frontmatter if significant
-
 ## Common Pitfalls to Avoid
 
 ❌ **Skipping codebase analysis**: Don't guess at file locations or patterns
@@ -1774,26 +1318,6 @@ See [docs/BEST_PRACTICES.md](../../docs/BEST_PRACTICES.md) for detailed guidance
 ❌ **Verification shortcuts**: Every step matters, don't skip any
 ❌ **Spec drift**: Keep spec updated if requirements change
 ❌ **Over-engineering**: Match complexity to actual requirements
-
-## Decision Tree: Which Skill to Use?
-
-```
-Need to plan a new feature or change?
-├─ Yes → Use `Skill(sdd-toolkit:sdd-plan)` (this skill)
-└─ No → Continue below
-
-Have an existing spec and ready to implement?
-├─ Yes, but don't know what to work on next
-│   └─ Use `Skill(sdd-toolkit:sdd-next)`
-└─ Yes, and need to update status/progress
-    └─ Use `Skill(sdd-toolkit:sdd-update)`
-
-Spec already exists and needs modification?
-├─ Minor updates (status, metadata, journal)
-│   └─ Use `Skill(sdd-toolkit:sdd-update)`
-└─ Major restructuring (new phases, tasks)
-    └─ Re-invoke this skill to generate new plan
-```
 
 ## Quick Reference
 
@@ -1823,21 +1347,6 @@ Spec already exists and needs modification?
 
 **Rule of thumb**: If hierarchy exceeds 5 levels or a single phase has >15 tasks, reorganize or split the spec.
 
-## See Also
-
-**sdd-next** - Use after creating a spec to:
-- Find the next task to work on
-- Create detailed execution plans for specific tasks
-- Understand task context and dependencies
-- Resume work on a partially-completed spec
-
-**sdd-update** - Use during/after implementation to:
-- Mark tasks as in_progress, completed, or blocked
-- Document implementation decisions and deviations
-- Track progress and update metrics
-- Move completed specs to appropriate folders
-- Journal verification results
-
 ---
 
-**Remember**: The time spent on specification pays exponential dividends in implementation quality and developer confidence. Never skip the planning phase. Once the spec is created, transition to the `Skill(sdd-toolkit:sdd-next)` to begin identifying and planning specific tasks for implementation.
+**Remember**: The time spent on specification pays exponential dividends in implementation quality and developer confidence. Never skip the planning phase.

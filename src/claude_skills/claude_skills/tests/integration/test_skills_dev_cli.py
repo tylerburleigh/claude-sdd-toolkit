@@ -2,22 +2,12 @@
 
 from __future__ import annotations
 
-import os
-import subprocess
-import sys
-from pathlib import Path
+from .cli_runner import run_cli
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-SDD_ENTRY = REPO_ROOT / "claude_skills" / "cli" / "sdd" / "__init__.py"
-
-
-def run_skills_dev_cli(*args: str) -> subprocess.CompletedProcess[str]:
-    """Run skills-dev CLI via sdd."""
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(REPO_ROOT)
-    cmd = [sys.executable, str(SDD_ENTRY), "skills-dev", *args]
-    return subprocess.run(cmd, capture_output=True, text=True, check=False, env=env)
+def run_skills_dev_cli(*args: object):
+    """Run skills-dev CLI via shared runner."""
+    return run_cli("skills-dev", *args)
 
 
 def test_skills_dev_help_lists_key_subcommands() -> None:

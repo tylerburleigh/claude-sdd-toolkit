@@ -6,63 +6,11 @@ Tests all query CLI commands with various arguments, JSON output, and error hand
 Note: Tests updated to use unified CLI (sdd update) instead of legacy sdd-update.
 """
 
-import sys
-import pytest
-import subprocess
 import json
-import shutil
-from pathlib import Path
 
-# Unified CLI command (uses sdd instead of sdd-update)
-CLI_CMD = "sdd"
+import pytest
 
-
-def run_cli(*args, **kwargs):
-    """
-    Run sdd command with fallback to python -m if sdd not on PATH.
-
-    Automatically reorders arguments to put global flags before subcommands.
-    Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
-    """
-    # Define global flags that must come before subcommands
-    global_flags_with_values = {'--path', '--specs-dir'}
-    global_flags_boolean = {'--quiet', '-q', '--json', '--debug', '--verbose', '-v', '--no-color'}
-    all_global_flags = global_flags_with_values | global_flags_boolean
-
-    args_list = list(args)
-
-    # Scan all args and separate global flags from subcommand and its args
-    global_args = []
-    non_global_args = []
-
-    i = 0
-    while i < len(args_list):
-        arg = args_list[i]
-
-        if arg in global_flags_with_values and i + 1 < len(args_list):
-            # This is a global flag with a value
-            global_args.append(arg)
-            global_args.append(args_list[i + 1])
-            i += 2
-        elif arg in global_flags_boolean:
-            # This is a boolean global flag
-            global_args.append(arg)
-            i += 1
-        else:
-            # This is not a global flag - could be subcommand or subcommand arg
-            non_global_args.append(arg)
-            i += 1
-
-    # Build final command: global_flags + subcommand + non-global args
-    final_args = global_args + non_global_args
-
-    if shutil.which(CLI_CMD):
-        return subprocess.run([CLI_CMD] + final_args, **kwargs)
-    else:
-        return subprocess.run(
-            [sys.executable, '-m', 'claude_skills.cli.sdd'] + final_args,
-            **kwargs
-        )
+from .cli_runner import run_cli
 
 
 @pytest.mark.integration
@@ -144,7 +92,7 @@ class TestQueryTasksCLI:
         result = run_cli( "query-tasks",
              "--path", str(specs_structure),
              "simple-spec-2025-01-01-001",
-             "--format", "simple",
+             "--simple",
             capture_output=True,
             text=True
         )
@@ -155,11 +103,11 @@ class TestQueryTasksCLI:
 
     def test_query_tasks_json_output(self, sample_json_spec_simple, specs_structure):
         """Test query-tasks with --json flag."""
-        result = run_cli( "query-tasks",
+        result = run_cli(
+             "--json",
+             "query-tasks",
              "--path", str(specs_structure),
              "simple-spec-2025-01-01-001",
-             "--format", "json",
-             "--json",
             capture_output=True,
             text=True
         )

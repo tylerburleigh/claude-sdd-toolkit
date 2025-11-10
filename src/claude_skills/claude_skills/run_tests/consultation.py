@@ -25,7 +25,7 @@ from claude_skills.common import ai_config
 
 def load_model_config() -> Dict:
     """
-    Load model configuration from config.yaml using shared ai_config module.
+    Load model configuration from `.claude/ai_config.yaml` using the shared ai_config module.
 
     Returns fallback to DEFAULT_MODELS if config not found or invalid.
 
@@ -101,7 +101,7 @@ def get_flags_for_tool(tool: str) -> List[str]:
 
 def load_consensus_config() -> Dict:
     """
-    Load consensus configuration from config.yaml using shared ai_config module.
+    Load consensus configuration from `.claude/ai_config.yaml` using the shared ai_config module.
 
     Returns:
         Dict with consensus configuration (pairs and auto_trigger)
@@ -240,7 +240,7 @@ MULTI_AGENT_PAIRS = {
 
 # Tool routing matrix based on failure type
 ROUTING_MATRIX = {
-    "assertion": ("codex", "gemini"),  # Primary, fallback
+    "assertion": ("cursor-agent", "gemini"),  # Primary, fallback
     "exception": ("codex", "gemini"),
     "import": ("gemini", "cursor-agent"),
     "fixture": ("gemini", "cursor-agent"),
@@ -282,6 +282,77 @@ def _build_tool_commands(failure_type: Optional[str] = None) -> Dict[str, List[s
 
 # Backward compatibility: Keep TOOL_COMMANDS for code that doesn't pass failure_type
 TOOL_COMMANDS = _build_tool_commands()
+
+
+def _dedupe_preserve_order(items: List[str]) -> List[str]:
+    """Return a list with duplicates removed while preserving order."""
+    seen: set[str] = set()
+    result: List[str] = []
+    for item in items:
+        if not item or item in seen:
+            continue
+        seen.add(item)
+        result.append(item)
+    return result
+
+
+def _routing_plan_for_failure(failure_type: Optional[str]) -> List[str]:
+    """Return the primary/fallback routing plan for a failure type."""
+    if not failure_type:
+        return []
+    if failure_type not in ROUTING_MATRIX:
+        return []
+    candidates = [
+        tool for tool in ROUTING_MATRIX[failure_type]
+        if tool and tool != "web"
+    ]
+    return _dedupe_preserve_order(candidates)
+
+
+def _mask_prompt_argument(command: List[str], prompt: str) -> List[str]:
+    """Replace the prompt argument with a placeholder for dry-run output."""
+    masked: List[str] = []
+    replaced = False
+    for part in command:
+        if not replaced and part == prompt:
+            masked.append("<prompt>")
+            replaced = True
+        else:
+            masked.append(part)
+    return masked
+
+
+def _print_consultation_plan(
+    plan_tools: List[str],
+    available_tools: List[str],
+    primary_tool: str,
+    prompt: str,
+    model: str
+) -> None:
+    """Emit a human-readable consultation plan for dry-run output."""
+    print("Consultation plan:")
+    for tool_name in plan_tools:
+        annotations: List[str] = []
+        if tool_name == primary_tool:
+            annotations.append("primary")
+        else:
+            annotations.append("fallback")
+        if tool_name not in available_tools:
+            annotations.append("missing")
+
+        suffix = f" ({', '.join(annotations)})" if annotations else ""
+        print(f"• {tool_name}{suffix}")
+
+    print()
+    print(f"Prompt length: {len(prompt)} characters")
+    print()
+
+    command = build_tool_command(primary_tool, prompt, model=model)
+    masked_command = _mask_prompt_argument(command, prompt)
+
+    print("Command preview:")
+    print(" ".join(masked_command))
+    print(f"<prompt with {len(prompt)} characters>")
 
 
 def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
@@ -583,27 +654,43 @@ def consult_with_auto_routing(
     if printer is None:
         printer = PrettyPrinter()
 
+    routing_plan = _routing_plan_for_failure(failure_type)
+
     # Check tool availability
     available_tools = detect_available_tools()
 
     if not available_tools:
-        printer.error("No external tools found")
-        printer.info("Install at least one: gemini, codex, or cursor-agent")
+        printer.error("No tools available from selected pair")
+        if routing_plan:
+            print(f"Needed: {', '.join(routing_plan)}")
+        else:
+            print("Needed: gemini, codex, cursor-agent")
+        print("Available: none")
         return 1
 
     # Determine which tool to use
     if tool == "auto":
-        tool = get_best_tool(failure_type, available_tools)
-        if not tool:
-            printer.error("No suitable tool found")
+        selected_tool = get_best_tool(failure_type, available_tools)
+        if not selected_tool:
+            printer.error("No tools available from selected pair")
+            if routing_plan:
+                print(f"Needed: {', '.join(routing_plan)}")
+            else:
+                print("Needed: gemini, codex, cursor-agent")
+            print(f"Available: {', '.join(available_tools)}" if available_tools else "Available: none")
             return 1
-        printer.info(f"Auto-selected tool: {tool}")
-        printer.blank()
     else:
-        if tool not in available_tools:
-            printer.error(f"{tool} is not available")
-            printer.info(f"Available tools: {', '.join(available_tools)}")
+        selected_tool = tool
+        if selected_tool not in available_tools:
+            printer.error("No tools available from selected pair")
+            print(f"Needed: {selected_tool}")
+            print(f"Available: {', '.join(available_tools)}")
             return 1
+
+    if tool == "auto":
+        tool = selected_tool
+
+    plan_tools = _dedupe_preserve_order([selected_tool] + routing_plan)
 
     # Read code files if paths provided
     test_code = None
@@ -632,8 +719,13 @@ def consult_with_auto_routing(
         question=question
     )
 
+    if dry_run:
+        model = get_model_for_tool(selected_tool, failure_type)
+        _print_consultation_plan(plan_tools, available_tools, selected_tool, prompt, model)
+        return 0
+
     # Run the consultation
-    return run_consultation(tool, prompt, dry_run, printer, failure_type)
+    return run_consultation(selected_tool, prompt, dry_run, printer, failure_type)
 
 
 # Valid failure types

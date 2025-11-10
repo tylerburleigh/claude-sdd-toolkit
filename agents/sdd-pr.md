@@ -1,7 +1,7 @@
 ---
 name: sdd-pr-subagent
 description: Create AI-powered pull requests by invoking the sdd-pr skill
-model: sonnet
+model: haiku
 required_information:
   pr_creation:
     - spec_id (spec identifier like "my-feature-2025-11-03-001")

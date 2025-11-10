@@ -955,6 +955,9 @@ sdd doc find-class PrettyPrinter --docs-path ./docs/documentation.json
 }
 ```
 
+**Schema Reference Requirement:**
+- Resolve the documentation schema from `~/.claude/plugins/cache/sdd-toolkit/src/claude_skills/schemas/documentation-schema.json` whenever validating or generating JSON output.
+
 Full schema: `documentation-schema.json`
 
 ---

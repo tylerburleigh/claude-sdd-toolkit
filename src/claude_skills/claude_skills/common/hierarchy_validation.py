@@ -17,6 +17,7 @@ from claude_skills.common import (
     validate_spec_id_format,
     validate_iso8601_date,
     normalize_message_text,
+    load_json_schema,
 )
 
 
@@ -25,6 +26,8 @@ _LOCATION_PATTERNS = (
     re.compile(r"node ['\"]([^'\"]+)['\"]", re.IGNORECASE),
     re.compile(r"task ['\"]([^'\"]+)['\"]", re.IGNORECASE),
 )
+
+_SPEC_SCHEMA_FILENAME = "sdd-spec-schema.json"
 
 
 def _extract_location(message: str) -> Optional[str]:
@@ -149,6 +152,53 @@ def _build_enhanced_errors(
         )
 
     return enhanced
+
+
+def _validate_against_schema(spec_data: Dict) -> Tuple[List[str], List[str], Optional[str]]:
+    """
+    Run JSON Schema validation against the canonical SDD spec schema.
+
+    Returns:
+        Tuple of (schema_errors, schema_warnings, schema_source).
+    """
+
+    schema, source, load_error = load_json_schema(_SPEC_SCHEMA_FILENAME)
+    if schema is None:
+        message = load_error or "Schema validation skipped: schema not found."
+        return [], [message], source
+
+    try:
+        import jsonschema  # type: ignore  # pylint: disable=import-error
+    except ImportError:
+        warning = (
+            "Schema validation skipped: install the 'jsonschema' package "
+            "or use optional dependency group 'validation' to enable Draft 7 validation."
+        )
+        return [], [warning], source
+
+    validator = jsonschema.Draft7Validator(schema)
+    validation_errors = sorted(validator.iter_errors(spec_data), key=lambda err: list(err.path))
+
+    schema_errors: List[str] = []
+    schema_warnings: List[str] = []
+    for error in validation_errors:
+        pointer = "/".join(str(part) for part in error.path) or "<root>"
+        message = f"Schema violation at '{pointer}': {error.message}"
+
+        # Backward compatibility: legacy specs omit metadata.id on hierarchy nodes.
+        # Treat the Draft 7 'id' requirement as a warning so old specs remain valid.
+        if (
+            pointer.startswith("hierarchy/")
+            and error.validator == "required"
+            and isinstance(getattr(error, "message", ""), str)
+            and "'id' is a required property" in error.message
+        ):
+            schema_warnings.append(message.replace("Schema violation", "Schema caution"))
+            continue
+
+        schema_errors.append(message)
+
+    return schema_errors, schema_warnings, source
 
 
 def validate_structure(spec_data: Dict) -> Tuple[bool, List[str], List[str]]:
@@ -598,11 +648,25 @@ def validate_metadata(hierarchy: Dict) -> Tuple[bool, List[str], List[str]]:
             # Define allowed task categories
             allowed_categories = ['investigation', 'implementation', 'refactoring', 'decision', 'research']
 
-            # Get task_category, default to 'implementation' for backward compatibility
-            task_category = metadata.get('task_category', 'implementation')
+            raw_category = metadata.get('task_category')
+            has_explicit_category = 'task_category' in metadata
+
+            if isinstance(raw_category, str):
+                normalized_category = raw_category.strip()
+            else:
+                normalized_category = raw_category
+
+            if has_explicit_category and (normalized_category is None or normalized_category == ""):
+                errors.append(
+                    f"❌ ERROR: Task node '{node_id}' has empty task_category; "
+                    f"set it to one of: {', '.join(allowed_categories)}"
+                )
+                normalized_category = None
+
+            task_category = normalized_category or 'implementation'
 
             # Validate task_category is in allowed enum values
-            if 'task_category' in metadata and task_category not in allowed_categories:
+            if has_explicit_category and normalized_category and task_category not in allowed_categories:
                 errors.append(
                     f"❌ ERROR: Task node '{node_id}' has invalid task_category '{task_category}'. "
                     f"Must be one of: {', '.join(allowed_categories)}"
@@ -643,6 +707,17 @@ def validate_spec_hierarchy(spec_data: Dict) -> JsonSpecValidationResult:
         generated=spec_data.get('generated', 'unknown'),
         last_updated=spec_data.get('last_updated', 'unknown'),
         spec_data=spec_data,
+    )
+
+    schema_errors, schema_warnings, schema_source = _validate_against_schema(spec_data)
+    result.schema_errors = schema_errors
+    result.schema_warnings = schema_warnings
+    result.schema_source = schema_source
+    result.enhanced_errors.extend(
+        _build_enhanced_errors(schema_errors, severity_hint="error", category="schema")
+    )
+    result.enhanced_errors.extend(
+        _build_enhanced_errors(schema_warnings, severity_hint="warning", category="schema")
     )
 
     hierarchy = spec_data.get('hierarchy', {})

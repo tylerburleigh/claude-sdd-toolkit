@@ -58,8 +58,7 @@ HOW TO FIX:
 
 EXAMPLE:
   Instead of: Read(specs/active/my-spec.json)
-  Use: Bash(sdd next-task plain-mode-support-2025-11-08)
-  Or:  Skill(sdd-next) [alternative option]
+  Use: Bash(sdd next-task plain-mode-support-2025-11-08-001)
 
 This hook enforces proper SDD workflow and prevents token waste.
 
