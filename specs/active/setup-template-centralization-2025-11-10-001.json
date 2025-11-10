@@ -1,7 +1,7 @@
 {
   "spec_id": "setup-template-centralization-2025-11-10-001",
   "generated": "2025-11-10T20:30:00Z",
-  "last_updated": "2025-11-10T23:38:37.473457Z",
+  "last_updated": "2025-11-10T23:39:39.771959Z",
   "metadata": {
     "title": "Setup Template Centralization",
     "description": "Centralize all setup-related configuration templates into a unified directory structure with a standard helper module for accessing them via importlib.resources",
@@ -11,7 +11,7 @@
       "Refactor all setup scripts to use the new helper module",
       "Ensure all setup commands use centralized templates with old files removed"
     ],
-    "progress_percentage": 32,
+    "progress_percentage": 34,
     "status": "active",
     "current_phase": "phase-2"
   },
@@ -28,7 +28,7 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {}
     },
     "phase-1": {
@@ -527,7 +527,7 @@
         "depends": []
       },
       "total_tasks": 14,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Update all setup scripts to use the new template helper instead of old methods"
       }
@@ -544,7 +544,7 @@
         "task-2-4"
       ],
       "total_tasks": 10,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -557,7 +557,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/ai_config_setup.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -569,7 +569,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/ai_config_setup.py",
         "task_category": "refactoring",
@@ -603,7 +603,7 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "Replace _find_packaged_template() with get_template()",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -612,9 +612,15 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Remove _find_packaged_template() function and use get_template('ai_config.yaml') instead"
+        "description": "Remove _find_packaged_template() function and use get_template('ai_config.yaml') instead",
+        "started_at": "2025-11-10T23:39:32.439893Z",
+        "status_note": "Verifying ai_config_setup uses get_template",
+        "completed_at": "2025-11-10T23:39:39.766198Z",
+        "needs_journaling": false,
+        "actual_hours": 0.002,
+        "journaled_at": "2025-11-10T23:39:39.770309Z"
       }
     },
     "task-2-2": {
@@ -1561,6 +1567,15 @@
       "content": "Confirmed ai_config_setup.py already imports get_template via , satisfying the subtask requirement. No code changes needed.",
       "metadata": {},
       "task_id": "task-2-1-1"
+    },
+    {
+      "timestamp": "2025-11-10T23:39:39.770296Z",
+      "entry_type": "status_change",
+      "title": "Remove legacy template finder",
+      "author": "claude-code",
+      "content": "Confirmed ai_config_setup.py already uses setup_templates.get_template() and no _find_packaged_template helper remains. No edits required for this subtask.",
+      "metadata": {},
+      "task_id": "task-2-1-2"
     }
   ]
 }
