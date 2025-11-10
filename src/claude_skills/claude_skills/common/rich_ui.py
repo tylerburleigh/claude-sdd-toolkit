@@ -150,7 +150,7 @@ class RichUi:
 
         # Add columns
         for col in columns:
-            table.add_column(col, overflow="fold")
+            table.add_column(col, overflow="ignore", no_wrap=True)
 
         # Add rows
         for row_data in data:

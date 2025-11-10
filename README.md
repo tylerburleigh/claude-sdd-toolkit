@@ -2,7 +2,7 @@
 
 > Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-0.4.5-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.5.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -81,7 +81,9 @@ Want to see a complete workflow from start to finish? Check out [docs/examples/c
 
 ## Latest Updates
 
-**Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+**Version 0.5.0** introduces Plain UI mode for better terminal compatibility, modernizes the configuration system with `default_mode` (rich/plain/json) and centralized AI config in `.claude/ai_config.yaml`, and adds optional JSON Schema validation. Includes workflow guardrails with pre-tool hooks that enforce structured CLI usage, preventing direct spec JSON access. Test suite reorganized to package namespace with comprehensive integration coverage. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage.
 
 **Version 0.4.2** introduces compact mode with estimated 30% token savings from `sdd` command output. Configure via `.claude/sdd_config.json` or use `--compact`/`--no-compact` flags.
 
@@ -546,7 +548,7 @@ your-project/
 │   └── .human-readable/     # Rendered markdown (gitignored)
 │
 ├── .claude/                 # Project settings (optional)
-│   └── settings.json        # Permissions
+│   └── settings.local.json  # Permissions
 │
 └── docs/                    # Generated docs (optional)
     ├── documentation.json   # Machine-readable
@@ -568,7 +570,7 @@ Run the setup command in your project:
 ```
 
 This automatically:
-- Creates `.claude/settings.json` in your project
+- Creates `.claude/settings.local.json` in your project
 - Adds all required permissions for SDD skills and tools
 - Prepares your project for spec-driven development
 
@@ -576,7 +578,7 @@ You only need to run this once per project.
 
 ### What Gets Configured
 
-The setup creates `.claude/settings.json` with permissions like:
+The setup creates `.claude/settings.local.json` with permissions like:
 
 ```json
 {
@@ -600,10 +602,22 @@ The SDD CLI supports optional configuration files that control output formatting
 - Global: `~/.claude/sdd_config.json`
 
 **What it configures:**
-- `output.json` - Default to JSON output (true/false)
-- `output.compact` - Use compact JSON formatting (true/false)
+- `output.default_mode` - Default output format: `"rich"` (formatted with colors), `"plain"` (simple text), or `"json"` (structured JSON)
+- `output.json_compact` - Use compact JSON formatting (`true` or `false`)
 
 **Example configuration:**
+```json
+{
+  "output": {
+    "default_mode": "rich",
+    "json_compact": true
+  }
+}
+```
+
+This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
+
+**Legacy format** (still supported for backward compatibility):
 ```json
 {
   "output": {
@@ -612,8 +626,6 @@ The SDD CLI supports optional configuration files that control output formatting
   }
 }
 ```
-
-This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
 
 For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
@@ -773,24 +785,30 @@ sdd skills-dev setup-permissions -- update .   # Set up permissions
 sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
 ```
 
-### Compact JSON Output (`--compact` flag)
+### Compact vs Pretty-Print JSON Output
 
-Many SDD CLI commands support a `--compact` flag that reduces output size for agent workflows. This is particularly useful when Claude Code agents invoke these commands repeatedly, as compact output significantly reduces token consumption.
+SDD CLI commands support both **compact** (single-line) and **pretty-print** (multi-line indented) JSON output formatting. This flexibility allows you to optimize for either token efficiency (compact) or human readability (pretty-print).
 
-**Commands with `--compact` support:**
-- `sdd prepare-task <spec-id> [task-id] --compact`
-- `sdd task-info <spec-id> <task-id> --compact`
-- `sdd check-deps <spec-id> <task-id> --compact`
-- `sdd progress <spec-id> --compact`
-- `sdd next-task <spec-id> --compact`
+**Output Modes:**
+- **Compact**: Single-line JSON with no whitespace or indentation - optimized for token efficiency
+- **Pretty-Print**: Multi-line JSON with 2-space indentation - optimized for human readability
 
-**Example:**
+**Commands with JSON output formatting:**
+- `sdd prepare-task`, `sdd task-info`, `sdd check-deps`, `sdd progress`, `sdd next-task`
+- `sdd list-phases`, `sdd query-tasks`, `sdd check-complete`
+- `sdd cache info`, `sdd list-plan-review-tools`
+- And all other commands that support `--json` output
+
+**CLI Flags:**
 ```bash
-# Normal output (verbose, human-readable)
-sdd prepare-task my-spec-001 task-1-1
+# Compact output (single-line, minified)
+sdd progress my-spec-001 --json --compact
 
-# Compact output (minified, optimized for agents)
-sdd prepare-task my-spec-001 task-1-1 --compact
+# Pretty-print output (multi-line, indented)
+sdd progress my-spec-001 --json --no-compact
+
+# Default behavior (uses config setting, or compact if no config)
+sdd progress my-spec-001 --json
 ```
 
 **Token Savings:**
@@ -807,19 +825,105 @@ Compact output achieves approximately **30% token reduction** across commands (m
 
 *Measured across 3 different spec types (in-progress, pending, completed) with minimal variance (~3.5%), confirming consistency.*
 
-**When to use `--compact`:**
+**When to use each mode:**
+
+**Use Compact (`--compact`) for:**
 - ✅ Agent workflows (sdd-next, sdd-plan, automated tools)
-- ✅ Programmatic parsing of JSON output
+- ✅ Programmatic parsing where whitespace doesn't matter
 - ✅ High-volume command execution (reduces context consumption)
-- ❌ Manual debugging or inspection (use normal output for readability)
+- ✅ CI/CD pipelines and automation scripts
 
-**What gets reduced:**
-- Whitespace removed (JSON minification)
-- Redundant metadata fields omitted
-- Nested structures flattened where possible
-- Field names preserved (full contract compatibility)
+**Use Pretty-Print (`--no-compact`) for:**
+- ✅ Manual debugging and inspection
+- ✅ Development and testing
+- ✅ When you need to visually verify JSON structure
+- ✅ Logging output that humans will read
 
-**Backward compatibility:** The `--compact` flag is opt-in. All commands continue to return verbose, human-readable output by default.
+**Configuration Precedence:**
+
+Output formatting follows this precedence chain (highest to lowest):
+1. **CLI flags** - `--compact` or `--no-compact` (overrides everything)
+2. **Config file** - `.claude/sdd_config.json` settings
+3. **Built-in defaults** - Compact mode
+
+**Example configuration** (`.claude/sdd_config.json`):
+```json
+{
+  "output": {
+    "default_mode": "rich",
+    "json_compact": false
+  }
+}
+```
+
+With this config, all commands output pretty-print JSON by default, but you can still override with `--compact` flag when needed.
+
+For complete configuration options, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
+
+### Practical Examples: Seeing the Difference
+
+Here's a real-world example showing the difference between compact and pretty-print modes:
+
+**Command:**
+```bash
+sdd progress json-output-standardization-2025-11-08-001 --json
+```
+
+**Compact output (`--compact`):**
+```json
+{"node_id":"spec-root","spec_id":"json-output-standardization-2025-11-08-001","title":"JSON Output Format Standardization","type":"spec","status":"in_progress","total_tasks":41,"completed_tasks":36,"percentage":87,"remaining_tasks":5,"current_phase":{"id":"phase-6","title":"Documentation & Finalization","completed":1,"total":6}}
+```
+**Tokens:** ~84 tokens
+
+**Pretty-print output (`--no-compact`):**
+```json
+{
+  "node_id": "spec-root",
+  "spec_id": "json-output-standardization-2025-11-08-001",
+  "title": "JSON Output Format Standardization",
+  "type": "spec",
+  "status": "in_progress",
+  "total_tasks": 41,
+  "completed_tasks": 36,
+  "percentage": 87,
+  "remaining_tasks": 5,
+  "current_phase": {
+    "id": "phase-6",
+    "title": "Documentation & Finalization",
+    "completed": 1,
+    "total": 6
+  }
+}
+```
+**Tokens:** ~120 tokens
+
+**Result:** Compact saves ~36 tokens (30% reduction) while delivering identical data.
+
+**Quick Comparison:**
+
+| Aspect | Compact | Pretty-Print |
+|--------|---------|--------------|
+| **Format** | Single line | Multi-line with indentation |
+| **Tokens** | ~84 | ~120 |
+| **Savings** | 30% reduction | - |
+| **Best for** | Agent workflows, automation | Human review, debugging |
+| **Readability** | Low (for humans) | High (for humans) |
+| **Parse speed** | Same | Same |
+
+**Testing Your Configuration:**
+
+To verify your configuration is working:
+
+```bash
+# Check what your current config produces
+sdd progress YOUR-SPEC-ID --json
+
+# Explicitly test compact mode
+sdd progress YOUR-SPEC-ID --json --compact
+
+# Explicitly test pretty-print mode
+sdd progress YOUR-SPEC-ID --json --no-compact
+```
 
 ## Prerequisites
 
@@ -870,4 +974,4 @@ Ready to get started?
 
 ---
 
-**Version**: 0.4.5 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.5.0 | **License**: MIT | **Author**: Tyler Burleigh

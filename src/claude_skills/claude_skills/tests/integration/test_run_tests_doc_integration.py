@@ -5,26 +5,12 @@ Tests the full E2E workflow of run-tests with documentation integration,
 including doc availability checking, user prompting, and graceful degradation.
 """
 
-import sys
-import pytest
-import subprocess
 import json
-import shutil
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-CLI_CMD = "sdd"
+import pytest
 
-
-def run_cli(*args, **kwargs):
-    """Run sdd command with fallback to python -m if sdd not on PATH."""
-    if shutil.which(CLI_CMD):
-        return subprocess.run([CLI_CMD] + list(args), **kwargs)
-    else:
-        return subprocess.run(
-            [sys.executable, '-m', 'claude_skills.cli.sdd'] + list(args),
-            **kwargs
-        )
+from .cli_runner import run_cli
 
 
 class TestRunTestsDocIntegration:
@@ -236,7 +222,10 @@ class TestRunTestsDocIntegration:
 
                 # Each tool should have a status
                 for tool_name, tool_info in tools.items():
-                    assert "available" in tool_info or "status" in tool_info
+                    if isinstance(tool_info, dict):
+                        assert "available" in tool_info or "status" in tool_info
+                    else:
+                        assert isinstance(tool_info, bool)
         except json.JSONDecodeError:
             pytest.fail("Invalid JSON output from check-tools")
 

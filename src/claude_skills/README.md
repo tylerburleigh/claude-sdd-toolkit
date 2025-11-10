@@ -77,7 +77,6 @@ sdd analyze-deps my-spec-001                     # Analyze dependencies
 
 # Context Monitoring
 sdd context                                      # Show current session token usage
-sdd context --json                               # Get JSON output
 sdd session-marker start                         # Mark session start
 
 # View all commands

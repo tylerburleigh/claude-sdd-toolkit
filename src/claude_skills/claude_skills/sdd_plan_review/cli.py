@@ -26,6 +26,7 @@ from claude_skills.sdd_plan_review.reporting import (
     generate_markdown_report,
     generate_json_report,
 )
+from claude_skills.common.json_output import output_json
 
 
 def cmd_review(args, printer):
@@ -143,48 +144,92 @@ def cmd_review(args, printer):
     )
     print(markdown_report)
 
-    # Determine output path
-    if args.output:
-        output_path = Path(args.output)
+    def sanitize_component(component: str) -> str:
+        cleaned = "".join(c if c.isalnum() or c in ("-", "_") else "-" for c in component.strip())
+        return cleaned or "spec"
+
+    # Determine default artifact directory (prefer specs/.reviews)
+    artifact_base_dir = spec_file.parent
+    reviews_dir = ensure_reviews_directory(specs_dir)
+    if reviews_dir.exists() and reviews_dir.is_dir():
+        artifact_base_dir = reviews_dir
     else:
-        # Find specs directory and use .reviews/ for default output
-        specs_dir = find_specs_directory(str(spec_file))
-        if specs_dir:
-            reviews_dir = ensure_reviews_directory(specs_dir)
-            output_path = reviews_dir / f"{spec_file.stem}-review.md"
-        else:
-            # Fallback to spec file's parent directory
-            output_path = spec_file.parent / f"{spec_file.stem}-review.md"
+        printer.warning(
+            f"Unable to write to reviews directory at {reviews_dir}. "
+            f"Falling back to {artifact_base_dir}."
+        )
 
-    # Save output
-    try:
-        # Determine output format based on extension
-        if output_path.suffix == '.json':
-            # JSON report
-            json_report = generate_json_report(
-                consensus,
-                spec_id,
-                spec_title,
-                args.type
+    safe_spec_id = sanitize_component(spec_id)
+    artifact_basename = f"{safe_spec_id}-review-{sanitize_component(args.type)}"
+    default_markdown_path = artifact_base_dir / f"{artifact_basename}.md"
+    default_json_path = artifact_base_dir / f"{artifact_basename}.json"
+
+    json_report = generate_json_report(
+        consensus,
+        spec_id,
+        spec_title,
+        args.type
+    )
+
+    json_report_text = json.dumps(json_report, indent=2) + "\n"
+
+    artifact_tasks = [
+        ("Markdown", default_markdown_path, lambda path: path.write_text(markdown_report, encoding="utf-8")),
+        ("JSON", default_json_path, lambda path: path.write_text(json_report_text, encoding="utf-8")),
+    ]
+
+    if args.output:
+        user_output = Path(args.output)
+        if user_output.suffix.lower() == ".json":
+            artifact_tasks.append(
+                ("--output JSON", user_output, lambda path: path.write_text(json_report_text, encoding="utf-8"))
             )
-            with open(output_path, 'w') as f:
-                json.dump(json_report, f, indent=2)
         else:
-            # Markdown report (default)
-            with open(output_path, 'w') as f:
-                f.write(markdown_report)
+            artifact_tasks.append(
+                ("--output Markdown", user_output, lambda path: path.write_text(markdown_report, encoding="utf-8"))
+            )
 
-        printer.success(f"\nReport saved to: {output_path}")
-    except Exception as e:
-        printer.error(f"Failed to save output: {str(e)}")
+    saved_artifacts = []
+    failed_artifacts = []
+    written_paths = set()
+
+    for label, destination, writer in artifact_tasks:
+        # Avoid duplicate writes to the same path
+        destination = destination.resolve()
+        if destination in written_paths:
+            continue
+        written_paths.add(destination)
+
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as mkdir_error:
+            printer.warning(f"Could not create directory for {label} at {destination}: {mkdir_error}")
+            failed_artifacts.append((label, destination, mkdir_error))
+            continue
+
+        try:
+            writer(destination)
+            saved_artifacts.append((label, destination))
+        except (OSError, PermissionError, ValueError) as write_error:
+            printer.warning(f"Failed to write {label} artifact to {destination}: {write_error}")
+            failed_artifacts.append((label, destination, write_error))
+
+    if saved_artifacts:
+        printer.success("\nSaved review artifacts:")
+        for label, path in saved_artifacts:
+            printer.detail(f"{label}: {path}")
+    else:
+        printer.warning("\nNo review artifacts were saved. See warnings above for details.")
+
+    if failed_artifacts:
+        for label, path, error in failed_artifacts:
+            printer.warning(f"Artifact write skipped for {label} ({path}): {error}")
 
     return 0
 
 
 def cmd_list_tools(args, printer):
     """List available AI CLI tools."""
-    printer.header("AI CLI Tools for Reviews")
-
     tools_to_check = ["gemini", "codex", "cursor-agent"]
 
     available = []
@@ -196,6 +241,23 @@ def cmd_list_tools(args, printer):
             available.append(tool)
         else:
             unavailable.append(tool)
+
+    # JSON output mode
+    if args.json:
+        output = {
+            "available": available,
+            "unavailable": unavailable,
+            "total": len(tools_to_check),
+            "available_count": len(available)
+        }
+        output_json(output, args.compact)
+        if len(available) == 0:
+            return 1
+        else:
+            return 0
+
+    # Rich UI mode
+    printer.header("AI CLI Tools for Reviews")
 
     if available:
         printer.success(f"\n✓ Available ({len(available)}):")

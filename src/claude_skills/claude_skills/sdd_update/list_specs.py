@@ -4,39 +4,31 @@ import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
-from rich.table import Table
-from rich.console import Console
-
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
+from claude_skills.common.json_output import output_json
+from claude_skills.common.ui_factory import create_ui
 
 
-def _create_progress_bar(percentage: int, width: int = 10) -> str:
+def _create_progress_bar_plain(percentage: int, width: int = 10) -> str:
     """
     Create a visual progress bar using block characters.
+
+    Works with both Rich and plain text backends.
 
     Args:
         percentage: Completion percentage (0-100)
         width: Width of the progress bar in characters
 
     Returns:
-        Rich markup string with colored progress bar
+        Progress bar string using block characters (no color codes)
     """
     # Calculate filled and empty portions
     filled = int((percentage / 100) * width)
     empty = width - filled
 
-    # Create bar with color coding based on progress
-    if percentage >= 75:
-        color = "green"
-    elif percentage >= 50:
-        color = "yellow"
-    elif percentage >= 25:
-        color = "orange1"
-    else:
-        color = "red"
-
-    # Build the bar using block characters
-    bar = f"[{color}]{'█' * filled}[/{color}]{'░' * empty}"
+    # Build the bar using block characters (no Rich markup)
+    # Use filled (█) and empty (░) block characters
+    bar = f"{'█' * filled}{'░' * empty}"
 
     return bar
 
@@ -48,6 +40,8 @@ def list_specs(
     output_format: str = "text",
     verbose: bool = False,
     printer: Optional[PrettyPrinter] = None,
+    compact: bool = False,
+    ui=None,
 ) -> List[Dict[str, Any]]:
     """
     List specification files with optional filtering.
@@ -58,6 +52,7 @@ def list_specs(
         output_format: Output format (text or json)
         verbose: Include detailed information
         printer: PrettyPrinter instance for output
+        ui: UI instance for console output (optional)
 
     Returns:
         List of spec info dictionaries
@@ -131,9 +126,9 @@ def list_specs(
 
     # Output results
     if output_format == "json":
-        print(json.dumps(specs_info, indent=2))
+        output_json(specs_info, compact=compact)
     else:
-        _print_specs_text(specs_info, verbose, printer)
+        _print_specs_text(specs_info, verbose, printer, ui)
 
     return specs_info
 
@@ -142,56 +137,43 @@ def _print_specs_text(
     specs_info: List[Dict[str, Any]],
     verbose: bool,
     printer: PrettyPrinter,
+    ui=None,
 ) -> None:
-    """Print specs using Rich.Table for structured output."""
+    """
+    Print specs using unified UI protocol (works with RichUi and PlainUi).
+
+    Prepares table data as a list of dictionaries, then renders using
+    the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
+    """
 
     if not specs_info:
         printer.info("No specifications found.")
         return
 
-    # Create Rich console
-    console = Console()
+    # Ensure we have a UI instance
+    if ui is None:
+        ui = create_ui()
 
-    # Create Rich.Table with specified columns
-    table = Table(
-        title="📋 Specifications",
-        show_header=True,
-        header_style="bold cyan",
-        border_style="blue",
-        title_style="bold magenta",
-    )
+    # 1. Prepare table data as List[Dict] (backend-agnostic)
+    table_data = []
 
-    # Add columns: ID, Title, Progress, Status, Phase, Updated
-    table.add_column("ID", style="cyan", no_wrap=True, min_width=30)
-    table.add_column("Title", style="white", min_width=25)
-    table.add_column("Progress", justify="right", style="yellow", min_width=12)
-    table.add_column("Status", justify="center", style="green", min_width=10)
-    table.add_column("Phase", style="blue", min_width=10)
-    table.add_column("Updated", style="dim", min_width=10)
-
-    # Add rows for each spec
     for spec in specs_info:
         # Format progress with visual progress bar
         if spec['total_tasks'] > 0:
-            # Create visual progress bar
-            progress_bar = _create_progress_bar(spec['progress_percentage'], width=10)
-            # Combine bar with text
+            progress_bar = _create_progress_bar_plain(spec['progress_percentage'], width=10)
             progress = f"{progress_bar} {spec['progress_percentage']}%\n{spec['completed_tasks']}/{spec['total_tasks']} tasks"
         else:
             progress = "No tasks"
 
-        # Format status with color/emoji
+        # Format status with emoji
         status = spec['status']
-        if status == "active":
-            status_display = "⚡ Active"
-        elif status == "completed":
-            status_display = "✅ Complete"
-        elif status == "pending":
-            status_display = "⏸️  Pending"
-        elif status == "archived":
-            status_display = "📦 Archived"
-        else:
-            status_display = status.title()
+        status_map = {
+            "active": "⚡ Active",
+            "completed": "✅ Complete",
+            "pending": "⏸️  Pending",
+            "archived": "📦 Archived"
+        }
+        status_display = status_map.get(status, status.title())
 
         # Format phase
         phase = spec.get('current_phase', '-')
@@ -199,34 +181,76 @@ def _print_specs_text(
         # Format updated timestamp
         updated = spec.get('updated_at', '-')
         if updated and updated != '-':
-            # Truncate to date only for brevity
             updated = updated.split('T')[0] if 'T' in updated else updated
 
-        # Add row to table
-        table.add_row(
-            spec['spec_id'],
-            spec['title'],
-            progress,
-            status_display,
-            phase,
-            updated
+        # Build row dictionary
+        row = {
+            "ID": spec['spec_id'],
+            "Title": spec['title'],
+            "Progress": progress,
+            "Status": status_display,
+            "Phase": phase,
+            "Updated": updated
+        }
+
+        table_data.append(row)
+
+    # 2. Define columns
+    columns = ["ID", "Title", "Progress", "Status", "Phase", "Updated"]
+
+    # 3. Render based on UI backend
+    if ui.console is None:
+        # PlainUi backend - use native print_table()
+        ui.print_table(data=table_data, columns=columns, title="📋 Specifications")
+    else:
+        # RichUi backend - convert to Rich Table and render
+        from rich.table import Table
+
+        table = Table(
+            title="📋 Specifications",
+            show_header=True,
+            header_style="bold cyan",
+            border_style="blue",
+            title_style="bold magenta",
         )
 
-    # Print table
-    console.print(table)
+        # Column configuration for Rich rendering
+        column_config = {
+            "ID": {"style": "cyan", "no_wrap": True, "overflow": "ignore", "min_width": 30},
+            "Title": {"style": "white", "no_wrap": True, "overflow": "ignore", "min_width": 25},
+            "Progress": {"style": "yellow", "no_wrap": True, "overflow": "ignore", "min_width": 12, "justify": "right"},
+            "Status": {"style": "green", "no_wrap": True, "overflow": "ignore", "min_width": 10, "justify": "center"},
+            "Phase": {"style": "blue", "no_wrap": True, "overflow": "ignore", "min_width": 10},
+            "Updated": {"style": "dim", "no_wrap": True, "overflow": "ignore", "min_width": 10}
+        }
 
-    # Print verbose details if requested
+        # Add columns
+        for col in columns:
+            config = column_config.get(col, {})
+            table.add_column(col, **config)
+
+        # Add rows
+        for row_data in table_data:
+            table.add_row(*[row_data.get(col, "") for col in columns])
+
+        # Render table
+        ui.console.print(table)
+
+    # 4. Print verbose details if requested
     if verbose:
-        console.print("\n[bold]Verbose Details:[/bold]")
+        # Format verbose output for both backends
+        verbose_text = "\n📊 Verbose Details:\n"
         for spec in specs_info:
-            console.print(f"\n[cyan]{spec['spec_id']}[/cyan]:")
+            verbose_text += f"\n{spec['spec_id']}:\n"
             if spec.get('version'):
-                console.print(f"  Version: {spec['version']}")
+                verbose_text += f"  Version: {spec['version']}\n"
             if spec.get('description'):
-                console.print(f"  Description: {spec['description']}")
+                verbose_text += f"  Description: {spec['description']}\n"
             if spec.get('author'):
-                console.print(f"  Author: {spec['author']}")
+                verbose_text += f"  Author: {spec['author']}\n"
             if spec.get('created_at'):
-                console.print(f"  Created: {spec['created_at']}")
+                verbose_text += f"  Created: {spec['created_at']}\n"
             if spec.get('file_path'):
-                console.print(f"  File: {spec['file_path']}")
+                verbose_text += f"  File: {spec['file_path']}\n"
+
+        printer.info(verbose_text)

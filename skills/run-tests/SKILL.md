@@ -58,7 +58,7 @@ sdd test discover --tree
 sdd test run --quick
 
 # Debug mode (verbose with locals and prints)
-sdd test run --debug
+sdd test run --preset-debug
 
 # Run specific test
 sdd test run tests/test_module.py::test_function
@@ -85,7 +85,7 @@ For large test suites with many failures:
 
 ```bash
 # Save output to timestamped file
-sdd test run --debug | tee /tmp/test-run-$(date +%Y%m%d-%H%M%S).log
+sdd test run --preset-debug | tee /tmp/test-run-$(date +%Y%m%d-%H%M%S).log
 ```
 
 ## Phase 2: Investigate Failures
@@ -274,7 +274,7 @@ sdd test run --list
 
 # Presets
 sdd test run --quick      # Stop on first failure
-sdd test run --debug      # Verbose + locals + prints
+sdd test run --preset-debug      # Verbose + locals + prints
 sdd test run --coverage   # Coverage report
 sdd test run --fast       # Skip slow tests
 sdd test run --parallel   # Run in parallel
@@ -442,7 +442,7 @@ Use additional tools when:
 
 **Consultation timeouts:**
 - Default: 90 seconds
-- Configurable via `config.yaml` (consultation.timeout_seconds)
+- Configurable via `.claude/ai_config.yaml` (`run-tests.consultation.timeout_seconds`)
 
 **When tools time out:**
 1. Simplify prompt (remove large code blocks)

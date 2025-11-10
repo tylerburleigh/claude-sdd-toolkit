@@ -1,7 +1,14 @@
 """Plugin registration system for subcommands."""
+import importlib
 import logging
+from typing import Callable, Optional, Sequence, Tuple
 
 logger = logging.getLogger(__name__)
+
+_OPTIONAL_MODULES: Sequence[Tuple[str, str, str]] = (
+    ("claude_skills.sdd_render.cli", "register_render", "sdd_render"),
+    ("claude_skills.sdd_fidelity_review.cli", "register_commands", "sdd_fidelity_review"),
+)
 
 
 def register_all_subcommands(subparsers, parent_parser):
@@ -25,10 +32,8 @@ def register_all_subcommands(subparsers, parent_parser):
     from claude_skills.sdd_validate.cli import register_validate
     from claude_skills.sdd_plan.cli import register_plan
     from claude_skills.sdd_plan_review.cli import register_plan_review
-    from claude_skills.sdd_render.cli import register_render
     from claude_skills.sdd_pr.cli import register_pr
     from claude_skills.context_tracker.cli import register_context, register_session_marker
-    from claude_skills.sdd_fidelity_review.cli import register_commands as register_fidelity_review
     from claude_skills.sdd_spec_mod.cli import register_spec_mod
     from claude_skills.common.cache.cli import register_cache
 
@@ -38,11 +43,9 @@ def register_all_subcommands(subparsers, parent_parser):
     register_validate(subparsers, parent_parser)
     register_plan(subparsers, parent_parser)
     register_plan_review(subparsers, parent_parser)
-    register_render(subparsers, parent_parser)
     register_pr(subparsers, parent_parser)
     register_context(subparsers, parent_parser)
     register_session_marker(subparsers, parent_parser)
-    register_fidelity_review(subparsers, parent_parser)
     register_spec_mod(subparsers, parent_parser)
     register_cache(subparsers, parent_parser)
 
@@ -50,6 +53,7 @@ def register_all_subcommands(subparsers, parent_parser):
     _register_doc_cli(subparsers, parent_parser)
     _register_test_cli(subparsers, parent_parser)
     _register_skills_dev_cli(subparsers, parent_parser)
+    _register_optional_modules(subparsers, parent_parser)
 
     # Optional: register workflow orchestration (may not exist in Phase 1)
     try:
@@ -116,3 +120,34 @@ def _register_skills_dev_cli(subparsers, parent_parser):
         required=True
     )
     register_skills_dev_subcommands(skills_dev_subparsers, parent_parser)
+
+
+def _register_optional_modules(subparsers, parent_parser) -> None:
+    """Register optional CLI extensions if their modules are present."""
+
+    for module_name, attr_name, label in _OPTIONAL_MODULES:
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            logger.warning("Optional module '%s' not available; skipping registration", label)
+            continue
+        except Exception as exc:  # pragma: no cover - defensive safeguard
+            logger.warning("Failed to import optional module '%s': %s", label, exc)
+            continue
+
+        register_fn: Optional[Callable] = getattr(module, attr_name, None)
+        if not callable(register_fn):
+            logger.warning(
+                "Optional module '%s' missing callable '%s'; skipping registration",
+                label,
+                attr_name,
+            )
+            continue
+
+        try:
+            register_fn(subparsers, parent_parser)
+            logger.debug("Optional module '%s' registered", label)
+        except Exception as exc:  # pragma: no cover - defensive safeguard
+            logger.warning(
+                "Optional module '%s' failed to register (%s)", label, exc
+            )

@@ -1,7 +1,9 @@
 """Shared AI configuration loader for skills.
 
-Loads configuration from config.yaml in skill directories (run-tests, sdd-render, etc.),
-with fallback to sensible defaults if config is missing or malformed.
+Loads configuration from the centralized `.claude/ai_config.yaml`, merging global defaults
+with any skill-specific overrides that live in the same file. The legacy per-skill
+`config.yaml` files have been retired and are only referenced for backwards compatibility
+checks.
 
 This module provides a common interface for all skills to load their AI tool configurations.
 """
@@ -36,8 +38,8 @@ DEFAULT_MODELS = {
         "flags": ["-m", "gemini-2.5-pro", "-p"]
     },
     "cursor-agent": {
-        "priority": ["cheetah"],
-        "flags": ["-p", "--model", "cheetah"]
+        "priority": ["composer-1"],
+        "flags": ["-p", "--model", "composer-1"]
     },
     "codex": {
         "priority": ["gpt-5-codex"],
@@ -46,17 +48,95 @@ DEFAULT_MODELS = {
 }
 
 
+def get_global_config_path() -> Path:
+    """Get the path to the global AI configuration file.
+
+    Searches in multiple locations:
+    1. .claude/ai_config.yaml in current working directory
+    2. .claude/ai_config.yaml relative to project root
+
+    Returns:
+        Path to global ai_config.yaml (may not exist)
+    """
+    possible_paths = [
+        Path.cwd() / ".claude" / "ai_config.yaml",
+        Path(__file__).parent.parent.parent.parent / ".claude" / "ai_config.yaml",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            return path
+
+    # Return first path even if it doesn't exist
+    return possible_paths[0]
+
+
+def load_global_config() -> Dict:
+    """Load the global AI configuration file.
+
+    Returns:
+        Dictionary with global configuration, or empty dict if file doesn't exist
+    """
+    config_path = get_global_config_path()
+
+    try:
+        if not config_path.exists():
+            return {}
+
+        with open(config_path, 'r') as f:
+            config_data = yaml.safe_load(f)
+
+        if not config_data:
+            return {}
+
+        return config_data
+
+    except (yaml.YAMLError, IOError) as e:
+        # Error loading global config, continue without it
+        return {}
+
+
+def merge_configs(base: Dict, override: Dict) -> Dict:
+    """Deep merge override configuration into base configuration.
+
+    Arrays in override completely replace arrays in base (not merged).
+    Nested dictionaries are merged recursively.
+
+    Args:
+        base: Base configuration dictionary
+        override: Override configuration dictionary
+
+    Returns:
+        Merged configuration dictionary
+    """
+    result = base.copy()
+
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            # Recursively merge nested dictionaries
+            result[key] = merge_configs(result[key], value)
+        else:
+            # Override with value from override config (including arrays)
+            result[key] = value
+
+    return result
+
+
 def get_config_path(skill_name: str) -> Path:
-    """Get the path to the config.yaml file for a skill.
+    """Locate the legacy per-skill `config.yaml` file if it still exists.
+
+    All live configuration now resides in `.claude/ai_config.yaml`; this helper is retained
+    for backwards compatibility with historical tooling that expected a file under
+    `skills/{skill_name}/config.yaml`.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
 
     Returns:
-        Path to config.yaml in the skill directory
+        Path to the historical config.yaml location for the skill (may not exist)
     """
     # This file is in src/claude_skills/claude_skills/common/ai_config.py
-    # We need to find skills/{skill_name}/config.yaml
+    # We need to find the legacy skills/{skill_name}/config.yaml path.
 
     # Try multiple possible locations
     possible_paths = [
@@ -75,35 +155,49 @@ def get_config_path(skill_name: str) -> Path:
 
 
 def load_skill_config(skill_name: str) -> Dict:
-    """Load full configuration from config.yaml with fallback to defaults.
+    """Load configuration from centralized global config with skill-specific overrides.
+
+    All AI configuration is centralized in .claude/ai_config.yaml.
+    This function extracts global defaults and merges in skill-specific settings.
+
+    Configuration hierarchy:
+    1. Code defaults (DEFAULT_TOOLS, DEFAULT_MODELS)
+    2. Global settings from .claude/ai_config.yaml (shared across all skills)
+    3. Skill-specific overrides from global config (keyed by skill_name)
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
 
     Returns:
-        Dict with complete configuration
+        Dict with complete merged configuration for the skill
     """
-    config_path = get_config_path(skill_name)
-
     try:
-        if not config_path.exists():
-            # Config file doesn't exist, use defaults
-            return {
-                "tools": DEFAULT_TOOLS.copy(),
-                "models": DEFAULT_MODELS.copy()
-            }
+        # Start with code defaults
+        result = {
+            "tools": DEFAULT_TOOLS.copy(),
+            "models": DEFAULT_MODELS.copy()
+        }
 
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
+        # Load global config
+        global_config = load_global_config()
+        if not global_config:
+            return result
 
-        if not config_data:
-            # Empty config, use defaults
-            return {
-                "tools": DEFAULT_TOOLS.copy(),
-                "models": DEFAULT_MODELS.copy()
-            }
+        # Extract global defaults (tools, models, consensus, consultation, rendering, enhancement)
+        # These are top-level keys that apply to all skills
+        global_defaults = {k: v for k, v in global_config.items() if k not in [
+            'run-tests', 'sdd-fidelity-review', 'sdd-render'
+        ]}
 
-        return config_data
+        # Merge global defaults into result
+        result = merge_configs(result, global_defaults)
+
+        # Extract and merge skill-specific config if it exists in global config
+        if skill_name in global_config:
+            skill_specific = global_config[skill_name]
+            result = merge_configs(result, skill_specific)
+
+        return result
 
     except (yaml.YAMLError, IOError, KeyError) as e:
         # Error loading config, fall back to defaults
@@ -252,9 +346,9 @@ def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
 def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
     """Get multi-agent pair configurations for consensus-based consultation.
 
-    Loads agent pair definitions from the skill's config.yaml file under the
-    'consensus.pairs' section. Each pair defines which agents should be consulted
-    together for multi-agent analysis.
+    Loads agent pair definitions from `.claude/ai_config.yaml` under the skill's
+    `consensus.pairs` section. Each pair defines which agents should be consulted together
+    for multi-agent analysis.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
@@ -277,10 +371,10 @@ def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
         ['gemini', 'cursor-agent']
 
     Notes:
-        - If config.yaml is missing or doesn't have a 'consensus.pairs' section,
-          returns sensible default pairs
+        - If `.claude/ai_config.yaml` is missing or doesn't have a `consensus.pairs`
+          section for the skill, returns sensible default pairs
         - Each pair should contain exactly 2 agents for optimal consensus analysis
-        - Agent names must correspond to tools defined in the 'tools' section
+        - Agent names must correspond to tools defined in the `tools` section
     """
     config = load_skill_config(skill_name)
 
@@ -304,9 +398,9 @@ def get_multi_agent_pairs(skill_name: str) -> Dict[str, List[str]]:
 def get_routing_config(skill_name: str) -> Dict[str, str]:
     """Get routing configuration that maps failure types to multi-agent pairs.
 
-    Loads auto-trigger routing rules from the skill's config.yaml file under the
-    'consensus.auto_trigger' section. These rules determine which agent pair should
-    be used for different types of test failures or analysis scenarios.
+    Loads auto-trigger routing rules from `.claude/ai_config.yaml` under the skill's
+    `consensus.auto_trigger` section. These rules determine which agent pair should be used
+    for different types of test failures or analysis scenarios.
 
     Args:
         skill_name: Name of the skill (e.g., 'run-tests', 'sdd-render')
@@ -332,11 +426,11 @@ def get_routing_config(skill_name: str) -> Dict[str, str]:
         'default'
 
     Notes:
-        - If config.yaml is missing or doesn't have 'consensus.auto_trigger',
-          returns sensible default routing rules
+        - If `.claude/ai_config.yaml` is missing or doesn't have `consensus.auto_trigger`
+          for the skill, returns sensible default routing rules
         - The pair names in routing values should correspond to keys in the
-          pairs configuration from get_multi_agent_pairs()
-        - The 'default' key is used as fallback when no specific rule matches
+          pairs configuration from `get_multi_agent_pairs()`
+        - The `default` key is used as fallback when no specific rule matches
     """
     config = load_skill_config(skill_name)
 

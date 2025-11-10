@@ -193,9 +193,6 @@ def generate_time_report(
     Returns:
         Dictionary with time analysis, or None on error
     """
-    if not printer:
-        printer = PrettyPrinter()
-
     # Load state
     spec_data = load_json_spec(spec_id, specs_dir)
     if not spec_data:
@@ -233,8 +230,17 @@ def generate_time_report(
             })
 
     if not tasks_with_time:
-        printer.warning("No time tracking data found")
-        return None
+        if printer:
+            printer.warning("No time tracking data found")
+        # Return empty report structure for JSON consumers
+        return {
+            "spec_id": spec_id,
+            "total_estimated": 0.0,
+            "total_actual": 0.0,
+            "total_variance": 0.0,
+            "variance_percentage": 0.0,
+            "tasks": []
+        }
 
     # Calculate metrics
     total_variance = total_actual - total_estimated
@@ -249,15 +255,16 @@ def generate_time_report(
         "tasks": tasks_with_time
     }
 
-    printer.header("Time Report")
-    printer.result("Total Estimated", f"{total_estimated:.1f}h")
-    printer.result("Total Actual", f"{total_actual:.1f}h")
-    printer.result("Variance", f"{total_variance:+.1f}h ({variance_pct:+.1f}%)")
+    if printer:
+        printer.header("Time Report")
+        printer.result("Total Estimated", f"{total_estimated:.1f}h")
+        printer.result("Total Actual", f"{total_actual:.1f}h")
+        printer.result("Variance", f"{total_variance:+.1f}h ({variance_pct:+.1f}%)")
 
-    printer.info("\nTask Breakdown:")
-    for task in sorted(tasks_with_time, key=lambda t: abs(t["variance"]), reverse=True):
-        variance_str = f"{task['variance']:+.1f}h" if task['estimated'] > 0 else "N/A"
-        printer.detail(f"{task['task_id']}: {task['actual']:.1f}h ({variance_str})")
+        printer.info("\nTask Breakdown:")
+        for task in sorted(tasks_with_time, key=lambda t: abs(t["variance"]), reverse=True):
+            variance_str = f"{task['variance']:+.1f}h" if task['estimated'] > 0 else "N/A"
+            printer.detail(f"{task['task_id']}: {task['actual']:.1f}h ({variance_str})")
 
     return report
 

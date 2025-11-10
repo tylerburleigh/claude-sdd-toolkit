@@ -81,7 +81,7 @@ Then use the AskUserQuestion tool:
 
 **If user chooses "Yes, set up permissions":**
 ```bash
-# Run the setup helper to configure .claude/settings.json
+# Run the setup helper to configure .claude/settings.local.json
 sdd skills-dev setup-permissions update .
 
 # Inform the user

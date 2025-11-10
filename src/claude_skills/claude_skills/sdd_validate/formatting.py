@@ -34,6 +34,7 @@ class NormalizedValidationResult:
 
 
 _ERROR_FIELDS: Sequence[str] = (
+    "schema_errors",
     "structure_errors",
     "hierarchy_errors",
     "node_errors",
@@ -44,6 +45,7 @@ _ERROR_FIELDS: Sequence[str] = (
 )
 
 _WARNING_FIELDS: Sequence[str] = (
+    "schema_warnings",
     "structure_warnings",
     "hierarchy_warnings",
     "node_warnings",

@@ -1,47 +1,57 @@
 ---
 name: sdd-plan-review
-description: Multi-model specification review using direct AI CLI tools. Calls gemini, codex, or cursor-agent CLIs in parallel to evaluate specs from multiple perspectives (architecture, security, feasibility). Provides actionable feedback to improve specification quality before implementation.
+description: Multi-model consultation and synthesis stage for SDD specifications. Coordinates parallel AI reviewers, consolidates consensus findings, and prepares advisory reports and handoffs without modifying specs or executing fixes.
 ---
 
 # Spec-Driven Development: Plan Review Skill
 
-## Skill Family
+## Overview
 
-This skill is part of the **Spec-Driven Development** family:
-- **Skill(sdd-toolkit:sdd-plan)** - Creates specifications and task hierarchies
-- **Skill(sdd-toolkit:sdd-plan-review)** (this skill) - Reviews specs with multi-model collaboration
-- **Skill(sdd-toolkit:sdd-next)** - Identifies next tasks and creates execution plans
-- **Skill(sdd-toolkit:sdd-update)** - Tracks progress and maintains documentation
+`Skill(sdd-toolkit:sdd-plan-review)` is the consultative review gate for Spec-Driven Development. It convenes multiple AI reviewers, challenges assumptions with anti-sycophancy prompts, and synthesizes a consensus readiness assessment before any implementation or remediation occurs.
 
-## Complete Workflow
+- Builds shared understanding of spec strengths, risks, and open questions
+- Produces an advisory report that captures agreements, disagreements, and severity tags
+- Recommends handoffs to the correct downstream skills instead of applying changes directly
+
+This stage is advisory-only. The output is a synthesized report and clear guidance on where follow-up work belongs.
+
+## Scope & Responsibilities
+
+**This skill delivers:**
+- Multi-model critique of draft specs across architecture, feasibility, risk, and verification
+- Consolidated findings that highlight consensus, dissent, and severity of concerns
+- Advisory recommendations on which downstream skill should address each issue
+- Structured reports (Markdown and JSON) that capture review context for the broader workflow
+
+**This skill does not:**
+- Edit specifications or apply fixes
+- Update spec metadata, journals, or approval status
+- Green-light implementation without stakeholder review
+
+## Position in the SDD Workflow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│            Spec-Driven Development Workflow                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────┐    ┌──────────┐    ┌─────────────┐    ┌─────────┐│
-│  │   PLAN   │───>│  REVIEW  │───>│    NEXT     │───>│  UPDATE ││
-│  └──────────┘    └──────────┘    └─────────────┘    └─────────┘│
-│       │               │                  │                │      │
-│   Creates JSON    Multi-model     Finds next        Updates     │
-│   spec file       validation      actionable        status &    │
-│                   via AI CLIs     task              progress    │
-│       │               │                  │                │      │
-│       └───────────────┴──────────────────┴────────────────┘      │
-│                              │                                    │
-│                         [Cycle repeats]                          │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
+PLAN → PLAN-REVIEW (consult) → UPDATE/NEXT/VALIDATE
 ```
 
-**Your Role (REVIEW)**: Validate specifications using multiple AI perspectives before expensive implementation begins. Catch issues early when they're cheap to fix.
+- **Entry point:** A draft spec exists and needs a critical second opinion.
+- **Core activity:** `sdd-plan-review` convenes multiple AI reviewers, scores the spec across shared dimensions, and synthesizes an advisory consensus.
+
+**Role of this skill:** Provide a rigorous, multi-perspective critique and consensus summary before any remediation starts. It informs, but never performs, follow-up edits.
+
+## Scope Boundaries
+
+- ✅ **Do:** Convene multi-model reviews, interrogate assumptions, aggregate perspectives, surface consensus/disagreements, and articulate advisory recommendations with severity tagging.
+- ✅ **Do:** Capture review metadata, scores, and rationale in the generated report so downstream skills have clear guidance.
+- ❌ **Don't:** Edit specs, adjust estimates, rewrite acceptance criteria, or change task hierarchies.
+- ❌ **Don't:** Update journals, statuses, or frontmatter.
+- ❌ **Don't:** Author execution plans or task breakdowns.
 
 ## Core Philosophy
 
 **Diverse Perspectives Improve Quality**: Multiple AI models reviewing a specification catch more issues than a single review. By consulting different AI CLIs (gemini, codex, cursor-agent) in parallel, we validate design decisions, identify risks, and build confidence before costly implementation.
 
-**Anti-Sycophancy by Design**: LLMs naturally want to agree and validate. This skill fights that tendency with prompts that **assume problems exist** and **demand critical analysis**. The tool automatically uses imperative, fault-finding language to extract genuine critique.
+**Anti-Sycophancy by Design**: LLMs naturally want to agree and validate. This skill enforces critical framing and dissent-seeking defaults so reviewers actively hunt for issues instead of rubber-stamping drafts.
 
 **Key Benefits:**
 - Catches specification gaps before coding begins
@@ -54,78 +64,41 @@ This skill is part of the **Spec-Driven Development** family:
 
 ## When to Use This Skill
 
-Use `Skill(sdd-toolkit:sdd-plan-review)` to:
-- Review new specifications before approval
-- Validate complex or high-risk specifications
-- Evaluate specs with novel architecture decisions
-- Get confidence before high-effort implementations
-- Security-review auth/data handling specs
-- Verify cross-team integration specs
-- Check feasibility of aggressive timelines
+Request `Skill(sdd-toolkit:sdd-plan-review)` when you need an advisory consensus on a draft specification:
+- New or revised specs that require stakeholder confidence before approval
+- High-risk, high-effort, or multi-team initiatives where blind spots are expensive
+- Novel architectures, emerging technologies, or unfamiliar integrations
+- Security-sensitive surfaces (auth, PII, critical data flows) that demand scrutiny
+- Aggressive timelines or estimates that need feasibility validation
 
-**Do NOT use for:**
-- Simple specs (< 5 tasks, well-understood patterns)
-- Specs already in active implementation
-- Quick prototypes or experiments
-- Trivial changes or bug fixes
-- Internal refactorings with no external impact
+**Do NOT request this skill when:**
+- The spec is trivial, low-risk, or already well-understood (<5 tasks, standard patterns)
+- Implementation is already underway
+- You need someone to make direct specification edits
+- The work is exploratory, disposable, or prototype-only
 
-## Skill Handoff Points
+**Reminder:** This skill surfaces findings and next-step recommendations—actual remediation flows through the calling agent.
 
-**When to transition to other skills:**
-
-← **From Skill(sdd-toolkit:sdd-plan)**:
-  - After spec creation, validate before approval
-  - Before committing to complex implementation
-  - When uncertainty exists about approach
-
-→ **To Skill(sdd-toolkit:sdd-update)**:
-  - After review, document review status in spec metadata
-  - Journal critical issues found and addressed
-  - Update spec frontmatter with review scores
-
-→ **To Skill(sdd-toolkit:sdd-next)**:
-  - After APPROVE recommendation, begin implementation
-  - Once critical issues are fixed and re-review passes
-  - When confidence is high and risks are mitigated
-
-← **Back to Skill(sdd-toolkit:sdd-plan)**:
-  - If REJECT recommendation, redesign spec
-  - When fundamental architectural changes needed
-  - To split overly complex specs
-
-## Decision Tree: When to Review?
+## Decision Guide: Should We Convene a Review?
 
 ```
-What's the situation?
-├─ Just created new spec → Use `Skill(sdd-toolkit:sdd-plan-review)` (validate before approval)
-├─ Security-sensitive (auth/data) → Use `Skill(sdd-toolkit:sdd-plan-review)` --type security
-├─ Tight deadline/aggressive estimates → Use `Skill(sdd-toolkit:sdd-plan-review)` --type feasibility
-├─ Novel architecture/technology → Use `Skill(sdd-toolkit:sdd-plan-review)` --type full
-├─ Simple spec (< 5 tasks) → Skip review, proceed with Skill(sdd-toolkit:sdd-next)
-├─ Already implementing → Skip review (too late)
-└─ Uncertain? → Use `Skill(sdd-toolkit:sdd-plan-review)` --type quick (10 min)
+Situation?
+├─ Draft spec ready for approval → Engage plan-review (full)
+├─ Security-critical area (auth/data/privacy) → Engage plan-review (security)
+├─ Feasibility questions or aggressive estimates → Engage plan-review (feasibility)
+├─ Major architectural novelty or integration risk → Engage plan-review (full)
+├─ Lightweight, low-risk spec → Skip; proceed directly to sdd-next
+├─ Work already executing → Use fidelity-review or update workflows instead
+└─ Unsure confidence level → Engage plan-review (quick) to gain signal
 
-Review Type Selection:
-├─ High risk + complex → full (20-30 min, comprehensive)
-├─ Auth/security/data → security (15-20 min, vulnerability focus)
-├─ Tight timeline → feasibility (10-15 min, estimate validation)
-├─ Low risk + simple → quick (10 min, completeness check)
-└─ Default → full (when unsure)
+After the consultation:
+├─ Return to calling agent for next steps
 ```
 
 ## Tool Verification
 
 **Before using this skill**, verify the required tools are available:
 
-```bash
-# Verify sdd review CLI is installed and accessible
-sdd --help
-```
-
-**Expected output**: Help text showing available commands (including review, list-review-tools)
-
-**Check which AI CLI tools are available:**
 ```bash
 sdd list-review-tools
 ```
@@ -173,29 +146,6 @@ sdd review user-auth-001 --type security
 sdd review user-auth-001 --type feasibility
 ```
 
-### Save Report
-
-```bash
-# Save as markdown
-sdd review user-auth-001 --output review-report.md
-
-# Save as JSON (for automation)
-sdd review user-auth-001 --output review-report.json
-```
-
-### Advanced Options
-
-```bash
-# Specify which tools to use
-sdd review user-auth-001 --tools gemini,codex
-
-# Use caching (skip re-calling models for same spec)
-sdd review user-auth-001 --cache
-
-# Preview without executing
-sdd review user-auth-001 --dry-run
-```
-
 ## Quick Reference: Common Commands
 
 | Command | Purpose | Typical Duration |
@@ -205,30 +155,27 @@ sdd review user-auth-001 --dry-run
 | `sdd review <spec> --type full` | Comprehensive analysis | 20-30 min |
 | `sdd review <spec> --type security` | Security vulnerability scan | 15-20 min |
 | `sdd review <spec> --type feasibility` | Estimate & dependency validation | 10-15 min |
-| `sdd review <spec> --output report.md` | Save review report | Variable |
 
 ## Typical Workflow
 
-**Standard review flow:**
+1. **Request the consultation**
+   ```bash
+   sdd review myspec --type full
+   ```
+   - Confirm the correct review type and tools, run once per major draft.
 
-```bash
-# 1. Create spec (via `Skill(sdd-toolkit:sdd-plan)`)
+2. **Interpret the synthesized report**
+   - Read the aggregated scores, model consensus summary, and severity-tagged findings.
+   - Capture key agreements/disagreements and any open questions that need follow-up.
 
-# 2. Review it
-sdd review myspec --type full
+3. **Prepare the advisory handoff**
+   - Summarize the readiness recommendation (approve / revise / reject) with rationale.
 
-# 3. If REVISE recommended, address issues
-#    ... edit spec based on critical/high issues ...
+## Outputs
 
-# 4. Quick re-review (optional)
-sdd review myspec --type quick
-
-# 5. Document review in spec (via `Skill(sdd-toolkit:sdd-update)`)
-sdd add-journal myspec --title "Review completed" --content "7.5/10 score, 2 critical issues addressed"
-
-# 6. Approve and proceed (via `Skill(sdd-toolkit:sdd-next)`)
-sdd update-frontmatter myspec status "approved"
-```
+- **Consensus report (Markdown):** Automatically saved to `specs/.reviews/<spec-id>-review-<type>.md` and printed to stdout; captures findings, severity tags, dissent notes, and recommended handoffs.
+- **JSON summary:** Automatically saved alongside the Markdown as `specs/.reviews/<spec-id>-review-<type>.json`; includes scores, recommendation, participating tools, and issue catalog for orchestration.
+- **Readiness recommendation:** APPROVE / REVISE / REJECT judgement with supporting rationale embedded in both default artifacts.
 
 ## Review Types
 
@@ -406,7 +353,7 @@ sdd review user-auth-001 --type full
 ```
 
 **What happens:**
-1. **Generate prompts** for each model with anti-sycophancy framing
+1. **Initiate each model review** with enforced critical framing
 2. **Call all AI CLI tools simultaneously** (ThreadPoolExecutor)
 3. **Collect responses** as they complete (timeouts: 60-120s per tool)
 4. **Handle failures gracefully** (continue with successful responses)
@@ -475,311 +422,30 @@ Dimension Scores:
 1. Missing authentication on admin endpoints
    Severity: CRITICAL | Flagged by: gemini, codex
    Impact: Unauthorized access to sensitive operations
-   Fix: Add JWT validation middleware to routes
+    Recommended follow-up: Add JWT validation middleware to routes
 
 ### High Priority Issues (Should Fix)
 2. Time estimates unrealistic for Phase 2
    Severity: HIGH | Flagged by: codex
    Impact: Timeline will slip, stakeholders disappointed
-   Fix: Increase estimates for tasks 2.3-2.5 by 50%
+    Recommended follow-up: Revisit estimates for tasks 2.3-2.5 (suggest +50%)
 ```
 
-### Phase 4: Act on Feedback
-
-**1. Prioritize issues:**
-
-```markdown
-CRITICAL (must fix immediately):
-  - [ ] Add authentication middleware
-  - [ ] Fix SQL injection vulnerability
-
-HIGH (should fix before approval):
-  - [ ] Increase time estimates for Phase 2
-  - [ ] Add error handling for network failures
-  - [ ] Clarify acceptance criteria for tasks 2.3-2.5
-
-MEDIUM (consider fixing):
-  - [ ] Add performance benchmarks
-  - [ ] Document API rate limits
-```
-
-**2. Update specification:**
-
-Edit the spec file to address issues found.
-
-**3. Document review (via Skill(sdd-toolkit:sdd-update)):**
-
-```bash
-# Journal the review results
-sdd add-journal user-auth-001 \
-  --title "Multi-model review completed" \
-  --content "Full review: 6.8/10 (REVISE). 2 critical + 3 high issues identified and fixed. Re-review pending."
-
-# Update metadata
-sdd update-frontmatter user-auth-001 review_status "revise"
-sdd update-frontmatter user-auth-001 review_score "6.8"
-```
-
-**4. Re-review if needed:**
-
-```bash
-# After fixes, quick re-review
-sdd review user-auth-001 --type quick
-
-# Should see improved scores
-# If APPROVE → proceed
-# If still REVISE → iterate
-```
-
-**5. Approve and proceed:**
-
-```bash
-# Update status to approved
-sdd update-frontmatter user-auth-001 status "approved"
-sdd update-frontmatter user-auth-001 review_status "approved"
-
-# Begin implementation (via Skill(sdd-toolkit:sdd-next))
-# (Use Skill(sdd-toolkit:sdd-next) to find first task)
-```
-
-## CLI Command Reference
-
-### `sdd review`
-
-Review a specification using multiple AI models.
-
-```bash
-sdd review {spec-id} [OPTIONS]
-```
-
-**Arguments:**
-- `{spec-id}`: Specification ID (required)
-
-**Options:**
-
-| Option | Values | Default | Description |
-|--------|--------|---------|-------------|
-| `--type` | `quick\|full\|security\|feasibility` | `full` | Review type |
-| `--tools` | Comma-separated list | Auto-detect | Which AI CLIs to use |
-| `--output` | File path | (stdout) | Save report to file (.md or .json) |
-| `--cache` | Flag | Off | Use cached results if available |
-| `--dry-run` | Flag | Off | Preview without executing |
-
-**Examples:**
-
-```bash
-# Basic review (auto-detects tools, uses full review)
-sdd review user-auth-001
-
-# Quick review (faster, less comprehensive)
-sdd review user-auth-001 --type quick
-
-# Security-focused review
-sdd review user-auth-001 --type security
-
-# Specify which tools to use
-sdd review user-auth-001 --tools gemini,codex
-
-# Save report to markdown file
-sdd review user-auth-001 --output review.md
-
-# Save report to JSON (for automation)
-sdd review user-auth-001 --output review.json
-
-# Use caching (skip model calls if spec unchanged)
-sdd review user-auth-001 --cache
-
-# Preview what would be done
-sdd review user-auth-001 --dry-run
-```
-
-### `sdd list-review-tools`
-
-Check which AI CLI tools are installed and available.
-
-```bash
-sdd list-review-tools
-```
-
-**Output:**
-```
-AI CLI Tools for Reviews
-
-✓ Available (2):
-  gemini
-  codex
-
-✗ Not Available (1):
-  cursor-agent
-
-Installation Instructions:
-
-Cursor Agent:
-  Install Cursor IDE from cursor.com
-  Cursor agent comes bundled with the IDE
-
-Summary: 2/3 tools available
-Multi-model reviews available
-```
-
-**Exit codes:**
-- `0`: At least 2 tools available (multi-model reviews possible)
-- `1`: 0-1 tools available (limited functionality)
-
-### Common Option Combinations
-
-```bash
-# Fast check before approval (10 min)
-sdd review myspec --type quick
-
-# Comprehensive pre-implementation review (20-30 min)
-sdd review myspec --type full --output full-review.md
-
-# Security audit for auth changes (15-20 min)
-sdd review auth-spec --type security --output security-audit.md
-
-# Validate aggressive timeline (10-15 min)
-sdd review big-refactor --type feasibility
-
-# Re-review after fixes (use cache to skip unchanged parts)
-sdd review myspec --type quick --cache
-
-# Production-ready review with all checks
-sdd review critical-spec --type full --tools gemini,codex,cursor-agent
-```
-
-## Integration with SDD Workflow
-
-### With `Skill(sdd-toolkit:sdd-plan)`
-
-**After spec creation:**
-
-```bash
-# 1. Create spec (via Skill(sdd-toolkit:sdd-plan))
-#    → Generates specs/active/myspec.json
-
-# 2. Review it
-sdd review myspec --type full
-
-# 3. If REVISE recommended, address critical/high issues
-#    ... edit specs/active/myspec.json ...
-
-# 4. Quick re-review after fixes (optional)
-sdd review myspec --type quick
-
-# 5. If APPROVE, proceed to implementation
-```
-
-**Review triggers redesign (REJECT):**
-
-```bash
-# Review identifies fundamental flaws
-sdd review myspec --type full
-# → Overall: 2.5/10 (REJECT)
-
-# Back to sdd-plan to redesign
-# (Use `Skill(sdd-toolkit:sdd-plan)` to create new version)
-```
-
-### With `Skill(sdd-toolkit:sdd-update)`
-
-**Document review results:**
-
-```bash
-# After review completes
-sdd review user-auth-001 --output review.md
-
-# Journal the review
-sdd add-journal user-auth-001 --title "Multi-model review completed" --content "Full review: 7.5/10 (APPROVE with minor issues). 2 critical issues fixed. Security review passed."
-
-# Update spec metadata with review status
-sdd update-frontmatter user-auth-001 review_status "approved"
-sdd update-frontmatter user-auth-001 review_score "7.5"
-sdd update-frontmatter user-auth-001 review_date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-# Update overall status to approved
-sdd update-frontmatter user-auth-001 status "approved"
-```
-
-**Track review history:**
-
-```json
-{
-  "metadata": {
-    "reviews": [
-      {
-        "date": "2025-10-20T15:30:00Z",
-        "type": "full",
-        "score": 6.8,
-        "recommendation": "REVISE",
-        "models": ["gemini", "codex"]
-      },
-      {
-        "date": "2025-10-21T10:00:00Z",
-        "type": "quick",
-        "score": 7.5,
-        "recommendation": "APPROVE",
-        "models": ["gemini", "codex"]
-      }
-    ]
-  }
-}
-```
-
-### With `Skill(sdd-toolkit:sdd-next)`
-
-**Review → Approve → Implement:**
-
-```bash
-# Review spec
-sdd review user-auth-001 --type full
-# → 8.2/10 (APPROVE)
-
-# Document approval (via Skill(sdd-toolkit:sdd-update))
-sdd update-frontmatter user-auth-001 status "approved"
-
-# Begin implementation (via Skill(sdd-toolkit:sdd-next))
-# (Use Skill(sdd-toolkit:sdd-next) to find first task)
-```
-
-**Review gates implementation:**
-
-```
-Review Score → Decision
-├─ 8-10 (APPROVE)     → Proceed to sdd-next
-├─ 5-7 (REVISE)       → Fix issues → Re-review
-└─ 1-4 (REJECT)       → Back to sdd-plan (redesign)
-```
-
-### Complete Integrated Workflow
-
-```bash
-# 1. Create spec
-# (Use Skill(sdd-toolkit:sdd-plan))
-# → specs/active/myspec.json created
-
-# 2. Review spec
-sdd review myspec --type full
-# → 6.5/10 (REVISE): 2 critical, 3 high issues
-
-# 3. Fix critical/high issues
-# ... edit specs/active/myspec.json ...
-
-# 4. Re-review (quick check)
-sdd review myspec --type quick
-# → 8.0/10 (APPROVE)
-
-# 5. Document review (via Skill(sdd-toolkit:sdd-update))
-sdd add-journal myspec --title "Review approved" \
-  --content "8.0/10, all critical issues resolved"
-sdd update-frontmatter myspec status "approved"
-
-# 6. Begin implementation (via Skill(sdd-toolkit:sdd-next))
-# (Use Skill(sdd-toolkit:sdd-next) to find first task)
-
-# 7. Track progress (via Skill(sdd-toolkit:sdd-update))
-# ... as implementation proceeds ...
-```
+### Phase 4: Synthesize Findings & Recommend Handoffs
+
+1. **Prioritize by consensus severity**
+   - Group findings by CRITICAL / HIGH / MEDIUM / LOW using the report metadata.
+   - Note which models agreed and where dissent exists so downstream skills know when to investigate further.
+
+2. **Identify the type of downstream work**
+   - Structural or architectural redesign
+   - Documentation, metadata, or journal updates
+   - Implementation sequencing once APPROVE is accepted
+   - Additional audits (tests, validation)
+
+3. **Capture the advisory summary**
+   - Record readiness recommendation, key blocking issues, and open questions.
+   - Return the path to the JSON report for full context.
 
 ## Advanced Topics
 
@@ -795,11 +461,6 @@ sdd update-frontmatter myspec status "approved"
 | **Network error** | Retry 2x with backoff | Usually recovers |
 | **Parse failure** | Use other model responses | No impact if ≥2 models succeed |
 
-**Timeouts per tool:**
-- Gemini: 60s (fast API)
-- Codex: 90s (thorough analysis)
-- Cursor Agent: 120s (local processing)
-
 **Partial results:**
 
 | Scenario | Outcome | Confidence |
@@ -808,59 +469,6 @@ sdd update-frontmatter myspec status "approved"
 | 2/3 tools succeed | Continue with 2 | Medium (noted in report) |
 | 1/3 tools succeed | Continue with 1 | Low (single-model warning) |
 | 0/3 tools succeed | Review fails | Error with troubleshooting |
-
-### Caching System
-
-**How it works:**
-
-Cache key = SHA-256 hash of:
-- Spec file content
-- Review type
-- Tool names used
-
-**Cache location:** `~/.claude/skills/sdd-plan-review/.cache/`
-
-**Cache behavior:**
-
-```bash
-# Default: No caching (always call tools)
-sdd review myspec
-
-# Use cache if available (skip model calls if unchanged)
-sdd review myspec --cache
-
-# Clear all cache
-rm -rf ~/.claude/skills/sdd-plan-review/.cache/
-```
-
-**When cache is used:**
-- Spec content identical
-- Same review type
-- Same tools requested
-- Cache entry < 7 days old
-
-**When cache is invalidated:**
-- Spec content changes (any edit)
-- Different review type requested
-- Different tools specified
-- Cache entry > 7 days old
-- Manual cache clear
-
-**Cache benefits:**
-- **Fast re-reviews** after minor fixes (instant)
-- **Cost savings** (no duplicate API calls)
-- **Consistent results** for same inputs
-
-**Cache limitations:**
-- Doesn't detect semantic changes (only content hash)
-- Can return stale results if models improve
-- Shared cache across all specs (based on hash)
-
-**Best practices:**
-- Use `--cache` for quick re-reviews after minor edits
-- Don't use `--cache` for major spec changes
-- Clear cache periodically (monthly)
-- Don't use `--cache` for first review of new spec
 
 ## Best Practices
 
@@ -910,21 +518,11 @@ rm -rf ~/.claude/skills/sdd-plan-review/.cache/
    - Consider context and tradeoffs
    - Models may misunderstand requirements
    - Use judgment on disagreements
-   - Document decisions to defer issues
+   - Recommend when issues might be deferred
 
-5. **Re-review after major changes**
-   - Quick re-review after critical fixes
-   - Full re-review after architectural changes
-   - Validates fixes were effective
+### Coordinating Follow-Up Work
 
-6. **Document review in spec**
-   - Journal review date, score, decision
-   - Track review history in metadata
-   - Note deferred issues with rationale
-
-### Acting on Feedback
-
-**Prioritization guide:**
+**Prioritization guide for downstream teams:**
 
 ```
 CRITICAL issues:
@@ -932,82 +530,32 @@ CRITICAL issues:
   - Blocking dependencies
   - Data loss risks
   - Compliance violations
-  → Fix immediately, cannot proceed without
+  → Escalate immediately
 
 HIGH issues:
   - Design flaws
   - Unrealistic estimates
   - Missing error handling
   - Quality concerns
-  → Should fix before approval
+  → Identify remediation work required before granting APPROVE
 
 MEDIUM issues:
   - Unclear requirements
   - Missing optimizations
   - Incomplete documentation
-  → Consider fixing, or defer with documentation
+  → Recommend whether to defer; provide rationale
 
 LOW issues:
   - Nice-to-have improvements
   - Edge case enhancements
   - Future considerations
-  → Note for later, proceed
+  → Identify as possible future work items
 ```
 
 **Balance perspectives:**
 
 When models disagree:
-1. Read all perspectives carefully
-2. Identify root cause of disagreement
-3. Research the specific concern
-4. Make informed decision with documentation
-5. Consider getting human expert review
+1. Review each perspective and note context differences.
+2. Identify root causes or assumptions driving the disagreement.
 
-**Track decisions:**
-
-```bash
-# Document decision to defer an issue
-sdd add-journal myspec --title "Deferred optimization concern" \
-  --content "Codex flagged potential N+1 query in Phase 2. Decision: defer to Phase 3 performance optimization task. Reasoning: premature optimization, need working implementation first."
-```
-
-## Spec Modification Handoff
-
-After plan review identifies consensus improvements, **sdd-next** orchestrates spec modifications before implementation begins.
-
-**Pattern:**
-1. Plan review generates multi-model report with consensus recommendations
-2. Report analyzed for 2-3 model agreement on improvements
-3. When ready to begin implementation, **sdd-next** presents modification options to user
-4. If approved, sdd-next invokes `sdd-modify-subagent` to apply consensus changes
-
-**Note:** This skill generates review reports identifying spec improvements through multi-model consensus. The review skill does NOT modify specs directly. Instead, **sdd-next** decides when and how to apply modifications based on review consensus before starting implementation.
-
-**For complete workflow:** See `Skill(sdd-toolkit:sdd-next)` documentation on orchestrating pre-implementation spec modifications via sdd-modify based on plan review consensus.
-
-## See Also
-
-**Skill(sdd-toolkit:sdd-plan)** - Use before this skill:
-- Create specifications from requirements
-- Generate task hierarchies and phases
-- Define dependencies and verification steps
-- Set up project structure
-
-**Skill(sdd-toolkit:sdd-next)** - Use after review:
-- Find next actionable task from approved spec
-- Create execution plans for implementation
-- Begin implementation after APPROVE
-- Handle blockers and resume work
-
-**Skill(sdd-toolkit:sdd-update)** - Use to document review:
-- Update spec metadata (status, review_score, review_date)
-- Add journal entries documenting review results
-- Track review history and decisions
-- Mark spec as approved after successful review
-- Document deferred issues
-
-**Skill(sdd-toolkit:sdd-validate)** - Complementary validation:
-- Validate JSON spec file structure
-- Check for schema compliance
-- Find structural errors
-- Different from review (validation vs quality assessment)
+Remember to include the JSON file path at the end of your report back.

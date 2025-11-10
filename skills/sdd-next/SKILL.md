@@ -191,7 +191,7 @@ The `sdd context` command requires a session marker to locate the transcript. Th
 sdd session-marker
 
 # Step 2: Check context using the marker from step 1
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **Output Format:**
@@ -199,11 +199,6 @@ sdd context --session-marker "SESSION_MARKER_<hash>" --json
 The command returns simplified JSON with just the percentage as a whole number:
 ```json
 {"context_percentage_used": 78}
-```
-
-To get full metrics output, add `--verbose` flag:
-```bash
-sdd context --session-marker "SESSION_MARKER_<hash>" --json --verbose
 ```
 
 **CRITICAL REQUIREMENTS:**
@@ -221,14 +216,14 @@ The session marker from step 1 must be written to the conversation transcript be
 
 ```bash
 # ❌ WRONG - Combined with &&
-sdd session-marker && sdd context --session-marker "..." --json
+sdd session-marker && sdd context --session-marker "..."
 
 # ❌ WRONG - Combined with $()
-sdd context --session-marker "$(sdd session-marker)" --json
+sdd context --session-marker "$(sdd session-marker)"
 
 # ❌ WRONG - Run in parallel (both in same message)
 # Bash call 1: sdd session-marker
-# Bash call 2: sdd context --session-marker "..." --json
+# Bash call 2: sdd context --session-marker "..."
 ```
 
 **When to Check Context:**
@@ -494,7 +489,7 @@ sdd session-marker
 
 ```bash
 # Second Bash call: Check context using the marker from first call
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **NEVER:**
@@ -569,7 +564,7 @@ sdd session-marker
 
 ```bash
 # Second Bash call: Check context using the marker from first call
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **NEVER combine with `&&`, `$()`, or run in parallel.** The marker must be logged to the transcript first.
@@ -757,7 +752,6 @@ You have access to the `sdd` CLI.
 - `--quiet, -q` - Minimal output (errors only)
 
 **Command-Specific Common Options:**
-- `--json` - Output as JSON (available on most commands)
 - `--path <dir>` - Specify specs directory path (spec operations only)
 - `--directory <dir>` - Specify project directory (project analysis commands only)
 - `--status <status>` - Filter by status: pending, in_progress, completed, blocked (query-tasks only)
@@ -1268,7 +1262,7 @@ sdd session-marker
 
 ```bash
 # Second Bash call: Check context using the marker from first call
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **NEVER combine with `&&`, `$()`, or run in parallel.** The marker must be logged to the transcript first.
@@ -1994,7 +1988,7 @@ sdd session-marker
 
 ```bash
 # Second Bash call: Check context using the marker from first call
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **Critical Requirements:**
@@ -2006,10 +2000,10 @@ sdd context --session-marker "SESSION_MARKER_<hash>" --json
 **Why This Fails:**
 ```bash
 # ❌ WRONG - Combined with &&
-sdd session-marker && sdd context --session-marker "..." --json
+sdd session-marker && sdd context --session-marker "..."
 
 # ❌ WRONG - Combined with $()
-sdd context --session-marker "$(sdd session-marker)" --json
+sdd context --session-marker "$(sdd session-marker)"
 
 # ❌ WRONG - Run in parallel (both Bash calls in same message)
 ```
@@ -2110,7 +2104,7 @@ Let me know how you'd like to proceed.
 sdd session-marker
 
 # Step 2: Check context using the marker from step 1
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
+sdd context --session-marker "SESSION_MARKER_<hash>"
 ```
 
 **CRITICAL:** Run as TWO SEPARATE, SEQUENTIAL commands. Never combine with `&&` or `$()`. Never run in parallel. See [Context Checking Pattern](#context-checking-pattern) section for details.

@@ -5,9 +5,12 @@ Tests: validate_structure, validate_hierarchy, validate_nodes, validate_task_cou
 validate_dependencies, validate_metadata, validate_spec_hierarchy.
 """
 
-import pytest
 import json
+import sys
+import builtins
 from pathlib import Path
+
+import pytest
 
 # Import validation functions from sdd_common
 from claude_skills.common.hierarchy_validation import (
@@ -17,7 +20,8 @@ from claude_skills.common.hierarchy_validation import (
     validate_task_counts,
     validate_dependencies,
     validate_metadata,
-    validate_spec_hierarchy
+    validate_spec_hierarchy,
+    _validate_against_schema,
 )
 
 
@@ -553,6 +557,47 @@ class TestValidateJsonSpec:
         # Should count all nodes in hierarchy
         assert result.total_nodes > 0
         assert result.total_tasks > 0
+
+
+class TestSchemaValidationHelpers:
+    """Tests for schema validation fallback behaviour."""
+
+    def test_validate_against_schema_missing_schema_emits_warning(self, monkeypatch):
+        monkeypatch.setattr(
+            "claude_skills.common.hierarchy_validation.load_json_schema",
+            lambda name: (None, None, "schema cache missing"),
+        )
+
+        errors, warnings, source = _validate_against_schema({})
+
+        assert errors == []
+        assert warnings == ["schema cache missing"]
+        assert source is None
+
+    def test_validate_against_schema_missing_dependency_emits_warning(self, monkeypatch):
+        monkeypatch.setattr(
+            "claude_skills.common.hierarchy_validation.load_json_schema",
+            lambda name: ({}, "package://schema", None),
+        )
+
+        original_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "jsonschema":
+                raise ImportError("jsonschema not installed")
+            return original_import(name, *args, **kwargs)
+
+        monkeypatch.delitem(sys.modules, "jsonschema", raising=False)
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+
+        errors, warnings, source = _validate_against_schema({})
+
+        assert errors == []
+        assert warnings == [
+            "Schema validation skipped: install the 'jsonschema' package "
+            "or use optional dependency group 'validation' to enable Draft 7 validation."
+        ]
+        assert source == "package://schema"
 
 
 @pytest.mark.integration

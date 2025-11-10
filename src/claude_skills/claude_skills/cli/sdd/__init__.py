@@ -196,11 +196,17 @@ def main():
     try:
         args = parser.parse_args(cmd_line)
 
+        # If --path was provided, reload config from that location
+        # This allows config-driven testing with temporary configs
+        if hasattr(args, 'path') and args.path and args.path != '.':
+            from pathlib import Path
+            config = load_sdd_config(project_path=Path(args.path))
+
         # Apply config defaults for args that weren't specified (are None)
         if args.json is None:
-            args.json = config['output']['json']
+            args.json = config['output']['default_mode'] == 'json'
         if args.compact is None:
-            args.compact = config['output']['compact']
+            args.compact = config['output']['json_compact']
 
     except SystemExit as e:
         # Check if it's an invalid command error and provide helpful suggestion

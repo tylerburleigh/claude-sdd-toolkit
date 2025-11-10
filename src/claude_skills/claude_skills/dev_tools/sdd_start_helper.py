@@ -20,11 +20,6 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from common.integrations import get_session_state
 
-# Configuration
-CLAUDE_HOME = Path.home() / ".claude"
-SETTINGS_FILE = CLAUDE_HOME / "settings.json"
-
-
 def check_permissions(project_root=None):
     """Check if SDD permissions are configured for the project."""
     if project_root is None:
@@ -36,11 +31,12 @@ def check_permissions(project_root=None):
     specs_dir = project_root / "specs"
     has_specs = specs_dir.exists()
 
-    # Check if permissions are in settings
+    # Check if permissions are in project-local settings
+    settings_file = project_root / ".claude" / "settings.local.json"
     needs_setup = False
-    if has_specs and SETTINGS_FILE.exists():
+    if has_specs and settings_file.exists():
         try:
-            with open(SETTINGS_FILE, 'r') as f:
+            with open(settings_file, 'r') as f:
                 settings = json.load(f)
 
             permissions = settings.get('permissions', {}).get('allow', [])

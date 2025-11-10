@@ -242,12 +242,16 @@ Failure types:
         "run",
         help="Run pytest with presets or custom configuration",
         description="Smart pytest runner with presets for common scenarios",
+        parents=[parent_parser],
     )
 
     preset_group = run_parser.add_mutually_exclusive_group()
     for preset_name, preset_config in get_presets().items():
+        option_flag = f"--{preset_name}"
+        if preset_name in {"debug", "verbose"}:
+            option_flag = f"--preset-{preset_name}"
         preset_group.add_argument(
-            f"--{preset_name}",
+            option_flag,
             action="store_const",
             const=preset_name,
             dest="preset",

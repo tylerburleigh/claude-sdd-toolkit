@@ -9,68 +9,16 @@ Tests all list commands:
 
 Tests cover:
 - Text/Rich output format (default)
-- JSON output format (--format json)
+- JSON output format (--json)
 - Output correctness and structure
 - Empty result handling
 """
 
-import sys
-import pytest
-import subprocess
 import json
-import shutil
-from pathlib import Path
 
-# Unified CLI command
-CLI_CMD = "sdd"
+import pytest
 
-
-def run_cli(*args, **kwargs):
-    """
-    Run sdd command with fallback to python -m if sdd not on PATH.
-
-    Automatically reorders arguments to put global flags before subcommands.
-    Global flags: --path, --specs-dir, --quiet, --json, --debug, --verbose, --no-color
-    """
-    # Define global flags that must come before subcommands
-    global_flags_with_values = {'--path', '--specs-dir'}
-    global_flags_boolean = {'--quiet', '-q', '--json', '--debug', '--verbose', '-v', '--no-color'}
-    all_global_flags = global_flags_with_values | global_flags_boolean
-
-    args_list = list(args)
-
-    # Scan all args and separate global flags from subcommand and its args
-    global_args = []
-    non_global_args = []
-
-    i = 0
-    while i < len(args_list):
-        arg = args_list[i]
-
-        if arg in global_flags_with_values and i + 1 < len(args_list):
-            # This is a global flag with a value
-            global_args.append(arg)
-            global_args.append(args_list[i + 1])
-            i += 2
-        elif arg in global_flags_boolean:
-            # This is a boolean global flag
-            global_args.append(arg)
-            i += 1
-        else:
-            # This is not a global flag - could be subcommand or subcommand arg
-            non_global_args.append(arg)
-            i += 1
-
-    # Build final command: global_flags + subcommand + non-global args
-    final_args = global_args + non_global_args
-
-    if shutil.which(CLI_CMD):
-        return subprocess.run([CLI_CMD] + final_args, **kwargs)
-    else:
-        return subprocess.run(
-            [sys.executable, '-m', 'claude_skills.cli.sdd'] + final_args,
-            **kwargs
-        )
+from .cli_runner import run_cli
 
 
 @pytest.mark.integration
@@ -168,8 +116,8 @@ class TestListSpecsCLI:
         spec_file = active_dir / "json-test-001.json"
         spec_file.write_text(json.dumps(spec_data, indent=2))
 
-        # Run list-specs command with JSON format
-        result = run_cli("list-specs", "--path", str(specs_dir), "--format", "json",
+        # Run list-specs command with the global --json flag
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir),
             capture_output=True,
             text=True
         )
@@ -230,7 +178,7 @@ class TestListSpecsCLI:
         (completed_dir / "completed-001.json").write_text(json.dumps(completed_spec))
 
         # List only active specs
-        result = run_cli("list-specs", "--path", str(specs_dir), "--status", "active", "--format", "json",
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir), "--status", "active",
             capture_output=True,
             text=True
         )
@@ -241,7 +189,7 @@ class TestListSpecsCLI:
         assert output_data[0]["status"] == "active"
 
         # List only completed specs
-        result = run_cli("list-specs", "--path", str(specs_dir), "--status", "completed", "--format", "json",
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir), "--status", "completed",
             capture_output=True,
             text=True
         )
@@ -274,7 +222,7 @@ class TestListSpecsCLI:
         (active_dir / "progress-test-001.json").write_text(json.dumps(spec_data))
 
         # Run list-specs with JSON output
-        result = run_cli("list-specs", "--path", str(specs_dir), "--format", "json",
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir),
             capture_output=True,
             text=True
         )
@@ -308,8 +256,8 @@ class TestListSpecsCLI:
 
         (active_dir / "verbose-001.json").write_text(json.dumps(spec_data))
 
-        # Run with --detailed and JSON format for easy verification
-        result = run_cli("list-specs", "--path", str(specs_dir), "--detailed", "--format", "json",
+        # Run with --detailed and the global --json flag for easy verification
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir), "--detailed",
             capture_output=True,
             text=True
         )
@@ -345,7 +293,7 @@ class TestListSpecsCLI:
             (active_dir / f"spec-{i:03d}.json").write_text(json.dumps(spec_data))
 
         # Run list-specs
-        result = run_cli("list-specs", "--path", str(specs_dir), "--format", "json",
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir),
             capture_output=True,
             text=True
         )
@@ -384,7 +332,7 @@ class TestListSpecsCLI:
         (active_dir / "ansi-test-001.json").write_text(json.dumps(spec_data))
 
         # Run list-specs with JSON output
-        result = run_cli("list-specs", "--path", str(specs_dir), "--format", "json",
+        result = run_cli("--json", "list-specs", "--path", str(specs_dir),
             capture_output=True,
             text=True
         )
@@ -493,8 +441,8 @@ class TestQueryTasksCLI:
 
         (active_dir / "json-query-001.json").write_text(json.dumps(spec_data))
 
-        # Run query-tasks with JSON format
-        result = run_cli("query-tasks", "--path", str(specs_dir), "json-query-001", "--format", "json",
+        # Run query-tasks with the global --json flag
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "json-query-001",
             capture_output=True,
             text=True
         )
@@ -529,7 +477,7 @@ class TestQueryTasksCLI:
         (active_dir / "filter-001.json").write_text(json.dumps(spec_data))
 
         # Query only pending tasks
-        result = run_cli("query-tasks", "--path", str(specs_dir), "filter-001", "--status", "pending", "--format", "json",
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "filter-001", "--status", "pending",
             capture_output=True,
             text=True
         )
@@ -558,7 +506,7 @@ class TestQueryTasksCLI:
         (active_dir / "type-filter-001.json").write_text(json.dumps(spec_data))
 
         # Query only tasks (not phases or verifications)
-        result = run_cli("query-tasks", "--path", str(specs_dir), "type-filter-001", "--type", "task", "--format", "json",
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "type-filter-001", "--type", "task",
             capture_output=True,
             text=True
         )
@@ -589,7 +537,7 @@ class TestQueryTasksCLI:
         (active_dir / "parent-filter-001.json").write_text(json.dumps(spec_data))
 
         # Query only tasks in phase-1
-        result = run_cli("query-tasks", "--path", str(specs_dir), "parent-filter-001", "--parent", "phase-1", "--format", "json",
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "parent-filter-001", "--parent", "phase-1",
             capture_output=True,
             text=True
         )
@@ -619,7 +567,7 @@ class TestQueryTasksCLI:
         (active_dir / "empty-001.json").write_text(json.dumps(spec_data))
 
         # Query for completed tasks (none exist)
-        result = run_cli("query-tasks", "--path", str(specs_dir), "empty-001", "--status", "completed", "--format", "json",
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "empty-001", "--status", "completed",
             capture_output=True,
             text=True
         )
@@ -656,7 +604,7 @@ class TestQueryTasksCLI:
         (active_dir / "ansi-query-001.json").write_text(json.dumps(spec_data))
 
         # Run query-tasks with JSON output
-        result = run_cli("query-tasks", "--path", str(specs_dir), "ansi-query-001", "--format", "json",
+        result = run_cli("--json", "query-tasks", "--path", str(specs_dir), "ansi-query-001",
             capture_output=True,
             text=True
         )

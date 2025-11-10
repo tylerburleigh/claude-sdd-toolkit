@@ -1,7 +1,7 @@
 ---
 name: sdd-fidelity-review-subagent
 description: Review implementation fidelity against specifications, comparing actual code to spec requirements
-model: sonnet
+model: haiku
 required_information:
   phase_review:
     - spec_id (the specification ID)
@@ -32,6 +32,19 @@ Use this agent when you need to:
 - Updating task status (use sdd-update)
 - Running tests (use run-tests)
 
+## Reading Specifications (CRITICAL)
+
+**NEVER read spec files directly. The skill uses the CLI tool, which handles all spec access:**
+
+- ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens (specs can be 50KB+)
+- ❌ **NEVER** use Python to parse spec JSON files
+- ❌ **NEVER** use `jq` to query spec files via Bash
+- ❌ **NEVER** use Bash commands to read specs (e.g., `cat`, `head`, `tail`, `grep`)
+- ❌ **NEVER** use command chaining to access specs (e.g., `sdd --version && cat specs/active/spec.json`)
+- ✅ **ALWAYS** invoke the skill and let it handle spec access via the `sdd fidelity-review` CLI tool
+
+**Your sole responsibility:** Invoke `Skill(sdd-toolkit:sdd-fidelity-review)` with a clear prompt. The skill handles ALL spec file operations.
+
 ## How This Agent Works
 
 This agent is a thin wrapper that invokes `Skill(sdd-toolkit:sdd-fidelity-review)`.
@@ -51,6 +64,13 @@ This agent is a thin wrapper that invokes `Skill(sdd-toolkit:sdd-fidelity-review
 6. Wait for the skill to complete its work
 7. Report the results back to the user with a summary of findings
 
+**In your task, DO NOT:**
+- ❌ Call the `sdd fidelity-review` CLI tool directly - the skill handles this
+- ❌ Read spec files yourself with Read/Python/jq/Bash - the skill uses CLI for ALL spec access
+- ❌ Read implementation files yourself - the skill does analysis via CLI
+- ❌ Attempt manual comparison or analysis - delegate to the skill
+- ❌ Parse or analyze code manually - the CLI tool consults AI models for this
+
 ## Contract Validation
 
 Before executing this agent, validate that the following information is provided:
@@ -62,16 +82,6 @@ Before executing this agent, validate that the following information is provided
 ### For Task Review
 - ✅ `spec_id` - Valid specification ID
 - ✅ `task_id` - Valid task ID within the spec
-
-**If required information is missing, return structured error:**
-
-```json
-{
-  "error": "missing_required_information",
-  "missing_fields": ["spec_id", "task_id"],
-  "message": "Cannot proceed with fidelity review. Please provide: spec_id (required), task_id (required for task review)"
-}
-```
 
 ## Review Types
 
@@ -86,26 +96,6 @@ The skill supports multiple review scopes:
 **Scope:** Individual task implementation
 **When to use:** Critical task validation, complex implementation verification
 **Output:** Task-specific compliance check with implementation comparison
-
-## Example Invocations
-
-**Phase review:**
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review phase phase-1 in spec user-auth-001. Compare all completed tasks in Phase 1 against specification requirements.",
-  description: "Phase 1 fidelity review"
-)
-```
-
-**Task-specific review:**
-```
-Task(
-  subagent_type: "sdd-toolkit:sdd-fidelity-review-subagent",
-  prompt: "Review task task-2-3 in spec user-auth-001. Compare implementation in src/middleware/auth.ts against task requirements.",
-  description: "Review auth middleware task"
-)
-```
 
 ## Error Handling
 
@@ -156,4 +146,6 @@ A successful fidelity review delegation:
 
 ---
 
-*This is a thin wrapper agent. All implementation logic is in Skill(sdd-toolkit:sdd-fidelity-review). For creating specifications, use Skill(sdd-toolkit:sdd-plan). For task progress updates, use sdd-update-subagent.*
+**Note:** All detailed fidelity review logic—including spec loading, implementation analysis, CLI tool invocation, AI consultation, and report generation—is handled by `Skill(sdd-toolkit:sdd-fidelity-review)`. This agent's sole role is to validate inputs, invoke the skill with a clear prompt, and communicate results back to the user.
+
+*For creating specifications, use Skill(sdd-toolkit:sdd-plan). For task progress updates, use sdd-update-subagent.*

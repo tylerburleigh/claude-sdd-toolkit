@@ -1,0 +1,2339 @@
+{
+  "spec_id": "rich-output-optimization-2025-11-07-001",
+  "generated": "2025-11-07T00:00:00Z",
+  "last_updated": "2025-11-08T11:24:10.117293Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Rich Text Output Optimization & Technical Debt Resolution",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6",
+        "phase-7"
+      ],
+      "total_tasks": 75,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Refactor Rich text output implementation to address technical debt, add proper configuration support, implement testing infrastructure, and optimize for AI-agent consumption based on multi-model consensus review",
+        "estimated_hours": 168,
+        "complexity": "high"
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Technical Foundation Fixes",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Replace temporary solutions with robust, production-ready implementations",
+        "risk_level": "medium",
+        "estimated_hours": 40
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6",
+          "phase-7"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7",
+        "task-1-8",
+        "task-1-9",
+        "task-1-10"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Create semantic color palette and console utilities",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4",
+          "task-1-5",
+          "task-1-6",
+          "task-1-7",
+          "task-1-8",
+          "task-1-9",
+          "task-1-10"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/colors.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Create new colors.py module with: (1) SEMANTIC_PALETTE dictionary mapping semantic names to Rich color styles, (2) get_console_width() function with dynamic detection capped at 5000, (3) should_use_color() function respecting NO_COLOR/FORCE_COLOR standards, (4) get_configured_console() factory function",
+        "reasoning": "Centralize color definitions and console configuration to eliminate hardcoded values (width=20000, force_terminal=True) and provide consistent patterns across all commands"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/rich_ui.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace Console(width=20000, force_terminal=True) with get_configured_console() from colors.py. Import semantic color constants instead of inline color strings",
+        "reasoning": "Core UI backend used by all commands - updating this establishes the new pattern"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Replace Console() initialization with get_configured_console(). Use SEMANTIC_PALETTE for status colors",
+        "reasoning": "Update list-specs command to use new console configuration"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/query_tasks.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/query_tasks.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace 2 Console() calls with get_configured_console(). Use semantic colors for task statuses",
+        "reasoning": "Update query-tasks command (has 2 console locations)"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/list_phases.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_phases.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace 3 Console() calls with get_configured_console(). Use semantic color palette",
+        "reasoning": "Update list-phases command (has 3 console locations)"
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/status_report.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/status_report.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace Console() with get_configured_console(). Use semantic colors for status panels",
+        "reasoning": "Update status-report command"
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/diff.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/diff.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Replace Console() with get_configured_console(). Use semantic colors for diff output",
+        "reasoning": "Update validate diff command"
+      }
+    },
+    "task-1-8": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace 2 Console() calls with get_configured_console(). Use semantic color palette",
+        "reasoning": "Update sdd-next command (has 2 console locations)"
+      }
+    },
+    "task-1-9": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-10"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace Console() with get_configured_console(). Use semantic severity colors from palette",
+        "reasoning": "Update fidelity-review report command"
+      }
+    },
+    "task-1-10": {
+      "type": "task",
+      "title": "Update FINDINGS.md with implementation notes",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4",
+          "task-1-5",
+          "task-1-6",
+          "task-1-7",
+          "task-1-8",
+          "task-1-9",
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "FINDINGS.md",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Add section documenting Phase 1 completion: console configuration refactor, width calculation approach, color detection logic, and removal of hardcoded values",
+        "reasoning": "Document the technical decisions and implementation approach for future reference"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "All commands render color output correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Run each modified command (list-specs, query-tasks, list-phases, status-report, diff, sdd-next, fidelity-review) and verify ANSI color codes appear correctly in Claude Code context",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "NO_COLOR environment variable disables colors",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "NO_COLOR=1 sdd list-specs --path specs && NO_COLOR=1 sdd query-tasks --path specs",
+        "expected": "Output contains no ANSI escape codes"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Configuration System",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3",
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Enable user control over output behavior through config and CLI flags",
+        "risk_level": "low",
+        "estimated_hours": 32
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4",
+        "task-2-5",
+        "task-2-6",
+        "task-2-7",
+        "task-2-8"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Update config schema with output.color setting",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/templates/sdd_config.json",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add output.color field with values 'auto' | 'always' | 'never'. Update comments explaining each option",
+        "reasoning": "Config template drives default configuration for new projects"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Add config migration logic for output.color",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/sdd_config.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add migration function to convert old configs without output.color to new schema. Default to 'auto' for backward compatibility. Update get_default_format() to respect output.color setting",
+        "reasoning": "Ensure existing user configs continue working while supporting new color control"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Update colors.py to read config for color preference",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-4",
+          "task-2-5",
+          "task-2-6",
+          "task-2-7",
+          "task-2-8"
+        ],
+        "blocked_by": [
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/colors.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Modify should_use_color() to read output.color from config. Respect 'always', 'never', and 'auto' settings. Maintain NO_COLOR/FORCE_COLOR env var support as highest priority",
+        "reasoning": "Central color detection function needs to honor user configuration"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "Add --no-color flag to list-specs command",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add --no-color flag to list-specs command argparse. Pass to get_configured_console() to override config",
+        "reasoning": "Give users per-command control over color output"
+      }
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "Add --no-color flag to query-tasks command",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add --no-color flag to query-tasks command argparse. Pass to console initialization",
+        "reasoning": "Consistent flag across all user-facing commands"
+      }
+    },
+    "task-2-6": {
+      "type": "task",
+      "title": "Add --no-color flag to list-phases command",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add --no-color flag to list-phases command argparse. Pass to console initialization",
+        "reasoning": "Consistent flag across all user-facing commands"
+      }
+    },
+    "task-2-7": {
+      "type": "task",
+      "title": "Add --no-color flag to status-report command",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add --no-color flag to status-report command argparse. Pass to console initialization",
+        "reasoning": "Consistent flag across all user-facing commands"
+      }
+    },
+    "task-2-8": {
+      "type": "task",
+      "title": "Add --no-color flag to sdd-next command",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add --no-color flag to sdd-next command argparse. Pass to console initialization",
+        "reasoning": "Consistent flag across all user-facing commands"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Config migration works for existing configs",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Test with old config file missing output.color. Verify migration adds default 'auto' value and commands work correctly",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "All color settings work correctly",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Test output.color: 'always' (colors on), 'never' (colors off), 'auto' (colors based on environment). Test with NO_COLOR=1 overriding config. Test --no-color flag overriding config",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "All commands have --no-color flag",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd list-specs --help && sdd query-tasks --help && sdd list-phases --help && sdd status-report --help",
+        "expected": "All commands show --no-color flag in help output"
+      }
+    },
+    "verify-2-4": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Testing & Validation Infrastructure",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4",
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure correctness, prevent regressions, validate performance",
+        "risk_level": "low",
+        "estimated_hours": 48
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4",
+        "task-3-5",
+        "task-3-6",
+        "task-3-7",
+        "task-3-8"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Create snapshot test framework for ANSI output",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_rich_output_snapshots.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "changes": "Create pytest-based snapshot testing framework. Capture ANSI output from commands, store as fixtures, compare on subsequent runs. Include helper to strip ANSI codes for assertion testing",
+        "reasoning": "Snapshot testing ensures color output remains consistent across changes"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Add snapshot tests for all major commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-8"
+        ],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_command_snapshots.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Create snapshot tests for: list-specs, query-tasks, list-phases, status-report, sdd-next. Each test runs command with test data and verifies ANSI output matches snapshot",
+        "reasoning": "Regression protection for each command's color output"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Create performance benchmark framework",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-4",
+          "task-3-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_performance_benchmarks.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "changes": "Create pytest benchmark suite measuring: rendering time for large outputs (1000+ tasks), memory usage with wide consoles, startup time overhead from new imports. Set baseline thresholds",
+        "reasoning": "Ensure performance doesn't degrade with new console configuration approach"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "Add benchmarks for large spec rendering",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-8"
+        ],
+        "blocked_by": [
+          "task-3-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_large_spec_performance.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Create test specs with 100, 500, 1000 tasks. Benchmark list-specs, query-tasks, status-report rendering time and memory. Assert times stay under thresholds (e.g., <2s for 1000 tasks)",
+        "reasoning": "Validate performance with realistic large specifications"
+      }
+    },
+    "task-3-5": {
+      "type": "task",
+      "title": "Create JSON format regression tests",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_json_output_regression.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add tests verifying --format=json still produces valid, parseable JSON with no ANSI codes. Test all commands supporting JSON output",
+        "reasoning": "Ensure JSON output remains clean for machine consumption"
+      }
+    },
+    "task-3-6": {
+      "type": "task",
+      "title": "Create accessibility validation tests",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_accessibility.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Create tests validating: (1) Color combinations meet WCAG contrast ratios, (2) Status information available via text not just color (emojis present), (3) Fallback to 16-color palette works",
+        "reasoning": "Ensure output is accessible to users with color blindness or limited terminal capabilities"
+      }
+    },
+    "task-3-7": {
+      "type": "task",
+      "title": "Add cross-terminal validation helpers",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_terminal_compatibility.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "changes": "Create manual test helpers for verifying output in: xterm, Claude Code, VS Code terminal, iTerm2, Windows Terminal. Document expected behavior for each",
+        "reasoning": "Different terminals have different ANSI support - validate across common environments"
+      }
+    },
+    "task-3-8": {
+      "type": "task",
+      "title": "Add testing documentation",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1",
+          "task-3-2",
+          "task-3-3",
+          "task-3-4",
+          "task-3-5",
+          "task-3-6",
+          "task-3-7"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/TESTING_RICH_OUTPUT.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Create documentation explaining: how to run snapshot tests, how to update snapshots when output intentionally changes, performance benchmark thresholds, accessibility requirements, cross-terminal testing procedure",
+        "reasoning": "Enable future contributors to maintain test infrastructure"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "All tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/tests/test_rich_output_snapshots.py src/claude_skills/tests/test_command_snapshots.py src/claude_skills/tests/test_performance_benchmarks.py src/claude_skills/tests/test_large_spec_performance.py src/claude_skills/tests/test_json_output_regression.py src/claude_skills/tests/test_accessibility.py",
+        "expected": "All tests pass with no failures"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Performance benchmarks meet thresholds",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/tests/test_performance_benchmarks.py --benchmark-only",
+        "expected": "All benchmarks under defined thresholds (e.g., 1000 tasks render in <2s)"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Accessibility requirements met",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/tests/test_accessibility.py -v",
+        "expected": "All accessibility tests pass: contrast ratios met, status emojis present, fallback colors work"
+      }
+    },
+    "verify-3-4": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Enhanced Visual Features",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Improve visual hierarchy and readability with validated patterns",
+        "risk_level": "low",
+        "estimated_hours": 24
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4",
+        "task-4-5",
+        "task-4-6",
+        "task-4-7",
+        "task-4-8"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Add color wrapping to status badges in list-specs",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Wrap status badges with semantic colors: [bold green]\u2705 Complete[/], [bold yellow]\ud83d\udd04 In Progress[/], [bold red]\ud83d\udeab Blocked[/], using SEMANTIC_PALETTE constants",
+        "reasoning": "Make status immediately scannable through color + emoji redundancy"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Color-code progress percentages to match bars in query-tasks",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/query_tasks.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Update _create_progress_bar() to return colored percentage text matching bar color (green for 75%+, yellow for 50-74%, orange for 25-49%, red for <25%)",
+        "reasoning": "Visual consistency between progress bar and percentage text improves readability"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Add Rich.Rule section dividers to status-report",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/status_report.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add Rich.Rule dividers between phases/progress/blockers sections with styled titles (e.g., Rule('[bold blue]Phase Progress[/]'))",
+        "reasoning": "Clear visual separation between report sections improves scannability"
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "Highlight blocked tasks with bold red in list-phases",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_phases.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Apply [bold red] style to blocked tasks in phase listings. Use SEMANTIC_PALETTE['status.blocked']",
+        "reasoning": "Blocked tasks need immediate attention - make them visually stand out"
+      }
+    },
+    "task-4-5": {
+      "type": "task",
+      "title": "Standardize secondary text styling across all commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Audit all secondary text (file paths, dates, metadata). Standardize to use 'dim' style consistently via SEMANTIC_PALETTE['data.metadata']",
+        "reasoning": "Consistent secondary text styling creates clear visual hierarchy"
+      }
+    },
+    "task-4-6": {
+      "type": "task",
+      "title": "Add background colors for critical alerts in fidelity-review",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_fidelity_review/report.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Use [white on red] for critical severity issues, [black on yellow] for high severity warnings. Ensure accessibility (text remains readable)",
+        "reasoning": "Background colors for critical issues grab attention immediately"
+      }
+    },
+    "task-4-7": {
+      "type": "task",
+      "title": "Ensure bright_blue used consistently for all borders",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-4-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Audit all Panel/Table border_style settings. Standardize to 'bright_blue' using SEMANTIC_PALETTE['ui.border']",
+        "reasoning": "Consistent border colors create unified visual design"
+      }
+    },
+    "task-4-8": {
+      "type": "task",
+      "title": "Update snapshots for visual enhancements",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1",
+          "task-4-2",
+          "task-4-3",
+          "task-4-4",
+          "task-4-5",
+          "task-4-6",
+          "task-4-7"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/tests/test_command_snapshots.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Regenerate snapshot fixtures to reflect new color-wrapped output. Run pytest with --snapshot-update flag",
+        "reasoning": "Snapshots need updating to reflect intentional visual changes"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Visual improvements render correctly in Claude Code",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Run list-specs, query-tasks, list-phases, status-report, fidelity-review in Claude Code. Verify: status badges colored, progress percentages match bars, section dividers visible, blocked tasks highlighted, critical alerts have backgrounds",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Snapshot tests pass with updated fixtures",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "pytest src/claude_skills/tests/test_command_snapshots.py -v",
+        "expected": "All snapshot tests pass with new fixtures"
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "AI-Agent Output Optimization",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Optimize output for AI consumption through structure, not hiding",
+        "risk_level": "low",
+        "estimated_hours": 40
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3",
+        "task-5-4",
+        "task-5-5",
+        "task-5-6"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Add --summary and --full mode flags to status-report",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-2",
+          "task-5-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/status_report.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Add --summary flag showing high-level overview (phase progress, critical blockers only). Add --full flag showing all details (default). Make modes explicit, not progressive hiding",
+        "reasoning": "Give AI agents explicit control over detail level without hiding information by default"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Add --summary and --full modes to list-phases",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-6"
+        ],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_phases.py",
+        "task_category": "implementation",
+        "estimated_hours": 5,
+        "changes": "Implement summary mode (phase names + progress only) and full mode (all task details). Follow pattern from task-5-1",
+        "reasoning": "Consistent summary/full pattern across commands"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Add explicit section markers for AI parsing",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-4",
+          "task-5-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Add helper functions for section markers: print_section_start('BLOCKERS'), print_section_end('BLOCKERS'). Use consistent === SECTION_NAME === format parseable by grep/AI",
+        "reasoning": "Explicit section boundaries help AI agents navigate output programmatically"
+      }
+    },
+    "task-5-4": {
+      "type": "task",
+      "title": "Implement --ai-mode flag for structured output",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-6"
+        ],
+        "blocked_by": [
+          "task-5-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 8,
+        "changes": "Add --ai-mode flag to list-specs, query-tasks, list-phases, status-report. In AI mode: use section markers, prefix every line with context (spec:phase:task), omit decorative boxes, prioritize grep-ability",
+        "reasoning": "Give AI agents a mode optimized for parsing without sacrificing human-readable default"
+      }
+    },
+    "task-5-5": {
+      "type": "task",
+      "title": "Add JSON sidecar metadata for machine consumption",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-5-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Add --metadata-file option to output structured JSON metadata alongside colored output. Include: status counts, priority levels, actionable items list, section boundaries. Separate from display output",
+        "reasoning": "Codex recommended machine-readable sidecar so AI can parse semantic meaning without relying on ANSI codes"
+      }
+    },
+    "task-5-6": {
+      "type": "task",
+      "title": "Create AI optimization documentation",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1",
+          "task-5-2",
+          "task-5-3",
+          "task-5-4",
+          "task-5-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/AI_AGENT_OPTIMIZATION.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Document: --ai-mode flag usage, section marker format, --summary vs --full modes, JSON metadata sidecar structure, best practices for AI consumption, grep patterns for common queries",
+        "reasoning": "Enable AI agents and developers to use AI-optimized output effectively"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "AI mode produces grep-friendly output",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Run commands with --ai-mode. Verify: section markers present (=== BLOCKERS ===), every line has context prefix, output is grep-able for common patterns, no decorative boxes",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "JSON metadata sidecar contains expected structure",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd status-report --path specs --metadata-file /tmp/metadata.json && python -c 'import json; data=json.load(open(\"/tmp/metadata.json\")); assert \"status_counts\" in data; assert \"actionable_items\" in data'",
+        "expected": "Metadata JSON file is valid and contains expected fields"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Phase 5 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-5",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Documentation & Polish",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-7"
+        ],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Finalize documentation, error handling, and user communication",
+        "risk_level": "low",
+        "estimated_hours": 28
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3",
+        "task-6-4",
+        "task-6-5",
+        "task-6-6",
+        "task-6-7"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "Create color semantics user documentation",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/COLOR_GUIDE.md",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Document semantic color palette: what each color means (green=success, red=error, etc.), emoji+color combinations, accessibility considerations, how to disable colors",
+        "reasoning": "Users need to understand what colors communicate"
+      }
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "Create troubleshooting guide for color issues",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/TROUBLESHOOTING_COLORS.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Document common issues: colors not appearing, wrong colors, garbled output. Include solutions: NO_COLOR, --no-color flag, terminal compatibility checks, config settings",
+        "reasoning": "Help users resolve color output problems independently"
+      }
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "Add error handling with graceful fallbacks",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/colors.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "changes": "Wrap console creation in try/except. If Rich initialization fails, fall back to plain print(). Log warnings but don't crash. Handle edge cases: terminal size detection failure, invalid color codes",
+        "reasoning": "Codex identified lack of error handling as critical gap - ensure graceful degradation"
+      }
+    },
+    "task-6-4": {
+      "type": "task",
+      "title": "Add stdout vs stderr strategy documentation",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-5",
+          "task-6-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/OUTPUT_STREAMS.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Document strategy: primary command output to stdout, progress/status/errors to stderr. Explain rationale and impact on piping. Provide examples",
+        "reasoning": "Gemini identified this as missing - document the strategy for future reference"
+      }
+    },
+    "task-6-5": {
+      "type": "task",
+      "title": "Implement stdout/stderr separation in commands",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-7"
+        ],
+        "blocked_by": [
+          "task-6-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/rich_ui.py",
+        "task_category": "implementation",
+        "estimated_hours": 6,
+        "changes": "Update console creation to support stderr for status/progress. Update commands to: (1) send primary data to stdout, (2) send ancillary info (spinners, warnings) to stderr",
+        "reasoning": "Proper stream separation enables piping without pollution from progress indicators"
+      }
+    },
+    "task-6-6": {
+      "type": "task",
+      "title": "Create migration guide for scripts parsing output",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-6-7"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/MIGRATION_GUIDE.md",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Document breaking changes: ANSI codes now in output by default, how to disable with NO_COLOR or --format=json, how stdout/stderr separation affects piping. Provide before/after examples",
+        "reasoning": "Help users update scripts that parse SDD output"
+      }
+    },
+    "task-6-7": {
+      "type": "task",
+      "title": "Update README with color feature overview",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-1",
+          "task-6-2",
+          "task-6-3",
+          "task-6-4",
+          "task-6-5",
+          "task-6-6"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "README.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add section showcasing Rich text output features: color screenshots, configuration options, links to detailed docs (COLOR_GUIDE.md, AI_AGENT_OPTIMIZATION.md)",
+        "reasoning": "Make color features discoverable to new users"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2",
+        "verify-6-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Documentation is comprehensive and accurate",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Review all documentation files: COLOR_GUIDE.md, TROUBLESHOOTING_COLORS.md, OUTPUT_STREAMS.md, MIGRATION_GUIDE.md, AI_AGENT_OPTIMIZATION.md, TESTING_RICH_OUTPUT.md. Verify accuracy, completeness, and clarity",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "Error handling prevents crashes",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Test error scenarios: terminal size detection failure, invalid color codes, Rich import failure. Verify graceful fallback to plain text with warnings",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-6-3": {
+      "type": "verify",
+      "title": "Phase 6 and full spec implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-7": {
+      "type": "phase",
+      "title": "Plan Review Rich Output",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-7-files",
+        "phase-7-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-6"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Transform sdd-plan-review from plain markdown to Rich-formatted terminal display",
+        "risk_level": "low",
+        "estimated_hours": 8
+      }
+    },
+    "phase-7-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "task-7-1",
+        "task-7-2",
+        "task-7-3",
+        "task-7-4",
+        "task-7-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-7-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-7-1": {
+      "type": "task",
+      "title": "Create display_rich_report() function in reporting.py",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-7-2",
+          "task-7-3",
+          "task-7-4",
+          "task-7-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/reporting.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "changes": "Add Rich panel-based report rendering with semantic color-coding for severity levels (Critical=red, High=orange1, Medium=yellow, Low=cyan). Create recommendation badges (APPROVE/REVISE/REJECT) with matching colors. Use Console(width=20000, force_terminal=True) for initialization",
+        "reasoning": "Core Rich display function to replace plain print output"
+      }
+    },
+    "task-7-2": {
+      "type": "task",
+      "title": "Implement Overall Assessment panel with color-coded recommendations",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-7-5"
+        ],
+        "blocked_by": [
+          "task-7-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/reporting.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Create panel with border color matching recommendation (green for APPROVE, yellow for REVISE, red for REJECT). Display consensus score, models consulted, consensus level",
+        "reasoning": "Primary assessment panel provides at-a-glance recommendation"
+      }
+    },
+    "task-7-3": {
+      "type": "task",
+      "title": "Implement Key Findings panel with severity color-coding",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-7-5"
+        ],
+        "blocked_by": [
+          "task-7-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/reporting.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Group issues by severity. Color-code severity headers: [bold red]\ud83d\udd34 CRITICAL[/], [orange1]\ud83d\udfe1 HIGH[/], [yellow]\ud83d\udd35 MEDIUM[/], [cyan]\u26aa LOW[/]. Use Rich.Markdown for issue descriptions",
+        "reasoning": "Make critical issues immediately visible through color coding"
+      }
+    },
+    "task-7-4": {
+      "type": "task",
+      "title": "Implement Individual Model Reviews in panels",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-7-5"
+        ],
+        "blocked_by": [
+          "task-7-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/reporting.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "changes": "Create panel for each model response with color-coded recommendation badges ([bold green]\u2705 APPROVE[/], [bold yellow]\u26a0\ufe0f REVISE[/], [bold red]\u274c REJECT[/]). Show scores, strengths, concerns using Rich.Markdown",
+        "reasoning": "Separate panel per model improves readability and allows comparison"
+      }
+    },
+    "task-7-5": {
+      "type": "task",
+      "title": "Update CLI to use Rich display instead of plain print",
+      "status": "pending",
+      "parent": "phase-7-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-7-1",
+          "task-7-2",
+          "task-7-3",
+          "task-7-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "changes": "Replace print(markdown_report) on line 144 with display_rich_report() call. Import display_rich_report from reporting module. Preserve file output functionality (--output flag) - only screen display uses Rich",
+        "reasoning": "Switch screen output to Rich while keeping file output unchanged"
+      }
+    },
+    "phase-7-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-7",
+      "children": [
+        "verify-7-1",
+        "verify-7-2",
+        "verify-7-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-7-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-7-1": {
+      "type": "verify",
+      "title": "Visual validation in Claude Code",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "steps": "Run sdd review command with full type. Verify: colors render correctly in Claude Code, severity levels have distinct colors (red/orange/yellow/cyan), recommendation badges color-coded (green/yellow/red), panels display with colored borders, Rich.Rule section dividers visible",
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-7-2": {
+      "type": "verify",
+      "title": "File output regression test",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "sdd review rich-output-optimization-2025-11-07-001 --output /tmp/test-review.md && sdd review rich-output-optimization-2025-11-07-001 --output /tmp/test-review.json",
+        "expected": "Both file outputs succeed with plain markdown/JSON (no ANSI codes in saved files). Screen display uses Rich formatting."
+      }
+    },
+    "verify-7-3": {
+      "type": "verify",
+      "title": "Phase 7 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-7-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-7",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "command": "",
+        "expected": ""
+      }
+    }
+  }
+}

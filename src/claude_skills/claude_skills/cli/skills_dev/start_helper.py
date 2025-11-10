@@ -20,11 +20,6 @@ from claude_skills.cli.skills_dev.git_config_helper import (
 )
 
 
-# Configuration
-CLAUDE_HOME = Path.home() / ".claude"
-SETTINGS_FILE = CLAUDE_HOME / "settings.json"
-
-
 def cmd_check_permissions(args, printer: PrettyPrinter) -> int:
     """Check if SDD permissions are configured for the project."""
     # Note: CLAUDE_TRANSCRIPT_PATH env var is automatically set by session-start hook
@@ -37,30 +32,20 @@ def cmd_check_permissions(args, printer: PrettyPrinter) -> int:
     specs_dir = project_root / "specs"
     has_specs = specs_dir.exists()
 
-    # Check if permissions are in settings
+    # Check if permissions are in project-local settings
+    settings_file = project_root / ".claude" / "settings.local.json"
     needs_setup = False
-    if has_specs:
+    if has_specs and settings_file.exists():
         try:
-            # Collect permissions from both global and project-local settings
-            all_permissions = []
+            with open(settings_file, 'r') as f:
+                settings = json.load(f)
 
-            # Check global settings
-            if SETTINGS_FILE.exists():
-                with open(SETTINGS_FILE, 'r') as f:
-                    global_settings = json.load(f)
-                all_permissions.extend(global_settings.get('permissions', {}).get('allow', []))
-
-            # Check project-local settings
-            local_settings_file = project_root / ".claude" / "settings.local.json"
-            if local_settings_file.exists():
-                with open(local_settings_file, 'r') as f:
-                    local_settings = json.load(f)
-                all_permissions.extend(local_settings.get('permissions', {}).get('allow', []))
+            permissions = settings.get('permissions', {}).get('allow', [])
 
             # Check for key SDD permissions
             has_permissions = any(
                 any(req in perm for req in ['specs', 'sdd-next', 'sdd-update'])
-                for perm in all_permissions
+                for perm in permissions
             )
 
             needs_setup = not has_permissions

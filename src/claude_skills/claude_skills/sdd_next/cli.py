@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 import os
 
-from rich.tree import Tree
 from rich.console import Console
 
 # Clean imports - no sys.path manipulation needed!
@@ -33,6 +32,8 @@ from claude_skills.common import (
     # JSON output formatting
     print_json_output,
 )
+from claude_skills.common.ui_factory import create_ui
+from claude_skills.common.json_output import output_json
 from claude_skills.common.completion import format_completion_prompt
 
 # Import from sdd_next module
@@ -252,15 +253,31 @@ def format_execution_plan(spec_id: str, task_id: str, specs_dir: Path) -> str:
 
 def cmd_verify_tools(args, printer):
     """Verify required tools are available."""
-    printer.action("Checking required tools...")
+    # Collect data
+    required_tools = {"python": True}  # Always available since we're running
+    optional_tools_status = {}
 
-    # Python is obviously available since we're running
-    printer.success("Python 3 is available")
-
-    # Check for optional tools
     optional_tools = ["git", "grep", "cat"]
     for tool in optional_tools:
-        if os.system(f"command -v {tool} > /dev/null 2>&1") == 0:
+        is_available = os.system(f"command -v {tool} > /dev/null 2>&1") == 0
+        optional_tools_status[tool] = is_available
+
+    # JSON output mode
+    if args.json:
+        output = {
+            "required": required_tools,
+            "optional": optional_tools_status,
+            "all_available": all(optional_tools_status.values())
+        }
+        output_json(output)
+        return 0
+
+    # Rich UI mode
+    printer.action("Checking required tools...")
+    printer.success("Python 3 is available")
+
+    for tool, available in optional_tools_status.items():
+        if available:
             printer.success(f"{tool} is available")
         else:
             printer.warning(f"{tool} not found (optional)")
@@ -389,24 +406,32 @@ def cmd_task_info(args, printer):
     return 0
 
 
-def _build_dependency_tree(deps: Dict[str, Any], task_id: str) -> Tree:
+def _print_dependency_tree(deps: Dict[str, Any], task_id: str, ui) -> None:
     """
-    Build a Rich Tree visualization for task dependencies.
+    Print dependency tree visualization using UI abstraction.
+
+    Supports both RichUi (Rich.Tree with colors) and PlainUi (plain text tree).
+    Uses ui.print_tree() abstraction for backend-agnostic rendering.
 
     Args:
         deps: Dependency information dictionary from check_dependencies()
         task_id: The task ID being analyzed
-
-    Returns:
-        Rich Tree object representing the dependency structure
+        ui: UI instance for console output
     """
-    # Create root node with task information
-    can_start_indicator = "✅" if deps.get('can_start') else "🚫"
-    root = Tree(f"{can_start_indicator} [bold]{task_id}[/bold]")
+    # Prepare tree data in nested dict format for ui.print_tree()
+    tree_data: Dict[str, Any] = {}
+
+    # Determine if we're in Rich mode for conditional markup
+    use_rich = ui.console is not None
 
     # Add blocked_by dependencies (hard blockers)
     if deps.get('blocked_by'):
-        blocked_branch = root.add("✗ [red bold]Blocked by[/red bold]")
+        if use_rich:
+            blocked_key = "✗ [red bold]Blocked by[/red bold]"
+        else:
+            blocked_key = "✗ Blocked by"
+
+        tree_data[blocked_key] = {}
         for dep in deps['blocked_by']:
             dep_id = dep.get('id', 'unknown')
             dep_title = dep.get('title', 'Untitled')
@@ -414,41 +439,73 @@ def _build_dependency_tree(deps: Dict[str, Any], task_id: str) -> Tree:
             # Truncate long titles
             if len(dep_title) > 60:
                 dep_title = dep_title[:57] + "..."
-            blocked_branch.add(f"[red]{dep_id}[/red]: {dep_title} [dim]({dep_status})[/dim]")
+
+            if use_rich:
+                tree_data[blocked_key][f"[red]{dep_id}[/red]"] = f"{dep_title} [dim]({dep_status})[/dim]"
+            else:
+                tree_data[blocked_key][dep_id] = f"{dep_title} ({dep_status})"
 
     # Add soft dependencies (recommended pre-work)
     if deps.get('soft_depends'):
-        soft_branch = root.add("⚠️  [yellow bold]Soft dependencies[/yellow bold]")
+        if use_rich:
+            soft_key = "⚠️  [yellow bold]Soft dependencies[/yellow bold]"
+        else:
+            soft_key = "⚠️  Soft dependencies"
+
+        tree_data[soft_key] = {}
         for dep in deps['soft_depends']:
             dep_id = dep.get('id', 'unknown')
             dep_title = dep.get('title', 'Untitled')
             dep_status = dep.get('status', 'unknown')
-            # Show checkmark if completed
             status_mark = "✓" if dep_status == 'completed' else "○"
             # Truncate long titles
             if len(dep_title) > 60:
                 dep_title = dep_title[:57] + "..."
-            soft_branch.add(f"{status_mark} [yellow]{dep_id}[/yellow]: {dep_title} [dim]({dep_status})[/dim]")
+
+            if use_rich:
+                tree_data[soft_key][f"{status_mark} [yellow]{dep_id}[/yellow]"] = f"{dep_title} [dim]({dep_status})[/dim]"
+            else:
+                tree_data[soft_key][f"{status_mark} {dep_id}"] = f"{dep_title} ({dep_status})"
 
     # Add blocks (tasks blocked by this one)
     if deps.get('blocks'):
-        blocks_branch = root.add("⏳ [blue bold]This task blocks[/blue bold]")
+        if use_rich:
+            blocks_key = "⏳ [blue bold]This task blocks[/blue bold]"
+        else:
+            blocks_key = "⏳ This task blocks"
+
+        tree_data[blocks_key] = {}
         for dep in deps['blocks']:
             dep_id = dep.get('id', 'unknown')
             dep_title = dep.get('title', 'Untitled')
             # Truncate long titles
             if len(dep_title) > 60:
                 dep_title = dep_title[:57] + "..."
-            blocks_branch.add(f"[blue]{dep_id}[/blue]: {dep_title}")
+
+            if use_rich:
+                tree_data[blocks_key][f"[blue]{dep_id}[/blue]"] = dep_title
+            else:
+                tree_data[blocks_key][dep_id] = dep_title
 
     # If no dependencies at all, add a note
-    if not deps.get('blocked_by') and not deps.get('soft_depends') and not deps.get('blocks'):
-        root.add("[dim]No dependencies[/dim]")
+    if not tree_data:
+        if use_rich:
+            tree_data["[dim]No dependencies[/dim]"] = {}
+        else:
+            tree_data["No dependencies"] = {}
 
-    return root
+    # Build root label with status indicator
+    can_start_indicator = "✅" if deps.get('can_start') else "🚫"
+    if use_rich:
+        root_label = f"{can_start_indicator} [bold]{task_id}[/bold]"
+    else:
+        root_label = f"{can_start_indicator} {task_id}"
+
+    # Use ui.print_tree() abstraction instead of manual rendering
+    ui.print_tree(tree_data, label=root_label)
 
 
-def cmd_check_deps(args, printer):
+def cmd_check_deps(args, printer, ui=None):
     """Check task dependencies."""
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
@@ -461,7 +518,7 @@ def cmd_check_deps(args, printer):
 
     # If no task_id provided, check all tasks
     if args.task_id is None:
-        return _check_all_task_deps(spec_data, args, printer)
+        return _check_all_task_deps(spec_data, args, printer, ui)
 
     # Single task check (existing behavior)
     if not args.json:
@@ -477,17 +534,23 @@ def cmd_check_deps(args, printer):
         print_json_output(deps, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
+        readiness_message = (
+            "Task can start: no blocking dependencies detected."
+            if deps.get("can_start")
+            else "Task cannot start yet: resolve blocking dependencies."
+        )
+        printer.result("Readiness", readiness_message)
         print()  # Blank line for spacing
 
-        # Build and render the dependency tree
-        tree = _build_dependency_tree(deps, args.task_id)
-        console = Console()
-        console.print(tree)
+        # Print the dependency tree using UI abstraction
+        if ui is None:
+            ui = create_ui(force_rich=True)
+        _print_dependency_tree(deps, args.task_id, ui)
 
     return 0
 
 
-def _check_all_task_deps(spec_data, args, printer):
+def _check_all_task_deps(spec_data, args, printer, ui=None):
     """Check dependencies for all tasks in the spec."""
     if not args.json:
         printer.action("Checking dependencies for all tasks...")
@@ -518,7 +581,12 @@ def _check_all_task_deps(spec_data, args, printer):
         print()  # Blank line for spacing
 
         # Use Rich Console for colored output
-        console = Console()
+        # Skip Rich visualization if using PlainUi (console would be None)
+        if ui and ui.console is None:
+            printer.info("Colored dependency visualization not available in plain mode.")
+            return 0
+
+        console = ui.console if ui else create_ui(force_rich=True).console
 
         if ready:
             console.print("\n✅ [bold green]Ready to start:[/bold green]")
@@ -585,7 +653,7 @@ def cmd_init_env(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(env, indent=2))
+        output_json(env)
     elif args.export:
         # Output as shell export statements
         print(f"export SPECS_DIR='{env['specs_dir']}'")
@@ -825,7 +893,7 @@ def cmd_validate_spec(args, printer):
     validation = validate_spec(spec_file)
 
     if args.json:
-        print(json.dumps(validation, indent=2))
+        output_json(validation)
     else:
         printer.result("Validating", validation['spec_file'])
 
@@ -862,7 +930,7 @@ def cmd_find_pattern(args, printer):
     matches = find_pattern(args.pattern, directory)
 
     if args.json:
-        print(json.dumps({"pattern": args.pattern, "matches": matches}, indent=2))
+        output_json({"pattern": args.pattern, "matches": matches})
     else:
         if matches:
             printer.success(f"Found {len(matches)} file(s) matching '{args.pattern}'")
@@ -883,7 +951,7 @@ def cmd_detect_project(args, printer):
     project = detect_project(directory)
 
     if args.json:
-        print(json.dumps(project, indent=2))
+        output_json(project)
     else:
         printer.success("Project analyzed")
         printer.result("Project Type", project['project_type'])
@@ -922,7 +990,7 @@ def cmd_find_tests(args, printer):
     tests = find_tests(directory, args.source_file)
 
     if args.json:
-        print(json.dumps(tests, indent=2))
+        output_json(tests)
     else:
         if tests['test_framework']:
             printer.success("Tests discovered")
@@ -956,7 +1024,7 @@ def cmd_check_environment(args, printer):
     env = check_environment(directory, required_deps)
 
     if args.json:
-        print(json.dumps(env, indent=2))
+        output_json(env)
     else:
         if env['valid']:
             printer.success("Environment is valid")
@@ -1005,7 +1073,7 @@ def cmd_find_circular_deps(args, printer):
     circular = find_circular_deps(spec_data)
 
     if args.json:
-        print(json.dumps(circular, indent=2))
+        output_json(circular)
     else:
         if circular['has_circular']:
             printer.error("Circular dependencies detected!")
@@ -1037,7 +1105,7 @@ def cmd_find_related_files(args, printer):
     related = find_related_files(args.file, directory)
 
     if args.json:
-        print(json.dumps(related, indent=2))
+        output_json(related)
     else:
         printer.success("Related files found")
         printer.result("Source", related['source_file'])
@@ -1074,7 +1142,7 @@ def cmd_validate_paths(args, printer):
     validation = validate_paths(paths, base_dir)
 
     if args.json:
-        print(json.dumps(validation, indent=2))
+        output_json(validation)
     else:
         if validation['valid_paths']:
             printer.success(f"Valid Paths ({len(validation['valid_paths'])})")
@@ -1101,7 +1169,7 @@ def cmd_spec_stats(args, printer):
     stats = spec_stats(spec_file, json_spec_file)
 
     if args.json:
-        print(json.dumps(stats, indent=2))
+        output_json(stats, args.compact)
     else:
         if stats['exists']:
             printer.success("Spec file analyzed")

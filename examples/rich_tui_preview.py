@@ -206,7 +206,7 @@ def demo_batch_execution_rich():
                 error=None,
                 duration=0.8,
                 timestamp=datetime.now().isoformat(),
-                model="cheetah",
+                model="composer-1",
                 prompt="Sample"
             ))
 

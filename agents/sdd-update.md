@@ -50,7 +50,7 @@ Use this agent when you need to:
 - Track time spent on tasks
 - Move specs between lifecycle folders (pending/active/completed/archived)
 - Update spec metadata
-- Update task metadata (file_path, description, task_category, actual_hours, status_note, verification_type, skill, command)
+- Update task metadata (file_path, description, task_category, actual_hours, status_note, verification_type, command)
 - Handle blockers and dependencies
 
 **Do NOT use this agent for:**

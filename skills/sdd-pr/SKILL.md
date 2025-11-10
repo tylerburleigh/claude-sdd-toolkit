@@ -319,20 +319,6 @@ Skill(sdd-toolkit:sdd-pr) "Create PR for spec refactor-api-2025-11-03-003"
 
 ## Troubleshooting
 
-### "gh CLI not found"
-
-**Problem**: GitHub CLI (`gh`) not installed
-
-**Solution**:
-```bash
-# Install gh CLI
-brew install gh  # macOS
-sudo apt install gh  # Linux
-
-# Authenticate
-gh auth login
-```
-
 ### "Spec missing git.branch_name metadata"
 
 **Problem**: Spec doesn't have branch information
@@ -357,22 +343,3 @@ git push -u origin <branch-name>
 **Problem**: Git diff exceeds size limit
 
 **Solution**: Skill automatically shows file-level summary instead of full diff when it's too large.
-
-## Related Skills
-
-- **sdd-plan**: Create detailed specs before implementation
-- **sdd-next**: Find next task to work on
-- **sdd-update**: Track progress and complete tasks
-- **sdd-validate**: Validate spec structure
-
-## Summary
-
-The sdd-pr skill transforms PR creation from a manual, time-consuming task into an automated, AI-powered workflow that:
-
-✅ **Saves Time**: No more writing detailed PR descriptions manually
-✅ **Improves Quality**: Comprehensive, well-structured PRs every time
-✅ **Provides Context**: Reviewers get full context from all sources
-✅ **Maintains Control**: User approval required before creation
-✅ **Integrates Seamlessly**: Works with sdd-update workflow
-
-Use this skill to create professional PRs that make code review more effective and your development workflow more efficient.

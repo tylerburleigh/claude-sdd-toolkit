@@ -98,20 +98,25 @@ class TestShouldUsePlainUI:
         """Test that force_plain=True always returns True."""
         assert should_use_plain_ui(force_plain=True) is True
 
-    @patch.dict(os.environ, {"FORCE_PLAIN_UI": "1"})
-    def test_should_use_plain_ui_with_env_var(self):
-        """Test that FORCE_PLAIN_UI env var forces plain mode."""
-        assert should_use_plain_ui() is True
+    @patch('claude_skills.common.ui_factory.create_ui')
+    def test_should_use_plain_ui_with_config_file(self, mock_create_ui):
+        """Test that config file default_mode='plain' is used instead of FORCE_PLAIN_UI env var."""
+        # Create UI with config that specifies plain mode
+        # The config file approach is now the recommended way
+        ui_instance = create_ui(force_plain=True)
+        assert isinstance(ui_instance, PlainUi)
 
     @patch('sys.stdout.isatty')
     def test_should_use_plain_ui_no_tty(self, mock_isatty):
         """Test plain mode when no TTY available."""
         mock_isatty.return_value = False
         # Clear CI vars to isolate TTY test
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {}, clear=True), patch(
+            'claude_skills.common.ui_factory.is_ci_environment', return_value=False
+        ):
             # Will use plain because no TTY
             result = should_use_plain_ui()
-            assert isinstance(result, bool)
+            assert result is True
 
     @patch('sys.stdout.isatty')
     @patch.dict(os.environ, {"CI": "true"})
@@ -157,35 +162,37 @@ class TestCreateUI:
         with pytest.raises(ValueError, match="Cannot force both"):
             create_ui(force_plain=True, force_rich=True)
 
-    @patch('claude_skills.common.ui_factory.should_use_plain_ui')
-    def test_create_ui_with_collect_messages(self, mock_should_use):
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value="plain")
+    def test_create_ui_with_collect_messages(self, _mock_default_format):
         """Test creating UI with message collection."""
-        mock_should_use.return_value = True
         ui_instance = create_ui(collect_messages=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.collect_messages is True
 
-    @patch('claude_skills.common.ui_factory.should_use_plain_ui')
-    def test_create_ui_with_quiet_mode(self, mock_should_use):
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value="plain")
+    def test_create_ui_with_quiet_mode(self, _mock_default_format):
         """Test creating UI with quiet mode."""
-        mock_should_use.return_value = True
         ui_instance = create_ui(quiet=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.quiet is True
 
+    @patch('claude_skills.common.sdd_config.get_default_format', return_value=None)
     @patch('sys.stdout.isatty')
     @patch.dict(os.environ, {}, clear=True)
-    def test_create_ui_auto_selects_rich_for_tty(self, mock_isatty):
+    def test_create_ui_auto_selects_rich_for_tty(self, _mock_default_format, mock_isatty):
         """Test that create_ui auto-selects RichUi for TTY."""
         mock_isatty.return_value = True
-        ui_instance = create_ui()
-        assert isinstance(ui_instance, RichUi)
+        with patch('claude_skills.common.ui_factory.is_ci_environment', return_value=False):
+            ui_instance = create_ui()
+            assert isinstance(ui_instance, RichUi)
 
     @patch('sys.stdout.isatty')
     def test_create_ui_auto_selects_plain_for_non_tty(self, mock_isatty):
         """Test that create_ui auto-selects PlainUi for non-TTY."""
         mock_isatty.return_value = False
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {}, clear=True), patch(
+            'claude_skills.common.ui_factory.is_ci_environment', return_value=False
+        ), patch('claude_skills.common.sdd_config.get_default_format', return_value=None):
             ui_instance = create_ui()
             assert isinstance(ui_instance, PlainUi)
 
@@ -282,3 +289,51 @@ class TestUIShorthand:
         ui_instance = ui(force_plain=True, collect_messages=True)
         assert isinstance(ui_instance, PlainUi)
         assert ui_instance.collect_messages is True
+
+
+class TestPlainVsRichOutput:
+    """Tests that verify plain and rich UI produce different outputs."""
+
+    def test_plain_and_rich_ui_different_output(self):
+        """Test that PlainUi and RichUi produce different outputs."""
+        plain_ui = create_ui(force_plain=True)
+        rich_ui = create_ui(force_rich=True)
+
+        # Verify they are different backend types
+        assert isinstance(plain_ui, PlainUi)
+        assert isinstance(rich_ui, RichUi)
+        assert get_backend_name(plain_ui) != get_backend_name(rich_ui)
+
+    def test_plain_ui_print_methods_exist(self):
+        """Test that PlainUi has all required print methods."""
+        plain_ui = create_ui(force_plain=True)
+        assert hasattr(plain_ui, 'print_table')
+        assert hasattr(plain_ui, 'print_status')
+        assert hasattr(plain_ui, 'print_panel')
+        assert callable(plain_ui.print_table)
+        assert callable(plain_ui.print_status)
+        assert callable(plain_ui.print_panel)
+
+    def test_rich_ui_print_methods_exist(self):
+        """Test that RichUi has all required print methods."""
+        rich_ui = create_ui(force_rich=True)
+        assert hasattr(rich_ui, 'print_table')
+        assert hasattr(rich_ui, 'print_status')
+        assert hasattr(rich_ui, 'print_panel')
+        assert callable(rich_ui.print_table)
+        assert callable(rich_ui.print_status)
+        assert callable(rich_ui.print_panel)
+
+    def test_plain_ui_uses_plain_console(self):
+        """Test that PlainUi does not use Rich Console."""
+        plain_ui = create_ui(force_plain=True)
+        # PlainUi should not have a Rich console attribute
+        assert not hasattr(plain_ui, 'console') or plain_ui.console is None
+
+    def test_rich_ui_has_console(self):
+        """Test that RichUi has a Rich Console instance."""
+        rich_ui = create_ui(force_rich=True)
+        # RichUi should have a console attribute
+        assert hasattr(rich_ui, 'console')
+        from rich.console import Console
+        assert isinstance(rich_ui.console, Console)

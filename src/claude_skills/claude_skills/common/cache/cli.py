@@ -14,6 +14,7 @@ from pathlib import Path
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.cache import CacheManager
 from claude_skills.common.config import get_cache_config, is_cache_enabled
+from claude_skills.common.json_output import output_json
 
 
 def handle_cache_clear(args, printer: PrettyPrinter):
@@ -35,7 +36,7 @@ def handle_cache_clear(args, printer: PrettyPrinter):
         # Check if caching is enabled
         if not is_cache_enabled():
             if getattr(args, 'json', None):
-                print(json.dumps({"error": "Cache is disabled in configuration"}, indent=2))
+                output_json({"error": "Cache is disabled in configuration"}, args.compact)
             else:
                 printer.warning("Cache is disabled in configuration")
                 printer.info("To enable caching, check .claude/config.json")
@@ -61,7 +62,7 @@ def handle_cache_clear(args, printer: PrettyPrinter):
                 result["filters"]["spec_id"] = spec_id
             if review_type:
                 result["filters"]["review_type"] = review_type
-            print(json.dumps(result, indent=2))
+            output_json(result, args.compact)
         else:
             # Human-readable output
             if count == 0:
@@ -108,7 +109,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Check if caching is enabled
         if not is_cache_enabled():
             if getattr(args, 'json', None):
-                print(json.dumps({"error": "Cache is disabled in configuration"}, indent=2))
+                output_json({"error": "Cache is disabled in configuration"}, args.compact)
             else:
                 printer.warning("Cache is disabled in configuration")
                 printer.info("To enable caching, check .claude/config.json")
@@ -123,7 +124,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Handle error case
         if "error" in stats:
             if getattr(args, 'json', None):
-                print(json.dumps({"error": stats['error']}, indent=2))
+                output_json({"error": stats['error']}, args.compact)
             else:
                 printer.error(f"Failed to get cache stats: {stats['error']}")
             return 1
@@ -133,7 +134,7 @@ def handle_cache_info(args, printer: PrettyPrinter):
         json_output = getattr(args, 'json', None)
         if json_output:
             # JSON output mode
-            print(json.dumps(stats, indent=2))
+            output_json(stats, args.compact)
             return 0
 
         # Human-readable output

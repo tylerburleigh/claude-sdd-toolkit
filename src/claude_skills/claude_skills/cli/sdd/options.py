@@ -39,13 +39,17 @@ def add_global_options(parser, config=None):
     )
 
     # JSON output - use mutually exclusive group for proper default handling
+    # Check new config format first, then fall back to deprecated keys
+    default_mode = config['output'].get('default_mode', config['output'].get('default_format', 'rich'))
+    is_json_default = default_mode == 'json'
+
     json_group = parser.add_mutually_exclusive_group()
     json_group.add_argument(
         '--json',
         action='store_const',
         const=True,
         dest='json',
-        help=f"Output in JSON format (default: {'enabled' if config['output']['json'] else 'disabled'} from config)"
+        help=f"Output in JSON format (default: {'enabled' if is_json_default else 'disabled'} from config)"
     )
     json_group.add_argument(
         '--no-json',
@@ -54,17 +58,20 @@ def add_global_options(parser, config=None):
         dest='json',
         help='Disable JSON output (override config)'
     )
-    # Set default after adding both options
+    # Don't set default here - will be set after config reload in main()
     parser.set_defaults(json=None)
 
     # Compact formatting - use mutually exclusive group
+    # Check new config format first, then fall back to deprecated key
+    json_compact = config['output'].get('json_compact', config['output'].get('compact', True))
+
     compact_group = parser.add_mutually_exclusive_group()
     compact_group.add_argument(
         '--compact',
         action='store_const',
         const=True,
         dest='compact',
-        help=f"Use compact JSON formatting (default: {'enabled' if config['output']['compact'] else 'disabled'} from config)"
+        help=f"Use compact JSON formatting (default: {'enabled' if json_compact else 'disabled'} from config)"
     )
     compact_group.add_argument(
         '--no-compact',
@@ -73,7 +80,7 @@ def add_global_options(parser, config=None):
         dest='compact',
         help='Disable compact formatting (override config)'
     )
-    # Set default after adding both options
+    # Don't set default here - will be set after config reload in main()
     parser.set_defaults(compact=None)
     parser.add_argument(
         '--path',

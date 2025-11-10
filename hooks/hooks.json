@@ -1,22 +1,12 @@
 {
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start"
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
-        "matcher": "Skill|SlashCommand",
+        "matcher": "Read",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/block-json-specs"
           }
         ]
       }

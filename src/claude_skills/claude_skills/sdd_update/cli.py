@@ -17,6 +17,8 @@ from pathlib import Path
 from claude_skills.common import find_specs_directory, PrettyPrinter
 from claude_skills.common import execute_verify_task, load_json_spec
 from claude_skills.common.spec import update_node, save_json_spec
+from claude_skills.common.sdd_config import get_default_format
+from claude_skills.common.json_output import output_json
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -311,7 +313,7 @@ def cmd_add_assumption(args, printer):
 
         # If JSON output requested, print structured data
         if getattr(args, 'json', False):
-            print(json.dumps(result, indent=2))
+            output_json(result, args.compact)
 
         return 0
 
@@ -341,34 +343,30 @@ def cmd_list_assumptions(args, printer):
         printer.error(f"Failed to list assumptions: {e}")
         return 1
 
+    # Check if JSON output is enabled (set by options.py from config)
+    use_json = getattr(args, 'json', False)
+
     if not assumptions:
-        if assumption_type:
-            printer.info(f"No {assumption_type} assumptions found")
+        if use_json:
+            # JSON output - empty array
+            output_json([], args.compact)
         else:
-            printer.info("No assumptions found")
+            if assumption_type:
+                printer.info(f"No {assumption_type} assumptions found")
+            else:
+                printer.info("No assumptions found")
         return 0
 
     # Display assumptions
-    if assumption_type:
-        printer.success(f"Found {len(assumptions)} {assumption_type} assumption(s):")
-    else:
-        printer.success(f"Found {len(assumptions)} assumption(s):")
-
-    # Check if JSON output is enabled (either via flag or config default)
-    # When json arg is None, the main CLI will apply config defaults
-    use_json = getattr(args, 'json', None)
-    if use_json is None:
-        # No explicit --json or --no-json flag, check config
-        try:
-            from claude_skills.common.sdd_config import load_sdd_config
-            config = load_sdd_config()
-            use_json = config.get('output', {}).get('json', False)
-        except Exception:
-            use_json = False
+    if not use_json:
+        if assumption_type:
+            printer.success(f"Found {len(assumptions)} {assumption_type} assumption(s):")
+        else:
+            printer.success(f"Found {len(assumptions)} assumption(s):")
 
     if use_json:
         # JSON output
-        print(json.dumps(assumptions, indent=2))
+        output_json(assumptions, args.compact)
     else:
         # Pretty print for human readability
         for i, assumption in enumerate(assumptions, 1):
@@ -429,7 +427,7 @@ def cmd_update_estimate(args, printer):
 
         # If JSON output requested, print structured data
         if getattr(args, 'json', False):
-            print(json.dumps(result, indent=2))
+            output_json(result, args.compact)
 
         return 0
 
@@ -482,7 +480,7 @@ def cmd_add_task(args, printer):
 
         # If JSON output requested, print structured data
         if getattr(args, 'json', False):
-            print(json.dumps(result, indent=2))
+            output_json(result, args.compact)
 
         return 0
 
@@ -530,7 +528,7 @@ def cmd_remove_task(args, printer):
 
         # If JSON output requested, print structured data
         if getattr(args, 'json', False):
-            print(json.dumps(result, indent=2))
+            output_json(result, args.compact)
 
         return 0
 
@@ -699,8 +697,13 @@ def cmd_time_report(args, printer):
         printer=printer if not args.json else None
     )
 
-    if args.json and report:
-        print(json.dumps(report, indent=2))
+    if args.json:
+        if report is not None:
+            output_json(report, args.compact)
+        else:
+            # Fallback for None (shouldn't happen with updated generate_time_report)
+            output_json({"error": "Failed to generate report"}, args.compact)
+            return 1
 
     return 0 if report else 1
 
@@ -724,7 +727,7 @@ def cmd_status_report(args, printer):
     )
 
     if args.json and report:
-        print(json.dumps(report, indent=2))
+        output_json(report, args.compact)
 
     return 0 if report else 1
 
@@ -746,14 +749,18 @@ def cmd_audit_spec(args, printer):
     )
 
     if args.json:
-        print(json.dumps(result, indent=2))
+        output_json(result, args.compact)
 
     return 0 if result.get("validation_passed", False) else 1
 
 
 def cmd_query_tasks(args, printer):
     """Query and filter tasks."""
-    if not args.json and args.format != "simple":
+    # Determine output mode: simple takes precedence, then json, then text/table
+    simple_mode = getattr(args, 'simple', False)
+    json_mode = getattr(args, 'json', False) and not simple_mode
+
+    if not json_mode and not simple_mode:
         printer.action("Querying tasks...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
@@ -761,8 +768,10 @@ def cmd_query_tasks(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    # Use Rich.Table formatter for table format
-    if args.format == "table" and not args.json:
+    # Use Rich.Table formatter for text mode (default)
+    if not json_mode and not simple_mode:
+        from claude_skills.common.ui_factory import create_ui
+        ui = create_ui()
         results = format_tasks_table(
             spec_id=args.spec_id,
             specs_dir=specs_dir,
@@ -770,11 +779,12 @@ def cmd_query_tasks(args, printer):
             task_type=args.type,
             parent=args.parent,
             printer=printer,
-            limit=args.limit
+            limit=args.limit,
+            ui=ui
         )
     else:
-        # For simple format or JSON, use original query_tasks
-        use_printer = not args.json and args.format != "simple"
+        # For simple or JSON mode, use original query_tasks
+        use_printer = not json_mode and not simple_mode
 
         results = query_tasks(
             spec_id=args.spec_id,
@@ -782,17 +792,17 @@ def cmd_query_tasks(args, printer):
             status=args.status,
             task_type=args.type,
             parent=args.parent,
-            format_type=args.format,
+            format_type="simple" if simple_mode else "json",
             printer=printer if use_printer else None,
             limit=args.limit
         )
 
-    # Handle output for simple format
-    if args.format == "simple" and results:
+    # Handle output for simple format (just task IDs)
+    if simple_mode and results:
         for task in results:
             print(task["id"])
-    elif args.json and results:
-        print(json.dumps(results, indent=2))
+    elif json_mode and results:
+        output_json(results, args.compact)
 
     return 0 if results is not None else 1
 
@@ -816,7 +826,7 @@ def cmd_get_task(args, printer):
     )
 
     if args.json and task:
-        print(json.dumps(task, indent=2))
+        output_json(task, args.compact)
 
     return 0 if task else 1
 
@@ -845,14 +855,19 @@ def cmd_get_journal(args, printer):
     )
 
     if args.json and entries is not None:
-        print(json.dumps(entries, indent=2))
+        output_json(entries, args.compact)
 
     return 0 if entries is not None else 1
 
 
 def cmd_list_phases(args, printer):
     """List all phases."""
-    if not args.json:
+    from claude_skills.common.ui_factory import create_ui
+
+    # Use global --json/--no-json flag to determine output format
+    json_mode = getattr(args, 'json', False)
+
+    if not json_mode:
         printer.action("Listing phases...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
@@ -860,23 +875,26 @@ def cmd_list_phases(args, printer):
         printer.error("Specs directory not found")
         return 1
 
-    # Use Rich.Table formatter for table output
-    if not args.json:
-        phases = format_phases_table(
-            spec_id=args.spec_id,
-            specs_dir=specs_dir,
-            printer=printer
-        )
-    else:
+    if json_mode:
         # Use original list_phases for JSON output
         phases = list_phases(
             spec_id=args.spec_id,
             specs_dir=specs_dir,
             printer=None
         )
+        if phases:
+            output_json(phases, args.compact)
+    else:
+        # Create UI instance (respects FORCE_PLAIN environment variable)
+        ui = create_ui()
 
-    if args.json and phases:
-        print(json.dumps(phases, indent=2))
+        # Use unified table formatter for text output (works with both RichUi and PlainUi)
+        phases = format_phases_table(
+            spec_id=args.spec_id,
+            specs_dir=specs_dir,
+            printer=printer,
+            ui=ui
+        )
 
     return 0 if phases is not None else 1
 
@@ -900,7 +918,7 @@ def cmd_check_complete(args, printer):
     )
 
     if args.json:
-        print(json.dumps(result, indent=2))
+        output_json(result, args.compact)
 
     return 0 if result.get("is_complete", False) else 1
 
@@ -923,7 +941,7 @@ def cmd_phase_time(args, printer):
     )
 
     if args.json and result:
-        print(json.dumps(result, indent=2))
+        output_json(result, args.compact)
 
     return 0 if result else 1
 
@@ -944,29 +962,46 @@ def cmd_list_blockers(args, printer):
         printer=printer if not args.json else None
     )
 
-    if args.json and blockers:
-        print(json.dumps(blockers, indent=2))
+    if args.json and blockers is not None:
+        output_json(blockers, args.compact)
 
     return 0 if blockers is not None else 1
 
 
 def cmd_reconcile_state(args, printer):
     """Reconcile JSON spec to fix inconsistent task statuses."""
-    printer.action(f"Reconciling state for {args.spec_id}...")
+    if not args.json:
+        printer.action(f"Reconciling state for {args.spec_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not args.json:
+            printer.error("Specs directory not found")
+        else:
+            output_json({"error": "Specs directory not found"}, args.compact)
         return 1
 
-    success = reconcile_state(
+    # Pass None for printer in JSON mode
+    result = reconcile_state(
         spec_id=args.spec_id,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not args.json else None
     )
 
-    return 0 if success else 1
+    # Handle JSON output
+    if args.json:
+        if isinstance(result, dict):
+            output_json(result, args.compact)
+            # Return error if there was an error in the result
+            return 1 if "error" in result else 0
+        else:
+            # Fallback for unexpected return type
+            output_json({"success": bool(result)}, args.compact)
+            return 0 if result else 1
+
+    # Non-JSON mode returns boolean
+    return 0 if result else 1
 
 
 def cmd_check_journaling(args, printer):
@@ -989,7 +1024,7 @@ def cmd_check_journaling(args, printer):
         return 1
 
     if args.json:
-        print(json.dumps(unjournaled, indent=2))
+        output_json(unjournaled, args.compact)
         return 0
 
     if not unjournaled:
@@ -1105,7 +1140,7 @@ def cmd_create_task_commit(args, printer):
             "task_id": args.task_id,
             "task_title": task_title
         }
-        print(json.dumps(result, indent=2))
+        output_json(result, args.compact)
 
     return 0
 
@@ -1137,7 +1172,7 @@ def cmd_complete_task(args, printer):
     )
 
     if args.json and success:
-        print(json.dumps(success, indent=2))
+        output_json(success, args.compact)
         return 0
 
     return 0 if success else 1
@@ -1145,6 +1180,9 @@ def cmd_complete_task(args, printer):
 
 def cmd_list_specs(args, printer):
     """List specification files with optional filtering."""
+    # Use global --json/--no-json flag to determine output format
+    output_format = 'json' if getattr(args, 'json', False) else 'text'
+
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
@@ -1153,9 +1191,10 @@ def cmd_list_specs(args, printer):
     list_specs(
         status=args.status,
         specs_dir=specs_dir,
-        output_format=getattr(args, 'format', 'text'),
+        output_format=output_format,
         verbose=args.detailed,
         printer=printer,
+        compact=getattr(args, 'compact', False),
     )
 
     return 0
@@ -1205,8 +1244,6 @@ def cmd_update_task_metadata(args, printer):
         metadata_updates['status_note'] = args.status_note
     if hasattr(args, 'verification_type') and args.verification_type:
         metadata_updates['verification_type'] = args.verification_type
-    if hasattr(args, 'skill') and args.skill:
-        metadata_updates['skill'] = args.skill
     if hasattr(args, 'command') and args.command:
         metadata_updates['command'] = args.command
 
@@ -1384,7 +1421,7 @@ def register_update(subparsers, parent_parser):
     p_query.add_argument("--status", choices=["pending", "in_progress", "completed", "blocked"], help="Filter by status")
     p_query.add_argument("--type", choices=["task", "verify", "group", "phase", "spec"], help="Filter by type")
     p_query.add_argument("--parent", help="Filter by parent node ID")
-    p_query.add_argument("--format", default="table", choices=["table", "json", "simple"], help="Output format")
+    p_query.add_argument("--simple", action="store_true", help="Output only task IDs (one per line)")
     p_query.add_argument("--limit", type=int, default=20, help="Maximum number of results to return (use 0 for unlimited, default: 20)")
     p_query.set_defaults(func=cmd_query_tasks)
 
@@ -1554,12 +1591,6 @@ def register_update(subparsers, parent_parser):
         action="store_true",
         help="Show detailed information",
     )
-    p_list_specs.add_argument(
-        "--format",
-        choices=["text", "json"],
-        default="text",
-        help="Output format (default: text)",
-    )
     p_list_specs.set_defaults(func=cmd_list_specs)
 
     # sync-metadata command
@@ -1577,14 +1608,13 @@ def register_update(subparsers, parent_parser):
     p_update_meta.add_argument("spec_id", help="Specification ID")
     p_update_meta.add_argument("task_id", help="Task ID to update")
 
-    # The 8 metadata field flags
+    # The metadata field flags
     p_update_meta.add_argument("--file-path", dest="file_path", help="File path for this task")
     p_update_meta.add_argument("--description", help="Task description")
     p_update_meta.add_argument("--task-category", dest="task_category", help="Task category (implementation, testing, etc.)")
     p_update_meta.add_argument("--actual-hours", dest="actual_hours", type=float, help="Actual hours spent on task")
     p_update_meta.add_argument("--status-note", dest="status_note", help="Status note or completion note")
     p_update_meta.add_argument("--verification-type", dest="verification_type", help="Verification type (auto, manual, none)")
-    p_update_meta.add_argument("--skill", help="Skill or tool used")
     p_update_meta.add_argument("--command", help="Command executed")
 
     # Standard flags

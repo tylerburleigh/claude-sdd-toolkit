@@ -26,6 +26,7 @@ try:
         ensure_reports_directory,
     )
     from claude_skills.common.sdd_config import get_default_format
+    from claude_skills.common.json_output import output_json
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -145,6 +146,31 @@ def _filter_actions_by_selection(actions, selection_criteria):
     return selected
 
 
+def _emit_schema_messages(result, printer, *, verbose: bool) -> None:
+    """Surface schema validation findings in non-verbose CLI output."""
+
+    errors = getattr(result, "schema_errors", []) or []
+    warnings = getattr(result, "schema_warnings", []) or []
+
+    if verbose:
+        # Verbose output will list individual issues later.
+        return
+
+    if errors:
+        printer.error("Schema validation errors:")
+        for message in errors[:5]:
+            printer.error(f"  - {message}")
+        if len(errors) > 5:
+            printer.error(f"  - ... {len(errors) - 5} more (use --verbose for full details)")
+
+    if warnings:
+        printer.warning("Schema validation warnings:")
+        for message in warnings[:5]:
+            printer.warning(f"  - {message}")
+        if len(warnings) > 5:
+            printer.warning(f"  - ... {len(warnings) - 5} more (use --verbose for full details)")
+
+
 def _interactive_select_fixes(actions, printer):
     """Interactively prompt user to select fixes."""
     if not actions:
@@ -251,8 +277,15 @@ def cmd_validate(args, printer):
         }
         if args.verbose:
             payload["issues"] = normalized.issues
+        schema_info = {
+            "source": getattr(result, "schema_source", None),
+            "errors": getattr(result, "schema_errors", []),
+            "warnings": getattr(result, "schema_warnings", []),
+        }
+        if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
+            payload["schema"] = schema_info
 
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         if not args.quiet:
             print()
@@ -264,9 +297,15 @@ def cmd_validate(args, printer):
         else:
             printer.success("✅ Validation PASSED")
 
+        if not args.quiet and getattr(result, "schema_source", None):
+            printer.result("Schema source", result.schema_source)
+
         summary = format_validation_summary(normalized, verbose=args.verbose)
         if summary:
             print(summary)
+
+        if not args.quiet:
+            _emit_schema_messages(result, printer, verbose=args.verbose)
 
         # Generate report if requested
         if args.report:
@@ -355,7 +394,7 @@ def cmd_fix(args, printer):
                 "skipped": len(actions),
                 "status": "preview",
             }
-            print(json.dumps(payload, indent=2))
+            output_json(payload)
         else:
             printer.info(f"Found {len(actions)} auto-fixable issue(s):")
             print()
@@ -409,7 +448,7 @@ def cmd_fix(args, printer):
         }
         if migration_actions:
             payload["migrated_tasks"] = [a.id.replace("file_path.remove_placeholder:", "") for a in migration_actions]
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         if report.applied_actions:
             printer.success(f"Applied {len(report.applied_actions)} fix(es)")
@@ -497,7 +536,13 @@ def cmd_report(args, printer):
     with open(output_path, "w") as f:
         f.write(report)
 
-    printer.success(f"Report saved to: {output_path}")
+    # Only print file location in non-JSON mode
+    if args.format != "json":
+        printer.success(f"Report saved to: {output_path}")
+    else:
+        # In JSON mode, output the report to stdout as well
+        print(report)
+
     return 0
 
 
@@ -552,7 +597,7 @@ def cmd_check_deps(args, printer):
             "bottlenecks": analysis.bottlenecks,
             "status": analysis.status,
         }
-        print(json.dumps(payload, indent=2))
+        output_json(payload)
     else:
         printer.success("Dependency Analysis:")
         if analysis.cycles:

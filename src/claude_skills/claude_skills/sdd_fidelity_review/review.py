@@ -1267,6 +1267,17 @@ class FidelityReviewer:
         prompt_parts.append("5. **Code Quality:** Are there any quality, maintainability, or security concerns?\n")
         prompt_parts.append("6. **Documentation:** Is the implementation properly documented?\n\n")
 
+        prompt_parts.append("## IMPORTANT CONSTRAINTS\n\n")
+        prompt_parts.append("**CRITICAL: This is a READ-ONLY review. You MUST NOT:**\n")
+        prompt_parts.append("- Write, create, or modify ANY files on disk\n")
+        prompt_parts.append("- Execute code or commands\n")
+        prompt_parts.append("- Make changes to the codebase\n\n")
+        prompt_parts.append("**Your role is ANALYSIS ONLY:**\n")
+        prompt_parts.append("- Review the specification and implementation\n")
+        prompt_parts.append("- Identify deviations and issues\n")
+        prompt_parts.append("- Provide your findings as TEXT in your response\n")
+        prompt_parts.append("- Do not reference external files you create or write\n\n")
+
         prompt_parts.append("---\n")
         prompt_parts.append("\n*Please provide a detailed review addressing each question above.*\n")
 

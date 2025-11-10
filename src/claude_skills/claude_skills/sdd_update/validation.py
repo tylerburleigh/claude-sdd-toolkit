@@ -3,7 +3,7 @@ JSON spec validation and reporting operations for SDD workflows.
 """
 
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 
 # Import from sdd-common
 from claude_skills.common.spec import load_json_spec
@@ -12,6 +12,9 @@ from claude_skills.common.printer import PrettyPrinter
 from claude_skills.common.dependency_analysis import find_circular_dependencies
 from claude_skills.common.hierarchy_validation import validate_spec_hierarchy
 from claude_skills.common.completion import check_spec_completion
+
+# Import panel-based status report
+from claude_skills.sdd_update.status_report import print_status_report
 
 
 def validate_spec(
@@ -82,14 +85,11 @@ def get_status_report(
     Args:
         spec_id: Specification ID
         specs_dir: Path to specs/active directory
-        printer: Optional printer for output
+        printer: Optional printer for output (None = JSON mode, no printing)
 
     Returns:
         Dictionary with status information, or None on error
     """
-    if not printer:
-        printer = PrettyPrinter()
-
     # Load spec
     spec_data = load_json_spec(spec_id, specs_dir)
     if not spec_data:
@@ -131,34 +131,25 @@ def get_status_report(
         "can_finalize": completion_result["can_finalize"]
     }
 
-    # Display report
-    printer.header(f"Status Report: {progress['title']}")
+    # Only print if printer was provided (not in JSON mode)
+    if printer:
+        # Use the new panel-based status report display
+        title = f"Status Report: {progress['title']}"
+        print_status_report(spec_data, title=title)
 
-    printer.result("Overall Progress", f"{progress['completed_tasks']}/{progress['total_tasks']} ({progress['percentage']}%)")
-    printer.result("Status", progress["status"])
+        # Add journaling warning if needed (not part of main dashboard)
+        if unjournaled_count > 0:
+            printer.warning(f"⚠️  {unjournaled_count} completed task(s) need journal entries")
+            printer.detail(f"    Run 'check-journaling {spec_id}' for details")
+            print()
 
-    printer.info("\nTask Status:")
-    for status, count in task_counts.items():
-        printer.detail(f"{status}: {count}")
-
-    # Show journaling warning if needed
-    if unjournaled_count > 0:
-        printer.info("\n⚠️  Journaling:")
-        printer.warning(f"  {unjournaled_count} completed task(s) need journal entries")
-        printer.detail(f"  Run 'check-journaling {spec_id}' for details")
-
-    printer.info("\nPhases:")
-    for phase in phases:
-        status_symbol = {"completed": "✓", "in_progress": "→", "pending": "○", "blocked": "✗"}.get(phase["status"], "?")
-        printer.detail(f"{status_symbol} {phase['title']}: {phase['completed_tasks']}/{phase['total_tasks']} ({phase['percentage']}%)")
-
-    # Display completion status if relevant
-    if completion_result["is_complete"]:
-        printer.success("\n✅ Spec is complete! All tasks finished.")
-        printer.detail("  Run 'sdd complete-spec' command to finalize and move to completed folder")
-    elif completion_result["percentage"] >= 90:
-        remaining = len(completion_result["incomplete_tasks"])
-        printer.info(f"\n⏳ Almost there! {remaining} task(s) remaining")
+        # Display completion status if relevant (not part of main dashboard)
+        if completion_result["is_complete"]:
+            printer.success("✅ Spec is complete! All tasks finished.")
+            printer.detail("  Run 'sdd complete-spec' command to finalize and move to completed folder")
+        elif completion_result["percentage"] >= 90:
+            remaining = len(completion_result["incomplete_tasks"])
+            printer.info(f"⏳ Almost there! {remaining} task(s) remaining")
 
     return report
 
@@ -184,10 +175,8 @@ def audit_spec(
     Returns:
         Dictionary with audit results
     """
-    if not printer:
-        printer = PrettyPrinter()
-
-    printer.action("Auditing JSON spec...")
+    if printer:
+        printer.action("Auditing JSON spec...")
 
     spec_data = load_json_spec(spec_id, specs_dir)
     if not spec_data:
@@ -225,21 +214,22 @@ def audit_spec(
         "warnings": warnings
     }
 
-    printer.info(f"Issues: {len(issues)}")
-    printer.info(f"Warnings: {len(warnings)}")
+    if printer:
+        printer.info(f"Issues: {len(issues)}")
+        printer.info(f"Warnings: {len(warnings)}")
 
-    if issues:
-        printer.error("Critical issues found:")
-        for issue in issues:
-            printer.detail(issue)
+        if issues:
+            printer.error("Critical issues found:")
+            for issue in issues:
+                printer.detail(issue)
 
-    if warnings:
-        printer.warning("Warnings:")
-        for warning in warnings[:5]:
-            printer.detail(warning)
+        if warnings:
+            printer.warning("Warnings:")
+            for warning in warnings[:5]:
+                printer.detail(warning)
 
-    if not issues and not warnings:
-        printer.success("Audit passed with no issues")
+        if not issues and not warnings:
+            printer.success("Audit passed with no issues")
 
     return result
 
@@ -249,7 +239,7 @@ def reconcile_state(
     specs_dir: Path,
     dry_run: bool = False,
     printer: Optional[PrettyPrinter] = None
-) -> bool:
+) -> Union[bool, Dict]:
     """
     Reconcile JSON spec by fixing inconsistent task statuses.
 
@@ -264,15 +254,14 @@ def reconcile_state(
         printer: Optional printer for output
 
     Returns:
-        True if reconciliation successful, False otherwise
+        Dictionary with reconciliation data when printer is None (JSON mode),
+        or boolean for backward compatibility (True if successful, False otherwise)
     """
-    if not printer:
-        printer = PrettyPrinter()
-
     from claude_skills.common.spec import save_json_spec
     from claude_skills.common.progress import recalculate_progress
 
-    printer.action("Reconciling JSON spec...")
+    if printer:
+        printer.action("Reconciling JSON spec...")
 
     # Load spec
     spec_data = load_json_spec(spec_id, specs_dir)
@@ -311,33 +300,50 @@ def reconcile_state(
             if not dry_run:
                 node_data["status"] = "in_progress"
 
-    # Report findings
-    if not fixes_made:
-        printer.success("No inconsistencies found - JSON spec is coherent")
-        return True
+    # Prepare result data
+    result_data = {
+        "spec_id": spec_id,
+        "fixes_applied": len(fixes_made),
+        "fixes": fixes_made,
+        "dry_run": dry_run
+    }
 
-    printer.warning(f"Found {len(fixes_made)} inconsistencies:")
-    for fix in fixes_made:
-        printer.detail(f"{fix['node_id']} ({fix['title']})")
-        printer.detail(f"  Status: {fix['old_status']} → {fix['new_status']}")
-        printer.detail(f"  Reason: {fix['reason']}")
+    # Report findings (only if printer is provided)
+    if not fixes_made:
+        if printer:
+            printer.success("No inconsistencies found - JSON spec is coherent")
+        # Return data for JSON mode or boolean for backward compatibility
+        return result_data if not printer else True
+
+    if printer:
+        printer.warning(f"Found {len(fixes_made)} inconsistencies:")
+        for fix in fixes_made:
+            printer.detail(f"{fix['node_id']} ({fix['title']})")
+            printer.detail(f"  Status: {fix['old_status']} → {fix['new_status']}")
+            printer.detail(f"  Reason: {fix['reason']}")
 
     if dry_run:
-        printer.warning("DRY RUN - No changes saved")
-        return True
+        if printer:
+            printer.warning("DRY RUN - No changes saved")
+        return result_data if not printer else True
 
     # Recalculate progress to ensure counts are correct
-    printer.action("Recalculating progress...")
+    if printer:
+        printer.action("Recalculating progress...")
     recalculate_progress(spec_data)
 
     # Save JSON spec with backup
-    printer.action("Saving reconciled spec...")
+    if printer:
+        printer.action("Saving reconciled spec...")
     if not save_json_spec(spec_id, specs_dir, spec_data, backup=True):
-        printer.error("Failed to save JSON spec")
-        return False
+        if printer:
+            printer.error("Failed to save JSON spec")
+        result_data["error"] = "Failed to save spec"
+        return result_data if not printer else False
 
-    printer.success(f"Reconciled {len(fixes_made)} task statuses")
-    return True
+    if printer:
+        printer.success(f"Reconciled {len(fixes_made)} task statuses")
+    return result_data if not printer else True
 
 
 def detect_unjournaled_tasks(

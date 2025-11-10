@@ -16,6 +16,7 @@ The **Skill(sdd-toolkit:sdd-validate)** skill provides comprehensive validation 
 - Calculate comprehensive spec statistics (depth, coverage, complexity)
 - Analyze dependencies (cycles, orphans, deadlocks, bottlenecks)
 - Differentiated exit codes for warnings vs errors
+- Draft 07 JSON Schema validation (installs automatically when `jsonschema` is available; run `pip install claude-skills[validation]` to enable)
 
 ## When to Use This Skill
 

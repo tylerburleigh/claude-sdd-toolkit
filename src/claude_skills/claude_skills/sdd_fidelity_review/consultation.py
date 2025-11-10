@@ -21,6 +21,7 @@ from claude_skills.common.ai_tools import (
     check_tool_available
 )
 from claude_skills.common.progress import ProgressEmitter
+from claude_skills.common import ai_config
 
 # Import cache modules with fallback
 try:
@@ -31,6 +32,25 @@ except ImportError:
     _CACHE_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+
+# Helper functions for config-driven behavior
+def get_fidelity_review_timeout() -> int:
+    """
+    Get consultation timeout from config.
+
+    Returns timeout in seconds from config file (defaults to 600).
+    """
+    return ai_config.get_timeout('sdd-fidelity-review', 'consultation')
+
+
+def get_enabled_fidelity_tools() -> Dict[str, Dict]:
+    """
+    Get enabled tools from config.
+
+    Returns dictionary of tools where enabled: true in config.
+    """
+    return ai_config.get_enabled_tools('sdd-fidelity-review')
 
 
 class FidelityVerdict(Enum):
@@ -104,7 +124,7 @@ def consult_ai_on_fidelity(
     prompt: str,
     tool: Optional[str] = None,
     model: Optional[str] = None,
-    timeout: int = 120
+    timeout: int = 600
 ) -> ToolResponse:
     """
     Consult an AI tool for implementation fidelity review.
@@ -117,7 +137,7 @@ def consult_ai_on_fidelity(
         tool: Specific tool to use (gemini, codex, cursor-agent).
               If None, uses first available tool.
         model: Model to request (optional, tool-specific)
-        timeout: Timeout in seconds (default: 120)
+        timeout: Timeout in seconds (default: 600)
 
     Returns:
         ToolResponse object with consultation results
@@ -189,7 +209,7 @@ def consult_multiple_ai_on_fidelity(
     prompt: str,
     tools: Optional[List[str]] = None,
     model: Optional[str] = None,
-    timeout: int = 120,
+    timeout: int = 600,
     require_all_success: bool = False,
     cache_key_params: Optional[Dict[str, Any]] = None,
     use_cache: Optional[bool] = None,
@@ -288,15 +308,32 @@ def consult_multiple_ai_on_fidelity(
             logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
 
     try:
-        # If no tools specified, detect all available tools
+        # If no tools specified, detect available tools and filter by config
         if tools is None:
-            tools = detect_available_tools()
-            if not tools:
+            # Get enabled tools from config
+            enabled_tools_config = get_enabled_fidelity_tools()
+            enabled_tool_names = list(enabled_tools_config.keys())
+
+            # Detect all available tools
+            all_available_tools = detect_available_tools()
+            if not all_available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
                     "Please install: gemini, codex, or cursor-agent"
                 )
-            logger.info(f"Using detected tools: {', '.join(tools)}")
+
+            # Filter to only tools that are BOTH available AND enabled
+            tools = [t for t in all_available_tools if t in enabled_tool_names]
+
+            if not tools:
+                # Fallback to all available if none match enabled filter
+                logger.warning(
+                    f"No tools matched enabled config ({enabled_tool_names}). "
+                    f"Using all available tools: {', '.join(all_available_tools)}"
+                )
+                tools = all_available_tools
+            else:
+                logger.info(f"Using enabled tools from config: {', '.join(tools)}")
 
         # Filter to only available tools
         available_tools = [t for t in tools if check_tool_available(t)]
@@ -320,12 +357,14 @@ def consult_multiple_ai_on_fidelity(
         # Execute consultations in parallel
         # Convert single model string to models dict if provided
         models_dict = {tool: model for tool in available_tools} if model else None
-        responses = execute_tools_parallel(
+        multi_response = execute_tools_parallel(
             tools=available_tools,
             prompt=prompt,
             models=models_dict,
             timeout=timeout
         )
+        # Extract list of responses from MultiToolResponse dataclass
+        responses = list(multi_response.responses.values())
 
         # Emit model_response events for each response
         if progress_emitter:

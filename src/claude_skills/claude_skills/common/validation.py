@@ -133,6 +133,11 @@ class JsonSpecValidationResult:
     generated: str
     last_updated: str
 
+    # JSON schema validation (optional)
+    schema_errors: List[str] = field(default_factory=list)
+    schema_warnings: List[str] = field(default_factory=list)
+    schema_source: Optional[str] = None
+
     # Validation categories (legacy string lists for compatibility)
     structure_errors: List[str] = field(default_factory=list)
     structure_warnings: List[str] = field(default_factory=list)
@@ -170,6 +175,7 @@ class JsonSpecValidationResult:
     def count_all_issues(self) -> Tuple[int, int]:
         """Count total errors and warnings across all categories"""
         error_count = (
+            len(self.schema_errors) +
             len(self.structure_errors) +
             len(self.hierarchy_errors) +
             len(self.node_errors) +
@@ -179,6 +185,7 @@ class JsonSpecValidationResult:
             len(self.cross_val_errors)
         )
         warning_count = (
+            len(self.schema_warnings) +
             len(self.structure_warnings) +
             len(self.hierarchy_warnings) +
             len(self.node_warnings) +

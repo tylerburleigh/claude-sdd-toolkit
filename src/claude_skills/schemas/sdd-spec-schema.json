@@ -4,7 +4,12 @@
   "title": "SDD Spec File Schema",
   "description": "Schema for SDD (Spec-Driven Development) JSON specification files",
   "type": "object",
-  "required": ["spec_id", "title", "generated", "last_updated", "hierarchy"],
+  "required": [
+    "spec_id",
+    "generated",
+    "last_updated",
+    "hierarchy"
+  ],
   "properties": {
     "spec_id": {
       "type": "string",
@@ -30,37 +35,99 @@
       "type": "object",
       "description": "Optional spec-level metadata",
       "properties": {
-        "estimated_hours": { "type": "number", "minimum": 0 },
-        "owner": { "type": "string" },
-        "status": { "type": "string", "enum": ["active", "archived", "completed"] },
+        "title": {
+          "type": "string",
+          "description": "Specification title retained for backward compatibility."
+        },
+        "description": {
+          "type": "string",
+          "description": "High-level description of the specification."
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key objectives or acceptance criteria for the spec."
+        },
+        "complexity": {
+          "type": "string",
+          "description": "Relative complexity indicator."
+        },
+        "estimated_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "owner": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "description": "Workflow status for the specification."
+        },
         "assumptions": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Design assumptions and constraints for this spec (e.g., single-user workflow, feature branch ownership)"
         },
         "revision_history": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["version", "date", "changelog"],
+            "required": [
+              "version",
+              "date",
+              "changelog"
+            ],
             "properties": {
-              "version": { "type": "string", "description": "Version number (e.g., 1.0, 1.1, 2.0)" },
-              "date": { "type": "string", "format": "date-time", "description": "ISO 8601 timestamp of revision" },
-              "author": { "type": "string", "description": "Who made the revision" },
-              "changelog": { "type": "string", "description": "Description of changes made in this revision" },
-              "modified_by": { "type": "string", "description": "Tool or command that made the modification (e.g., sdd modify-spec)" },
-              "review_triggered_by": { "type": "string", "description": "Path to review report that triggered this revision (if applicable)" }
+              "version": {
+                "type": "string",
+                "description": "Version number (e.g., 1.0, 1.1, 2.0)"
+              },
+              "date": {
+                "type": "string",
+                "format": "date-time",
+                "description": "ISO 8601 timestamp of revision"
+              },
+              "author": {
+                "type": "string",
+                "description": "Who made the revision"
+              },
+              "changelog": {
+                "type": "string",
+                "description": "Description of changes made in this revision"
+              },
+              "modified_by": {
+                "type": "string",
+                "description": "Tool or command that made the modification (e.g., sdd modify-spec)"
+              },
+              "review_triggered_by": {
+                "type": "string",
+                "description": "Path to review report that triggered this revision (if applicable)"
+              }
             }
           },
           "description": "Version history tracking spec modifications over time"
         }
-      }
+      },
+      "additionalProperties": true
     },
     "hierarchy": {
       "type": "object",
       "description": "Task hierarchy tree",
       "patternProperties": {
-        "^(spec-root|phase-\\d+|task-\\d+-\\d+|verify-\\d+-\\d+)$": {
+        "^spec-root$": {
+          "$ref": "#/definitions/node"
+        },
+        "^phase-\\d+(?:-[\\w-]+)*$": {
+          "$ref": "#/definitions/node"
+        },
+        "^task-\\d+(?:-\\d+)+$": {
+          "$ref": "#/definitions/node"
+        },
+        "^verify-\\d+(?:-\\d+)+$": {
           "$ref": "#/definitions/node"
         }
       }
@@ -69,7 +136,16 @@
   "definitions": {
     "node": {
       "type": "object",
-      "required": ["id", "type", "title", "status", "parent", "children", "total_tasks", "completed_tasks"],
+      "required": [
+        "type",
+        "title",
+        "status",
+        "parent",
+        "children",
+        "total_tasks",
+        "completed_tasks",
+        "metadata"
+      ],
       "properties": {
         "id": {
           "type": "string",
@@ -77,7 +153,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["spec", "phase", "group", "task", "subtask", "verify"],
+          "enum": [
+            "spec",
+            "phase",
+            "group",
+            "task",
+            "subtask",
+            "verify"
+          ],
           "description": "Node type in hierarchy"
         },
         "title": {
@@ -87,17 +170,132 @@
         },
         "status": {
           "type": "string",
-          "enum": ["pending", "in_progress", "completed", "blocked"],
+          "enum": [
+            "pending",
+            "in_progress",
+            "completed",
+            "blocked"
+          ],
           "description": "Current status"
         },
         "parent": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Parent node ID (null only for spec-root)"
         },
         "children": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of child node IDs"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Node-specific metadata",
+          "default": {},
+          "properties": {
+            "purpose": {
+              "type": "string",
+              "description": "High-level intent or goal for the node's work."
+            },
+            "risk_level": {
+              "type": "string",
+              "description": "Qualitative risk indicator (e.g., low, medium, high)."
+            },
+            "estimated_hours": {
+              "type": "number",
+              "minimum": 0
+            },
+            "complexity": {
+              "type": "string",
+              "description": "Relative complexity label."
+            },
+            "task_category": {
+              "type": "string",
+              "enum": [
+                "investigation",
+                "implementation",
+                "refactoring",
+                "decision",
+                "research"
+              ],
+              "description": "Category of task work."
+            },
+            "file_path": {
+              "type": "string",
+              "description": "Primary file impacted by the node."
+            },
+            "details": {
+              "type": "string",
+              "description": "Free-form detail text for subtasks and tasks."
+            },
+            "changes": {
+              "type": "string",
+              "description": "Summary of expected code or documentation changes."
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Supporting rationale or justification."
+            },
+            "owner": {
+              "type": "string",
+              "description": "Optional owner or assignee."
+            },
+            "verification_type": {
+              "type": "string",
+              "enum": [
+                "auto",
+                "manual",
+                "fidelity"
+              ]
+            },
+            "agent": {
+              "type": "string",
+              "description": "Automation agent to run for verification."
+            },
+            "command": {
+              "type": "string",
+              "description": "Command or instructions for automated verification."
+            },
+            "expected": {
+              "type": "string",
+              "description": "Expected outcome of verification."
+            },
+            "scope": {
+              "type": "string",
+              "description": "Scope identifier for fidelity verification."
+            },
+            "target": {
+              "type": "string",
+              "description": "Target identifier for verification scope."
+            },
+            "status": {
+              "type": "string",
+              "description": "Optional workflow status for metadata (distinct from node status)."
+            },
+            "started_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when work started."
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when work completed."
+            },
+            "actual_hours": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Actual hours spent on the node."
+            },
+            "on_failure": {
+              "$ref": "#/definitions/on_failure_actions"
+            }
+          },
+          "additionalProperties": true
         },
         "total_tasks": {
           "type": "integer",
@@ -112,65 +310,23 @@
         "dependencies": {
           "type": "object",
           "properties": {
-            "blocked_by": { "type": "array", "items": { "type": "string" } },
-            "depends": { "type": "array", "items": { "type": "string" } },
-            "blocks": { "type": "array", "items": { "type": "string" } }
-          }
-        },
-        "metadata": {
-          "type": "object",
-          "description": "Node-specific metadata",
-          "properties": {
-            "task_category": {
-              "type": "string",
-              "enum": ["investigation", "implementation", "refactoring", "decision", "research"],
-              "description": "Category of task work. Optional field for backward compatibility. Values: 'investigation' (exploring/analyzing existing code), 'implementation' (writing new functionality), 'refactoring' (improving code structure without changing behavior), 'decision' (architectural/design choices), 'research' (gathering information, reading docs). Default behavior when omitted: inferred from task context."
+            "blocked_by": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
-            "file_path": {
-              "type": "string",
-              "description": "Path to the primary file being modified by this task. DESIGN PRINCIPLE: Tasks are atomic - each task should modify exactly ONE file. This enables: (1) precise dependency tracking, (2) granular progress monitoring, (3) parallel implementation, (4) straightforward verification, (5) easy rollback. MULTI-FILE SCENARIOS: When a feature requires changes across multiple files, decompose into multiple tasks (each with its own file_path) with explicit dependencies, or use subtasks under a parent task. VALIDATION: Required for implementation/refactoring tasks. Optional for investigation/decision/research tasks (use placeholder values like 'investigation', 'decision', 'research' when no specific file). EXAMPLES: 'src/auth/middleware.js', 'models/user.py', 'docs/api.md'"
+            "depends": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
-            "verification_type": {
-              "type": "string",
-              "enum": ["auto", "manual", "fidelity"],
-              "description": "Type of verification: 'auto' (automated tests/checks), 'manual' (human review checklist), 'fidelity' (implementation vs spec comparison)"
-            },
-            "agent": {
-              "type": "string",
-              "description": "Agent/subagent identifier for automated verification. Use the base name (e.g., 'run-tests', 'sdd-fidelity-review'). The system invokes via Task(subagent_type: 'sdd-toolkit:{agent}-subagent'). For direct invocation, use Skill(sdd-toolkit:{agent}).",
-              "examples": ["run-tests", "sdd-fidelity-review", "sdd-validate", "code-doc"]
-            },
-            "command": {
-              "type": "string",
-              "description": "Command or arguments to pass to the skill/tool"
-            },
-            "scope": {
-              "type": "string",
-              "enum": ["phase", "task"],
-              "description": "Scope for fidelity review verification: 'phase' (single phase, typically 3-10 tasks), 'task' (single task, typically 1 file). Only used when verification_type is 'fidelity'."
-            },
-            "target": {
-              "type": "string",
-              "description": "Target identifier for scoped fidelity review. When scope='phase', use phase-id (e.g., 'phase-2'). When scope='task', use task-id (e.g., 'task-2-3')."
-            },
-            "on_failure": {
-              "$ref": "#/definitions/on_failure_actions",
-              "description": "Actions to take when verification fails"
-            },
-            "started_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "ISO 8601 timestamp when task was started (automatically populated by sdd-update)"
-            },
-            "completed_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "ISO 8601 timestamp when task was completed (automatically populated by sdd-update)"
-            },
-            "actual_hours": {
-              "type": "number",
-              "minimum": 0,
-              "description": "Actual time spent on task in hours (enables variance analysis against estimated_hours)"
+            "blocks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         }
@@ -187,7 +343,11 @@
         },
         "revert_status": {
           "type": "string",
-          "enum": ["pending", "in_progress", "blocked"],
+          "enum": [
+            "pending",
+            "in_progress",
+            "blocked"
+          ],
           "description": "Status to revert the parent task to on failure (default: in_progress)",
           "default": "in_progress"
         },
@@ -200,7 +360,9 @@
         },
         "notify": {
           "type": "string",
-          "enum": ["log", "email", "slack", "none"],
+          "enum": [
+            "log"
+          ],
           "description": "Notification method on failure (default: log)",
           "default": "log"
         },

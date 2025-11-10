@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# PreToolUse hook to block reading .json spec files
+# Forces use of sdd-next skill instead of direct file reading
+
+set -euo pipefail
+
+# Read JSON input from stdin
+input=$(cat)
+
+# Extract file_path from tool_input using jq (or fall back to grep/sed if jq unavailable)
+if command -v jq &> /dev/null; then
+    file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty')
+else
+    # Fallback: simple extraction using grep/sed
+    file_path=$(echo "$input" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+fi
+
+# If no file_path found, allow (might be a different Read operation)
+if [ -z "$file_path" ]; then
+    exit 0
+fi
+
+# Check if file path matches **/specs/**/*.json pattern
+if [[ "$file_path" == *"/specs/"*".json" ]]; then
+    # Block the read with helpful error message
+    cat >&2 <<'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                    ⛔ JSON SPEC READ BLOCKED                           ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+WHAT: You attempted to read a .json specification file directly.
+
+WHY: JSON specs are often very large (50KB+) and waste context tokens.
+     The SDD toolkit provides optimized tools for working with specs.
+
+HOW TO FIX:
+  Use sdd CLI commands to query spec information without reading the JSON file.
+  Efficient alternatives depend on what you need:
+
+  - Get the next task to work on:
+    Bash(sdd next-task <spec-id>)
+
+  - Query tasks by status, type, or parent:
+    Bash(sdd query-tasks <spec-id> --status pending --limit 5)
+
+  - Get detailed info on a specific task:
+    Bash(sdd get-task <spec-id> <task-id> --include-journal)
+
+  - Check overall progress:
+    Bash(sdd progress <spec-id>)
+
+  - Get spec statistics and structure:
+    Bash(sdd spec-stats <path-to-spec.md>)
+
+  - View decision journal:
+    Bash(sdd get-journal <spec-id>)
+
+EXAMPLE:
+  Instead of: Read(specs/active/my-spec.json)
+  Use: Bash(sdd next-task plain-mode-support-2025-11-08-001)
+
+This hook enforces proper SDD workflow and prevents token waste.
+
+EOF
+    exit 2
+fi
+
+# Allow the read for non-spec .json files
+exit 0
