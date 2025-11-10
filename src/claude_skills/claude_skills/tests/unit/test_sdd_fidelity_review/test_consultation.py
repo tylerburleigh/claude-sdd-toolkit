@@ -260,6 +260,26 @@ def test_parse_review_response_parses_json_schema() -> None:
     assert parsed.confidence == pytest.approx(0.9)
 
 
+def test_parse_review_response_parses_nested_response_field() -> None:
+    payload = {
+        "verdict": "fail",
+        "summary": "Nested payload summary.",
+        "issues": ["Top level issue entry."],
+        "recommendations": ["Top level recommendation."],
+        "confidence": 0.4,
+    }
+    outer = {"response": json.dumps(payload)}
+    raw = json.dumps(outer)
+    response = _make_response("gemini", ToolStatus.SUCCESS, output=raw)
+    parsed = parse_review_response(response)
+
+    assert parsed.verdict is FidelityVerdict.FAIL
+    assert parsed.summary == "Nested payload summary."
+    assert parsed.issues == ["Top level issue entry."]
+    assert parsed.recommendations == ["Top level recommendation."]
+    assert parsed.confidence == pytest.approx(0.4)
+
+
 def test_parse_review_response_parses_json_code_block_entries() -> None:
     payload = {
         "verdict": "partial",

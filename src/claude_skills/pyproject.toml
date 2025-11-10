@@ -45,11 +45,14 @@ where = ["."]
 include = ["claude_skills*"]
 
 [tool.setuptools.package-data]
+# Include bundled resource templates so editable installs and wheels both ship setup assets.
 claude_skills = [
     "*.json",
     "**/*.json",
+    "common/templates/setup/*.json",
     "*.yaml",
     "**/*.yaml",
+    "common/templates/setup/*.yaml",
     "**/*.md",
     "common/templates/*.md",
 ]

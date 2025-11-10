@@ -1099,6 +1099,14 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
     summary_provided = False
 
     if isinstance(json_payload, dict):
+        if (
+            "response" in json_payload
+            and isinstance(json_payload["response"], str)
+        ):
+            nested_payload = _load_json_from_text(json_payload["response"])
+            if isinstance(nested_payload, dict):
+                json_payload = nested_payload
+
         verdict_from_json = _coerce_verdict(json_payload.get("verdict"))
         if verdict_from_json is not None:
             verdict = verdict_from_json

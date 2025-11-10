@@ -1,7 +1,7 @@
 {
   "spec_id": "setup-template-centralization-2025-11-10-001",
   "generated": "2025-11-10T20:30:00Z",
-  "last_updated": "2025-11-10T23:19:26.636902Z",
+  "last_updated": "2025-11-10T23:23:17.820482Z",
   "metadata": {
     "title": "Setup Template Centralization",
     "description": "Centralize all setup-related configuration templates into a unified directory structure with a standard helper module for accessing them via importlib.resources",
@@ -11,7 +11,7 @@
       "Refactor all setup scripts to use the new helper module",
       "Ensure all setup commands use centralized templates with old files removed"
     ],
-    "progress_percentage": 21,
+    "progress_percentage": 23,
     "status": "active",
     "current_phase": "phase-1"
   },
@@ -28,7 +28,7 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {}
     },
     "phase-1": {
@@ -41,7 +41,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "description": "Create the centralized template directory, helper module, and all template files"
       },
@@ -54,7 +54,7 @@
     "phase-1-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1",
       "children": [
         "task-1-1",
@@ -67,8 +67,12 @@
         "task-1-8"
       ],
       "total_tasks": 11,
-      "completed_tasks": 10,
-      "metadata": {},
+      "completed_tasks": 11,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-10T23:23:17.810767Z",
+        "journaled_at": "2025-11-10T23:23:17.820394Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-1-verify"
@@ -374,7 +378,7 @@
     "task-1-8": {
       "type": "task",
       "title": "src/claude_skills/pyproject.toml",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -385,12 +389,18 @@
         ]
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/pyproject.toml",
         "task_category": "implementation",
         "estimated_hours": 0.25,
-        "description": "Update package-data to include *.yaml and **/*.yaml files"
+        "description": "Update package-data to include *.yaml and **/*.yaml files",
+        "started_at": "2025-11-10T23:22:34.455790Z",
+        "status_note": "Ensuring setup templates ship in package data",
+        "completed_at": "2025-11-10T23:23:17.810269Z",
+        "needs_journaling": false,
+        "actual_hours": 0.012,
+        "journaled_at": "2025-11-10T23:23:17.815166Z"
       }
     },
     "phase-1-verify": {
@@ -1479,6 +1489,24 @@
       "content": "Added packed settings.local.json template enumerating standard SDD permissions so new projects bootstrap with the required allow list. No automated tests were run; JSON template updated only.",
       "metadata": {},
       "task_id": "task-1-6"
+    },
+    {
+      "timestamp": "2025-11-10T23:23:17.815155Z",
+      "entry_type": "status_change",
+      "title": "Ship YAML setup templates",
+      "author": "claude-code",
+      "content": "Expanded package data to explicitly bundle the new setup JSON/YAML templates alongside the existing globs. This ensures wheels and editable installs include the centralized setup resources. Not run: tests (config-only change).",
+      "metadata": {},
+      "task_id": "task-1-8"
+    },
+    {
+      "timestamp": "2025-11-10T23:23:17.820379Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-1-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-1-files"
     }
   ]
 }
