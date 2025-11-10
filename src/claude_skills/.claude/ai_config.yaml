@@ -1,0 +1,59 @@
+# Centralized AI Model Consultation Configuration
+#
+# This file defines the default AI tooling strategy used by the SDD toolkit.
+# Generated automatically during `sdd skills-dev setup-permissions update`.
+# You can customise any section to tune model selection, consensus behaviour,
+# or skill-specific overrides. Re-run the setup command to regenerate only if
+# you delete this file; existing customisations are preserved.
+
+tools:
+  gemini:
+    command: gemini
+    enabled: true
+    description: Strategic analysis and hypothesis validation
+  cursor-agent:
+    command: cursor-agent
+    enabled: true
+    description: Repository-wide pattern discovery
+  codex:
+    command: codex
+    enabled: false
+    description: Code-level review and bug fixes
+
+models:
+  gemini:
+    priority:
+      - gemini-2.5-pro
+  cursor-agent:
+    priority:
+      - composer-1
+  codex:
+    priority:
+      - gpt-5-codex
+
+consensus:
+  agents:
+    - cursor-agent
+    - gemini
+    - codex
+  auto_trigger:
+    default: false
+    assertion: true
+    exception: true
+    fixture: true
+    import: false
+    timeout: true
+    flaky: false
+    multi-file: true
+
+consultation:
+  timeout_seconds: 600
+
+# Skill-specific overrides can be added below. Example:
+#
+# run-tests:
+#   consultation:
+#     timeout_seconds: 900
+#   tools:
+#     codex:
+#       enabled: true

@@ -367,7 +367,8 @@ class TestListBlockersCLI:
     def test_list_blockers_basic(self, sample_json_spec_with_blockers, specs_structure):
         """Test basic list-blockers command."""
         result = run_cli(
-             "list-blockers",
+               "--no-json",
+               "list-blockers",
              "--path", str(specs_structure),
              "blocked-spec-2025-01-01-005",
             capture_output=True,
@@ -400,7 +401,8 @@ class TestListBlockersCLI:
     def test_list_blockers_no_blockers(self, sample_json_spec_simple, specs_structure):
         """Test list-blockers when there are no blocked tasks."""
         result = run_cli(
-             "list-blockers",
+               "--no-json",
+               "list-blockers",
              "--path", str(specs_structure),
              "simple-spec-2025-01-01-001",
             capture_output=True,
@@ -419,7 +421,8 @@ class TestUpdatedCLICommands:
     def test_add_journal_new_signature(self, sample_json_spec_simple, specs_structure):
         """Test add-journal command with new spec_id-based signature."""
         result = run_cli(
-             "add-journal",
+               "--no-json",
+               "add-journal",
              "--path", str(specs_structure),
              "simple-spec-2025-01-01-001",
              "--title", "Test Journal Entry",
@@ -435,7 +438,8 @@ class TestUpdatedCLICommands:
     def test_add_journal_with_task_id(self, sample_json_spec_simple, specs_structure):
         """Test add-journal command with task reference."""
         result = run_cli(
-             "add-journal",
+               "--no-json",
+               "add-journal",
              "--path", str(specs_structure),
              "simple-spec-2025-01-01-001",
              "--title", "Task Started",
@@ -616,6 +620,7 @@ class TestCompletionDetection:
         # Mock user input to decline completion (to avoid file moves)
         with patch('builtins.input', return_value='n'):
             result = run_cli(
+                "--no-json",
                 "update-status",
                 "--path", str(specs_structure),
                 spec_id,
@@ -646,6 +651,7 @@ class TestCompletionDetection:
 
         # Mark the last non-blocked task as completed
         result = run_cli(
+            "--no-json",
             "update-status",
             "--path", str(specs_structure),
             spec_id,
@@ -674,6 +680,7 @@ class TestCompletionDetection:
 
         # Provide user input via stdin (y to confirm completion, empty for hours)
         result = run_cli(
+            "--no-json",
             "update-status",
             "--path", str(specs_structure),
             spec_id,
@@ -709,6 +716,7 @@ class TestCompletionDetection:
 
         # Provide user input via stdin to decline completion
         result = run_cli(
+            "--no-json",
             "update-status",
             "--path", str(specs_structure),
             spec_id,

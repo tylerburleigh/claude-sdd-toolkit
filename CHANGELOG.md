@@ -4,6 +4,14 @@ All notable changes to the SDD Toolkit will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
 
+# Unreleased
+
+### Added
+- `ai_config_setup.ensure_ai_config()` helper shared by setup workflows to seed `.claude/ai_config.yaml` with packaged defaults.
+
+### Fixed
+- Updated CLI integration tests to opt into text output (`--no-json`) so completion prompts and human-facing messaging continue to be covered after switching to JSON-first defaults.
+
 ## [0.5.0] - 2025-11-09
 
 ### Added

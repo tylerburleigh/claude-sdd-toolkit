@@ -152,7 +152,7 @@ class TestCheckDepsCommand:
 
     def test_check_deps_no_blockers(self, sample_json_spec_simple, specs_structure):
         """Test check-deps for task with no blockers."""
-        result = run_cli("--path", str(specs_structure),
+        result = run_cli("--no-json", "--path", str(specs_structure),
              "check-deps", "simple-spec-2025-01-01-001", "task-1-1",
             capture_output=True,
             text=True
@@ -163,7 +163,7 @@ class TestCheckDepsCommand:
 
     def test_check_deps_with_blockers(self, sample_json_spec_with_deps, specs_structure):
         """Test check-deps for blocked task."""
-        result = run_cli("--path", str(specs_structure),
+        result = run_cli("--no-json", "--path", str(specs_structure),
              "check-deps", "deps-spec-2025-01-01-003", "task-2-2",
             capture_output=True,
             text=True
@@ -192,7 +192,7 @@ class TestProgressCommand:
 
     def test_progress_command(self, sample_json_spec_simple, specs_structure):
         """Test progress command."""
-        result = run_cli( "progress", "simple-spec-2025-01-01-001",
+        result = run_cli("--no-json", "progress", "simple-spec-2025-01-01-001",
              "--path", str(specs_structure),
             capture_output=True,
             text=True
@@ -223,7 +223,7 @@ class TestListPhasesCommand:
 
     def test_list_phases(self, sample_json_spec_simple, specs_structure):
         """Test list-phases command."""
-        result = run_cli( "list-phases", "simple-spec-2025-01-01-001",
+        result = run_cli("--no-json", "list-phases", "simple-spec-2025-01-01-001",
              "--path", str(specs_structure),
             capture_output=True,
             text=True
