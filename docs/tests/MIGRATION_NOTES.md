@@ -240,3 +240,7 @@ Phase 2 introduces three new integration suites that align with the package-scop
 ### Configuration
 
 - Migrated `tests/unit/test_config.py` to `tests/unit/test_common/test_config_legacy.py`, preserving file/env override behaviour and default-merging logic for `claude_skills.common.config`.
+
+### Run Tests
+
+- Relocated `tests/unit/test_pytest_parser.py` to `tests/unit/test_run_tests/test_pytest_parser_legacy.py`, retaining parser, summary formatting, and Rich progress display scenarios for `claude_skills.run_tests.pytest_parser`.
