@@ -1,7 +1,7 @@
 {
   "spec_id": "setup-template-centralization-2025-11-10-001",
   "generated": "2025-11-10T20:30:00Z",
-  "last_updated": "2025-11-10T21:37:33.467823Z",
+  "last_updated": "2025-11-10T21:56:18.370707Z",
   "metadata": {
     "title": "Setup Template Centralization",
     "description": "Centralize all setup-related configuration templates into a unified directory structure with a standard helper module for accessing them via importlib.resources",
@@ -11,7 +11,7 @@
       "Refactor all setup scripts to use the new helper module",
       "Ensure all setup commands use centralized templates with old files removed"
     ],
-    "progress_percentage": 2,
+    "progress_percentage": 4,
     "status": "active",
     "current_phase": "phase-1"
   },
@@ -28,7 +28,7 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {}
     },
     "phase-1": {
@@ -41,7 +41,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "description": "Create the centralized template directory, helper module, and all template files"
       },
@@ -67,7 +67,7 @@
         "task-1-8"
       ],
       "total_tasks": 11,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -113,7 +113,7 @@
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/templates/setup/__init__.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -130,12 +130,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/templates/setup/__init__.py",
         "task_category": "implementation",
         "estimated_hours": 0.25,
-        "description": "Create __init__.py for setup templates directory"
+        "description": "Create __init__.py for setup templates directory",
+        "started_at": "2025-11-10T21:55:59.557710Z",
+        "status_note": "Preparing package marker module and constants for setup templates.",
+        "completed_at": "2025-11-10T21:56:18.365463Z",
+        "needs_journaling": false,
+        "actual_hours": 0.005,
+        "journaled_at": "2025-11-10T21:56:18.369080Z"
       }
     },
     "task-1-3": {
@@ -1407,6 +1413,15 @@
       "content": "Created src/claude_skills/claude_skills/common/templates/__init__.py so the templates directory is importable. Added SETUP_TEMPLATE_PACKAGE constant for upcoming helpers and documented purpose. No runtime tests required.",
       "metadata": {},
       "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-11-10T21:56:18.369074Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/common/templates/setup/__init__.py",
+      "author": "claude-code",
+      "content": "Created package marker module for setup templates with filename constants for ai_config.yaml, git_config.json, sdd_config.json, and settings.local.json. No automated tests required.",
+      "metadata": {},
+      "task_id": "task-1-2"
     }
   ]
 }
