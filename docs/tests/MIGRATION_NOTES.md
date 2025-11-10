@@ -244,3 +244,4 @@ Phase 2 introduces three new integration suites that align with the package-scop
 ### Run Tests
 
 - Relocated `tests/unit/test_pytest_parser.py` to `tests/unit/test_run_tests/test_pytest_parser_legacy.py`, retaining parser, summary formatting, and Rich progress display scenarios for `claude_skills.run_tests.pytest_parser`.
+- Migrated `tests/unit/test_tui_progress.py` into `tests/unit/test_common/test_tui_progress_legacy.py`, preserving consultation/batch trackers, threading safety, queued callback wrapper, and progress message formatting coverage for `claude_skills.common.tui_progress`.
