@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-10 18:23:55
+**Generated:** 2025-11-10 18:31:40
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 293
-- **Total Lines:** 101559
+- **Total Lines:** 101564
 - **Total Classes:** 406
 - **Total Functions:** 1214
 - **Avg Complexity:** 5.02
@@ -281,7 +281,7 @@ Example:
 ### `CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1453`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1457`
 
 **Description:**
 > Issue with assigned severity category.
@@ -440,7 +440,7 @@ Example:
 ### `ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1291`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1295`
 
 **Description:**
 > Consensus analysis across multiple AI review responses.
@@ -12548,7 +12548,7 @@ Args:
 ### `categorize_issue_severity(issue) -> CategorizedIssue`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1475`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1479`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12582,7 +12582,7 @@ Example:
 ### `categorize_issues(issues) -> List[CategorizedIssue]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1583`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1587`
 **Complexity:** 1
 
 **Description:**
@@ -15939,7 +15939,7 @@ Returns:
 ### `detect_consensus(parsed_responses, min_agreement, similarity_threshold) -> ConsensusResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1331`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1335`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -22694,7 +22694,7 @@ Example:
 ### `parse_multiple_responses(responses) -> List[ParsedReviewResponse]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1267`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/consultation.py:1271`
 **Complexity:** 1
 
 **Description:**
@@ -26300,7 +26300,7 @@ a decision needs to be made about what to implement.
 ### `test_categorize_issues_assigns_severity() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:418`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:419`
 **Complexity:** 1
 
 ---
@@ -26959,7 +26959,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_majority() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:386`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:387`
 **Complexity:** 1
 
 ---
@@ -26967,7 +26967,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_consensus_preserves_original_text() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:397`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:398`
 **Complexity:** 1
 
 ---
@@ -28709,7 +28709,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_multiple_responses() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:375`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:376`
 **Complexity:** 1
 
 ---
@@ -28717,7 +28717,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_defaults_to_unknown() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:369`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:370`
 **Complexity:** 1
 
 ---
@@ -28741,7 +28741,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_findings_heading_with_bullets() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:335`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:336`
 **Complexity:** 1
 
 ---
@@ -28749,7 +28749,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_handles_numbered_findings_section() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:307`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:308`
 **Complexity:** 1
 
 ---
@@ -28757,7 +28757,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_keeps_full_first_paragraph_summary() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:356`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:357`
 **Complexity:** 1
 
 ---
@@ -28765,7 +28765,7 @@ a decision needs to be made about what to implement.
 ### `test_parse_review_response_parses_json_code_block_entries() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:283`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:284`
 **Complexity:** 1
 
 ---

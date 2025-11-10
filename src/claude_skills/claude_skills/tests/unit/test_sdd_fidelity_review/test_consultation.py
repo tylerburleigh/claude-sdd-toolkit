@@ -278,6 +278,7 @@ def test_parse_review_response_parses_nested_response_field() -> None:
     assert parsed.issues == ["Top level issue entry."]
     assert parsed.recommendations == ["Top level recommendation."]
     assert parsed.confidence == pytest.approx(0.4)
+    assert parsed.structured_response == payload
 
 
 def test_parse_review_response_parses_json_code_block_entries() -> None:

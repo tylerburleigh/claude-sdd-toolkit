@@ -1098,6 +1098,7 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         )
 
     json_payload = _load_json_from_text(output)
+    structured_payload: Optional[Dict[str, Any]] = None
     summary_provided = False
 
     if isinstance(json_payload, dict):
@@ -1137,6 +1138,8 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         json_confidence = _coerce_confidence_value(json_payload.get("confidence"))
         if json_confidence is not None:
             confidence = json_confidence
+
+        structured_payload = json_payload
 
     # Extract verdict using pattern matching
     if verdict is FidelityVerdict.UNKNOWN:
@@ -1260,7 +1263,8 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         recommendations=recommendations,
         summary=summary,
         raw_response=output,
-        confidence=confidence
+        confidence=confidence,
+        structured_response=structured_payload
     )
 
 
