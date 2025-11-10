@@ -1,42 +1,43 @@
-"""
-Unit tests for TUI progress feedback context managers.
+from __future__ import annotations
 
-Tests the progress callback protocol, context managers, and tracker classes
-for AI tool consultation progress feedback.
-"""
+"""Unit tests for TUI progress helpers."""
 
-import pytest
+import threading
 import time
 from unittest.mock import Mock, call
 
+import pytest
+
+from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 from claude_skills.common.tui_progress import (
+    BatchProgressTracker,
+    NoOpProgressCallback,
+    ProgressCallback,
+    ProgressTracker,
+    QueuedProgressCallback,
     ai_consultation_progress,
     batch_consultation_progress,
-    NoOpProgressCallback,
-    QueuedProgressCallback,
-    ProgressTracker,
-    BatchProgressTracker,
-    ProgressCallback,
-    format_progress_message
+    format_progress_message,
 )
-from claude_skills.common.ai_tools import ToolStatus, ToolResponse
+
+
+pytestmark = pytest.mark.unit
 
 
 class TestNoOpProgressCallback:
     """Test that NoOp callback never crashes."""
 
-    def test_on_start_no_crash(self):
+    def test_on_start_no_crash(self) -> None:
         """on_start accepts arguments without error."""
         callback = NoOpProgressCallback()
         callback.on_start("gemini", 90, model="gemini-2.5-pro")
-        # No assertion needed - just verify no exception
 
-    def test_on_update_no_crash(self):
+    def test_on_update_no_crash(self) -> None:
         """on_update accepts arguments without error."""
         callback = NoOpProgressCallback()
         callback.on_update("gemini", elapsed=30.0, timeout=90)
 
-    def test_on_complete_no_crash(self):
+    def test_on_complete_no_crash(self) -> None:
         """on_complete accepts arguments without error."""
         callback = NoOpProgressCallback()
         callback.on_complete(
@@ -44,15 +45,15 @@ class TestNoOpProgressCallback:
             ToolStatus.SUCCESS,
             45.2,
             output_length=1024,
-            error=None
+            error=None,
         )
 
-    def test_on_batch_start_no_crash(self):
+    def test_on_batch_start_no_crash(self) -> None:
         """on_batch_start accepts arguments without error."""
         callback = NoOpProgressCallback()
         callback.on_batch_start(["gemini", "codex"], 2, 120)
 
-    def test_on_tool_complete_no_crash(self):
+    def test_on_tool_complete_no_crash(self) -> None:
         """on_tool_complete accepts arguments without error."""
         callback = NoOpProgressCallback()
         response = ToolResponse(
@@ -61,11 +62,11 @@ class TestNoOpProgressCallback:
             output="test",
             error=None,
             duration=45.2,
-            timestamp="2025-11-07T12:00:00Z"
+            timestamp="2025-11-07T12:00:00Z",
         )
         callback.on_tool_complete("gemini", response, 1, 2)
 
-    def test_on_batch_complete_no_crash(self):
+    def test_on_batch_complete_no_crash(self) -> None:
         """on_batch_complete accepts arguments without error."""
         callback = NoOpProgressCallback()
         callback.on_batch_complete(
@@ -73,26 +74,26 @@ class TestNoOpProgressCallback:
             success_count=2,
             failure_count=0,
             total_duration=60.0,
-            max_duration=45.2
+            max_duration=45.2,
         )
 
 
 class TestSingleConsultationContextManager:
     """Test context manager for single tool consultations."""
 
-    def test_calls_on_start_when_entering(self):
+    def test_calls_on_start_when_entering(self) -> None:
         """Context manager calls on_start when entering."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=90, callback=callback) as progress:
+        with ai_consultation_progress("gemini", timeout=90, callback=callback):
             pass
 
         callback.on_start.assert_called_once()
-        args, kwargs = callback.on_start.call_args
+        _, kwargs = callback.on_start.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["timeout"] == 90
 
-    def test_calls_on_complete_when_complete_called(self):
+    def test_calls_on_complete_when_complete_called(self) -> None:
         """Context manager calls on_complete when complete() called."""
         callback = Mock(spec=ProgressCallback)
 
@@ -103,42 +104,40 @@ class TestSingleConsultationContextManager:
                 output="test output",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
         callback.on_complete.assert_called_once()
-        args, kwargs = callback.on_complete.call_args
+        _, kwargs = callback.on_complete.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["status"] == ToolStatus.SUCCESS
         assert "duration" in kwargs
         assert "output_length" in kwargs
 
-    def test_auto_completes_if_user_forgets(self):
+    def test_auto_completes_if_user_forgets(self) -> None:
         """Context manager auto-completes if complete() not called."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=90, callback=callback) as progress:
-            # User forgets to call progress.complete()
+        with ai_consultation_progress("gemini", timeout=90, callback=callback):
             pass
 
-        # Should still call on_complete in finally block
         callback.on_complete.assert_called_once()
 
-    def test_handles_exception_during_execution(self):
+    def test_handles_exception_during_execution(self) -> None:
         """Context manager calls on_complete even if exception raised."""
         callback = Mock(spec=ProgressCallback)
 
         with pytest.raises(ValueError):
-            with ai_consultation_progress("gemini", timeout=90, callback=callback) as progress:
+            with ai_consultation_progress("gemini", timeout=90, callback=callback):
                 raise ValueError("Test error")
 
         callback.on_complete.assert_called_once()
-        args, kwargs = callback.on_complete.call_args
+        _, kwargs = callback.on_complete.call_args
         assert kwargs["status"] == ToolStatus.ERROR
         assert "Test error" in kwargs["error"]
 
-    def test_prevents_double_completion(self):
+    def test_prevents_double_completion(self) -> None:
         """ProgressTracker ignores duplicate complete() calls."""
         callback = Mock(spec=ProgressCallback)
 
@@ -149,15 +148,14 @@ class TestSingleConsultationContextManager:
                 output="test",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
-            progress.complete(response)  # Second call should be ignored
+            progress.complete(response)
 
-        # on_complete should only be called once (not twice)
         assert callback.on_complete.call_count == 1
 
-    def test_passes_context_to_callbacks(self):
+    def test_passes_context_to_callbacks(self) -> None:
         """Context manager passes extra context to callbacks."""
         callback = Mock(spec=ProgressCallback)
 
@@ -166,17 +164,16 @@ class TestSingleConsultationContextManager:
             timeout=90,
             callback=callback,
             model="gemini-2.5-pro",
-            prompt_length=1024
-        ) as progress:
+            prompt_length=1024,
+        ):
             pass
 
-        args, kwargs = callback.on_start.call_args
+        _, kwargs = callback.on_start.call_args
         assert kwargs["model"] == "gemini-2.5-pro"
         assert kwargs["prompt_length"] == 1024
 
-    def test_uses_no_op_callback_by_default(self):
+    def test_uses_no_op_callback_by_default(self) -> None:
         """Context manager uses NoOp callback if none provided."""
-        # Should not raise any exceptions
         with ai_consultation_progress("gemini", timeout=90) as progress:
             response = ToolResponse(
                 tool="gemini",
@@ -184,7 +181,7 @@ class TestSingleConsultationContextManager:
                 output="test",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
@@ -192,31 +189,31 @@ class TestSingleConsultationContextManager:
 class TestBatchConsultationContextManager:
     """Test context manager for batch tool consultations."""
 
-    def test_calls_on_batch_start_when_entering(self):
+    def test_calls_on_batch_start_when_entering(self) -> None:
         """Context manager calls on_batch_start when entering."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex"],
             timeout=120,
-            callback=callback
-        ) as progress:
+            callback=callback,
+        ):
             pass
 
         callback.on_batch_start.assert_called_once()
-        args, kwargs = callback.on_batch_start.call_args
+        _, kwargs = callback.on_batch_start.call_args
         assert kwargs["tools"] == ["gemini", "codex"]
         assert kwargs["count"] == 2
         assert kwargs["timeout"] == 120
 
-    def test_calls_on_tool_complete_for_each_tool(self):
+    def test_calls_on_tool_complete_for_each_tool(self) -> None:
         """Context manager calls on_tool_complete for each marked tool."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex"],
             timeout=120,
-            callback=callback
+            callback=callback,
         ) as progress:
             response1 = ToolResponse(
                 tool="gemini",
@@ -224,7 +221,7 @@ class TestBatchConsultationContextManager:
                 output="output1",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             response2 = ToolResponse(
                 tool="codex",
@@ -232,91 +229,105 @@ class TestBatchConsultationContextManager:
                 output="output2",
                 error=None,
                 duration=50.1,
-                timestamp="2025-11-07T12:00:05Z"
+                timestamp="2025-11-07T12:00:05Z",
             )
             progress.mark_complete("gemini", response1)
             progress.mark_complete("codex", response2)
 
         assert callback.on_tool_complete.call_count == 2
 
-    def test_tracks_success_and_failure_counts(self):
+    def test_tracks_success_and_failure_counts(self) -> None:
         """BatchProgressTracker correctly counts successes and failures."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex", "cursor-agent"],
             timeout=120,
-            callback=callback
+            callback=callback,
         ) as progress:
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="ok",
-                error=None,
-                duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
-            progress.mark_complete("codex", ToolResponse(
-                tool="codex",
-                status=ToolStatus.TIMEOUT,
-                output="",
-                error="Timeout",
-                duration=120.0,
-                timestamp="2025-11-07T12:02:00Z"
-            ))
-            progress.mark_complete("cursor-agent", ToolResponse(
-                tool="cursor-agent",
-                status=ToolStatus.SUCCESS,
-                output="ok",
-                error=None,
-                duration=60.0,
-                timestamp="2025-11-07T12:01:00Z"
-            ))
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="ok",
+                    error=None,
+                    duration=45.2,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "codex",
+                ToolResponse(
+                    tool="codex",
+                    status=ToolStatus.TIMEOUT,
+                    output="",
+                    error="Timeout",
+                    duration=120.0,
+                    timestamp="2025-11-07T12:02:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "cursor-agent",
+                ToolResponse(
+                    tool="cursor-agent",
+                    status=ToolStatus.SUCCESS,
+                    output="ok",
+                    error=None,
+                    duration=60.0,
+                    timestamp="2025-11-07T12:01:00Z",
+                ),
+            )
 
-        # Check on_batch_complete call
         callback.on_batch_complete.assert_called_once()
-        args, kwargs = callback.on_batch_complete.call_args
+        _, kwargs = callback.on_batch_complete.call_args
         assert kwargs["total_count"] == 3
         assert kwargs["success_count"] == 2
         assert kwargs["failure_count"] == 1
 
-    def test_tracks_max_duration(self):
+    def test_tracks_max_duration(self) -> None:
         """BatchProgressTracker tracks maximum individual tool duration."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex"],
             timeout=120,
-            callback=callback
+            callback=callback,
         ) as progress:
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="ok",
-                error=None,
-                duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
-            progress.mark_complete("codex", ToolResponse(
-                tool="codex",
-                status=ToolStatus.SUCCESS,
-                output="ok",
-                error=None,
-                duration=85.7,  # Longer
-                timestamp="2025-11-07T12:01:00Z"
-            ))
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="ok",
+                    error=None,
+                    duration=45.2,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "codex",
+                ToolResponse(
+                    tool="codex",
+                    status=ToolStatus.SUCCESS,
+                    output="ok",
+                    error=None,
+                    duration=85.7,
+                    timestamp="2025-11-07T12:01:00Z",
+                ),
+            )
 
-        args, kwargs = callback.on_batch_complete.call_args
+        _, kwargs = callback.on_batch_complete.call_args
         assert kwargs["max_duration"] == 85.7
 
-    def test_prevents_double_marking_same_tool(self):
+    def test_prevents_double_marking_same_tool(self) -> None:
         """BatchProgressTracker ignores duplicate mark_complete for same tool."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex"],
             timeout=120,
-            callback=callback
+            callback=callback,
         ) as progress:
             response = ToolResponse(
                 tool="gemini",
@@ -324,30 +335,28 @@ class TestBatchConsultationContextManager:
                 output="ok",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.mark_complete("gemini", response)
-            progress.mark_complete("gemini", response)  # Duplicate
+            progress.mark_complete("gemini", response)
 
-        # on_tool_complete should only be called once for gemini
         assert callback.on_tool_complete.call_count == 1
 
-    def test_calls_on_batch_complete_when_exiting(self):
+    def test_calls_on_batch_complete_when_exiting(self) -> None:
         """Context manager calls on_batch_complete when exiting."""
         callback = Mock(spec=ProgressCallback)
 
         with batch_consultation_progress(
             ["gemini", "codex"],
             timeout=120,
-            callback=callback
-        ) as progress:
+            callback=callback,
+        ):
             pass
 
         callback.on_batch_complete.assert_called_once()
 
-    def test_uses_no_op_callback_by_default(self):
+    def test_uses_no_op_callback_by_default(self) -> None:
         """Context manager uses NoOp callback if none provided."""
-        # Should not raise any exceptions
         with batch_consultation_progress(["gemini", "codex"], timeout=120) as progress:
             response = ToolResponse(
                 tool="gemini",
@@ -355,7 +364,7 @@ class TestBatchConsultationContextManager:
                 output="test",
                 error=None,
                 duration=45.2,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.mark_complete("gemini", response)
 
@@ -363,7 +372,7 @@ class TestBatchConsultationContextManager:
 class TestProgressTracker:
     """Test ProgressTracker dataclass directly."""
 
-    def test_tracks_completion_state(self):
+    def test_tracks_completion_state(self) -> None:
         """ProgressTracker tracks whether complete() has been called."""
         callback = Mock(spec=ProgressCallback)
         tracker = ProgressTracker(
@@ -371,7 +380,7 @@ class TestProgressTracker:
             timeout=90,
             callback=callback,
             context={},
-            start_time=time.time()
+            start_time=time.time(),
         )
 
         assert tracker.completed is False
@@ -382,7 +391,7 @@ class TestProgressTracker:
             output="test",
             error=None,
             duration=45.2,
-            timestamp="2025-11-07T12:00:00Z"
+            timestamp="2025-11-07T12:00:00Z",
         )
         tracker.complete(response)
 
@@ -392,21 +401,22 @@ class TestProgressTracker:
 class TestBatchProgressTracker:
     """Test BatchProgressTracker dataclass directly."""
 
-    def test_initializes_with_empty_completed_list(self):
+    def test_initializes_with_empty_completed_list(self) -> None:
         """BatchProgressTracker initializes completed_tools as empty list."""
         callback = Mock(spec=ProgressCallback)
         tracker = BatchProgressTracker(
             tools=["gemini", "codex"],
             timeout=120,
             callback=callback,
-            context={}
+            context={},
+            start_time=time.time(),
         )
 
         assert tracker.completed_tools == []
         assert tracker.success_count == 0
         assert tracker.failure_count == 0
 
-    def test_updates_counts_correctly(self):
+    def test_updates_counts_correctly(self) -> None:
         """BatchProgressTracker updates success/failure counts correctly."""
         callback = Mock(spec=ProgressCallback)
         tracker = BatchProgressTracker(
@@ -414,29 +424,35 @@ class TestBatchProgressTracker:
             timeout=120,
             callback=callback,
             context={},
-            start_time=time.time()
+            start_time=time.time(),
         )
 
-        tracker.mark_complete("gemini", ToolResponse(
-            tool="gemini",
-            status=ToolStatus.SUCCESS,
-            output="ok",
-            error=None,
-            duration=45.2,
-            timestamp="2025-11-07T12:00:00Z"
-        ))
+        tracker.mark_complete(
+            "gemini",
+            ToolResponse(
+                tool="gemini",
+                status=ToolStatus.SUCCESS,
+                output="ok",
+                error=None,
+                duration=45.2,
+                timestamp="2025-11-07T12:00:00Z",
+            ),
+        )
 
         assert tracker.success_count == 1
         assert tracker.failure_count == 0
 
-        tracker.mark_complete("codex", ToolResponse(
-            tool="codex",
-            status=ToolStatus.ERROR,
-            output="",
-            error="Failed",
-            duration=10.0,
-            timestamp="2025-11-07T12:00:10Z"
-        ))
+        tracker.mark_complete(
+            "codex",
+            ToolResponse(
+                tool="codex",
+                status=ToolStatus.ERROR,
+                output="",
+                error="Failed",
+                duration=10.0,
+                timestamp="2025-11-07T12:00:10Z",
+            ),
+        )
 
         assert tracker.success_count == 1
         assert tracker.failure_count == 1
@@ -445,7 +461,7 @@ class TestBatchProgressTracker:
 class TestElapsedTimeTracking:
     """Test elapsed time tracking and periodic update callbacks."""
 
-    def test_on_update_called_periodically(self):
+    def test_on_update_called_periodically(self) -> None:
         """Context manager calls on_update at regular intervals."""
         callback = Mock(spec=ProgressCallback)
 
@@ -453,9 +469,8 @@ class TestElapsedTimeTracking:
             "gemini",
             timeout=10,
             callback=callback,
-            update_interval=0.5  # Fast updates for testing
+            update_interval=0.5,
         ) as progress:
-            # Wait for at least 2 updates
             time.sleep(1.5)
 
             response = ToolResponse(
@@ -464,14 +479,13 @@ class TestElapsedTimeTracking:
                 output="test",
                 error=None,
                 duration=1.5,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
-        # Should have called on_update at least twice (at 0.5s and 1.0s)
         assert callback.on_update.call_count >= 2
 
-    def test_on_update_receives_elapsed_time(self):
+    def test_on_update_receives_elapsed_time(self) -> None:
         """on_update callback receives elapsed time parameter."""
         callback = Mock(spec=ProgressCallback)
 
@@ -479,9 +493,9 @@ class TestElapsedTimeTracking:
             "gemini",
             timeout=10,
             callback=callback,
-            update_interval=0.3
+            update_interval=0.3,
         ) as progress:
-            time.sleep(0.8)  # Wait for at least 2 updates
+            time.sleep(0.8)
 
             response = ToolResponse(
                 tool="gemini",
@@ -489,19 +503,17 @@ class TestElapsedTimeTracking:
                 output="test",
                 error=None,
                 duration=0.8,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
-        # Check that on_update was called with elapsed parameter
         assert callback.on_update.call_count >= 1
-        args, kwargs = callback.on_update.call_args
-        assert "elapsed" in kwargs
-        assert kwargs["elapsed"] > 0.0
+        _, kwargs = callback.on_update.call_args
+        assert "elapsed" in kwargs and kwargs["elapsed"] > 0.0
         assert kwargs["tool"] == "gemini"
         assert kwargs["timeout"] == 10
 
-    def test_update_thread_stops_on_completion(self):
+    def test_update_thread_stops_on_completion(self) -> None:
         """Background update thread stops when consultation completes."""
         callback = Mock(spec=ProgressCallback)
 
@@ -509,9 +521,9 @@ class TestElapsedTimeTracking:
             "gemini",
             timeout=30,
             callback=callback,
-            update_interval=0.2
+            update_interval=0.2,
         ) as progress:
-            time.sleep(0.5)  # Wait for at least 2 updates
+            time.sleep(0.5)
             initial_count = callback.on_update.call_count
 
             response = ToolResponse(
@@ -520,18 +532,16 @@ class TestElapsedTimeTracking:
                 output="test",
                 error=None,
                 duration=0.5,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
-            # Wait a bit to ensure thread has stopped
             time.sleep(0.5)
             final_count = callback.on_update.call_count
 
-        # No new updates should have occurred after completion
         assert final_count == initial_count
 
-    def test_update_thread_stops_on_context_exit(self):
+    def test_update_thread_stops_on_context_exit(self) -> None:
         """Background update thread stops when exiting context."""
         callback = Mock(spec=ProgressCallback)
 
@@ -539,44 +549,37 @@ class TestElapsedTimeTracking:
             "gemini",
             timeout=30,
             callback=callback,
-            update_interval=0.2
-        ) as progress:
+            update_interval=0.2,
+        ):
             time.sleep(0.5)
 
-        # After exiting context, thread should be stopped
-        # Wait to ensure no more updates
         initial_count = callback.on_update.call_count
         time.sleep(0.5)
         final_count = callback.on_update.call_count
 
-        # No new updates should occur after context exit
         assert final_count == initial_count
 
-    def test_update_thread_stops_on_exception(self):
+    def test_update_thread_stops_on_exception(self) -> None:
         """Background update thread stops when exception raised."""
         callback = Mock(spec=ProgressCallback)
 
-        try:
+        with pytest.raises(ValueError):
             with ai_consultation_progress(
                 "gemini",
                 timeout=30,
                 callback=callback,
-                update_interval=0.2
-            ) as progress:
+                update_interval=0.2,
+            ):
                 time.sleep(0.5)
                 raise ValueError("Test exception")
-        except ValueError:
-            pass
 
-        # After exception, thread should be stopped
         initial_count = callback.on_update.call_count
         time.sleep(0.5)
         final_count = callback.on_update.call_count
 
-        # No new updates should occur after exception
         assert final_count == initial_count
 
-    def test_no_race_condition_on_completion(self):
+    def test_no_race_condition_on_completion(self) -> None:
         """No race condition when complete() called during update."""
         callback = Mock(spec=ProgressCallback)
 
@@ -584,9 +587,9 @@ class TestElapsedTimeTracking:
             "gemini",
             timeout=30,
             callback=callback,
-            update_interval=0.1  # Very fast updates to increase chance of race
+            update_interval=0.1,
         ) as progress:
-            time.sleep(0.25)  # Let some updates happen
+            time.sleep(0.25)
 
             response = ToolResponse(
                 tool="gemini",
@@ -594,35 +597,34 @@ class TestElapsedTimeTracking:
                 output="test",
                 error=None,
                 duration=0.25,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
-        # Should only call on_complete once, not multiple times
         assert callback.on_complete.call_count == 1
 
-    def test_update_interval_calculation_short_timeout(self):
+    def test_update_interval_calculation_short_timeout(self) -> None:
         """Update interval is 2s for short timeouts (<30s)."""
         from claude_skills.common.tui_progress import _calculate_update_interval
 
         interval = _calculate_update_interval(20)
         assert interval == 2.0
 
-    def test_update_interval_calculation_medium_timeout(self):
+    def test_update_interval_calculation_medium_timeout(self) -> None:
         """Update interval is 5s for medium timeouts (30-120s)."""
         from claude_skills.common.tui_progress import _calculate_update_interval
 
         interval = _calculate_update_interval(60)
         assert interval == 5.0
 
-    def test_update_interval_calculation_long_timeout(self):
+    def test_update_interval_calculation_long_timeout(self) -> None:
         """Update interval is 10s for long timeouts (>120s)."""
         from claude_skills.common.tui_progress import _calculate_update_interval
 
         interval = _calculate_update_interval(300)
         assert interval == 10.0
 
-    def test_custom_update_interval_override(self):
+    def test_custom_update_interval_override(self) -> None:
         """Custom update_interval parameter overrides calculation."""
         from claude_skills.common.tui_progress import _calculate_update_interval
 
@@ -633,7 +635,7 @@ class TestElapsedTimeTracking:
 class TestBatchElapsedTimeTracking:
     """Test elapsed time tracking for batch operations."""
 
-    def test_batch_on_update_called_periodically(self):
+    def test_batch_on_update_called_periodically(self) -> None:
         """Batch context manager calls on_update at regular intervals."""
         callback = Mock(spec=ProgressCallback)
 
@@ -641,33 +643,36 @@ class TestBatchElapsedTimeTracking:
             ["gemini", "codex"],
             timeout=10,
             callback=callback,
-            update_interval=0.5
+            update_interval=0.5,
         ) as progress:
-            # Wait for at least 2 updates
             time.sleep(1.5)
 
-            # Complete the batch
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=1.0,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
-            progress.mark_complete("codex", ToolResponse(
-                tool="codex",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=1.2,
-                timestamp="2025-11-07T12:00:01Z"
-            ))
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=1.0,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "codex",
+                ToolResponse(
+                    tool="codex",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=1.2,
+                    timestamp="2025-11-07T12:00:01Z",
+                ),
+            )
 
-        # Should have called on_update at least twice
         assert callback.on_update.call_count >= 2
 
-    def test_batch_on_update_includes_batch_context(self):
+    def test_batch_on_update_includes_batch_context(self) -> None:
         """Batch on_update includes batch-specific context."""
         callback = Mock(spec=ProgressCallback)
 
@@ -675,28 +680,29 @@ class TestBatchElapsedTimeTracking:
             ["gemini", "codex"],
             timeout=10,
             callback=callback,
-            update_interval=0.3
+            update_interval=0.3,
         ) as progress:
             time.sleep(0.5)
 
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=0.4,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.4,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
 
-        # Check that on_update was called with batch context
         assert callback.on_update.call_count >= 1
-        args, kwargs = callback.on_update.call_args
-        assert "batch_mode" in kwargs
+        _, kwargs = callback.on_update.call_args
         assert kwargs["batch_mode"] is True
         assert "completed_count" in kwargs
         assert "total_count" in kwargs
 
-    def test_batch_update_thread_stops_on_all_complete(self):
+    def test_batch_update_thread_stops_on_all_complete(self) -> None:
         """Batch update thread stops when all tools complete."""
         callback = Mock(spec=ProgressCallback)
 
@@ -704,38 +710,40 @@ class TestBatchElapsedTimeTracking:
             ["gemini", "codex"],
             timeout=30,
             callback=callback,
-            update_interval=0.2
+            update_interval=0.2,
         ) as progress:
             time.sleep(0.5)
 
-            # Complete all tools
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=0.3,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
-            progress.mark_complete("codex", ToolResponse(
-                tool="codex",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=0.4,
-                timestamp="2025-11-07T12:00:01Z"
-            ))
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.3,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "codex",
+                ToolResponse(
+                    tool="codex",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.4,
+                    timestamp="2025-11-07T12:00:01Z",
+                ),
+            )
 
             initial_count = callback.on_update.call_count
-
-            # Wait to ensure no more updates
             time.sleep(0.5)
             final_count = callback.on_update.call_count
 
-        # No new updates should occur after all tools complete
         assert final_count == initial_count
 
-    def test_batch_update_thread_stops_on_context_exit(self):
+    def test_batch_update_thread_stops_on_context_exit(self) -> None:
         """Batch update thread stops when exiting context."""
         callback = Mock(spec=ProgressCallback)
 
@@ -743,35 +751,32 @@ class TestBatchElapsedTimeTracking:
             ["gemini", "codex"],
             timeout=30,
             callback=callback,
-            update_interval=0.2
-        ) as progress:
+            update_interval=0.2,
+        ):
             time.sleep(0.5)
 
-        # After exiting, thread should be stopped
         initial_count = callback.on_update.call_count
         time.sleep(0.5)
         final_count = callback.on_update.call_count
 
-        # No new updates should occur
         assert final_count == initial_count
 
 
 class TestThreadSafety:
     """Test thread safety of progress tracking."""
 
-    def test_concurrent_completion_is_safe(self):
+    def test_concurrent_completion_is_safe(self) -> None:
         """Multiple threads can safely interact with tracker."""
-        import threading
         callback = Mock(spec=ProgressCallback)
 
-        def complete_task(progress):
+        def complete_task(progress) -> None:
             response = ToolResponse(
                 tool="gemini",
                 status=ToolStatus.SUCCESS,
                 output="test",
                 error=None,
                 duration=0.1,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
@@ -779,24 +784,21 @@ class TestThreadSafety:
             "gemini",
             timeout=30,
             callback=callback,
-            update_interval=0.1
+            update_interval=0.1,
         ) as progress:
-            # Spawn multiple threads trying to complete simultaneously
             threads = [
                 threading.Thread(target=complete_task, args=(progress,))
                 for _ in range(5)
             ]
 
-            for t in threads:
-                t.start()
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
 
-            for t in threads:
-                t.join()
-
-        # Despite multiple threads, on_complete should only be called once
         assert callback.on_complete.call_count == 1
 
-    def test_batch_concurrent_marking_is_safe(self):
+    def test_batch_concurrent_marking_is_safe(self) -> None:
         """Multiple threads can safely mark tools complete in batch."""
         callback = Mock(spec=ProgressCallback)
 
@@ -804,40 +806,38 @@ class TestThreadSafety:
             ["tool1", "tool2", "tool3", "tool4"],
             timeout=30,
             callback=callback,
-            update_interval=0.1
+            update_interval=0.1,
         ) as progress:
-            # Mark tools complete from different threads
-            import threading
-
-            def mark_tool(tool_name):
-                progress.mark_complete(tool_name, ToolResponse(
-                    tool=tool_name,
-                    status=ToolStatus.SUCCESS,
-                    output="test",
-                    error=None,
-                    duration=0.1,
-                    timestamp="2025-11-07T12:00:00Z"
-                ))
+            def mark_tool(tool_name: str) -> None:
+                progress.mark_complete(
+                    tool_name,
+                    ToolResponse(
+                        tool=tool_name,
+                        status=ToolStatus.SUCCESS,
+                        output="test",
+                        error=None,
+                        duration=0.1,
+                        timestamp="2025-11-07T12:00:00Z",
+                    ),
+                )
 
             threads = [
                 threading.Thread(target=mark_tool, args=(f"tool{i}",))
                 for i in range(1, 5)
             ]
 
-            for t in threads:
-                t.start()
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
 
-            for t in threads:
-                t.join()
-
-        # All 4 tools should be marked complete exactly once
         assert callback.on_tool_complete.call_count == 4
 
 
 class TestQueuedProgressCallback:
     """Test queue-based progress callback wrapper for parallel consultations."""
 
-    def test_forwards_on_start_to_wrapped_callback(self):
+    def test_forwards_on_start_to_wrapped_callback(self) -> None:
         """QueuedProgressCallback forwards on_start calls to wrapped callback."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
@@ -845,64 +845,52 @@ class TestQueuedProgressCallback:
         queued.start()
         queued.on_start("gemini", 90, model="gemini-2.5-pro")
 
-        # Give consumer thread time to process
         time.sleep(0.2)
         queued.stop()
 
         wrapped.on_start.assert_called_once()
-        args, kwargs = wrapped.on_start.call_args
+        _, kwargs = wrapped.on_start.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["timeout"] == 90
         assert kwargs["model"] == "gemini-2.5-pro"
 
-    def test_handles_large_queue_bursts(self):
+    def test_handles_large_queue_bursts(self) -> None:
         """QueuedProgressCallback handles large bursts of progress updates."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Queue a large burst of updates
         for i in range(100):
             queued.on_update(f"tool{i % 5}", elapsed=float(i), timeout=90)
 
-        # Give time to process all items
         time.sleep(1.0)
         queued.stop()
 
-        # All updates should have been processed
         assert wrapped.on_update.call_count == 100
 
-    def test_stop_waits_for_pending_queue_items(self):
+    def test_stop_waits_for_pending_queue_items(self) -> None:
         """QueuedProgressCallback waits for pending items when stopping."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Queue several items
         queued.on_start("gemini", 90)
         queued.on_update("gemini", 10.0, 90)
         queued.on_update("gemini", 20.0, 90)
         queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
 
-        # Give a short time for processing to start
         time.sleep(0.1)
-
-        # Stop with sufficient timeout for processing
         queued.stop(timeout=5.0)
 
-        # All items should have been processed before stop completed
         assert wrapped.on_start.call_count == 1
         assert wrapped.on_update.call_count == 2
         assert wrapped.on_complete.call_count == 1
 
-    def test_restart_after_stop(self):
+    def test_restart_after_stop(self) -> None:
         """QueuedProgressCallback can be restarted after stopping."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
-        # First cycle
         queued.start()
         queued.on_start("gemini", 90)
         time.sleep(0.2)
@@ -910,47 +898,39 @@ class TestQueuedProgressCallback:
 
         first_call_count = wrapped.on_start.call_count
 
-        # Second cycle
         queued.start()
         queued.on_start("codex", 120)
         time.sleep(0.2)
         queued.stop()
 
-        # Should have two on_start calls total
         assert wrapped.on_start.call_count == first_call_count + 1
 
-    def test_queue_preserves_update_sequence(self):
+    def test_queue_preserves_update_sequence(self) -> None:
         """QueuedProgressCallback preserves exact sequence of rapid updates."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Rapid sequence of updates with increasing elapsed times
         expected_sequence = [5.0, 10.0, 15.0, 20.0, 25.0, 30.0]
         for elapsed in expected_sequence:
             queued.on_update("gemini", elapsed, 90)
 
-        # Give time to process
         time.sleep(0.5)
         queued.stop()
 
-        # Verify exact sequence was preserved
         assert wrapped.on_update.call_count == len(expected_sequence)
         actual_sequence = [
-            call[1]["elapsed"]
-            for call in wrapped.on_update.call_args_list
+            call_kwargs["elapsed"]
+            for _, call_kwargs in wrapped.on_update.call_args_list
         ]
         assert actual_sequence == expected_sequence
 
-    def test_queue_with_mixed_callback_types(self):
+    def test_queue_with_mixed_callback_types(self) -> None:
         """QueuedProgressCallback handles mixed callback types in sequence."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Mix different callback types
         queued.on_start("gemini", 90)
         queued.on_update("gemini", 10.0, 90)
         queued.on_batch_start(["codex", "cursor-agent"], 2, 120)
@@ -961,17 +941,15 @@ class TestQueuedProgressCallback:
             output="test",
             error=None,
             duration=45.0,
-            timestamp="2025-11-07T12:00:00Z"
+            timestamp="2025-11-07T12:00:00Z",
         )
         queued.on_tool_complete("codex", response, 1, 2)
         queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
         queued.on_batch_complete(2, 2, 0, 100.0, 45.0)
 
-        # Give time to process
         time.sleep(0.5)
         queued.stop()
 
-        # Verify all callbacks were called
         assert wrapped.on_start.call_count == 1
         assert wrapped.on_update.call_count == 2
         assert wrapped.on_batch_start.call_count == 1
@@ -979,73 +957,66 @@ class TestQueuedProgressCallback:
         assert wrapped.on_complete.call_count == 1
         assert wrapped.on_batch_complete.call_count == 1
 
-    def test_forwards_on_update_to_wrapped_callback(self):
+    def test_forwards_on_update_to_wrapped_callback(self) -> None:
         """QueuedProgressCallback forwards on_update calls to wrapped callback."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
         queued.on_update("gemini", elapsed=30.0, timeout=90)
-
         time.sleep(0.2)
         queued.stop()
 
         wrapped.on_update.assert_called_once()
-        args, kwargs = wrapped.on_update.call_args
+        _, kwargs = wrapped.on_update.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["elapsed"] == 30.0
         assert kwargs["timeout"] == 90
 
-    def test_forwards_on_complete_to_wrapped_callback(self):
+    def test_forwards_on_complete_to_wrapped_callback(self) -> None:
         """QueuedProgressCallback forwards on_complete calls to wrapped callback."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
         queued.on_complete("gemini", ToolStatus.SUCCESS, 45.0, output_length=1024)
-
         time.sleep(0.2)
         queued.stop()
 
         wrapped.on_complete.assert_called_once()
-        args, kwargs = wrapped.on_complete.call_args
+        _, kwargs = wrapped.on_complete.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["status"] == ToolStatus.SUCCESS
         assert kwargs["duration"] == 45.0
         assert kwargs["output_length"] == 1024
 
-    def test_handles_multiple_parallel_calls(self):
+    def test_handles_multiple_parallel_calls(self) -> None:
         """QueuedProgressCallback safely handles calls from multiple threads."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
 
-        # Spawn multiple threads making calls
-        def make_calls(thread_id):
+        def make_calls(thread_id: int) -> None:
             for i in range(10):
                 queued.on_update(f"tool{thread_id}", elapsed=float(i), timeout=90)
 
-        import threading
         threads = [
             threading.Thread(target=make_calls, args=(tid,))
             for tid in range(5)
         ]
 
-        for t in threads:
-            t.start()
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
 
-        for t in threads:
-            t.join()
-
-        # Give consumer time to process all
         time.sleep(0.5)
         queued.stop()
 
-        # Should have called on_update 50 times (5 threads * 10 calls each)
         assert wrapped.on_update.call_count == 50
 
-    def test_stops_cleanly(self):
+    def test_stops_cleanly(self) -> None:
         """QueuedProgressCallback stops consumer thread cleanly."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
@@ -1056,10 +1027,9 @@ class TestQueuedProgressCallback:
 
         queued.stop()
 
-        # Thread should have stopped
         assert not queued._consumer_thread.is_alive()
 
-    def test_ignores_duplicate_start(self):
+    def test_ignores_duplicate_start(self) -> None:
         """QueuedProgressCallback ignores duplicate start() calls."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
@@ -1067,43 +1037,36 @@ class TestQueuedProgressCallback:
         queued.start()
         first_thread = queued._consumer_thread
 
-        queued.start()  # Try to start again
+        queued.start()
         second_thread = queued._consumer_thread
 
-        # Should be the same thread instance
         assert first_thread is second_thread
-
         queued.stop()
 
-    def test_processes_queued_calls_in_order(self):
+    def test_processes_queued_calls_in_order(self) -> None:
         """QueuedProgressCallback processes calls in FIFO order."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Queue multiple different calls
         queued.on_start("gemini", 90)
         queued.on_update("gemini", 10.0, 90)
         queued.on_update("gemini", 20.0, 90)
         queued.on_complete("gemini", ToolStatus.SUCCESS, 30.0)
 
-        # Give consumer time to process
         time.sleep(0.3)
         queued.stop()
 
-        # Verify order using call_args_list
         assert wrapped.on_start.call_count == 1
         assert wrapped.on_update.call_count == 2
         assert wrapped.on_complete.call_count == 1
 
-        # Check elapsed times are in order
         first_update = wrapped.on_update.call_args_list[0][1]["elapsed"]
         second_update = wrapped.on_update.call_args_list[1][1]["elapsed"]
         assert first_update == 10.0
         assert second_update == 20.0
 
-    def test_handles_wrapped_callback_exceptions(self):
+    def test_handles_wrapped_callback_exceptions(self) -> None:
         """QueuedProgressCallback handles exceptions from wrapped callback gracefully."""
         wrapped = Mock(spec=ProgressCallback)
         wrapped.on_start.side_effect = Exception("Callback error")
@@ -1111,49 +1074,39 @@ class TestQueuedProgressCallback:
         queued = QueuedProgressCallback(wrapped)
         queued.start()
 
-        # This should not crash the consumer thread
         queued.on_start("gemini", 90)
-
         time.sleep(0.2)
 
-        # Queue should still be working
         queued.on_update("gemini", 10.0, 90)
-
         time.sleep(0.2)
         queued.stop()
 
-        # Both calls should have been attempted
         assert wrapped.on_start.call_count == 1
         assert wrapped.on_update.call_count == 1
 
-    def test_forwards_batch_callbacks(self):
+    def test_forwards_batch_callbacks(self) -> None:
         """QueuedProgressCallback forwards batch-specific callbacks."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-
-        # Test batch_start
         queued.on_batch_start(["gemini", "codex"], 2, 120)
 
-        # Test tool_complete
         response = ToolResponse(
             tool="gemini",
             status=ToolStatus.SUCCESS,
             output="test",
             error=None,
             duration=45.0,
-            timestamp="2025-11-07T12:00:00Z"
+            timestamp="2025-11-07T12:00:00Z",
         )
         queued.on_tool_complete("gemini", response, 1, 2)
-
-        # Test batch_complete
         queued.on_batch_complete(
             total_count=2,
             success_count=2,
             failure_count=0,
             total_duration=100.0,
-            max_duration=55.0
+            max_duration=55.0,
         )
 
         time.sleep(0.3)
@@ -1163,14 +1116,12 @@ class TestQueuedProgressCallback:
         wrapped.on_tool_complete.assert_called_once()
         wrapped.on_batch_complete.assert_called_once()
 
-    def test_can_be_used_with_no_op_callback(self):
+    def test_can_be_used_with_no_op_callback(self) -> None:
         """QueuedProgressCallback works with NoOpProgressCallback."""
         noop = NoOpProgressCallback()
         queued = QueuedProgressCallback(noop)
 
         queued.start()
-
-        # Should not raise any exceptions
         queued.on_start("gemini", 90)
         queued.on_update("gemini", 30.0, 90)
         queued.on_complete("gemini", ToolStatus.SUCCESS, 45.0)
@@ -1182,177 +1133,183 @@ class TestQueuedProgressCallback:
 class TestProgressBarCleanup:
     """Test progress bar cleanup on completion and error."""
 
-    def test_cleanup_on_successful_completion(self):
+    def test_cleanup_on_successful_completion(self) -> None:
         """Progress tracker cleans up properly on successful completion."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2,
+        ) as progress:
             time.sleep(0.5)
-
             response = ToolResponse(
                 tool="gemini",
                 status=ToolStatus.SUCCESS,
                 output="test",
                 error=None,
                 duration=0.5,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
-
-            # Update thread reference before exiting context
             update_thread = progress._update_thread
 
-        # After context exit, update thread should be stopped
-        assert update_thread is not None
-        assert not update_thread.is_alive()
-
-        # Callback should have been called
+        assert update_thread is not None and not update_thread.is_alive()
         callback.on_complete.assert_called_once()
 
-    def test_cleanup_on_exception(self):
+    def test_cleanup_on_exception(self) -> None:
         """Progress tracker cleans up properly when exception occurs."""
         callback = Mock(spec=ProgressCallback)
-
         update_thread = None
+
         try:
-            with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+            with ai_consultation_progress(
+                "gemini",
+                timeout=30,
+                callback=callback,
+                update_interval=0.2,
+            ) as progress:
                 update_thread = progress._update_thread
                 time.sleep(0.3)
                 raise ValueError("Test error")
         except ValueError:
             pass
 
-        # Update thread should be stopped after exception
-        assert update_thread is not None
-        assert not update_thread.is_alive()
-
-        # on_complete should have been called with error status
+        assert update_thread is not None and not update_thread.is_alive()
         callback.on_complete.assert_called_once()
-        args, kwargs = callback.on_complete.call_args
+        _, kwargs = callback.on_complete.call_args
         assert kwargs["status"] == ToolStatus.ERROR
         assert "Test error" in kwargs["error"]
 
-    def test_cleanup_without_explicit_complete_call(self):
+    def test_cleanup_without_explicit_complete_call(self) -> None:
         """Progress tracker auto-completes and cleans up if complete() not called."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2,
+        ) as progress:
             update_thread = progress._update_thread
             time.sleep(0.3)
-            # Intentionally not calling progress.complete()
 
-        # Update thread should still be stopped
-        assert update_thread is not None
-        assert not update_thread.is_alive()
-
-        # on_complete should have been called automatically
+        assert update_thread is not None and not update_thread.is_alive()
         callback.on_complete.assert_called_once()
 
-    def test_batch_cleanup_on_completion(self):
+    def test_batch_cleanup_on_completion(self) -> None:
         """Batch tracker cleans up properly on completion."""
         callback = Mock(spec=ProgressCallback)
 
-        with batch_consultation_progress(["gemini", "codex"], timeout=30, callback=callback, update_interval=0.2) as progress:
+        with batch_consultation_progress(
+            ["gemini", "codex"],
+            timeout=30,
+            callback=callback,
+            update_interval=0.2,
+        ) as progress:
             time.sleep(0.3)
-
-            progress.mark_complete("gemini", ToolResponse(
-                tool="gemini",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=0.2,
-                timestamp="2025-11-07T12:00:00Z"
-            ))
-            progress.mark_complete("codex", ToolResponse(
-                tool="codex",
-                status=ToolStatus.SUCCESS,
-                output="test",
-                error=None,
-                duration=0.25,
-                timestamp="2025-11-07T12:00:01Z"
-            ))
-
+            progress.mark_complete(
+                "gemini",
+                ToolResponse(
+                    tool="gemini",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.2,
+                    timestamp="2025-11-07T12:00:00Z",
+                ),
+            )
+            progress.mark_complete(
+                "codex",
+                ToolResponse(
+                    tool="codex",
+                    status=ToolStatus.SUCCESS,
+                    output="test",
+                    error=None,
+                    duration=0.25,
+                    timestamp="2025-11-07T12:00:01Z",
+                ),
+            )
             update_thread = progress._update_thread
 
-        # After context exit, update thread should be stopped
-        assert update_thread is not None
-        assert not update_thread.is_alive()
-
-        # Batch complete callback should have been called
+        assert update_thread is not None and not update_thread.is_alive()
         callback.on_batch_complete.assert_called_once()
 
-    def test_batch_cleanup_on_exception(self):
+    def test_batch_cleanup_on_exception(self) -> None:
         """Batch tracker cleans up properly when exception occurs."""
         callback = Mock(spec=ProgressCallback)
-
         update_thread = None
+
         try:
-            with batch_consultation_progress(["gemini", "codex"], timeout=30, callback=callback, update_interval=0.2) as progress:
+            with batch_consultation_progress(
+                ["gemini", "codex"],
+                timeout=30,
+                callback=callback,
+                update_interval=0.2,
+            ) as progress:
                 update_thread = progress._update_thread
                 time.sleep(0.3)
                 raise RuntimeError("Batch processing failed")
         except RuntimeError:
             pass
 
-        # Update thread should be stopped after exception
-        assert update_thread is not None
-        assert not update_thread.is_alive()
-
-        # on_batch_complete should still have been called
+        assert update_thread is not None and not update_thread.is_alive()
         callback.on_batch_complete.assert_called_once()
 
-    def test_cleanup_stops_update_callbacks(self):
+    def test_cleanup_stops_update_callbacks(self) -> None:
         """Cleanup stops periodic update callbacks from firing."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
-            time.sleep(0.5)  # Let some updates happen
-
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2,
+        ) as progress:
+            time.sleep(0.5)
             response = ToolResponse(
                 tool="gemini",
                 status=ToolStatus.SUCCESS,
                 output="test",
                 error=None,
                 duration=0.5,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
             progress.complete(response)
 
-        # Count updates before cleanup
         update_count_at_complete = callback.on_update.call_count
-
-        # Wait to ensure no more updates after cleanup
         time.sleep(0.5)
         update_count_after_wait = callback.on_update.call_count
 
-        # No new updates should have occurred after completion
         assert update_count_after_wait == update_count_at_complete
 
-    def test_cleanup_is_idempotent(self):
+    def test_cleanup_is_idempotent(self) -> None:
         """Cleanup can be safely called multiple times."""
         callback = Mock(spec=ProgressCallback)
 
-        with ai_consultation_progress("gemini", timeout=30, callback=callback, update_interval=0.2) as progress:
+        with ai_consultation_progress(
+            "gemini",
+            timeout=30,
+            callback=callback,
+            update_interval=0.2,
+        ) as progress:
             time.sleep(0.3)
-
             response = ToolResponse(
                 tool="gemini",
                 status=ToolStatus.SUCCESS,
                 output="test",
                 error=None,
                 duration=0.3,
-                timestamp="2025-11-07T12:00:00Z"
+                timestamp="2025-11-07T12:00:00Z",
             )
-
-            # Call complete() multiple times
             progress.complete(response)
             progress.complete(response)
             progress.complete(response)
 
-        # on_complete should only be called once despite multiple complete() calls
         assert callback.on_complete.call_count == 1
 
-    def test_queued_callback_cleanup(self):
+    def test_queued_callback_cleanup(self) -> None:
         """QueuedProgressCallback cleans up consumer thread properly."""
         wrapped = Mock(spec=ProgressCallback)
         queued = QueuedProgressCallback(wrapped)
@@ -1363,17 +1320,12 @@ class TestProgressBarCleanup:
 
         queued.on_start("gemini", 90)
         time.sleep(0.2)
-
-        # Stop and verify cleanup
         queued.stop(timeout=2.0)
 
-        # Consumer thread should be stopped
         assert not queued._consumer_thread.is_alive()
-
-        # No errors should occur, callback should have been processed
         assert wrapped.on_start.call_count == 1
 
-    def test_queued_callback_cleanup_after_exception(self):
+    def test_queued_callback_cleanup_after_exception(self) -> None:
         """QueuedProgressCallback cleans up even when wrapped callback raises."""
         wrapped = Mock(spec=ProgressCallback)
         wrapped.on_start.side_effect = Exception("Callback error")
@@ -1381,46 +1333,42 @@ class TestProgressBarCleanup:
         queued = QueuedProgressCallback(wrapped)
         queued.start()
 
-        # This should not crash the consumer thread
         queued.on_start("gemini", 90)
         time.sleep(0.2)
-
-        # Cleanup should still work
         queued.stop(timeout=2.0)
 
-        # Consumer thread should be stopped despite exception
         assert not queued._consumer_thread.is_alive()
 
 
 class TestProgressMessageFormatting:
     """Test progress message formatting helper."""
 
-    def test_basic_message_format(self):
+    def test_basic_message_format(self) -> None:
         """format_progress_message creates basic status message."""
         message = format_progress_message("gemini", 30.5)
         assert message == "Waiting for gemini... 30.5s"
 
-    def test_message_with_timeout(self):
+    def test_message_with_timeout(self) -> None:
         """format_progress_message includes timeout when provided."""
         message = format_progress_message("gemini", 30.5, 90)
         assert message == "Waiting for gemini... 30.5s / 90s"
 
-    def test_message_without_timeout_display(self):
+    def test_message_without_timeout_display(self) -> None:
         """format_progress_message excludes timeout when include_timeout=False."""
         message = format_progress_message("codex", 125.7, 300, include_timeout=False)
         assert message == "Waiting for codex... 125.7s"
 
-    def test_formats_decimal_places(self):
+    def test_formats_decimal_places(self) -> None:
         """format_progress_message formats elapsed time to 1 decimal place."""
         message = format_progress_message("gemini", 45.678)
         assert message == "Waiting for gemini... 45.7s"
 
-    def test_formats_integer_elapsed(self):
+    def test_formats_integer_elapsed(self) -> None:
         """format_progress_message handles integer elapsed time."""
         message = format_progress_message("gemini", 45)
         assert message == "Waiting for gemini... 45.0s"
 
-    def test_formats_different_tool_names(self):
+    def test_formats_different_tool_names(self) -> None:
         """format_progress_message works with different tool names."""
         message1 = format_progress_message("gemini", 10.0)
         message2 = format_progress_message("codex", 20.0)
@@ -1430,12 +1378,12 @@ class TestProgressMessageFormatting:
         assert "codex" in message2
         assert "cursor-agent" in message3
 
-    def test_formats_long_elapsed_times(self):
+    def test_formats_long_elapsed_times(self) -> None:
         """format_progress_message handles long elapsed times."""
         message = format_progress_message("gemini", 725.3, 900)
         assert message == "Waiting for gemini... 725.3s / 900s"
 
-    def test_formats_zero_elapsed(self):
+    def test_formats_zero_elapsed(self) -> None:
         """format_progress_message handles zero elapsed time."""
         message = format_progress_message("gemini", 0.0)
         assert message == "Waiting for gemini... 0.0s"

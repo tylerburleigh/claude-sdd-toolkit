@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-"""
-Legacy cache CLI tests migrated from `tests/unit/test_cache_cli.py`.
-"""
+"""Unit tests for cache CLI behaviour."""
 
 import json
 from unittest.mock import Mock, patch

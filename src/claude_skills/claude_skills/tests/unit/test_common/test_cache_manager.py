@@ -208,3 +208,94 @@ def test_get_stats_counts_expired_entries(
     assert stats["expired_entries"] == 1
     assert stats["active_entries"] == 1
     assert stats["total_size_bytes"] >= 0
+
+
+def test_cache_dir_created(tmp_path: Path) -> None:
+    custom_dir = tmp_path / "nested" / "cache-location"
+    cache = CacheManager(cache_dir=custom_dir, auto_cleanup=False)
+
+    assert cache.cache_dir == custom_dir
+    assert custom_dir.exists()
+    assert custom_dir.is_dir()
+
+
+def test_atomic_write_leaves_no_temp_files(tmp_path: Path) -> None:
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=False)
+
+    assert cache.set("atomic", {"value": True}) is True
+    assert list(tmp_path.glob("*.tmp")) == []
+    assert list(tmp_path.glob("*.json")) == [tmp_path / "atomic.json"]
+
+
+def test_key_sanitization_round_trip(tmp_path: Path) -> None:
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=False)
+    key = "path/with\\separators"
+
+    assert cache.set(key, {"ok": True}) is True
+    assert cache.get(key) == {"ok": True}
+    # Ensure sanitized file exists on disk
+    assert (tmp_path / "path_with_separators.json").exists()
+
+
+def test_set_handles_non_serializable_value(tmp_path: Path) -> None:
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=False)
+
+    class NonSerializable:
+        pass
+
+    assert cache.set("bad", NonSerializable()) is False
+    assert cache.get("bad") is None
+
+
+def test_auto_cleanup_disabled_retains_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    advance = _install_fake_time(monkeypatch, start=10_000.0)
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=False)
+
+    cache.set("expired", {"value": 1}, ttl_hours=0.001)
+    advance(10.0)
+
+    files = list(tmp_path.glob("*.json"))
+    assert len(files) == 1  # File still present because cleanup disabled
+    assert cache.get("expired") is None  # Lookup still respects TTL and removes entry
+
+
+def test_auto_cleanup_runs_when_interval_passed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    advance = _install_fake_time(monkeypatch, start=10_000.0)
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=True)
+    cache.CLEANUP_INTERVAL_HOURS = 0.0001  # ~0.36 seconds
+
+    cache.set("expired", {"value": 1}, ttl_hours=0.0001)
+    advance(10.0)  # Ensure entry expired well in the past
+
+    cache._last_cleanup_time = 0
+    cache.set("active", {"value": 2})
+
+    files = list(tmp_path.glob("*.json"))
+    assert files == [tmp_path / "active.json"]
+
+
+def test_auto_cleanup_respects_interval(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    advance = _install_fake_time(monkeypatch, start=10_000.0)
+    cache = CacheManager(cache_dir=tmp_path, auto_cleanup=True)
+    cache.CLEANUP_INTERVAL_HOURS = 100  # Very large interval
+
+    cache.set("expired", {"value": 1}, ttl_hours=0.0001)
+    advance(10.0)
+
+    # Because interval not elapsed, cleanup shouldn't run
+    cache.set("active", {"value": 2})
+
+    files = sorted(tmp_path.glob("*.json"))
+    assert (tmp_path / "expired.json") in files
+    assert (tmp_path / "active.json") in files
+
+
+def test_auto_cleanup_on_initialization(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    advance = _install_fake_time(monkeypatch, start=10_000.0)
+    first = CacheManager(cache_dir=tmp_path, auto_cleanup=False)
+    first.set("expired", {"value": 1}, ttl_hours=0.0001)
+    advance(10.0)
+
+    # Second manager with auto_cleanup should remove expired entry on init
+    CacheManager(cache_dir=tmp_path, auto_cleanup=True)
+    assert list(tmp_path.glob("*.json")) == []

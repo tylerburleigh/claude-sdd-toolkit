@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-"""
-Legacy tests for `claude_skills.common.ai_tools`, migrated from `tests/unit/test_ai_tools.py`.
-"""
+"""Unit tests for `claude_skills.common.ai_tools`."""
 
 import subprocess
 from dataclasses import FrozenInstanceError

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-"""
-Legacy cache suite migrated from `tests/unit/test_cache.py`.
-Exercises CacheManager CRUD behaviour, TTL, statistics, and key generation.
-"""
+"""Exercises CacheManager CRUD behaviour, TTL, statistics, and key generation."""
 
 import json
 import time

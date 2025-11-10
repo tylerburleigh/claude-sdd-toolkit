@@ -15,50 +15,29 @@ from claude_skills.common.json_output import (
 pytestmark = pytest.mark.unit
 
 
-def test_output_json_pretty_prints_by_default(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {"status": "ok", "count": 2}
-
+def test_output_json_pretty_print_default(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"status": "success", "count": 42}
     output_json(payload)
-
     captured = capsys.readouterr().out
     assert json.loads(captured) == payload
     assert "\n" in captured
-    assert "  " in captured  # 2-space indent
+    assert "  " in captured
 
 
-def test_output_json_compact_mode_omits_whitespace(capsys: pytest.CaptureFixture[str]) -> None:
-    output_json({"a": 1, "b": 2}, compact=True)
+def test_output_json_compact_mode(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"status": "success", "count": 42}
+    output_json(payload, compact=True)
     captured = capsys.readouterr().out.strip()
-    assert captured == '{"a":1,"b":2}'
+    assert captured == '{"status":"success","count":42}'
 
 
-def test_format_json_output_supports_sort_keys() -> None:
-    result = format_json_output({"z": 1, "a": 2}, compact=True, sort_keys=True)
-    assert result == '{"a":2,"z":1}'
-
-
-def test_print_json_output_accepts_compact_flag(capsys: pytest.CaptureFixture[str]) -> None:
-    print_json_output({"value": "x"}, compact=True)
-    captured = capsys.readouterr().out.strip()
-    assert captured == '{"value":"x"}'
-
-
-def test_output_json_raises_for_unserialisable_data(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Preserve stdout to avoid polluting the test log
-    buffer = StringIO()
-    monkeypatch.setattr("sys.stdout", buffer)
-
-    with pytest.raises(TypeError):
-        output_json({"func": lambda x: x})
-
-
-def test_output_json_handles_nested_structures(capsys: pytest.CaptureFixture[str]) -> None:
+def test_output_json_nested_structures(capsys: pytest.CaptureFixture[str]) -> None:
     payload = {
         "task": {
-            "id": "task-1",
+            "id": "task-1-1",
             "metadata": {
                 "estimated_hours": 2.5,
-                "tags": ["auth", "backend"],
+                "tags": ["test", "example"],
             },
         }
     }
@@ -69,24 +48,21 @@ def test_output_json_handles_nested_structures(capsys: pytest.CaptureFixture[str
     assert "tags" in captured
 
 
-def test_output_json_handles_lists(capsys: pytest.CaptureFixture[str]) -> None:
+def test_output_json_list_data(capsys: pytest.CaptureFixture[str]) -> None:
     payload = [{"id": 1}, {"id": 2}]
     output_json(payload)
     captured = capsys.readouterr().out
     assert json.loads(captured) == payload
 
 
-def test_output_json_handles_empty_structures(capsys: pytest.CaptureFixture[str]) -> None:
+def test_output_json_empty_structures(capsys: pytest.CaptureFixture[str]) -> None:
     output_json({})
-    captured = capsys.readouterr().out.strip()
-    assert captured == "{}"
-
+    assert capsys.readouterr().out.strip() == "{}"
     output_json([])
-    captured = capsys.readouterr().out.strip()
-    assert captured == "[]"
+    assert capsys.readouterr().out.strip() == "[]"
 
 
-def test_output_json_preserves_unicode(capsys: pytest.CaptureFixture[str]) -> None:
+def test_output_json_unicode_characters(capsys: pytest.CaptureFixture[str]) -> None:
     payload = {"message": "Hello 世界", "emoji": "🎉"}
     output_json(payload)
     captured = capsys.readouterr().out
@@ -96,79 +72,84 @@ def test_output_json_preserves_unicode(capsys: pytest.CaptureFixture[str]) -> No
 
 
 def test_output_json_special_values(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {"null": None, "true": True, "false": False, "number": 42}
+    payload = {"null_value": None, "true_value": True, "false_value": False, "number": 123}
     output_json(payload)
     captured = capsys.readouterr().out
-    parsed = json.loads(captured)
-    assert parsed == payload
+    assert json.loads(captured) == payload
 
 
-def test_output_json_compact_vs_pretty_size_difference(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {
-        "level1": {
-            "level2": {
-                "level3": {
-                    "key": "value",
-                    "items": [1, 2, 3],
-                }
-            }
-        }
-    }
+def test_output_json_compact_vs_pretty_size(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"nested": {"key": "value", "items": [1, 2, 3]}}
     output_json(payload, compact=False)
-    pretty = capsys.readouterr().out
-
+    pretty_output = capsys.readouterr().out
     output_json(payload, compact=True)
-    compact = capsys.readouterr().out
+    compact_output = capsys.readouterr().out
+    assert len(compact_output) < len(pretty_output)
+    assert json.loads(pretty_output) == json.loads(compact_output)
 
-    assert len(compact) < len(pretty)
-    assert json.loads(compact) == json.loads(pretty)
 
-
-def test_format_json_output_pretty_matches_compact_when_reparsed() -> None:
-    payload = {"status": "ok", "count": 2}
+def test_format_json_output_variants() -> None:
+    payload = {"status": "success", "count": 42}
     pretty = format_json_output(payload, compact=False)
     compact = format_json_output(payload, compact=True)
     assert json.loads(pretty) == payload
-    assert json.loads(compact) == payload
+    assert compact == '{"status":"success","count":42}'
+    sorted_json = format_json_output({"z": 1, "a": 2}, compact=True, sort_keys=True)
+    assert sorted_json == '{"a":2,"z":1}'
 
 
-def test_print_json_output_pretty(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {"value": "x"}
+def test_print_json_output_modes(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"key": "value"}
     print_json_output(payload, compact=False)
+    assert json.loads(capsys.readouterr().out) == payload
+    print_json_output(payload, compact=True)
+    assert capsys.readouterr().out.strip() == '{"key":"value"}'
+
+
+def test_output_json_handles_strings(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {
+        "single": "It's a test",
+        "double": 'He said "hello"',
+        "multiline": "Line 1\nLine 2\nLine 3",
+    }
+    output_json(payload)
     captured = capsys.readouterr().out
     assert json.loads(captured) == payload
-    assert "\n" in captured
+    assert "Line 1\\nLine 2\\nLine 3" in captured
+
+
+def test_output_json_non_serialisable_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    buffer = StringIO()
+    monkeypatch.setattr("sys.stdout", buffer)
+    with pytest.raises(TypeError):
+        output_json({"function": lambda x: x})
+
+
+def test_output_json_deeply_nested(capsys: pytest.CaptureFixture[str]) -> None:
+    data = {"level": 0}
+    node = data
+    for i in range(1, 10):
+        node["nested"] = {"level": i}
+        node = node["nested"]
+    output_json(data)
+    assert json.loads(capsys.readouterr().out) == data
 
 
 def test_output_json_large_numbers(capsys: pytest.CaptureFixture[str]) -> None:
     payload = {
-        "large_int": 2**63 - 1,
-        "large_float": 1.79e308,
-        "small_float": 5e-324,
+        "large_int": 9223372036854775807,
+        "large_float": 1.7976931348623157e308,
+        "small_float": 2.2250738585072014e-308,
     }
-    output_json(payload)
-    captured = capsys.readouterr().out
-    assert json.loads(captured) == payload
-
-
-def test_output_json_strings_with_quotes_and_newlines(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {
-        "single": "It's a test",
-        "double": 'He said "hello"',
-        "multiline": "Line 1\nLine 2",
-    }
-    output_json(payload)
-    captured = capsys.readouterr().out
-    assert json.loads(captured) == payload
-
-
-def test_output_json_accepts_positional_and_keyword_arguments(capsys: pytest.CaptureFixture[str]) -> None:
-    payload = {"value": "x"}
     output_json(payload)
     assert json.loads(capsys.readouterr().out) == payload
 
+
+def test_output_json_accepts_kwargs_and_positionals(capsys: pytest.CaptureFixture[str]) -> None:
+    payload = {"value": "x"}
+    output_json(payload)
+    assert json.loads(capsys.readouterr().out) == payload
     output_json(payload, compact=True)
     assert json.loads(capsys.readouterr().out.strip()) == payload
-
     output_json(data=payload, compact=False)
     assert json.loads(capsys.readouterr().out) == payload

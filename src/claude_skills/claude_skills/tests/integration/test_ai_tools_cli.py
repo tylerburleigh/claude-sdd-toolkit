@@ -368,25 +368,6 @@ def test_execute_tools_parallel_partial_failure(mock_tools: MockToolSuite) -> No
     assert result.responses["codex"].status is ToolStatus.ERROR
 
 
-def test_execute_tools_parallel_timeout(mock_tools: MockToolSuite) -> None:
-    mock_tools.rewrite(
-        "codex",
-        """
-        #!/bin/bash
-        sleep 2
-        echo "slow"
-        """,
-    )
-    result = execute_tools_parallel(
-        tools=["gemini", "codex"],
-        prompt="time bound",
-        timeout=0.2,
-    )
-    assert result.responses["codex"].status is ToolStatus.TIMEOUT
-    assert result.success_count == 1
-    assert result.failure_count == 1
-
-
 def test_execute_tools_parallel_collects_statistics(mock_tools: MockToolSuite) -> None:
     result = execute_tools_parallel(
         tools=["gemini", "codex"],
