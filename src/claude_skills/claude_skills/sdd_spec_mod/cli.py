@@ -33,19 +33,31 @@ def cmd_apply_modifications(args, printer):
     if not specs_dir:
         printer.error("Specs directory not found")
         printer.detail("Looked for specs/active/, specs/completed/, specs/archived/")
+        printer.info("\nTroubleshooting:")
+        printer.detail("1. Verify you're in the correct project directory")
+        printer.detail("2. Check that specs/ folder exists with subfolders: pending/, active/, completed/, archived/")
+        printer.detail("3. Or specify path explicitly: --specs-dir /path/to/specs")
         return 1
 
     # Find spec file
     spec_file = find_spec_file(args.spec_id, specs_dir)
     if not spec_file:
         printer.error(f"Spec file not found for: {args.spec_id}")
-        printer.detail(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
+        printer.detail(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived, {specs_dir}/pending")
+        printer.info("\nNext steps:")
+        printer.detail("1. List available specs: sdd list-specs")
+        printer.detail(f"2. Verify spec ID format matches filename (without .json)")
+        printer.detail(f"3. Check if spec is in pending/ folder: {specs_dir}/pending/")
         return 1
 
     # Verify modifications file exists
     mod_file = Path(args.from_file)
     if not mod_file.exists():
         printer.error(f"Modifications file not found: {args.from_file}")
+        printer.info("\nNext steps:")
+        printer.detail("1. Verify the file path is correct (use absolute path or relative to current directory)")
+        printer.detail("2. Parse review feedback first: sdd parse-review <spec-id> --review report.md --output mods.json")
+        printer.detail("3. Or create manually - see format: sdd apply-modifications --help")
         return 1
 
     printer.info(f"Applying modifications to: {spec_file}")
@@ -99,9 +111,18 @@ def cmd_apply_modifications(args, printer):
         return 1
     except json.JSONDecodeError as e:
         printer.error(f"Invalid JSON in modifications file: {str(e)}")
+        printer.info("\nNext steps:")
+        printer.detail("1. Validate JSON syntax: Use a JSON validator or 'python -m json.tool < file.json'")
+        printer.detail("2. Check for common issues: trailing commas, unescaped quotes, missing brackets")
+        printer.detail("3. See format documentation in MODIFICATIONS_FORMAT.md")
         return 1
     except ValueError as e:
         printer.error(f"Invalid modification format: {str(e)}")
+        printer.info("\nNext steps:")
+        printer.detail("1. Verify operation type is one of: add_node, remove_node, update_node_field, move_node")
+        printer.detail("2. Check required fields for your operation type")
+        printer.detail("3. Use --dry-run first to preview changes without applying")
+        printer.detail("4. See examples in MODIFICATIONS_FORMAT.md")
         return 1
     except Exception as e:
         printer.error(f"Failed to apply modifications: {str(e)}")

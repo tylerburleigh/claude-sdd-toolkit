@@ -56,9 +56,21 @@ HOW TO FIX:
   - View decision journal:
     Bash(sdd get-journal <spec-id>)
 
-EXAMPLE:
-  Instead of: Read(specs/active/my-spec.json)
-  Use: Bash(sdd next-task plain-mode-support-2025-11-08-001)
+  - Modify spec structure (bulk operations):
+    Bash(sdd apply-modifications <spec-id> --from modifications.json)
+
+  - Parse review feedback into modifications:
+    Bash(sdd parse-review <spec-id> --review report.md --output mods.json)
+
+  - Update single task metadata field:
+    Bash(sdd update-task-metadata <spec-id> <task-id> --description "new desc")
+
+EXAMPLES:
+  Reading: Instead of Read(specs/active/my-spec.json)
+    Use: Bash(sdd next-task plain-mode-support-2025-11-08-001)
+
+  Modifying: Instead of Read + Edit JSON file
+    Use: Bash(sdd apply-modifications my-spec-001 --from mods.json)
 
 This hook enforces proper SDD workflow and prevents token waste.
 

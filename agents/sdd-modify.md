@@ -38,6 +38,8 @@ Use this agent when you need to:
 - Creating new specifications (use sdd-plan)
 - Running validation only (use sdd-validate-subagent)
 
+**Note:** This agent wraps `Skill(sdd-toolkit:sdd-modify)`. For detailed workflow instructions, command usage, and best practices, see the skill's SKILL.md file.
+
 ## How This Agent Works
 
 This agent is a programmatic interface that invokes `Skill(sdd-toolkit:sdd-modify)` or directly executes CLI commands.

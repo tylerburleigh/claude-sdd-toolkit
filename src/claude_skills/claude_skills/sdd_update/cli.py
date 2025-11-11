@@ -1226,6 +1226,10 @@ def cmd_update_task_metadata(args, printer):
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
         printer.error("Specs directory not found")
+        printer.info("\nNext steps:")
+        printer.detail("1. Verify you're in the project root directory")
+        printer.detail("2. Check that specs/ folder exists with subfolders: pending/, active/, completed/, archived/")
+        printer.detail("3. Or specify path: --specs-dir /path/to/specs")
         return 1
 
     # Collect metadata updates from args (8 fields)
@@ -1256,12 +1260,20 @@ def cmd_update_task_metadata(args, printer):
     spec_data = load_json_spec(args.spec_id, specs_dir)
     if not spec_data:
         printer.error(f"Could not load JSON spec file for {args.spec_id}")
+        printer.info("\nNext steps:")
+        printer.detail("1. List available specs: sdd list-specs")
+        printer.detail(f"2. Verify spec ID format: '{args.spec_id}' (without .json extension)")
+        printer.detail("3. Check all spec folders: pending/, active/, completed/, archived/")
         return 1
 
     # Verify task exists in hierarchy
     hierarchy = spec_data.get("hierarchy", {})
     if args.task_id not in hierarchy:
         printer.error(f"Task '{args.task_id}' not found in spec {args.spec_id}")
+        printer.info("\nNext steps:")
+        printer.detail(f"1. List tasks: sdd query-tasks {args.spec_id}")
+        printer.detail(f"2. Get task details: sdd get-task {args.spec_id} <task-id>")
+        printer.detail("3. Verify task ID format (e.g., 'task-1-2-3' not 'Task 1.2.3')")
         return 1
 
     # Show preview of changes
