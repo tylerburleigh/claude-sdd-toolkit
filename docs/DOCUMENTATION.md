@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 12:53:33
+**Generated:** 2025-11-11 13:06:43
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 304
-- **Total Lines:** 104657
-- **Total Classes:** 428
-- **Total Functions:** 1305
-- **Avg Complexity:** 4.88
+- **Total Files:** 305
+- **Total Lines:** 104915
+- **Total Classes:** 429
+- **Total Functions:** 1314
+- **Avg Complexity:** 4.85
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -802,6 +802,21 @@ Supports multiple programming languages.
 - `error()`
 - `header()`
 - `detail()`
+
+---
+
+### `DummyProvider`
+
+**Language:** python
+**Inherits from:** `ProviderContext`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:70`
+
+**Description:**
+> Simple ProviderContext implementation for exercising the base class.
+
+**Methods:**
+- `__init__()`
+- `_execute()`
 
 ---
 
@@ -23046,6 +23061,26 @@ Returns:
 
 ---
 
+### `make_metadata(provider_name, capabilities) -> ProviderMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:40`
+**Complexity:** 2
+
+**Parameters:**
+- `provider_name`: str
+- `capabilities`: Optional[Set[ProviderCapability]]
+
+---
+
+### `make_result() -> GenerationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:57`
+**Complexity:** 1
+
+---
+
 ### `mark_task_blocked(spec_id, task_id, reason, specs_dir, blocker_type, ticket, dry_run, printer) -> bool`
 
 **Language:** python
@@ -24748,6 +24783,19 @@ Returns:
 
 **Description:**
 > Utility for tests to clear registry state.
+
+---
+
+### `reset_registry_state() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:98`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture(autouse=True)`
+
+**Description:**
+> Ensure registry isolation across tests.
 
 ---
 
@@ -26740,6 +26788,14 @@ Returns:
 **Parameters:**
 - `tmp_path`: Path
 - `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_available_providers_honors_priority_and_availability() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:206`
+**Complexity:** 1
 
 ---
 
@@ -30098,6 +30154,30 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_provider_context_invokes_hooks_and_streams() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:105`
+**Complexity:** 1
+
+---
+
+### `test_provider_context_maps_file_not_found_to_unavailable() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:149`
+**Complexity:** 1
+
+---
+
+### `test_provider_context_wraps_unknown_exceptions() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:135`
+**Complexity:** 1
+
+---
+
 ### `test_real_tools_optional_smoke() -> None`
 
 **Language:** python
@@ -30182,6 +30262,14 @@ a decision needs to be made about what to implement.
 
 **Parameters:**
 - `set_skill_config`: Callable[[Dict[str, Any]], None]
+
+---
+
+### `test_resolve_provider_passes_dependencies_and_returns_metadata() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:163`
+**Complexity:** 1
 
 ---
 
@@ -30282,6 +30370,14 @@ a decision needs to be made about what to implement.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/test_run_tests_consultation_cli.py:371`
+**Complexity:** 1
+
+---
+
+### `test_run_provider_streaming_happy_path() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:225`
 **Complexity:** 1
 
 ---
@@ -34435,6 +34531,36 @@ Returns:
 - `unittest.mock.Mock`
 - `unittest.mock.mock_open`
 - `unittest.mock.patch`
+
+### `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py`
+
+- `__future__.annotations`
+- `claude_skills.cli.provider_runner.RunnerConfig`
+- `claude_skills.cli.provider_runner.run_provider`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.GenerationResult`
+- `claude_skills.common.providers.ModelDescriptor`
+- `claude_skills.common.providers.ProviderCapability`
+- `claude_skills.common.providers.ProviderContext`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.ProviderMetadata`
+- `claude_skills.common.providers.ProviderStatus`
+- `claude_skills.common.providers.ProviderUnavailableError`
+- `claude_skills.common.providers.StreamChunk`
+- `claude_skills.common.providers.available_providers`
+- `claude_skills.common.providers.get_provider_metadata`
+- `claude_skills.common.providers.register_provider`
+- `claude_skills.common.providers.reset_registry`
+- `claude_skills.common.providers.resolve_provider`
+- `claude_skills.common.providers.set_dependency_resolver`
+- `pytest`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Set`
+- `unittest.mock.Mock`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
 
