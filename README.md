@@ -2,7 +2,7 @@
 
 > Plan-first development with Claude - systematic, trackable, and organized
 
-[![Plugin Version](https://img.shields.io/badge/version-0.5.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.5.1-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -81,7 +81,9 @@ Want to see a complete workflow from start to finish? Check out [docs/examples/c
 
 ## Latest Updates
 
-**Version 0.5.0** introduces Plain UI mode for better terminal compatibility, modernizes the configuration system with `default_mode` (rich/plain/json) and centralized AI config in `.claude/ai_config.yaml`, and adds optional JSON Schema validation. Includes workflow guardrails with pre-tool hooks that enforce structured CLI usage, preventing direct spec JSON access. Test suite reorganized to package namespace with comprehensive integration coverage. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+**Version 0.5.1** introduces a unified provider abstraction layer for AI tool orchestration with four provider implementations (Gemini, Codex, Cursor Agent, Claude). The Claude provider features read-only tool restrictions for secure execution. All providers now use correct, CLI-supported model names with increased 360s default timeouts for extended reasoning. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+**Version 0.5.0** introduces Plain UI mode for better terminal compatibility, modernizes the configuration system with `default_mode` (rich/plain/json) and centralized AI config in `.claude/ai_config.yaml`, and adds optional JSON Schema validation. Includes workflow guardrails with pre-tool hooks that enforce structured CLI usage, preventing direct spec JSON access. Test suite reorganized to package namespace with comprehensive integration coverage.
 
 **Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage.
 
@@ -151,7 +153,7 @@ Best practice: Ask Claude to "Document this codebase" before creating specs to e
 
 Model providers (Gemini, Codex, Cursor Agent, Claude) plug into a shared layer under `claude_skills.common.providers`. Each provider subclasses `ProviderContext`, exposes supported capabilities/models through `ProviderMetadata` + `ModelDescriptor`, and receives lifecycle hooks (`ProviderHooks`) so skills can stream output, collect token usage, and normalize failures. The registry helpers (`register_provider`, `register_lazy_provider`, `resolve_provider`) manage discovery, while detectors coordinate PATH lookups and environment overrides (`CLAUDE_SKILLS_TOOL_PATH`, `*_CLI_BINARY`, `*_CLI_AVAILABLE_OVERRIDE`) before instantiating providers.
 
-**Claude Provider:** Uses the `claude` CLI with read-only tool restrictions for security (allows Read, Grep, Glob, WebSearch, WebFetch, Task, Explore; blocks Write, Edit, Bash). Supports Sonnet 4.5 and Haiku 3.5 models with 360-second default timeout.
+**Claude Provider:** Uses the `claude` CLI with read-only tool restrictions for security (allows Read, Grep, Glob, WebSearch, WebFetch, Task, Explore; blocks Write, Edit, Bash). Supports Sonnet 4.5 and Haiku 4.5 models with 360-second default timeout.
 
 Test providers in isolation with the CLI runner:
 
@@ -1014,4 +1016,4 @@ Ready to get started?
 
 ---
 
-**Version**: 0.5.0 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.5.1 | **License**: MIT | **Author**: Tyler Burleigh

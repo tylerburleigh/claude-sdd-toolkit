@@ -65,7 +65,7 @@ The Claude provider (`ClaudeProvider`) integrates Anthropic's Claude models via 
 
 **Models Supported:**
 - `claude-sonnet-4.5` (default): Balanced performance with text, vision, streaming, and thinking capabilities
-- `claude-haiku-3.5`: Fast model with text and streaming capabilities
+- `claude-haiku-4.5`: Fast model with text and streaming capabilities
 
 **Security Features:**
 - Read-only operations enforced via `--allowed-tools` flag (Read, Grep, Glob, WebSearch, WebFetch, Task, Explore)
@@ -81,7 +81,7 @@ providers:
     command: "claude"
     enabled: true
     models:
-      priority: ["claude-sonnet-4.5", "claude-haiku-3.5"]
+      priority: ["claude-sonnet-4.5", "claude-haiku-4.5"]
 ```
 
 **Usage Example:**
