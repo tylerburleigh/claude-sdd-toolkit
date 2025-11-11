@@ -127,6 +127,46 @@ def _handle_error(args: argparse.Namespace, printer: PrettyPrinter, exc: Excepti
     return 1
 
 
+def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
+    """
+    Parse repeated model override flags into an ai_config-compatible structure.
+    """
+    if not values:
+        return None
+
+    overrides: dict[str, str] = {}
+    default_override: Optional[str] = None
+
+    for raw_value in values:
+        if not raw_value:
+            continue
+        entry = raw_value.strip()
+        if not entry:
+            continue
+
+        separator_index = -1
+        for separator in ("=", ":"):
+            if separator in entry:
+                separator_index = entry.find(separator)
+                break
+
+        if separator_index > 0:
+            key = entry[:separator_index].strip()
+            value = entry[separator_index + 1 :].strip()
+            if key and value:
+                overrides[key] = value
+            continue
+
+        default_override = entry
+
+    if overrides:
+        if default_override:
+            overrides.setdefault("default", default_override)
+        return overrides
+
+    return default_override
+
+
 def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     project_dir = Path(args.directory)
     if not project_dir.exists():
@@ -410,6 +450,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
 
         use_multi_agent = not args.single_agent
         tool_arg = args.ai_tool if hasattr(args, 'ai_tool') else "auto"
+        model_override = _parse_model_override(getattr(args, "model", None))
 
         printer.detail("\n🧠 Generating AI documentation...")
         if use_multi_agent and len(available_tools) >= 2:
@@ -431,6 +472,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 dry_run=args.dry_run,
                 verbose=getattr(args, 'verbose', False),
                 printer=printer,
+                model_override=model_override,
             )
             if not arch_success:
                 printer.warning(f"Failed to get architecture research")
@@ -448,6 +490,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
                 dry_run=args.dry_run,
                 verbose=getattr(args, 'verbose', False),
                 printer=printer,
+                model_override=model_override,
             )
             if not context_success:
                 printer.warning(f"Failed to get AI context research")
@@ -556,6 +599,12 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     analyze_ai_parser.add_argument('--version', default='1.0.0', help='Project version (default: 1.0.0)')
     analyze_ai_parser.add_argument('--exclude', action='append', default=[], help='Exclude pattern (can be used multiple times)')
     analyze_ai_parser.add_argument('--ai-tool', choices=['auto', 'cursor-agent', 'gemini', 'codex'], default='auto', help='AI tool to use (default: auto-select)')
+    analyze_ai_parser.add_argument(
+        '--model',
+        action='append',
+        metavar='MODEL',
+        help='Override model selection (repeat for per-tool overrides, e.g., gemini=gemini-pro)',
+    )
     analyze_ai_parser.add_argument('--single-agent', action='store_true', help='Use single agent instead of multi-agent consultation')
     analyze_ai_parser.add_argument('--skip-architecture', action='store_true', help='Skip ARCHITECTURE.md generation')
     analyze_ai_parser.add_argument('--skip-ai-context', action='store_true', help='Skip AI_CONTEXT.md generation')

@@ -85,6 +85,13 @@ Multiple SDD Toolkit skills independently determine which AI model to request wh
   - ✅ Updated fidelity CLI/report pipeline to surface consulted model metadata (`count`, per-tool map, summary string).  
   - ⏳ Next: propagate helpers into `run_tests`, `code_doc`, and `sdd_plan_review` workflows; extend their CLIs & tests accordingly.  
   - ⏳ Follow-up: documentation/changelog updates once remaining skills consume the shared helpers.
+- **2025-11-12**  
+  - ✅ Migrated `run_tests`, `code_doc`, and `sdd_plan_review` skills to the shared model resolver, including CLI `--model` overrides and per-tool logging.  
+  - ✅ Added regression suites (`test_run_tests/test_consultation_models.py`, `test_code_doc/test_ai_consultation.py`, `test_sdd_plan_review/test_models.py`) covering override precedence and integration with `execute_tools_parallel`.  
+  - ✅ Updated plan review and documentation CLIs to expose resolved model metadata; refreshed CHANGELOG entry for the consolidation work.  
+  - ✅ Refreshed `.claude/ai_config.yaml` template with sample per-skill overrides (run-tests, code-doc, plan-review, render) and setup messaging highlighting the new `--model` flags.  
+  - ✅ Audited `sdd_update` (no direct AI calls) and `sdd_pr` (context-only handoff) to confirm they require no resolver wiring; documented CLI override usage in the README.  
+  - ⏳ Next: audit remaining AI-enabled flows (render, update, PR) for any bespoke model handling; document template updates for `.claude/ai_config.yaml`.
 
 ## Risks & Mitigations
 

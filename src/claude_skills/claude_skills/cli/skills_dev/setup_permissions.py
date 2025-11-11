@@ -12,7 +12,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.common.setup_templates import copy_template_to, load_json_template
+from claude_skills.common.setup_templates import copy_template_to, load_json_template_clean
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
@@ -207,7 +207,7 @@ def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter
         # Create .claude directory if needed
         config_file.parent.mkdir(parents=True, exist_ok=True)
 
-        base_config = deepcopy(load_json_template("sdd_config.json"))
+        base_config = deepcopy(load_json_template_clean("sdd_config.json"))
         output_config = base_config.setdefault("output", {})
         user_output = config.get("output", {})
 
@@ -345,7 +345,7 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         with settings_file.open(encoding="utf-8") as f:
             settings = json.load(f)
     else:
-        settings = deepcopy(load_json_template("settings.local.json"))
+        settings = deepcopy(load_json_template_clean("settings.local.json"))
 
     # Ensure permissions structure exists
     permissions = settings.setdefault("permissions", {})

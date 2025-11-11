@@ -103,7 +103,9 @@ class MarkdownEnhancer:
         self,
         spec_data: Dict[str, Any],
         parsed_spec: ParsedSpec,
-        options: Optional[EnhancementOptions] = None
+        options: Optional[EnhancementOptions] = None,
+        *,
+        model_override: Any = None,
     ):
         """Initialize markdown enhancer.
 
@@ -115,11 +117,18 @@ class MarkdownEnhancer:
         self.spec_data = spec_data
         self.parsed_spec = parsed_spec
         self.options = options or EnhancementOptions()
+        self.model_override = model_override
 
         # Initialize AI enhancement modules
-        self.summary_generator = ExecutiveSummaryGenerator(spec_data)
+        self.summary_generator = ExecutiveSummaryGenerator(
+            spec_data,
+            model_override=model_override,
+        )
         self.viz_builder = VisualizationBuilder(spec_data)
-        self.narrative_enhancer = NarrativeEnhancer(spec_data)
+        self.narrative_enhancer = NarrativeEnhancer(
+            spec_data,
+            model_override=model_override,
+        )
         self.insight_generator = InsightGenerator(
             spec_data,
             analyzer=SpecAnalyzer(spec_data)

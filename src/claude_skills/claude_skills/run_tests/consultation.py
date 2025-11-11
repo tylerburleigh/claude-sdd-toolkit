@@ -6,7 +6,7 @@ debugging. Provides auto-routing based on failure type and prompt formatting.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, NamedTuple, Sequence
+from typing import Any, Dict, List, Optional, Tuple, NamedTuple, Sequence
 import time
 
 # Add parent directory to path to import sdd_common
@@ -27,8 +27,6 @@ def load_model_config() -> Dict:
     """
     Load model configuration from `.claude/ai_config.yaml` using the shared ai_config module.
 
-    Returns fallback to DEFAULT_MODELS if config not found or invalid.
-
     Returns:
         Dict with model configuration including priorities and overrides
     """
@@ -36,42 +34,32 @@ def load_model_config() -> Dict:
     return config.get('models', {})
 
 
-def get_model_for_tool(tool: str, failure_type: Optional[str] = None) -> str:
+def get_model_for_tool(
+    tool: str,
+    failure_type: Optional[str] = None,
+    override: Any = None,
+) -> Optional[str]:
     """
     Get the best model for a tool, considering priority and failure-type overrides.
-
-    Falls back to hardcoded defaults if configuration not available.
 
     Args:
         tool: Tool name (gemini, codex, cursor-agent)
         failure_type: Optional failure type for override lookup
+        override: Optional CLI override (string or mapping)
 
     Returns:
-        Model name to use
+        Model name to use, or None if no model is configured
     """
-    # Load config
-    model_config = load_model_config()
+    context: Optional[Dict[str, Any]] = None
+    if failure_type:
+        context = {"failure_type": failure_type}
 
-    # If no config, use hardcoded defaults (defined below in DEFAULT_MODELS)
-    if not model_config:
-        return DEFAULT_MODELS.get(tool, "")
-
-    # Check for failure-type override first
-    if failure_type and 'overrides' in model_config:
-        overrides = model_config['overrides']
-        if failure_type in overrides and tool in overrides[failure_type]:
-            priority_list = overrides[failure_type][tool]
-            if priority_list and len(priority_list) > 0:
-                return priority_list[0]  # Return first in override priority
-
-    # Use global priority for tool
-    if tool in model_config:
-        tool_config = model_config[tool]
-        if 'priority' in tool_config and len(tool_config['priority']) > 0:
-            return tool_config['priority'][0]  # Return first in priority
-
-    # Fallback to hardcoded default
-    return DEFAULT_MODELS.get(tool, "")
+    return ai_config.resolve_tool_model(
+        "run-tests",
+        tool,
+        override=override,
+        context=context,
+    )
 
 
 def get_flags_for_tool(tool: str) -> List[str]:
@@ -153,14 +141,6 @@ def get_consultation_timeout() -> int:
 # CONFIGURATION - Customize these settings for your environment
 # =============================================================================
 
-# Default models to use for each tool
-# Modify these if you want to use different models or if the defaults are unavailable
-DEFAULT_MODELS = {
-    "gemini": "gemini-2.5-pro",      # Can also use: gemini-2.0-flash-exp, etc.
-    "codex": "gpt-5-codex",           # Can also use: gpt-5, gpt-5-mini, etc.
-    "cursor-agent": "gpt-5-codex",    # Can also use: gpt-5, claude-sonnet-4, etc.
-}
-
 # Additional flags for each tool
 # Customize these if you need different behavior
 TOOL_FLAGS = {
@@ -185,7 +165,10 @@ ROUTING_MATRIX = {
 
 # Tool-specific command templates
 # These are built dynamically from configuration with fallback to defaults
-def _build_tool_commands(failure_type: Optional[str] = None) -> Dict[str, List[str]]:
+def _build_tool_commands(
+    failure_type: Optional[str] = None,
+    override: Any = None,
+) -> Dict[str, List[str]]:
     """
     Build tool command templates from configuration.
 
@@ -195,22 +178,34 @@ def _build_tool_commands(failure_type: Optional[str] = None) -> Dict[str, List[s
     Returns:
         Dict mapping tool names to command templates
     """
-    return {
-        "gemini": [
-            "gemini",
-            "-m", get_model_for_tool("gemini", failure_type)
-        ] + get_flags_for_tool("gemini") + ["-p"],
-        "codex": [
-            "codex",
-            "exec",
-            "--model", get_model_for_tool("codex", failure_type)
-        ] + get_flags_for_tool("codex"),
-        "cursor-agent": [
-            "cursor-agent",
-            "-p",
-            "--model", get_model_for_tool("cursor-agent", failure_type)
-        ] + get_flags_for_tool("cursor-agent"),
-    }
+    commands: Dict[str, List[str]] = {}
+
+    def _extend_with_model(cmd: List[str], model: Optional[str], flag: List[str]) -> None:
+        if model:
+            cmd.extend(flag + [model])
+
+    gemini_model = get_model_for_tool("gemini", failure_type, override=override)
+    gemini_cmd: List[str] = ["gemini"]
+    _extend_with_model(gemini_cmd, gemini_model, ["-m"])
+    gemini_cmd.extend(get_flags_for_tool("gemini"))
+    gemini_cmd.append("-p")
+    commands["gemini"] = gemini_cmd
+
+    codex_model = get_model_for_tool("codex", failure_type, override=override)
+    codex_cmd: List[str] = ["codex", "exec"]
+    # Legacy tool flags expect --model for codex template
+    _extend_with_model(codex_cmd, codex_model, ["--model"])
+    codex_cmd.extend(get_flags_for_tool("codex"))
+    commands["codex"] = codex_cmd
+
+    cursor_model = get_model_for_tool("cursor-agent", failure_type, override=override)
+    cursor_cmd: List[str] = ["cursor-agent"]
+    cursor_cmd.append("-p")
+    _extend_with_model(cursor_cmd, cursor_model, ["--model"])
+    cursor_cmd.extend(get_flags_for_tool("cursor-agent"))
+    commands["cursor-agent"] = cursor_cmd
+
+    return commands
 
 # Backward compatibility: Keep TOOL_COMMANDS for code that doesn't pass failure_type
 TOOL_COMMANDS = _build_tool_commands()
@@ -259,7 +254,7 @@ def _print_consultation_plan(
     available_tools: List[str],
     primary_tool: str,
     prompt: str,
-    model: str
+    model: Optional[str]
 ) -> None:
     """Emit a human-readable consultation plan for dry-run output."""
     print("Consultation plan:")
@@ -285,6 +280,8 @@ def _print_consultation_plan(
     print("Command preview:")
     print(" ".join(masked_command))
     print(f"<prompt with {len(prompt)} characters>")
+    if model is not None:
+        print(f"Resolved model: {model}")
 
 
 def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
@@ -451,7 +448,8 @@ def run_consultation(
     prompt: str,
     dry_run: bool = False,
     printer: Optional[PrettyPrinter] = None,
-    failure_type: Optional[str] = None
+    failure_type: Optional[str] = None,
+    model_override: Any = None,
 ) -> int:
     """
     Run the external tool consultation.
@@ -462,6 +460,7 @@ def run_consultation(
         dry_run: If True, just print the command without running
         printer: PrettyPrinter instance (creates default if None)
         failure_type: Optional failure type for model selection
+        model_override: Optional explicit model override (string or mapping)
 
     Returns:
         Exit code from the tool
@@ -482,7 +481,7 @@ def run_consultation(
         return 1
 
     # Get model for tool
-    model = get_model_for_tool(tool, failure_type)
+    model = get_model_for_tool(tool, failure_type, override=model_override)
 
     if dry_run:
         printer.info("Would run:")
@@ -563,7 +562,8 @@ def consult_with_auto_routing(
     question: Optional[str] = None,
     tool: str = "auto",
     dry_run: bool = False,
-    printer: Optional[PrettyPrinter] = None
+    printer: Optional[PrettyPrinter] = None,
+    model_override: Any = None,
 ) -> int:
     """
     High-level consultation function with auto-routing.
@@ -579,6 +579,7 @@ def consult_with_auto_routing(
         tool: Tool to use ("auto" for auto-selection)
         dry_run: If True, show command without running
         printer: PrettyPrinter instance (creates default if None)
+        model_override: Optional explicit model override (string or mapping)
 
     Returns:
         Exit code from consultation
@@ -652,12 +653,19 @@ def consult_with_auto_routing(
     )
 
     if dry_run:
-        model = get_model_for_tool(selected_tool, failure_type)
+        model = get_model_for_tool(selected_tool, failure_type, override=model_override)
         _print_consultation_plan(plan_tools, available_tools, selected_tool, prompt, model)
         return 0
 
     # Run the consultation
-    return run_consultation(selected_tool, prompt, dry_run, printer, failure_type)
+    return run_consultation(
+        selected_tool,
+        prompt,
+        dry_run,
+        printer,
+        failure_type,
+        model_override=model_override,
+    )
 
 
 # Valid failure types
@@ -677,7 +685,12 @@ class ConsultationResponse(NamedTuple):
     duration: float = 0.0
 
 
-def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None) -> ConsultationResponse:
+def run_tool_parallel(
+    tool: str,
+    prompt: str,
+    failure_type: Optional[str] = None,
+    model_override: Any = None,
+) -> ConsultationResponse:
     """
     Run a single tool consultation and capture output.
 
@@ -685,12 +698,13 @@ def run_tool_parallel(tool: str, prompt: str, failure_type: Optional[str] = None
         tool: Tool name (gemini, codex, cursor-agent)
         prompt: Formatted prompt
         failure_type: Optional failure type for model selection
+        model_override: Optional explicit model override (string or mapping)
 
     Returns:
         ConsultationResponse with results
     """
     # Get model for tool
-    model = get_model_for_tool(tool, failure_type)
+    model = get_model_for_tool(tool, failure_type, override=model_override)
     timeout = get_consultation_timeout()
 
     # Use shared execute_tool() implementation
@@ -927,7 +941,8 @@ def consult_multi_agent(
     question: Optional[str] = None,
     agents: Optional[Sequence[str]] = None,
     dry_run: bool = False,
-    printer: Optional[PrettyPrinter] = None
+    printer: Optional[PrettyPrinter] = None,
+    model_override: Any = None,
 ) -> int:
     """
     Consult multiple agents in parallel and synthesize their responses.
@@ -945,6 +960,7 @@ def consult_multi_agent(
             used, falling back to built-in defaults if necessary.
         dry_run: If True, show what would be run without executing.
         printer: PrettyPrinter instance (creates default if None).
+        model_override: Optional explicit model override (string or mapping).
 
     Returns:
         Exit code (0 if at least one consultation succeeded).
@@ -994,7 +1010,8 @@ def consult_multi_agent(
             question=question,
             tool=single_tool,
             dry_run=dry_run,
-            printer=printer
+            printer=printer,
+            model_override=model_override,
         )
 
     # Read code files if paths provided
@@ -1022,10 +1039,23 @@ def consult_multi_agent(
         question=question
     )
 
+    model_context: Optional[Dict[str, Any]] = None
+    if failure_type:
+        model_context = {"failure_type": failure_type}
+
+    resolved_models = ai_config.resolve_models_for_tools(
+        "run-tests",
+        agents_to_consult,
+        override=model_override,
+        context=model_context,
+    )
+
     if dry_run:
         printer.info(f"Would consult {len(agents_to_consult)} agents in parallel:")
         for tool in agents_to_consult:
-            print(f"  • {tool}")
+            model = resolved_models.get(tool)
+            suffix = f" (model: {model})" if model else ""
+            print(f"  • {tool}{suffix}")
         print()
         print(f"Prompt length: {len(prompt)} characters")
         return 0
@@ -1036,15 +1066,13 @@ def consult_multi_agent(
     print("=" * 60)
     print()
 
-    # Build models dict for each tool
-    models = {tool: get_model_for_tool(tool, failure_type) for tool in agents_to_consult}
     timeout = get_consultation_timeout()
 
     # Use shared execute_tools_parallel() implementation
     multi_response = execute_tools_parallel(
         tools=agents_to_consult,
         prompt=prompt,
-        models=models,
+        models=dict(resolved_models),
         timeout=timeout
     )
 

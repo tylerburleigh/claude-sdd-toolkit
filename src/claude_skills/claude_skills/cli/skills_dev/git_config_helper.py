@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple
 
 from claude_skills.common import PrettyPrinter
-from claude_skills.common.setup_templates import load_json_template
+from claude_skills.common.setup_templates import load_json_template_clean
 
 
 _FALLBACK_GIT_CONFIG: Dict[str, Any] = {
@@ -41,7 +41,7 @@ def _load_default_git_config() -> Dict[str, Any]:
     """
 
     try:
-        template = load_json_template("git_config.json")
+        template = load_json_template_clean("git_config.json")
         if isinstance(template, dict):
             config = deepcopy(template)
 

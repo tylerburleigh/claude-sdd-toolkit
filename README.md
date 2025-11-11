@@ -634,6 +634,27 @@ This allows you to set your output preferences once rather than passing `--json`
 
 For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
+### AI Model Overrides
+
+The same setup process seeds `.claude/ai_config.yaml`, which now centralizes tool priorities and example per-skill overrides for:
+
+- `run-tests` consultation failure types
+- `code-doc` architecture vs AI context generations
+- `sdd-plan-review` review modes
+- `sdd-render` executive-summary and narrative passes
+
+You can tweak these defaults directly in the YAML or override them per run with `--model` flags. The flag accepts either a single model (applied to every tool) or tool-specific entries:
+
+```bash
+# Force a single model
+run-tests consult failing-test --model gemini-2.5-pro
+
+# Mix tool-specific and fallback overrides
+sdd doc analyze-with-ai spec.json --model gemini=gemini-2.5-flash --model cursor-agent=composer-2 --model composer-1
+```
+
+The same syntax is supported by `sdd plan-review review` and `sdd render --mode enhanced`, ensuring the resolved model map is surfaced in verbose/dry-run output for easy debugging.
+
 ## Troubleshooting
 
 ### Skills Not Working

@@ -24,6 +24,9 @@ _MINIMAL_TEMPLATE = """# Centralized AI Model Consultation Configuration
 # This file defines default AI tool settings for the SDD Toolkit. You can
 # customise tools, model priorities, consensus rules, and per-skill overrides.
 # Generated automatically during `sdd-setup`.
+#
+# Tip: You can override these defaults at run time with CLI flags such as
+# `--model gemini=gemini-2.5-flash` or `--model cursor-agent=composer-2`.
 
 tools:
   gemini:
@@ -49,6 +52,42 @@ models:
   codex:
     priority:
       - gpt-5-codex
+
+run-tests:
+  models:
+    overrides:
+      failure_type:
+        assertion:
+          gemini: gemini-2.5-pro
+        timeout:
+          cursor-agent: composer-1
+
+code-doc:
+  models:
+    overrides:
+      doc_type:
+        architecture:
+          cursor-agent: composer-1
+        ai_context:
+          gemini: gemini-2.5-pro
+
+sdd-plan-review:
+  models:
+    overrides:
+      review_type:
+        full:
+          gemini: gemini-2.5-pro
+        quick:
+          cursor-agent: composer-1
+
+sdd-render:
+  models:
+    overrides:
+      feature:
+        executive_summary:
+          gemini: gemini-2.5-pro
+        narrative:
+          cursor-agent: composer-1
 
 consensus:
   agents:

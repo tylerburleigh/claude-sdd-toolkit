@@ -67,11 +67,12 @@ def test_consult_ai_on_fidelity_auto_detects_available_tool() -> None:
     success_response = _make_response("codex", ToolStatus.SUCCESS, output="OK")
     with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=["codex"]):
         with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
-            with patch(
-                "claude_skills.sdd_fidelity_review.consultation.execute_tool",
-                return_value=success_response,
-            ) as mock_execute:
-                response = consult_ai_on_fidelity("prompt", tool=None)
+            with patch("claude_skills.sdd_fidelity_review.consultation.ai_config.resolve_tool_model", return_value=None):
+                with patch(
+                    "claude_skills.sdd_fidelity_review.consultation.execute_tool",
+                    return_value=success_response,
+                ) as mock_execute:
+                    response = consult_ai_on_fidelity("prompt", tool=None)
     assert response is success_response
     mock_execute.assert_called_once_with(tool="codex", prompt="prompt", model=None, timeout=600)
 
@@ -256,7 +257,7 @@ def test_parse_review_response_parses_json_schema() -> None:
     assert any("Create src/claude_skills/claude_skills/common/templates/setup/__init__.py" in rec for rec in parsed.recommendations)
     assert any("regression test" in rec for rec in parsed.recommendations)
     assert any("Document the new setup templates" in rec for rec in parsed.recommendations)
-    assert parsed.tool == "gemini"
+    assert parsed.provider == "gemini"
     assert parsed.model is None
 
 
@@ -277,7 +278,7 @@ def test_parse_review_response_parses_nested_response_field() -> None:
     assert parsed.issues == ["Top level issue entry."]
     assert parsed.recommendations == ["Top level recommendation."]
     assert parsed.structured_response == payload
-    assert parsed.tool == "gemini"
+    assert parsed.provider == "gemini"
     assert parsed.model is None
 
 
@@ -301,7 +302,7 @@ def test_parse_review_response_parses_json_code_block_entries() -> None:
     assert any("Integration tests not provided" in issue for issue in parsed.issues)
     assert any("Core logic aligned" in issue for issue in parsed.issues)
     assert any("Add integration tests covering template loader import paths." in rec for rec in parsed.recommendations)
-    assert parsed.tool == "cursor-agent"
+    assert parsed.provider == "cursor-agent"
     assert parsed.model is None
 
 

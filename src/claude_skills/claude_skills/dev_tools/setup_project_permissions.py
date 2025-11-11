@@ -16,7 +16,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from claude_skills.common.ai_config_setup import ensure_ai_config
-from claude_skills.common.setup_templates import copy_template_to, load_json_template
+from claude_skills.common.setup_templates import copy_template_to, load_json_template_clean
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
@@ -232,7 +232,7 @@ def update_permissions(project_root: Path | str) -> int:
         with settings_file.open(encoding="utf-8") as file:
             settings = json.load(file)
     else:
-        settings = deepcopy(load_json_template("settings.local.json"))
+        settings = deepcopy(load_json_template_clean("settings.local.json"))
 
     if not isinstance(settings, dict):
         settings = {}
@@ -311,6 +311,12 @@ def update_permissions(project_root: Path | str) -> int:
 
     if ai_config_result.success:
         print(f"✅ {ai_config_result.message}", file=sys.stderr)
+        if ai_config_result.created:
+            print(
+                "   Tip: Adjust per-skill model priorities under `.claude/ai_config.yaml` "
+                "or use CLI overrides like `--model gemini=gemini-2.5-pro` during consultations.",
+                file=sys.stderr,
+            )
     else:
         print(f"⚠️  {ai_config_result.message}", file=sys.stderr)
 

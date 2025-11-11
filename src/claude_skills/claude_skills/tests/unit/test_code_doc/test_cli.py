@@ -149,3 +149,22 @@ def test_validate_missing_jsonschema_uses_basic_checks(monkeypatch: pytest.Monke
     assert "install jsonschema" in payload["message"]
     assert payload["schema"]["source"] == "package://schema"
     assert any("jsonschema" in warning for warning in payload["schema"]["warnings"])
+
+
+def test_parse_model_override_accepts_none() -> None:
+    assert cli._parse_model_override(None) is None
+    assert cli._parse_model_override([]) is None
+
+
+def test_parse_model_override_single_value() -> None:
+    assert cli._parse_model_override(["gemini-pro"]) == "gemini-pro"
+
+
+def test_parse_model_override_per_tool_values() -> None:
+    result = cli._parse_model_override(["gemini=gemini-pro", "cursor-agent:cursor-model"])
+    assert result == {"gemini": "gemini-pro", "cursor-agent": "cursor-model"}
+
+
+def test_parse_model_override_mixed_with_default() -> None:
+    result = cli._parse_model_override(["gemini=model-a", "shared-model"])
+    assert result == {"gemini": "model-a", "default": "shared-model"}

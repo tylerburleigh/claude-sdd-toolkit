@@ -18,7 +18,7 @@ This module provides documentation-specific functionality:
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
@@ -26,8 +26,6 @@ from claude_skills.common.ai_tools import (
     detect_available_tools,
     build_tool_command,
     execute_tools_parallel,
-    execute_tool,
-    ToolStatus,
 )
 from claude_skills.common import ai_config
 
@@ -35,26 +33,53 @@ from claude_skills.common import ai_config
 # CONFIGURATION
 # =============================================================================
 
-# Default models - cursor-agent with composer-1 for fast analysis
-DEFAULT_MODELS = {
-    "cursor-agent": "composer-1",        # Fast model for analysis
-    "gemini": "gemini-2.5-pro",       # Good for structured analysis
-    "codex": "gpt-5-codex",           # Good for code understanding
-}
-
-# Tool command templates
-TOOL_COMMANDS = {
-    "cursor-agent": ["cursor-agent", "-p", "--model", DEFAULT_MODELS["cursor-agent"]],
-    "gemini": ["gemini", "-m", DEFAULT_MODELS["gemini"], "-p"],
-    "codex": ["codex", "exec", "--model", DEFAULT_MODELS["codex"], "--skip-git-repo-check"],
-}
-
 # Documentation type routing (which tool is best for which doc type)
 DOC_TYPE_ROUTING = {
     "architecture": ("cursor-agent", "gemini"),   # cursor-agent good for architecture
     "ai_context": ("gemini", "cursor-agent"),     # gemini good for quick context
     "developer_guide": ("codex", "gemini"),       # codex good for code examples
 }
+
+
+def _build_context(doc_type: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not doc_type:
+        return None
+    return {"doc_type": doc_type}
+
+
+def get_model_for_tool(
+    tool: str,
+    doc_type: Optional[str] = None,
+    override: Any = None,
+) -> Optional[str]:
+    """
+    Resolve the preferred model for a given tool, honoring CLI overrides and config.
+    """
+    context = _build_context(doc_type)
+    return ai_config.resolve_tool_model(
+        "code-doc",
+        tool,
+        override=override,
+        context=context,
+    )
+
+
+def resolve_models_for_tools(
+    tools: Sequence[str],
+    doc_type: Optional[str] = None,
+    override: Any = None,
+) -> Dict[str, Optional[str]]:
+    """
+    Resolve models for multiple tools while preserving order.
+    """
+    context = _build_context(doc_type)
+    ordered = ai_config.resolve_models_for_tools(
+        "code-doc",
+        tools,
+        override=override,
+        context=context,
+    )
+    return dict(ordered)
 
 def get_available_tools() -> List[str]:
     """
@@ -373,7 +398,9 @@ def run_consultation(
     prompt: str,
     dry_run: bool = False,
     verbose: bool = False,
-    printer: Optional['PrettyPrinter'] = None
+    printer: Optional['PrettyPrinter'] = None,
+    doc_type: Optional[str] = None,
+    model_override: Any = None,
 ) -> Tuple[bool, str]:
     """
     Run consultation with an AI tool.
@@ -384,18 +411,24 @@ def run_consultation(
         dry_run: If True, show command without running
         verbose: Enable verbose output
         printer: Optional PrettyPrinter for consistent output (falls back to print if None)
+        doc_type: Optional documentation type for contextual model overrides
+        model_override: Optional CLI override (string or mapping)
 
     Returns:
         Tuple of (success: bool, output: str)
     """
+    resolved_model = get_model_for_tool(tool, doc_type=doc_type, override=model_override)
+
     # Use shared utility to build command
     try:
-        cmd = build_tool_command(tool, prompt)
+        cmd = build_tool_command(tool, prompt, model=resolved_model)
     except ValueError as e:
         return False, str(e)
 
     if dry_run:
-        msg = f"Would run: {' '.join(cmd[:4])} <prompt ({len(prompt)} chars)>"
+        preview = " ".join(cmd[:4]) if len(cmd) >= 4 else " ".join(cmd)
+        model_note = f" [model={resolved_model}]" if resolved_model else ""
+        msg = f"Would run: {preview} <prompt ({len(prompt)} chars)>{model_note}"
         if printer:
             printer.detail(msg)
         else:
@@ -453,7 +486,8 @@ def consult_multi_agent(
     agents: Optional[Sequence[str]] = None,
     dry_run: bool = False,
     verbose: bool = False,
-    printer: Optional['PrettyPrinter'] = None
+    printer: Optional['PrettyPrinter'] = None,
+    model_override: Any = None,
 ) -> Dict[str, any]:
     """
     Consult multiple AI tools in parallel and synthesize responses.
@@ -518,7 +552,9 @@ def consult_multi_agent(
             prompt,
             dry_run=dry_run,
             verbose=verbose,
-            printer=printer
+            printer=printer,
+            doc_type=doc_type,
+            model_override=model_override,
         )
         return {
             "success": success,
@@ -531,15 +567,25 @@ def consult_multi_agent(
             }]
         }
 
+    resolved_models = resolve_models_for_tools(
+        ordered_agents,
+        doc_type=doc_type,
+        override=model_override,
+    )
+
     if dry_run:
         if printer:
             printer.detail(f"Would consult {len(ordered_agents)} tools in parallel:")
             for tool in ordered_agents:
-                printer.detail(f"  - {tool}")
+                model = resolved_models.get(tool)
+                suffix = f" (model: {model})" if model else ""
+                printer.detail(f"  - {tool}{suffix}")
         else:
             print(f"Would consult {len(ordered_agents)} tools in parallel:")
             for tool in ordered_agents:
-                print(f"  - {tool}")
+                model = resolved_models.get(tool)
+                suffix = f" (model: {model})" if model else ""
+                print(f"  - {tool}{suffix}")
             sys.stdout.flush()
         return {"success": True, "responses": []}
 
@@ -569,7 +615,8 @@ def consult_multi_agent(
     start_time = time.time()
     multi_response = execute_tools_parallel(
         tools=ordered_agents,
-        prompt=prompt
+        prompt=prompt,
+        models=resolved_models,
     )
     total_duration = time.time() - start_time
 
@@ -642,7 +689,8 @@ def generate_architecture_docs(
     use_multi_agent: bool = True,
     dry_run: bool = False,
     verbose: bool = False,
-    printer: Optional['PrettyPrinter'] = None
+    printer: Optional['PrettyPrinter'] = None,
+    model_override: Any = None,
 ) -> Tuple[bool, Dict]:
     """
     Get architecture research findings from AI consultation.
@@ -663,7 +711,15 @@ def generate_architecture_docs(
     prompt = format_architecture_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("architecture", prompt, agents=None, dry_run=dry_run, verbose=verbose, printer=printer)
+        result = consult_multi_agent(
+            "architecture",
+            prompt,
+            agents=None,
+            dry_run=dry_run,
+            verbose=verbose,
+            printer=printer,
+            model_override=model_override,
+        )
         return result["success"], result
     else:
         if tool == "auto":
@@ -671,7 +727,15 @@ def generate_architecture_docs(
             if not tool:
                 return False, {"error": "No AI tools available"}
 
-        success, output = run_consultation(tool, prompt, dry_run, verbose, printer)
+        success, output = run_consultation(
+            tool,
+            prompt,
+            dry_run,
+            verbose,
+            printer,
+            doc_type="architecture",
+            model_override=model_override,
+        )
         return success, {"responses_by_tool": {tool: output} if success else {}}
 
 
@@ -683,7 +747,8 @@ def generate_ai_context_docs(
     use_multi_agent: bool = True,
     dry_run: bool = False,
     verbose: bool = False,
-    printer: Optional['PrettyPrinter'] = None
+    printer: Optional['PrettyPrinter'] = None,
+    model_override: Any = None,
 ) -> Tuple[bool, Dict]:
     """
     Get AI context research findings from AI consultation.
@@ -704,7 +769,15 @@ def generate_ai_context_docs(
     prompt = format_ai_context_research_prompt(context_summary, key_files, project_root)
 
     if use_multi_agent:
-        result = consult_multi_agent("ai_context", prompt, agents=None, dry_run=dry_run, verbose=verbose, printer=printer)
+        result = consult_multi_agent(
+            "ai_context",
+            prompt,
+            agents=None,
+            dry_run=dry_run,
+            verbose=verbose,
+            printer=printer,
+            model_override=model_override,
+        )
         return result["success"], result
     else:
         if tool == "auto":
@@ -712,5 +785,13 @@ def generate_ai_context_docs(
             if not tool:
                 return False, {"error": "No AI tools available"}
 
-        success, output = run_consultation(tool, prompt, dry_run, verbose, printer)
+        success, output = run_consultation(
+            tool,
+            prompt,
+            dry_run,
+            verbose,
+            printer,
+            doc_type="ai_context",
+            model_override=model_override,
+        )
         return success, {"responses_by_tool": {tool: output} if success else {}}

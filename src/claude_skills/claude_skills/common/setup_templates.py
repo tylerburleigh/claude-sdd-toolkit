@@ -75,6 +75,44 @@ def load_yaml_template(template_name: str) -> Any:
         return yaml.safe_load(template_file)
 
 
+def strip_template_metadata(data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Remove template metadata fields from a dictionary.
+
+    Template metadata fields are keys that start with an underscore (_). These
+    fields are used to document templates (e.g., _comment, _description,
+    _enabled_description) but should not be copied into actual configuration
+    files.
+
+    Args:
+        data: Dictionary potentially containing metadata fields
+
+    Returns:
+        New dictionary with metadata fields removed
+    """
+    return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+def load_json_template_clean(template_name: str) -> Any:
+    """
+    Load a JSON template and strip metadata fields.
+
+    This is a convenience wrapper around load_json_template() that automatically
+    removes fields starting with underscore (_) which are used for template
+    documentation but should not appear in actual configuration files.
+
+    Args:
+        template_name: Name of the template file to load
+
+    Returns:
+        Template data with metadata fields removed
+    """
+    data = load_json_template(template_name)
+    if isinstance(data, dict):
+        return strip_template_metadata(data)
+    return data
+
+
 def copy_template_to(
     template_name: str, destination: Path | str, *, overwrite: bool = False
 ) -> Path:
@@ -109,6 +147,8 @@ def copy_template_to(
 __all__ = [
     "get_template",
     "load_json_template",
+    "load_json_template_clean",
     "load_yaml_template",
+    "strip_template_metadata",
     "copy_template_to",
 ]

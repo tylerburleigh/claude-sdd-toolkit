@@ -74,7 +74,7 @@ class ExecutiveSummaryGenerator:
         >>> # summary = agent.run(prompt, spec_data)
     """
 
-    def __init__(self, spec_data: Dict[str, Any]):
+    def __init__(self, spec_data: Dict[str, Any], *, model_override: Any = None):
         """Initialize executive summary generator.
 
         Args:
@@ -83,6 +83,7 @@ class ExecutiveSummaryGenerator:
         self.spec_data = spec_data
         self.metadata = spec_data.get('metadata', {})
         self.hierarchy = spec_data.get('hierarchy', {})
+        self.model_override = model_override
 
     def build_summary_prompt(self) -> str:
         """Build AI prompt template for generating executive summary.
@@ -433,11 +434,19 @@ Please analyze the above spec data and generate the executive summary following 
 """
 
         # Build command from config
-        cmd = get_agent_command('sdd-render', agent_to_use, full_prompt)
+        cmd = get_agent_command(
+            'sdd-render',
+            agent_to_use,
+            full_prompt,
+            model_override=self.model_override,
+            context={"feature": "executive_summary"},
+        )
         timeout = get_timeout('sdd-render', 'default')
 
         if dry_run:
-            return True, f"Would run: {' '.join(cmd[:4])} <prompt ({len(full_prompt)} chars)>"
+            preview = " ".join(cmd[:4]) if len(cmd) >= 4 else " ".join(cmd)
+            model_note = f" [model_override={self.model_override}]" if self.model_override else ""
+            return True, f"Would run: {preview} <prompt ({len(full_prompt)} chars)>{model_note}"
 
         # Execute agent
         try:

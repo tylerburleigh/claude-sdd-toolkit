@@ -618,18 +618,32 @@ def get_agent_priority(skill_name: str, default_order: Optional[List[str]] = Non
     return default_order or ['gemini', 'cursor-agent', 'codex']
 
 
-def get_agent_command(skill_name: str, agent_name: str, prompt: str) -> List[str]:
+def get_agent_command(
+    skill_name: str,
+    agent_name: str,
+    prompt: str,
+    *,
+    model_override: Any = None,
+    context: Optional[Mapping[str, Any]] = None,
+) -> List[str]:
     """Build the command list for invoking an agent.
 
     Args:
         skill_name: Name of the skill
         agent_name: Name of the agent (gemini, cursor-agent, codex)
         prompt: The prompt to send to the agent
+        model_override: Optional explicit model override (string or mapping)
+        context: Optional context mapping used for contextual overrides
 
     Returns:
         List of command arguments for subprocess.run
     """
-    preferred_model = resolve_tool_model(skill_name, agent_name)
+    preferred_model = resolve_tool_model(
+        skill_name,
+        agent_name,
+        override=model_override,
+        context=context,
+    )
 
     try:
         return build_tool_command(agent_name, prompt, model=preferred_model)
