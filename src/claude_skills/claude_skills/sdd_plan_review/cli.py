@@ -10,6 +10,7 @@ import argparse
 import sys
 import json
 from pathlib import Path
+from typing import Optional
 from claude_skills.common import (
     PrettyPrinter,
     load_json_spec,
@@ -27,6 +28,46 @@ from claude_skills.sdd_plan_review.reporting import (
     generate_json_report,
 )
 from claude_skills.common.json_output import output_json
+
+
+def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
+    """
+    Normalize repeated model override arguments into a form accepted by ai_config.
+    """
+    if not values:
+        return None
+
+    overrides: dict[str, str] = {}
+    default_override: Optional[str] = None
+
+    for raw_value in values:
+        if not raw_value:
+            continue
+        entry = raw_value.strip()
+        if not entry:
+            continue
+
+        separator_index = -1
+        for separator in ("=", ":"):
+            if separator in entry:
+                separator_index = entry.find(separator)
+                break
+
+        if separator_index > 0:
+            key = entry[:separator_index].strip()
+            value = entry[separator_index + 1 :].strip()
+            if key and value:
+                overrides[key] = value
+            continue
+
+        default_override = entry
+
+    if overrides:
+        if default_override:
+            overrides.setdefault("default", default_override)
+        return overrides
+
+    return default_override
 
 
 def cmd_review(args, printer):
@@ -71,12 +112,16 @@ def cmd_review(args, printer):
 
     printer.info(f"Using {len(tools_to_use)} tool(s): {', '.join(tools_to_use)}")
 
+    model_override = _parse_model_override(getattr(args, "model", None))
+
     # Dry run mode
     if args.dry_run:
         printer.info("\n[DRY RUN MODE]")
         printer.detail(f"Would review: {spec_file}")
         printer.detail(f"Review type: {args.type}")
         printer.detail(f"Tools: {', '.join(tools_to_use)}")
+        if model_override:
+            printer.detail(f"Model override: {model_override}")
         printer.detail(f"Parallel: Yes")
         if args.output:
             printer.detail(f"Output: {args.output}")
@@ -112,13 +157,17 @@ def cmd_review(args, printer):
         review_type=args.type,
         spec_id=spec_id,
         spec_title=spec_title,
-        parallel=True
+        parallel=True,
+        model_override=model_override,
     )
 
     # Display execution summary
     printer.header("\nReview Complete")
     printer.info(f"Execution time: {results['execution_time']:.1f}s")
     printer.success(f"Models responded: {len(results['parsed_responses'])}/{len(tools_to_use)}")
+    resolved_models = results.get("models")
+    if resolved_models:
+        printer.detail(f"Resolved models: {resolved_models}")
 
     if results['failures']:
         printer.warning(f"Failed: {len(results['failures'])} tool(s)")
@@ -320,6 +369,12 @@ def register_plan_review(subparsers, parent_parser):
     parser_review.add_argument(
         '--tools',
         help='Comma-separated list of tools to use (e.g., gemini,codex)'
+    )
+    parser_review.add_argument(
+        '--model',
+        action='append',
+        metavar='MODEL',
+        help='Override model selection (repeat for per-tool overrides, e.g., gemini=gemini-pro)',
     )
     parser_review.add_argument(
         '--output',

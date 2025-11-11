@@ -6,11 +6,13 @@ implementation fidelity review use cases. Provides simplified API with
 fidelity-review-specific defaults and error handling.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple, Set, Callable, Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
+import json
 import re
+from copy import deepcopy
 
 from claude_skills.common.ai_tools import (
     ToolResponse,
@@ -33,6 +35,19 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+FIDELITY_SKILL_NAME = "sdd-fidelity-review"
+
+
+def _summarize_models_map(models_map: Mapping[str, Optional[str]]) -> Optional[str]:
+    """Convert a per-tool model map into a deterministic summary string."""
+    if not models_map:
+        return None
+    summary_parts = [
+        f"{tool}:{model if model is not None else 'none'}"
+        for tool, model in models_map.items()
+    ]
+    return "|".join(summary_parts) if summary_parts else None
+
 
 # Helper functions for config-driven behavior
 def get_fidelity_review_timeout() -> int:
@@ -41,7 +56,7 @@ def get_fidelity_review_timeout() -> int:
 
     Returns timeout in seconds from config file (defaults to 600).
     """
-    return ai_config.get_timeout('sdd-fidelity-review', 'consultation')
+    return ai_config.get_timeout(FIDELITY_SKILL_NAME, 'consultation')
 
 
 def get_enabled_fidelity_tools() -> Dict[str, Dict]:
@@ -50,7 +65,7 @@ def get_enabled_fidelity_tools() -> Dict[str, Dict]:
 
     Returns dictionary of tools where enabled: true in config.
     """
-    return ai_config.get_enabled_tools('sdd-fidelity-review')
+    return ai_config.get_enabled_tools(FIDELITY_SKILL_NAME)
 
 
 class FidelityVerdict(Enum):
@@ -83,26 +98,37 @@ class ParsedReviewResponse:
         issues: List of identified issues
         recommendations: List of suggested improvements
         summary: Brief summary of findings
-        raw_response: Original AI response text
-        confidence: Confidence level if extractable (0.0-1.0)
+        raw_response: Original AI response text when structured parsing fails
+        structured_response: Parsed JSON payload when available
+        provider: Tool/provider that produced the response
+        model: Model identifier if provided by the tool
     """
     verdict: FidelityVerdict
     issues: List[str] = field(default_factory=list)
     recommendations: List[str] = field(default_factory=list)
     summary: str = ""
-    raw_response: str = ""
-    confidence: Optional[float] = None
+    raw_response: Optional[str] = None
+    structured_response: Optional[Dict[str, Any]] = None
+    provider: Optional[str] = None
+    model: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
-        return {
+        data: Dict[str, Any] = {
             "verdict": self.verdict.value,
             "issues": self.issues,
             "recommendations": self.recommendations,
             "summary": self.summary,
-            "raw_response": self.raw_response,
-            "confidence": self.confidence
         }
+        if self.raw_response is not None:
+            data["raw_response"] = self.raw_response
+        if self.structured_response is not None:
+            data["structured_response"] = self.structured_response
+        if self.provider is not None:
+            data["provider"] = self.provider
+        if self.model is not None:
+            data["model"] = self.model
+        return data
 
 
 class ConsultationError(Exception):
@@ -118,6 +144,495 @@ class NoToolsAvailableError(ConsultationError):
 class ConsultationTimeoutError(ConsultationError):
     """Raised when consultation times out."""
     pass
+
+
+SECTION_HEADING_ISSUE_KEYWORDS = (
+    "issue",
+    "finding",
+    "concern",
+    "deviation",
+    "blocker",
+    "blocking",
+    "risk",
+    "problem",
+    "failure",
+)
+SECTION_HEADING_RECOMMENDATION_KEYWORDS = (
+    "recommendation",
+    "suggestion",
+    "next step",
+    "action",
+    "follow-up",
+    "remediation",
+    "mitigation",
+    "todo",
+    "fix",
+)
+ISSUE_KEYWORDS = (
+    "issue",
+    "problem",
+    "concern",
+    "bug",
+    "error",
+    "fail",
+    "failure",
+    "missing",
+    "absent",
+    "does not",
+    "not met",
+    "not satisfied",
+    "deviation",
+    "deviate",
+    "deviates",
+    "blocker",
+    "blocking",
+    "incomplete",
+    "incorrect",
+    "mismatch",
+    "violation",
+    "prevent",
+    "broken",
+    "lack",
+    "lacking",
+)
+RECOMMENDATION_KEYWORDS = (
+    "recommend",
+    "should",
+    "consider",
+    "suggest",
+    "ensure",
+    "add",
+    "implement",
+    "address",
+    "fix",
+    "resolve",
+    "mitigate",
+    "need to",
+    "must",
+    "propose",
+    "update",
+    "restore",
+    "provide",
+)
+ISSUE_PREFIXES = (
+    "blocking",
+    "critical",
+    "major",
+    "minor",
+    "deviation",
+    "issue",
+    "concern",
+    "failing",
+    "fails",
+    "failed",
+    "missing",
+    "broken",
+)
+RECOMMENDATION_PREFIXES = (
+    "recommend",
+    "recommendation",
+    "suggest",
+    "should",
+    "must",
+    "need to",
+    "consider",
+    "ensure",
+    "action",
+    "next step",
+)
+SHORT_RESPONSE_DENYLIST = {"yes", "no", "n/a", "none", "ok", "pass"}
+LIST_ITEM_PATTERN = re.compile(r'^\s*(?:[-*•‣▪◦]|\d+[.)])\s+(.*)$')
+HEADING_PATTERN = re.compile(r'^\s*(#{2,6})\s+(.+)$', re.MULTILINE)
+NEGATIVE_STATUS_TOKENS = (
+    "no",
+    "not",
+    "fail",
+    "failed",
+    "failure",
+    "missing",
+    "insufficient",
+    "inadequate",
+    "partial",
+    "block",
+    "blocked",
+    "deviation",
+    "deviates",
+    "doesn't",
+    "does not",
+    "did not",
+    "unable",
+)
+POSITIVE_STATUS_TOKENS = (
+    "yes",
+    "pass",
+    "passes",
+    "passed",
+    "met",
+    "complete",
+    "completed",
+    "sufficient",
+    "adequate",
+    "true",
+    "aligned",
+)
+
+
+def _strip_markdown_emphasis(text: str) -> str:
+    """Remove common markdown emphasis markers without altering content casing."""
+    if not text:
+        return ""
+    cleaned = text.strip()
+    cleaned = re.sub(r'\*\*(.+?)\*\*', r'\1', cleaned)
+    cleaned = re.sub(r'\*(.+?)\*', r'\1', cleaned)
+    cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)
+    cleaned = re.sub(r'\[(.+?)\]\((.*?)\)', r'\1', cleaned)
+    return re.sub(r'\s+', ' ', cleaned).strip()
+
+
+def _normalize_for_matching(text: str) -> str:
+    """Normalize text for deduplication and fuzzy matching."""
+    if not text:
+        return ""
+    return re.sub(r'\s+', ' ', text).strip().lower()
+
+
+def _classify_heading(heading: Optional[str]) -> Optional[str]:
+    """Classify section heading as issue or recommendation oriented."""
+    if not heading:
+        return None
+    heading_lower = heading.lower()
+    if any(keyword in heading_lower for keyword in SECTION_HEADING_ISSUE_KEYWORDS):
+        return "issue"
+    if any(keyword in heading_lower for keyword in SECTION_HEADING_RECOMMENDATION_KEYWORDS):
+        return "recommendation"
+    return None
+
+
+def _split_sections_by_heading(text: str) -> List[Tuple[Optional[str], str]]:
+    """
+    Split text into sections using markdown headings.
+
+    Returns list of (heading, section_text) pairs. Sections prior to the first
+    heading are returned with heading=None.
+    """
+    if not text.strip():
+        return []
+
+    sections: List[Tuple[Optional[str], str]] = []
+    matches = list(HEADING_PATTERN.finditer(text))
+
+    if not matches:
+        return [(None, text.strip())]
+
+    first_start = matches[0].start()
+    if first_start > 0:
+        preamble = text[:first_start].strip()
+        if preamble:
+            sections.append((None, preamble))
+
+    for index, match in enumerate(matches):
+        heading = match.group(2).strip()
+        section_start = match.end()
+        section_end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        section_text = text[section_start:section_end].strip()
+        sections.append((heading, section_text))
+
+    return sections
+
+
+def _extract_list_items(section_text: str) -> List[str]:
+    """
+    Extract bullet or numbered list items from section text.
+
+    Preserves multi-line items by joining continuation lines with spaces.
+    """
+    if not section_text:
+        return []
+
+    items: List[str] = []
+    current_parts: List[str] = []
+
+    for line in section_text.splitlines():
+        if not line.strip():
+            if current_parts:
+                items.append(" ".join(current_parts).strip())
+                current_parts = []
+            continue
+
+        match = LIST_ITEM_PATTERN.match(line)
+        if match:
+            if current_parts:
+                items.append(" ".join(current_parts).strip())
+            current_parts = [match.group(1).strip()]
+            continue
+
+        if current_parts and line.startswith((" ", "\t")):
+            current_parts.append(line.strip())
+        elif current_parts:
+            current_parts.append(line.strip())
+
+    if current_parts:
+        items.append(" ".join(current_parts).strip())
+
+    return [item for item in items if item]
+
+
+def _dedupe_preserve_order(items: List[str]) -> List[str]:
+    seen: Set[str] = set()
+    deduped: List[str] = []
+    for item in items:
+        normalized = _normalize_for_matching(item)
+        if normalized not in seen:
+            seen.add(normalized)
+            deduped.append(item)
+    return deduped
+
+
+def _strip_code_fences(text: str) -> str:
+    """Remove Markdown code fences if present."""
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return stripped
+
+    newline_index = stripped.find("\n")
+    if newline_index == -1:
+        return stripped.strip("`").strip()
+
+    content = stripped[newline_index + 1 :]
+    if content.endswith("```"):
+        content = content[:-3]
+    return content.strip()
+
+
+def _load_json_from_text(text: str) -> Optional[Any]:
+    """Attempt to parse JSON from the provided text or embedded code block."""
+    candidate = _strip_code_fences(text)
+
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt to parse first JSON object in text
+    start_obj = candidate.find("{")
+    end_obj = candidate.rfind("}")
+    if start_obj != -1 and end_obj != -1 and end_obj > start_obj:
+        try:
+            return json.loads(candidate[start_obj:end_obj + 1])
+        except json.JSONDecodeError:
+            pass
+
+    # Attempt to parse first JSON array
+    start_array = candidate.find("[")
+    end_array = candidate.rfind("]")
+    if start_array != -1 and end_array != -1 and end_array > start_array:
+        try:
+            return json.loads(candidate[start_array:end_array + 1])
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+
+def _coerce_verdict(value: Optional[str]) -> Optional[FidelityVerdict]:
+    """Convert a string verdict to the matching FidelityVerdict."""
+    if not value or not isinstance(value, str):
+        return None
+    normalized = value.strip().lower()
+    mapping = {
+        "pass": FidelityVerdict.PASS,
+        "fail": FidelityVerdict.FAIL,
+        "failed": FidelityVerdict.FAIL,
+        "failure": FidelityVerdict.FAIL,
+        "partial": FidelityVerdict.PARTIAL,
+        "unknown": FidelityVerdict.UNKNOWN,
+    }
+    return mapping.get(normalized)
+
+
+def _coerce_issue_entry(entry: Any) -> Optional[str]:
+    """Normalize issue entries from structured JSON responses."""
+    if isinstance(entry, str):
+        return entry.strip() or None
+
+    if isinstance(entry, dict):
+        candidate_fields = ["description", "detail", "text", "summary", "issue"]
+        text_value = None
+        for field in candidate_fields:
+            value = entry.get(field)
+            if isinstance(value, str) and value.strip():
+                text_value = value.strip()
+                break
+        if not text_value:
+            return None
+
+        severity = entry.get("severity")
+        if isinstance(severity, str) and severity.strip():
+            sev = severity.strip()
+            if not text_value.lower().startswith(sev.lower()):
+                text_value = f"{sev}: {text_value}"
+        return text_value
+
+    return None
+
+
+def _coerce_recommendation_entry(entry: Any) -> Optional[str]:
+    """Normalize recommendation entries from structured JSON responses."""
+    if isinstance(entry, str):
+        return entry.strip() or None
+
+    if isinstance(entry, dict):
+        candidate_fields = ["description", "detail", "text", "recommendation", "summary"]
+        for field in candidate_fields:
+            value = entry.get(field)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+    return None
+
+
+def _score_keywords(text: str, keywords: tuple[str, ...]) -> int:
+    """Count keyword matches within text for heuristic scoring."""
+    return sum(1 for keyword in keywords if keyword in text)
+
+
+def _is_negative_status(text: Optional[str]) -> bool:
+    if not text or not isinstance(text, str):
+        return False
+    lowered = text.strip().lower()
+    if any(token in lowered for token in NEGATIVE_STATUS_TOKENS):
+        return True
+    if any(token == lowered for token in POSITIVE_STATUS_TOKENS):
+        return False
+    return False
+
+
+def _is_positive_status(text: Optional[str]) -> bool:
+    if not text or not isinstance(text, str):
+        return False
+    lowered = text.strip().lower()
+    return any(token == lowered for token in POSITIVE_STATUS_TOKENS)
+
+
+def _extract_structured_json_insights(
+    payload: Dict[str, Any],
+    add_issue: Callable[[str], None],
+    add_recommendation: Callable[[str], None],
+) -> None:
+    def _combine_message(label: str, answer: Optional[str], details: Optional[str]) -> str:
+        parts = [label]
+        if isinstance(answer, str) and answer.strip():
+            parts.append(answer.strip())
+        if isinstance(details, str) and details.strip():
+            parts.append(details.strip())
+        return ": ".join(parts) if len(parts) > 1 else parts[0]
+
+    def _handle_section(label: str, section: Any, status_keys: Tuple[str, ...] = ("answer", "status", "met", "result")) -> None:
+        if not isinstance(section, dict):
+            return
+        answer = None
+        for key in status_keys:
+            if key in section:
+                candidate = section[key]
+                if isinstance(candidate, str) and candidate.strip():
+                    answer = candidate
+                    break
+        details = None
+        for key in ("details", "comment", "note", "explanation", "reason"):
+            if key in section and isinstance(section[key], str) and section[key].strip():
+                details = section[key]
+                break
+
+        if answer and _is_positive_status(answer):
+            return
+
+        candidate_texts = []
+        candidate_texts.append(_combine_message(label, answer, details))
+
+        if answer and _is_negative_status(answer):
+            add_issue(candidate_texts[-1])
+        elif details and _is_negative_status(details):
+            add_issue(candidate_texts[-1])
+
+    _handle_section("Requirement alignment", payload.get("requirement_alignment"))
+    _handle_section("Success criteria", payload.get("success_criteria"))
+    _handle_section("Test coverage", payload.get("test_coverage"))
+    _handle_section("Documentation", payload.get("documentation"))
+
+    code_quality = payload.get("code_quality")
+    if isinstance(code_quality, dict):
+        issues_list = code_quality.get("issues")
+        if isinstance(issues_list, list):
+            for entry in issues_list:
+                issue_text = _coerce_issue_entry(entry)
+                if issue_text:
+                    add_issue(issue_text)
+        cq_details = code_quality.get("details")
+        if isinstance(cq_details, str) and cq_details.strip() and _is_negative_status(cq_details):
+            add_issue(f"Code quality: {cq_details.strip()}")
+
+    deviations = payload.get("deviations")
+    if isinstance(deviations, list):
+        for entry in deviations:
+            issue_text = _coerce_issue_entry(entry)
+            if issue_text:
+                add_issue(issue_text)
+
+    follow_up_keys = ("next_steps", "actions", "follow_ups", "follow_up_actions", "remediations")
+    for key in follow_up_keys:
+        value = payload.get(key)
+        if isinstance(value, list):
+            for entry in value:
+                rec_text = _coerce_recommendation_entry(entry)
+                if rec_text:
+                    add_recommendation(rec_text)
+        elif isinstance(value, str) and value.strip():
+            add_recommendation(value.strip())
+
+
+def _classify_list_item(text: str, section_hint: Optional[str]) -> Optional[str]:
+    """
+    Classify list item as issue or recommendation using heuristics.
+
+    Considers section headings, severity prefixes, and keyword presence while
+    avoiding overly short benign responses.
+    """
+    normalized = _normalize_for_matching(text)
+    if not normalized:
+        return None
+    if len(normalized.replace(" ", "")) < 6:
+        return None
+    if normalized in SHORT_RESPONSE_DENYLIST:
+        return None
+
+    section_type = section_hint
+    issue_score = 0
+    recommendation_score = 0
+
+    if section_type == "issue":
+        issue_score += 2
+    elif section_type == "recommendation":
+        recommendation_score += 2
+
+    if any(normalized.startswith(prefix) for prefix in ISSUE_PREFIXES):
+        issue_score += 2
+    if any(normalized.startswith(prefix) for prefix in RECOMMENDATION_PREFIXES):
+        recommendation_score += 2
+
+    issue_score += _score_keywords(normalized, ISSUE_KEYWORDS)
+    recommendation_score += _score_keywords(normalized, RECOMMENDATION_KEYWORDS)
+
+    if issue_score == recommendation_score == 0:
+        if section_type and len(normalized.split()) >= 5:
+            return section_type
+        return None
+
+    if issue_score > recommendation_score:
+        return "issue"
+    if recommendation_score > issue_score:
+        return "recommendation"
+
+    return section_type or ("issue" if issue_score > 0 else None)
 
 
 def consult_ai_on_fidelity(
@@ -174,11 +689,18 @@ def consult_ai_on_fidelity(
                 "Please install it or choose a different tool."
             )
 
+        # Resolve model configuration (explicit CLI arg wins over config)
+        resolved_model = ai_config.resolve_tool_model(
+            FIDELITY_SKILL_NAME,
+            tool,
+            override=model,
+        )
+
         # Execute consultation
         response = execute_tool(
             tool=tool,
             prompt=prompt,
-            model=model,
+            model=resolved_model,
             timeout=timeout
         )
 
@@ -258,54 +780,8 @@ def consult_multiple_ai_on_fidelity(
     """
     # Check cache if enabled and cache_key_params provided
     cache_enabled = use_cache if use_cache is not None else (_CACHE_AVAILABLE and is_cache_enabled())
-    cached_responses = None
-    cache_key = None  # Initialize cache_key for use in both lookup and save
-    cache = None  # Initialize cache instance for reuse
-
-    if cache_enabled and cache_key_params and _CACHE_AVAILABLE:
-        try:
-            cache = CacheManager()
-            cache_key = generate_fidelity_review_key(
-                spec_id=cache_key_params.get("spec_id", ""),
-                scope=cache_key_params.get("scope", ""),
-                target=cache_key_params.get("target", ""),
-                file_paths=cache_key_params.get("file_paths"),
-                model=model
-            )
-
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                logger.info("Cache hit: Using cached AI consultation results")
-                # Emit cache_check event (cache hit)
-                if progress_emitter:
-                    progress_emitter.emit("cache_check", {
-                        "cache_hit": True,
-                        "cache_key": cache_key[:32] + "...",
-                        "num_responses": len(cached_data)
-                    })
-                # Reconstruct ToolResponse objects from cached data
-                cached_responses = []
-                for resp_data in cached_data:
-                    cached_responses.append(ToolResponse(
-                        tool=resp_data["tool"],
-                        status=ToolStatus(resp_data["status"]),
-                        output=resp_data["output"],
-                        error=resp_data.get("error"),
-                        exit_code=resp_data.get("exit_code"),
-                        model=resp_data.get("model"),
-                        metadata=resp_data.get("metadata", {})
-                    ))
-                return cached_responses
-            else:
-                logger.debug("Cache miss: Will consult AI tools and cache results")
-                # Emit cache_check event (cache miss)
-                if progress_emitter:
-                    progress_emitter.emit("cache_check", {
-                        "cache_hit": False,
-                        "cache_key": cache_key[:32] + "..."
-                    })
-        except Exception as e:
-            logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
+    cache_key = None
+    cache = None
 
     try:
         # If no tools specified, detect available tools and filter by config
@@ -346,17 +822,79 @@ def consult_multiple_ai_on_fidelity(
             unavailable = set(tools) - set(available_tools)
             logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
 
+        resolved_models_map = ai_config.resolve_models_for_tools(
+            FIDELITY_SKILL_NAME,
+            available_tools,
+            override=model,
+        )
+        models_summary = _summarize_models_map(resolved_models_map)
+        models_payload = dict(resolved_models_map)
+
+        if cache_enabled and cache_key_params and _CACHE_AVAILABLE:
+            try:
+                cache = cache or CacheManager()
+                cache_key = generate_fidelity_review_key(
+                    spec_id=cache_key_params.get("spec_id", ""),
+                    scope=cache_key_params.get("scope", ""),
+                    target=cache_key_params.get("target", ""),
+                    file_paths=cache_key_params.get("file_paths"),
+                    models=resolved_models_map,
+                    model=model,
+                )
+
+                cached_data = cache.get(cache_key)
+                if cached_data:
+                    logger.info("Cache hit: Using cached AI consultation results")
+                    if progress_emitter:
+                        progress_emitter.emit("cache_check", {
+                            "cache_hit": True,
+                            "cache_key": cache_key[:32] + "...",
+                            "num_responses": len(cached_data),
+                            "models": models_payload,
+                            "models_summary": models_summary,
+                        })
+                    cached_responses = [
+                        ToolResponse(
+                            tool=resp_data["tool"],
+                            status=ToolStatus(resp_data["status"]),
+                            output=resp_data["output"],
+                            error=resp_data.get("error"),
+                            exit_code=resp_data.get("exit_code"),
+                            model=resp_data.get("model"),
+                            metadata=resp_data.get("metadata", {})
+                        )
+                        for resp_data in cached_data
+                    ]
+                    return cached_responses
+                else:
+                    logger.debug("Cache miss: Will consult AI tools and cache results")
+                    if progress_emitter:
+                        progress_emitter.emit("cache_check", {
+                            "cache_hit": False,
+                            "cache_key": cache_key[:32] + "...",
+                            "models": models_payload,
+                            "models_summary": models_summary,
+                        })
+            except Exception as e:
+                logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
+
         # Emit ai_consultation event before calling AI tools
         if progress_emitter:
             progress_emitter.emit("ai_consultation", {
                 "tools": available_tools,
-                "model": model,
+                "model": models_summary,
+                "models_summary": models_summary,
+                "models": models_payload,
                 "timeout": timeout
             })
 
         # Execute consultations in parallel
-        # Convert single model string to models dict if provided
-        models_dict = {tool: model for tool in available_tools} if model else None
+        models_dict_raw = {
+            tool: resolved_model
+            for tool, resolved_model in resolved_models_map.items()
+            if resolved_model
+        }
+        models_dict = models_dict_raw if models_dict_raw else None
         multi_response = execute_tools_parallel(
             tools=available_tools,
             prompt=prompt,
@@ -373,6 +911,8 @@ def consult_multiple_ai_on_fidelity(
                     "tool": resp.tool,
                     "status": resp.status.value,
                     "model": resp.model,
+                    "models_summary": models_summary,
+                    "models": models_payload,
                     "has_error": resp.error is not None,
                     "output_length": len(resp.output) if resp.output else 0
                 })
@@ -402,14 +942,18 @@ def consult_multiple_ai_on_fidelity(
                         progress_emitter.emit("cache_save", {
                             "success": True,
                             "cache_key": cache_key[:32] + "...",
-                            "num_responses": len(serialized_responses)
+                            "num_responses": len(serialized_responses),
+                            "models_summary": models_summary,
+                            "models": models_payload,
                         })
                 else:
                     logger.warning("Failed to save consultation results to cache")
                     if progress_emitter:
                         progress_emitter.emit("cache_save", {
                             "success": False,
-                            "cache_key": cache_key[:32] + "..."
+                            "cache_key": cache_key[:32] + "...",
+                            "models_summary": models_summary,
+                            "models": models_payload,
                         })
             except Exception as e:
                 logger.warning(f"Failed to save consultation results to cache: {e}")
@@ -417,7 +961,9 @@ def consult_multiple_ai_on_fidelity(
                 if progress_emitter:
                     progress_emitter.emit("cache_save", {
                         "success": False,
-                        "error": str(e)
+                        "error": str(e),
+                        "models_summary": models_summary,
+                        "models": models_payload,
                     })
                 # Continue without caching - non-fatal error
 
@@ -436,7 +982,9 @@ def consult_multiple_ai_on_fidelity(
             progress_emitter.emit("complete", {
                 "total_responses": len(responses),
                 "successful": successful,
-                "failed": len(responses) - successful
+                "failed": len(responses) - successful,
+                "models_summary": models_summary,
+                "models": models_payload,
             })
 
         return responses
@@ -530,6 +1078,9 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         ...     print(f"- {issue}")
     """
     # Handle both string input and ToolResponse objects
+    provider_name: Optional[str] = None
+    model_name: Optional[str] = None
+
     if isinstance(response, str):
         output = response.strip()
         success = True
@@ -538,13 +1089,33 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         output = response.output.strip() if response.output else ""
         success = response.success
         error = response.error
+        provider_name = response.tool
+        model_name = response.model
 
     # Initialize with defaults
     verdict = FidelityVerdict.UNKNOWN
-    issues = []
-    recommendations = []
+    issues: List[str] = []
+    recommendations: List[str] = []
     summary = ""
-    confidence = None
+
+    issue_seen: Set[str] = set()
+    recommendation_seen: Set[str] = set()
+
+    def add_issue(candidate: str) -> None:
+        cleaned_candidate = _strip_markdown_emphasis(candidate)
+        normalized_candidate = _normalize_for_matching(cleaned_candidate)
+        if not normalized_candidate or normalized_candidate in issue_seen:
+            return
+        issue_seen.add(normalized_candidate)
+        issues.append(cleaned_candidate)
+
+    def add_recommendation(candidate: str) -> None:
+        cleaned_candidate = _strip_markdown_emphasis(candidate)
+        normalized_candidate = _normalize_for_matching(cleaned_candidate)
+        if not normalized_candidate or normalized_candidate in recommendation_seen:
+            return
+        recommendation_seen.add(normalized_candidate)
+        recommendations.append(cleaned_candidate)
 
     # If response failed, return early with UNKNOWN verdict
     if not success:
@@ -554,20 +1125,62 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             recommendations=[],
             summary="Unable to complete review due to tool failure",
             raw_response=output,
-            confidence=0.0
+            provider=provider_name,
+            model=model_name
         )
 
-    # Extract verdict using pattern matching
-    verdict_patterns = [
-        (r'\b(PASS|PASSED|PASSES)\b', FidelityVerdict.PASS),
-        (r'\b(FAIL|FAILED|FAILS|FAILURE)\b', FidelityVerdict.FAIL),
-        (r'\b(PARTIAL|PARTIALLY)\b', FidelityVerdict.PARTIAL),
-    ]
+    json_payload = _load_json_from_text(output)
+    structured_payload: Optional[Dict[str, Any]] = None
+    summary_provided = False
 
-    for pattern, verdict_value in verdict_patterns:
-        if re.search(pattern, output, re.IGNORECASE):
-            verdict = verdict_value
-            break
+    if isinstance(json_payload, dict):
+        if (
+            "response" in json_payload
+            and isinstance(json_payload["response"], str)
+        ):
+            nested_payload = _load_json_from_text(json_payload["response"])
+            if isinstance(nested_payload, dict):
+                json_payload = nested_payload
+
+        verdict_from_json = _coerce_verdict(json_payload.get("verdict"))
+        if verdict_from_json is not None:
+            verdict = verdict_from_json
+
+        json_summary = json_payload.get("summary")
+        if isinstance(json_summary, str) and json_summary.strip():
+            summary = json_summary.strip()
+            summary_provided = True
+
+        json_issues = json_payload.get("issues")
+        if isinstance(json_issues, list):
+            for entry in json_issues:
+                issue_text = _coerce_issue_entry(entry)
+                if issue_text:
+                    add_issue(issue_text)
+
+        json_recommendations = json_payload.get("recommendations")
+        if isinstance(json_recommendations, list):
+            for entry in json_recommendations:
+                rec_text = _coerce_recommendation_entry(entry)
+                if rec_text:
+                    add_recommendation(rec_text)
+
+        _extract_structured_json_insights(json_payload, add_issue, add_recommendation)
+
+        structured_payload = deepcopy(json_payload)
+
+    # Extract verdict using pattern matching
+    if verdict is FidelityVerdict.UNKNOWN:
+        verdict_patterns = [
+            (r'\b(PASS|PASSED|PASSES)\b', FidelityVerdict.PASS),
+            (r'\b(FAIL|FAILED|FAILS|FAILURE)\b', FidelityVerdict.FAIL),
+            (r'\b(PARTIAL|PARTIALLY)\b', FidelityVerdict.PARTIAL),
+        ]
+
+        for pattern, verdict_value in verdict_patterns:
+            if re.search(pattern, output, re.IGNORECASE):
+                verdict = verdict_value
+                break
 
     # Heuristic: If "PASS" appears but also mentions issues/concerns, mark as PARTIAL
     # But exclude phrases like "no issues", "no problems", etc.
@@ -586,66 +1199,88 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             if any(keyword in output_lower for keyword in concern_keywords):
                 verdict = FidelityVerdict.PARTIAL
 
-    # Extract issues (look for common patterns)
-    issue_patterns = [
-        r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|$)',
-        r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|$)',
-        r'[-•*]\s*Issue:\s*(.+?)(?:\n|$)',
-    ]
+    normalized_output = output.replace("\r\n", "\n")
 
-    for pattern in issue_patterns:
-        matches = re.finditer(pattern, output, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            issue_text = match.group(1).strip()
-            # Split on bullet points if multiple issues in one match
-            sub_issues = re.split(r'\n[-•*]\s*', issue_text)
-            issues.extend([i.strip() for i in sub_issues if i.strip()])
+    # Extract structured sections using headings and list heuristics
+    sections = _split_sections_by_heading(normalized_output)
+    allow_issue_extraction = not issues
+    allow_recommendation_extraction = not recommendations
+    if allow_issue_extraction or allow_recommendation_extraction:
+        for heading, section_text in sections:
+            section_hint = _classify_heading(heading)
+            items = _extract_list_items(section_text)
 
-    # Extract recommendations (look for common patterns)
-    rec_patterns = [
-        r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|$)',
-        r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|$)',
-        r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|$)',
-    ]
+            if not items and section_hint in {"issue", "recommendation"}:
+                # Split paragraph text into meaningful chunks when no explicit list exists
+                items = [
+                    chunk.strip()
+                    for chunk in re.split(r'\n\s*\n', section_text)
+                    if chunk and chunk.strip()
+                ]
 
-    for pattern in rec_patterns:
-        matches = re.finditer(pattern, output, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            rec_text = match.group(1).strip()
-            # Split on bullet points if multiple recommendations in one match
-            sub_recs = re.split(r'\n[-•*]\s*', rec_text)
-            recommendations.extend([r.strip() for r in sub_recs if r.strip()])
+            for item in items:
+                classification = _classify_list_item(item, section_hint)
+                if allow_issue_extraction and classification == "issue":
+                    add_issue(item)
+                elif allow_recommendation_extraction and classification == "recommendation":
+                    add_recommendation(item)
 
-    # Extract summary (first paragraph or first 200 chars)
-    summary_match = re.match(r'^(.+?)(?:\n\n|\n#|$)', output, re.DOTALL)
-    if summary_match:
-        summary = summary_match.group(1).strip()
-        if len(summary) > 200:
-            summary = summary[:197] + "..."
-    else:
-        summary = output[:200] + "..." if len(output) > 200 else output
+    # Fallback to legacy regex extraction for backward compatibility
+    if not issues:
+        issue_patterns = [
+            r'(?:Issue|Problem|Concern|Error)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+            r'(?:Found|Identified)\s+(?:the following\s+)?(?:issue|problem)(?:s)?:\s*\n?(.+?)(?:\n\n|\Z)',
+            r'[-•*]\s*Issue:\s*(.+?)(?:\n|\Z)',
+        ]
 
-    # Extract confidence if mentioned (0-100% or 0.0-1.0)
-    confidence_match = re.search(
-        r'(?:confidence|certainty):\s*(\d+(?:\.\d+)?)\s*%?',
-        output,
-        re.IGNORECASE
-    )
-    if confidence_match:
-        conf_value = float(confidence_match.group(1))
-        # Normalize to 0.0-1.0 range
-        if conf_value > 1.0:
-            confidence = conf_value / 100.0
+        for pattern in issue_patterns:
+            matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                issue_text = match.group(1).strip()
+                sub_issues = re.split(r'\n[-•*]\s*', issue_text)
+                for sub_issue in sub_issues:
+                    if sub_issue.strip():
+                        add_issue(sub_issue)
+
+    if not recommendations:
+        rec_patterns = [
+            r'(?:Recommendation|Suggest|Should)(?:s)?:\s*\n?[-•*]?\s*(.+?)(?:\n\n|\n[-•*]|\Z)',
+            r'(?:I recommend|It is recommended|Consider)\s+(.+?)(?:\n|\Z)',
+            r'[-•*]\s*Recommendation:\s*(.+?)(?:\n|\Z)',
+        ]
+
+        for pattern in rec_patterns:
+            matches = re.finditer(pattern, normalized_output, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                rec_text = match.group(1).strip()
+                sub_recs = re.split(r'\n[-•*]\s*', rec_text)
+                for sub_rec in sub_recs:
+                    if sub_rec.strip():
+                        add_recommendation(sub_rec)
+
+    # Extract summary (first paragraph with generous cap)
+    if not summary_provided:
+        summary_segments = [
+            segment.strip()
+            for segment in re.split(r'\n\s*\n', normalized_output, maxsplit=1)
+            if segment and segment.strip()
+        ]
+        if summary_segments:
+            summary = summary_segments[0]
         else:
-            confidence = conf_value
+            summary = normalized_output.strip()
+
+    final_raw_response = None if structured_payload is not None else (output if output else None)
 
     return ParsedReviewResponse(
         verdict=verdict,
         issues=issues,
         recommendations=recommendations,
         summary=summary,
-        raw_response=output,
-        confidence=confidence
+        raw_response=final_raw_response,
+        structured_response=structured_payload,
+        provider=provider_name,
+        model=model_name
     )
 
 
@@ -776,35 +1411,51 @@ def detect_consensus(
 
     # 2. Collect all issues and count occurrences
     issue_counts: Dict[str, int] = {}
+    issue_order: List[str] = []
+    issue_originals: Dict[str, str] = {}
     for response in parsed_responses:
         for issue in response.issues:
-            # Normalize: lowercase and strip whitespace
-            normalized_issue = issue.lower().strip()
-            issue_counts[normalized_issue] = issue_counts.get(normalized_issue, 0) + 1
+            cleaned_issue = issue.strip()
+            normalized_issue = _normalize_for_matching(cleaned_issue)
+            if not normalized_issue:
+                continue
+            if normalized_issue not in issue_counts:
+                issue_counts[normalized_issue] = 0
+                issue_originals[normalized_issue] = cleaned_issue
+                issue_order.append(normalized_issue)
+            issue_counts[normalized_issue] += 1
 
     # 3. Identify consensus issues (mentioned by >= min_agreement models)
-    consensus_issues = []
-    all_issues = []
-    for issue, count in issue_counts.items():
-        if count >= min_agreement:
-            consensus_issues.append(issue)
-        all_issues.append(issue)
+    consensus_issues = _dedupe_preserve_order([
+        issue_originals[norm]
+        for norm in issue_order
+        if issue_counts.get(norm, 0) >= min_agreement
+    ])
+    all_issues = _dedupe_preserve_order([issue_originals[norm] for norm in issue_order])
 
     # 4. Collect all recommendations and count occurrences
     rec_counts: Dict[str, int] = {}
+    rec_order: List[str] = []
+    rec_originals: Dict[str, str] = {}
     for response in parsed_responses:
         for rec in response.recommendations:
-            # Normalize: lowercase and strip whitespace
-            normalized_rec = rec.lower().strip()
-            rec_counts[normalized_rec] = rec_counts.get(normalized_rec, 0) + 1
+            cleaned_rec = rec.strip()
+            normalized_rec = _normalize_for_matching(cleaned_rec)
+            if not normalized_rec:
+                continue
+            if normalized_rec not in rec_counts:
+                rec_counts[normalized_rec] = 0
+                rec_originals[normalized_rec] = cleaned_rec
+                rec_order.append(normalized_rec)
+            rec_counts[normalized_rec] += 1
 
     # 5. Identify consensus recommendations (mentioned by >= min_agreement models)
-    consensus_recommendations = []
-    all_recommendations = []
-    for rec, count in rec_counts.items():
-        if count >= min_agreement:
-            consensus_recommendations.append(rec)
-        all_recommendations.append(rec)
+    consensus_recommendations = _dedupe_preserve_order([
+        rec_originals[norm]
+        for norm in rec_order
+        if rec_counts.get(norm, 0) >= min_agreement
+    ])
+    all_recommendations = _dedupe_preserve_order([rec_originals[norm] for norm in rec_order])
 
     return ConsensusResult(
         consensus_verdict=consensus_verdict,

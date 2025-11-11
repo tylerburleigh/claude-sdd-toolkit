@@ -90,12 +90,6 @@ sdd fidelity-review <spec-id> --task <task-id>
 sdd fidelity-review <spec-id> --phase <phase-id>
 ```
 
-**Output Location (Automatic):**
-- The CLI writes a synthesized consensus Markdown report (not raw AI transcripts) to `specs/.fidelity-reviews/`. Each file captures the JSON summary you return—review scope, consensus findings, deviations, recommendations, and metadata—so downstream agents can inspect the full consensus context without rerunning the review.
-- Task reviews: `specs/.fidelity-reviews/<spec-id>-task-<task-id>-fidelity-review.md`
-- Phase reviews: `specs/.fidelity-reviews/<spec-id>-phase-<phase-id>-fidelity-review.md`
-- Always reference the auto-generated filename when reporting results so the caller can connect the CLI’s JSON output, your summarized response, and the persisted Markdown artifact.
-
 ### Step 3: Execute CLI Command
 
 Use the Bash tool to execute the constructed command:
@@ -149,7 +143,7 @@ The CLI returns JSON output with the structure:
 }
 ```
 
-Parse this JSON, surface the structured findings directly to the invoking workflow, and include a link or path to the stored Markdown consensus report. The agent’s responsibility is to faithfully relay the CLI’s assessed deviations, recommendations, consensus signals, and metadata—perform validation/formatting as needed, but do not introduce any new analysis beyond what the CLI returned. Do not open or read the saved Markdown artifact; simply point the caller to its location.
+Parse this JSON, surface the structured findings directly to the invoking workflow, and include a link or path to the saved JSON report. The agent’s responsibility is to faithfully relay the CLI’s assessed deviations, recommendations, consensus signals, and metadata—perform validation/formatting as needed, but do not introduce any new analysis beyond what the CLI returned. Do not open or read the saved artifact; simply point the caller to its location.
 
 ## Report Structure
 
@@ -246,8 +240,8 @@ Fidelity review generates a detailed report comparing implementation against spe
 
 **Usage Pattern:**
 1. Skill executes `sdd fidelity-review` CLI tool
-2. CLI analyzes implementation, generates JSON output, and saves the consensus Markdown report
-3. Skill parses the JSON, presents the summarized findings, and surfaces the stored report path to the caller
+2. CLI analyzes implementation, generates JSON output, and saves both the JSON and Markdown consensus reports in `.fidelity-reviews/`
+3. Skill parses the JSON, presents the summarized findings, and surfaces the stored report paths to the caller
 
 ## Fidelity Assessment
 
@@ -282,7 +276,7 @@ Specified features not implemented:
 ✅ Highlight recommendations for remediation
 ✅ Note AI consensus from multiple tool perspectives
 ✅ Provide context from the fidelity assessment
-✅ Surface the saved Markdown report path so the caller can inspect the full consensus artifact
+✅ Surface the saved JSON and Markdown report paths so the caller can inspect the full consensus artifacts
 
 ### DON'T
 ❌ Attempt to manually implement review logic (CLI handles it)

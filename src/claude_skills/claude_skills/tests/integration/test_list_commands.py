@@ -69,7 +69,7 @@ class TestListSpecsCLI:
         spec_file.write_text(json.dumps(spec_data, indent=2))
 
         # Run list-specs command (text output is default)
-        result = run_cli("--path", str(specs_dir), "list-specs",
+        result = run_cli("--no-json", "--path", str(specs_dir), "list-specs",
             capture_output=True,
             text=True
         )
@@ -145,7 +145,7 @@ class TestListSpecsCLI:
         active_dir.mkdir(parents=True)
 
         # Run list-specs on empty directory
-        result = run_cli("--path", str(specs_dir), "list-specs",
+        result = run_cli("--no-json", "--path", str(specs_dir), "list-specs",
             capture_output=True,
             text=True
         )

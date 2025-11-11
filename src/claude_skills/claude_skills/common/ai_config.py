@@ -9,8 +9,9 @@ This module provides a common interface for all skills to load their AI tool con
 """
 
 import yaml
+from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from claude_skills.common.ai_tools import build_tool_command
 
@@ -61,6 +62,25 @@ DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
 }
 
 
+def _normalize_priority_entry(entry: object) -> List[str]:
+    """Normalize model priority definition to a clean list of strings."""
+    if isinstance(entry, dict):
+        values = entry.get("priority")
+        return _normalize_priority_entry(values)
+    if isinstance(entry, (list, tuple)):
+        normalized: List[str] = []
+        for item in entry:
+            if isinstance(item, str):
+                stripped = item.strip()
+                if stripped:
+                    normalized.append(stripped)
+        return normalized
+    if isinstance(entry, str):
+        stripped = entry.strip()
+        return [stripped] if stripped else []
+    return []
+
+
 def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
     """Remove duplicates while preserving the original order."""
     seen: set[str] = set()
@@ -75,6 +95,321 @@ def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
         result.append(normalized)
     return result
 
+
+def _normalize_context_values(value: Any) -> List[str]:
+    """Normalize context values into a list of comparable strings."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        stripped = value.strip()
+        return [stripped, stripped.lower()] if stripped else []
+    if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+        results: List[str] = []
+        for item in value:
+            if isinstance(item, str):
+                stripped = item.strip()
+                if stripped:
+                    results.extend([stripped, stripped.lower()])
+            elif item is not None:
+                as_str = str(item).strip()
+                if as_str:
+                    results.extend([as_str, as_str.lower()])
+        # Preserve order but dedupe
+        deduped: List[str] = []
+        seen: set[str] = set()
+        for candidate in results:
+            if candidate not in seen:
+                seen.add(candidate)
+                deduped.append(candidate)
+        return deduped
+    # Fallback to string representation
+    as_str = str(value).strip()
+    return [as_str, as_str.lower()] if as_str else []
+
+
+def _extract_priority_from_value(value: Any, tool: str) -> List[str]:
+    """Extract a normalized priority list from a configuration value."""
+    if isinstance(value, Mapping):
+        if tool in value:
+            return _extract_priority_from_value(value[tool], tool)
+        tool_lower = tool.lower()
+        if tool_lower in value:
+            return _extract_priority_from_value(value[tool_lower], tool)
+        if "priority" in value:
+            return _normalize_priority_entry(value.get("priority"))
+        # Dictionaries with a single value might just wrap the priority.
+        if len(value) == 1:
+            only_value = next(iter(value.values()))
+            return _extract_priority_from_value(only_value, tool)
+    return _normalize_priority_entry(value)
+
+
+def _extract_override_priority(
+    overrides_config: Any,
+    tool: str,
+    context: Optional[Mapping[str, Any]],
+) -> List[str]:
+    """Attempt to resolve contextual override priorities for a tool."""
+    if not isinstance(overrides_config, Mapping):
+        return []
+
+    direct_priority = _extract_priority_from_value(overrides_config.get(tool), tool)
+    if direct_priority:
+        return direct_priority
+
+    direct_priority = _extract_priority_from_value(
+        overrides_config.get(tool.lower()), tool
+    )
+    if direct_priority:
+        return direct_priority
+
+    if context:
+        for context_key, context_value in context.items():
+            key_map = overrides_config.get(context_key)
+            if not isinstance(key_map, Mapping):
+                key_map = overrides_config.get(context_key.lower())
+            if not isinstance(key_map, Mapping):
+                continue
+
+            candidate_keys = _normalize_context_values(context_value)
+            for candidate_key in candidate_keys:
+                if not candidate_key:
+                    continue
+                candidate_value = key_map.get(candidate_key)
+                if candidate_value is None:
+                    candidate_value = key_map.get(candidate_key.lower())
+                priority = _extract_priority_from_value(candidate_value, tool)
+                if priority:
+                    return priority
+
+            for fallback_key in ("*", "default", "__default__"):
+                candidate_value = key_map.get(fallback_key)
+                priority = _extract_priority_from_value(candidate_value, tool)
+                if priority:
+                    return priority
+
+    for fallback_key in ("*", "default", "__default__"):
+        candidate_value = overrides_config.get(fallback_key)
+        priority = _extract_priority_from_value(candidate_value, tool)
+        if priority:
+            return priority
+
+    return []
+
+
+def _extract_model_priority(
+    models_config: Any,
+    tool: str,
+    context: Optional[Mapping[str, Any]] = None,
+) -> List[str]:
+    """Extract model priority list for a tool using configuration and context."""
+    if isinstance(models_config, Mapping):
+        overrides = models_config.get("overrides")
+        override_priority = _extract_override_priority(overrides, tool, context)
+        if override_priority:
+            return override_priority
+
+        base_priority = _extract_priority_from_value(models_config.get(tool), tool)
+        if base_priority:
+            return base_priority
+
+        base_priority = _extract_priority_from_value(models_config.get(tool.lower()), tool)
+        if base_priority:
+            return base_priority
+
+    elif isinstance(models_config, Sequence) and not isinstance(models_config, (str, bytes)):
+        # Legacy support where models config may just be a list of priorities.
+        return _normalize_priority_entry(models_config)
+    elif isinstance(models_config, str):
+        return _normalize_priority_entry(models_config)
+
+    return []
+
+
+def _coerce_override_map(override: Any) -> Tuple[Optional[str], Dict[str, str]]:
+    """
+    Normalize override input into (default_override, per_tool_overrides).
+
+    Supports:
+        - None -> (None, {})
+        - "model-name" -> ("model-name", {})
+        - {"gemini": "model"} -> (None, {"gemini": "model"})
+        - {"default": "model"} -> ("model", {})
+        - {"gemini": ["model-a", "model-b"]} -> (None, {"gemini": "model-a"})
+    """
+    default_override: Optional[str] = None
+    per_tool: Dict[str, str] = {}
+
+    if override is None:
+        return default_override, per_tool
+
+    if isinstance(override, str):
+        normalized = override.strip()
+        if normalized:
+            default_override = normalized
+        return default_override, per_tool
+
+    if not isinstance(override, Mapping):
+        return default_override, per_tool
+
+    for key, value in override.items():
+        if not isinstance(key, str):
+            continue
+        normalized_key = key.strip()
+        if not normalized_key:
+            continue
+
+        priority_list = _normalize_priority_entry(value)
+        override_value = priority_list[0] if priority_list else None
+        if not override_value:
+            continue
+
+        lowered_key = normalized_key.lower()
+
+        if lowered_key in {"*", "default", "__default__"}:
+            default_override = override_value
+        else:
+            per_tool[normalized_key] = override_value
+            if lowered_key != normalized_key:
+                per_tool[lowered_key] = override_value
+
+    return default_override, per_tool
+
+
+def _resolve_context_for_tool(
+    context: Optional[Mapping[str, Any]], tool: str
+) -> Optional[Mapping[str, Any]]:
+    """Extract context applicable to a specific tool."""
+    if not context or not isinstance(context, Mapping):
+        return None
+
+    tool_specific = context.get(tool)
+    wildcard_specific = context.get("*")
+
+    all_values_are_mappings = all(isinstance(v, Mapping) for v in context.values())
+
+    if isinstance(tool_specific, Mapping):
+        merged: Dict[str, Any] = {}
+        if isinstance(wildcard_specific, Mapping):
+            merged.update(wildcard_specific)
+        merged.update(tool_specific)
+        return merged
+
+    if all_values_are_mappings:
+        return None
+
+    shared: Dict[str, Any] = {}
+    for key, value in context.items():
+        if key in {tool, "*"} and isinstance(value, Mapping):
+            continue
+        if isinstance(value, Mapping):
+            continue
+        shared[key] = value
+
+    return shared if shared else None
+
+
+def resolve_tool_model(
+    skill_name: str,
+    tool: str,
+    override: Any = None,
+    context: Optional[Mapping[str, Any]] = None,
+) -> Optional[str]:
+    """
+    Resolve the model string for a given tool within a skill.
+
+    Resolution order:
+        1. CLI override (global or per-tool)
+        2. Skill config contextual overrides (models.overrides.*)
+        3. Skill config base model priority
+        4. DEFAULT_MODELS fallback
+
+    Returns:
+        Model identifier string or None if no model is configured.
+    """
+    if not tool or not isinstance(tool, str):
+        return None
+
+    normalized_tool = tool.strip()
+    if not normalized_tool:
+        return None
+
+    default_override, per_tool_overrides = _coerce_override_map(override)
+    if normalized_tool in per_tool_overrides:
+        return per_tool_overrides[normalized_tool]
+
+    wildcard_override_key = normalized_tool.lower()
+    if wildcard_override_key in per_tool_overrides:
+        return per_tool_overrides[wildcard_override_key]
+
+    if default_override:
+        return default_override
+
+    skill_config = load_skill_config(skill_name)
+    models_config = skill_config.get("models") if isinstance(skill_config, Mapping) else {}
+    tool_context = _resolve_context_for_tool(context, normalized_tool)
+
+    priority = _extract_model_priority(models_config, normalized_tool, tool_context)
+    if priority:
+        return priority[0]
+
+    default_priority = _normalize_priority_entry(DEFAULT_MODELS.get(normalized_tool))
+    return default_priority[0] if default_priority else None
+
+
+def resolve_models_for_tools(
+    skill_name: str,
+    tools: Iterable[str],
+    override: Any = None,
+    context: Optional[Mapping[str, Any]] = None,
+) -> "OrderedDict[str, Optional[str]]":
+    """
+    Resolve models for a collection of tools, preserving input order.
+
+    Args:
+        skill_name: Name of the skill requesting tool models.
+        tools: Iterable of tool names (strings).
+        override: Optional CLI override (string or mapping).
+        context: Optional shared context or dict-of-dicts keyed by tool.
+
+    Returns:
+        OrderedDict mapping tool names to resolved model strings (or None).
+    """
+    if tools is None:
+        return OrderedDict()
+
+    normalized_tools: List[str] = []
+    seen: set[str] = set()
+    for tool in tools:
+        if not isinstance(tool, str):
+            continue
+        stripped = tool.strip()
+        if not stripped or stripped in seen:
+            continue
+        seen.add(stripped)
+        normalized_tools.append(stripped)
+
+    default_override, per_tool_overrides = _coerce_override_map(override)
+
+    resolved: "OrderedDict[str, Optional[str]]" = OrderedDict()
+    for tool_name in normalized_tools:
+        per_tool_override = per_tool_overrides.get(tool_name)
+        if per_tool_override is None:
+            per_tool_override = per_tool_overrides.get(tool_name.lower())
+
+        tool_context = _resolve_context_for_tool(context, tool_name)
+        resolved_model = resolve_tool_model(
+            skill_name=skill_name,
+            tool=tool_name,
+            override=per_tool_override if per_tool_override is not None else default_override,
+            context=tool_context,
+        )
+        resolved[tool_name] = resolved_model
+
+    return resolved
+def get_preferred_model(skill_name: str, tool_name: str) -> Optional[str]:
+    """Return the highest-priority configured model for a tool if available."""
+    return resolve_tool_model(skill_name, tool_name)
 
 
 def get_global_config_path() -> Path:
@@ -283,30 +618,32 @@ def get_agent_priority(skill_name: str, default_order: Optional[List[str]] = Non
     return default_order or ['gemini', 'cursor-agent', 'codex']
 
 
-def get_agent_command(skill_name: str, agent_name: str, prompt: str) -> List[str]:
+def get_agent_command(
+    skill_name: str,
+    agent_name: str,
+    prompt: str,
+    *,
+    model_override: Any = None,
+    context: Optional[Mapping[str, Any]] = None,
+) -> List[str]:
     """Build the command list for invoking an agent.
 
     Args:
         skill_name: Name of the skill
         agent_name: Name of the agent (gemini, cursor-agent, codex)
         prompt: The prompt to send to the agent
+        model_override: Optional explicit model override (string or mapping)
+        context: Optional context mapping used for contextual overrides
 
     Returns:
         List of command arguments for subprocess.run
     """
-    config = load_skill_config(skill_name)
-    models = config.get('models', DEFAULT_MODELS)
-
-    model_priority: Sequence[str] = ()
-    model_config = models.get(agent_name)
-    if isinstance(model_config, dict):
-        priority_value = model_config.get('priority')
-        if isinstance(priority_value, (list, tuple)):
-            model_priority = priority_value
-    elif isinstance(model_config, (list, tuple)):
-        model_priority = model_config
-
-    preferred_model = model_priority[0] if model_priority else None
+    preferred_model = resolve_tool_model(
+        skill_name,
+        agent_name,
+        override=model_override,
+        context=context,
+    )
 
     try:
         return build_tool_command(agent_name, prompt, model=preferred_model)

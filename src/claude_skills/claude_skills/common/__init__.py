@@ -141,6 +141,8 @@ from .ai_config import (
     get_timeout,
     get_tool_config,
     is_tool_enabled,
+    resolve_tool_model,
+    resolve_models_for_tools,
 )
 
 # Contract extraction
@@ -308,6 +310,8 @@ __all__ = [
     "get_timeout",
     "get_tool_config",
     "is_tool_enabled",
+    "resolve_tool_model",
+    "resolve_models_for_tools",
 
     # Contract extraction
     "extract_prepare_task_contract",

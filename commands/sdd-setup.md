@@ -98,9 +98,9 @@ During permission setup, you'll be prompted about git integration:
 
 **Prompt 2: Enable git write operations?** (only if Prompt 1 = Yes)
 - Shows risk warning about repository modifications
-- If **Yes**: Adds write permissions:
-  - `git checkout`, `git add`, `git commit`, `git push`, `git rm`
-  - `gh pr create` (GitHub CLI PR creation)
+- If **Yes**: Adds write permissions using **three-tier model**:
+  - **ALLOW list** (safe writes): `git checkout`, `git add`, `git commit`, `git push`, `git rm`, `git mv`, `gh pr create`
+  - **ASK list** (dangerous ops): force push, hard reset, rebase, history rewriting, force deletions
 - If **No**: Keeps read-only git access only
 
 **Risk Warning Displayed:**
@@ -112,10 +112,18 @@ Write operations allow Claude to:
   • Stage changes (git add)
   • Create commits (git commit)
   • Push to remote (git push)
+  • Remove files (git rm)
   • Create pull requests (gh pr create)
 
 RISK: These operations can modify your repository and push changes.
 Always review Claude's proposed changes before approval.
+
+Dangerous operations requiring approval:
+  • Force push (git push --force)
+  • Hard reset (git reset --hard)
+  • Rebase operations (git rebase)
+  • History rewriting (git commit --amend)
+  • Force deletion (git branch -D, git clean -f)
 ```
 
 ### Step 3: Check Git Configuration
@@ -333,7 +341,7 @@ Display:
 Display:
 ```
 ✅ SDD output config already exists at .claude/sdd_config.json
-   (Modify manually or see docs/SDD_CONFIG_README.md for details)
+   (Modify manually as needed)
 ```
 
 ### Step 6: Show Success & Next Steps
@@ -390,7 +398,6 @@ After successful configuration, display a summary:
 **If sdd_config.json already existed**, show:
 ```
 ✅ SDD CLI Config: Already configured
-   (See docs/SDD_CONFIG_README.md to modify settings)
 ```
 
 Then show next steps:
@@ -440,21 +447,31 @@ The setup adds these permissions:
 
 **Git/GitHub Permissions (Prompted During Setup):**
 
-During the interactive setup, you'll be prompted to enable git integration permissions. Based on your choices:
+During the interactive setup, you'll be prompted to enable git integration permissions. The setup uses a **three-tier permission model** for safety:
 
 **If you enable git integration + write operations:**
-- Read permissions: `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`
-- Write permissions: `git checkout`, `git add`, `git commit`, `git push`, `git rm`
-- GitHub CLI: `gh pr view`, `gh pr create`
+- **ALLOW list** (read operations): `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`, `gh pr view`
+- **ALLOW list** (safe write operations): `git checkout`, `git add`, `git commit`, `git push`, `git rm`, `git mv`, `gh pr create`
+- **ASK list** (dangerous operations requiring approval):
+  - Force operations: `git push --force`, `git push -f`, `git push --force-with-lease`, `git clean -f*`
+  - History rewriting: `git reset --hard`, `git reset --mixed`, `git reset`, `git rebase`, `git commit --amend`, `git filter-branch`, `git filter-repo`
+  - Deletion operations: `git branch -D`, `git push origin --delete`, `git tag -d`
+  - Reflog/stash: `git reflog expire`, `git reflog delete`, `git stash drop`, `git stash clear`
+  - Aggressive GC: `git gc --prune=now`
 
 **If you enable git integration (read-only):**
-- Read permissions: `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`
-- GitHub CLI: `gh pr view`
+- **ALLOW list**: `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`, `gh pr view`
+- No write permissions added
 
 **If you skip git setup:**
 - No git permissions added (you can manually add them to `.claude/settings.local.json` later)
 
-All git permissions are added to the `allow` list for automated workflows. If you prefer to be prompted before each git operation, manually edit `.claude/settings.local.json` and move the permissions from `allow` to `ask`.
+**Three-Tier Permission Model:**
+1. **ALLOW**: Read-only operations and safe writes execute automatically without prompts
+2. **ASK**: Dangerous operations (data loss risk, history rewriting) require explicit user approval
+3. **DENY**: Blocked operations (not used by default in SDD setup)
+
+This model provides a balance between workflow efficiency and safety - routine git operations (commit, push, checkout) work automatically, while potentially destructive operations (force push, hard reset, rebase) always require your explicit approval.
 
 ### Git Integration (`.claude/git_config.json`)
 
@@ -526,8 +543,6 @@ The setup creates a configuration file for SDD CLI output formatting:
 2. Global config (`~/.claude/sdd_config.json`)
 3. Project config (`./.claude/sdd_config.json`)
 4. CLI arguments (highest priority)
-
-For detailed information, see `docs/SDD_CONFIG_README.md` in the toolkit.
 
 ## Important Notes
 

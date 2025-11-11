@@ -5,12 +5,14 @@ Configures .claude/settings.local.json with required SDD tool permissions.
 Used by /sdd-begin command and sdd-plan skill to ensure proper permissions.
 """
 
+from __future__ import annotations
+
 import json
-import sys
+from copy import deepcopy
 from pathlib import Path
 
 from claude_skills.common import PrettyPrinter
-
+from claude_skills.common.setup_templates import copy_template_to, load_json_template_clean
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
@@ -23,9 +25,9 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
+    "Skill(sdd-toolkit:sdd-fidelity-review)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
-
     # Skills (short form without namespace - also needed)
     "Skill(run-tests)",
     "Skill(sdd-plan)",
@@ -37,27 +39,35 @@ SDD_PERMISSIONS = [
     "Skill(sdd-render)",
     "Skill(code-doc)",
     "Skill(doc-query)",
-
     # Slash commands
     "SlashCommand(/sdd-begin)",
-
     # CLI command permissions (unified sdd CLI + legacy standalone commands)
     # NOTE: Bash(sdd:*) allows command chaining that could bypass Read() restrictions
     # (e.g., "sdd --version && cat specs/active/spec.json"). This is accepted as a
     # workflow trade-off. Protection against reading spec files is guidance-based
     # (skills are instructed to use sdd tools exclusively) rather than security-based.
     # The focus is on efficiency (avoiding context waste) rather than access control.
-    "Bash(sdd:*)",      # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
-
+    "Bash(sdd:*)",  # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
     # AI CLI tool permissions
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
     "Bash(codex:*)",
-
+    # Testing permissions (for run-tests skill)
+    "Bash(pytest:*)",
+    "Bash(python -m pytest:*)",
+    "Bash(pip show:*)",  # Useful for debugging package issues
+    # System utilities (commonly needed for workflows)
+    "Bash(mkdir:*)",  # Creating directories
+    "Bash(find:*)",  # Finding files
+    "Bash(cat:*)",  # Quick file reads
+    # Web search for documentation and debugging
+    "WebSearch",
     # Note: Git/GitHub CLI permissions can be optionally configured during setup.
     # See GIT_READ_PERMISSIONS and GIT_WRITE_PERMISSIONS below for available options.
-
     # File access permissions
+    "Read(//**/specs/**)",  # Reading spec files
+    "Read(//tmp/**)",  # Temp file read access for testing
+    "Write(//tmp/**)",  # Temp file write access for testing/debugging
     "Write(//**/specs/active/**)",
     "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
@@ -73,21 +83,55 @@ GIT_READ_PERMISSIONS = [
     "Bash(git log:*)",
     "Bash(git branch:*)",
     "Bash(git diff:*)",
-    "Bash(git rev-parse:*)",
     "Bash(git show:*)",
     "Bash(git describe:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git ls-tree:*)",  # Inspect tree objects
     "Bash(gh pr view:*)",
 ]
 
-# Git write permissions (potentially destructive operations)
-# ⚠️ These allow Claude to modify repository state and push changes
+# Git write permissions (safe write operations)
+# These allow Claude to modify repository state with standard workflows
 GIT_WRITE_PERMISSIONS = [
     "Bash(git checkout:*)",
     "Bash(git add:*)",
     "Bash(git commit:*)",
-    "Bash(git push:*)",
+    "Bash(git push:*)",  # Note: Does not include --force variants
     "Bash(git rm:*)",
     "Bash(gh pr create:*)",
+    "Bash(git mv:*)",
+]
+
+# Git dangerous permissions (destructive operations requiring user approval)
+# ⚠️ These operations can cause data loss or rewrite history
+# Automatically added to ASK list when git write is enabled
+GIT_DANGEROUS_PERMISSIONS = [
+    # Force operations (can overwrite remote history or delete local files)
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git push --force-with-lease:*)",
+    "Bash(git clean -f:*)",
+    "Bash(git clean -fd:*)",
+    "Bash(git clean -fx:*)",
+    # History rewriting operations (can lose commits or changes)
+    "Bash(git reset --hard:*)",
+    "Bash(git reset --mixed:*)",
+    "Bash(git reset:*)",  # Covers all reset modes (defaults to --mixed)
+    "Bash(git rebase:*)",
+    "Bash(git commit --amend:*)",
+    "Bash(git filter-branch:*)",
+    "Bash(git filter-repo:*)",
+    # Deletion operations (can remove branches or tags)
+    "Bash(git branch -D:*)",
+    "Bash(git push origin --delete:*)",
+    "Bash(git tag -d:*)",
+    # Reflog and stash operations (can lose commit references)
+    "Bash(git reflog expire:*)",
+    "Bash(git reflog delete:*)",
+    "Bash(git stash drop:*)",
+    "Bash(git stash clear:*)",
+    # Aggressive garbage collection
+    "Bash(git gc --prune=now:*)",
 ]
 
 
@@ -117,21 +161,20 @@ def _prompt_for_config(printer: PrettyPrinter) -> dict:
 
     while True:
         mode_pref = input("Default output mode? [json/text/markdown] (default: json): ").strip().lower()
-        if mode_pref in ['', 'j', 'json']:
-            default_mode = 'json'
+        if mode_pref in ["", "j", "json"]:
+            default_mode = "json"
             break
-        elif mode_pref in ['t', 'text']:
-            default_mode = 'text'
+        if mode_pref in ["t", "text"]:
+            default_mode = "text"
             break
-        elif mode_pref in ['m', 'md', 'markdown']:
-            default_mode = 'markdown'
+        if mode_pref in ["m", "md", "markdown"]:
+            default_mode = "markdown"
             break
-        else:
-            printer.warning("Please enter 'json', 'text', or 'markdown'")
+        printer.warning("Please enter 'json', 'text', or 'markdown'")
 
     # Only ask about compact if JSON is enabled
     use_compact = True  # default
-    if default_mode == 'json':
+    if default_mode == "json":
         printer.info("")
         printer.info("JSON Formatting:")
         printer.info("  • Compact: Single-line JSON (smaller output, recommended)")
@@ -140,69 +183,70 @@ def _prompt_for_config(printer: PrettyPrinter) -> dict:
 
         while True:
             compact_pref = input("Use compact JSON formatting? [Y/n]: ").strip().lower()
-            if compact_pref in ['', 'y', 'yes']:
+            if compact_pref in ["", "y", "yes"]:
                 use_compact = True
                 break
-            elif compact_pref in ['n', 'no']:
+            if compact_pref in ["n", "no"]:
                 use_compact = False
                 break
-            else:
-                printer.warning("Please enter 'y' for yes or 'n' for no")
+            printer.warning("Please enter 'y' for yes or 'n' for no")
 
     return {
         "output": {
             "default_mode": default_mode,
-            "json_compact": use_compact
+            "json_compact": use_compact,
         }
     }
 
 
 def _create_config_file(project_path: Path, config: dict, printer: PrettyPrinter) -> bool:
-    """Create .claude/sdd_config.json with user preferences.
-
-    Args:
-        project_path: Project root directory
-        config: Configuration dict to write
-        printer: PrettyPrinter instance
-
-    Returns:
-        True if config was created successfully, False otherwise
-    """
+    """Create .claude/sdd_config.json with user preferences."""
     config_file = project_path / ".claude" / "sdd_config.json"
 
     try:
         # Create .claude directory if needed
         config_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Write config file
-        with open(config_file, 'w') as f:
-            json.dump(config, f, indent=2)
-            f.write('\n')  # Add trailing newline
+        base_config = deepcopy(load_json_template_clean("sdd_config.json"))
+        output_config = base_config.setdefault("output", {})
+        user_output = config.get("output", {})
+
+        default_mode = user_output.get("default_mode")
+        if default_mode:
+            output_config["default_mode"] = default_mode
+            # Maintain compatibility: json flag reflects whether json output is enabled
+            output_config["json"] = default_mode == "json"
+
+        json_compact = user_output.get("json_compact")
+        if json_compact is not None:
+            output_config["json_compact"] = json_compact
+            # Older configs used 'compact'; keep in sync if template still exposes it
+            if "compact" in output_config:
+                output_config["compact"] = json_compact
+
+        with config_file.open("w", encoding="utf-8") as f:
+            json.dump(base_config, f, indent=2)
+            f.write("\n")
 
         printer.success(f"✅ Created configuration file: {config_file}")
         printer.info("")
         printer.info("Your preferences:")
-        default_mode = config['output'].get('default_mode', 'text')
-        printer.info(f"  • Default output mode: {default_mode}")
-        if default_mode == 'json':
-            json_compact = config['output'].get('json_compact', True)
-            printer.info(f"  • JSON format: {'compact' if json_compact else 'pretty-printed'}")
+        printer.info(f"  • Default output mode: {output_config.get('default_mode', 'text')}")
+        if output_config.get("default_mode") == "json":
+            printer.info(
+                f"  • JSON format: {'compact' if output_config.get('json_compact', True) else 'pretty-printed'}"
+            )
         printer.info("")
 
         return True
-
-    except (IOError, OSError) as e:
-        printer.error(f"❌ Failed to create config file: {e}")
+    except (IOError, OSError, ValueError) as exc:
+        printer.error(f"❌ Failed to create config file: {exc}")
         return False
 
 
-def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
-    """Prompt user about adding git/GitHub permissions.
-
-    Returns:
-        List of git permissions to add (may include read-only, write, or both)
-    """
-    permissions_to_add = []
+def _prompt_for_git_permissions(printer: PrettyPrinter) -> dict:
+    """Prompt user about adding git/GitHub permissions."""
+    permissions = {"allow": [], "ask": []}
 
     printer.info("")
     printer.info("🔧 Git Integration Setup")
@@ -216,20 +260,19 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
     # Prompt 1: Enable git integration at all?
     while True:
         response = input("Enable git integration? (y/n): ").strip().lower()
-        if response in ['y', 'yes']:
+        if response in ["y", "yes"]:
             # Add read-only permissions automatically
             printer.info("")
             printer.info("✓ Adding read-only git permissions (status, log, diff, etc.)")
-            permissions_to_add.extend(GIT_READ_PERMISSIONS)
+            permissions["allow"].extend(GIT_READ_PERMISSIONS)
             break
-        elif response in ['n', 'no']:
+        if response in ["n", "no"]:
             printer.info("")
             printer.info("⊘ Skipping git integration setup")
             printer.info("  You can manually add git permissions to .claude/settings.local.json later")
             printer.info("")
-            return permissions_to_add
-        else:
-            printer.warning("Please enter 'y' for yes or 'n' for no")
+            return permissions
+        printer.warning("Please enter 'y' for yes or 'n' for no")
 
     # Prompt 2: Enable write operations?
     printer.info("")
@@ -240,6 +283,7 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
     printer.info("  • Stage changes (git add)")
     printer.info("  • Create commits (git commit)")
     printer.info("  • Push to remote (git push)")
+    printer.info("  • Remove files (git rm)")
     printer.info("  • Create pull requests (gh pr create)")
     printer.info("")
     printer.warning("RISK: These operations can modify your repository and push changes.")
@@ -248,21 +292,32 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> list:
 
     while True:
         response = input("Enable git write operations? (y/n): ").strip().lower()
-        if response in ['y', 'yes']:
+        if response in ["y", "yes"]:
             printer.info("")
             printer.info("✓ Adding git write permissions")
-            permissions_to_add.extend(GIT_WRITE_PERMISSIONS)
+            permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
+
+            # Automatically add dangerous operations to ASK list
+            printer.info("✓ Adding dangerous git operations to ASK list (requires approval)")
+            printer.info("")
+            printer.info("  Dangerous operations requiring approval:")
+            printer.info("    • Force push (git push --force)")
+            printer.info("    • Hard reset (git reset --hard)")
+            printer.info("    • Rebase operations (git rebase)")
+            printer.info("    • History rewriting (git commit --amend)")
+            printer.info("    • Force deletion (git branch -D, git clean -f)")
+            printer.info("")
+            permissions["ask"].extend(GIT_DANGEROUS_PERMISSIONS)
             break
-        elif response in ['n', 'no']:
+        if response in ["n", "no"]:
             printer.info("")
             printer.info("✓ Git integration enabled (read-only)")
             printer.info("  You can manually add write permissions later if needed")
             break
-        else:
-            printer.warning("Please enter 'y' for yes or 'n' for no")
+        printer.warning("Please enter 'y' for yes or 'n' for no")
 
     printer.info("")
-    return permissions_to_add
+    return permissions
 
 
 def cmd_update(args, printer: PrettyPrinter) -> int:
@@ -282,40 +337,38 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         printer.info("")
         config = _prompt_for_config(printer)
         _create_config_file(project_path, config, printer)
+    elif not config_exists:
+        copy_template_to("sdd_config.json", config_file)
 
-    # Load existing settings or create new
+    # Load existing settings or start from the packaged template
     if settings_file.exists():
-        with open(settings_file, 'r') as f:
+        with settings_file.open(encoding="utf-8") as f:
             settings = json.load(f)
     else:
-        settings = {
-            "$schema": "https://json.schemastore.org/claude-code-settings.json",
-            "permissions": {
-                "allow": [],
-                "deny": [],
-                "ask": []
-            }
-        }
+        settings = deepcopy(load_json_template_clean("settings.local.json"))
 
     # Ensure permissions structure exists
-    if "permissions" not in settings:
-        settings["permissions"] = {"allow": [], "deny": [], "ask": []}
-    if "allow" not in settings["permissions"]:
-        settings["permissions"]["allow"] = []
+    permissions = settings.setdefault("permissions", {})
+    permissions.setdefault("allow", [])
+    permissions.setdefault("deny", [])
+    permissions.setdefault("ask", [])
+
+    # Track existing permissions across both allow and ask lists
+    existing_allow = set(permissions["allow"])
+    existing_ask = set(permissions["ask"])
+    new_permissions: list[str] = []
+    new_ask_permissions: list[str] = []
 
     # Add SDD permissions (avoid duplicates)
-    existing_permissions = set(settings["permissions"]["allow"])
-    new_permissions = []
-
     for perm in SDD_PERMISSIONS:
-        if perm not in existing_permissions:
+        if perm not in existing_allow:
             new_permissions.append(perm)
-            settings["permissions"]["allow"].append(perm)
+            permissions["allow"].append(perm)
+            existing_allow.add(perm)
 
     # Show what's being added (if not in JSON mode)
     if not args.json and new_permissions:
         printer.info(f"Adding {len(new_permissions)} permissions:")
-        # Show first 5 permissions
         for perm in new_permissions[:5]:
             printer.info(f"  • {perm}")
         if len(new_permissions) > 5:
@@ -326,44 +379,59 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
     if not args.json:
         git_permissions = _prompt_for_git_permissions(printer)
 
-        # Add git permissions (avoid duplicates)
-        for perm in git_permissions:
-            if perm not in existing_permissions:
+        # Add git permissions to allow list (avoid duplicates)
+        for perm in git_permissions["allow"]:
+            if perm not in existing_allow:
                 new_permissions.append(perm)
-                settings["permissions"]["allow"].append(perm)
-                existing_permissions.add(perm)
+                permissions["allow"].append(perm)
+                existing_allow.add(perm)
+
+        # Add dangerous git permissions to ask list (avoid duplicates)
+        for perm in git_permissions["ask"]:
+            if perm not in existing_ask:
+                new_ask_permissions.append(perm)
+                permissions["ask"].append(perm)
+                existing_ask.add(perm)
 
     # Write updated settings
-    with open(settings_file, 'w') as f:
+    with settings_file.open("w", encoding="utf-8") as f:
         json.dump(settings, f, indent=2)
-        f.write('\n')  # Add trailing newline
+        f.write("\n")
 
     result = {
         "success": True,
         "settings_file": str(settings_file),
         "permissions_added": len(new_permissions),
-        "total_permissions": len(settings["permissions"]["allow"]),
-        "new_permissions": new_permissions
+        "ask_permissions_added": len(new_ask_permissions),
+        "total_allow_permissions": len(permissions["allow"]),
+        "total_ask_permissions": len(permissions["ask"]),
+        "new_permissions": new_permissions,
+        "new_ask_permissions": new_ask_permissions,
     }
 
     if args.json:
         print(json.dumps(result, indent=2))
     else:
-        if new_permissions:
-            printer.success(f"✅ Added {len(new_permissions)} new SDD permissions to {settings_file}")
+        total_added = len(new_permissions) + len(new_ask_permissions)
+        if total_added > 0:
+            printer.success(f"✅ Added {len(new_permissions)} new permissions to ALLOW list")
+            if new_ask_permissions:
+                printer.success(
+                    f"✅ Added {len(new_ask_permissions)} dangerous operations to ASK list (requires approval)"
+                )
         else:
             printer.success(f"✅ All SDD permissions already configured in {settings_file}")
 
     return 0
 
 
-def categorize_missing_permissions(missing: list) -> dict:
+def categorize_missing_permissions(missing: list[str]) -> dict[str, list[str]]:
     """Categorize missing permissions by type for better reporting."""
     categories = {
         "skills": [],
         "commands": [],
         "bash": [],
-        "file_access": []
+        "file_access": [],
     }
 
     for perm in missing:
@@ -393,7 +461,7 @@ def cmd_check(args, printer: PrettyPrinter) -> int:
             "total_required": len(SDD_PERMISSIONS),
             "total_present": 0,
             "total_missing": len(SDD_PERMISSIONS),
-            "message": "Settings file does not exist"
+            "message": "Settings file does not exist",
         }
         if args.json:
             print(json.dumps(result, indent=2))
@@ -402,7 +470,7 @@ def cmd_check(args, printer: PrettyPrinter) -> int:
             printer.info(f"Missing all {len(SDD_PERMISSIONS)} SDD permissions")
         return 1
 
-    with open(settings_file, 'r') as f:
+    with settings_file.open(encoding="utf-8") as f:
         settings = json.load(f)
 
     existing_permissions = set(settings.get("permissions", {}).get("allow", []))
@@ -452,7 +520,7 @@ def cmd_check(args, printer: PrettyPrinter) -> int:
         "total_present": total_present,
         "total_missing": total_missing,
         "missing_permissions": missing,
-        "missing_by_category": missing_by_category
+        "missing_by_category": missing_by_category,
     }
 
     if args.json:
@@ -492,33 +560,31 @@ def register_setup_permissions(subparsers, parent_parser):
     """Register setup-permissions subcommands."""
     # Create setup-permissions parser
     setup_perms_parser = subparsers.add_parser(
-        'setup-permissions',
+        "setup-permissions",
         parents=[parent_parser],
-        help='Configure SDD project permissions',
-        description='Configure .claude/settings.local.json with required SDD tool permissions'
+        help="Configure SDD project permissions",
+        description="Configure .claude/settings.local.json with required SDD tool permissions",
     )
 
     # Create subparsers for setup-permissions commands
     setup_perms_subparsers = setup_perms_parser.add_subparsers(
-        title='setup-permissions commands',
-        dest='setup_permissions_command',
-        required=True
+        title="setup-permissions commands", dest="setup_permissions_command", required=True
     )
 
     # update command
     update_cmd = setup_perms_subparsers.add_parser(
-        'update',
+        "update",
         parents=[parent_parser],
-        help='Update project settings with SDD permissions'
+        help="Update project settings with SDD permissions",
     )
-    update_cmd.add_argument('project_root', help='Project root directory (e.g., "." for current)')
+    update_cmd.add_argument("project_root", help='Project root directory (e.g., "." for current)')
     update_cmd.set_defaults(func=cmd_update)
 
     # check command
     check_cmd = setup_perms_subparsers.add_parser(
-        'check',
+        "check",
         parents=[parent_parser],
-        help='Check if SDD permissions are configured'
+        help="Check if SDD permissions are configured",
     )
-    check_cmd.add_argument('project_root', help='Project root directory')
+    check_cmd.add_argument("project_root", help="Project root directory")
     check_cmd.set_defaults(func=cmd_check)

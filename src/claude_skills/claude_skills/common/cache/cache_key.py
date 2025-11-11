@@ -7,7 +7,59 @@ Generates deterministic cache keys based on spec ID, file contents, model, and p
 import hashlib
 import json
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Any, Iterable, List, Mapping, Optional, Dict
+
+
+def _stringify_models(models: Any) -> Optional[str]:
+    """Normalize model representations into a deterministic string."""
+    if models is None:
+        return None
+
+    if isinstance(models, str):
+        normalized = models.strip()
+        return normalized or None
+
+    if isinstance(models, Mapping):
+        items = []
+        for key in sorted(models.keys(), key=lambda k: str(k)):
+            tool = str(key).strip()
+            value = models[key]
+            if value is None:
+                value_str = "none"
+            elif isinstance(value, str):
+                value_str = value.strip() or "none"
+            else:
+                value_str = str(value).strip() or "none"
+            items.append(f"{tool}:{value_str}")
+        return "|".join(items) if items else None
+
+    if isinstance(models, Iterable) and not isinstance(models, (str, bytes)):
+        cleaned = []
+        for item in models:
+            if item is None:
+                continue
+            if isinstance(item, str):
+                candidate = item.strip()
+            else:
+                candidate = str(item).strip()
+            if candidate:
+                cleaned.append(candidate)
+        return "|".join(sorted(set(cleaned))) if cleaned else None
+
+    return None
+
+
+def _normalize_model_identifier(model: Optional[str] = None, models: Any = None) -> Optional[str]:
+    """Return a normalized model identifier string for cache usage."""
+    models_identifier = _stringify_models(models)
+    if models_identifier:
+        return models_identifier
+
+    if model is None:
+        return None
+
+    normalized_model = model.strip()
+    return normalized_model or None
 
 
 def generate_cache_key(
@@ -107,7 +159,8 @@ def generate_fidelity_review_key(
     scope: str,
     target: str,
     file_paths: Optional[List[str]] = None,
-    model: Optional[str] = None
+    model: Optional[str] = None,
+    models: Any = None,
 ) -> str:
     """
     Generate cache key for fidelity review consultations.
@@ -117,21 +170,25 @@ def generate_fidelity_review_key(
         scope: Review scope ("task", "phase", or "spec")
         target: Target identifier (task ID, phase ID, or spec ID)
         file_paths: Files being reviewed (optional)
-        model: Model name (optional)
+        model: Single model identifier override (optional)
+        models: Structured model mapping or list (optional)
 
     Returns:
         Deterministic cache key
     """
-    extra_params = {
+    normalized_model = _normalize_model_identifier(model=model, models=models)
+
+    extra_params: Dict[str, Any] = {
         "scope": scope,
         "target": target,
-        "review_type": "fidelity"
+        "review_type": "fidelity",
+        "models": normalized_model or "default",
     }
 
     return generate_cache_key(
         spec_id=spec_id,
         file_paths=file_paths,
-        model=model,
+        model=normalized_model,
         prompt_version="fidelity-v1",
         extra_params=extra_params
     )

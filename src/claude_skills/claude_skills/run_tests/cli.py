@@ -41,6 +41,50 @@ def _maybe_json(args: argparse.Namespace, payload: Any) -> bool:
     return False
 
 
+def _parse_model_override(values: Optional[List[str]]) -> Optional[Any]:
+    """
+    Parse model override arguments into a structure compatible with ai_config helpers.
+
+    Accepts either a single model string (global override) or repeated tool-specific
+    entries in the form `tool=model` or `tool:model`.
+    """
+    if not values:
+        return None
+
+    overrides: Dict[str, str] = {}
+    default_override: Optional[str] = None
+
+    for raw_value in values:
+        if not raw_value:
+            continue
+        entry = raw_value.strip()
+        if not entry:
+            continue
+
+        separator_index = -1
+        for separator in ("=", ":"):
+            if separator in entry:
+                separator_index = entry.find(separator)
+                break
+
+        if separator_index > 0:
+            key = entry[:separator_index].strip()
+            value = entry[separator_index + 1 :].strip()
+            if key and value:
+                overrides[key] = value
+            continue
+
+        # Treat bare value as global default override (last one wins)
+        default_override = entry
+
+    if overrides:
+        if default_override:
+            overrides.setdefault("default", default_override)
+        return overrides
+
+    return default_override
+
+
 # ---------------------------------------------------------------------------
 # Command handlers
 # ---------------------------------------------------------------------------
@@ -80,6 +124,8 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         print_routing_matrix(printer)
         return 0
 
+    model_override = _parse_model_override(getattr(args, "model", None))
+
     if args.prompt:
         tool = args.tool if args.tool != "auto" else None
         if tool is None:
@@ -91,7 +137,13 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
                 printer.info("Install at least one: gemini, codex, or cursor-agent")
                 return 1
             tool = available_tools[0]
-        return run_consultation(tool, args.prompt, args.dry_run, printer)
+        return run_consultation(
+            tool,
+            args.prompt,
+            args.dry_run,
+            printer,
+            model_override=model_override,
+        )
 
     if not args.failure_type:
         if _maybe_json(args, {"status": "error", "message": "failure_type is required"}):
@@ -140,6 +192,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             agents=agents_override,
             dry_run=args.dry_run,
             printer=printer,
+            model_override=model_override,
         )
 
     return consult_with_auto_routing(
@@ -153,6 +206,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         tool=args.tool,
         dry_run=args.dry_run,
         printer=printer,
+        model_override=model_override,
     )
 
 
@@ -230,6 +284,12 @@ Failure types:
     consult_parser.add_argument("--context", help="Additional context about the issue")
     consult_parser.add_argument("--question", help="Specific question to ask (overrides defaults)")
     consult_parser.add_argument("--tool", "-t", choices=["gemini", "codex", "cursor-agent", "auto"], default="auto")
+    consult_parser.add_argument(
+        "--model",
+        action="append",
+        metavar="MODEL",
+        help="Override model selection (repeat for tool-specific overrides, e.g., gemini=gemini-pro).",
+    )
     consult_parser.add_argument("--prompt", "-p", help="Use a custom prompt instead of auto-formatting")
     consult_parser.add_argument("--dry-run", action="store_true", help="Show what would be run without executing")
     consult_parser.add_argument("--list-routing", action="store_true", help="Show the routing matrix")

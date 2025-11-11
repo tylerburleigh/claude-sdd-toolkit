@@ -12,11 +12,12 @@ import json
 import time
 import tempfile
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from claude_skills.sdd_plan_review.prompts import generate_review_prompt
 from claude_skills.sdd_plan_review.synthesis import parse_response, build_consensus
 from claude_skills.common.ai_tools import check_tool_available, execute_tools_parallel
+from claude_skills.common import ai_config
 
 
 def detect_available_tools() -> List[str]:
@@ -44,7 +45,8 @@ def review_with_tools(
     review_type: str = "full",
     spec_id: str = "unknown",
     spec_title: str = "Specification",
-    parallel: bool = True
+    parallel: bool = True,
+    model_override: Any = None,
 ) -> Dict[str, Any]:
     """
     Review a spec using multiple AI tools with full synthesis.
@@ -92,10 +94,18 @@ def review_with_tools(
     print(f"\n   Sending {review_type} review to {len(tools)} external AI model(s): {', '.join(tools)}")
     print(f"   Evaluating: {dimensions}")
 
+    resolved_models = ai_config.resolve_models_for_tools(
+        "sdd-plan-review",
+        tools,
+        override=model_override,
+        context={"review_type": review_type} if review_type else None,
+    )
+
     # Execute tools in parallel using shared implementation
     multi_response = execute_tools_parallel(
         tools=tools,
         prompt=prompt,
+        models=dict(resolved_models),
         timeout=600
     )
 
@@ -145,5 +155,6 @@ def review_with_tools(
         }
 
     results["execution_time"] = time.time() - start_time
+    results["models"] = dict(resolved_models)
 
     return results

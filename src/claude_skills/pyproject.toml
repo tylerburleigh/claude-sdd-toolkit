@@ -45,7 +45,17 @@ where = ["."]
 include = ["claude_skills*"]
 
 [tool.setuptools.package-data]
-claude_skills = ["*.json", "**/*.json", "**/*.md", "common/templates/*.md"]
+# Include bundled resource templates so editable installs and wheels both ship setup assets.
+claude_skills = [
+    "*.json",
+    "**/*.json",
+    "common/templates/setup/*.json",
+    "*.yaml",
+    "**/*.yaml",
+    "common/templates/setup/*.yaml",
+    "**/*.md",
+    "common/templates/*.md",
+]
 
 [tool.pytest.ini_options]
 # Mirror project-level pytest discovery so editable installs run the same suite.

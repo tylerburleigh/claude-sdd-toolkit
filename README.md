@@ -548,7 +548,9 @@ your-project/
 │   └── .human-readable/     # Rendered markdown (gitignored)
 │
 ├── .claude/                 # Project settings (optional)
-│   └── settings.local.json  # Permissions
+│   ├── settings.local.json  # Permissions
+│   ├── sdd_config.json      # CLI output preferences
+│   └── ai_config.yaml       # AI tool defaults
 │
 └── docs/                    # Generated docs (optional)
     ├── documentation.json   # Machine-readable
@@ -572,6 +574,7 @@ Run the setup command in your project:
 This automatically:
 - Creates `.claude/settings.local.json` in your project
 - Adds all required permissions for SDD skills and tools
+- Seeds `.claude/sdd_config.json` and `.claude/ai_config.yaml` from the packaged setup templates
 - Prepares your project for spec-driven development
 
 You only need to run this once per project.
@@ -592,6 +595,8 @@ The setup creates `.claude/settings.local.json` with permissions like:
   }
 }
 ```
+
+All three setup files (`settings.local.json`, `sdd_config.json`, and `ai_config.yaml`) start from the packaged defaults bundled in `claude_skills.common.templates.setup`. You can access or copy them programmatically through `claude_skills.common.setup_templates` (for example, `load_json_template("sdd_config.json")` or `copy_template_to("settings.local.json", <path>)`) whenever you need to reset a project or inspect the baseline configuration.
 
 ### SDD CLI Configuration (Optional)
 
@@ -627,7 +632,26 @@ This allows you to set your output preferences once rather than passing `--json`
 }
 ```
 
-For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
+### AI Model Overrides
+
+The same setup process seeds `.claude/ai_config.yaml`, which now centralizes tool priorities and example per-skill overrides for:
+
+- `run-tests` consultation failure types
+- `code-doc` architecture vs AI context generations
+- `sdd-plan-review` review modes
+- `sdd-render` executive-summary and narrative passes
+
+You can tweak these defaults directly in the YAML or override them per run with `--model` flags. The flag accepts either a single model (applied to every tool) or tool-specific entries:
+
+```bash
+# Force a single model
+run-tests consult failing-test --model gemini-2.5-pro
+
+# Mix tool-specific and fallback overrides
+sdd doc analyze-with-ai spec.json --model gemini=gemini-2.5-flash --model cursor-agent=composer-2 --model composer-1
+```
+
+The same syntax is supported by `sdd plan-review review` and `sdd render --mode enhanced`, ensuring the resolved model map is surfaced in verbose/dry-run output for easy debugging.
 
 ## Troubleshooting
 
@@ -857,8 +881,6 @@ Output formatting follows this precedence chain (highest to lowest):
 ```
 
 With this config, all commands output pretty-print JSON by default, but you can still override with `--compact` flag when needed.
-
-For complete configuration options, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
 ### Practical Examples: Seeing the Difference
 

@@ -4,6 +4,20 @@ All notable changes to the SDD Toolkit will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and aspires to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (but probably doesn't).
 
+# Unreleased
+
+### Added
+- `ai_config_setup.ensure_ai_config()` helper shared by setup workflows to seed `.claude/ai_config.yaml` with packaged defaults.
+- `sdd fidelity-review` now auto-saves both Markdown and JSON reports when no output path is provided, making it easier to reuse results across tooling.
+- Centralized setup templates bundled under `claude_skills.common.templates.setup` with a public `setup_templates` helper module for loading or copying packaged defaults.
+- Unit and integration coverage that exercises the new setup templates, including `tests/unit/test_common/test_setup_templates.py` and the updated `skills-dev setup-permissions` integration flow.
+
+### Fixed
+- Updated CLI integration tests to opt into text output (`--no-json`) so completion prompts and human-facing messaging continue to be covered after switching to JSON-first defaults.
+
+### Changed
+- Consolidated AI model resolution across `run-tests`, `sdd doc analyze-with-ai`, `sdd plan-review`, and `sdd render --mode enhanced`. These flows now delegate to `ai_config.resolve_tool_model`, accept `--model` CLI overrides (global or per-tool), surface the resolved map in progress output, and ship unit tests documenting the shared helper contract.
+
 ## [0.5.0] - 2025-11-09
 
 ### Added

@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from claude_skills.common import (
     find_specs_directory,
@@ -12,6 +12,44 @@ from claude_skills.common import (
 )
 from .renderer import SpecRenderer
 from .orchestrator import AIEnhancedRenderer
+
+
+def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
+    """Normalize CLI-provided model overrides."""
+    if not values:
+        return None
+
+    overrides: dict[str, str] = {}
+    default_override: Optional[str] = None
+
+    for raw_value in values:
+        if not raw_value:
+            continue
+        entry = raw_value.strip()
+        if not entry:
+            continue
+
+        separator_index = -1
+        for separator in ("=", ":"):
+            if separator in entry:
+                separator_index = entry.find(separator)
+                break
+
+        if separator_index > 0:
+            key = entry[:separator_index].strip()
+            value = entry[separator_index + 1 :].strip()
+            if key and value:
+                overrides[key] = value
+            continue
+
+        default_override = entry
+
+    if overrides:
+        if default_override:
+            overrides.setdefault("default", default_override)
+        return overrides
+
+    return default_override
 
 
 def cmd_render(args, printer: PrettyPrinter) -> int:
@@ -30,6 +68,7 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     """
     enhancement_level = getattr(args, 'enhancement_level', None)
     mode = getattr(args, 'mode', None)
+    model_override = _parse_model_override(getattr(args, 'model', None))
 
     # If enhancement_level is specified, imply enhanced mode
     # This makes --mode truly optional when using --enhancement-level
@@ -136,7 +175,10 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
             # Try AI-enhanced rendering with fallback to basic
             try:
                 # Use AI-enhanced renderer with full pipeline
-                renderer = AIEnhancedRenderer(spec_data)
+                renderer = AIEnhancedRenderer(
+                    spec_data,
+                    model_override=model_override,
+                )
                 # Enable AI features with specified enhancement level
                 markdown = renderer.render(
                     output_format='markdown',
@@ -145,6 +187,8 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
                 )
 
                 if args.verbose:
+                    if model_override:
+                        printer.detail(f"Model override: {model_override}")
                     printer.detail("AI enhancement pipeline:")
                     pipeline_status = renderer.get_pipeline_status()
                     for stage, implemented in pipeline_status.items():
@@ -243,6 +287,12 @@ def register_render(subparsers, parent_parser):
         choices=['full', 'standard', 'summary'],
         default=None,
         help='AI enhancement level: summary (exec summary only), standard (base + narrative, default), full (all features). Automatically enables enhanced mode.'
+    )
+    parser.add_argument(
+        '--model',
+        action='append',
+        metavar='MODEL',
+        help='Override AI model selection (repeat for per-agent overrides, e.g., gemini=gemini-pro).',
     )
 
     parser.set_defaults(func=cmd_render)

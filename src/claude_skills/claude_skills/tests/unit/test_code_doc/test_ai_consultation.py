@@ -6,12 +6,14 @@ Tests prompt formatting, tool detection, and multi-agent coordination.
 
 import pytest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from claude_skills.code_doc.ai_consultation import (
     format_architecture_research_prompt,
     format_ai_context_research_prompt,
     get_best_tool,
+    get_model_for_tool,
+    consult_multi_agent,
     run_consultation,
     DOC_TYPE_ROUTING
 )
@@ -224,3 +226,86 @@ class TestPromptContentValidation:
 
         assert "XYZ123" in arch_prompt
         assert "XYZ123" in context_prompt
+
+
+class TestModelResolution:
+    """Tests ensuring shared model helpers are used."""
+
+    def test_get_model_for_tool_delegates_to_ai_config(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        captured = {}
+
+        def _mock_resolve(skill, tool, override=None, context=None):
+            captured["skill"] = skill
+            captured["tool"] = tool
+            captured["override"] = override
+            captured["context"] = context
+            return "mock-model"
+
+        monkeypatch.setattr("claude_skills.code_doc.ai_consultation.ai_config.resolve_tool_model", _mock_resolve)
+
+        model = get_model_for_tool("gemini", doc_type="architecture", override={"gemini": "cli"})
+        assert model == "mock-model"
+        assert captured == {
+            "skill": "code-doc",
+            "tool": "gemini",
+            "override": {"gemini": "cli"},
+            "context": {"doc_type": "architecture"},
+        }
+
+    def test_consult_multi_agent_passes_resolved_models(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        ordered = ["gemini", "cursor-agent"]
+
+        monkeypatch.setattr(
+            "claude_skills.code_doc.ai_consultation.get_available_tools",
+            lambda: ordered,
+        )
+        monkeypatch.setattr(
+            "claude_skills.code_doc.ai_consultation.ai_config.get_consensus_agents",
+            lambda *_: ordered,
+        )
+
+        resolved_models = {
+            "gemini": "gemini-model",
+            "cursor-agent": "cursor-model",
+        }
+
+        monkeypatch.setattr(
+            "claude_skills.code_doc.ai_consultation.resolve_models_for_tools",
+            lambda tools, doc_type=None, override=None: resolved_models,
+        )
+
+        calls = {}
+
+        def _mock_execute(tools, prompt, models):
+            calls["tools"] = tuple(tools)
+            calls["prompt"] = prompt
+            calls["models"] = models
+            return MagicMock(
+                success=True,
+                responses={
+                    tool: MagicMock(tool=tool, success=True, output="ok", duration=1.0)
+                    for tool in tools
+                },
+            )
+
+        monkeypatch.setattr(
+            "claude_skills.code_doc.ai_consultation.execute_tools_parallel",
+            _mock_execute,
+        )
+
+        result = consult_multi_agent(
+            doc_type="architecture",
+            prompt="Test prompt",
+            agents=None,
+            dry_run=False,
+            verbose=False,
+            printer=None,
+            model_override="override-model",
+        )
+
+        assert result["success"] is True
+        assert calls["tools"] == tuple(ordered)
+        assert calls["models"] == resolved_models

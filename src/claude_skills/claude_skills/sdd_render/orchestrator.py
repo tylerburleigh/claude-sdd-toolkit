@@ -126,7 +126,7 @@ class AIEnhancedRenderer:
         >>> # markdown = renderer.render(enable_ai=True, output_format='html')
     """
 
-    def __init__(self, spec_data: Dict[str, Any]):
+    def __init__(self, spec_data: Dict[str, Any], *, model_override: Any = None):
         """Initialize orchestrator with spec data.
 
         Args:
@@ -135,6 +135,7 @@ class AIEnhancedRenderer:
         """
         self.spec_data = spec_data
         self.base_renderer = SpecRenderer(spec_data)
+        self.model_override = model_override
 
     def _generate_base_markdown(self) -> str:
         """Generate base markdown using SpecRenderer.
@@ -383,7 +384,8 @@ class AIEnhancedRenderer:
             enhancer = MarkdownEnhancer(
                 spec_data=self.spec_data,
                 parsed_spec=parsed_spec,
-                options=options
+                options=options,
+                model_override=self.model_override,
             )
             enhanced_markdown = enhancer.enhance()
             logger.info("AI enhancement pipeline completed successfully")

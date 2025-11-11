@@ -46,6 +46,7 @@ class TestStatusReportCompletion:
 
         # Run status-report command
         result = run_cli(
+            "--no-json",
             "status-report",
             "--path", str(specs_structure),
             spec_id,
@@ -69,6 +70,7 @@ class TestStatusReportCompletion:
 
         # Run status-report command
         result = run_cli(
+            "--no-json",
             "status-report",
             "--path", str(specs_structure),
             spec_id,
@@ -94,6 +96,7 @@ class TestStatusReportCompletion:
 
         # Run status-report command
         result = run_cli(
+            "--no-json",
             "status-report",
             "--path", str(specs_structure),
             spec_id,

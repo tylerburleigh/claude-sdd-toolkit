@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import Any, List, Tuple
 from unittest.mock import patch
 
 import pytest
@@ -53,7 +53,7 @@ def spec_setup(tmp_path: Path) -> Path:
     return specs_dir
 
 
-def make_args(specs_dir: Path, output: str | None = None) -> argparse.Namespace:
+def make_args(specs_dir: Path, output: str | None = None, model: list[str] | None = None) -> argparse.Namespace:
     return argparse.Namespace(
         spec_id="demo-plan",
         type="quick",
@@ -63,6 +63,7 @@ def make_args(specs_dir: Path, output: str | None = None) -> argparse.Namespace:
         dry_run=False,
         specs_dir=str(specs_dir),
         path=None,
+        model=model,
     )
 
 
@@ -136,3 +137,42 @@ def test_cmd_review_respects_output_flag_while_persisting_defaults(tmp_path: Pat
 
     assert user_output.exists()
     assert user_output.read_text(encoding="utf-8") == "*Mock*\n"
+
+
+def test_cmd_review_passes_model_override(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, spec_setup: Path) -> None:
+    printer = DummyPrinter()
+    args = make_args(spec_setup, model=["gemini=demo", "fallback"])
+
+    captured_override: list[Any] = []
+
+    def _mock_review_with_tools(**kwargs: Any) -> dict:
+        captured_override.append(kwargs.get("model_override"))
+        result = mock_review_results()
+        result["models"] = {"gemini": "demo-model", "codex": "codex-model"}
+        return result
+
+    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["gemini", "codex"]), \
+         patch("claude_skills.sdd_plan_review.cli.review_with_tools", side_effect=_mock_review_with_tools), \
+         patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="# Report\n"), \
+         patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value={"artifact": "plan-review"}):
+        exit_code = cmd_review(args, printer)
+
+    assert exit_code == 0
+    assert captured_override == [{"gemini": "demo", "default": "fallback"}]
+    assert any("Resolved models" in message for level, message in printer.messages if level == "detail")
+
+
+def test_parse_model_override_helpers() -> None:
+    from claude_skills.sdd_plan_review.cli import _parse_model_override
+
+    assert _parse_model_override(None) is None
+    assert _parse_model_override([]) is None
+    assert _parse_model_override(["global-model"]) == "global-model"
+    assert _parse_model_override(["gemini=model-a", "cursor-agent:model-b"]) == {
+        "gemini": "model-a",
+        "cursor-agent": "model-b",
+    }
+    assert _parse_model_override(["gemini=model-a", "fallback"]) == {
+        "gemini": "model-a",
+        "default": "fallback",
+    }

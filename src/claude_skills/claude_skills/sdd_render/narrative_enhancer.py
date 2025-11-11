@@ -76,7 +76,7 @@ class NarrativeEnhancer:
         ...     print(f"{trans.target_id}: {trans.content}")
     """
 
-    def __init__(self, spec_data: Dict[str, Any]):
+    def __init__(self, spec_data: Dict[str, Any], *, model_override: Any = None):
         """Initialize narrative enhancer.
 
         Args:
@@ -85,6 +85,7 @@ class NarrativeEnhancer:
         self.spec_data = spec_data
         self.hierarchy = spec_data.get('hierarchy', {})
         self.metadata = spec_data.get('metadata', {})
+        self.model_override = model_override
 
     def generate_phase_transitions(self) -> List[NarrativeElement]:
         """Generate transitional text between phases.
@@ -383,7 +384,13 @@ Keep it actionable and concise.
         for agent in enabled_available:
             try:
                 # Build command from config
-                cmd = get_agent_command('sdd-render', agent, prompt)
+                cmd = get_agent_command(
+                    'sdd-render',
+                    agent,
+                    prompt,
+                    model_override=self.model_override,
+                    context={"feature": "narrative"},
+                )
                 timeout = get_timeout('sdd-render', 'narrative')
 
                 result = subprocess.run(

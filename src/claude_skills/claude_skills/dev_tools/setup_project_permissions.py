@@ -2,18 +2,21 @@
 """
 Setup Project Permissions Script
 
-Configures .claude/settings.local.json with required SDD tool permissions.
-Used by /sdd-begin command and sdd-plan skill to ensure proper permissions.
-
-Also sets up .claude/ai_config.yaml with centralized AI model consultation configuration.
+Configures `.claude/settings.local.json` with required SDD tool permissions and
+bootstraps `.claude/ai_config.yaml`. This legacy utility mirrors the modern CLI
+workflow while remaining available for direct invocation.
 """
+
+from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import sys
+from copy import deepcopy
 from pathlib import Path
 
+from claude_skills.common.ai_config_setup import ensure_ai_config
+from claude_skills.common.setup_templates import copy_template_to, load_json_template_clean
 
 # Standard SDD permissions to add
 SDD_PERMISSIONS = [
@@ -26,9 +29,9 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-plan-review)",
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
+    "Skill(sdd-toolkit:sdd-fidelity-review)",
     "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
-
     # Skills (short form without namespace - also needed)
     "Skill(run-tests)",
     "Skill(sdd-plan)",
@@ -40,43 +43,53 @@ SDD_PERMISSIONS = [
     "Skill(sdd-render)",
     "Skill(code-doc)",
     "Skill(doc-query)",
-
     # Slash commands
     "SlashCommand(/sdd-begin)",
-
-    # CLI command permissions
-    "Bash(sdd:*)",
+    # CLI command permissions (unified sdd CLI + legacy standalone commands)
+    # NOTE: Bash(sdd:*) allows command chaining that could bypass Read() restrictions
+    # (e.g., "sdd --version && cat specs/active/spec.json"). This is accepted as a
+    # workflow trade-off. The focus is on efficiency rather than access control.
+    "Bash(sdd:*)",  # Covers: sdd doc, sdd test, sdd skills-dev, sdd <any-command>
+    # AI CLI tool permissions
     "Bash(cursor-agent:*)",
     "Bash(gemini:*)",
     "Bash(codex:*)",
-
-    # Note: Git/GitHub CLI permissions can be optionally configured during setup.
-    # See GIT_READ_PERMISSIONS and GIT_WRITE_PERMISSIONS below for available options.
-
+    # Testing permissions (for run-tests skill)
+    "Bash(pytest:*)",
+    "Bash(python -m pytest:*)",
+    "Bash(pip show:*)",  # Useful for debugging package issues
+    # System utilities (commonly needed for workflows)
+    "Bash(mkdir:*)",  # Creating directories
+    "Bash(find:*)",  # Finding files
+    "Bash(cat:*)",  # Quick file reads
+    # Web search for documentation and debugging
+    "WebSearch",
     # File access permissions
+    "Read(//**/specs/**)",  # Reading spec files
+    "Read(//tmp/**)",  # Temp file read access for testing
+    "Write(//tmp/**)",  # Temp file write access for testing/debugging
     "Write(//**/specs/active/**)",
     "Write(//**/specs/pending/**)",
     "Write(//**/specs/completed/**)",
     "Write(//**/specs/archived/**)",
     "Edit(//**/specs/active/**)",
-    "Edit(//**/specs/pending/**)"
+    "Edit(//**/specs/pending/**)",
 ]
 
 # Git read-only permissions (safe operations)
-# These allow Claude to inspect repository state without making changes
 GIT_READ_PERMISSIONS = [
     "Bash(git status:*)",
     "Bash(git log:*)",
     "Bash(git branch:*)",
     "Bash(git diff:*)",
-    "Bash(git rev-parse:*)",
     "Bash(git show:*)",
     "Bash(git describe:*)",
+    "Bash(git rev-parse:*)",
+    "Bash(git ls-tree:*)",
     "Bash(gh pr view:*)",
 ]
 
-# Git write permissions (potentially destructive operations)
-# ⚠️ These allow Claude to modify repository state and push changes
+# Git write permissions (safe write operations)
 GIT_WRITE_PERMISSIONS = [
     "Bash(git checkout:*)",
     "Bash(git add:*)",
@@ -84,16 +97,38 @@ GIT_WRITE_PERMISSIONS = [
     "Bash(git push:*)",
     "Bash(git rm:*)",
     "Bash(gh pr create:*)",
+    "Bash(git mv:*)",
+]
+
+# Git dangerous permissions (destructive operations requiring approval)
+GIT_DANGEROUS_PERMISSIONS = [
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git push --force-with-lease:*)",
+    "Bash(git clean -f:*)",
+    "Bash(git clean -fd:*)",
+    "Bash(git clean -fx:*)",
+    "Bash(git reset --hard:*)",
+    "Bash(git reset --mixed:*)",
+    "Bash(git reset:*)",
+    "Bash(git rebase:*)",
+    "Bash(git commit --amend:*)",
+    "Bash(git filter-branch:*)",
+    "Bash(git filter-repo:*)",
+    "Bash(git branch -D:*)",
+    "Bash(git push origin --delete:*)",
+    "Bash(git tag -d:*)",
+    "Bash(git reflog expire:*)",
+    "Bash(git reflog delete:*)",
+    "Bash(git stash drop:*)",
+    "Bash(git stash clear:*)",
+    "Bash(git gc --prune=now:*)",
 ]
 
 
-def _prompt_for_git_permissions() -> list:
-    """Prompt user about adding git/GitHub permissions.
-
-    Returns:
-        List of git permissions to add (may include read-only, write, or both)
-    """
-    permissions_to_add = []
+def _prompt_for_git_permissions() -> dict[str, list[str]]:
+    """Prompt user about adding git/GitHub permissions."""
+    permissions: dict[str, list[str]] = {"allow": [], "ask": []}
 
     print("\n🔧 Git Integration Setup\n", file=sys.stderr)
     print("Git integration allows Claude to:", file=sys.stderr)
@@ -105,20 +140,18 @@ def _prompt_for_git_permissions() -> list:
     # Prompt 1: Enable git integration at all?
     while True:
         response = input("Enable git integration? (y/n): ").strip().lower()
-        if response in ['y', 'yes']:
-            # Add read-only permissions automatically
+        if response in {"y", "yes"}:
             print("", file=sys.stderr)
             print("✓ Adding read-only git permissions (status, log, diff, etc.)", file=sys.stderr)
-            permissions_to_add.extend(GIT_READ_PERMISSIONS)
+            permissions["allow"].extend(GIT_READ_PERMISSIONS)
             break
-        elif response in ['n', 'no']:
+        if response in {"n", "no"}:
             print("", file=sys.stderr)
             print("⊘ Skipping git integration setup", file=sys.stderr)
             print("  You can manually add git permissions to .claude/settings.local.json later", file=sys.stderr)
             print("", file=sys.stderr)
-            return permissions_to_add
-        else:
-            print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
+            return permissions
+        print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
 
     # Prompt 2: Enable write operations?
     print("", file=sys.stderr)
@@ -128,6 +161,7 @@ def _prompt_for_git_permissions() -> list:
     print("  • Stage changes (git add)", file=sys.stderr)
     print("  • Create commits (git commit)", file=sys.stderr)
     print("  • Push to remote (git push)", file=sys.stderr)
+    print("  • Remove files (git rm)", file=sys.stderr)
     print("  • Create pull requests (gh pr create)", file=sys.stderr)
     print("", file=sys.stderr)
     print("RISK: These operations can modify your repository and push changes.", file=sys.stderr)
@@ -136,273 +170,160 @@ def _prompt_for_git_permissions() -> list:
 
     while True:
         response = input("Enable git write operations? (y/n): ").strip().lower()
-        if response in ['y', 'yes']:
+        if response in {"y", "yes"}:
             print("", file=sys.stderr)
             print("✓ Adding git write permissions", file=sys.stderr)
-            permissions_to_add.extend(GIT_WRITE_PERMISSIONS)
+            permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
+            print("✓ Adding dangerous git operations to ASK list (requires approval)", file=sys.stderr)
+            permissions["ask"].extend(GIT_DANGEROUS_PERMISSIONS)
             break
-        elif response in ['n', 'no']:
+        if response in {"n", "no"}:
             print("", file=sys.stderr)
             print("✓ Git integration enabled (read-only)", file=sys.stderr)
             print("  You can manually add write permissions later if needed", file=sys.stderr)
             break
-        else:
-            print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
+        print("Please enter 'y' for yes or 'n' for no", file=sys.stderr)
 
     print("", file=sys.stderr)
-    return permissions_to_add
+    return permissions
 
 
-def ensure_gitignore_pattern(project_root, pattern):
-    """Add a pattern to .gitignore if not already present.
-
-    Args:
-        project_root: Root directory of the project
-        pattern: Pattern to add to .gitignore (e.g., "specs/.fidelity-reviews/")
-
-    Returns:
-        Tuple of (success: bool, message: str, already_present: bool)
-    """
+def ensure_gitignore_pattern(project_root: Path | str, pattern: str) -> tuple[bool, str, bool]:
+    """Add a pattern to .gitignore if not already present."""
     project_path = Path(project_root).resolve()
     gitignore_file = project_path / ".gitignore"
 
     try:
-        # Read existing .gitignore if it exists
         if gitignore_file.exists():
             gitignore_content = gitignore_file.read_text()
-            # Check if pattern already exists
             if pattern in gitignore_content:
                 return True, f"Pattern already in .gitignore: {pattern}", True
         else:
             gitignore_content = ""
 
-        # Ensure pattern ends with newline for consistency
-        pattern_to_add = pattern if pattern.endswith('\n') else pattern + '\n'
+        pattern_to_add = pattern if pattern.endswith("\n") else f"{pattern}\n"
 
-        # Add pattern if not present
         if pattern not in gitignore_content:
-            # Add a comment explaining the pattern
             if "SDD Toolkit" not in gitignore_content:
-                new_content = gitignore_content + "\n# SDD Toolkit\n" + pattern_to_add
+                new_content = f"{gitignore_content}\n# SDD Toolkit\n{pattern_to_add}"
             else:
-                # If SDD Toolkit section exists, add pattern there
-                new_content = gitignore_content + pattern_to_add
+                new_content = f"{gitignore_content}{pattern_to_add}"
 
             gitignore_file.write_text(new_content)
             return True, f"Added pattern to .gitignore: {pattern}", False
-        else:
-            return True, f"Pattern already in .gitignore: {pattern}", True
 
-    except (OSError, PermissionError) as e:
-        return False, f"Could not update .gitignore: {e}", False
-
-
-def setup_ai_config(project_root):
-    """Setup .claude/ai_config.yaml with centralized AI model configuration.
-
-    Copies the AI config template from the installed claude_skills package to the project.
-    If ai_config.yaml already exists, it is not overwritten.
-
-    Args:
-        project_root: Root directory of the project
-
-    Returns:
-        Tuple of (success: bool, message: str, created: bool)
-    """
-    project_path = Path(project_root).resolve()
-    claude_dir = project_path / ".claude"
-    ai_config_file = claude_dir / "ai_config.yaml"
-
-    try:
-        # Create .claude directory if needed
-        claude_dir.mkdir(parents=True, exist_ok=True)
-
-        # If ai_config.yaml already exists, don't overwrite
-        if ai_config_file.exists():
-            return True, "ai_config.yaml already exists", False
-
-        # Try to find the template from the installed package
-        # The template should be at the same location as this script
-        template_path = Path(__file__).parent.parent / ".." / ".." / ".claude" / "ai_config.yaml"
-
-        # If not found relative to script, search in the package
-        if not template_path.exists():
-            # Try looking in site-packages
-            try:
-                import claude_skills
-                package_dir = Path(claude_skills.__file__).parent.parent
-                template_path = package_dir / ".claude" / "ai_config.yaml"
-            except (ImportError, AttributeError):
-                pass
-
-        # If we still don't have a template, create a minimal one
-        if not template_path.exists():
-            # Create a minimal AI config - users can customize if needed
-            minimal_config = """# Centralized AI Model Consultation Configuration
-#
-# This file defines AI tool configurations for all skills.
-# Generated by setup_project_permissions.py
-
-tools:
-  gemini:
-    command: gemini
-    enabled: true
-    description: Strategic analysis and hypothesis validation
-  codex:
-    command: codex
-    enabled: false
-    description: Code-level review and bug fixes
-  cursor-agent:
-    command: cursor-agent
-    enabled: true
-    description: Repository-wide pattern discovery
-
-models:
-  gemini:
-    priority:
-      - gemini-2.5-pro
-  cursor-agent:
-    priority:
-      - composer-1
-  codex:
-    priority:
-      - gpt-5-codex
-
-consensus:
-    agents:
-      - cursor-agent
-      - gemini
-      - codex
-    auto_trigger:
-      default: false
-      assertion: true
-      exception: true
-      fixture: true
-      import: false
-      timeout: true
-      flaky: false
-      multi-file: true
-
-consultation:
-    timeout_seconds: 600
-"""
-            ai_config_file.write_text(minimal_config)
-            return True, f"Created minimal ai_config.yaml at {ai_config_file}", True
-
-        # Copy template to project
-        shutil.copy2(template_path, ai_config_file)
-        return True, f"Copied ai_config.yaml from template to {ai_config_file}", True
-
-    except (OSError, PermissionError) as e:
-        return False, f"Could not setup ai_config.yaml: {e}", False
+        return True, f"Pattern already in .gitignore: {pattern}", True
+    except (OSError, PermissionError) as exc:
+        return False, f"Could not update .gitignore: {exc}", False
 
 
-def update_permissions(project_root):
-    """Update .claude/settings.local.json with SDD permissions."""
+def update_permissions(project_root: Path | str) -> int:
+    """Update `.claude/settings.local.json` with SDD permissions."""
     project_path = Path(project_root).resolve()
     settings_file = project_path / ".claude" / "settings.local.json"
+    config_file = project_path / ".claude" / "sdd_config.json"
 
-    # Create .claude directory if it doesn't exist
     settings_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load existing settings or create new
+    if not config_file.exists():
+        copy_template_to("sdd_config.json", config_file)
+
     if settings_file.exists():
-        with open(settings_file, 'r') as f:
-            settings = json.load(f)
+        with settings_file.open(encoding="utf-8") as file:
+            settings = json.load(file)
     else:
-        settings = {
-            "$schema": "https://json.schemastore.org/claude-code-settings.json",
-            "permissions": {
-                "allow": [],
-                "deny": [],
-                "ask": []
-            }
-        }
+        settings = deepcopy(load_json_template_clean("settings.local.json"))
 
-    # Ensure permissions structure exists
-    if "permissions" not in settings:
-        settings["permissions"] = {"allow": [], "deny": [], "ask": []}
-    if "allow" not in settings["permissions"]:
-        settings["permissions"]["allow"] = []
+    if not isinstance(settings, dict):
+        settings = {}
 
-    # Add SDD permissions (avoid duplicates)
-    existing_permissions = set(settings["permissions"]["allow"])
-    new_permissions = []
+    permissions = settings.setdefault("permissions", {})
+    permissions.setdefault("allow", [])
+    permissions.setdefault("deny", [])
+    permissions.setdefault("ask", [])
+
+    existing_allow = set(permissions["allow"])
+    existing_ask = set(permissions["ask"])
+    new_permissions: list[str] = []
+    new_ask_permissions: list[str] = []
 
     for perm in SDD_PERMISSIONS:
-        if perm not in existing_permissions:
+        if perm not in existing_allow:
+            permissions["allow"].append(perm)
             new_permissions.append(perm)
-            settings["permissions"]["allow"].append(perm)
+            existing_allow.add(perm)
 
-    # Prompt for git permissions (interactive setup)
     git_permissions = _prompt_for_git_permissions()
 
-    # Add git permissions (avoid duplicates)
-    for perm in git_permissions:
-        if perm not in existing_permissions:
+    for perm in git_permissions["allow"]:
+        if perm not in existing_allow:
+            permissions["allow"].append(perm)
             new_permissions.append(perm)
-            settings["permissions"]["allow"].append(perm)
-            existing_permissions.add(perm)
+            existing_allow.add(perm)
 
-    # Write updated settings
-    with open(settings_file, 'w') as f:
-        json.dump(settings, f, indent=2)
-        f.write('\n')  # Add trailing newline
+    for perm in git_permissions["ask"]:
+        if perm not in existing_ask:
+            permissions["ask"].append(perm)
+            new_ask_permissions.append(perm)
+            existing_ask.add(perm)
 
-    # Update .gitignore to include specs/.fidelity-reviews/
+    with settings_file.open("w", encoding="utf-8") as file:
+        json.dump(settings, file, indent=2)
+        file.write("\n")
+
     gitignore_success, gitignore_msg, already_present = ensure_gitignore_pattern(
         project_path, "specs/.fidelity-reviews/"
     )
 
-    # Setup AI configuration
-    ai_config_success, ai_config_msg, ai_config_created = setup_ai_config(project_path)
+    ai_config_result = ensure_ai_config(project_path)
 
     result = {
         "success": True,
         "settings_file": str(settings_file),
         "permissions_added": len(new_permissions),
-        "total_permissions": len(settings["permissions"]["allow"]),
+        "ask_permissions_added": len(new_ask_permissions),
+        "total_allow_permissions": len(permissions["allow"]),
+        "total_ask_permissions": len(permissions["ask"]),
         "new_permissions": new_permissions,
+        "new_ask_permissions": new_ask_permissions,
         "gitignore": {
             "success": gitignore_success,
             "message": gitignore_msg,
-            "already_present": already_present
+            "already_present": already_present,
         },
-        "ai_config": {
-            "success": ai_config_success,
-            "message": ai_config_msg,
-            "created": ai_config_created
-        }
+        "ai_config": ai_config_result.to_dict(),
     }
 
     print(json.dumps(result, indent=2))
 
-    # Human-readable output to stderr
-    if new_permissions:
-        print(f"\n✅ Added {len(new_permissions)} new SDD permissions to {settings_file}", file=sys.stderr)
+    if new_permissions or new_ask_permissions:
+        print(
+            f"\n✅ Added {len(new_permissions)} ALLOW and {len(new_ask_permissions)} ASK permissions in {settings_file}",
+            file=sys.stderr,
+        )
     else:
         print(f"\n✅ All SDD permissions already configured in {settings_file}", file=sys.stderr)
 
     if gitignore_success:
-        if already_present:
-            print(f"✅ {gitignore_msg}", file=sys.stderr)
-        else:
-            print(f"✅ {gitignore_msg}", file=sys.stderr)
+        print(f"✅ {gitignore_msg}", file=sys.stderr)
     else:
         print(f"⚠️  {gitignore_msg}", file=sys.stderr)
 
-    if ai_config_success:
-        if ai_config_created:
-            print(f"✅ {ai_config_msg}", file=sys.stderr)
-        else:
-            print(f"✅ {ai_config_msg}", file=sys.stderr)
+    if ai_config_result.success:
+        print(f"✅ {ai_config_result.message}", file=sys.stderr)
+        if ai_config_result.created:
+            print(
+                "   Tip: Adjust per-skill model priorities under `.claude/ai_config.yaml` "
+                "or use CLI overrides like `--model gemini=gemini-2.5-pro` during consultations.",
+                file=sys.stderr,
+            )
     else:
-        print(f"⚠️  {ai_config_msg}", file=sys.stderr)
+        print(f"⚠️  {ai_config_result.message}", file=sys.stderr)
 
     return 0
 
 
-def check_permissions(project_root):
+def check_permissions(project_root: Path | str) -> int:
     """Check if SDD permissions are configured."""
     project_path = Path(project_root).resolve()
     settings_file = project_path / ".claude" / "settings.local.json"
@@ -412,23 +333,21 @@ def check_permissions(project_root):
             "configured": False,
             "settings_file": str(settings_file),
             "exists": False,
-            "message": "Settings file does not exist"
+            "message": "Settings file does not exist",
         }
         print(json.dumps(result, indent=2))
         return 1
 
-    with open(settings_file, 'r') as f:
-        settings = json.load(f)
+    with settings_file.open(encoding="utf-8") as file:
+        settings = json.load(file)
 
     existing_permissions = set(settings.get("permissions", {}).get("allow", []))
 
-    # Check if key SDD permissions are present
     required_permissions = [
         "Skill(sdd-toolkit:sdd-plan)",
         "Skill(sdd-toolkit:sdd-next)",
         "Skill(sdd-toolkit:sdd-update)",
     ]
-
     configured = all(perm in existing_permissions for perm in required_permissions)
 
     result = {
@@ -436,35 +355,33 @@ def check_permissions(project_root):
         "settings_file": str(settings_file),
         "exists": True,
         "total_permissions": len(existing_permissions),
-        "has_required": configured
+        "has_required": configured,
     }
 
     print(json.dumps(result, indent=2))
     return 0 if configured else 1
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Setup SDD Project Permissions')
-    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Setup SDD Project Permissions")
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
-    # update command
-    update_cmd = subparsers.add_parser('update', help='Update project settings with SDD permissions')
-    update_cmd.add_argument('project_root', help='Project root directory (e.g., "." for current)')
+    update_cmd = subparsers.add_parser("update", help="Update project settings with SDD permissions")
+    update_cmd.add_argument("project_root", help='Project root directory (e.g., "." for current)')
 
-    # check command
-    check_cmd = subparsers.add_parser('check', help='Check if SDD permissions are configured')
-    check_cmd.add_argument('project_root', help='Project root directory')
+    check_cmd = subparsers.add_parser("check", help="Check if SDD permissions are configured")
+    check_cmd.add_argument("project_root", help="Project root directory")
 
     args = parser.parse_args()
 
-    if args.command == 'update':
+    if args.command == "update":
         return update_permissions(args.project_root)
-    elif args.command == 'check':
+    if args.command == "check":
         return check_permissions(args.project_root)
-    else:
-        parser.print_help()
-        return 1
+
+    parser.print_help()
+    return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
