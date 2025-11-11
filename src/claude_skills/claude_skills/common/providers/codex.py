@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import subprocess
 from typing import Any, Dict, List, Optional, Sequence, Protocol
 
@@ -30,6 +29,7 @@ from .base import (
     TokenUsage,
 )
 from .registry import register_provider
+from .detectors import detect_provider_availability
 
 DEFAULT_BINARY = "codex"
 DEFAULT_TIMEOUT_SECONDS = 120
@@ -334,31 +334,8 @@ class CodexProvider(ProviderContext):
 
 
 def is_codex_available() -> bool:
-    """
-    Check whether the Codex CLI is available.
-
-    Respects the CODEX_CLI_AVAILABLE_OVERRIDE environment variable for tests.
-    """
-    override = os.environ.get(AVAILABILITY_OVERRIDE_ENV)
-    if override is not None:
-        return override.lower() not in {"0", "false", "no"}
-
-    binary = os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
-    binary_path = shutil.which(binary)
-    if not binary_path:
-        return False
-
-    try:
-        subprocess.run(  # noqa: S603,S607 - intentional availability probe
-            [binary_path, "--version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=5,
-            check=True,
-        )
-        return True
-    except (OSError, subprocess.SubprocessError):
-        return False
+    """Codex CLI availability check."""
+    return detect_provider_availability("codex")
 
 
 def create_provider(

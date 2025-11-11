@@ -148,16 +148,31 @@ def test_multi_tool_response_filter_failed() -> None:
 
 
 def test_check_tool_available_found(mocker) -> None:
+    mocker.patch("claude_skills.common.ai_tools.get_provider_detector", return_value=None)
     mocker.patch("shutil.which", return_value="/usr/bin/gemini")
     assert check_tool_available("gemini") is True
 
 
 def test_check_tool_available_not_found(mocker) -> None:
+    mocker.patch("claude_skills.common.ai_tools.get_provider_detector", return_value=None)
     mocker.patch("shutil.which", return_value=None)
     assert check_tool_available("nonexistent") is False
 
 
+def test_check_tool_available_uses_detector(mocker) -> None:
+    detector = Mock()
+    detector.is_available.side_effect = lambda use_probe: not use_probe
+    mocker.patch("claude_skills.common.ai_tools.get_provider_detector", return_value=detector)
+
+    assert check_tool_available("gemini") is True
+    detector.is_available.assert_called_with(use_probe=False)
+
+    assert check_tool_available("gemini", check_version=True) is False
+    detector.is_available.assert_called_with(use_probe=True)
+
+
 def test_detect_available_tools_returns_expected(mocker) -> None:
+    mocker.patch("claude_skills.common.ai_tools.get_provider_detector", return_value=None)
     def fake_which(name: str) -> str | None:
         return f"/usr/bin/{name}" if name != "cursor-agent" else None
 

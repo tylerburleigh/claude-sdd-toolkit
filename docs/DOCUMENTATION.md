@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:19:21
+**Generated:** 2025-11-11 13:26:01
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 309
-- **Total Lines:** 106012
-- **Total Classes:** 435
-- **Total Functions:** 1332
-- **Avg Complexity:** 4.81
+- **Total Files:** 311
+- **Total Lines:** 106613
+- **Total Classes:** 438
+- **Total Functions:** 1341
+- **Avg Complexity:** 4.79
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -547,6 +547,31 @@ class instantiations across the codebase.
 
 ---
 
+### `CursorAgentProvider`
+
+**Language:** python
+**Inherits from:** `ProviderContext`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:114`
+
+**Description:**
+> ProviderContext implementation backed by cursor-agent.
+
+**Methods:**
+- `__init__()`
+- `_first_model_id()`
+- `_ensure_model()`
+- `_build_command()`
+- `_run()`
+- `_cursor_json_flag_error()`
+- `_remove_json_flag()`
+- `_run_with_retry()`
+- `_parse_json_payload()`
+- `_usage_from_payload()`
+- `_emit_stream_if_requested()`
+- `_execute()`
+
+---
+
 ### `DependencyAnalysis`
 
 **Language:** python
@@ -971,6 +996,16 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_codex_provider.py:25`
+
+**Methods:**
+- `__init__()`
+
+---
+
+### `FakeProcess`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:25`
 
 **Methods:**
 - `__init__()`
@@ -2742,6 +2777,20 @@ Attributes:
 
 **Description:**
 > Callable signature used for executing Codex CLI commands.
+
+**Methods:**
+- `__call__()`
+
+---
+
+### `RunnerProtocol`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:40`
+
+**Description:**
+> Callable signature used for executing cursor-agent CLI commands.
 
 **Methods:**
 - `__call__()`
@@ -9237,6 +9286,20 @@ callers understand that provider execution is not yet wired up.
 ### `_default_runner(command) -> subprocess.CompletedProcess[str]`
 
 **Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:53`
+**Complexity:** 1
+
+**Description:**
+> Invoke the cursor-agent CLI via subprocess.
+
+**Parameters:**
+- `command`: Sequence[str]
+
+---
+
+### `_default_runner(command) -> subprocess.CompletedProcess[str]`
+
+**Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:53`
 **Complexity:** 1
 
@@ -10867,6 +10930,17 @@ Returns:
 **Parameters:**
 - `issue_text`: str
 - `severity`: str
+
+---
+
+### `_payload(content) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:32`
+**Complexity:** 1
+
+**Parameters:**
+- `content`: str
 
 ---
 
@@ -16473,6 +16547,17 @@ Returns:
 > Factory used by the provider registry.
 
 dependencies/overrides allow callers (or tests) to inject runner/env/binary.
+
+---
+
+### `create_provider() -> CursorAgentProvider`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:369`
+**Complexity:** 4
+
+**Description:**
+> Factory used by the provider registry.
 
 ---
 
@@ -22584,6 +22669,19 @@ Respects the CODEX_CLI_AVAILABLE_OVERRIDE environment variable for tests.
 
 ---
 
+### `is_cursor_agent_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:341`
+**Complexity:** 4
+
+**Description:**
+> Check whether the cursor-agent CLI is available.
+
+Respects CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE for tests.
+
+---
+
 ### `is_gemini_available() -> bool`
 
 **Language:** python
@@ -28267,6 +28365,17 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_create_provider_and_availability_override(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:157`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
 ### `test_create_provider_injects_custom_runner_and_model(monkeypatch) -> None`
 
 **Language:** python
@@ -28275,6 +28384,38 @@ a decision needs to be made about what to implement.
 
 **Parameters:**
 - `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_cursor_agent_provider_builds_command_and_parses_json() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:47`
+**Complexity:** 1
+
+---
+
+### `test_cursor_agent_provider_handles_invalid_json() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:146`
+**Complexity:** 1
+
+---
+
+### `test_cursor_agent_provider_rejects_attachments() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:133`
+**Complexity:** 1
+
+---
+
+### `test_cursor_agent_provider_retries_without_json_flag() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py:108`
+**Complexity:** 2
 
 ---
 
@@ -32771,6 +32912,10 @@ Returns:
 - `codex.CodexProvider`
 - `codex.create_provider`
 - `codex.is_codex_available`
+- `cursor_agent.CURSOR_METADATA`
+- `cursor_agent.CursorAgentProvider`
+- `cursor_agent.create_provider`
+- `cursor_agent.is_cursor_agent_available`
 - `gemini.GEMINI_METADATA`
 - `gemini.GeminiProvider`
 - `gemini.create_provider`
@@ -32829,6 +32974,35 @@ Returns:
 - `typing.Optional`
 - `typing.Protocol`
 - `typing.Sequence`
+
+### `src/claude_skills/claude_skills/common/providers/cursor_agent.py`
+
+- `__future__.annotations`
+- `base.GenerationRequest`
+- `base.GenerationResult`
+- `base.ModelDescriptor`
+- `base.ProviderCapability`
+- `base.ProviderContext`
+- `base.ProviderExecutionError`
+- `base.ProviderHooks`
+- `base.ProviderMetadata`
+- `base.ProviderStatus`
+- `base.ProviderTimeoutError`
+- `base.ProviderUnavailableError`
+- `base.StreamChunk`
+- `base.TokenUsage`
+- `json`
+- `os`
+- `registry.register_provider`
+- `shutil`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Sequence`
+- `typing.Tuple`
 
 ### `src/claude_skills/claude_skills/common/providers/gemini.py`
 
@@ -34929,6 +35103,21 @@ Returns:
 - `claude_skills.common.providers.codex.CodexProvider`
 - `claude_skills.common.providers.codex.create_provider`
 - `claude_skills.common.providers.codex.is_codex_available`
+- `json`
+- `pytest`
+- `typing.Dict`
+- `typing.List`
+
+### `src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py`
+
+- `__future__.annotations`
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.cursor_agent.CURSOR_METADATA`
+- `claude_skills.common.providers.cursor_agent.CursorAgentProvider`
+- `claude_skills.common.providers.cursor_agent.create_provider`
+- `claude_skills.common.providers.cursor_agent.is_cursor_agent_available`
 - `json`
 - `pytest`
 - `typing.Dict`

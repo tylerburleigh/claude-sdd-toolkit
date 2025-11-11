@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T18:25:33.877920Z",
+  "last_updated": "2025-11-11T18:32:33.304111Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 60,
+    "progress_percentage": 65,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -285,7 +285,7 @@
         "verify-3-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Port key tool integrations to the new abstraction for parity with existing capabilities.",
         "estimated_hours": 19,
@@ -358,16 +358,19 @@
     "task-3-4": {
       "type": "task",
       "title": "Add provider availability detection",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 3,
         "file_path": "src/claude_skills/claude_skills/common/providers/detectors.py",
-        "changes": "Centralise provider discovery strategies including environment checks and feature flags."
+        "changes": "Centralise provider discovery strategies including environment checks and feature flags.",
+        "completed_at": "2025-11-11T18:32:33.292263Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-11T18:32:33.294018Z"
       }
     },
     "task-3-5": {
@@ -622,6 +625,15 @@
       "content": "Introduced src/claude_skills/claude_skills/common/providers/cursor_agent.py to wrap the cursor-agent CLI: sandboxed command construction with temperature/max-token/working-dir support, --json fallback retry, response parsing with streaming chunk emission, and registry registration plus metadata exports. Added tests in src/claude_skills/claude_skills/tests/unit/test_providers/test_cursor_agent_provider.py covering JSON parsing, fallback path, unsupported attachment validation, factory injection, and availability overrides. Verified via pytest src/claude_skills/claude_skills/tests/unit/test_providers.",
       "metadata": {},
       "task_id": "task-3-3"
+    },
+    {
+      "timestamp": "2025-11-11T18:32:33.294007Z",
+      "entry_type": "status_change",
+      "title": "Provider availability detectors",
+      "author": "claude-code",
+      "content": "Implemented src/claude_skills/claude_skills/common/providers/detectors.py with reusable ProviderDetector configs, CLI probe orchestration, env overrides, and registry-style APIs. Updated gemini/codex/cursor providers plus ai_tools.check_tool_available to use the centralized detectors and broadened providers/__init__.py exports. Added regression coverage in src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py and extended test_common/test_ai_tools.py to cover detector delegation. Validated with pytest src/claude_skills/claude_skills/tests/unit/test_providers and pytest src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py.",
+      "metadata": {},
+      "task_id": "task-3-4"
     }
   ]
 }

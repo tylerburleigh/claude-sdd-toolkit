@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import subprocess
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
 
@@ -29,6 +28,7 @@ from .base import (
     TokenUsage,
 )
 from .registry import register_provider
+from .detectors import detect_provider_availability
 
 DEFAULT_BINARY = "cursor-agent"
 DEFAULT_TIMEOUT_SECONDS = 120
@@ -339,31 +339,8 @@ class CursorAgentProvider(ProviderContext):
 
 
 def is_cursor_agent_available() -> bool:
-    """
-    Check whether the cursor-agent CLI is available.
-
-    Respects CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE for tests.
-    """
-    override = os.environ.get(AVAILABILITY_OVERRIDE_ENV)
-    if override is not None:
-        return override.lower() not in {"0", "false", "no"}
-
-    binary = os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
-    binary_path = shutil.which(binary)
-    if not binary_path:
-        return False
-
-    try:
-        subprocess.run(  # noqa: S603,S607 - intentional availability probe
-            [binary_path, "--version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            timeout=5,
-            check=True,
-        )
-        return True
-    except (OSError, subprocess.SubprocessError):
-        return False
+    """Cursor Agent CLI availability check."""
+    return detect_provider_availability("cursor-agent")
 
 
 def create_provider(

@@ -18,6 +18,8 @@ import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from claude_skills.common.providers import get_provider_detector
+
 
 class ToolStatus(Enum):
     """Status of AI tool execution."""
@@ -302,6 +304,10 @@ def check_tool_available(
         >>> check_tool_available("gemini", check_version=True)
         True
     """
+    detector = get_provider_detector(tool)
+    if detector is not None:
+        return detector.is_available(use_probe=check_version)
+
     executable = _resolve_tool_executable(tool)
 
     # Quick PATH check

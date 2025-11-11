@@ -37,6 +37,15 @@ from .registry import (
     set_dependency_resolver,
     reset_registry,
 )
+from .detectors import (
+    ProviderDetector,
+    register_detector as register_provider_detector,
+    get_detector as get_provider_detector,
+    detect_provider_availability,
+    iter_detector_statuses,
+    reset_detectors as reset_provider_detectors,
+    list_detectors as list_provider_detectors,
+)
 from .gemini import (
     GeminiProvider,
     create_provider as create_gemini_provider,
@@ -84,6 +93,13 @@ __all__ = [
     "describe_providers",
     "set_dependency_resolver",
     "reset_registry",
+    "ProviderDetector",
+    "register_provider_detector",
+    "get_provider_detector",
+    "detect_provider_availability",
+    "iter_detector_statuses",
+    "reset_provider_detectors",
+    "list_provider_detectors",
     "GeminiProvider",
     "create_gemini_provider",
     "gemini_is_available",
