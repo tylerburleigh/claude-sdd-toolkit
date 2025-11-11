@@ -1084,10 +1084,16 @@ def apply_modifications(
 
     # Map operation names to functions
     operation_handlers = {
+        # Low-level node operations
         "add_node": _handle_add_node,
         "remove_node": _handle_remove_node,
         "update_node_field": _handle_update_node_field,
         "move_node": _handle_move_node,
+        # High-level task-centric convenience operations
+        "update_task": _handle_update_task,
+        "update_metadata": _handle_update_metadata,
+        "add_verification": _handle_add_verification,
+        "batch_update": _handle_batch_update,
     }
 
     # Apply each modification sequentially with per-operation validation
@@ -1274,3 +1280,396 @@ def _handle_move_node(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[st
     position = mod.get("position")
 
     return move_node(spec_data, node_id, new_parent_id, position)
+
+
+def _handle_update_task(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Handle update_task operation from modifications file.
+
+    This is a convenience wrapper that allows updating multiple task fields
+    in a single operation. It's task-centric and more user-friendly than
+    calling update_node_field multiple times.
+
+    Args:
+        spec_data: The full spec data dictionary
+        mod: Modification dict containing:
+            - task_id: ID of the task to update
+            - updates: Dict of field-value pairs to update
+
+    Returns:
+        Dict with success status and message
+
+    Example:
+        {
+            "operation": "update_task",
+            "task_id": "task-1-5-3",
+            "updates": {
+                "title": "New title",
+                "description": "New description",
+                "file_path": "app/services/foo.py",
+                "task_category": "implementation"
+            }
+        }
+    """
+    # Validate required fields
+    if "task_id" not in mod:
+        return {
+            "success": False,
+            "message": "Missing required field: task_id"
+        }
+
+    if "updates" not in mod:
+        return {
+            "success": False,
+            "message": "Missing required field: updates"
+        }
+
+    task_id = mod["task_id"]
+    updates = mod["updates"]
+
+    if not isinstance(updates, dict):
+        return {
+            "success": False,
+            "message": "updates must be a dictionary"
+        }
+
+    if not updates:
+        return {
+            "success": False,
+            "message": "updates dictionary cannot be empty"
+        }
+
+    # Verify task exists
+    task = get_node(spec_data, task_id)
+    if task is None:
+        return {
+            "success": False,
+            "message": f"Task '{task_id}' not found in hierarchy"
+        }
+
+    # Validate it's a task-like node
+    task_type = task.get("type")
+    if task_type not in ["task", "subtask", "verify"]:
+        return {
+            "success": False,
+            "message": f"Node '{task_id}' is type '{task_type}', not a task/subtask/verify"
+        }
+
+    # Track which fields were updated
+    updated_fields = []
+    failed_fields = []
+
+    # Apply each update sequentially
+    for field, value in updates.items():
+        result = update_node_field(spec_data, task_id, field, value)
+        if result.get("success"):
+            updated_fields.append(field)
+        else:
+            failed_fields.append((field, result.get("message", "Unknown error")))
+
+    # Determine overall success
+    if failed_fields:
+        if not updated_fields:
+            # All updates failed
+            error_msgs = [f"{field}: {msg}" for field, msg in failed_fields]
+            return {
+                "success": False,
+                "message": f"All updates failed for task '{task_id}'. Errors: {'; '.join(error_msgs)}"
+            }
+        else:
+            # Partial success
+            error_msgs = [f"{field}: {msg}" for field, msg in failed_fields]
+            return {
+                "success": False,
+                "message": f"Updated {len(updated_fields)} field(s) but {len(failed_fields)} failed: {'; '.join(error_msgs)}",
+                "updated_fields": updated_fields,
+                "failed_fields": failed_fields
+            }
+    else:
+        # All updates succeeded
+        return {
+            "success": True,
+            "message": f"Successfully updated {len(updated_fields)} field(s) for task '{task_id}'",
+            "updated_fields": updated_fields
+        }
+
+
+def _handle_update_metadata(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Handle update_metadata operation from modifications file.
+
+    This is a convenience wrapper for updating metadata fields without
+    needing to nest them under a "metadata" key. It merges with existing
+    metadata rather than replacing it.
+
+    Args:
+        spec_data: The full spec data dictionary
+        mod: Modification dict containing:
+            - task_id or node_id: ID of the node to update
+            - metadata: Dict of metadata field-value pairs to merge
+
+    Returns:
+        Dict with success status and message
+
+    Example:
+        {
+            "operation": "update_metadata",
+            "task_id": "task-1-5-3",
+            "metadata": {
+                "details": "Detailed implementation notes",
+                "estimated_hours": 4,
+                "priority": "high"
+            }
+        }
+    """
+    # Accept either task_id or node_id
+    node_id = mod.get("task_id") or mod.get("node_id")
+    if not node_id:
+        return {
+            "success": False,
+            "message": "Missing required field: task_id or node_id"
+        }
+
+    if "metadata" not in mod:
+        return {
+            "success": False,
+            "message": "Missing required field: metadata"
+        }
+
+    metadata = mod["metadata"]
+
+    if not isinstance(metadata, dict):
+        return {
+            "success": False,
+            "message": "metadata must be a dictionary"
+        }
+
+    if not metadata:
+        return {
+            "success": False,
+            "message": "metadata dictionary cannot be empty"
+        }
+
+    # Verify node exists
+    node = get_node(spec_data, node_id)
+    if node is None:
+        return {
+            "success": False,
+            "message": f"Node '{node_id}' not found in hierarchy"
+        }
+
+    # Use update_node_field which handles metadata merging
+    result = update_node_field(spec_data, node_id, "metadata", metadata)
+
+    if result.get("success"):
+        return {
+            "success": True,
+            "message": f"Successfully merged {len(metadata)} metadata field(s) for node '{node_id}'",
+            "merged_fields": list(metadata.keys())
+        }
+    else:
+        return {
+            "success": False,
+            "message": result.get("message", f"Failed to update metadata for node '{node_id}'")
+        }
+
+
+def _handle_add_verification(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Handle add_verification operation from modifications file.
+
+    This is a convenience wrapper for adding verification steps to tasks.
+    It auto-generates the boilerplate structure needed for a verify node.
+
+    Args:
+        spec_data: The full spec data dictionary
+        mod: Modification dict containing:
+            - task_id: ID of the parent task
+            - verify_id: ID for the new verification node
+            - description: Description of what to verify
+            - command: Optional command to run for verification
+            - verification_type: Optional type (default: "manual")
+
+    Returns:
+        Dict with success status and message
+
+    Example:
+        {
+            "operation": "add_verification",
+            "task_id": "task-2-1",
+            "verify_id": "verify-2-1-1",
+            "description": "Base streaming insert helper works correctly with staging write-through",
+            "command": "pytest tests/test_streaming.py",
+            "verification_type": "automated"
+        }
+    """
+    # Validate required fields
+    required_fields = ["task_id", "verify_id", "description"]
+    missing = [f for f in required_fields if f not in mod]
+    if missing:
+        return {
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}"
+        }
+
+    task_id = mod["task_id"]
+    verify_id = mod["verify_id"]
+    description = mod["description"]
+    command = mod.get("command", "")
+    verification_type = mod.get("verification_type", "manual")
+
+    # Validate description is not empty
+    if not description or not description.strip():
+        return {
+            "success": False,
+            "message": "description cannot be empty"
+        }
+
+    # Verify parent task exists
+    parent_task = get_node(spec_data, task_id)
+    if parent_task is None:
+        return {
+            "success": False,
+            "message": f"Parent task '{task_id}' not found in hierarchy"
+        }
+
+    # Validate parent is a task-like node
+    parent_type = parent_task.get("type")
+    if parent_type not in ["task", "subtask", "phase", "group"]:
+        return {
+            "success": False,
+            "message": f"Parent '{task_id}' is type '{parent_type}', cannot add verification to this type"
+        }
+
+    # Create verification node data with boilerplate
+    node_data = {
+        "node_id": verify_id,
+        "type": "verify",
+        "title": description.strip(),
+        "description": description.strip(),
+        "status": "pending",
+        "metadata": {
+            "verification_type": verification_type
+        },
+        "dependencies": {
+            "blocks": [],
+            "blocked_by": [],
+            "depends": []
+        }
+    }
+
+    # Add command if provided
+    if command:
+        node_data["command"] = command
+
+    # Use add_node to add the verification
+    result = add_node(spec_data, task_id, node_data)
+
+    if result.get("success"):
+        return {
+            "success": True,
+            "message": f"Successfully added verification '{verify_id}' to task '{task_id}'",
+            "node_id": verify_id
+        }
+    else:
+        return {
+            "success": False,
+            "message": result.get("message", f"Failed to add verification '{verify_id}'")
+        }
+
+
+def _handle_batch_update(spec_data: Dict[str, Any], mod: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Handle batch_update operation from modifications file.
+
+    This allows applying the same change to multiple nodes at once,
+    which is useful for bulk operations like setting priority across
+    all tasks in a phase.
+
+    Args:
+        spec_data: The full spec data dictionary
+        mod: Modification dict containing:
+            - node_ids: List of node IDs to update
+            - field: Field name to update
+            - value: Value to set for all nodes
+
+    Returns:
+        Dict with success status and message
+
+    Example:
+        {
+            "operation": "batch_update",
+            "node_ids": ["task-1-1", "task-1-2", "task-1-3"],
+            "field": "metadata",
+            "value": {"priority": "high"}
+        }
+    """
+    # Validate required fields
+    required_fields = ["node_ids", "field", "value"]
+    missing = [f for f in required_fields if f not in mod]
+    if missing:
+        return {
+            "success": False,
+            "message": f"Missing required fields: {', '.join(missing)}"
+        }
+
+    node_ids = mod["node_ids"]
+    field = mod["field"]
+    value = mod["value"]
+
+    if not isinstance(node_ids, list):
+        return {
+            "success": False,
+            "message": "node_ids must be a list"
+        }
+
+    if not node_ids:
+        return {
+            "success": False,
+            "message": "node_ids list cannot be empty"
+        }
+
+    # Track results
+    updated_nodes = []
+    failed_nodes = []
+
+    # Apply update to each node
+    for node_id in node_ids:
+        # Verify node exists
+        node = get_node(spec_data, node_id)
+        if node is None:
+            failed_nodes.append((node_id, "Node not found"))
+            continue
+
+        # Apply update
+        result = update_node_field(spec_data, node_id, field, value)
+        if result.get("success"):
+            updated_nodes.append(node_id)
+        else:
+            failed_nodes.append((node_id, result.get("message", "Unknown error")))
+
+    # Determine overall success
+    if failed_nodes:
+        if not updated_nodes:
+            # All updates failed
+            error_msgs = [f"{nid}: {msg}" for nid, msg in failed_nodes]
+            return {
+                "success": False,
+                "message": f"All batch updates failed. Errors: {'; '.join(error_msgs)}"
+            }
+        else:
+            # Partial success
+            error_msgs = [f"{nid}: {msg}" for nid, msg in failed_nodes]
+            return {
+                "success": False,
+                "message": f"Updated {len(updated_nodes)}/{len(node_ids)} nodes. Failures: {'; '.join(error_msgs)}",
+                "updated_nodes": updated_nodes,
+                "failed_nodes": failed_nodes
+            }
+    else:
+        # All updates succeeded
+        return {
+            "success": True,
+            "message": f"Successfully updated field '{field}' for {len(updated_nodes)} node(s)",
+            "updated_nodes": updated_nodes
+        }

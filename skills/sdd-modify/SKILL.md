@@ -272,21 +272,27 @@ Create a JSON file with desired modifications:
     {
       "operation": "update_task",
       "task_id": "task-2-1",
-      "field": "description",
-      "value": "Implement OAuth 2.0 authentication with PKCE flow and refresh tokens"
+      "updates": {
+        "description": "Implement OAuth 2.0 authentication with PKCE flow and refresh tokens",
+        "task_category": "implementation",
+        "file_path": "app/services/auth_service.py"
+      }
     },
     {
       "operation": "add_verification",
       "task_id": "task-2-1",
       "verify_id": "verify-2-1-4",
       "description": "Verify refresh token rotation works correctly",
-      "command": "pytest tests/test_auth.py::test_refresh_token_rotation -v"
+      "command": "pytest tests/test_auth.py::test_refresh_token_rotation -v",
+      "verification_type": "automated"
     },
     {
-      "operation": "update_task",
+      "operation": "update_metadata",
       "task_id": "task-2-2",
-      "field": "task_category",
-      "value": "implementation"
+      "metadata": {
+        "estimated_hours": 3,
+        "priority": "high"
+      }
     }
   ]
 }
@@ -445,24 +451,37 @@ Modification files use this structure:
 
 ### Supported Operations
 
-**1. update_task** - Modify existing task fields
+#### High-Level Task-Centric Operations (Recommended)
+
+**1. update_task** - Modify multiple task fields in one operation
 
 ```json
 {
   "operation": "update_task",
   "task_id": "task-2-1",
-  "field": "description",
-  "value": "Updated description"
+  "updates": {
+    "title": "Updated title",
+    "description": "Updated description",
+    "file_path": "app/services/auth.py",
+    "task_category": "implementation"
+  }
 }
 ```
 
 **Updatable fields:**
+- `title` - Task title
 - `description` - Task description
 - `task_category` - Task category (implementation, test, documentation, etc.)
 - `skill` - Skill to use for this task
 - `command` - Command to run for this task
 - `file_path` - Related file path
 - `status_note` - Note about current status
+- `status` - Task status (pending, in_progress, completed, blocked)
+
+**Notes:**
+- Can update multiple fields in single operation
+- Unknown fields are rejected with clear error
+- Validates task exists and is correct type
 
 **2. add_verification** - Add verification step to task
 
@@ -472,7 +491,8 @@ Modification files use this structure:
   "task_id": "task-2-1",
   "verify_id": "verify-2-1-4",
   "description": "Verify X works correctly",
-  "command": "pytest tests/test_x.py -v"
+  "command": "pytest tests/test_x.py -v",
+  "verification_type": "automated"
 }
 ```
 
@@ -480,48 +500,122 @@ Modification files use this structure:
 - `task_id` - Parent task
 - `verify_id` - Unique verification ID (must follow pattern verify-X-Y-Z)
 - `description` - What to verify
-- `command` - Optional command to run
 
-**3. update_metadata** - Update task metadata
+**Optional fields:**
+- `command` - Command to run for verification
+- `verification_type` - Type of verification ("manual" or "automated", defaults to "manual")
+
+**Notes:**
+- Auto-generates boilerplate (type, status, dependencies)
+- Validates parent task exists
+- Prevents duplicate verify_id
+
+**3. update_metadata** - Update task metadata fields
 
 ```json
 {
   "operation": "update_metadata",
   "task_id": "task-2-1",
-  "field": "actual_hours",
-  "value": 4.5
+  "metadata": {
+    "details": "Detailed implementation notes",
+    "estimated_hours": 4,
+    "priority": "high",
+    "complexity": "medium"
+  }
 }
 ```
 
-**Updatable metadata:**
-- `actual_hours` - Actual time spent
+**Common metadata fields:**
+- `details` - Detailed implementation notes
 - `estimated_hours` - Estimated time
-- `priority` - Task priority
-- `complexity` - Task complexity
+- `actual_hours` - Actual time spent
+- `priority` - Task priority (high, medium, low)
+- `complexity` - Task complexity (high, medium, low)
+- Any custom fields your workflow needs
 
-**4. add_task** - Add new task to phase (FUTURE)
+**Notes:**
+- Merges with existing metadata (doesn't replace)
+- Can update multiple metadata fields at once
+- Works on any node type (task, subtask, verify, phase)
 
-```json
-{
-  "operation": "add_task",
-  "phase_id": "phase-2",
-  "task_id": "task-2-5",
-  "description": "New task description",
-  "task_category": "implementation"
-}
-```
-
-**5. remove_task** - Remove task from spec (FUTURE)
+**4. batch_update** - Apply same change to multiple nodes
 
 ```json
 {
-  "operation": "remove_task",
-  "task_id": "task-2-5",
-  "reason": "No longer needed after refactoring"
+  "operation": "batch_update",
+  "node_ids": ["task-1-1", "task-1-2", "task-1-3"],
+  "field": "metadata",
+  "value": {"priority": "high"}
 }
 ```
 
-**6. reorder_tasks** - Change task order within phase (FUTURE)
+**Required fields:**
+- `node_ids` - List of node IDs to update
+- `field` - Field name to update
+- `value` - Value to set for all nodes
+
+**Notes:**
+- Useful for bulk operations (e.g., set priority for all tasks in phase)
+- Partial success possible (reports which nodes succeeded/failed)
+- Works with any updatable field including metadata
+
+#### Low-Level Node Operations (Advanced)
+
+For direct node manipulation, use these operations:
+
+**5. add_node** - Add any node type (task, subtask, verify, phase, group)
+
+```json
+{
+  "operation": "add_node",
+  "parent_id": "phase-2",
+  "node_data": {
+    "node_id": "task-2-5",
+    "type": "task",
+    "title": "New task",
+    "description": "Task description",
+    "status": "pending",
+    "metadata": {},
+    "dependencies": {"blocks": [], "blocked_by": [], "depends": []}
+  }
+}
+```
+
+**6. remove_node** - Remove node (optionally with descendants)
+
+```json
+{
+  "operation": "remove_node",
+  "node_id": "task-2-5",
+  "cascade": true
+}
+```
+
+**7. update_node_field** - Update single field on any node
+
+```json
+{
+  "operation": "update_node_field",
+  "node_id": "task-2-1",
+  "field": "description",
+  "value": "Updated description"
+}
+```
+
+**8. move_node** - Move node to different parent
+
+```json
+{
+  "operation": "move_node",
+  "node_id": "task-1-3",
+  "new_parent_id": "phase-2",
+  "position": 0
+}
+```
+
+#### Future Operations (Not Yet Implemented)
+
+**9. reorder_tasks** - Change task order within phase (PLANNED)
 
 ```json
 {
@@ -869,11 +963,10 @@ sdd apply-modifications my-spec-001 --from mods.json
 ### Current Limitations
 
 1. **No interactive guided mode** - Interactive workflow is planned for Phase 2
-2. **Limited operation types** - Only update_task, add_verification, update_metadata currently supported
-3. **No task reordering** - Cannot change task order within phases yet
-4. **No phase operations** - Cannot add/remove/reorder phases
-5. **Single spec at a time** - No batch operations across multiple specs
-6. **Manual batch creation** - No automated batching or dependency resolution
+2. **No task reordering** - Cannot change task order within phases yet (use move_node as workaround)
+3. **Limited phase operations** - Can add/remove phases with low-level operations, but no high-level convenience operations
+4. **Single spec at a time** - No batch operations across multiple specs
+5. **Manual batch creation** - No automated batching or dependency resolution for complex multi-spec workflows
 
 ### Future Enhancements (Phase 2)
 
