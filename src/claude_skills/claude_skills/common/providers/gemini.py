@@ -1,0 +1,334 @@
+"""
+Gemini CLI provider implementation.
+
+Bridges the `gemini` command-line interface to the ProviderContext contract by
+handling availability checks, safe command construction, response parsing, and
+token usage normalization.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+from typing import Any, Dict, List, Optional, Sequence, Protocol
+
+from .base import (
+    GenerationRequest,
+    GenerationResult,
+    ModelDescriptor,
+    ProviderCapability,
+    ProviderContext,
+    ProviderExecutionError,
+    ProviderHooks,
+    ProviderMetadata,
+    ProviderStatus,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+    StreamChunk,
+    TokenUsage,
+)
+from .registry import register_provider
+
+DEFAULT_BINARY = "gemini"
+DEFAULT_TIMEOUT_SECONDS = 120
+AVAILABILITY_OVERRIDE_ENV = "GEMINI_CLI_AVAILABLE_OVERRIDE"
+CUSTOM_BINARY_ENV = "GEMINI_CLI_BINARY"
+
+
+class RunnerProtocol(Protocol):
+    """Callable signature used for executing Gemini CLI commands."""
+
+    def __call__(
+        self,
+        command: Sequence[str],
+        *,
+        timeout: Optional[int] = None,
+        env: Optional[Dict[str, str]] = None,
+    ) -> subprocess.CompletedProcess[str]:
+        raise NotImplementedError
+
+
+def _default_runner(
+    command: Sequence[str],
+    *,
+    timeout: Optional[int] = None,
+    env: Optional[Dict[str, str]] = None,
+) -> subprocess.CompletedProcess[str]:
+    """Invoke the Gemini CLI via subprocess."""
+    return subprocess.run(  # noqa: S603,S607 - intentional CLI invocation
+        list(command),
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=env,
+        check=False,
+    )
+
+
+GEMINI_MODELS: List[ModelDescriptor] = [
+    ModelDescriptor(
+        id="gemini-2.0-flash",
+        display_name="Gemini 2.0 Flash",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.VISION,
+        },
+        routing_hints={"tier": "flash"},
+    ),
+    ModelDescriptor(
+        id="gemini-2.0-pro",
+        display_name="Gemini 2.0 Pro",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.VISION,
+        },
+        routing_hints={"tier": "pro"},
+    ),
+    ModelDescriptor(
+        id="gemini-2.0-ultra",
+        display_name="Gemini 2.0 Ultra",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.VISION,
+        },
+        routing_hints={"tier": "ultra"},
+    ),
+]
+
+GEMINI_METADATA = ProviderMetadata(
+    provider_name="gemini",
+    models=tuple(GEMINI_MODELS),
+    default_model="gemini-2.0-flash",
+    security_flags={"writes_allowed": False},
+    extra={"cli": "gemini", "output_format": "json"},
+)
+
+
+class GeminiProvider(ProviderContext):
+    """ProviderContext implementation backed by the Gemini CLI."""
+
+    def __init__(
+        self,
+        metadata: ProviderMetadata,
+        hooks: ProviderHooks,
+        *,
+        model: Optional[str] = None,
+        binary: Optional[str] = None,
+        runner: Optional[RunnerProtocol] = None,
+        env: Optional[Dict[str, str]] = None,
+        timeout: Optional[int] = None,
+    ):
+        super().__init__(metadata, hooks)
+        self._runner = runner or _default_runner
+        self._binary = binary or os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
+        self._env = env
+        self._timeout = timeout or DEFAULT_TIMEOUT_SECONDS
+        self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
+
+    def _first_model_id(self) -> str:
+        if not self.metadata.models:
+            raise ProviderUnavailableError(
+                "Gemini provider metadata is missing model descriptors.",
+                provider=self.metadata.provider_name,
+            )
+        return self.metadata.models[0].id
+
+    def _ensure_model(self, candidate: str) -> str:
+        available = {descriptor.id for descriptor in self.metadata.models}
+        if candidate not in available:
+            raise ProviderExecutionError(
+                f"Unsupported Gemini model '{candidate}'. Available: {', '.join(sorted(available))}",
+                provider=self.metadata.provider_name,
+            )
+        return candidate
+
+    def _validate_request(self, request: GenerationRequest) -> None:
+        unsupported: List[str] = []
+        if request.temperature is not None:
+            unsupported.append("temperature")
+        if request.max_tokens is not None:
+            unsupported.append("max_tokens")
+        if request.continuation_id:
+            unsupported.append("continuation_id")
+        if request.attachments:
+            unsupported.append("attachments")
+        if unsupported:
+            raise ProviderExecutionError(
+                f"Gemini CLI does not support: {', '.join(unsupported)}",
+                provider=self.metadata.provider_name,
+            )
+
+    def _build_prompt(self, request: GenerationRequest) -> str:
+        if request.system_prompt:
+            return f"{request.system_prompt.strip()}\n\n{request.prompt}"
+        return request.prompt
+
+    def _build_command(self, model: str, prompt: str) -> List[str]:
+        command = [self._binary, "--output-format", "json", "-p", prompt]
+        if model:
+            command[1:1] = ["-m", model]
+        return command
+
+    def _run(self, command: Sequence[str], timeout: Optional[int]) -> subprocess.CompletedProcess[str]:
+        try:
+            return self._runner(command, timeout=timeout, env=self._env)
+        except FileNotFoundError as exc:
+            raise ProviderUnavailableError(
+                f"Gemini CLI '{self._binary}' is not available on PATH.",
+                provider=self.metadata.provider_name,
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            raise ProviderTimeoutError(str(exc), provider=self.metadata.provider_name) from exc
+
+    def _parse_output(self, raw: str) -> Dict[str, Any]:
+        text = raw.strip()
+        if not text:
+            raise ProviderExecutionError(
+                "Gemini CLI returned empty output.",
+                provider=self.metadata.provider_name,
+            )
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ProviderExecutionError(
+                f"Gemini CLI returned invalid JSON: {exc}",
+                provider=self.metadata.provider_name,
+            ) from exc
+
+    def _extract_usage(self, payload: Dict[str, Any]) -> TokenUsage:
+        stats = payload.get("stats") or {}
+        models_section = stats.get("models") or {}
+        first_model = next(iter(models_section.values()), {})
+        tokens = first_model.get("tokens") or {}
+        return TokenUsage(
+            input_tokens=int(tokens.get("prompt") or tokens.get("input") or 0),
+            output_tokens=int(tokens.get("candidates") or tokens.get("output") or 0),
+            total_tokens=int(tokens.get("total") or 0),
+            metadata={"stats": stats} if stats else {},
+        )
+
+    def _resolve_model(self, request: GenerationRequest) -> str:
+        model_override = request.metadata.get("model") if request.metadata else None
+        if model_override:
+            return self._ensure_model(str(model_override))
+        return self._model
+
+    def _emit_stream_if_requested(self, content: str, *, stream: bool) -> None:
+        if not stream or not content:
+            return
+        self._emit_stream_chunk(StreamChunk(content=content, index=0))
+
+    def _execute(self, request: GenerationRequest) -> GenerationResult:
+        self._validate_request(request)
+        model = self._resolve_model(request)
+        prompt = self._build_prompt(request)
+        command = self._build_command(model, prompt)
+        timeout = request.timeout or self._timeout
+        completed = self._run(command, timeout=timeout)
+
+        if completed.returncode != 0:
+            stderr = (completed.stderr or "").strip()
+            raise ProviderExecutionError(
+                f"Gemini CLI exited with code {completed.returncode}: {stderr or 'no stderr'}",
+                provider=self.metadata.provider_name,
+            )
+
+        payload = self._parse_output(completed.stdout)
+        content = str(payload.get("response") or payload.get("content") or "").strip()
+        reported_model = payload.get("model") or next(iter((payload.get("stats") or {}).get("models") or {}), model)
+        usage = self._extract_usage(payload)
+
+        self._emit_stream_if_requested(content, stream=request.stream)
+
+        return GenerationResult(
+            content=content,
+            model_fqn=f"{self.metadata.provider_name}:{reported_model}",
+            status=ProviderStatus.SUCCESS,
+            usage=usage,
+            stderr=(completed.stderr or "").strip() or None,
+            raw_payload=payload,
+        )
+
+
+def is_gemini_available() -> bool:
+    """
+    Check whether the Gemini CLI is available.
+
+    Respects the GEMINI_CLI_AVAILABLE_OVERRIDE environment variable for tests.
+    """
+    override = os.environ.get(AVAILABILITY_OVERRIDE_ENV)
+    if override is not None:
+        return override.lower() not in {"0", "false", "no"}
+
+    binary = os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
+    binary_path = shutil.which(binary)
+    if not binary_path:
+        return False
+
+    try:
+        subprocess.run(  # noqa: S603,S607 - intentional availability probe
+            [binary_path, "--help"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            check=True,
+        )
+        return True
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def create_provider(
+    *,
+    hooks: ProviderHooks,
+    model: Optional[str] = None,
+    dependencies: Optional[Dict[str, object]] = None,
+    overrides: Optional[Dict[str, object]] = None,
+) -> GeminiProvider:
+    """
+    Factory used by the provider registry.
+
+    dependencies/overrides allow callers (or tests) to inject runner/env/binary.
+    """
+    dependencies = dependencies or {}
+    overrides = overrides or {}
+    runner = dependencies.get("runner")
+    env = dependencies.get("env")
+    binary = overrides.get("binary") or dependencies.get("binary")
+    timeout = overrides.get("timeout")
+    selected_model = overrides.get("model") if overrides.get("model") else model
+
+    return GeminiProvider(
+        metadata=GEMINI_METADATA,
+        hooks=hooks,
+        model=selected_model,
+        binary=binary,  # type: ignore[arg-type]
+        runner=runner if runner is not None else None,  # type: ignore[arg-type]
+        env=env if env is not None else None,  # type: ignore[arg-type]
+        timeout=timeout if timeout is not None else None,
+    )
+
+
+# Register the provider immediately so consumers can resolve it by id.
+register_provider(
+    "gemini",
+    factory=create_provider,
+    metadata=GEMINI_METADATA,
+    availability_check=is_gemini_available,
+    description="Google Gemini CLI adapter",
+    tags=("cli", "text", "vision"),
+    replace=True,
+)
+
+
+__all__ = [
+    "GeminiProvider",
+    "create_provider",
+    "is_gemini_available",
+    "GEMINI_METADATA",
+]

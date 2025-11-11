@@ -37,6 +37,12 @@ from .registry import (
     set_dependency_resolver,
     reset_registry,
 )
+from .gemini import (
+    GeminiProvider,
+    create_provider as create_gemini_provider,
+    is_gemini_available as gemini_is_available,
+    GEMINI_METADATA,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -66,4 +72,8 @@ __all__ = [
     "describe_providers",
     "set_dependency_resolver",
     "reset_registry",
+    "GeminiProvider",
+    "create_gemini_provider",
+    "gemini_is_available",
+    "GEMINI_METADATA",
 ]
