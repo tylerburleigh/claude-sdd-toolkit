@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:26:01
+**Generated:** 2025-11-11 13:32:49
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 311
-- **Total Lines:** 106613
-- **Total Classes:** 438
-- **Total Functions:** 1341
-- **Avg Complexity:** 4.79
+- **Total Files:** 313
+- **Total Lines:** 106832
+- **Total Classes:** 439
+- **Total Functions:** 1356
+- **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -1719,7 +1719,7 @@ Attributes:
 ### `MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:125`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:127`
 
 **Description:**
 > Response from multiple tool consultations run in parallel.
@@ -2436,6 +2436,21 @@ Subclasses should:
 
 **Properties:**
 - `metadata`
+
+---
+
+### `ProviderDetector`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:42`
+
+**Description:**
+> Configuration describing how to detect a provider CLI.
+
+**Methods:**
+- `_resolve_binary()`
+- `_run_probe()`
+- `is_available()`
 
 ---
 
@@ -8168,7 +8183,7 @@ Attributes:
 ### `ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:32`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:34`
 
 **Description:**
 > Standardized response from AI tool consultation.
@@ -8214,7 +8229,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:22`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:24`
 
 **Description:**
 > Status of AI tool execution.
@@ -8936,6 +8951,17 @@ Args:
 
 ---
 
+### `_coerce_bool(value) -> Optional[bool]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:23`
+**Complexity:** 4
+
+**Parameters:**
+- `value`: Optional[str]
+
+---
+
 ### `_coerce_issue_entry(entry) -> Optional[str]`
 
 **Language:** python
@@ -9196,7 +9222,7 @@ Returns:
 ### `_cursor_agent_json_flag_error(result) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:433`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:439`
 **Complexity:** 5
 
 **Description:**
@@ -9967,7 +9993,7 @@ Returns:
 ### `_get_configured_tool_path() -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:253`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:255`
 **Complexity:** 2
 
 **Description:**
@@ -11432,7 +11458,7 @@ Returns:
 ### `_remove_first_occurrence(items, token) -> tuple[list[str], bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:467`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:473`
 **Complexity:** 4
 
 **Description:**
@@ -11505,6 +11531,14 @@ Returns a tuple of (new_list, removed_flag).
 
 ---
 
+### `_reset_default_detectors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:121`
+**Complexity:** 2
+
+---
+
 ### `_resolve_consensus_agents(agents_override) -> List[str]`
 
 **Language:** python
@@ -11548,6 +11582,17 @@ Returns:
 
 **Parameters:**
 - `provider_id`: str
+
+---
+
+### `_resolve_executable(binary) -> Optional[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:34`
+**Complexity:** 2
+
+**Parameters:**
+- `binary`: str
 
 ---
 
@@ -11599,7 +11644,7 @@ Returns:
 ### `_resolve_tool_executable(tool) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:267`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:269`
 **Complexity:** 2
 
 **Description:**
@@ -13194,7 +13239,7 @@ Returns:
 ### `build_tool_command(tool, prompt) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:362`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:368`
 **Complexity:** 7
 
 **Description:**
@@ -14007,8 +14052,8 @@ Example:
 ### `check_tool_available(tool) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:277`
-**Complexity:** 4
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:279`
+**Complexity:** 5
 
 **Description:**
 > Check if a tool is available and optionally working.
@@ -16540,7 +16585,7 @@ Returns:
 ### `create_provider() -> CodexProvider`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/codex.py:364`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/codex.py:341`
 **Complexity:** 4
 
 **Description:**
@@ -16553,7 +16598,7 @@ dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 ### `create_provider() -> CursorAgentProvider`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:369`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:346`
 **Complexity:** 4
 
 **Description:**
@@ -16564,7 +16609,7 @@ dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 ### `create_provider() -> GeminiProvider`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:286`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:263`
 **Complexity:** 4
 
 **Description:**
@@ -16903,7 +16948,7 @@ Example:
 ### `detect_available_tools(tools) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:327`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:333`
 **Complexity:** 4
 
 **Description:**
@@ -17119,6 +17164,24 @@ Returns:
 
 **Parameters:**
 - `directory`: Optional[Path]
+
+---
+
+### `detect_provider_availability(provider_id) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:141`
+**Complexity:** 2
+
+**Description:**
+> Check whether a provider is available.
+
+Args:
+    provider_id: Identifier ("gemini", "codex", "cursor-agent")
+    use_probe: When False, only perform PATH resolution / overrides.
+
+**Parameters:**
+- `provider_id`: str
 
 ---
 
@@ -17620,7 +17683,7 @@ Example:
 ### `execute_tool(tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:488`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:494`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -17654,7 +17717,7 @@ Example:
 ### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:677`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:683`
 **Complexity:** 5
 
 **Description:**
@@ -20983,6 +21046,20 @@ Example:
 
 ---
 
+### `get_detector(provider_id) -> Optional[ProviderDetector]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:136`
+**Complexity:** 1
+
+**Description:**
+> Return the detector for a provider id.
+
+**Parameters:**
+- `provider_id`: str
+
+---
+
 ### `get_directory_structure(test_files, root) -> Dict`
 
 **Language:** python
@@ -22660,12 +22737,10 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/providers/codex.py:336`
-**Complexity:** 4
+**Complexity:** 1
 
 **Description:**
-> Check whether the Codex CLI is available.
-
-Respects the CODEX_CLI_AVAILABLE_OVERRIDE environment variable for tests.
+> Codex CLI availability check.
 
 ---
 
@@ -22673,12 +22748,10 @@ Respects the CODEX_CLI_AVAILABLE_OVERRIDE environment variable for tests.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:341`
-**Complexity:** 4
+**Complexity:** 1
 
 **Description:**
-> Check whether the cursor-agent CLI is available.
-
-Respects CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE for tests.
+> Cursor Agent CLI availability check.
 
 ---
 
@@ -22686,12 +22759,10 @@ Respects CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE for tests.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:258`
-**Complexity:** 4
+**Complexity:** 1
 
 **Description:**
-> Check whether the Gemini CLI is available.
-
-Respects the GEMINI_CLI_AVAILABLE_OVERRIDE environment variable for tests.
+> Gemini CLI availability check.
 
 ---
 
@@ -22850,6 +22921,17 @@ Returns:
 
 ---
 
+### `iter_detector_statuses() -> Dict[str, bool]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:155`
+**Complexity:** 1
+
+**Description:**
+> Return availability map for all registered detectors.
+
+---
+
 ### `list_assumptions(spec_data, assumption_type) -> List[Any]`
 
 **Language:** python
@@ -22895,6 +22977,17 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `list_detectors() -> Iterable[ProviderDetector]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:168`
+**Complexity:** 1
+
+**Description:**
+> Expose registered detector configs.
 
 ---
 
@@ -24602,6 +24695,20 @@ Args:
 
 ---
 
+### `register_detector(detector) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:127`
+**Complexity:** 3
+
+**Description:**
+> Register a detector configuration.
+
+**Parameters:**
+- `detector`: ProviderDetector
+
+---
+
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -25071,6 +25178,27 @@ Returns:
 
 **Parameters:**
 - `cmd_line`: None
+
+---
+
+### `reset_detectors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:163`
+**Complexity:** 1
+
+**Description:**
+> Reset detectors to the default set (used by tests).
+
+---
+
+### `reset_detectors() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py:22`
+**Complexity:** 1
+
+**Decorators:** `@pytest.fixture(autouse=True)`
 
 ---
 
@@ -27525,7 +27653,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_model_only() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:294`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:309`
 **Complexity:** 1
 
 ---
@@ -27544,7 +27672,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_whitespace() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:203`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:218`
 **Complexity:** 1
 
 ---
@@ -27552,7 +27680,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_simple() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:194`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:209`
 **Complexity:** 1
 
 ---
@@ -27736,7 +27864,18 @@ a decision needs to be made about what to implement.
 ### `test_check_tool_available_not_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:155`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:156`
+**Complexity:** 1
+
+**Parameters:**
+- `mocker`: None
+
+---
+
+### `test_check_tool_available_uses_detector(mocker) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:162`
 **Complexity:** 1
 
 **Parameters:**
@@ -28471,7 +28610,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_handles_version_failures() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:180`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:195`
 **Complexity:** 1
 
 ---
@@ -28479,7 +28618,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_parallel_invocation(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:287`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:302`
 **Complexity:** 1
 
 **Parameters:**
@@ -28490,7 +28629,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_returns_expected(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:160`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:174`
 **Complexity:** 1
 
 **Parameters:**
@@ -28513,7 +28652,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_with_version_check() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:171`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:186`
 **Complexity:** 1
 
 ---
@@ -28542,6 +28681,39 @@ a decision needs to be made about what to implement.
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_fidelity_review/test_consultation.py:399`
 **Complexity:** 1
+
+---
+
+### `test_detect_provider_availability_missing_binary_returns_false(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py:40`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: None
+
+---
+
+### `test_detect_provider_availability_respects_override(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py:48`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: None
+
+---
+
+### `test_detect_provider_availability_runs_probe(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py:28`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: None
 
 ---
 
@@ -28680,7 +28852,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_captures_duration(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:280`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:295`
 **Complexity:** 1
 
 **Parameters:**
@@ -28702,7 +28874,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_error_status(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:240`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:255`
 **Complexity:** 1
 
 **Parameters:**
@@ -28791,7 +28963,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_not_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:233`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:248`
 **Complexity:** 1
 
 **Parameters:**
@@ -28813,7 +28985,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:216`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:231`
 **Complexity:** 1
 
 **Parameters:**
@@ -28824,7 +28996,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_timeout(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:226`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:241`
 **Complexity:** 1
 
 **Parameters:**
@@ -28876,7 +29048,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_handles_failures(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:264`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:279`
 **Complexity:** 1
 
 **Parameters:**
@@ -28898,7 +29070,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:248`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:263`
 **Complexity:** 1
 
 **Parameters:**
@@ -30619,6 +30791,17 @@ a decision needs to be made about what to implement.
 **Complexity:** 2
 
 **Decorators:** `@pytest.mark.skipif(not os.environ.get('SDD_TEST_USE_REAL_TOOLS'), reason='Real tool smoke tests disabled (set SDD_TEST_USE_REAL_TOOLS=1 to enable)')`
+
+---
+
+### `test_register_custom_detector(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py:56`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: None
 
 ---
 
@@ -32646,6 +32829,7 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/ai_tools.py`
 
+- `claude_skills.common.providers.get_provider_detector`
 - `concurrent.futures.ThreadPoolExecutor`
 - `concurrent.futures.as_completed`
 - `dataclasses.dataclass`
@@ -32916,6 +33100,13 @@ Returns:
 - `cursor_agent.CursorAgentProvider`
 - `cursor_agent.create_provider`
 - `cursor_agent.is_cursor_agent_available`
+- `detectors.ProviderDetector`
+- `detectors.detect_provider_availability`
+- `detectors.get_detector`
+- `detectors.iter_detector_statuses`
+- `detectors.list_detectors`
+- `detectors.register_detector`
+- `detectors.reset_detectors`
 - `gemini.GEMINI_METADATA`
 - `gemini.GeminiProvider`
 - `gemini.create_provider`
@@ -32963,10 +33154,10 @@ Returns:
 - `base.ProviderUnavailableError`
 - `base.StreamChunk`
 - `base.TokenUsage`
+- `detectors.detect_provider_availability`
 - `json`
 - `os`
 - `registry.register_provider`
-- `shutil`
 - `subprocess`
 - `typing.Any`
 - `typing.Dict`
@@ -32991,10 +33182,10 @@ Returns:
 - `base.ProviderUnavailableError`
 - `base.StreamChunk`
 - `base.TokenUsage`
+- `detectors.detect_provider_availability`
 - `json`
 - `os`
 - `registry.register_provider`
-- `shutil`
 - `subprocess`
 - `typing.Any`
 - `typing.Dict`
@@ -33003,6 +33194,20 @@ Returns:
 - `typing.Protocol`
 - `typing.Sequence`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/common/providers/detectors.py`
+
+- `__future__.annotations`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `logging`
+- `os`
+- `shutil`
+- `subprocess`
+- `typing.Dict`
+- `typing.Iterable`
+- `typing.Optional`
+- `typing.Sequence`
 
 ### `src/claude_skills/claude_skills/common/providers/gemini.py`
 
@@ -33020,10 +33225,10 @@ Returns:
 - `base.ProviderUnavailableError`
 - `base.StreamChunk`
 - `base.TokenUsage`
+- `detectors.detect_provider_availability`
 - `json`
 - `os`
 - `registry.register_provider`
-- `shutil`
 - `subprocess`
 - `typing.Any`
 - `typing.Dict`
@@ -35138,6 +35343,18 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py`
+
+- `__future__.annotations`
+- `claude_skills.common.providers.ProviderDetector`
+- `claude_skills.common.providers.detect_provider_availability`
+- `claude_skills.common.providers.get_provider_detector`
+- `claude_skills.common.providers.register_provider_detector`
+- `claude_skills.common.providers.reset_provider_detectors`
+- `pytest`
+- `subprocess`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
 
