@@ -1,0 +1,203 @@
+from __future__ import annotations
+
+from collections import OrderedDict
+from typing import Any, Callable, Dict
+
+import pytest
+
+from claude_skills.common import ai_config
+
+
+pytestmark = pytest.mark.unit
+
+
+@pytest.fixture
+def set_skill_config(monkeypatch: pytest.MonkeyPatch) -> Callable[[Dict[str, Any]], None]:
+    """Provide a helper for overriding load_skill_config within tests."""
+
+    def _apply(config: Dict[str, Any]) -> None:
+        monkeypatch.setattr(
+            ai_config,
+            "load_skill_config",
+            lambda _: config,
+        )
+
+    return _apply
+
+
+def test_resolve_tool_model_prefers_cli_override_string(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {}})
+    result = ai_config.resolve_tool_model("some-skill", "gemini", override="cli-model")
+    assert result == "cli-model"
+
+
+def test_resolve_tool_model_prefers_cli_override_map(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {}})
+    override = {"gemini": "per-tool", "default": "ignored"}
+    result = ai_config.resolve_tool_model("skill", "gemini", override=override)
+    assert result == "per-tool"
+
+
+def test_resolve_tool_model_uses_failure_type_override(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config(
+        {
+            "models": {
+                "gemini": {"priority": ["base-gemini"]},
+                "overrides": {
+                    "failure_type": {
+                        "assertion": {"gemini": "assertion-model"},
+                        "timeout": {"gemini": {"priority": ["timeout-model"]}},
+                    }
+                },
+            }
+        }
+    )
+
+    result = ai_config.resolve_tool_model(
+        "skill",
+        "gemini",
+        context={"failure_type": "assertion"},
+    )
+    assert result == "assertion-model"
+
+
+def test_resolve_tool_model_falls_back_to_default_priority(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {"gemini": " "}})
+    result = ai_config.resolve_tool_model("skill", "gemini")
+    assert result == ai_config.DEFAULT_MODELS["gemini"]["priority"][0]
+
+
+def test_resolve_tool_model_returns_none_for_unknown_tool(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {}})
+    result = ai_config.resolve_tool_model("skill", "nonexistent")
+    assert result is None
+
+
+def test_resolve_tool_model_handles_empty_priority_lists(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {"gemini": []}})
+    result = ai_config.resolve_tool_model("skill", "gemini")
+    assert result == ai_config.DEFAULT_MODELS["gemini"]["priority"][0]
+
+
+def test_resolve_models_for_tools_shared_context_override(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config(
+        {
+            "models": {
+                "gemini": {"priority": ["base-gemini"]},
+                "cursor-agent": {"priority": ["base-cursor"]},
+                "overrides": {
+                    "failure_type": {
+                        "assertion": {
+                            "gemini": "gemini-assertion",
+                            "cursor-agent": "cursor-assertion",
+                        }
+                    }
+                },
+            }
+        }
+    )
+
+    models = ai_config.resolve_models_for_tools(
+        "skill",
+        ["gemini", "cursor-agent"],
+        context={"failure_type": "assertion"},
+    )
+    assert models == OrderedDict(
+        [
+            ("gemini", "gemini-assertion"),
+            ("cursor-agent", "cursor-assertion"),
+        ]
+    )
+
+
+def test_resolve_models_for_tools_tool_specific_context(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config(
+        {
+            "models": {
+                "gemini": {"priority": ["base-gemini"]},
+                "cursor-agent": {"priority": ["base-cursor"]},
+                "overrides": {
+                    "failure_type": {
+                        "assertion": {"gemini": "gemini-assertion"},
+                        "timeout": {"cursor-agent": "cursor-timeout"},
+                    }
+                },
+            }
+        }
+    )
+
+    context = {
+        "gemini": {"failure_type": "assertion"},
+        "cursor-agent": {"failure_type": "timeout"},
+    }
+
+    models = ai_config.resolve_models_for_tools(
+        "skill",
+        ["gemini", "cursor-agent"],
+        context=context,
+    )
+    assert models == OrderedDict(
+        [
+            ("gemini", "gemini-assertion"),
+            ("cursor-agent", "cursor-timeout"),
+        ]
+    )
+
+
+def test_resolve_models_for_tools_applies_override_map(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {}})
+    override = {"gemini": "cli-gemini", "cursor-agent": "cli-cursor"}
+    models = ai_config.resolve_models_for_tools(
+        "skill",
+        ["gemini", "cursor-agent"],
+        override=override,
+    )
+    assert models == OrderedDict(
+        [
+            ("gemini", "cli-gemini"),
+            ("cursor-agent", "cli-cursor"),
+        ]
+    )
+
+
+def test_resolve_models_for_tools_handles_default_override(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {"gemini": ["base"], "cursor-agent": ["alt"]}})
+    models = ai_config.resolve_models_for_tools(
+        "skill",
+        ["gemini", "cursor-agent"],
+        override="global-model",
+    )
+    assert models == OrderedDict(
+        [
+            ("gemini", "global-model"),
+            ("cursor-agent", "global-model"),
+        ]
+    )
+
+
+def test_resolve_models_for_tools_empty_input_returns_empty(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    set_skill_config({"models": {}})
+    models = ai_config.resolve_models_for_tools("skill", [])
+    assert models == OrderedDict()

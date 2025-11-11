@@ -4,7 +4,7 @@ Fidelity Review Report Generation Module
 Generates structured reports from fidelity review results.
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Mapping
 from pathlib import Path
 from datetime import datetime
 import json
@@ -158,10 +158,83 @@ class FidelityReport:
         self.consensus = review_results.get("consensus", {})
         self.categorized_issues = review_results.get("categorized_issues", [])
         self.parsed_responses = review_results.get("parsed_responses", [])
-        self.models_consulted = review_results.get(
-            "models_consulted",
-            len(self.parsed_responses)
-        )
+
+        default_model_count = len(self.parsed_responses)
+        raw_models = review_results.get("models_consulted", None)
+        self.models_metadata = self._coerce_models_metadata(raw_models, default_model_count)
+        # Backwards compatible aliases
+        self.models_consulted = self.models_metadata
+        self.models_consulted_count = self.models_metadata.get("count", default_model_count)
+
+    @staticmethod
+    def _coerce_models_metadata(raw: Any, default_count: int) -> Dict[str, Any]:
+        """Normalize models_consulted data into a structured dictionary."""
+        def _build_summary(tools_map: Dict[str, Any]) -> str:
+            return "|".join(
+                f"{tool}:{(str(value).strip() if value not in (None, '') else 'none')}"
+                for tool, value in tools_map.items()
+            )
+
+        if isinstance(raw, dict):
+            tools_raw = raw.get("tools", {})
+            tools: Dict[str, Any] = {}
+            if isinstance(tools_raw, Mapping):
+                for key, value in tools_raw.items():
+                    tools[str(key)] = value
+            elif isinstance(tools_raw, list):
+                for index, value in enumerate(tools_raw, start=1):
+                    tools[str(index)] = value
+            count = raw.get("count")
+            if count is None:
+                count = len(tools)
+            metadata: Dict[str, Any] = {
+                "count": int(count),
+                "tools": tools,
+            }
+            summary = raw.get("summary")
+            if summary:
+                metadata["summary"] = str(summary)
+            elif tools:
+                metadata["summary"] = _build_summary(tools)
+            return metadata
+
+        if isinstance(raw, list):
+            tools = {str(index): value for index, value in enumerate(raw, start=1)}
+            metadata = {
+                "count": len(tools),
+                "tools": tools,
+            }
+            if tools:
+                metadata["summary"] = _build_summary(tools)
+            return metadata
+
+        if isinstance(raw, (int, float)):
+            return {
+                "count": int(raw),
+                "tools": {},
+            }
+
+        return {
+            "count": default_count,
+            "tools": {},
+        }
+
+    def _format_models_display(self) -> str:
+        """Format models metadata for human-readable display."""
+        count = self.models_metadata.get("count", 0)
+        tools = self.models_metadata.get("tools", {})
+        if not tools:
+            return str(count)
+
+        parts: List[str] = []
+        for tool, model in tools.items():
+            if model in (None, ""):
+                model_text = "none"
+            else:
+                model_text = str(model)
+            parts.append(f"{tool} -> {model_text}")
+        models_detail = ", ".join(parts)
+        return f"{count} ({models_detail})"
 
     def _get_report_metadata(self) -> Dict[str, Any]:
         """
@@ -173,7 +246,7 @@ class FidelityReport:
         return {
             "generated_at": datetime.utcnow().isoformat() + "Z",
             "spec_id": self.spec_id,
-            "models_consulted": self.models_consulted,
+            "models_consulted": self.models_metadata,
             "report_version": "1.0"
         }
 
@@ -221,7 +294,7 @@ class FidelityReport:
         # Header section
         output.append("# Implementation Fidelity Review\n")
         output.append(f"**Spec:** {self.spec_id}\n")
-        output.append(f"**Models Consulted:** {self.models_consulted}\n")
+        output.append(f"**Models Consulted:** {self._format_models_display()}\n")
 
         # Get consensus data (handle both dict and object)
         consensus_dict = self._convert_to_dict(self.consensus)
@@ -278,7 +351,7 @@ class FidelityReport:
         return {
             "metadata": self._get_report_metadata(),
             "spec_id": self.spec_id,
-            "models_consulted": self.models_consulted,
+            "models_consulted": self.models_metadata,
             "consensus": consensus_dict,
             "categorized_issues": categorized_issues_list,
             "individual_responses": individual_responses_list
@@ -313,7 +386,7 @@ class FidelityReport:
         print(printer.bold("IMPLEMENTATION FIDELITY REVIEW"))
         print("=" * 80)
         print(f"\nSpec: {printer.cyan(self.spec_id)}")
-        print(f"Consulted {self.models_consulted} AI model(s)")
+        print(f"Consulted {self._format_models_display()} AI model(s)")
 
         # Consensus verdict with color
         verdict_upper = consensus_verdict.upper()
@@ -402,7 +475,7 @@ class FidelityReport:
             console.print()
             console.print("[bold cyan]IMPLEMENTATION FIDELITY REVIEW[/bold cyan]")
             console.print(f"[dim]Spec: {self.spec_id}[/dim]")
-            console.print(f"[dim]Consulted {self.models_consulted} AI model(s)[/dim]")
+            console.print(f"[dim]Consulted {self._format_models_display()} AI model(s)[/dim]")
             console.print()
 
             # Consensus verdict with styling
@@ -424,7 +497,7 @@ class FidelityReport:
             print()
             print("IMPLEMENTATION FIDELITY REVIEW")
             print(f"Spec: {self.spec_id}")
-            print(f"Consulted {self.models_consulted} AI model(s)")
+            print(f"Consulted {self._format_models_display()} AI model(s)")
             print()
 
             # Consensus verdict

@@ -9,7 +9,8 @@ import argparse
 import sys
 import json
 import re
-from typing import Optional, List, Callable
+from collections import OrderedDict
+from typing import Optional, List, Callable, Dict, Any
 from pathlib import Path
 
 from .review import FidelityReviewer
@@ -78,10 +79,11 @@ def _create_fidelity_report(
     parsed_responses,
     consensus,
     categorized_issues,
+    models_metadata: Dict[str, Any],
 ) -> FidelityReport:
     review_results = {
         "spec_id": reviewer.spec_id,
-        "models_consulted": len(parsed_responses),
+        "models_consulted": models_metadata,
         "consensus": consensus,
         "categorized_issues": categorized_issues,
         "parsed_responses": parsed_responses,
@@ -222,7 +224,27 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         if consensus_issues is None and isinstance(consensus, dict):
             consensus_issues = consensus.get("consensus_issues", [])
         categorized_issues = categorize_issues(consensus_issues or [])
-        report = _create_fidelity_report(reviewer, parsed_responses, consensus, categorized_issues)
+        models_ordered = OrderedDict(
+            (resp.tool, resp.model)
+            for resp in response_list
+        )
+        models_metadata: Dict[str, Any] = {
+            "count": len(models_ordered),
+            "tools": models_ordered,
+        }
+        if models_ordered:
+            models_metadata["summary"] = "|".join(
+                f"{tool}:{model if model is not None else 'none'}"
+                for tool, model in models_ordered.items()
+            )
+
+        report = _create_fidelity_report(
+            reviewer,
+            parsed_responses,
+            consensus,
+            categorized_issues,
+            models_metadata,
+        )
 
         compact = bool(getattr(args, "compact", False))
         output_format = args.format if hasattr(args, "format") else "text"

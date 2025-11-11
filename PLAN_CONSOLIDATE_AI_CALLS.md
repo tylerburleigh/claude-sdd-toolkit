@@ -77,6 +77,15 @@ Multiple SDD Toolkit skills independently determine which AI model to request wh
 2. Refresh `.claude` template comments to mention automatic model selection.
 3. Remove obsolete helper functions or duplication.
 
+## Progress Log
+
+- **2025-11-11 (EOD)**  
+  - ✅ Completed Phase 1 helpers (`resolve_tool_model`, `resolve_models_for_tools`) with comprehensive unit coverage in `test_common/test_ai_config_models.py`.  
+  - ✅ Refactored `sdd_fidelity_review` single-tool and multi-tool flows to use shared helpers. Progress emitters now include per-tool model maps and summaries; cache keys accept structured model data.  
+  - ✅ Updated fidelity CLI/report pipeline to surface consulted model metadata (`count`, per-tool map, summary string).  
+  - ⏳ Next: propagate helpers into `run_tests`, `code_doc`, and `sdd_plan_review` workflows; extend their CLIs & tests accordingly.  
+  - ⏳ Follow-up: documentation/changelog updates once remaining skills consume the shared helpers.
+
 ## Risks & Mitigations
 
 - **Risk:** Skills relying on bespoke overrides may lose behavior.
