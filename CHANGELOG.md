@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Fixed
 - Updated CLI integration tests to opt into text output (`--no-json`) so completion prompts and human-facing messaging continue to be covered after switching to JSON-first defaults.
+- Restored the packaged `.claude/settings.local.json` template so setup tooling and tests can copy the default permission manifest without errors.
 
 ### Changed
 - Consolidated AI model resolution across `run-tests`, `sdd doc analyze-with-ai`, `sdd plan-review`, and `sdd render --mode enhanced`. These flows now delegate to `ai_config.resolve_tool_model`, accept `--model` CLI overrides (global or per-tool), surface the resolved map in progress output, and ship unit tests documenting the shared helper contract.
