@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T17:51:09.001660Z",
+  "last_updated": "2025-11-11T17:53:20.485175Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 30,
+    "progress_percentage": 35,
     "current_phase": "phase-2"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -159,7 +159,7 @@
         "verify-2-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Introduce the foundational provider abstraction modules and supporting scaffolding.",
         "estimated_hours": 16,
@@ -208,16 +208,22 @@
     "task-2-3": {
       "type": "task",
       "title": "Add provider registry utilities",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 4,
         "file_path": "src/claude_skills/claude_skills/common/providers/registry.py",
-        "changes": "Implement lazy registration, discovery, and dependency injection hooks for provider instances."
+        "changes": "Implement lazy registration, discovery, and dependency injection hooks for provider instances.",
+        "started_at": "2025-11-11T17:53:16.407807Z",
+        "status_note": "Building provider registry utils.",
+        "completed_at": "2025-11-11T17:53:20.471853Z",
+        "needs_journaling": false,
+        "actual_hours": 0.001,
+        "journaled_at": "2025-11-11T17:53:20.482337Z"
       }
     },
     "task-2-4": {
@@ -520,6 +526,15 @@
       "content": "Added src/claude_skills/claude_skills/cli/provider_runner.py exposing build_parser/run_cli/run_provider helpers. Runner parses prompts/metadata, invokes ProviderContext via hooks, handles streaming output buffering, pretty/JSON formatting, and standardized error handling for missing providers, timeouts, and execution failures.\n\nVerification: python -m py_compile src/claude_skills/claude_skills/cli/provider_runner.py",
       "metadata": {},
       "task_id": "task-2-2"
+    },
+    {
+      "timestamp": "2025-11-11T17:53:20.482310Z",
+      "entry_type": "status_change",
+      "title": "Provider registry utilities",
+      "author": "claude-code",
+      "content": "Implemented src/claude_skills/claude_skills/common/providers/registry.py with registration/lazy-loading APIs, availability checks, dependency resolver hooks, and metadata helpers. Updated provider package exports and wired provider_runner to the registry.\n\nVerification: python -m py_compile on registry + provider_runner.",
+      "metadata": {},
+      "task_id": "task-2-3"
     }
   ]
 }

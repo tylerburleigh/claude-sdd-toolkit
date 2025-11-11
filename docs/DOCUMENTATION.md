@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 12:46:05
+**Generated:** 2025-11-11 12:51:14
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 302
-- **Total Lines:** 103881
-- **Total Classes:** 423
-- **Total Functions:** 1287
-- **Avg Complexity:** 4.9
+- **Total Files:** 303
+- **Total Lines:** 104289
+- **Total Classes:** 426
+- **Total Functions:** 1295
+- **Avg Complexity:** 4.89
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -2360,6 +2360,20 @@ Hooks default to no-ops so providers can invoke them unconditionally.
 
 ---
 
+### `ProviderLoader`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:48`
+
+**Description:**
+> Callable used by the runner to obtain ProviderContext instances.
+
+**Methods:**
+- `__call__()`
+
+---
+
 ### `ProviderMetadata`
 
 **Language:** python
@@ -2588,6 +2602,26 @@ Attributes:
 - `render_all()`
 - `clear_messages()`
 - `context()`
+
+---
+
+### `RunnerConfig`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:61`
+
+**Description:**
+> Configuration parsed from CLI flags or programmatic callers.
+
+---
+
+### `RunnerResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:76`
+
+**Description:**
+> Return payload for scripted consumers.
 
 ---
 
@@ -9009,6 +9043,23 @@ Returns:
 
 ---
 
+### `_default_provider_loader(provider) -> ProviderContext`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:149`
+**Complexity:** 3
+
+**Description:**
+> Lazy loader that defers to the provider registry once it exists.
+
+Until the registry module lands, this helper raises a clear error so
+callers understand that provider execution is not yet wired up.
+
+**Parameters:**
+- `provider`: str
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -9160,6 +9211,20 @@ Returns:
 
 **Parameters:**
 - `payload`: Any
+
+---
+
+### `_dump_json_result(result) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:346`
+**Complexity:** 3
+
+**Description:**
+> Emit JSON payload for automation.
+
+**Parameters:**
+- `result`: RunnerResult
 
 ---
 
@@ -10097,6 +10162,20 @@ Args:
 
 ---
 
+### `_load_prompt(args) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:269`
+**Complexity:** 3
+
+**Description:**
+> Resolve prompt from inline text or file/stdin.
+
+**Parameters:**
+- `args`: argparse.Namespace
+
+---
+
 ### `_make_args() -> Namespace`
 
 **Language:** python
@@ -10497,6 +10576,20 @@ Extracts issues from sections:
 
 ---
 
+### `_parse_metadata(args) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:281`
+**Complexity:** 7
+
+**Description:**
+> Combine key=value pairs and JSON metadata flags.
+
+**Parameters:**
+- `args`: argparse.Namespace
+
+---
+
 ### `_parse_model_override(values) -> Optional[object]`
 
 **Language:** python
@@ -10722,6 +10815,22 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 **Parameters:**
 - `phases`: List[Dict[str, Any]]
 - `ui`: None
+
+---
+
+### `_print_result(result, config, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:304`
+**Complexity:** 8
+
+**Description:**
+> Pretty-print execution results.
+
+**Parameters:**
+- `result`: RunnerResult
+- `config`: RunnerConfig
+- `printer`: PrettyPrinter
 
 ---
 
@@ -12736,6 +12845,17 @@ Returns:
 - `query`: Any
 - `class_name`: str
 - `crud_ops`: Dict[str, List[Dict[str, Any]]]
+
+---
+
+### `build_parser() -> argparse.ArgumentParser`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:87`
+**Complexity:** 1
+
+**Description:**
+> Create an ArgumentParser for provider invocations.
 
 ---
 
@@ -24655,6 +24775,20 @@ Example:
 
 ---
 
+### `run_cli(argv) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:370`
+**Complexity:** 3
+
+**Description:**
+> Command-line entrypoint used by python -m claude_skills.cli.provider_runner.
+
+**Parameters:**
+- `argv`: Optional[List[str]]
+
+---
+
 ### `run_cli() -> None`
 
 **Language:** python
@@ -24757,6 +24891,23 @@ Returns:
 
 **Description:**
 > Run doc CLI via sdd.
+
+---
+
+### `run_provider(config) -> RunnerResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:176`
+⚠️ **Complexity:** 11 (High)
+
+**Description:**
+> Execute a provider with the supplied configuration.
+
+Returns a RunnerResult containing execution metadata so automated callers
+can inspect status, timing, and outputs.
+
+**Parameters:**
+- `config`: RunnerConfig
 
 ---
 
@@ -31289,6 +31440,37 @@ Returns:
 - `claude_skills.common.load_json_spec`
 - `claude_skills.sdd_render.AIEnhancedRenderer`
 - `claude_skills.sdd_render.SpecRenderer`
+
+### `src/claude_skills/claude_skills/cli/provider_runner.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.GenerationResult`
+- `claude_skills.common.providers.ProviderContext`
+- `claude_skills.common.providers.ProviderError`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.ProviderStatus`
+- `claude_skills.common.providers.ProviderTimeoutError`
+- `claude_skills.common.providers.ProviderUnavailableError`
+- `claude_skills.common.providers.StreamChunk`
+- `claude_skills.common.providers.TokenUsage`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `dataclasses.replace`
+- `json`
+- `logging`
+- `pathlib.Path`
+- `sys`
+- `time`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
 
 ### `src/claude_skills/claude_skills/cli/sdd/__init__.py`
 

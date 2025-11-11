@@ -25,6 +25,18 @@ from .base import (
     BeforeExecuteHook,
     AfterResultHook,
 )
+from .registry import (
+    ProviderFactory,
+    ProviderRegistration,
+    register_provider,
+    register_lazy_provider,
+    available_providers,
+    resolve_provider,
+    get_provider_metadata,
+    describe_providers,
+    set_dependency_resolver,
+    reset_registry,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -44,4 +56,14 @@ __all__ = [
     "StreamCallback",
     "BeforeExecuteHook",
     "AfterResultHook",
+    "ProviderFactory",
+    "ProviderRegistration",
+    "register_provider",
+    "register_lazy_provider",
+    "available_providers",
+    "resolve_provider",
+    "get_provider_metadata",
+    "describe_providers",
+    "set_dependency_resolver",
+    "reset_registry",
 ]

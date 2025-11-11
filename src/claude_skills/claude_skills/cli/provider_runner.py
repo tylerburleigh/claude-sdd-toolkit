@@ -39,10 +39,10 @@ from claude_skills.common.providers import (
 
 logger = logging.getLogger(__name__)
 
-try:  # Registry will be introduced in a subsequent task; keep import optional.
-    from claude_skills.common.providers import registry as provider_registry  # type: ignore
+try:
+    from claude_skills.common.providers import resolve_provider as _resolve_provider
 except Exception:  # pragma: no cover - best effort optional dependency
-    provider_registry = None  # type: ignore
+    _resolve_provider = None  # type: ignore
 
 
 class ProviderLoader(Protocol):
@@ -158,19 +158,12 @@ def _default_provider_loader(
     Until the registry module lands, this helper raises a clear error so
     callers understand that provider execution is not yet wired up.
     """
-    if provider_registry is None:
+    if _resolve_provider is None:
         raise ProviderUnavailableError(
             "Provider registry is not available yet.",
             provider=provider,
         )
-
-    resolve = getattr(provider_registry, "resolve_provider", None)
-    if resolve is None:
-        raise ProviderUnavailableError(
-            "Provider registry is missing resolve_provider().",
-            provider=provider,
-        )
-    return resolve(provider, hooks=hooks, model=model)
+    return _resolve_provider(provider, hooks=hooks, model=model)
 
 
 def run_provider(
