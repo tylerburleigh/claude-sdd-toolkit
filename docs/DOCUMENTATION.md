@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:52:43
+**Generated:** 2025-11-11 13:59:38
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 314
-- **Total Lines:** 106945
+- **Total Lines:** 107005
 - **Total Classes:** 439
-- **Total Functions:** 1362
-- **Avg Complexity:** 4.73
+- **Total Functions:** 1367
+- **Avg Complexity:** 4.72
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -8979,7 +8979,7 @@ Args:
 ### `_coerce_override_map(override) -> Tuple[Optional[str], Dict[str, str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:229`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:257`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9242,7 +9242,7 @@ Returns:
 ### `_dedupe_preserve_order(items) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:84`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:112`
 **Complexity:** 6
 
 **Description:**
@@ -9678,7 +9678,7 @@ Preserves multi-line items by joining continuation lines with spaces.
 ### `_extract_model_priority(models_config, tool, context) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:200`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:228`
 **Complexity:** 8
 
 **Description:**
@@ -9694,7 +9694,7 @@ Preserves multi-line items by joining continuation lines with spaces.
 ### `_extract_override_priority(overrides_config, tool, context) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:147`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:175`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -9710,7 +9710,7 @@ Preserves multi-line items by joining continuation lines with spaces.
 ### `_extract_priority_from_value(value, tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:130`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:158`
 **Complexity:** 6
 
 **Description:**
@@ -10018,6 +10018,20 @@ The coverage preset auto-detects the source directory to avoid hard-coding.
 
 Returns:
     Dictionary of preset configurations
+
+---
+
+### `_get_provider_map(config) -> Dict[str, Dict]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:82`
+**Complexity:** 3
+
+**Description:**
+> Return the provider configuration map, falling back to tools/defaults.
+
+**Parameters:**
+- `config`: Mapping[str, Any]
 
 ---
 
@@ -10685,7 +10699,7 @@ Returns:
 ### `_normalize_auto_trigger_value(value) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:714`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:742`
 **Complexity:** 6
 
 **Description:**
@@ -10699,7 +10713,7 @@ Returns:
 ### `_normalize_context_values(value) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:99`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:127`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -10756,7 +10770,7 @@ Returns:
 ### `_normalize_priority_entry(entry) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:65`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:93`
 **Complexity:** 7
 
 **Description:**
@@ -10764,6 +10778,20 @@ Returns:
 
 **Parameters:**
 - `entry`: object
+
+---
+
+### `_normalize_provider_settings(config) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:65`
+**Complexity:** 3
+
+**Description:**
+> Ensure provider-centric configuration is present with backwards compatibility.
+
+**Parameters:**
+- `config`: Dict[str, Any]
 
 ---
 
@@ -11591,7 +11619,7 @@ Returns:
 ### `_resolve_context_for_tool(context, tool) -> Optional[Mapping[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:279`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:307`
 **Complexity:** 10
 
 **Description:**
@@ -20638,7 +20666,7 @@ Returns:
 ### `get_agent_command(skill_name, agent_name, prompt) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:621`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:649`
 **Complexity:** 2
 
 **Description:**
@@ -20664,7 +20692,7 @@ Returns:
 ### `get_agent_priority(skill_name, default_order) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:593`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:621`
 **Complexity:** 6
 
 **Description:**
@@ -20867,7 +20895,7 @@ Returns:
 ### `get_config_path(skill_name) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:489`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:517`
 **Complexity:** 3
 
 **Description:**
@@ -20965,7 +20993,7 @@ Returns:
 ### `get_consensus_agents(skill_name) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:731`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:759`
 **Complexity:** 7
 
 **Description:**
@@ -21138,7 +21166,7 @@ Returns dictionary of tools where enabled: true in config.
 ### `get_enabled_tools(skill_name) -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:574`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:602`
 **Complexity:** 1
 
 **Description:**
@@ -21216,7 +21244,7 @@ Returns:
 ### `get_global_config_path() -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:415`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:443`
 **Complexity:** 3
 
 **Description:**
@@ -21519,7 +21547,7 @@ Returns:
 ### `get_preferred_model(skill_name, tool_name) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:410`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:438`
 **Complexity:** 1
 
 **Description:**
@@ -21701,7 +21729,7 @@ Example:
 ### `get_routing_config(skill_name) -> Dict[str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:761`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:789`
 **Complexity:** 3
 
 **Description:**
@@ -22259,7 +22287,7 @@ Returns:
 ### `get_timeout(skill_name, timeout_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:655`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:683`
 **Complexity:** 4
 
 **Description:**
@@ -22281,7 +22309,7 @@ Returns:
 ### `get_tool_config(skill_name, tool_name) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:683`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:711`
 **Complexity:** 1
 
 **Description:**
@@ -22890,7 +22918,7 @@ Returns:
 ### `is_tool_enabled(skill_name, tool_name) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:698`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:726`
 **Complexity:** 2
 
 **Description:**
@@ -23203,7 +23231,7 @@ Returns:
 ### `load_global_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:438`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:466`
 **Complexity:** 4
 
 **Description:**
@@ -23342,7 +23370,7 @@ Returns:
 ### `load_skill_config(skill_name) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:521`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:549`
 **Complexity:** 4
 
 **Description:**
@@ -23578,7 +23606,7 @@ Returns:
 ### `merge_configs(base, override) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:463`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:491`
 **Complexity:** 5
 
 **Description:**
@@ -25301,7 +25329,7 @@ Returns:
 ### `resolve_models_for_tools(skill_name, tools, override, context) -> 'OrderedDict[str, Optional[str]]'`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:360`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:388`
 **Complexity:** 8
 
 **Description:**
@@ -25341,7 +25369,7 @@ Returns:
 ### `resolve_tool_model(skill_name, tool, override, context) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:312`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:340`
 **Complexity:** 8
 
 **Description:**
@@ -29666,6 +29694,17 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_get_enabled_tools_uses_provider_section(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_config_models.py:206`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
 ### `test_get_file_changes_falls_back_on_first_run(monkeypatch, tmp_path, sample_json_spec_simple, specs_structure) -> None`
 
 **Language:** python
@@ -29915,6 +29954,17 @@ a decision needs to be made about what to implement.
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py:21`
 **Complexity:** 1
+
+---
+
+### `test_get_tool_config_reads_from_providers(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_config_models.py:217`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
 
 ---
 
@@ -30223,6 +30273,17 @@ a decision needs to be made about what to implement.
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py:36`
 **Complexity:** 1
+
+---
+
+### `test_load_skill_config_promotes_tools_to_providers(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_config_models.py:227`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
 
 ---
 

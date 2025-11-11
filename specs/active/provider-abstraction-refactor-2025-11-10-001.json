@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T18:52:57.024542Z",
+  "last_updated": "2025-11-11T19:01:08.902850Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 80,
+    "progress_percentage": 85,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -428,7 +428,7 @@
         "verify-4-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Adopt the provider abstraction across runtime surfaces and documentation.",
         "estimated_hours": 13,
@@ -459,22 +459,28 @@
     "task-4-2": {
       "type": "task",
       "title": "Update configuration modules for providers",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 3,
         "file_path": "src/claude_skills/claude_skills/common/ai_config.py",
-        "changes": "Introduce provider-centric configuration knobs, default fallbacks, and compatibility shims."
+        "changes": "Introduce provider-centric configuration knobs, default fallbacks, and compatibility shims.",
+        "started_at": "2025-11-11T18:54:13.075099Z",
+        "status_note": "Updating AI config for provider settings",
+        "completed_at": "2025-11-11T19:01:08.886089Z",
+        "needs_journaling": false,
+        "actual_hours": 0.116,
+        "journaled_at": "2025-11-11T19:01:08.898868Z"
       }
     },
     "task-4-3": {
       "type": "task",
       "title": "Align runtime consumers with provider registry",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [],
       "total_tasks": 1,
@@ -483,7 +489,9 @@
         "task_category": "refactoring",
         "estimated_hours": 4,
         "file_path": "src/claude_skills/claude_skills",
-        "details": "Update run-tests and SDD skill runtimes to resolve providers via registry and handle new response envelopes."
+        "details": "Update run-tests and SDD skill runtimes to resolve providers via registry and handle new response envelopes.",
+        "started_at": "2025-11-11T19:00:21.344254Z",
+        "status_note": "Aligning runtimes with provider registry"
       }
     },
     "task-4-4": {
@@ -688,6 +696,15 @@
       "content": "Refactored src/claude_skills/claude_skills/common/ai_tools.py to execute via the provider registry: execute_tool now resolves ProviderContext instances, maps ProviderStatus to ToolStatus, and records normalized usage metadata instead of shelling out directly. Expanded test coverage with provider-backed unit stubs in src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py and updated integration tests in src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py to emit provider-compliant JSON payloads. Verification: pytest src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py, pytest src/claude_skills/claude_skills/tests/unit/test_providers, pytest src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py.",
       "metadata": {},
       "task_id": "task-4-1"
+    },
+    {
+      "timestamp": "2025-11-11T19:01:08.898829Z",
+      "entry_type": "status_change",
+      "title": "Provider-centric AI configuration",
+      "author": "claude-code",
+      "content": "Normalized ai_config to promote provider-centric settings: load_skill_config now ensures a providers section (with tools shim) and all helpers (get_enabled_tools, get_tool_config, etc.) read from it. Added guard utilities (_normalize_provider_settings, _get_provider_map) plus regression tests validating enabled-tool filtering and config promotion. Verified with pytest src/claude_skills/claude_skills/tests/unit/test_common/test_ai_config_models.py and pytest src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py.",
+      "metadata": {},
+      "task_id": "task-4-2"
     }
   ]
 }
