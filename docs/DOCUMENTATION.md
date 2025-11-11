@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 12:51:14
+**Generated:** 2025-11-11 12:53:33
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 303
-- **Total Lines:** 104289
-- **Total Classes:** 426
-- **Total Functions:** 1295
-- **Avg Complexity:** 4.89
+- **Total Files:** 304
+- **Total Lines:** 104657
+- **Total Classes:** 428
+- **Total Functions:** 1305
+- **Avg Complexity:** 4.88
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -2343,6 +2343,24 @@ Subclasses should:
 
 ---
 
+### `ProviderFactory`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:27`
+
+**Description:**
+> Callable that instantiates a ProviderContext.
+
+Implementations should accept keyword-only arguments for hooks, model,
+dependencies, and overrides so the registry can pass future options
+without breaking signatures.
+
+**Methods:**
+- `__call__()`
+
+---
+
 ### `ProviderHooks`
 
 **Language:** python
@@ -2388,6 +2406,21 @@ Attributes:
     default_model: Optional default model id used when no override supplied.
     security_flags: Provider-specific sandbox/safety configuration.
     extra: Arbitrary metadata (version info, auth requirements, etc.).
+
+---
+
+### `ProviderRegistration`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:54`
+
+**Description:**
+> Internal record for a registered provider.
+
+**Methods:**
+- `load_factory()`
+- `is_available()`
+- `resolve_metadata()`
 
 ---
 
@@ -8214,6 +8247,19 @@ Args:
 
 ---
 
+### `_build_attr_resolver(module_path, attr, provider_id) -> Callable[[], Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:226`
+**Complexity:** 2
+
+**Parameters:**
+- `module_path`: str
+- `attr`: str
+- `provider_id`: str
+
+---
+
 ### `_build_bidirectional_deps_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
@@ -9047,7 +9093,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:149`
-**Complexity:** 3
+**Complexity:** 2
 
 **Description:**
 > Lazy loader that defers to the provider registry once it exists.
@@ -9217,7 +9263,7 @@ Returns:
 ### `_dump_json_result(result) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:346`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:339`
 **Complexity:** 3
 
 **Description:**
@@ -10165,7 +10211,7 @@ Args:
 ### `_load_prompt(args) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:269`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:262`
 **Complexity:** 3
 
 **Description:**
@@ -10579,7 +10625,7 @@ Extracts issues from sections:
 ### `_parse_metadata(args) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:281`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:274`
 **Complexity:** 7
 
 **Description:**
@@ -10821,7 +10867,7 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_print_result(result, config, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:304`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:297`
 **Complexity:** 8
 
 **Description:**
@@ -11253,6 +11299,17 @@ Returns:
 **Parameters:**
 - `context`: Optional[Mapping[str, Any]]
 - `tool`: str
+
+---
+
+### `_resolve_dependencies(provider_id) -> Dict[str, object]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:327`
+**Complexity:** 4
+
+**Parameters:**
+- `provider_id`: str
 
 ---
 
@@ -12699,6 +12756,17 @@ Returns:
 - `spec_id`: str
 - `specs_dir`: Path
 - `printer`: Optional[PrettyPrinter]
+
+---
+
+### `available_providers() -> List[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:239`
+**Complexity:** 2
+
+**Description:**
+> Return provider identifiers sorted by priority (desc) then name.
 
 ---
 
@@ -16543,6 +16611,17 @@ Example:
 
 **Parameters:**
 - `args`: None
+
+---
+
+### `describe_providers() -> List[Dict[str, object]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:292`
+**Complexity:** 2
+
+**Description:**
+> Return descriptive information for all registered providers.
 
 ---
 
@@ -21175,6 +21254,20 @@ Example:
 
 ---
 
+### `get_provider_metadata(provider_id) -> Optional[ProviderMetadata]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:284`
+**Complexity:** 2
+
+**Description:**
+> Return ProviderMetadata if available.
+
+**Parameters:**
+- `provider_id`: str
+
+---
+
 ### `get_revision_history(spec_data) -> List[Dict[str, Any]]`
 
 **Language:** python
@@ -24235,6 +24328,21 @@ Args:
 
 ---
 
+### `register_lazy_provider(provider_id, module_path) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:176`
+**Complexity:** 4
+
+**Description:**
+> Helper for registering providers by module path without importing upfront.
+
+**Parameters:**
+- `provider_id`: str
+- `module_path`: str
+
+---
+
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
@@ -24326,6 +24434,32 @@ Args:
 **Parameters:**
 - `subparsers`: None
 - `parent_parser`: None
+
+---
+
+### `register_provider(provider_id) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:127`
+**Complexity:** 6
+
+**Description:**
+> Register a provider factory with the global registry.
+
+Args:
+    provider_id: Canonical provider identifier (e.g., "gemini").
+    factory: Callable that instantiates ProviderContext instances.
+    lazy_loader: Callable that returns a factory when invoked (lazy import).
+    metadata: Optional ProviderMetadata object (cached).
+    metadata_resolver: Callable that returns ProviderMetadata on demand.
+    availability_check: Callable returning bool to gate resolution.
+    priority: Sorting priority for available_providers (higher first).
+    description: Human-readable description for diagnostics.
+    tags: Optional labels describing the provider (e.g., ["cli", "modelchorus"]).
+    replace: Overwrite existing registration if True.
+
+**Parameters:**
+- `provider_id`: str
 
 ---
 
@@ -24606,6 +24740,17 @@ Returns:
 
 ---
 
+### `reset_registry() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:321`
+**Complexity:** 1
+
+**Description:**
+> Utility for tests to clear registry state.
+
+---
+
 ### `reset_schema_loader(monkeypatch) -> None`
 
 **Language:** python
@@ -24661,6 +24806,20 @@ Returns:
 - `tools`: Iterable[str]
 - `override`: Any
 - `context`: Optional[Mapping[str, Any]]
+
+---
+
+### `resolve_provider(provider_id) -> ProviderContext`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:252`
+**Complexity:** 3
+
+**Description:**
+> Instantiate a provider by id using the registered factory.
+
+**Parameters:**
+- `provider_id`: str
 
 ---
 
@@ -24778,7 +24937,7 @@ Example:
 ### `run_cli(argv) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:370`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:363`
 **Complexity:** 3
 
 **Description:**
@@ -24897,7 +25056,7 @@ Returns:
 ### `run_provider(config) -> RunnerResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:176`
+**Defined in:** `src/claude_skills/claude_skills/cli/provider_runner.py:169`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -25393,6 +25552,23 @@ Returns:
 - `spec_data`: Dict
 - `backup`: bool
 - `validate`: bool
+
+---
+
+### `set_dependency_resolver(resolver) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/registry.py:310`
+**Complexity:** 1
+
+**Description:**
+> Register a callable that supplies dependency dictionaries per provider id.
+
+The resolver is invoked during `resolve_provider` and should return a dict
+that will be passed to the provider factory via the `dependencies` keyword.
+
+**Parameters:**
+- `resolver`: Optional[DependencyResolver]
 
 ---
 
@@ -32202,6 +32378,16 @@ Returns:
 - `base.StreamCallback`
 - `base.StreamChunk`
 - `base.TokenUsage`
+- `registry.ProviderFactory`
+- `registry.ProviderRegistration`
+- `registry.available_providers`
+- `registry.describe_providers`
+- `registry.get_provider_metadata`
+- `registry.register_lazy_provider`
+- `registry.register_provider`
+- `registry.reset_registry`
+- `registry.resolve_provider`
+- `registry.set_dependency_resolver`
 
 ### `src/claude_skills/claude_skills/common/providers/base.py`
 
@@ -32218,6 +32404,25 @@ Returns:
 - `typing.Optional`
 - `typing.Sequence`
 - `typing.Set`
+
+### `src/claude_skills/claude_skills/common/providers/registry.py`
+
+- `__future__.annotations`
+- `base.ProviderContext`
+- `base.ProviderHooks`
+- `base.ProviderMetadata`
+- `base.ProviderUnavailableError`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `importlib`
+- `logging`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Sequence`
 
 ### `src/claude_skills/claude_skills/common/query_operations.py`
 
