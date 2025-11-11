@@ -38,6 +38,7 @@ Thumbs.db
 
 # Claude Code
 settings.local.json
+!src/claude_skills/claude_skills/common/templates/setup/settings.local.json
 settings.json
 .cache/
 .claude/

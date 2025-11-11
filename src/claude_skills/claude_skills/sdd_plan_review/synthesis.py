@@ -11,6 +11,9 @@ import re
 from typing import Dict, Any, List, Optional, Tuple
 from statistics import mean, median
 
+from claude_skills.common import ai_config
+from claude_skills.common.ai_tools import execute_tool, ToolStatus
+
 
 def parse_response(tool_output: str, tool_name: str) -> Dict[str, Any]:
     """
@@ -79,10 +82,6 @@ def synthesize_with_ai(
     Returns:
         Synthesized consensus dictionary
     """
-    import subprocess
-    import tempfile
-    import os
-
     if not responses:
         return {
             "success": False,
@@ -158,63 +157,53 @@ def synthesize_with_ai(
 
     prompt = "\n".join(prompt_parts)
 
-    # Call AI for synthesis using gemini (fast and capable)
-    try:
-        cmd = [
-            "gemini",
-            "-m", "gemini-2.5-pro",
-            "-p", prompt
-        ]
+    agent_priority = ai_config.get_agent_priority("sdd-plan-review")
+    tool_name = agent_priority[0] if agent_priority else "gemini"
+    model = ai_config.resolve_tool_model(
+        "sdd-plan-review",
+        tool_name,
+        context={"feature": "synthesis"},
+    )
+    timeout = ai_config.get_timeout("sdd-plan-review", "narrative")
 
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=120,
-            cwd=working_dir
-        )
+    response = execute_tool(
+        tool_name,
+        prompt,
+        model=model,
+        timeout=timeout,
+    )
 
-        if result.returncode != 0:
-            return {
-                "success": False,
-                "error": f"AI synthesis failed: {result.stderr}"
-            }
-
-        synthesis_text = result.stdout
-
-        # Handle gemini wrapper format
-        if '{"response":' in synthesis_text and '"stats":' in synthesis_text:
-            try:
-                start = synthesis_text.find('{')
-                end = synthesis_text.rfind('}') + 1
-                wrapper = json.loads(synthesis_text[start:end])
-                if "response" in wrapper:
-                    synthesis_text = wrapper["response"]
-            except:
-                pass
-
-        return {
-            "success": True,
-            "synthesis_text": synthesis_text,
-            "num_models": len(responses),
-            "models": [r.get("tool") for r in responses]
-        }
-
-    except subprocess.TimeoutExpired:
+    if not response.success:
+        if response.status == ToolStatus.TIMEOUT:
+            error = f"{tool_name} timed out after {timeout}s"
+        elif response.status == ToolStatus.NOT_FOUND:
+            error = f"{tool_name} provider not available for synthesis"
+        else:
+            error = response.error or f"{tool_name} synthesis failed (status={response.status.value})"
         return {
             "success": False,
-            "error": "AI synthesis timed out after 120s"
+            "error": error,
         }
-    except FileNotFoundError:
-        return {
-            "success": False,
-            "error": "gemini CLI not found - required for synthesis"
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "error": f"Synthesis error: {str(e)}"
-        }
+
+    synthesis_text = response.output
+
+    # Handle gemini wrapper format for backwards compatibility
+    if '{"response":' in synthesis_text and '"stats":' in synthesis_text:
+        try:
+            start = synthesis_text.find('{')
+            end = synthesis_text.rfind('}') + 1
+            wrapper = json.loads(synthesis_text[start:end])
+            if "response" in wrapper:
+                synthesis_text = wrapper["response"]
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+    return {
+        "success": True,
+        "synthesis_text": synthesis_text,
+        "num_models": len(responses),
+        "models": [r.get("tool") for r in responses],
+    }
 
 
 

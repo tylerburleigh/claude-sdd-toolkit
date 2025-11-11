@@ -14,9 +14,11 @@ making complex specifications accessible at-a-glance.
 
 from typing import Dict, Any, Optional, Tuple, List
 from dataclasses import dataclass
-import subprocess
 import json
-from claude_skills.common import get_agent_priority, get_agent_command, get_timeout, get_enabled_tools
+
+from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools
+from claude_skills.common.ai_config import resolve_tool_model
+from claude_skills.common.ai_tools import execute_tool, detect_available_tools, ToolStatus
 
 
 @dataclass
@@ -343,27 +345,28 @@ Base your analysis on the spec data provided, including:
             >>> print(f"Available agents: {', '.join(agents)}")
             Available agents: gemini, cursor-agent
         """
-        agent_commands = {
-            "cursor-agent": ["cursor-agent", "--version"],
-            "gemini": ["gemini", "--version"],
-            "codex": ["codex", "--version"],
-        }
+        tools = ["cursor-agent", "gemini", "codex"]
+        return detect_available_tools(tools, check_version=True)
 
-        available = []
-        for agent, cmd in agent_commands.items():
-            try:
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    timeout=5
-                )
-                # Some tools return 0 or 1 for --version
-                if result.returncode in (0, 1):
-                    available.append(agent)
-            except (FileNotFoundError, subprocess.TimeoutExpired):
-                pass
+    def _resolve_model(self, agent: str, *, feature: str) -> Optional[str]:
+        return resolve_tool_model(
+            "sdd-render",
+            agent,
+            override=self.model_override,
+            context={"feature": feature},
+        )
 
-        return available
+    def _invoke_agent(self, agent: str, prompt: str, *, feature: str, timeout: int) :
+        model = self._resolve_model(agent, feature=feature)
+        return execute_tool(agent, prompt, model=model, timeout=timeout)
+
+    @staticmethod
+    def _format_failure(agent: str, response, timeout: int) -> str:
+        if response.status == ToolStatus.TIMEOUT:
+            return f"{agent} timed out after {timeout} seconds"
+        if response.status == ToolStatus.NOT_FOUND:
+            return f"{agent} provider is not available. Install the CLI or configure the provider registry."
+        return response.error or f"{agent} returned status {response.status.value}"
 
     def generate_summary(
         self,
@@ -433,40 +436,26 @@ Base your analysis on the spec data provided, including:
 Please analyze the above spec data and generate the executive summary following the structure outlined.
 """
 
-        # Build command from config
-        cmd = get_agent_command(
-            'sdd-render',
-            agent_to_use,
-            full_prompt,
-            model_override=self.model_override,
-            context={"feature": "executive_summary"},
-        )
         timeout = get_timeout('sdd-render', 'default')
 
         if dry_run:
-            preview = " ".join(cmd[:4]) if len(cmd) >= 4 else " ".join(cmd)
-            model_note = f" [model_override={self.model_override}]" if self.model_override else ""
-            return True, f"Would run: {preview} <prompt ({len(full_prompt)} chars)>{model_note}"
-
-        # Execute agent
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout
+            model_note = self._resolve_model(agent_to_use, feature="executive_summary") or "default model"
+            return True, (
+                f"Would consult {agent_to_use} (model={model_note}) "
+                f"with prompt length {len(full_prompt)} chars [timeout={timeout}s]"
             )
 
-            if result.returncode == 0:
-                return True, result.stdout
-            else:
-                error_msg = result.stderr if result.stderr else result.stdout
-                return False, f"Agent failed: {error_msg}"
+        response = self._invoke_agent(
+            agent_to_use,
+            full_prompt,
+            feature="executive_summary",
+            timeout=timeout,
+        )
 
-        except subprocess.TimeoutExpired:
-            return False, "Agent timed out after 120 seconds"
-        except Exception as e:
-            return False, f"Agent execution error: {str(e)}"
+        if response.success:
+            return True, response.output
+
+        return False, self._format_failure(agent_to_use, response, timeout)
 
     def generate_summary_with_fallback(self) -> Tuple[bool, str]:
         """Generate summary with automatic fallback to available agents.

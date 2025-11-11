@@ -4,7 +4,6 @@ Pytest fixtures for code-doc tests.
 
 import pytest
 from pathlib import Path
-from unittest.mock import MagicMock
 
 
 @pytest.fixture
@@ -211,35 +210,48 @@ def sample_layers():
 
 
 @pytest.fixture
-def mock_subprocess_run(monkeypatch):
-    """Mock subprocess.run for AI tool testing."""
-    def _mock_run(*args, **kwargs):
-        """Return mock successful AI response."""
-        mock_result = MagicMock()
-        mock_result.returncode = 0
-        mock_result.stdout = "Mock AI generated documentation content"
-        mock_result.stderr = ""
-        return mock_result
+def mock_execute_tool(monkeypatch):
+    """Mock execute_tool for successful AI consultation."""
+    from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 
-    import subprocess
-    monkeypatch.setattr(subprocess, 'run', _mock_run)
-    return _mock_run
+    def _mock(tool, prompt, *, model=None, timeout=90):
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.SUCCESS,
+            output="Mock AI generated documentation content",
+            duration=1.0,
+            model=model,
+            prompt=prompt,
+        )
+
+    monkeypatch.setattr(
+        "claude_skills.code_doc.ai_consultation.execute_tool",
+        _mock,
+    )
+    return _mock
 
 
 @pytest.fixture
-def mock_subprocess_run_failure(monkeypatch):
-    """Mock subprocess.run returning failure."""
-    def _mock_run(*args, **kwargs):
-        """Return mock failed AI response."""
-        mock_result = MagicMock()
-        mock_result.returncode = 1
-        mock_result.stdout = ""
-        mock_result.stderr = "AI tool error"
-        return mock_result
+def mock_execute_tool_failure(monkeypatch):
+    """Mock execute_tool returning a failure response."""
+    from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 
-    import subprocess
-    monkeypatch.setattr(subprocess, 'run', _mock_run)
-    return _mock_run
+    def _mock(tool, prompt, *, model=None, timeout=90):
+        return ToolResponse(
+            tool=tool,
+            status=ToolStatus.ERROR,
+            output="",
+            error="AI tool error",
+            duration=0.5,
+            model=model,
+            prompt=prompt,
+        )
+
+    monkeypatch.setattr(
+        "claude_skills.code_doc.ai_consultation.execute_tool",
+        _mock,
+    )
+    return _mock
 
 
 @pytest.fixture

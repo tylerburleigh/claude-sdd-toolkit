@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 - Consolidated AI model resolution across `run-tests`, `sdd doc analyze-with-ai`, `sdd plan-review`, and `sdd render --mode enhanced`. These flows now delegate to `ai_config.resolve_tool_model`, accept `--model` CLI overrides (global or per-tool), surface the resolved map in progress output, and ship unit tests documenting the shared helper contract.
+- Run-tests, code-doc, and sdd-render runtimes now invoke AI providers via the shared registry/`execute_tool` helpers, so dry runs, timeouts, and error reporting use the new normalized response envelope.
 
 ## [0.5.0] - 2025-11-09
 

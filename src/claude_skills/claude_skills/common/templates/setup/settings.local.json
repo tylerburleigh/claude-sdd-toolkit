@@ -1,0 +1,33 @@
+{
+  "_comment": "Default permission manifest for .claude/settings.local.json",
+  "_description": "Copy this file to .claude/settings.local.json to bootstrap Claude Code guardrails for the SDD Toolkit.",
+  "permissions": {
+    "_description": "Buckets that control how Claude can invoke skills, CLI commands, and filesystem operations.",
+    "_allow_description": "Always-on permissions that unblock core SDD workflows.",
+    "_ask_description": "Operations that require an explicit user approval in the IDE.",
+    "_deny_description": "Operations that remain disallowed even when requested.",
+    "allow": [
+      "Skill(sdd-toolkit:run-tests)",
+      "Skill(sdd-toolkit:sdd-plan)",
+      "Skill(sdd-toolkit:sdd-next)",
+      "Skill(sdd-toolkit:sdd-update)",
+      "Skill(sdd-toolkit:sdd-validate)",
+      "Skill(sdd-toolkit:sdd-render)",
+      "Skill(sdd-toolkit:sdd-plan-review)",
+      "Skill(sdd-toolkit:sdd-fidelity-review)",
+      "Skill(sdd-toolkit:sdd-pr)",
+      "Skill(sdd-toolkit:code-doc)",
+      "Skill(sdd-toolkit:doc-query)",
+      "Bash(sdd:*)",
+      "SlashCommand(/sdd-begin)",
+      "Read(//**/specs/**)",
+      "Write(//**/specs/active/**)",
+      "Write(//**/specs/pending/**)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git push --force:*)"
+    ],
+    "deny": []
+  }
+}
