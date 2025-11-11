@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T17:30:22.186212Z",
+  "last_updated": "2025-11-11T17:36:31.438736Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 5,
+    "progress_percentage": 10,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -56,7 +56,7 @@
         "verify-1-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Document current provider usage and produce the blueprint for the new abstraction.",
         "estimated_hours": 11,
@@ -87,16 +87,22 @@
     "task-1-2": {
       "type": "task",
       "title": "Map abstraction requirements to consumer expectations",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "research",
         "estimated_hours": 3,
         "file_path": "docs/research/provider_requirements_matrix.md",
-        "details": "Align new provider capabilities with needs from run-tests, sdd skills, and CLI tooling including error handling and streaming behaviour."
+        "details": "Align new provider capabilities with needs from run-tests, sdd skills, and CLI tooling including error handling and streaming behaviour.",
+        "started_at": "2025-11-11T17:36:26.939233Z",
+        "status_note": "Mapping consumer requirements for provider abstraction.",
+        "completed_at": "2025-11-11T17:36:31.432885Z",
+        "needs_journaling": false,
+        "actual_hours": 0.001,
+        "journaled_at": "2025-11-11T17:36:31.437065Z"
       }
     },
     "task-1-3": {
@@ -439,6 +445,15 @@
       "content": "Created docs/research/model_chorus_provider_audit.md summarizing ModelChorus base interfaces, CLI scaffolding, and concrete providers (Claude, Gemini, Codex, Cursor Agent). Captured responsibilities, entrypoints, JSON contracts, security constraints, and noted Gemini supports_thinking bug for the refactor.\n\nVerification: manual review of new doc and source files.",
       "metadata": {},
       "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-11-11T17:36:31.437027Z",
+      "entry_type": "status_change",
+      "title": "Provider requirement matrix",
+      "author": "claude-code",
+      "content": "Authored docs/research/provider_requirements_matrix.md capturing run-tests, sdd-fidelity-review, and sdd-plan-review consumer expectations plus shared CLI tooling requirements. Documented tool routing, prompt packaging, streaming, error handling, caching, and security constraints, and highlighted gaps + next steps for ProviderContext design.\n\nVerification: manual doc review.",
+      "metadata": {},
+      "task_id": "task-1-2"
     }
   ]
 }
