@@ -20,6 +20,44 @@
   - complete_task_workflow (45)
   - update_task_status (42)
 
+## Provider Abstraction Guide
+
+The provider layer under `src/claude_skills/claude_skills/common/providers` standardizes how CLI-first model providers integrate with the toolkit. It mirrors the ModelChorus contracts so skills can swap providers without rewriting orchestration code.
+
+### Key Components
+
+- `ProviderContext`: Base class that enforces `_execute()` plus shared lifecycle hooks. Subclasses (e.g., `GeminiProvider`, `CodexProvider`, `CursorAgentProvider`) translate `GenerationRequest` inputs into provider-specific CLI calls and emit normalized `GenerationResult` payloads.
+- Data contracts: `GenerationRequest`, `GenerationResult`, `TokenUsage`, `ProviderMetadata`, and `ModelDescriptor` describe prompts, responses, and routing metadata. Capabilities (`ProviderCapability`) and execution statuses (`ProviderStatus`) let registries reason about feature support.
+- Hooks: `ProviderHooks` supplies `before_execute`, `on_stream_chunk`, and `after_result` callbacks so skills can log, stream, or collect telemetry without leaking provider internals.
+
+### Registry & Availability
+
+- `register_provider` / `register_lazy_provider` keep a central registry (`provider_id` → factory) and expose helpers such as `available_providers()`, `resolve_provider()`, and `get_provider_metadata()`.
+- `detectors.py` defines `ProviderDetector` configurations for each CLI. Detectors handle PATH discovery, environment overrides (`CLAUDE_SKILLS_TOOL_PATH`, `*_CLI_BINARY`, `*_CLI_AVAILABLE_OVERRIDE`), and optional probes (for example `--version`) before the registry attempts instantiation.
+- Dependency injection: `set_dependency_resolver()` allows complex providers to pull shared resources (API clients, caches) lazily when resolved from the registry.
+
+### Manual Invocation
+
+Use the runner in `claude_skills.cli.provider_runner` to smoke-test providers outside of skills:
+
+```bash
+python -m claude_skills.cli.provider_runner \
+  --provider codex \
+  --prompt "List three API hardening steps" \
+  --system-prompt "Answer in bullet points" \
+  --json
+```
+
+The runner loads the provider via the registry, streams output to stdout (unless `--quiet-stream`), captures JSON results, and normalizes errors like timeouts or missing binaries.
+
+### Implementing a Provider
+
+1. Create a `ProviderContext` subclass that validates requests, shells out to the underlying CLI/tooling, and returns a populated `GenerationResult`. See `common/providers/codex.py` for a reference implementation.
+2. Export a factory (commonly `create_provider()`) that accepts `hooks`, optional `model`, and dependency overrides. Register it immediately or lazily in `__init__.py`.
+3. Supply metadata (`ProviderMetadata`, `ModelDescriptor` list) so routing heuristics know which models and capabilities are available.
+4. (Optional) Provide a `ProviderDetector` entry when availability depends on binaries or environment variables so higher-level UX can surface actionable status.
+
+Following this pattern ensures every provider benefits from the same telemetry, error handling, and streaming UX regardless of the underlying command.
 
 
 ## 🏛️ Classes

@@ -147,6 +147,18 @@ Best practice: Ask Claude to "Document this codebase" before creating specs to e
 
 **Context Tracking**: The toolkit monitors your Claude conversation token usage to prevent hitting the 160k "usable context" limit (80% of 200k total before auto-compaction). `sdd-next` automatically checks context after completing tasks and warns when usage exceeds safe thresholds.
 
+### Provider Abstraction
+
+Model providers (Gemini, Codex, Cursor Agent) plug into a shared layer under `claude_skills.common.providers`. Each provider subclasses `ProviderContext`, exposes supported capabilities/models through `ProviderMetadata` + `ModelDescriptor`, and receives lifecycle hooks (`ProviderHooks`) so skills can stream output, collect token usage, and normalize failures. The registry helpers (`register_provider`, `register_lazy_provider`, `resolve_provider`) manage discovery, while detectors coordinate PATH lookups and environment overrides (`CLAUDE_SKILLS_TOOL_PATH`, `*_CLI_BINARY`, `*_CLI_AVAILABLE_OVERRIDE`) before instantiating providers.
+
+Test providers in isolation with the CLI runner:
+
+```bash
+python -m claude_skills.cli.provider_runner --provider gemini --prompt "Summarize the release notes" --json
+```
+
+The runner wires hooks, handles streaming, and returns a normalized `GenerationResult` payload. To add a new provider, expose a `create_provider()` factory that returns your `ProviderContext` subclass, register it (lazily if desired), and describe its models/capabilities so routing heuristics can pick the right tool.
+
 ### Skills
 
 **Skills** extend Claude's capabilities. The toolkit provides:
