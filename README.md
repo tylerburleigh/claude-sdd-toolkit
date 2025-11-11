@@ -632,8 +632,6 @@ This allows you to set your output preferences once rather than passing `--json`
 }
 ```
 
-For complete configuration details, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
-
 ### AI Model Overrides
 
 The same setup process seeds `.claude/ai_config.yaml`, which now centralizes tool priorities and example per-skill overrides for:
@@ -883,8 +881,6 @@ Output formatting follows this precedence chain (highest to lowest):
 ```
 
 With this config, all commands output pretty-print JSON by default, but you can still override with `--compact` flag when needed.
-
-For complete configuration options, see [docs/SDD_CONFIG_README.md](docs/SDD_CONFIG_README.md).
 
 ### Practical Examples: Seeing the Difference
 

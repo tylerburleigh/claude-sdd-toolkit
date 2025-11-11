@@ -341,7 +341,7 @@ Display:
 Display:
 ```
 ✅ SDD output config already exists at .claude/sdd_config.json
-   (Modify manually or see docs/SDD_CONFIG_README.md for details)
+   (Modify manually as needed)
 ```
 
 ### Step 6: Show Success & Next Steps
@@ -398,7 +398,6 @@ After successful configuration, display a summary:
 **If sdd_config.json already existed**, show:
 ```
 ✅ SDD CLI Config: Already configured
-   (See docs/SDD_CONFIG_README.md to modify settings)
 ```
 
 Then show next steps:
@@ -544,8 +543,6 @@ The setup creates a configuration file for SDD CLI output formatting:
 2. Global config (`~/.claude/sdd_config.json`)
 3. Project config (`./.claude/sdd_config.json`)
 4. CLI arguments (highest priority)
-
-For detailed information, see `docs/SDD_CONFIG_README.md` in the toolkit.
 
 ## Important Notes
 
