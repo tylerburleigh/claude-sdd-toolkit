@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 12:24:38
+**Generated:** 2025-11-11 12:46:05
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 300
-- **Total Lines:** 103539
-- **Total Classes:** 409
+- **Total Files:** 302
+- **Total Lines:** 103881
+- **Total Classes:** 423
 - **Total Functions:** 1287
 - **Avg Complexity:** 4.9
 - **Max Complexity:** 55
@@ -1036,6 +1036,37 @@ This class will be implemented in Phase 3 (Core Review Logic).
 
 ---
 
+### `GenerationRequest`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:119`
+
+**Description:**
+> Normalized request payload for provider execution.
+
+Attributes closely follow the ModelChorus GenerationRequest contract to
+simplify migration between ecosystems.
+
+---
+
+### `GenerationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:148`
+
+**Description:**
+> Normalized provider response.
+
+Attributes:
+    content: Final text output (aggregated if streaming was used).
+    model_fqn: Fully-qualified model identifier `<provider>:<model>`.
+    status: ProviderStatus describing execution outcome.
+    usage: Optional token usage data.
+    stderr: Captured stderr/log output for debugging.
+    raw_payload: Provider-specific metadata (JSON blobs, traces, etc.).
+
+---
+
 ### `GoParser`
 
 **Language:** python
@@ -1545,6 +1576,22 @@ Attributes:
 - `path_for()`
 - `rewrite()`
 - `remove()`
+
+---
+
+### `ModelDescriptor`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:81`
+
+**Description:**
+> Describes a model supported by a provider.
+
+Attributes:
+    id: Provider-specific identifier (e.g., "gemini-2.5-pro").
+    display_name: Friendly name for UIs/logs.
+    capabilities: Capability flags supported by the model.
+    routing_hints: Optional metadata used by registries (cost, latency, etc.).
 
 ---
 
@@ -2228,6 +2275,144 @@ Attributes:
 
 ---
 
+### `ProviderCapability`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:18`
+
+**Description:**
+> Declares the feature flags a provider can expose to routing heuristics.
+
+These values intentionally align with the audited ModelChorus capabilities
+so that metadata can be shared between ecosystems.
+
+---
+
+### `ProviderContext`
+
+**Language:** python
+**Inherits from:** `ABC`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:199`
+
+**Description:**
+> Base class for provider implementations.
+
+Subclasses should:
+    * Resolve CLI/environment dependencies during initialization.
+    * Implement `_execute()` to run the underlying provider and return a
+      populated `GenerationResult`.
+    * Emit streaming chunks via `self._hooks.emit_stream()` when `request.stream`
+      is True and the provider supports streaming output.
+
+**Methods:**
+- `__init__()`
+- `supports()`
+- `generate()`
+- `_prepare_request()`
+- `_emit_stream_chunk()`
+- `_execute()`
+
+**Properties:**
+- `metadata`
+
+---
+
+### `ProviderError`
+
+**Language:** python
+**Inherits from:** `RuntimeError`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:49`
+
+**Description:**
+> Base exception for provider orchestration.
+
+**Methods:**
+- `__init__()`
+
+---
+
+### `ProviderExecutionError`
+
+**Language:** python
+**Inherits from:** `ProviderError`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:61`
+
+**Description:**
+> Raised when a provider command returns a non-retryable error.
+
+---
+
+### `ProviderHooks`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:175`
+
+**Description:**
+> Optional lifecycle hooks wired by the registry.
+
+Hooks default to no-ops so providers can invoke them unconditionally.
+
+**Methods:**
+- `emit_before()`
+- `emit_stream()`
+- `emit_after()`
+
+---
+
+### `ProviderMetadata`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:99`
+
+**Description:**
+> Provider-level metadata shared with registries and consumers.
+
+Attributes:
+    provider_name: Canonical provider identifier ("gemini", "codex", etc.).
+    models: Supported model descriptors.
+    default_model: Optional default model id used when no override supplied.
+    security_flags: Provider-specific sandbox/safety configuration.
+    extra: Arbitrary metadata (version info, auth requirements, etc.).
+
+---
+
+### `ProviderStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:33`
+
+**Description:**
+> Normalized execution outcomes emitted by providers.
+
+This mirrors the legacy ToolStatus enum so existing callers can map the
+new abstraction back to their current success/error handling paths.
+
+---
+
+### `ProviderTimeoutError`
+
+**Language:** python
+**Inherits from:** `ProviderError`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:65`
+
+**Description:**
+> Raised when a provider exceeds its allotted execution time.
+
+---
+
+### `ProviderUnavailableError`
+
+**Language:** python
+**Inherits from:** `ProviderError`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:57`
+
+**Description:**
+> Raised when a provider cannot be instantiated (binary missing, auth issues).
+
+---
+
 ### `PytestOutputParser`
 
 **Language:** python
@@ -2508,6 +2693,16 @@ Example:
 - `count_all_issues()`
 - `is_valid()`
 - `calculate_completion()`
+
+---
+
+### `StreamChunk`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:139`
+
+**Description:**
+> Represents a streamed fragment emitted by the provider.
 
 ---
 
@@ -7727,6 +7922,16 @@ Attributes:
 
 **Properties:**
 - `context_percentage`
+
+---
+
+### `TokenUsage`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/base.py:70`
+
+**Description:**
+> Token accounting information reported by providers.
 
 ---
 
@@ -31795,6 +32000,42 @@ Returns:
 - `typing.List`
 - `typing.Optional`
 - `typing.TextIO`
+
+### `src/claude_skills/claude_skills/common/providers/__init__.py`
+
+- `base.AfterResultHook`
+- `base.BeforeExecuteHook`
+- `base.GenerationRequest`
+- `base.GenerationResult`
+- `base.ModelDescriptor`
+- `base.ProviderCapability`
+- `base.ProviderContext`
+- `base.ProviderError`
+- `base.ProviderExecutionError`
+- `base.ProviderHooks`
+- `base.ProviderMetadata`
+- `base.ProviderStatus`
+- `base.ProviderTimeoutError`
+- `base.ProviderUnavailableError`
+- `base.StreamCallback`
+- `base.StreamChunk`
+- `base.TokenUsage`
+
+### `src/claude_skills/claude_skills/common/providers/base.py`
+
+- `__future__.annotations`
+- `abc.ABC`
+- `abc.abstractmethod`
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Sequence`
+- `typing.Set`
 
 ### `src/claude_skills/claude_skills/common/query_operations.py`
 

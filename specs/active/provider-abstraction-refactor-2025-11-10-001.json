@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T17:42:55.966349Z",
+  "last_updated": "2025-11-11T17:46:21.007366Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,8 +21,8 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 20,
-    "current_phase": "phase-1"
+    "progress_percentage": 25,
+    "current_phase": "phase-2"
   },
   "hierarchy": {
     "spec-root": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -149,7 +149,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Scaffolding & Core Modules",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "task-2-1",
@@ -159,7 +159,7 @@
         "verify-2-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Introduce the foundational provider abstraction modules and supporting scaffolding.",
         "estimated_hours": 16,
@@ -169,16 +169,22 @@
     "task-2-1": {
       "type": "task",
       "title": "Implement base provider module",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 5,
         "file_path": "src/claude_skills/claude_skills/common/providers/base.py",
-        "changes": "Define ProviderContext, abstract execution hooks, and error surface for compliant providers."
+        "changes": "Define ProviderContext, abstract execution hooks, and error surface for compliant providers.",
+        "started_at": "2025-11-11T17:46:11.330633Z",
+        "status_note": "Adding provider base abstractions.",
+        "completed_at": "2025-11-11T17:46:20.996909Z",
+        "needs_journaling": false,
+        "actual_hours": 0.003,
+        "journaled_at": "2025-11-11T17:46:21.006058Z"
       }
     },
     "task-2-2": {
@@ -493,6 +499,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-11T17:46:21.006038Z",
+      "entry_type": "status_change",
+      "title": "Base provider module",
+      "author": "claude-code",
+      "content": "Implemented src/claude_skills/claude_skills/common/providers/base.py plus package exports. Defines ProviderCapability/Status enums, token/model metadata dataclasses, GenerationRequest/Result/StreamChunk, lifecycle hooks, and ProviderContext abstraction with standardized error handling and streaming hooks.\n\nVerification: manual review.",
+      "metadata": {},
+      "task_id": "task-2-1"
     }
   ]
 }
