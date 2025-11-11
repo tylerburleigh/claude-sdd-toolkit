@@ -18,6 +18,12 @@ from claude_skills.common.ai_tools import (
     execute_tool,
     execute_tools_parallel,
 )
+from claude_skills.common.providers import (
+    GenerationResult,
+    ProviderStatus,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+)
 
 
 pytestmark = pytest.mark.unit
@@ -229,35 +235,53 @@ def test_build_tool_command_handles_whitespace() -> None:
 
 
 def test_execute_tool_success(mocker) -> None:
-    completed = subprocess.CompletedProcess(args=["gemini"], returncode=0, stdout="output")
-    mocker.patch("subprocess.run", return_value=completed)
+    provider = Mock()
+    provider.generate.return_value = GenerationResult(
+        content="output",
+        model_fqn="gemini:demo",
+        status=ProviderStatus.SUCCESS,
+    )
+    mocker.patch("claude_skills.common.ai_tools.resolve_provider", return_value=provider)
 
     result = execute_tool("gemini", "hello")
     assert result.success is True
     assert result.output == "output"
-    assert result.exit_code == 0
+    assert result.model == "gemini:demo"
+    assert result.exit_code is None
 
 
 def test_execute_tool_timeout(mocker) -> None:
-    mocker.patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd="gemini", timeout=1))
+    provider = Mock()
+    provider.generate.side_effect = ProviderTimeoutError("slow")
+    mocker.patch("claude_skills.common.ai_tools.resolve_provider", return_value=provider)
+
     result = execute_tool("gemini", "hello")
     assert result.status == ToolStatus.TIMEOUT
     assert result.success is False
 
 
 def test_execute_tool_not_found(mocker) -> None:
-    mocker.patch("subprocess.run", side_effect=FileNotFoundError("gemini"))
+    mocker.patch(
+        "claude_skills.common.ai_tools.resolve_provider",
+        side_effect=ProviderUnavailableError("missing gemini"),
+    )
     result = execute_tool("gemini", "hello")
     assert result.status == ToolStatus.NOT_FOUND
     assert result.success is False
 
 
 def test_execute_tool_error_status(mocker) -> None:
-    completed = subprocess.CompletedProcess(args=["gemini"], returncode=1, stdout="", stderr="boom")
-    mocker.patch("subprocess.run", return_value=completed)
+    provider = Mock()
+    provider.generate.return_value = GenerationResult(
+        content="",
+        model_fqn="gemini:demo",
+        status=ProviderStatus.ERROR,
+        stderr="boom",
+    )
+    mocker.patch("claude_skills.common.ai_tools.resolve_provider", return_value=provider)
     result = execute_tool("gemini", "hello")
     assert result.status == ToolStatus.ERROR
-    assert result.success is False
+    assert result.error == "boom"
 
 
 def test_execute_tools_parallel_success(mocker) -> None:
@@ -293,8 +317,13 @@ def test_execute_tools_parallel_handles_failures(mocker) -> None:
 
 
 def test_execute_tool_captures_duration(mocker) -> None:
-    completed = subprocess.CompletedProcess(args=["gemini"], returncode=0, stdout="hi")
-    mocker.patch("subprocess.run", return_value=completed)
+    provider = Mock()
+    provider.generate.return_value = GenerationResult(
+        content="hi",
+        model_fqn="gemini:demo",
+        status=ProviderStatus.SUCCESS,
+    )
+    mocker.patch("claude_skills.common.ai_tools.resolve_provider", return_value=provider)
     result = execute_tool("gemini", "hello")
     assert result.duration is not None
 

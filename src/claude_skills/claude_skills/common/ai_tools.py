@@ -18,7 +18,18 @@ import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from claude_skills.common.providers import get_provider_detector
+from claude_skills.common.providers import (
+    GenerationRequest,
+    ProviderExecutionError,
+    ProviderHooks,
+    ProviderStatus,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+    ProviderError,
+    TokenUsage,
+    resolve_provider,
+    get_provider_detector,
+)
 
 
 class ToolStatus(Enum):
@@ -330,6 +341,30 @@ def check_tool_available(
     return True
 
 
+_PROVIDER_STATUS_MAP = {
+    ProviderStatus.SUCCESS: ToolStatus.SUCCESS,
+    ProviderStatus.TIMEOUT: ToolStatus.TIMEOUT,
+    ProviderStatus.NOT_FOUND: ToolStatus.NOT_FOUND,
+    ProviderStatus.INVALID_OUTPUT: ToolStatus.INVALID_OUTPUT,
+    ProviderStatus.ERROR: ToolStatus.ERROR,
+    ProviderStatus.CANCELED: ToolStatus.ERROR,
+}
+
+
+def _map_provider_status(status: ProviderStatus) -> ToolStatus:
+    return _PROVIDER_STATUS_MAP.get(status, ToolStatus.ERROR)
+
+
+def _token_usage_metadata(usage: TokenUsage) -> dict:
+    return {
+        "input_tokens": usage.input_tokens,
+        "output_tokens": usage.output_tokens,
+        "cached_input_tokens": usage.cached_input_tokens,
+        "total_tokens": usage.total_tokens,
+        "metadata": usage.metadata,
+    }
+
+
 def detect_available_tools(
     tools: Optional[list[str]] = None,
     *,
@@ -523,160 +558,67 @@ def execute_tool(
     start_time = time.time()
     timestamp = datetime.now().isoformat()
 
+    def _failure_response(status: ToolStatus, error: str) -> ToolResponse:
+        duration = time.time() - start_time
+        return ToolResponse(
+            tool=tool,
+            status=status,
+            output="",
+            error=error,
+            duration=duration,
+            timestamp=timestamp,
+            model=model,
+            prompt=prompt,
+            exit_code=None,
+        )
+
     try:
-        # Build command
-        command = build_tool_command(tool, prompt, model=model)
-
-        # Execute with timeout
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
+        hooks = ProviderHooks()
+        context = resolve_provider(tool, hooks=hooks, model=model)
+        request = GenerationRequest(
+            prompt=prompt,
             timeout=timeout,
-            check=False  # Don't raise on non-zero exit
+            metadata={},
+            stream=False,
         )
+        result = context.generate(request)
+        status = _map_provider_status(result.status)
+        error_message = None
+        if status != ToolStatus.SUCCESS:
+            error_message = result.stderr or f"Provider returned status {result.status.value}"
 
-        # Check exit code
-        if result.returncode == 0:
-            duration = time.time() - start_time
-            return ToolResponse(
-                tool=tool,
-                status=ToolStatus.SUCCESS,
-                output=result.stdout.strip(),
-                error=None,
-                duration=duration,
-                timestamp=timestamp,
-                model=model,
-                prompt=prompt,
-                exit_code=0
-            )
+        metadata = {
+            "token_usage": _token_usage_metadata(result.usage),
+            "raw_payload": result.raw_payload,
+        }
+        if result.stderr:
+            metadata["stderr"] = result.stderr
 
-        # Retry cursor-agent once without --json if it appears unsupported
-        if (
-            tool == "cursor-agent"
-            and "--json" in command
-            and _cursor_agent_json_flag_error(result)
-        ):
-            fallback_command, removed = _remove_first_occurrence(command, "--json")
-
-            if removed:
-                fallback_result = subprocess.run(
-                    fallback_command,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout,
-                    check=False
-                )
-
-                if fallback_result.returncode == 0:
-                    duration = time.time() - start_time
-                    return ToolResponse(
-                        tool=tool,
-                        status=ToolStatus.SUCCESS,
-                        output=fallback_result.stdout.strip(),
-                        error=None,
-                        duration=duration,
-                        timestamp=timestamp,
-                        model=model,
-                        prompt=prompt,
-                        exit_code=0,
-                        metadata={"cursor_agent_retry_without_json": True}
-                    )
-
-                duration = time.time() - start_time
-                first_error = result.stderr.strip() or result.stdout.strip() or f"Tool exited with code {result.returncode}"
-                second_error = fallback_result.stderr.strip() or fallback_result.stdout.strip() or f"Tool exited with code {fallback_result.returncode}"
-                combined_error = (
-                    "cursor-agent rejected '--json' flag "
-                    f"(exit code {result.returncode}): {first_error}. "
-                    "Retry without '--json' also failed "
-                    f"(exit code {fallback_result.returncode}): {second_error}"
-                )
-
-                return ToolResponse(
-                    tool=tool,
-                    status=ToolStatus.ERROR,
-                    output=fallback_result.stdout.strip() or result.stdout.strip(),
-                    error=combined_error,
-                    duration=duration,
-                    timestamp=timestamp,
-                    model=model,
-                    prompt=prompt,
-                    exit_code=fallback_result.returncode,
-                    metadata={"cursor_agent_retry_without_json": True}
-                )
-
-        duration = time.time() - start_time
-
-        # Non-zero exit code without retry
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.ERROR,
-            output=result.stdout.strip(),
-            error=result.stderr.strip() or f"Tool exited with code {result.returncode}",
-            duration=duration,
-            timestamp=timestamp,
-            model=model,
-            prompt=prompt,
-            exit_code=result.returncode
-        )
-
-    except subprocess.TimeoutExpired:
         duration = time.time() - start_time
         return ToolResponse(
             tool=tool,
-            status=ToolStatus.TIMEOUT,
-            output="",
-            error=f"Tool timed out after {timeout}s",
+            status=status,
+            output=result.content,
+            error=error_message,
             duration=duration,
             timestamp=timestamp,
-            model=model,
+            model=result.model_fqn,
             prompt=prompt,
-            exit_code=None
+            exit_code=None,
+            metadata=metadata,
         )
-
-    except FileNotFoundError:
-        duration = time.time() - start_time
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.NOT_FOUND,
-            output="",
-            error=f"Tool '{tool}' not found in PATH",
-            duration=duration,
-            timestamp=timestamp,
-            model=model,
-            prompt=prompt,
-            exit_code=None
-        )
-
-    except ValueError as e:
-        # Unknown tool from build_tool_command
-        duration = time.time() - start_time
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.ERROR,
-            output="",
-            error=str(e),
-            duration=duration,
-            timestamp=timestamp,
-            model=model,
-            prompt=prompt,
-            exit_code=None
-        )
-
-    except Exception as e:
-        # Unexpected error
-        duration = time.time() - start_time
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.ERROR,
-            output="",
-            error=f"Unexpected error: {type(e).__name__}: {str(e)}",
-            duration=duration,
-            timestamp=timestamp,
-            model=model,
-            prompt=prompt,
-            exit_code=None
+    except ProviderUnavailableError as exc:
+        return _failure_response(ToolStatus.NOT_FOUND, str(exc))
+    except ProviderTimeoutError as exc:
+        return _failure_response(ToolStatus.TIMEOUT, str(exc) or f"Tool timed out after {timeout}s")
+    except ProviderExecutionError as exc:
+        return _failure_response(ToolStatus.ERROR, str(exc))
+    except ProviderError as exc:
+        return _failure_response(ToolStatus.ERROR, str(exc))
+    except Exception as exc:  # pragma: no cover - defensive guard
+        return _failure_response(
+            ToolStatus.ERROR,
+            f"Unexpected error: {type(exc).__name__}: {exc}",
         )
 
 

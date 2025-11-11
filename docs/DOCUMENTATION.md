@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:35:37
+**Generated:** 2025-11-11 13:52:43
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 314
-- **Total Lines:** 106924
+- **Total Lines:** 106945
 - **Total Classes:** 439
-- **Total Functions:** 1360
-- **Avg Complexity:** 4.74
+- **Total Functions:** 1362
+- **Avg Complexity:** 4.73
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -1719,7 +1719,7 @@ Attributes:
 ### `MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:127`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:138`
 
 **Description:**
 > Response from multiple tool consultations run in parallel.
@@ -8183,7 +8183,7 @@ Attributes:
 ### `ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:34`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:45`
 
 **Description:**
 > Standardized response from AI tool consultation.
@@ -8229,7 +8229,7 @@ Example:
 
 **Language:** python
 **Inherits from:** `Enum`
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:24`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:35`
 
 **Description:**
 > Status of AI tool execution.
@@ -9222,7 +9222,7 @@ Returns:
 ### `_cursor_agent_json_flag_error(result) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:439`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:474`
 **Complexity:** 5
 
 **Description:**
@@ -9993,7 +9993,7 @@ Returns:
 ### `_get_configured_tool_path() -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:255`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:266`
 **Complexity:** 2
 
 **Description:**
@@ -10553,6 +10553,17 @@ Args:
 - `spec_data`: Dict[str, object]
 - `spec_path`: Path | None
 - `incremental`: bool
+
+---
+
+### `_map_provider_status(status) -> ToolStatus`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:354`
+**Complexity:** 1
+
+**Parameters:**
+- `status`: ProviderStatus
 
 ---
 
@@ -11476,7 +11487,7 @@ Returns:
 ### `_remove_first_occurrence(items, token) -> tuple[list[str], bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:473`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:508`
 **Complexity:** 4
 
 **Description:**
@@ -11662,7 +11673,7 @@ Returns:
 ### `_resolve_tool_executable(tool) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:269`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:280`
 **Complexity:** 2
 
 **Description:**
@@ -12008,6 +12019,17 @@ Returns:
 
 **Parameters:**
 - `models_map`: Mapping[str, Optional[str]]
+
+---
+
+### `_token_usage_metadata(usage) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:358`
+**Complexity:** 1
+
+**Parameters:**
+- `usage`: TokenUsage
 
 ---
 
@@ -13257,7 +13279,7 @@ Returns:
 ### `build_tool_command(tool, prompt) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:368`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:403`
 **Complexity:** 7
 
 **Description:**
@@ -14070,7 +14092,7 @@ Example:
 ### `check_tool_available(tool) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:279`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:290`
 **Complexity:** 5
 
 **Description:**
@@ -16966,7 +16988,7 @@ Example:
 ### `detect_available_tools(tools) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:333`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:368`
 **Complexity:** 4
 
 **Description:**
@@ -17701,8 +17723,8 @@ Example:
 ### `execute_tool(tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:494`
-⚠️ **Complexity:** 17 (High)
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:529`
+**Complexity:** 10
 
 **Description:**
 > Execute AI tool with a prompt and return structured response.
@@ -17735,7 +17757,7 @@ Example:
 ### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:683`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:625`
 **Complexity:** 5
 
 **Description:**
@@ -27660,7 +27682,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_executes_successfully(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:214`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:230`
 **Complexity:** 1
 
 **Parameters:**
@@ -27671,7 +27693,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_model_only() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:309`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:338`
 **Complexity:** 1
 
 ---
@@ -27679,7 +27701,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_special_characters(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:221`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:237`
 **Complexity:** 1
 
 **Parameters:**
@@ -27690,7 +27712,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_whitespace() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:218`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:224`
 **Complexity:** 1
 
 ---
@@ -27698,7 +27720,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_simple() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:209`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:215`
 **Complexity:** 1
 
 ---
@@ -27706,7 +27728,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_uses_list_invocation(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:229`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:245`
 **Complexity:** 1
 
 **Parameters:**
@@ -27871,7 +27893,7 @@ a decision needs to be made about what to implement.
 ### `test_check_tool_available_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:150`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:156`
 **Complexity:** 1
 
 **Parameters:**
@@ -27882,7 +27904,7 @@ a decision needs to be made about what to implement.
 ### `test_check_tool_available_not_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:156`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:162`
 **Complexity:** 1
 
 **Parameters:**
@@ -27893,7 +27915,7 @@ a decision needs to be made about what to implement.
 ### `test_check_tool_available_uses_detector(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:162`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:168`
 **Complexity:** 1
 
 **Parameters:**
@@ -27904,7 +27926,7 @@ a decision needs to be made about what to implement.
 ### `test_check_tool_available_with_version(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:189`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:205`
 **Complexity:** 1
 
 **Parameters:**
@@ -27982,7 +28004,7 @@ a decision needs to be made about what to implement.
 ### `test_cli_check_tools_handles_missing_binaries() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:419`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:469`
 **Complexity:** 4
 
 ---
@@ -27990,7 +28012,7 @@ a decision needs to be made about what to implement.
 ### `test_cli_check_tools_reports_mock_binaries(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:407`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:457`
 **Complexity:** 5
 
 **Parameters:**
@@ -28606,7 +28628,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_discovers_mock_binaries(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:184`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:200`
 **Complexity:** 1
 
 **Parameters:**
@@ -28617,7 +28639,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_handles_partial_availability(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:207`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:223`
 **Complexity:** 1
 
 **Parameters:**
@@ -28628,7 +28650,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_handles_version_failures() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:195`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:201`
 **Complexity:** 1
 
 ---
@@ -28636,7 +28658,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_parallel_invocation(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:302`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:331`
 **Complexity:** 1
 
 **Parameters:**
@@ -28647,7 +28669,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_returns_expected(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:174`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:180`
 **Complexity:** 1
 
 **Parameters:**
@@ -28658,7 +28680,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_when_none_available(monkeypatch, tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:200`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:216`
 **Complexity:** 1
 
 **Parameters:**
@@ -28670,7 +28692,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_with_version_check() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:186`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:192`
 **Complexity:** 1
 
 ---
@@ -28678,7 +28700,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_without_version_check(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:195`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:211`
 **Complexity:** 1
 
 **Parameters:**
@@ -28870,7 +28892,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_captures_duration(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:295`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:319`
 **Complexity:** 1
 
 **Parameters:**
@@ -28881,7 +28903,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_captures_timing_metadata(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:242`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:258`
 **Complexity:** 1
 
 **Parameters:**
@@ -28892,7 +28914,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_error_status(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:255`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:273`
 **Complexity:** 1
 
 **Parameters:**
@@ -28903,7 +28925,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_crash_exit_code(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:329`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:372`
 **Complexity:** 1
 
 **Parameters:**
@@ -28914,7 +28936,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_large_output(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:271`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:295`
 **Complexity:** 1
 
 **Parameters:**
@@ -28925,8 +28947,8 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_missing_tool(monkeypatch, tmp_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:249`
-**Complexity:** 2
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:265`
+**Complexity:** 3
 
 **Parameters:**
 - `monkeypatch`: pytest.MonkeyPatch
@@ -28937,7 +28959,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_non_zero_exit(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:299`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:335`
 **Complexity:** 2
 
 **Parameters:**
@@ -28948,7 +28970,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_stderr_only_output(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:256`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:273`
 **Complexity:** 1
 
 **Parameters:**
@@ -28959,7 +28981,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_timeout(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:314`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:353`
 **Complexity:** 2
 
 **Parameters:**
@@ -28970,7 +28992,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_handles_unicode_output(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:286`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:316`
 **Complexity:** 1
 
 **Parameters:**
@@ -28981,7 +29003,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_not_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:248`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:263`
 **Complexity:** 1
 
 **Parameters:**
@@ -28992,7 +29014,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_runs_mock_binary(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:235`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:251`
 **Complexity:** 1
 
 **Parameters:**
@@ -29003,7 +29025,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:231`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:237`
 **Complexity:** 1
 
 **Parameters:**
@@ -29014,7 +29036,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_timeout(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:241`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:253`
 **Complexity:** 1
 
 **Parameters:**
@@ -29025,7 +29047,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_all_fail(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:390`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:440`
 **Complexity:** 1
 
 **Parameters:**
@@ -29036,7 +29058,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_all_success(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:342`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:388`
 **Complexity:** 1
 
 **Parameters:**
@@ -29047,7 +29069,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_collects_statistics(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:371`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:421`
 **Complexity:** 1
 
 **Parameters:**
@@ -29058,7 +29080,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_empty_tool_list() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:383`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:433`
 **Complexity:** 1
 
 ---
@@ -29066,7 +29088,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_handles_failures(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:279`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:303`
 **Complexity:** 1
 
 **Parameters:**
@@ -29077,7 +29099,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_partial_failure(mock_tools) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:352`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:398`
 **Complexity:** 1
 
 **Parameters:**
@@ -29088,7 +29110,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:263`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:287`
 **Complexity:** 1
 
 **Parameters:**
@@ -30264,7 +30286,7 @@ a decision needs to be made about what to implement.
 ### `test_multi_tool_response_all_failed() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:96`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:102`
 **Complexity:** 1
 
 ---
@@ -30272,7 +30294,7 @@ a decision needs to be made about what to implement.
 ### `test_multi_tool_response_all_succeeded() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:106`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:112`
 **Complexity:** 1
 
 ---
@@ -30280,7 +30302,7 @@ a decision needs to be made about what to implement.
 ### `test_multi_tool_response_filter_failed() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:130`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:136`
 **Complexity:** 1
 
 ---
@@ -30288,7 +30310,7 @@ a decision needs to be made about what to implement.
 ### `test_multi_tool_response_filter_successful() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:115`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:121`
 **Complexity:** 1
 
 ---
@@ -30296,7 +30318,7 @@ a decision needs to be made about what to implement.
 ### `test_multi_tool_response_success_property() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:85`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:91`
 **Complexity:** 1
 
 ---
@@ -30838,7 +30860,7 @@ a decision needs to be made about what to implement.
 ### `test_real_tools_optional_smoke() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:431`
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py:481`
 **Complexity:** 2
 
 **Decorators:** `@pytest.mark.skipif(not os.environ.get('SDD_TEST_USE_REAL_TOOLS'), reason='Real tool smoke tests disabled (set SDD_TEST_USE_REAL_TOOLS=1 to enable)')`
@@ -31219,7 +31241,7 @@ a decision needs to be made about what to implement.
 ### `test_tool_response_failed_property() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:45`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:51`
 **Complexity:** 2
 
 ---
@@ -31227,7 +31249,7 @@ a decision needs to be made about what to implement.
 ### `test_tool_response_immutable() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:31`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:37`
 **Complexity:** 1
 
 **Description:**
@@ -31238,7 +31260,7 @@ a decision needs to be made about what to implement.
 ### `test_tool_response_serialization() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:59`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:65`
 **Complexity:** 1
 
 ---
@@ -31246,7 +31268,7 @@ a decision needs to be made about what to implement.
 ### `test_tool_response_success_property() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:39`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:45`
 **Complexity:** 1
 
 ---
@@ -32880,7 +32902,16 @@ Returns:
 
 ### `src/claude_skills/claude_skills/common/ai_tools.py`
 
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.ProviderError`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.ProviderStatus`
+- `claude_skills.common.providers.ProviderTimeoutError`
+- `claude_skills.common.providers.ProviderUnavailableError`
+- `claude_skills.common.providers.TokenUsage`
 - `claude_skills.common.providers.get_provider_detector`
+- `claude_skills.common.providers.resolve_provider`
 - `concurrent.futures.ThreadPoolExecutor`
 - `concurrent.futures.as_completed`
 - `dataclasses.dataclass`
@@ -35201,6 +35232,10 @@ Returns:
 - `claude_skills.common.ai_tools.detect_available_tools`
 - `claude_skills.common.ai_tools.execute_tool`
 - `claude_skills.common.ai_tools.execute_tools_parallel`
+- `claude_skills.common.providers.GenerationResult`
+- `claude_skills.common.providers.ProviderStatus`
+- `claude_skills.common.providers.ProviderTimeoutError`
+- `claude_skills.common.providers.ProviderUnavailableError`
 - `dataclasses.FrozenInstanceError`
 - `pytest`
 - `subprocess`

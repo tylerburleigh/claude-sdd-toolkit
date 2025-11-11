@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T18:37:28.892579Z",
+  "last_updated": "2025-11-11T18:52:57.024542Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,8 +21,8 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 75,
-    "current_phase": "phase-3"
+    "progress_percentage": 80,
+    "current_phase": "phase-4"
   },
   "hierarchy": {
     "spec-root": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -418,7 +418,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Refactor & Rollout",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "task-4-1",
@@ -428,7 +428,7 @@
         "verify-4-1"
       ],
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Adopt the provider abstraction across runtime surfaces and documentation.",
         "estimated_hours": 13,
@@ -438,16 +438,22 @@
     "task-4-1": {
       "type": "task",
       "title": "Refactor ai_tools to delegate to providers",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "refactoring",
         "estimated_hours": 4,
         "file_path": "src/claude_skills/claude_skills/common/ai_tools.py",
-        "changes": "Replace direct tool orchestration logic with provider registry lookups and normalized execution flow."
+        "changes": "Replace direct tool orchestration logic with provider registry lookups and normalized execution flow.",
+        "started_at": "2025-11-11T18:52:50.218450Z",
+        "status_note": "Refactoring ai_tools for provider delegation",
+        "completed_at": "2025-11-11T18:52:57.012532Z",
+        "needs_journaling": false,
+        "actual_hours": 0.002,
+        "journaled_at": "2025-11-11T18:52:57.022249Z"
       }
     },
     "task-4-2": {
@@ -673,6 +679,15 @@
       "content": "All child tasks in phase phase-3 have been completed.",
       "metadata": {},
       "task_id": "phase-3"
+    },
+    {
+      "timestamp": "2025-11-11T18:52:57.022229Z",
+      "entry_type": "status_change",
+      "title": "ai_tools provider delegation",
+      "author": "claude-code",
+      "content": "Refactored src/claude_skills/claude_skills/common/ai_tools.py to execute via the provider registry: execute_tool now resolves ProviderContext instances, maps ProviderStatus to ToolStatus, and records normalized usage metadata instead of shelling out directly. Expanded test coverage with provider-backed unit stubs in src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py and updated integration tests in src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py to emit provider-compliant JSON payloads. Verification: pytest src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py, pytest src/claude_skills/claude_skills/tests/unit/test_providers, pytest src/claude_skills/claude_skills/tests/integration/test_ai_tools_cli.py.",
+      "metadata": {},
+      "task_id": "task-4-1"
     }
   ]
 }
