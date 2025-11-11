@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T17:40:26.045584Z",
+  "last_updated": "2025-11-11T17:42:55.966349Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 15,
+    "progress_percentage": 20,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -47,7 +47,7 @@
     "phase-1": {
       "type": "phase",
       "title": "Design Foundations",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "task-1-1",
@@ -56,11 +56,14 @@
         "verify-1-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Document current provider usage and produce the blueprint for the new abstraction.",
         "estimated_hours": 11,
-        "owner": "architecture"
+        "owner": "architecture",
+        "needs_journaling": false,
+        "completed_at": "2025-11-11T17:42:55.955115Z",
+        "journaled_at": "2025-11-11T17:42:55.966294Z"
       }
     },
     "task-1-1": {
@@ -129,15 +132,18 @@
     "verify-1-1": {
       "type": "verify",
       "title": "Blueprint review sign-off",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "owner": "architecture",
-        "expected": "Design review approved with sign-off from architecture lead and implementation stakeholders."
+        "expected": "Design review approved with sign-off from architecture lead and implementation stakeholders.",
+        "completed_at": "2025-11-11T17:42:55.955061Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-11T17:42:55.957817Z"
       }
     },
     "phase-2": {
@@ -469,6 +475,24 @@
       "content": "Expanded docs/ARCHITECTURE.md with Section 7 detailing the provider abstraction blueprint: goals, registry + provider interfaces (Mermaid diagram), lifecycle hooks, integration notes for run-tests/fidelity-review/plan-review, and extension hooks for streaming and telemetry.\n\nVerification: manual review of architecture doc.",
       "metadata": {},
       "task_id": "task-1-3"
+    },
+    {
+      "timestamp": "2025-11-11T17:42:55.957796Z",
+      "entry_type": "status_change",
+      "title": "Blueprint sign-off",
+      "author": "claude-code",
+      "content": "Architecture lead approved the provider abstraction blueprint in docs/ARCHITECTURE.md (with optional streaming support retained). Verification done via conversation confirmation.",
+      "metadata": {},
+      "task_id": "verify-1-1"
+    },
+    {
+      "timestamp": "2025-11-11T17:42:55.966280Z",
+      "entry_type": "status_change",
+      "title": "Phase Completed: Design Foundations",
+      "author": "claude-code",
+      "content": "All child tasks in phase phase-1 have been completed.",
+      "metadata": {},
+      "task_id": "phase-1"
     }
   ]
 }
