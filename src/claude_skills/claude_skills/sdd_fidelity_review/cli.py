@@ -271,12 +271,12 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             if specs_dir:
                 fidelity_dir = ensure_fidelity_reviews_directory(specs_dir)
                 base_name = _build_output_basename(args.spec_id, task_id, phase_id, file_paths)
-                markdown_path = fidelity_dir / f"{base_name}.md"
                 json_path = fidelity_dir / f"{base_name}.json"
-                if _write_report_artifact(markdown_path, "markdown", get_markdown, get_json_text):
-                    saved_paths.append(markdown_path)
                 if _write_report_artifact(json_path, "json", get_markdown, get_json_text):
                     saved_paths.append(json_path)
+                markdown_path = fidelity_dir / f"{base_name}.md"
+                if _write_report_artifact(markdown_path, "markdown", get_markdown, get_json_text):
+                    saved_paths.append(markdown_path)
 
         # Step 8: Emit console output in requested format
         if output_format == "json":

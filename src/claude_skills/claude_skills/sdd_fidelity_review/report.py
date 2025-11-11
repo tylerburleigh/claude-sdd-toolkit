@@ -658,17 +658,6 @@ class FidelityReport:
 
         table.add_row("Recommendations", *rec_counts)
 
-        # Row 4: Confidence (if available)
-        if any("confidence" in response for response in parsed_responses_list):
-            confidences = []
-            for response in parsed_responses_list:
-                confidence = response.get("confidence", "N/A")
-                if confidence != "N/A":
-                    confidences.append(f"{confidence}%")
-                else:
-                    confidences.append("N/A")
-            table.add_row("Confidence", *confidences)
-
         console.print(table)
         console.print()
 

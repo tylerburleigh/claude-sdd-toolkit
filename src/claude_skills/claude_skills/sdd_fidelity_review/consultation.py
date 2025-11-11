@@ -12,6 +12,7 @@ from enum import Enum
 import logging
 import json
 import re
+from copy import deepcopy
 
 from claude_skills.common.ai_tools import (
     ToolResponse,
@@ -34,6 +35,20 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+FIDELITY_SKILL_NAME = "sdd-fidelity-review"
+
+
+def _resolve_tool_model(tool: str, requested_model: Optional[str]) -> Optional[str]:
+    """Determine which model to use for a tool, falling back to config defaults."""
+    if requested_model:
+        return requested_model
+
+    try:
+        return ai_config.get_preferred_model(FIDELITY_SKILL_NAME, tool)
+    except Exception as exc:  # pragma: no cover - defensive logging
+        logger.debug("Unable to resolve preferred model for %s: %s", tool, exc)
+        return None
+
 
 # Helper functions for config-driven behavior
 def get_fidelity_review_timeout() -> int:
@@ -42,7 +57,7 @@ def get_fidelity_review_timeout() -> int:
 
     Returns timeout in seconds from config file (defaults to 600).
     """
-    return ai_config.get_timeout('sdd-fidelity-review', 'consultation')
+    return ai_config.get_timeout(FIDELITY_SKILL_NAME, 'consultation')
 
 
 def get_enabled_fidelity_tools() -> Dict[str, Dict]:
@@ -51,7 +66,7 @@ def get_enabled_fidelity_tools() -> Dict[str, Dict]:
 
     Returns dictionary of tools where enabled: true in config.
     """
-    return ai_config.get_enabled_tools('sdd-fidelity-review')
+    return ai_config.get_enabled_tools(FIDELITY_SKILL_NAME)
 
 
 class FidelityVerdict(Enum):
@@ -84,28 +99,37 @@ class ParsedReviewResponse:
         issues: List of identified issues
         recommendations: List of suggested improvements
         summary: Brief summary of findings
-        raw_response: Original AI response text
-        confidence: Confidence level if extractable (0.0-1.0)
+        raw_response: Original AI response text when structured parsing fails
+        structured_response: Parsed JSON payload when available
+        provider: Tool/provider that produced the response
+        model: Model identifier if provided by the tool
     """
     verdict: FidelityVerdict
     issues: List[str] = field(default_factory=list)
     recommendations: List[str] = field(default_factory=list)
     summary: str = ""
-    raw_response: str = ""
-    confidence: Optional[float] = None
+    raw_response: Optional[str] = None
     structured_response: Optional[Dict[str, Any]] = None
+    provider: Optional[str] = None
+    model: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
-        return {
+        data: Dict[str, Any] = {
             "verdict": self.verdict.value,
             "issues": self.issues,
             "recommendations": self.recommendations,
             "summary": self.summary,
-            "raw_response": self.raw_response,
-            "confidence": self.confidence,
-            "structured_response": self.structured_response
         }
+        if self.raw_response is not None:
+            data["raw_response"] = self.raw_response
+        if self.structured_response is not None:
+            data["structured_response"] = self.structured_response
+        if self.provider is not None:
+            data["provider"] = self.provider
+        if self.model is not None:
+            data["model"] = self.model
+        return data
 
 
 class ConsultationError(Exception):
@@ -354,6 +378,17 @@ def _extract_list_items(section_text: str) -> List[str]:
     return [item for item in items if item]
 
 
+def _dedupe_preserve_order(items: List[str]) -> List[str]:
+    seen: Set[str] = set()
+    deduped: List[str] = []
+    for item in items:
+        normalized = _normalize_for_matching(item)
+        if normalized not in seen:
+            seen.add(normalized)
+            deduped.append(item)
+    return deduped
+
+
 def _strip_code_fences(text: str) -> str:
     """Remove Markdown code fences if present."""
     stripped = text.strip()
@@ -453,46 +488,6 @@ def _coerce_recommendation_entry(entry: Any) -> Optional[str]:
             value = entry.get(field)
             if isinstance(value, str) and value.strip():
                 return value.strip()
-
-    return None
-
-
-def _coerce_confidence_value(value: Any) -> Optional[float]:
-    """Normalize confidence to a float between 0.0 and 1.0."""
-    if value is None:
-        return None
-
-    if isinstance(value, (int, float)):
-        numeric = float(value)
-        return numeric / 100.0 if numeric > 1.0 else numeric
-
-    if isinstance(value, str):
-        text = value.strip()
-        if not text:
-            return None
-        if text.endswith("%"):
-            text = text[:-1].strip()
-            try:
-                return float(text) / 100.0
-            except ValueError:
-                return None
-        try:
-            numeric = float(text)
-            return numeric / 100.0 if numeric > 1.0 else numeric
-        except ValueError:
-            return None
-
-    if isinstance(value, dict):
-        for key in ("value", "score", "confidence"):
-            if key in value:
-                normalized = _coerce_confidence_value(value[key])
-                if normalized is not None:
-                    return normalized
-        percentage = value.get("percent") or value.get("percentage")
-        if percentage is not None:
-            normalized = _coerce_confidence_value(percentage)
-            if normalized is not None:
-                return normalized
 
     return None
 
@@ -695,11 +690,14 @@ def consult_ai_on_fidelity(
                 "Please install it or choose a different tool."
             )
 
+        # Resolve model configuration (explicit CLI arg wins over config)
+        resolved_model = _resolve_tool_model(tool, model)
+
         # Execute consultation
         response = execute_tool(
             tool=tool,
             prompt=prompt,
-            model=model,
+            model=resolved_model,
             timeout=timeout
         )
 
@@ -867,17 +865,25 @@ def consult_multiple_ai_on_fidelity(
             unavailable = set(tools) - set(available_tools)
             logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
 
+        resolved_models = {
+            tool: _resolve_tool_model(tool, model)
+            for tool in available_tools
+        }
+        non_empty_models = sorted({m for m in resolved_models.values() if m})
+        model_identifier = model if model else (",".join(non_empty_models) if non_empty_models else None)
+
         # Emit ai_consultation event before calling AI tools
         if progress_emitter:
             progress_emitter.emit("ai_consultation", {
                 "tools": available_tools,
-                "model": model,
+                "model": model_identifier,
                 "timeout": timeout
             })
 
         # Execute consultations in parallel
-        # Convert single model string to models dict if provided
-        models_dict = {tool: model for tool in available_tools} if model else None
+        models_dict = {tool: resolved for tool, resolved in resolved_models.items() if resolved}
+        if not models_dict:
+            models_dict = None
         multi_response = execute_tools_parallel(
             tools=available_tools,
             prompt=prompt,
@@ -1051,6 +1057,9 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         ...     print(f"- {issue}")
     """
     # Handle both string input and ToolResponse objects
+    provider_name: Optional[str] = None
+    model_name: Optional[str] = None
+
     if isinstance(response, str):
         output = response.strip()
         success = True
@@ -1059,13 +1068,14 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         output = response.output.strip() if response.output else ""
         success = response.success
         error = response.error
+        provider_name = response.tool
+        model_name = response.model
 
     # Initialize with defaults
     verdict = FidelityVerdict.UNKNOWN
     issues: List[str] = []
     recommendations: List[str] = []
     summary = ""
-    confidence = None
 
     issue_seen: Set[str] = set()
     recommendation_seen: Set[str] = set()
@@ -1094,7 +1104,8 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
             recommendations=[],
             summary="Unable to complete review due to tool failure",
             raw_response=output,
-            confidence=0.0
+            provider=provider_name,
+            model=model_name
         )
 
     json_payload = _load_json_from_text(output)
@@ -1135,11 +1146,7 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
 
         _extract_structured_json_insights(json_payload, add_issue, add_recommendation)
 
-        json_confidence = _coerce_confidence_value(json_payload.get("confidence"))
-        if json_confidence is not None:
-            confidence = json_confidence
-
-        structured_payload = json_payload
+        structured_payload = deepcopy(json_payload)
 
     # Extract verdict using pattern matching
     if verdict is FidelityVerdict.UNKNOWN:
@@ -1242,29 +1249,17 @@ def parse_review_response(response: ToolResponse) -> ParsedReviewResponse:
         else:
             summary = normalized_output.strip()
 
-    # Extract confidence if mentioned (0-100% or 0.0-1.0)
-    if confidence is None:
-        confidence_match = re.search(
-            r'(?:confidence|certainty):\s*(\d+(?:\.\d+)?)\s*%?',
-            output,
-            re.IGNORECASE
-        )
-        if confidence_match:
-            conf_value = float(confidence_match.group(1))
-            # Normalize to 0.0-1.0 range
-            if conf_value > 1.0:
-                confidence = conf_value / 100.0
-            else:
-                confidence = conf_value
+    final_raw_response = None if structured_payload is not None else (output if output else None)
 
     return ParsedReviewResponse(
         verdict=verdict,
         issues=issues,
         recommendations=recommendations,
         summary=summary,
-        raw_response=output,
-        confidence=confidence,
-        structured_response=structured_payload
+        raw_response=final_raw_response,
+        structured_response=structured_payload,
+        provider=provider_name,
+        model=model_name
     )
 
 
@@ -1410,12 +1405,12 @@ def detect_consensus(
             issue_counts[normalized_issue] += 1
 
     # 3. Identify consensus issues (mentioned by >= min_agreement models)
-    consensus_issues = [
+    consensus_issues = _dedupe_preserve_order([
         issue_originals[norm]
         for norm in issue_order
         if issue_counts.get(norm, 0) >= min_agreement
-    ]
-    all_issues = [issue_originals[norm] for norm in issue_order]
+    ])
+    all_issues = _dedupe_preserve_order([issue_originals[norm] for norm in issue_order])
 
     # 4. Collect all recommendations and count occurrences
     rec_counts: Dict[str, int] = {}
@@ -1434,12 +1429,12 @@ def detect_consensus(
             rec_counts[normalized_rec] += 1
 
     # 5. Identify consensus recommendations (mentioned by >= min_agreement models)
-    consensus_recommendations = [
+    consensus_recommendations = _dedupe_preserve_order([
         rec_originals[norm]
         for norm in rec_order
         if rec_counts.get(norm, 0) >= min_agreement
-    ]
-    all_recommendations = [rec_originals[norm] for norm in rec_order]
+    ])
+    all_recommendations = _dedupe_preserve_order([rec_originals[norm] for norm in rec_order])
 
     return ConsensusResult(
         consensus_verdict=consensus_verdict,

@@ -1304,8 +1304,7 @@ class FidelityReviewer:
             '    "details": "Note doc updates or omissions."\n'
             '  },\n'
             '  "issues": ["Concise list of primary issues for consensus logic."],\n'
-            '  "recommendations": ["Actionable next steps to resolve findings."],\n'
-            '  "confidence": 0.0\n'
+          '  "recommendations": ["Actionable next steps to resolve findings."]\n'
             '}\n'
         )
         prompt_parts.append("```\n\n")
@@ -1313,7 +1312,6 @@ class FidelityReviewer:
             "Rules:\n"
             "- Use lowercase values shown for enumerated fields (e.g., `verdict`, status flags).\n"
             "- Keep arrays as arrays (use `[]` when a section has nothing to report).\n"
-            "- `confidence` is a number between 0 and 1 (e.g., 0.85 for 85%).\n"
             "- Populate `issues` and `recommendations` with the key takeaways you want surfaced downstream.\n"
             "- Feel free to include additional keys if needed, but never omit the ones above.\n\n"
         )

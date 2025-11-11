@@ -61,6 +61,25 @@ DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
 }
 
 
+def _normalize_priority_entry(entry: object) -> List[str]:
+    """Normalize model priority definition to a clean list of strings."""
+    if isinstance(entry, dict):
+        values = entry.get("priority")
+        return _normalize_priority_entry(values)
+    if isinstance(entry, (list, tuple)):
+        normalized: List[str] = []
+        for item in entry:
+            if isinstance(item, str):
+                stripped = item.strip()
+                if stripped:
+                    normalized.append(stripped)
+        return normalized
+    if isinstance(entry, str):
+        stripped = entry.strip()
+        return [stripped] if stripped else []
+    return []
+
+
 def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
     """Remove duplicates while preserving the original order."""
     seen: set[str] = set()
@@ -75,6 +94,19 @@ def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
         result.append(normalized)
     return result
 
+
+def get_preferred_model(skill_name: str, tool_name: str) -> Optional[str]:
+    """Return the highest-priority configured model for a tool if available."""
+    config = load_skill_config(skill_name)
+    models = config.get("models", {})
+    priority = _normalize_priority_entry(models.get(tool_name))
+
+    if priority:
+        return priority[0]
+
+    # Fall back to builtin defaults if present
+    default_priority = _normalize_priority_entry(DEFAULT_MODELS.get(tool_name))
+    return default_priority[0] if default_priority else None
 
 
 def get_global_config_path() -> Path:

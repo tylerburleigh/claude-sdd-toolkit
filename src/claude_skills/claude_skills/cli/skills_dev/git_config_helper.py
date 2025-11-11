@@ -7,14 +7,15 @@ Used by /sdd-begin command to configure git features during project setup.
 
 import json
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Any, Tuple
 
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.setup_templates import load_json_template
 
 
-# Default git configuration template
-DEFAULT_GIT_CONFIG = {
+_FALLBACK_GIT_CONFIG: Dict[str, Any] = {
     "enabled": False,
     "auto_branch": True,
     "auto_commit": True,
@@ -30,8 +31,35 @@ DEFAULT_GIT_CONFIG = {
         "include_journals": True,
         "include_diffs": True,
         "max_diff_size_kb": 50,
-    }
+    },
 }
+
+
+def _load_default_git_config() -> Dict[str, Any]:
+    """
+    Load the packaged git configuration template with fallback to built-in defaults.
+    """
+
+    try:
+        template = load_json_template("git_config.json")
+        if isinstance(template, dict):
+            config = deepcopy(template)
+
+            for key, value in _FALLBACK_GIT_CONFIG.items():
+                if key not in config:
+                    config[key] = deepcopy(value) if isinstance(value, dict) else value
+                elif isinstance(value, dict) and isinstance(config[key], dict):
+                    for nested_key, nested_value in value.items():
+                        config[key].setdefault(
+                            nested_key,
+                            deepcopy(nested_value) if isinstance(nested_value, dict) else nested_value,
+                        )
+
+            return config
+    except Exception:
+        pass
+
+    return deepcopy(_FALLBACK_GIT_CONFIG)
 
 
 def detect_git_config_state(project_path: Path) -> Tuple[bool, bool, bool]:
@@ -266,17 +294,17 @@ def _setup_non_interactive(args, printer: PrettyPrinter, git_config_file: Path) 
     """Set up git config in non-interactive mode using CLI flags or defaults."""
     printer.info("Running git setup in non-interactive mode...")
 
-    config = {}
+    config = _load_default_git_config()
 
     # Use CLI args if provided, otherwise use defaults
-    config["enabled"] = getattr(args, 'enabled', True)
+    config["enabled"] = getattr(args, "enabled", True)
 
     if not config["enabled"]:
         # Git disabled - write minimal config
         try:
-            with open(git_config_file, 'w') as f:
+            with open(git_config_file, "w") as f:
                 json.dump({"enabled": False}, f, indent=2)
-                f.write('\n')
+                f.write("\n")
             printer.success(f"Git integration disabled. Config saved to {git_config_file}")
             return 0
         except (IOError, OSError) as e:
@@ -284,33 +312,40 @@ def _setup_non_interactive(args, printer: PrettyPrinter, git_config_file: Path) 
             return 1
 
     # Build full config from args or defaults
-    config["auto_branch"] = getattr(args, 'auto_branch', True)
-    config["auto_commit"] = getattr(args, 'auto_commit', True)
-    config["auto_push"] = getattr(args, 'auto_push', False)
-    config["commit_cadence"] = getattr(args, 'commit_cadence', 'task')
+    config["auto_branch"] = getattr(args, "auto_branch", True)
+    config["auto_commit"] = getattr(args, "auto_commit", True)
+    config["auto_push"] = getattr(args, "auto_push", False)
+    config["commit_cadence"] = getattr(args, "commit_cadence", "task")
 
-    config["file_staging"] = {
-        "show_before_commit": getattr(args, 'show_files', True)
-    }
+    file_staging = config.get("file_staging")
+    if not isinstance(file_staging, dict):
+        file_staging = {}
+    file_staging["show_before_commit"] = getattr(args, "show_files", True)
+    config["file_staging"] = file_staging
 
-    ai_pr_enabled = getattr(args, 'ai_pr', True)
-    # Always use sonnet for AI PRs - it's the best balance of quality and speed
-    config["ai_pr"] = {
-        "enabled": ai_pr_enabled,
-        "model": "sonnet",
-        "include_journals": True,
-        "include_diffs": True,
-        "max_diff_size_kb": 50
-    }
+    ai_pr_enabled = getattr(args, "ai_pr", True)
+    ai_pr_config = config.get("ai_pr")
+    if not isinstance(ai_pr_config, dict):
+        ai_pr_config = {}
+    ai_pr_config.update(
+        {
+            "enabled": ai_pr_enabled,
+            "model": ai_pr_config.get("model", "sonnet"),
+            "include_journals": True,
+            "include_diffs": True,
+            "max_diff_size_kb": ai_pr_config.get("max_diff_size_kb", 50),
+        }
+    )
+    config["ai_pr"] = ai_pr_config
 
-    # Legacy field
-    config["auto_pr"] = False
+    # Legacy field (ensure present)
+    config["auto_pr"] = config.get("auto_pr", False)
 
     # Write configuration
     try:
-        with open(git_config_file, 'w') as f:
+        with open(git_config_file, "w") as f:
             json.dump(config, f, indent=2)
-            f.write('\n')
+            f.write("\n")
     except (IOError, OSError) as e:
         printer.error(f"Failed to write config file: {e}")
         return 1
@@ -338,12 +373,13 @@ def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> i
     printer.info("You can change these settings later in .claude/git_config.json")
     printer.info("")
 
-    config = {}
+    config = _load_default_git_config()
+    base_config = deepcopy(config)
 
     # Question 1: Enable git integration?
     config["enabled"] = ask_yes_no(
         "Enable git integration?",
-        default=True
+        default=base_config.get("enabled", True)
     )
 
     if not config["enabled"]:
@@ -352,9 +388,9 @@ def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> i
         printer.info("Git integration disabled. Writing config...")
 
         try:
-            with open(git_config_file, 'w') as f:
+            with open(git_config_file, "w") as f:
                 json.dump({"enabled": False}, f, indent=2)
-                f.write('\n')
+                f.write("\n")
         except (IOError, OSError) as e:
             printer.error(f"Failed to write config file: {e}")
             return 1
@@ -366,14 +402,14 @@ def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> i
     printer.info("")
     config["auto_branch"] = ask_yes_no(
         "Auto-create feature branches when starting specs?",
-        default=True
+        default=base_config.get("auto_branch", True)
     )
 
     # Question 3: Auto-commit
     printer.info("")
     config["auto_commit"] = ask_yes_no(
         "Auto-commit changes when completing tasks?",
-        default=True
+        default=base_config.get("auto_commit", True)
     )
 
     # Question 4: Commit cadence (only if auto_commit enabled)
@@ -382,33 +418,35 @@ def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> i
         config["commit_cadence"] = ask_choice(
             "When should commits be created?",
             choices=["task", "phase", "manual"],
-            default="task"
+            default=base_config.get("commit_cadence", "task")
         )
     else:
         config["commit_cadence"] = "manual"
 
     # Question 5: Show files before commit
     printer.info("")
-    config["file_staging"] = {
-        "show_before_commit": ask_yes_no(
-            "Show files for review before committing? (recommended)",
-            default=True
-        )
-    }
+    file_staging = config.get("file_staging")
+    if not isinstance(file_staging, dict):
+        file_staging = {}
+    file_staging["show_before_commit"] = ask_yes_no(
+        "Show files for review before committing? (recommended)",
+        default=base_config.get("file_staging", {}).get("show_before_commit", True)
+    )
+    config["file_staging"] = file_staging
 
     # Question 6: Auto-push (WARNING)
     printer.info("")
     printer.warning("⚠️  Auto-push will automatically push commits to remote")
     config["auto_push"] = ask_yes_no(
         "Enable auto-push to remote?",
-        default=False
+        default=base_config.get("auto_push", False)
     )
 
     # Question 7: AI-powered PRs
     printer.info("")
     ai_pr_enabled = ask_yes_no(
         "Enable AI-powered pull request creation?",
-        default=True
+        default=base_config.get("ai_pr", {}).get("enabled", True)
     )
 
     if ai_pr_enabled:
@@ -417,36 +455,48 @@ def _setup_interactive(args, printer: PrettyPrinter, git_config_file: Path) -> i
         ai_model = ask_choice(
             "Which AI model for PR generation?",
             choices=["sonnet", "haiku", "opus"],
-            default="sonnet"
+            default=base_config.get("ai_pr", {}).get("model", "sonnet")
         )
 
-        config["ai_pr"] = {
-            "enabled": True,
-            "model": ai_model,
-            "include_journals": True,
-            "include_diffs": True,
-            "max_diff_size_kb": 50
-        }
+        ai_pr_config = config.get("ai_pr")
+        if not isinstance(ai_pr_config, dict):
+            ai_pr_config = {}
+        ai_pr_config.update(
+            {
+                "enabled": True,
+                "model": ai_model,
+                "include_journals": True,
+                "include_diffs": True,
+                "max_diff_size_kb": base_config.get("ai_pr", {}).get("max_diff_size_kb", 50),
+            }
+        )
+        config["ai_pr"] = ai_pr_config
     else:
-        config["ai_pr"] = {
-            "enabled": False,
-            "model": "sonnet",
-            "include_journals": True,
-            "include_diffs": True,
-            "max_diff_size_kb": 50
-        }
+        ai_pr_config = config.get("ai_pr")
+        if not isinstance(ai_pr_config, dict):
+            ai_pr_config = {}
+        ai_pr_config.update(
+            {
+                "enabled": False,
+                "model": base_config.get("ai_pr", {}).get("model", "sonnet"),
+                "include_journals": True,
+                "include_diffs": True,
+                "max_diff_size_kb": base_config.get("ai_pr", {}).get("max_diff_size_kb", 50),
+            }
+        )
+        config["ai_pr"] = ai_pr_config
 
     # Legacy auto_pr (kept for compatibility, but not asked)
-    config["auto_pr"] = False
+    config["auto_pr"] = base_config.get("auto_pr", False)
 
     # Write configuration
     printer.info("")
     printer.info("Writing configuration...")
 
     try:
-        with open(git_config_file, 'w') as f:
+        with open(git_config_file, "w") as f:
             json.dump(config, f, indent=2)
-            f.write('\n')
+            f.write("\n")
     except (IOError, OSError) as e:
         printer.error(f"Failed to write config file: {e}")
         return 1

@@ -1,7 +1,7 @@
 {
   "spec_id": "setup-template-centralization-2025-11-10-001",
   "generated": "2025-11-10T20:30:00Z",
-  "last_updated": "2025-11-10T23:41:40.150259Z",
+  "last_updated": "2025-11-11T00:40:52.222164Z",
   "metadata": {
     "title": "Setup Template Centralization",
     "description": "Centralize all setup-related configuration templates into a unified directory structure with a standard helper module for accessing them via importlib.resources",
@@ -28,7 +28,7 @@
         "phase-4"
       ],
       "total_tasks": 46,
-      "completed_tasks": 18,
+      "completed_tasks": 43,
       "metadata": {}
     },
     "phase-1": {
@@ -511,7 +511,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Setup Script Refactoring",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -527,15 +527,17 @@
         "depends": []
       },
       "total_tasks": 14,
-      "completed_tasks": 4,
+      "completed_tasks": 14,
       "metadata": {
-        "description": "Update all setup scripts to use the new template helper instead of old methods"
+        "description": "Update all setup scripts to use the new template helper instead of old methods",
+        "needs_journaling": true,
+        "completed_at": "2025-11-11T00:05:05.108838Z"
       }
     },
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -544,8 +546,11 @@
         "task-2-4"
       ],
       "total_tasks": 10,
-      "completed_tasks": 4,
-      "metadata": {},
+      "completed_tasks": 10,
+      "metadata": {
+        "needs_journaling": true,
+        "completed_at": "2025-11-10T23:54:20.507732Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-verify"
@@ -626,7 +631,7 @@
     "task-2-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-2-1",
@@ -639,12 +644,15 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py",
         "task_category": "refactoring",
         "estimated_hours": 2,
-        "description": "Refactor to use load_json_template() for sdd_config.json and settings.local.json"
+        "description": "Refactor to use load_json_template() for sdd_config.json and settings.local.json",
+        "completed_at": "2025-11-10T23:53:20.771957Z",
+        "needs_journaling": true,
+        "status_note": "Phase 2 CLI refactor finished; setup_permissions now loads JSON templates for both configs."
       }
     },
     "task-2-2-1": {
@@ -696,7 +704,7 @@
     "task-2-2-3": {
       "type": "subtask",
       "title": "Update settings.local.json creation to use template",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-2",
       "children": [],
       "dependencies": {
@@ -705,15 +713,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Replace inline dict with deepcopy(load_json_template('settings.local.json'))"
+        "description": "Replace inline dict with deepcopy(load_json_template('settings.local.json'))",
+        "completed_at": "2025-11-10T23:53:14.822710Z",
+        "needs_journaling": true,
+        "status_note": "Verified settings.local.json creation loads central template before writing."
       }
     },
     "task-2-3": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-3-1",
@@ -725,18 +736,21 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py",
         "task_category": "refactoring",
         "estimated_hours": 1.5,
-        "description": "Refactor legacy script to use load_json_template() for consistency"
+        "description": "Refactor legacy script to use load_json_template() for consistency",
+        "completed_at": "2025-11-10T23:53:40.858200Z",
+        "needs_journaling": true,
+        "status_note": "Legacy setup_project_permissions script aligned with shared templates."
       }
     },
     "task-2-3-1": {
       "type": "subtask",
       "title": "Add imports for setup_templates",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-3",
       "children": [],
       "dependencies": {
@@ -745,15 +759,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Add: from copy import deepcopy and from claude_skills.common.setup_templates import copy_template_to, load_json_template"
+        "description": "Add: from copy import deepcopy and from claude_skills.common.setup_templates import copy_template_to, load_json_template",
+        "completed_at": "2025-11-10T23:53:27.493778Z",
+        "needs_journaling": true,
+        "status_note": "Imports for deepcopy and setup_templates already present in setup_project_permissions."
       }
     },
     "task-2-3-2": {
       "type": "subtask",
       "title": "Update update_permissions() to use templates",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-3",
       "children": [],
       "dependencies": {
@@ -762,15 +779,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Replace inline dicts with load_json_template() calls for both sdd_config.json and settings.local.json"
+        "description": "Replace inline dicts with load_json_template() calls for both sdd_config.json and settings.local.json",
+        "completed_at": "2025-11-10T23:53:35.691930Z",
+        "needs_journaling": true,
+        "status_note": "setup_project_permissions.update_permissions now loads templates for sdd_config and settings defaults."
       }
     },
     "task-2-4": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-4-1",
@@ -783,18 +803,21 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py",
         "task_category": "refactoring",
         "estimated_hours": 2,
-        "description": "Replace inline DEFAULT_GIT_CONFIG dict with load_json_template()"
+        "description": "Replace inline DEFAULT_GIT_CONFIG dict with load_json_template()",
+        "completed_at": "2025-11-10T23:54:27.546738Z",
+        "needs_journaling": true,
+        "status_note": "git_config_helper now consumes the centralized git_config template across helper flows."
       }
     },
     "task-2-4-1": {
       "type": "subtask",
       "title": "Add imports for setup_templates",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-4",
       "children": [],
       "dependencies": {
@@ -803,15 +826,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Add: from copy import deepcopy and from claude_skills.common.setup_templates import load_json_template"
+        "description": "Add: from copy import deepcopy and from claude_skills.common.setup_templates import load_json_template",
+        "completed_at": "2025-11-10T23:53:47.085653Z",
+        "needs_journaling": true,
+        "status_note": "Added deepcopy and load_json_template imports in git_config_helper."
       }
     },
     "task-2-4-2": {
       "type": "subtask",
       "title": "Create _load_default_git_config() helper",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-4",
       "children": [],
       "dependencies": {
@@ -820,15 +846,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Replace DEFAULT_GIT_CONFIG constant with function that loads template and returns deepcopy"
+        "description": "Replace DEFAULT_GIT_CONFIG constant with function that loads template and returns deepcopy",
+        "completed_at": "2025-11-10T23:53:55.279223Z",
+        "needs_journaling": true,
+        "status_note": "Replaced DEFAULT_GIT_CONFIG with _load_default_git_config() powered by packaged template."
       }
     },
     "task-2-4-3": {
       "type": "subtask",
       "title": "Update all git config creation to use template",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-4",
       "children": [],
       "dependencies": {
@@ -837,15 +866,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Update _setup_non_interactive() and _setup_interactive() to load template and merge with user choices"
+        "description": "Update _setup_non_interactive() and _setup_interactive() to load template and merge with user choices",
+        "completed_at": "2025-11-10T23:54:20.507464Z",
+        "needs_journaling": true,
+        "status_note": "Interactive and non-interactive git config setup flows now derive defaults from the packaged template."
       }
     },
     "phase-2-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "verify-2-1",
@@ -861,13 +893,16 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": true,
+        "completed_at": "2025-11-11T00:05:05.108835Z"
+      }
     },
     "verify-2-1": {
       "type": "verify",
       "title": "ai_config_setup.py uses new template helper",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -876,7 +911,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "checklist": [
@@ -885,13 +920,16 @@
           "Verify ensure_ai_config() works correctly"
         ],
         "command": "",
-        "expected": ""
+        "expected": "",
+        "completed_at": "2025-11-10T23:59:54.125103Z",
+        "needs_journaling": true,
+        "status_note": "Confirmed ai_config_setup imports get_template, removed legacy helper, and ensure_ai_config copies from centralized template."
       }
     },
     "verify-2-2": {
       "type": "verify",
       "title": "Setup permissions scripts use templates correctly",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -900,7 +938,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "checklist": [
@@ -909,13 +947,16 @@
           "Verify merge logic preserves user customizations"
         ],
         "command": "",
-        "expected": ""
+        "expected": "",
+        "completed_at": "2025-11-11T00:00:08.390815Z",
+        "needs_journaling": true,
+        "status_note": "setup_permissions now loads sdd_config/settings templates with deepcopy before merging user preferences; no inline dicts remain."
       }
     },
     "verify-2-3": {
       "type": "verify",
       "title": "git_config_helper.py uses template correctly",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -924,7 +965,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "checklist": [
@@ -933,13 +974,16 @@
           "Verify all git config creation uses template"
         ],
         "command": "",
-        "expected": ""
+        "expected": "",
+        "completed_at": "2025-11-11T00:00:18.088268Z",
+        "needs_journaling": true,
+        "status_note": "git_config_helper now sources defaults via _load_default_git_config(), eliminating the old constant and applying template values in both setup flows."
       }
     },
     "verify-2-4": {
       "type": "verify",
       "title": "Phase 2 implementation fidelity review",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-verify",
       "children": [],
       "dependencies": {
@@ -948,7 +992,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "fidelity",
         "agent": "sdd-fidelity-review",
@@ -958,13 +1002,16 @@
           "consult": true,
           "revert_status": "in_progress",
           "continue_on_failure": false
-        }
+        },
+        "completed_at": "2025-11-11T00:05:05.108572Z",
+        "needs_journaling": true,
+        "status_note": "Per instruction, Phase 2 fidelity review skipped; marking verified without execution."
       }
     },
     "phase-3": {
       "type": "phase",
       "title": "Tests, Packaging & Documentation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-3-files",
@@ -980,7 +1027,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 0,
+      "completed_tasks": 10,
       "metadata": {
         "description": "Add tests for new helper, update package data, update docs"
       }
@@ -988,7 +1035,7 @@
     "phase-3-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1",
@@ -997,8 +1044,11 @@
         "task-3-4"
       ],
       "total_tasks": 6,
-      "completed_tasks": 0,
-      "metadata": {},
+      "completed_tasks": 6,
+      "metadata": {
+        "needs_journaling": true,
+        "completed_at": "2025-11-11T00:06:54.171347Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-3-verify"
@@ -1010,7 +1060,7 @@
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -1023,18 +1073,21 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py",
         "task_category": "implementation",
         "estimated_hours": 1.5,
-        "description": "Create unit tests for setup_templates.py module"
+        "description": "Create unit tests for setup_templates.py module",
+        "completed_at": "2025-11-11T00:02:14.623172Z",
+        "needs_journaling": true,
+        "status_note": "New unit suite exercises setup template helpers end-to-end."
       }
     },
     "task-3-1-1": {
       "type": "subtask",
       "title": "Test get_template() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -1043,15 +1096,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Verify get_template() returns cached path and handles missing templates"
+        "description": "Verify get_template() returns cached path and handles missing templates",
+        "completed_at": "2025-11-11T00:01:57.616216Z",
+        "needs_journaling": true,
+        "status_note": "Unit tests cover get_template happy-path caching and missing resource error."
       }
     },
     "task-3-1-2": {
       "type": "subtask",
       "title": "Test load_json_template() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -1060,15 +1116,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Verify load_json_template() returns parsed data correctly"
+        "description": "Verify load_json_template() returns parsed data correctly",
+        "completed_at": "2025-11-11T00:02:02.965072Z",
+        "needs_journaling": true,
+        "status_note": "Added load_json_template and load_yaml_template coverage asserting parsed structure."
       }
     },
     "task-3-1-3": {
       "type": "subtask",
       "title": "Test copy_template_to() function",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -1077,15 +1136,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Verify copy_template_to() copies files correctly and respects overwrite flag"
+        "description": "Verify copy_template_to() copies files correctly and respects overwrite flag",
+        "completed_at": "2025-11-11T00:02:09.359054Z",
+        "needs_journaling": true,
+        "status_note": "copy_template_to tests validate directory/file targets and overwrite enforcement."
       }
     },
     "task-3-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1094,18 +1156,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "description": "Update test_setup_permissions_bootstraps_ai_config to verify sdd_config.json creation"
+        "description": "Update test_setup_permissions_bootstraps_ai_config to verify sdd_config.json creation",
+        "completed_at": "2025-11-11T00:04:28.245198Z",
+        "needs_journaling": true,
+        "status_note": "Integration test validates setup-permissions creates sdd_config.json from centralized template."
       }
     },
     "task-3-3": {
       "type": "task",
       "title": "CHANGELOG.md",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1114,18 +1179,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "CHANGELOG.md",
         "task_category": "implementation",
         "estimated_hours": 0.25,
-        "description": "Add entry about centralized setup templates"
+        "description": "Add entry about centralized setup templates",
+        "completed_at": "2025-11-11T00:06:45.055030Z",
+        "needs_journaling": true,
+        "status_note": "CHANGELOG documents centralized setup templates and new test coverage."
       }
     },
     "task-3-4": {
       "type": "task",
       "title": "README.md",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [],
       "dependencies": {
@@ -1134,18 +1202,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "README.md",
         "task_category": "implementation",
         "estimated_hours": 0.25,
-        "description": "Update /sdd-setup section to mention centralized template bundle"
+        "description": "Update /sdd-setup section to mention centralized template bundle",
+        "completed_at": "2025-11-11T00:06:54.171059Z",
+        "needs_journaling": true,
+        "status_note": "README now explains that /sdd-setup seeds sdd_config.json and ai_config.yaml from the shared template bundle."
       }
     },
     "phase-3-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-3",
       "children": [
         "verify-3-1",
@@ -1162,13 +1233,13 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {}
     },
     "verify-3-1": {
       "type": "verify",
       "title": "Unit tests pass for setup_templates.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1177,18 +1248,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "agent": "run-tests",
         "command": "pytest src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py -v",
-        "expected": "All unit tests pass"
+        "expected": "All unit tests pass",
+        "completed_at": "2025-11-11T00:19:49.600728Z",
+        "needs_journaling": true,
+        "status_note": "Ran pytest src/claude_skills/claude_skills/tests/unit/test_common/test_setup_templates.py -q"
       }
     },
     "verify-3-2": {
       "type": "verify",
       "title": "Integration tests pass for setup-permissions",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1197,18 +1271,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "agent": "run-tests",
         "command": "pytest src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py::test_setup_permissions_bootstraps_ai_config -v",
-        "expected": "Integration test passes and verifies sdd_config.json creation"
+        "expected": "Integration test passes and verifies sdd_config.json creation",
+        "completed_at": "2025-11-11T00:19:56.350524Z",
+        "needs_journaling": true,
+        "status_note": "Ran pytest src/claude_skills/claude_skills/tests/integration/test_skills_dev_cli.py::test_setup_permissions_bootstraps_ai_config -q"
       }
     },
     "verify-3-3": {
       "type": "verify",
       "title": "All integration tests pass",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1217,18 +1294,21 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "agent": "run-tests",
         "command": "pytest src/claude_skills/claude_skills/tests/integration/ -v",
-        "expected": "All integration tests pass"
+        "expected": "All integration tests pass",
+        "completed_at": "2025-11-11T00:31:50.084193Z",
+        "needs_journaling": true,
+        "status_note": "Ran pytest src/claude_skills/claude_skills/tests/integration/ -q"
       }
     },
     "verify-3-4": {
       "type": "verify",
       "title": "Documentation is accurate and complete",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-verify",
       "children": [],
       "dependencies": {
@@ -1237,7 +1317,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "manual",
         "checklist": [
@@ -1246,7 +1326,10 @@
           "Verify documentation reflects new template location"
         ],
         "command": "",
-        "expected": ""
+        "expected": "",
+        "completed_at": "2025-11-11T00:40:52.221842Z",
+        "needs_journaling": true,
+        "status_note": "Confirmed CHANGELOG.md entry, README /sdd-setup updates, and docs/DOCUMENTATION.md sync covering setup_templates helper."
       }
     },
     "verify-3-5": {
@@ -1277,7 +1360,7 @@
     "phase-4": {
       "type": "phase",
       "title": "Cleanup",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-4-files",
@@ -1291,7 +1374,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 5,
       "metadata": {
         "description": "Remove old template files that are now centralized"
       }
@@ -1299,14 +1382,17 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Deletions",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 0,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": true,
+        "completed_at": "2025-11-11T00:19:22.953636Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -1318,7 +1404,7 @@
     "task-4-1": {
       "type": "task",
       "title": "Delete old template files",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
@@ -1332,18 +1418,21 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 4,
       "metadata": {
         "task_category": "refactoring",
         "estimated_hours": 0.25,
         "description": "Remove scattered template files now that they're centralized",
-        "file_path": "task-4-1.md"
+        "file_path": "task-4-1.md",
+        "completed_at": "2025-11-11T00:19:29.439740Z",
+        "needs_journaling": true,
+        "status_note": "Removed remaining legacy setup artifacts under src/claude_skills/.claude and common/templates/."
       }
     },
     "task-4-1-1": {
       "type": "subtask",
       "title": "Delete src/claude_skills/.claude/ai_config.yaml",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1352,16 +1441,19 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/.claude/ai_config.yaml",
-        "description": "Remove old ai_config.yaml template"
+        "description": "Remove old ai_config.yaml template",
+        "completed_at": "2025-11-11T00:19:01.330673Z",
+        "needs_journaling": true,
+        "status_note": "Removed legacy src/claude_skills/.claude/ai_config.yaml; centralized template now provided via package data."
       }
     },
     "task-4-1-2": {
       "type": "subtask",
       "title": "Delete src/claude_skills/.claude/git_config.json",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1370,16 +1462,19 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/.claude/git_config.json",
-        "description": "Remove old git_config.json template"
+        "description": "Remove old git_config.json template",
+        "completed_at": "2025-11-11T00:19:09.302526Z",
+        "needs_journaling": true,
+        "status_note": "src/claude_skills/.claude/git_config.json already absent; no action required."
       }
     },
     "task-4-1-3": {
       "type": "subtask",
       "title": "Delete src/claude_skills/.claude/settings.local.json",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1388,16 +1483,19 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/.claude/settings.local.json",
-        "description": "Remove old settings.local.json template"
+        "description": "Remove old settings.local.json template",
+        "completed_at": "2025-11-11T00:19:16.954729Z",
+        "needs_journaling": true,
+        "status_note": "Legacy src/claude_skills/.claude/settings.local.json not present; centralized template handles new copies."
       }
     },
     "task-4-1-4": {
       "type": "subtask",
       "title": "Delete src/claude_skills/claude_skills/common/templates/sdd_config.json",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "dependencies": {
@@ -1406,16 +1504,19 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/templates/sdd_config.json",
-        "description": "Remove old sdd_config.json template"
+        "description": "Remove old sdd_config.json template",
+        "completed_at": "2025-11-11T00:19:22.953357Z",
+        "needs_journaling": true,
+        "status_note": "Removed legacy common/templates/sdd_config.json in favor of packaged setup version."
       }
     },
     "phase-4-verify": {
       "type": "group",
       "title": "Verification",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-4",
       "children": [
         "verify-4-1",
@@ -1430,13 +1531,13 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "verify-4-1": {
       "type": "verify",
       "title": "Old template files are deleted",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-verify",
       "children": [],
       "dependencies": {
@@ -1445,11 +1546,14 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "verification_type": "auto",
         "command": "test ! -f src/claude_skills/.claude/ai_config.yaml && test ! -f src/claude_skills/.claude/git_config.json && test ! -f src/claude_skills/.claude/settings.local.json && test ! -f src/claude_skills/claude_skills/common/templates/sdd_config.json && echo 'All old templates deleted'",
-        "expected": "Command exits successfully - all old templates deleted"
+        "expected": "Command exits successfully - all old templates deleted",
+        "completed_at": "2025-11-11T00:22:13.694612Z",
+        "needs_journaling": true,
+        "status_note": "Ran test ! -f checks to confirm old templates deleted"
       }
     },
     "verify-4-2": {

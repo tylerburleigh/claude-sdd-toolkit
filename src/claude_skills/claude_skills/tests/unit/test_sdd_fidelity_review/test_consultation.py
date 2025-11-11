@@ -240,7 +240,6 @@ def test_parse_review_response_parses_json_schema() -> None:
             "Create src/claude_skills/claude_skills/common/templates/setup/__init__.py and populate the export tuple.",
             "Add a regression test that imports ALL_SETUP_TEMPLATES."
         ],
-        "confidence": 0.9,
         "next_steps": [
             "Document the new setup templates in the onboarding guide."
         ]
@@ -257,7 +256,8 @@ def test_parse_review_response_parses_json_schema() -> None:
     assert any("Create src/claude_skills/claude_skills/common/templates/setup/__init__.py" in rec for rec in parsed.recommendations)
     assert any("regression test" in rec for rec in parsed.recommendations)
     assert any("Document the new setup templates" in rec for rec in parsed.recommendations)
-    assert parsed.confidence == pytest.approx(0.9)
+    assert parsed.tool == "gemini"
+    assert parsed.model is None
 
 
 def test_parse_review_response_parses_nested_response_field() -> None:
@@ -266,7 +266,6 @@ def test_parse_review_response_parses_nested_response_field() -> None:
         "summary": "Nested payload summary.",
         "issues": ["Top level issue entry."],
         "recommendations": ["Top level recommendation."],
-        "confidence": 0.4,
     }
     outer = {"response": json.dumps(payload)}
     raw = json.dumps(outer)
@@ -277,8 +276,9 @@ def test_parse_review_response_parses_nested_response_field() -> None:
     assert parsed.summary == "Nested payload summary."
     assert parsed.issues == ["Top level issue entry."]
     assert parsed.recommendations == ["Top level recommendation."]
-    assert parsed.confidence == pytest.approx(0.4)
     assert parsed.structured_response == payload
+    assert parsed.tool == "gemini"
+    assert parsed.model is None
 
 
 def test_parse_review_response_parses_json_code_block_entries() -> None:
@@ -292,7 +292,6 @@ def test_parse_review_response_parses_json_code_block_entries() -> None:
         "recommendations": [
             {"text": "Add integration tests covering template loader import paths."}
         ],
-        "confidence": {"value": 72, "scale": "0-100"},
     }
     raw = f"```json\n{json.dumps(payload, indent=2)}\n```"
     response = _make_response("cursor-agent", ToolStatus.SUCCESS, output=raw)
@@ -302,7 +301,8 @@ def test_parse_review_response_parses_json_code_block_entries() -> None:
     assert any("Integration tests not provided" in issue for issue in parsed.issues)
     assert any("Core logic aligned" in issue for issue in parsed.issues)
     assert any("Add integration tests covering template loader import paths." in rec for rec in parsed.recommendations)
-    assert parsed.confidence == pytest.approx(0.72)
+    assert parsed.tool == "cursor-agent"
+    assert parsed.model is None
 
 
 def test_parse_review_response_handles_numbered_findings_section() -> None:

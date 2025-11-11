@@ -13,6 +13,9 @@ import pytest
 
 from claude_skills.common import hierarchy_validation
 from .cli_runner import run_cli
+def run_cli_no_json(*args: object):
+    """Invoke CLI with global --no-json flag to force text output."""
+    return run_cli("--no-json", *args)
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "sdd_validate"
 CLEAN_SPEC = FIXTURES_DIR / "clean_spec.json"
@@ -26,20 +29,20 @@ class TestValidateCommand:
 
     def test_validate_clean_spec_exit_0(self):
         """Clean spec should exit with code 0."""
-        result = run_cli("validate", str(CLEAN_SPEC))
+        result = run_cli_no_json("validate", str(CLEAN_SPEC))
         assert result.returncode == 0
         assert "Validation PASSED" in result.stdout or "✅" in result.stdout
 
     def test_validate_warnings_spec_exit_1(self):
         """Warnings-only spec should exit with code 1."""
-        result = run_cli("validate", str(WARNINGS_SPEC))
+        result = run_cli_no_json("validate", str(WARNINGS_SPEC))
         assert result.returncode == 1
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
         assert "warnings" in combined_output.lower()
 
     def test_validate_errors_spec_exit_2(self):
         """Spec with errors should exit with code 2."""
-        result = run_cli("validate", str(ERRORS_SPEC))
+        result = run_cli_no_json("validate", str(ERRORS_SPEC))
         assert result.returncode == 2
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
         assert "failed" in combined_output.lower() or "❌" in combined_output
@@ -68,13 +71,13 @@ class TestValidateCommand:
 
     def test_validate_verbose_output(self):
         """Test --verbose flag shows detailed output."""
-        result = run_cli("--verbose", "validate", str(WARNINGS_SPEC))
+        result = run_cli_no_json("--verbose", "validate", str(WARNINGS_SPEC))
         # Verbose should show more details
         assert "ERROR" in result.stdout or "WARN" in result.stdout or len(result.stdout) > 100
 
     def test_validate_nonexistent_file(self):
         """Test validation of nonexistent file returns exit 2."""
-        result = run_cli("validate", "/nonexistent/file.json")
+        result = run_cli_no_json("validate", "/nonexistent/file.json")
         assert result.returncode == 2
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
         assert "not found" in combined_output.lower()
@@ -86,7 +89,7 @@ class TestValidateCommand:
         spec_copy = tmp_path / "test_spec.json"
         shutil.copy(CLEAN_SPEC, spec_copy)
 
-        result = run_cli("validate", str(spec_copy), "--report")
+        result = run_cli_no_json("validate", str(spec_copy), "--report")
         assert result.returncode == 0
 
         # Check that report was created
@@ -99,7 +102,7 @@ class TestValidateCommand:
         spec_copy = tmp_path / "test_spec.json"
         shutil.copy(CLEAN_SPEC, spec_copy)
 
-        result = run_cli("validate", str(spec_copy), "--report", "--report-format", "json")
+        result = run_cli_no_json("validate", str(spec_copy), "--report", "--report-format", "json")
         assert result.returncode == 0
 
         report_file = tmp_path / "test_spec-validation-report.json"
@@ -118,7 +121,7 @@ class TestValidateCommand:
         spec_data["hierarchy"] = []  # invalid type (should be object)
         spec_copy.write_text(json.dumps(spec_data))
 
-        result = run_cli(
+        result = run_cli_no_json(
             "validate",
             str(spec_copy),
             "--report",
@@ -157,7 +160,7 @@ class TestValidateCommand:
             lambda name: ({"type": "object"}, "package://schema", None),
         )
 
-        result = run_cli("validate", str(CLEAN_SPEC))
+        result = run_cli_no_json("validate", str(CLEAN_SPEC))
         assert result.returncode == 0
 
         combined = (result.stdout or "") + (result.stderr or "")
@@ -170,7 +173,7 @@ class TestValidateCommand:
         spec_data["hierarchy"] = []  # invalid type to trigger schema error
         spec_copy.write_text(json.dumps(spec_data))
 
-        result = run_cli("validate", str(spec_copy))
+        result = run_cli_no_json("validate", str(spec_copy))
 
         assert result.returncode == 2
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
@@ -200,13 +203,13 @@ class TestFixCommand:
 
     def test_fix_preview_clean_spec(self):
         """Preview on clean spec shows no actions."""
-        result = run_cli("fix", str(CLEAN_SPEC), "--preview")
+        result = run_cli_no_json("fix", str(CLEAN_SPEC), "--preview")
         assert result.returncode == 0
         assert "No auto-fixable issues" in result.stdout or "0" in result.stdout
 
     def test_fix_preview_with_issues(self):
         """Preview on spec with issues shows actions."""
-        result = run_cli("fix", str(AUTOFIX_SPEC), "--preview")
+        result = run_cli_no_json("fix", str(AUTOFIX_SPEC), "--preview")
         assert result.returncode == 0
         assert "auto-fixable" in result.stdout.lower() or "issue" in result.stdout.lower()
 
@@ -221,7 +224,7 @@ class TestFixCommand:
 
     def test_fix_dry_run(self):
         """Test --dry-run is alias for --preview."""
-        result = run_cli("fix", str(AUTOFIX_SPEC), "--dry-run")
+        result = run_cli_no_json("fix", str(AUTOFIX_SPEC), "--dry-run")
         assert result.returncode == 0
 
     def test_fix_apply_creates_backup(self, tmp_path):
@@ -230,7 +233,7 @@ class TestFixCommand:
         spec_copy = tmp_path / "test_spec.json"
         shutil.copy(AUTOFIX_SPEC, spec_copy)
 
-        result = run_cli("fix", str(spec_copy))
+        result = run_cli_no_json("fix", str(spec_copy))
 
         # Backup should be created
         backup_file = tmp_path / "test_spec.json.backup"
@@ -242,7 +245,7 @@ class TestFixCommand:
         spec_copy = tmp_path / "test_spec.json"
         shutil.copy(AUTOFIX_SPEC, spec_copy)
 
-        result = run_cli("fix", str(spec_copy), "--no-backup")
+        result = run_cli_no_json("fix", str(spec_copy), "--no-backup")
 
         # No backup should be created
         backup_file = tmp_path / "test_spec.json.backup"
@@ -266,7 +269,7 @@ class TestReportCommand:
     def test_report_markdown(self, tmp_path):
         """Test generating markdown report."""
         output_file = tmp_path / "report.md"
-        result = run_cli("report", str(CLEAN_SPEC), "--output", str(output_file))
+        result = run_cli("report", str(CLEAN_SPEC), "--format", "markdown", "--output", str(output_file))
         assert result.returncode == 0
         assert output_file.exists()
 
@@ -288,13 +291,13 @@ class TestReportCommand:
 
     def test_report_stdout(self):
         """Test report to stdout with --output -"""
-        result = run_cli("report", str(CLEAN_SPEC), "--output", "-")
+        result = run_cli("report", str(CLEAN_SPEC), "--format", "markdown", "--output", "-")
         assert result.returncode == 0
         assert "# Validation Report" in result.stdout
 
     def test_report_with_dependencies(self):
         """Test report includes dependency analysis."""
-        result = run_cli("report", str(DEPENDENCY_SPEC), "--output", "-")
+        result = run_cli("report", str(DEPENDENCY_SPEC), "--format", "markdown", "--output", "-")
         assert result.returncode == 0
         assert "Dependency" in result.stdout or "dependencies" in result.stdout.lower()
 
@@ -312,6 +315,8 @@ class TestReportCommand:
         result = run_cli(
             "report",
             str(DEPENDENCY_SPEC),
+            "--format",
+            "markdown",
             "--output",
             str(output_file),
             "--bottleneck-threshold",

@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+from claude_skills.common.setup_templates import load_json_template
+
 from .cli_runner import run_cli
 
 
@@ -36,3 +41,26 @@ def test_skills_dev_migrate_shows_guidance() -> None:
     stdout = result.stdout.lower()
     assert "skills-dev" in stdout
     assert "legacy" in stdout
+
+
+def test_setup_permissions_bootstraps_ai_config(tmp_path: Path) -> None:
+    project_root = tmp_path / "proj"
+    project_root.mkdir()
+
+    result = run_skills_dev_cli("setup-permissions", "update", project_root, "--json")
+    assert result.returncode == 0
+
+    claude_dir = project_root / ".claude"
+    config_path = claude_dir / "sdd_config.json"
+    settings_path = claude_dir / "settings.local.json"
+
+    assert config_path.exists()
+    assert settings_path.exists()
+
+    config_data = json.loads(config_path.read_text())
+    assert config_data == load_json_template("sdd_config.json")
+
+    settings_data = json.loads(settings_path.read_text())
+    permissions = settings_data.get("permissions", {})
+    allow_list = permissions.get("allow", [])
+    assert "Skill(sdd-toolkit:sdd-plan)" in allow_list

@@ -389,8 +389,8 @@ def build_tool_command(
         ['gemini', '-m', 'gemini-exp-1114', '--output-format', 'json', '-p', 'Analyze code']
         >>> build_tool_command("codex", "Fix bug", model="o1")
         ['codex', 'exec', '--sandbox', 'read-only', '--json', '-m', 'o1', 'Fix bug']
-        >>> build_tool_command("cursor-agent", "Review code")
-        ['cursor-agent', '--print', '--json', 'Review code']
+        >>> build_tool_command("cursor-agent", "Review code", model="composer-1")
+        ['cursor-agent', '--print', '--json', '--model', 'composer-1', 'Review code']
     """
     if tool == "gemini":
         cmd = ["gemini"]
@@ -421,8 +421,9 @@ def build_tool_command(
         # IMPROVEMENT: Request JSON output for structured parsing
         cmd = ["cursor-agent", "--print"]
         cmd.append("--json")
+        if model:
+            cmd.extend(["--model", model])
         cmd.append(prompt)
-        # cursor-agent doesn't support model selection
         return cmd
 
     else:
