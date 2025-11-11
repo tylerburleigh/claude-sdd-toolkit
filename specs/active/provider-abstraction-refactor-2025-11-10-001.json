@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T17:36:31.438736Z",
+  "last_updated": "2025-11-11T17:40:26.045584Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 10,
+    "progress_percentage": 15,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -56,7 +56,7 @@
         "verify-1-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Document current provider usage and produce the blueprint for the new abstraction.",
         "estimated_hours": 11,
@@ -108,16 +108,22 @@
     "task-1-3": {
       "type": "task",
       "title": "Draft provider abstraction architecture blueprint",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "decision",
         "estimated_hours": 4,
         "file_path": "docs/ARCHITECTURE.md",
-        "details": "Produce UML-style diagrams and interface definitions covering base provider contracts, registry interaction, and lifecycle hooks."
+        "details": "Produce UML-style diagrams and interface definitions covering base provider contracts, registry interaction, and lifecycle hooks.",
+        "started_at": "2025-11-11T17:40:17.197510Z",
+        "status_note": "Drafting provider abstraction blueprint in architecture doc.",
+        "completed_at": "2025-11-11T17:40:26.041261Z",
+        "needs_journaling": false,
+        "actual_hours": 0.002,
+        "journaled_at": "2025-11-11T17:40:26.044298Z"
       }
     },
     "verify-1-1": {
@@ -454,6 +460,15 @@
       "content": "Authored docs/research/provider_requirements_matrix.md capturing run-tests, sdd-fidelity-review, and sdd-plan-review consumer expectations plus shared CLI tooling requirements. Documented tool routing, prompt packaging, streaming, error handling, caching, and security constraints, and highlighted gaps + next steps for ProviderContext design.\n\nVerification: manual doc review.",
       "metadata": {},
       "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-11T17:40:26.044282Z",
+      "entry_type": "status_change",
+      "title": "Provider abstraction blueprint",
+      "author": "claude-code",
+      "content": "Expanded docs/ARCHITECTURE.md with Section 7 detailing the provider abstraction blueprint: goals, registry + provider interfaces (Mermaid diagram), lifecycle hooks, integration notes for run-tests/fidelity-review/plan-review, and extension hooks for streaming and telemetry.\n\nVerification: manual review of architecture doc.",
+      "metadata": {},
+      "task_id": "task-1-3"
     }
   ]
 }

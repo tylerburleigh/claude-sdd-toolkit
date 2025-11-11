@@ -279,6 +279,104 @@ sdd_plan → sdd_plan_review → sdd_next → implementation (using run_tests) �
 
 ---
 
+## 7. Provider Abstraction Blueprint
+
+### 7.1 Goals & Constraints
+
+- **Unify provider contracts** so run-tests, plan-review, and fidelity-review consume the same interface, mirroring ModelChorus’ `ModelProvider` + `GenerationRequest/Response`.
+- **Honor consumer expectations** documented in `docs/research/model_chorus_provider_audit.md` and `docs/research/provider_requirements_matrix.md`, especially streaming parity, capability metadata, deterministic model identities, and secure CLI invocation.
+- **Remain CLI-first**: implementations still wrap Gemini, Codex, Cursor Agent (and future providers) via subprocess, but encapsulate safety flags, retries, and JSON parsing inside provider modules instead of each skill.
+
+### 7.2 Logical Architecture
+
+```mermaid
+classDiagram
+    class ProviderRegistry {
+        +register(factory: ProviderFactory)
+        +resolve(tool_id: str, ctx: ProviderConfigCtx) ProviderHandle
+        +available_providers(): List~str~
+    }
+
+    class ProviderFactory {
+        <<interface>>
+        +tool_id: str
+        +create(ctx: ProviderConfigCtx) ProviderHandle
+    }
+
+    class ProviderHandle {
+        +metadata: ProviderMetadata
+        +generate(request: GenerationRequest, stream: bool=False) -> GenerationResult
+        +supports(capability: Capability) bool
+    }
+
+    class ProviderMetadata {
+        +provider_name: str
+        +models: List~ModelDescriptor~
+        +security_flags: Dict
+    }
+
+    class ModelDescriptor {
+        +id: str
+        +capabilities: Set~Capability~
+        +routing_hints: Dict
+    }
+
+    class GenerationRequest {
+        +prompt: str
+        +system_prompt: Optional~str~
+        +temperature: Optional~float~
+        +max_tokens: Optional~int~
+        +continuation_id: Optional~str~
+        +metadata: Dict
+        +stream: bool
+    }
+
+    class GenerationResult {
+        +content: str|AsyncIterator~str~
+        +model_fqn: str
+        +usage: TokenUsage
+        +status: ProviderStatus
+        +stderr: Optional~str~
+        +raw_payload: Dict
+    }
+
+    ProviderFactory <|.. ClaudeFactory
+    ProviderFactory <|.. GeminiFactory
+    ProviderFactory <|.. CodexFactory
+    ProviderFactory <|.. CursorFactory
+    ProviderRegistry o--> ProviderFactory
+    ProviderHandle o--> ProviderMetadata
+    ProviderMetadata o--> ModelDescriptor
+```
+
+**Implementation notes**
+- `ProviderHandle.generate()` returns either a buffered `GenerationResult` or, if `stream=True`, exposes an async iterator that yields partial content while continuing to track usage metadata.
+- `model_fqn` adopts the `<provider>:<model>` convention so caches, journals, and telemetry remain deterministic when providers change implementation details.
+
+### 7.3 Lifecycle Hooks
+
+1. **Registration** – During CLI boot, each provider module calls `registry.register(factory)` with its tool id (`"gemini"`, `"codex"`, etc.) and dependency checks (binary availability, env vars). Factories advertise capability vectors (text, vision, function-calling, thinking) derived from the ModelChorus audit.
+2. **Resolution** – Skills invoke `registry.resolve(tool_id, ctx)`; the registry pulls overrides from `ai_config.resolve_models_for_tools()` plus `.model-chorusrc` defaults, injects security knobs (read-only sandbox, disallowed tools), and emits `ProviderUnavailableError` early so callers can degrade gracefully.
+3. **Execution** – `ProviderHandle.generate()` orchestrates request normalization, CLI command construction, subprocess execution with retries/backoff (mirroring ModelChorus `CLIProvider`), and optional streaming. When streaming is enabled the handle emits `ProgressEmitter` events (`model_response`, `cache_save`, etc.) so run-tests can match fidelity-review’s live telemetry.
+4. **Result Mapping** – Raw CLI output is parsed into `GenerationResult` with `ProviderStatus` normalized back to the existing `ToolStatus` enum (success, timeout, not_found, invalid_output, error). Consumers retain familiar semantics while gaining richer metadata (token usage, model lineage, raw payloads).
+
+### 7.4 Registry Integration with Existing Skills
+
+- **run-tests** – Auto-routing simply swaps `execute_tools_parallel()` for a registry-backed dispatcher. The skill requests streaming (`stream=True`) to reduce verbosity per the CLI-output audit and still feeds normalized responses into the existing synthesis formatter.
+- **sdd-fidelity-review** – Keeps cache logic intact but derives deterministic `model_fqn` strings from `GenerationResult`, eliminating ad-hoc string formatting and ensuring cache keys stay consistent even if provider internals change.
+- **sdd-plan-review** – Delegates Gemini JSON wrapper stripping to the Gemini provider, so plan-review only handles normalized Markdown/text and can subscribe to streaming chunks for progress updates without parsing CLI-specific noise.
+- **common.ai_tools** – Serves as a compatibility shim translating `GenerationResult` ↔ `ToolResponse` until every skill migrates. This allows incremental rollout without breaking existing commands.
+
+### 7.5 Lifecycle Extension Points
+
+- **`before_execute(request, metadata)`** – For logging/instrumentation hooks that inspect prompts and enforce policy (e.g., secret redaction) before subprocess execution.
+- **`on_stream_chunk(chunk, state)`** – Allows ProgressEmitter to broadcast streamed tokens/tool events centrally instead of each skill re-implementing streaming logic.
+- **`after_result(result)`** – Centralizes caching, telemetry, and cost accounting so consumers simply opt-in via registry configuration rather than duplicating plumbing.
+
+These hooks reside in the registry layer, ensuring cross-cutting concerns (telemetry, retries, sandbox enforcement) remain consistent regardless of which skill invokes a provider.
+
+---
+
 ## Codebase Statistics
 
 - **Total Files**: 159 Python files
