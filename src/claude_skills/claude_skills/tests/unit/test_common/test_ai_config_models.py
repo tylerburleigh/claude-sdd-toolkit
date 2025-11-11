@@ -201,3 +201,35 @@ def test_resolve_models_for_tools_empty_input_returns_empty(
     set_skill_config({"models": {}})
     models = ai_config.resolve_models_for_tools("skill", [])
     assert models == OrderedDict()
+
+
+def test_get_enabled_tools_uses_provider_section(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        ai_config,
+        "load_skill_config",
+        lambda _skill: {"providers": {"gemini": {"enabled": True}, "codex": {"enabled": False}}},
+    )
+    enabled = ai_config.get_enabled_tools("skill")
+    assert "gemini" in enabled
+    assert "codex" not in enabled
+
+
+def test_get_tool_config_reads_from_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        ai_config,
+        "load_skill_config",
+        lambda _skill: {"providers": {"custom": {"enabled": True}}},
+    )
+    config = ai_config.get_tool_config("skill", "custom")
+    assert config == {"enabled": True}
+
+
+def test_load_skill_config_promotes_tools_to_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        ai_config,
+        "load_global_config",
+        lambda: {"tools": {"custom": {"enabled": False}}},
+    )
+    config = ai_config.load_skill_config("skill")
+    assert config["providers"]["custom"]["enabled"] is False
+    assert config["tools"]["custom"]["enabled"] is False

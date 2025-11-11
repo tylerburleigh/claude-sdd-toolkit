@@ -124,7 +124,7 @@ class TestToolSelection:
 class TestConsultation:
     """Tests for run_consultation()."""
 
-    def test_run_consultation_success(self, mock_subprocess_run):
+    def test_run_consultation_success(self, mock_execute_tool):
         """Should successfully run consultation."""
         prompt = "Generate documentation"
 
@@ -133,23 +133,23 @@ class TestConsultation:
         assert success is True
         assert "Mock AI" in output
 
-    def test_run_consultation_failure(self, mock_subprocess_run_failure):
+    def test_run_consultation_failure(self, mock_execute_tool_failure):
         """Should handle consultation failure."""
         prompt = "Generate documentation"
 
         success, output = run_consultation("gemini", prompt, dry_run=False, verbose=False)
 
         assert success is False
-        assert output != ""  # Should have error message
+        assert "error" in output.lower() or output
 
     def test_run_consultation_dry_run(self):
-        """Dry run should not execute subprocess."""
+        """Dry run should not execute provider."""
         prompt = "Generate documentation"
 
         success, output = run_consultation("gemini", prompt, dry_run=True, verbose=False)
 
         assert success is True
-        assert "Dry run" in output
+        assert "Would consult" in output
 
     def test_run_consultation_unknown_tool(self):
         """Should fail for unknown tool."""

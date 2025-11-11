@@ -1,0 +1,125 @@
+"""
+Provider abstraction primitives.
+
+Re-exports the base request/response dataclasses, capability/status enums,
+error hierarchy, and ProviderContext needed by higher-level registries
+and skill integrations.
+"""
+
+from .base import (
+    ProviderCapability,
+    ProviderStatus,
+    ProviderError,
+    ProviderUnavailableError,
+    ProviderExecutionError,
+    ProviderTimeoutError,
+    ModelDescriptor,
+    ProviderMetadata,
+    TokenUsage,
+    StreamChunk,
+    GenerationRequest,
+    GenerationResult,
+    ProviderHooks,
+    ProviderContext,
+    StreamCallback,
+    BeforeExecuteHook,
+    AfterResultHook,
+)
+from .registry import (
+    ProviderFactory,
+    ProviderRegistration,
+    register_provider,
+    register_lazy_provider,
+    available_providers,
+    resolve_provider,
+    get_provider_metadata,
+    describe_providers,
+    set_dependency_resolver,
+    reset_registry,
+)
+from .detectors import (
+    ProviderDetector,
+    register_detector as register_provider_detector,
+    get_detector as get_provider_detector,
+    detect_provider_availability,
+    iter_detector_statuses,
+    reset_detectors as reset_provider_detectors,
+    list_detectors as list_provider_detectors,
+)
+from .gemini import (
+    GeminiProvider,
+    create_provider as create_gemini_provider,
+    is_gemini_available as gemini_is_available,
+    GEMINI_METADATA,
+)
+from .codex import (
+    CodexProvider,
+    create_provider as create_codex_provider,
+    is_codex_available as codex_is_available,
+    CODEX_METADATA,
+)
+from .cursor_agent import (
+    CursorAgentProvider,
+    create_provider as create_cursor_agent_provider,
+    is_cursor_agent_available as cursor_agent_is_available,
+    CURSOR_METADATA,
+)
+from .claude import (
+    ClaudeProvider,
+    create_provider as create_claude_provider,
+    is_claude_available as claude_is_available,
+    CLAUDE_METADATA,
+)
+
+__all__ = [
+    "ProviderCapability",
+    "ProviderStatus",
+    "ProviderError",
+    "ProviderUnavailableError",
+    "ProviderExecutionError",
+    "ProviderTimeoutError",
+    "ModelDescriptor",
+    "ProviderMetadata",
+    "TokenUsage",
+    "StreamChunk",
+    "GenerationRequest",
+    "GenerationResult",
+    "ProviderHooks",
+    "ProviderContext",
+    "StreamCallback",
+    "BeforeExecuteHook",
+    "AfterResultHook",
+    "ProviderFactory",
+    "ProviderRegistration",
+    "register_provider",
+    "register_lazy_provider",
+    "available_providers",
+    "resolve_provider",
+    "get_provider_metadata",
+    "describe_providers",
+    "set_dependency_resolver",
+    "reset_registry",
+    "ProviderDetector",
+    "register_provider_detector",
+    "get_provider_detector",
+    "detect_provider_availability",
+    "iter_detector_statuses",
+    "reset_provider_detectors",
+    "list_provider_detectors",
+    "GeminiProvider",
+    "create_gemini_provider",
+    "gemini_is_available",
+    "GEMINI_METADATA",
+    "CodexProvider",
+    "create_codex_provider",
+    "codex_is_available",
+    "CODEX_METADATA",
+    "CursorAgentProvider",
+    "create_cursor_agent_provider",
+    "cursor_agent_is_available",
+    "CURSOR_METADATA",
+    "ClaudeProvider",
+    "create_claude_provider",
+    "claude_is_available",
+    "CLAUDE_METADATA",
+]

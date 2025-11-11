@@ -11,9 +11,11 @@ Transforms dry technical specs into engaging, story-like documents.
 
 from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass
-import subprocess
 import json
-from claude_skills.common import get_agent_priority, get_agent_command, get_timeout, get_enabled_tools
+
+from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools
+from claude_skills.common.ai_config import resolve_tool_model
+from claude_skills.common.ai_tools import execute_tool, detect_available_tools
 
 
 @dataclass
@@ -383,28 +385,20 @@ Keep it actionable and concise.
         # Try agents in priority order until one succeeds
         for agent in enabled_available:
             try:
-                # Build command from config
-                cmd = get_agent_command(
-                    'sdd-render',
-                    agent,
-                    prompt,
-                    model_override=self.model_override,
-                    context={"feature": "narrative"},
-                )
                 timeout = get_timeout('sdd-render', 'narrative')
 
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout
+                response = self._invoke_agent(
+                    agent,
+                    prompt,
+                    feature="narrative",
+                    timeout=timeout,
                 )
 
-                if result.returncode == 0:
-                    return result.stdout.strip()
+                if response.success:
+                    return response.output.strip()
 
-            except (subprocess.TimeoutExpired, Exception):
-                # Try next agent
+            except Exception:
+                # Try next agent on unexpected errors
                 continue
 
         # All agents failed
@@ -416,26 +410,20 @@ Keep it actionable and concise.
         Returns:
             List of available agent names
         """
-        agent_commands = {
-            "cursor-agent": ["cursor-agent", "--version"],
-            "gemini": ["gemini", "--version"],
-            "codex": ["codex", "--version"],
-        }
+        tools = ["cursor-agent", "gemini", "codex"]
+        return detect_available_tools(tools, check_version=True)
 
-        available = []
-        for agent, cmd in agent_commands.items():
-            try:
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    timeout=5
-                )
-                if result.returncode in (0, 1):
-                    available.append(agent)
-            except (FileNotFoundError, subprocess.TimeoutExpired):
-                pass
+    def _resolve_model(self, agent: str, *, feature: str) -> Optional[str]:
+        return resolve_tool_model(
+            "sdd-render",
+            agent,
+            override=self.model_override,
+            context={"feature": feature},
+        )
 
-        return available
+    def _invoke_agent(self, agent: str, prompt: str, *, feature: str, timeout: int):
+        model = self._resolve_model(agent, feature=feature)
+        return execute_tool(agent, prompt, model=model, timeout=timeout)
 
     def enhance_spec_narrative(self) -> Dict[str, List[NarrativeElement]]:
         """Generate all narrative enhancements for the spec.

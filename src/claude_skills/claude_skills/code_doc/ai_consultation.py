@@ -4,10 +4,9 @@ AI Consultation for Documentation Generation
 Shells out to external AI CLI tools (gemini, codex, cursor-agent) to generate
 contextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
 
-Uses shared AI tool utilities from claude_skills.common.ai_tools:
-- detect_available_tools(): Check which AI tools are installed
-- build_tool_command(): Build command arrays for tool execution
-- execute_tools_parallel(): Run multiple tools concurrently
+Uses shared AI tool utilities from claude_skills.common.ai_tools and the
+provider abstraction so consultations are routed through a consistent
+registry and response envelope.
 
 This module provides documentation-specific functionality:
 - Prompt formatting for architecture and AI context research
@@ -15,17 +14,16 @@ This module provides documentation-specific functionality:
 - High-level orchestration for documentation generation workflows
 """
 
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 from claude_skills.common.ai_tools import (
     detect_available_tools,
-    build_tool_command,
     execute_tools_parallel,
+    execute_tool,
+    ToolStatus,
 )
 from claude_skills.common import ai_config
 
@@ -417,24 +415,25 @@ def run_consultation(
     Returns:
         Tuple of (success: bool, output: str)
     """
+    known_tools = {"gemini", "codex", "cursor-agent"}
     resolved_model = get_model_for_tool(tool, doc_type=doc_type, override=model_override)
+    timeout = ai_config.get_timeout("code-doc", "consultation")
 
-    # Use shared utility to build command
-    try:
-        cmd = build_tool_command(tool, prompt, model=resolved_model)
-    except ValueError as e:
-        return False, str(e)
+    if tool not in known_tools:
+        return False, f"Unknown tool '{tool}'. Available tools: gemini, codex, cursor-agent"
 
     if dry_run:
-        preview = " ".join(cmd[:4]) if len(cmd) >= 4 else " ".join(cmd)
-        model_note = f" [model={resolved_model}]" if resolved_model else ""
-        msg = f"Would run: {preview} <prompt ({len(prompt)} chars)>{model_note}"
+        model_note = f"model={resolved_model}" if resolved_model else "default model"
+        msg = (
+            f"Would consult {tool} ({model_note}) "
+            f"with prompt length {len(prompt)} chars [timeout={timeout}s]"
+        )
         if printer:
             printer.detail(msg)
         else:
             print(msg)
             sys.stdout.flush()
-        return True, "Dry run - no output"
+        return True, msg
 
     # Determine what type of research from prompt
     if "Architecture" in prompt:
@@ -460,24 +459,22 @@ def run_consultation(
             print("=" * 60)
         sys.stdout.flush()
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False
+    response = execute_tool(tool, prompt, model=resolved_model, timeout=timeout)
+
+    if response.success:
+        return True, response.output
+
+    if response.status == ToolStatus.TIMEOUT:
+        message = f"{tool} timed out after {timeout} seconds"
+    elif response.status == ToolStatus.NOT_FOUND:
+        message = (
+            f"{tool} not found. Install gemini, codex, or cursor-agent "
+            "and ensure they are on PATH."
         )
+    else:
+        message = response.error or f"{tool} consultation failed (status={response.status.value})"
 
-        if result.returncode == 0:
-            return True, result.stdout
-        else:
-            error_msg = result.stderr or result.stdout or f"Tool exited with code {result.returncode}"
-            return False, error_msg
-
-    except FileNotFoundError:
-        return False, f"{tool} not found. Is it installed?"
-    except Exception as e:
-        return False, f"Error running {tool}: {e}"
+    return False, message
 
 
 def consult_multi_agent(

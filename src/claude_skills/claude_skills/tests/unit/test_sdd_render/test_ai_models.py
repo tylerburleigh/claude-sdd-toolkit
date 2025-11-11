@@ -26,21 +26,28 @@ def _minimal_spec() -> Dict[str, Any]:
 def test_executive_summary_uses_model_override(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: Dict[str, Any] = {}
 
-    def _mock_get_agent_command(skill, agent, prompt, *, model_override=None, context=None):
-        captured["skill"] = skill
+    def _mock_resolve(self, agent, *, feature):
         captured["agent"] = agent
-        captured["model_override"] = model_override
-        captured["context"] = context
-        return ["echo", "summary"]
+        captured["feature"] = feature
+        captured["model_override"] = self.model_override
+        return "demo-model"
 
     monkeypatch.setattr(
-        "claude_skills.sdd_render.executive_summary.get_agent_command",
-        _mock_get_agent_command,
+        "claude_skills.sdd_render.executive_summary.ExecutiveSummaryGenerator._resolve_model",
+        _mock_resolve,
     )
+    def _mock_execute(agent, prompt, *, model=None, timeout=None):
+        captured["invoked_agent"] = agent
+        captured["timeout"] = timeout
+        return SimpleNamespace(success=True, output="Summary", status=None)
 
     monkeypatch.setattr(
-        "claude_skills.sdd_render.executive_summary.subprocess.run",
-        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="Summary", stderr=""),
+        "claude_skills.sdd_render.executive_summary.execute_tool",
+        _mock_execute,
+    )
+    monkeypatch.setattr(
+        "claude_skills.sdd_render.executive_summary.ExecutiveSummaryGenerator.get_available_agents",
+        lambda self: ["gemini"],
     )
 
     generator = ExecutiveSummaryGenerator(
@@ -52,31 +59,32 @@ def test_executive_summary_uses_model_override(monkeypatch: pytest.MonkeyPatch) 
 
     assert success is True
     assert output == "Summary"
-    assert captured == {
-        "skill": "sdd-render",
-        "agent": "gemini",
-        "model_override": {"gemini": "demo-model"},
-        "context": {"feature": "executive_summary"},
-    }
+    assert captured["agent"] == "gemini"
+    assert captured["feature"] == "executive_summary"
+    assert captured["model_override"] == {"gemini": "demo-model"}
+    assert captured["invoked_agent"] == "gemini"
 
 
 def test_narrative_enhancer_uses_model_override(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: Dict[str, Any] = {}
 
-    def _mock_get_agent_command(skill, agent, prompt, *, model_override=None, context=None):
-        captured["skill"] = skill
+    def _mock_resolve(self, agent, *, feature):
         captured["agent"] = agent
-        captured["model_override"] = model_override
-        captured["context"] = context
-        return ["echo", "narrative"]
+        captured["feature"] = feature
+        captured["model_override"] = self.model_override
+        return "demo-model"
 
     monkeypatch.setattr(
-        "claude_skills.sdd_render.narrative_enhancer.get_agent_command",
-        _mock_get_agent_command,
+        "claude_skills.sdd_render.narrative_enhancer.NarrativeEnhancer._resolve_model",
+        _mock_resolve,
     )
     monkeypatch.setattr(
-        "claude_skills.sdd_render.narrative_enhancer.subprocess.run",
-        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout="Narrative", stderr=""),
+        "claude_skills.sdd_render.narrative_enhancer.execute_tool",
+        lambda agent, prompt, *, model=None, timeout=None: SimpleNamespace(
+            success=True,
+            output="Narrative",
+            status=None,
+        ),
     )
     monkeypatch.setattr(
         "claude_skills.sdd_render.narrative_enhancer.get_agent_priority",
@@ -95,9 +103,6 @@ def test_narrative_enhancer_uses_model_override(monkeypatch: pytest.MonkeyPatch)
     result = enhancer._generate_narrative_ai("Explain phase flow")
 
     assert result == "Narrative"
-    assert captured == {
-        "skill": "sdd-render",
-        "agent": "gemini",
-        "model_override": {"gemini": "demo-model"},
-        "context": {"feature": "narrative"},
-    }
+    assert captured["agent"] == "gemini"
+    assert captured["feature"] == "narrative"
+    assert captured["model_override"] == {"gemini": "demo-model"}

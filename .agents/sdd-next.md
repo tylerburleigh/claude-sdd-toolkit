@@ -26,7 +26,14 @@ Post-Implementation Checklist -> Phase Loop (optional) -> Finish
 ## Global Requirements & Conventions
 
 - Stay inside the repo root (`cd /Users/tylerburleigh/Documents/claude-sdd-toolkit`) and keep commands one-per-line (no `&&`).
-- Use `sdd` commands for all spec inspection; never use `Read`, `cat`, `head`, `tail`, `grep`, `jq` or similar to read spec JSON directly.
+- Use `sdd` commands for all spec JSON reading operations
+- NEVER use `Read` to read spec JSON directly
+- NEVER use `cat` to read spec JSON directly
+- NEVER use `head` to read spec JSON directly
+- NEVER use `tail` to read spec JSON directly
+- NEVER use `grep` to read spec JSON directly
+- NEVER use `jq` to read spec JSON directly
+- NEVER use `grep` to read spec JSON directly
 - Kick off each session with `sdd verify-tools` (once per terminal) if tooling status is unknown.
 - Gate key decisions (spec choice, task selection, plan approval) with `AskUserQuestion`.
 - Prefer `sdd find-specs`, `sdd list-specs --verbose`, and `sdd query-tasks` over manual filesystem inspection.

@@ -16,7 +16,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from claude_skills.common.ai_tools import build_tool_command
 
 
-# Default tool configuration (fallback if config file not found)
+# Default provider/tool configuration (fallback if config file not found)
 DEFAULT_TOOLS = {
     "gemini": {
         "description": "Strategic analysis and hypothesis validation",
@@ -32,23 +32,31 @@ DEFAULT_TOOLS = {
         "description": "Code-level review and bug fixes",
         "command": "codex",
         "enabled": False
+    },
+    "claude": {
+        "description": "Extended reasoning and analysis with read-only access",
+        "command": "claude",
+        "enabled": True
     }
 }
 
 DEFAULT_MODELS = {
     "gemini": {
-        "priority": ["gemini-2.5-pro"]
+        "priority": ["gemini-2.5-flash", "gemini-2.5-pro"]
     },
     "cursor-agent": {
-        "priority": ["composer-1"]
+        "priority": ["composer-1", "gpt-5-codex"]
     },
     "codex": {
-        "priority": ["gpt-5-codex"]
+        "priority": ["gpt-5-codex", "gpt-5-codex-mini", "gpt-5"]
+    },
+    "claude": {
+        "priority": ["sonnet", "haiku"]
     }
 }
 
 
-DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex"]
+DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude"]
 
 DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
     "default": False,
@@ -60,6 +68,34 @@ DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
     "flaky": False,
     "multi-file": True,
 }
+
+
+def _normalize_provider_settings(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Ensure provider-centric configuration is present with backwards compatibility."""
+    providers_section: Dict[str, Any] = {}
+    existing_providers = config.get("providers")
+    if isinstance(existing_providers, dict):
+        providers_section = existing_providers
+
+    tools_section = config.get("tools")
+    if isinstance(tools_section, dict):
+        providers_section = merge_configs(providers_section, tools_section)
+
+    normalized = merge_configs(DEFAULT_TOOLS, providers_section)
+    config["providers"] = normalized
+    config["tools"] = merge_configs({}, normalized)
+    return config
+
+
+def _get_provider_map(config: Mapping[str, Any]) -> Dict[str, Dict]:
+    """Return the provider configuration map, falling back to tools/defaults."""
+    providers = config.get("providers")
+    if isinstance(providers, dict):
+        return providers
+    tools = config.get("tools")
+    if isinstance(tools, dict):
+        return tools
+    return DEFAULT_TOOLS
 
 
 def _normalize_priority_entry(entry: object) -> List[str]:
@@ -561,14 +597,14 @@ def load_skill_config(skill_name: str) -> Dict:
             skill_specific = global_config[skill_name]
             result = merge_configs(result, skill_specific)
 
-        return result
+        return _normalize_provider_settings(result)
 
     except (yaml.YAMLError, IOError, KeyError) as e:
         # Error loading config, fall back to defaults
-        return {
+        return _normalize_provider_settings({
             "tools": DEFAULT_TOOLS.copy(),
             "models": DEFAULT_MODELS.copy()
-        }
+        })
 
 
 def get_enabled_tools(skill_name: str) -> Dict[str, Dict]:
@@ -581,11 +617,11 @@ def get_enabled_tools(skill_name: str) -> Dict[str, Dict]:
         Dict mapping tool name to tool configuration (only enabled tools)
     """
     config = load_skill_config(skill_name)
-    tools = config.get('tools', DEFAULT_TOOLS)
+    providers = _get_provider_map(config)
 
     return {
         name: tool_config
-        for name, tool_config in tools.items()
+        for name, tool_config in providers.items()
         if tool_config.get('enabled', True)
     }
 
@@ -691,8 +727,8 @@ def get_tool_config(skill_name: str, tool_name: str) -> Optional[Dict]:
         Tool configuration dict or None if not found
     """
     config = load_skill_config(skill_name)
-    tools = config.get('tools', {})
-    return tools.get(tool_name)
+    providers = _get_provider_map(config)
+    return providers.get(tool_name)
 
 
 def is_tool_enabled(skill_name: str, tool_name: str) -> bool:
