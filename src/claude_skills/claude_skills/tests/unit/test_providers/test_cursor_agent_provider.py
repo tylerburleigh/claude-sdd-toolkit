@@ -33,7 +33,7 @@ def _payload(content: str = "Cursor response") -> str:
     return json.dumps(
         {
             "content": content,
-            "model": "cursor-fast",
+            "model": "composer-1",
             "usage": {
                 "input_tokens": 15,
                 "output_tokens": 31,
@@ -57,7 +57,7 @@ def test_cursor_agent_provider_builds_command_and_parses_json() -> None:
     provider = CursorAgentProvider(
         CURSOR_METADATA,
         ProviderHooks(on_stream_chunk=lambda chunk: streamed.append(chunk.content)),
-        model="cursor-fast",
+        model="composer-1",
         runner=runner,
         binary="cursor-agent",
     )
@@ -88,7 +88,7 @@ def test_cursor_agent_provider_builds_command_and_parses_json() -> None:
         "--max-tokens",
         "600",
         "--model",
-        "cursor-fast",
+        "composer-1",
         "--system",
         "System instructions",
         "--quiet",
@@ -99,7 +99,7 @@ def test_cursor_agent_provider_builds_command_and_parses_json() -> None:
     assert captured["timeout"] == 30
     assert streamed == ["Cursor response"]
     assert result.content == "Cursor response"
-    assert result.model_fqn == "cursor-agent:cursor-fast"
+    assert result.model_fqn == "cursor-agent:composer-1"
     assert result.usage.input_tokens == 15
     assert result.usage.output_tokens == 31
     assert result.usage.total_tokens == 46
@@ -165,7 +165,7 @@ def test_create_provider_and_availability_override(monkeypatch: pytest.MonkeyPat
     provider = create_provider(
         hooks=ProviderHooks(),
         dependencies={"runner": runner},
-        overrides={"model": "cursor-fast", "binary": "cursor-agent"},
+        overrides={"model": "composer-1", "binary": "cursor-agent"},
     )
 
     provider.generate(GenerationRequest(prompt="test"))

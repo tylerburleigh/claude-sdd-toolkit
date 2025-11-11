@@ -64,6 +64,12 @@ from .cursor_agent import (
     is_cursor_agent_available as cursor_agent_is_available,
     CURSOR_METADATA,
 )
+from .claude import (
+    ClaudeProvider,
+    create_provider as create_claude_provider,
+    is_claude_available as claude_is_available,
+    CLAUDE_METADATA,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -112,4 +118,8 @@ __all__ = [
     "create_cursor_agent_provider",
     "cursor_agent_is_available",
     "CURSOR_METADATA",
+    "ClaudeProvider",
+    "create_claude_provider",
+    "claude_is_available",
+    "CLAUDE_METADATA",
 ]

@@ -32,7 +32,7 @@ from .registry import register_provider
 from .detectors import detect_provider_availability
 
 DEFAULT_BINARY = "codex"
-DEFAULT_TIMEOUT_SECONDS = 120
+DEFAULT_TIMEOUT_SECONDS = 360
 AVAILABILITY_OVERRIDE_ENV = "CODEX_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CODEX_CLI_BINARY"
 
@@ -69,31 +69,41 @@ def _default_runner(
 
 CODEX_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
-        id="codex-gpt-4o",
-        display_name="Codex GPT-4o",
+        id="gpt-5-codex",
+        display_name="GPT-5 Codex",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
             ProviderCapability.FUNCTION_CALLING,
         },
-        routing_hints={"tier": "primary"},
+        routing_hints={"tier": "primary", "optimized_for": "codex"},
     ),
     ModelDescriptor(
-        id="codex-gpt-4o-mini",
-        display_name="Codex GPT-4o Mini",
+        id="gpt-5-codex-mini",
+        display_name="GPT-5 Codex Mini",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,
             ProviderCapability.FUNCTION_CALLING,
         },
-        routing_hints={"tier": "fast"},
+        routing_hints={"tier": "fast", "optimized_for": "codex"},
+    ),
+    ModelDescriptor(
+        id="gpt-5",
+        display_name="GPT-5",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.FUNCTION_CALLING,
+        },
+        routing_hints={"tier": "general"},
     ),
 ]
 
 CODEX_METADATA = ProviderMetadata(
     provider_name="codex",
     models=tuple(CODEX_MODELS),
-    default_model="codex-gpt-4o-mini",
+    default_model="gpt-5-codex",
     security_flags={"writes_allowed": False, "sandbox": "read-only"},
     extra={"cli": "codex", "command": "codex exec"},
 )

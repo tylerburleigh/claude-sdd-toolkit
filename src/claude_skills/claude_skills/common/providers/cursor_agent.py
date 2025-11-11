@@ -31,7 +31,7 @@ from .registry import register_provider
 from .detectors import detect_provider_availability
 
 DEFAULT_BINARY = "cursor-agent"
-DEFAULT_TIMEOUT_SECONDS = 120
+DEFAULT_TIMEOUT_SECONDS = 360
 DEFAULT_TEMPERATURE = 0.3
 AVAILABILITY_OVERRIDE_ENV = "CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CURSOR_AGENT_CLI_BINARY"
@@ -69,8 +69,8 @@ def _default_runner(
 
 CURSOR_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
-        id="cursor-default",
-        display_name="Cursor Agent Default",
+        id="composer-1",
+        display_name="Composer-1",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.FUNCTION_CALLING,
@@ -79,31 +79,21 @@ CURSOR_MODELS: List[ModelDescriptor] = [
         routing_hints={"tier": "default"},
     ),
     ModelDescriptor(
-        id="cursor-fast",
-        display_name="Cursor Agent Fast",
+        id="gpt-5-codex",
+        display_name="GPT-5 Codex",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.FUNCTION_CALLING,
             ProviderCapability.STREAMING,
         },
-        routing_hints={"tier": "fast"},
-    ),
-    ModelDescriptor(
-        id="cursor-premium",
-        display_name="Cursor Agent Premium",
-        capabilities={
-            ProviderCapability.TEXT,
-            ProviderCapability.FUNCTION_CALLING,
-            ProviderCapability.STREAMING,
-        },
-        routing_hints={"tier": "premium"},
+        routing_hints={"tier": "codex"},
     ),
 ]
 
 CURSOR_METADATA = ProviderMetadata(
     provider_name="cursor-agent",
     models=tuple(CURSOR_MODELS),
-    default_model="cursor-default",
+    default_model="composer-1",
     security_flags={"writes_allowed": False},
     extra={"cli": "cursor-agent", "command": "cursor-agent chat"},
 )

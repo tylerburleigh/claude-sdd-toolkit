@@ -41,6 +41,7 @@ def test_parallel_execution_handles_mixed_results(mocker) -> None:
         "gemini": ToolResponse(tool="gemini", status=ToolStatus.SUCCESS, output="ok"),
         "codex": ToolResponse(tool="codex", status=ToolStatus.ERROR, error="boom"),
         "cursor-agent": ToolResponse(tool="cursor-agent", status=ToolStatus.TIMEOUT),
+        "claude": ToolResponse(tool="claude", status=ToolStatus.SUCCESS, output="claude ok"),
     }
 
     mocker.patch(
@@ -54,15 +55,16 @@ def test_parallel_execution_handles_mixed_results(mocker) -> None:
 
     multi = execute_tools_parallel(list(responses.keys()), "prompt")
 
-    assert multi.success_count == 1
+    assert multi.success_count == 2
     assert multi.failure_count == 2
     assert multi.responses["gemini"].success is True
+    assert multi.responses["claude"].success is True
     assert multi.responses["codex"].status == ToolStatus.ERROR
     assert multi.responses["cursor-agent"].status == ToolStatus.TIMEOUT
 
 
 def test_orchestrator_falls_back_to_available_tool(mocker) -> None:
-    preferred = ["gemini", "codex", "cursor-agent"]
+    preferred = ["gemini", "codex", "cursor-agent", "claude"]
 
     def fake_check(tool: str, check_version: bool = False) -> bool:
         return tool == "codex"
@@ -89,4 +91,4 @@ def test_orchestrator_raises_when_no_tools_available(mocker) -> None:
     )
 
     with pytest.raises(RuntimeError):
-        _ = _orchestrate("no tools", ["gemini", "codex"])
+        _ = _orchestrate("no tools", ["gemini", "codex", "claude"])

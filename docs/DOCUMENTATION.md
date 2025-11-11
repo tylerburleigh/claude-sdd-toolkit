@@ -26,7 +26,7 @@ The provider layer under `src/claude_skills/claude_skills/common/providers` stan
 
 ### Key Components
 
-- `ProviderContext`: Base class that enforces `_execute()` plus shared lifecycle hooks. Subclasses (e.g., `GeminiProvider`, `CodexProvider`, `CursorAgentProvider`) translate `GenerationRequest` inputs into provider-specific CLI calls and emit normalized `GenerationResult` payloads.
+- `ProviderContext`: Base class that enforces `_execute()` plus shared lifecycle hooks. Subclasses (e.g., `GeminiProvider`, `CodexProvider`, `CursorAgentProvider`, `ClaudeProvider`) translate `GenerationRequest` inputs into provider-specific CLI calls and emit normalized `GenerationResult` payloads.
 - Data contracts: `GenerationRequest`, `GenerationResult`, `TokenUsage`, `ProviderMetadata`, and `ModelDescriptor` describe prompts, responses, and routing metadata. Capabilities (`ProviderCapability`) and execution statuses (`ProviderStatus`) let registries reason about feature support.
 - Hooks: `ProviderHooks` supplies `before_execute`, `on_stream_chunk`, and `after_result` callbacks so skills can log, stream, or collect telemetry without leaking provider internals.
 
@@ -58,6 +58,46 @@ The runner loads the provider via the registry, streams output to stdout (unless
 4. (Optional) Provide a `ProviderDetector` entry when availability depends on binaries or environment variables so higher-level UX can surface actionable status.
 
 Following this pattern ensures every provider benefits from the same telemetry, error handling, and streaming UX regardless of the underlying command.
+
+### Claude Provider
+
+The Claude provider (`ClaudeProvider`) integrates Anthropic's Claude models via the `claude` CLI tool with read-only tool restrictions for security.
+
+**Models Supported:**
+- `claude-sonnet-4.5` (default): Balanced performance with text, vision, streaming, and thinking capabilities
+- `claude-haiku-3.5`: Fast model with text and streaming capabilities
+
+**Security Features:**
+- Read-only operations enforced via `--allowed-tools` flag (Read, Grep, Glob, WebSearch, WebFetch, Task, Explore)
+- Write operations explicitly blocked via `--disallowed-tools` flag (Write, Edit, Bash)
+- Security flags: `writes_allowed: False`, `read_only: True`
+
+**Configuration:**
+```yaml
+# In .claude/ai_config.yaml
+providers:
+  claude:
+    description: "Extended reasoning and analysis with read-only access"
+    command: "claude"
+    enabled: true
+    models:
+      priority: ["claude-sonnet-4.5", "claude-haiku-3.5"]
+```
+
+**Usage Example:**
+```bash
+python -m claude_skills.cli.provider_runner \
+  --provider claude \
+  --prompt "Analyze this codebase structure" \
+  --system-prompt "Focus on architectural patterns" \
+  --json
+```
+
+**Environment Variables:**
+- `CLAUDE_CLI_BINARY`: Override default `claude` binary path
+- `CLAUDE_CLI_AVAILABLE_OVERRIDE`: Force availability status (1/true or 0/false)
+
+**Timeout:** Default timeout is 360 seconds (configurable via `--timeout` flag or provider initialization)
 
 
 ## 🏛️ Classes

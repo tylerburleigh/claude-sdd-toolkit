@@ -32,23 +32,31 @@ DEFAULT_TOOLS = {
         "description": "Code-level review and bug fixes",
         "command": "codex",
         "enabled": False
+    },
+    "claude": {
+        "description": "Extended reasoning and analysis with read-only access",
+        "command": "claude",
+        "enabled": True
     }
 }
 
 DEFAULT_MODELS = {
     "gemini": {
-        "priority": ["gemini-2.5-pro"]
+        "priority": ["gemini-2.5-flash", "gemini-2.5-pro"]
     },
     "cursor-agent": {
-        "priority": ["composer-1"]
+        "priority": ["composer-1", "gpt-5-codex"]
     },
     "codex": {
-        "priority": ["gpt-5-codex"]
+        "priority": ["gpt-5-codex", "gpt-5-codex-mini", "gpt-5"]
+    },
+    "claude": {
+        "priority": ["sonnet", "haiku"]
     }
 }
 
 
-DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex"]
+DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude"]
 
 DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
     "default": False,

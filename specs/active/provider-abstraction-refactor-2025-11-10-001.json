@@ -22,7 +22,13 @@
     "status": "completed",
     "activated_date": "2025-11-11T17:24:32.862704Z",
     "progress_percentage": 100,
-    "current_phase": "phase-4"
+    "current_phase": "phase-4",
+    "git": {
+      "branch_name": "provider-abstraction",
+      "base_branch": "main",
+      "pr_url": "https://github.com/tylerburleigh/claude-sdd-toolkit/pull/23",
+      "pr_number": 23
+    }
   },
   "hierarchy": {
     "spec-root": {

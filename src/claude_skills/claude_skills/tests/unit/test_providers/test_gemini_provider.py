@@ -33,10 +33,10 @@ def _payload(content: str = "Gemini output") -> str:
     return json.dumps(
         {
             "response": content,
-            "model": "gemini-2.0-pro",
+            "model": "gemini-2.5-flash",
             "stats": {
                 "models": {
-                    "gemini-2.0-pro": {
+                    "gemini-2.5-flash": {
                         "tokens": {"prompt": 10, "candidates": 50, "total": 60}
                     }
                 }
@@ -58,7 +58,7 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
     provider = GeminiProvider(
         GEMINI_METADATA,
         ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
-        model="gemini-2.0-pro",
+        model="gemini-2.5-pro",
         runner=runner,
         binary="gemini",
     )
@@ -76,7 +76,7 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
     assert captured["command"] == [
         "gemini",
         "-m",
-        "gemini-2.0-pro",
+        "gemini-2.5-pro",
         "--output-format",
         "json",
         "-p",
@@ -85,7 +85,7 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
     assert captured["timeout"] == 30
     assert stream_chunks == ["Gemini output"]
     assert result.content == "Gemini output"
-    assert result.model_fqn == "gemini:gemini-2.0-pro"
+    assert result.model_fqn == "gemini:gemini-2.5-flash"
     assert result.usage.input_tokens == 10
     assert result.usage.output_tokens == 50
     assert result.usage.total_tokens == 60
@@ -135,13 +135,13 @@ def test_create_provider_injects_custom_runner_and_model(monkeypatch: pytest.Mon
     provider = create_provider(
         hooks=ProviderHooks(),
         dependencies={"runner": runner},
-        overrides={"model": "gemini-2.0-pro", "binary": "gemini"},
+        overrides={"model": "gemini-2.5-pro", "binary": "gemini"},
     )
 
     result = provider.generate(GenerationRequest(prompt="test"))
     assert runner_called is True
     assert result.content == "Override"
-    assert result.model_fqn == "gemini:gemini-2.0-pro"
+    assert result.model_fqn == "gemini:gemini-2.5-flash"
 
 
 def test_is_gemini_available_respects_override(monkeypatch: pytest.MonkeyPatch) -> None:

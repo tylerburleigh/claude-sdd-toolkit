@@ -113,6 +113,13 @@ _DEFAULT_DETECTORS: tuple[ProviderDetector, ...] = (
         binary_env="CURSOR_AGENT_CLI_BINARY",
         probe_args=("--version",),
     ),
+    ProviderDetector(
+        provider_id="claude",
+        default_binary="claude",
+        override_env="CLAUDE_CLI_AVAILABLE_OVERRIDE",
+        binary_env="CLAUDE_CLI_BINARY",
+        probe_args=("--version",),
+    ),
 )
 
 _DETECTORS: Dict[str, ProviderDetector] = {}
@@ -143,7 +150,7 @@ def detect_provider_availability(provider_id: str, *, use_probe: bool = True) ->
     Check whether a provider is available.
 
     Args:
-        provider_id: Identifier ("gemini", "codex", "cursor-agent")
+        provider_id: Identifier ("gemini", "codex", "cursor-agent", "claude")
         use_probe: When False, only perform PATH resolution / overrides.
     """
     detector = get_detector(provider_id)

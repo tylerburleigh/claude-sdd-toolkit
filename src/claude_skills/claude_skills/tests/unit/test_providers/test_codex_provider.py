@@ -47,7 +47,7 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
             _event(
                 "item.completed",
                 agent_message={"content": "Hello world"},
-                model="codex-gpt-4o",
+                model="gpt-5-codex",
             ),
             _event(
                 "turn.completed",
@@ -70,7 +70,7 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
     provider = CodexProvider(
         CODEX_METADATA,
         ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
-        model="codex-gpt-4o",
+        model="gpt-5-codex",
         runner=runner,
         binary="codex",
     )
@@ -93,7 +93,7 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
         "read-only",
         "--json",
         "-m",
-        "codex-gpt-4o",
+        "gpt-5-codex",
         "--image",
         "diagram.png",
         "System\n\nSolve",
@@ -101,7 +101,7 @@ def test_codex_provider_parses_jsonl_and_streams() -> None:
     assert captured_command["timeout"] == 45
     assert stream_chunks == ["Hello", " world"]
     assert result.content == "Hello world"
-    assert result.model_fqn == "codex:codex-gpt-4o"
+    assert result.model_fqn == "codex:gpt-5-codex"
     assert result.usage.input_tokens == 10
     assert result.usage.output_tokens == 20
     assert result.usage.cached_input_tokens == 2
@@ -166,7 +166,7 @@ def test_create_provider_and_availability_override(monkeypatch: pytest.MonkeyPat
     provider = create_provider(
         hooks=ProviderHooks(),
         dependencies={"runner": runner},
-        overrides={"model": "codex-gpt-4o", "binary": "codex"},
+        overrides={"model": "gpt-5-codex", "binary": "codex"},
     )
 
     with pytest.raises(ProviderExecutionError):

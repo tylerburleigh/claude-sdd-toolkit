@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 # Unreleased
 
 ### Added
+- **Claude Provider** - New AI provider for Anthropic Claude models with read-only tool restrictions
+  - Supports Sonnet 4.5 and Haiku 3.5 models
+  - Read-only security mode (blocks Write, Edit, Bash tools)
+  - Allows Read, Grep, Glob, WebSearch, WebFetch, Task, Explore tools only
+  - Default 360-second timeout for extended reasoning
+  - Comprehensive unit and integration test coverage (19 unit tests)
+  - Provider detection with environment variable overrides
+  - CLI runner support for testing: `python -m claude_skills.cli.provider_runner --provider claude`
 - `ai_config_setup.ensure_ai_config()` helper shared by setup workflows to seed `.claude/ai_config.yaml` with packaged defaults.
 - `sdd fidelity-review` now auto-saves both Markdown and JSON reports when no output path is provided, making it easier to reuse results across tooling.
 - Centralized setup templates bundled under `claude_skills.common.templates.setup` with a public `setup_templates` helper module for loading or copying packaged defaults.
@@ -18,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Restored the packaged `.claude/settings.local.json` template so setup tooling and tests can copy the default permission manifest without errors.
 
 ### Changed
+- **Provider Timeout Increased** - All AI provider default timeouts increased from 120s to 360s to support extended reasoning and complex tasks across Gemini, Codex, Cursor Agent, and Claude providers
 - Consolidated AI model resolution across `run-tests`, `sdd doc analyze-with-ai`, `sdd plan-review`, and `sdd render --mode enhanced`. These flows now delegate to `ai_config.resolve_tool_model`, accept `--model` CLI overrides (global or per-tool), surface the resolved map in progress output, and ship unit tests documenting the shared helper contract.
 - Run-tests, code-doc, and sdd-render runtimes now invoke AI providers via the shared registry/`execute_tool` helpers, so dry runs, timeouts, and error reporting use the new normalized response envelope.
 
