@@ -43,6 +43,12 @@ from .gemini import (
     is_gemini_available as gemini_is_available,
     GEMINI_METADATA,
 )
+from .codex import (
+    CodexProvider,
+    create_provider as create_codex_provider,
+    is_codex_available as codex_is_available,
+    CODEX_METADATA,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -76,4 +82,8 @@ __all__ = [
     "create_gemini_provider",
     "gemini_is_available",
     "GEMINI_METADATA",
+    "CodexProvider",
+    "create_codex_provider",
+    "codex_is_available",
+    "CODEX_METADATA",
 ]

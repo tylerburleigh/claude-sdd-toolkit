@@ -2,7 +2,7 @@
   "spec_id": "provider-abstraction-refactor-2025-11-10-001",
   "title": "Provider Abstraction Refactor",
   "generated": "2025-11-10T15:00:00Z",
-  "last_updated": "2025-11-11T18:15:04.204534Z",
+  "last_updated": "2025-11-11T18:19:15.277082Z",
   "metadata": {
     "title": "Provider Abstraction Refactor",
     "description": "Refactor AI tool orchestration to use a provider abstraction inspired by model_chorus patterns, enabling consistent onboarding of new tools and cleaner runtime integration.",
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-11T17:24:32.862704Z",
-    "progress_percentage": 50,
+    "progress_percentage": 55,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -37,7 +37,7 @@
         "phase-4"
       ],
       "total_tasks": 20,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "purpose": "Deliver a modular provider abstraction that consolidates tool orchestration logic across the toolkit.",
         "estimated_hours": 59,
@@ -285,7 +285,7 @@
         "verify-3-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Port key tool integrations to the new abstraction for parity with existing capabilities.",
         "estimated_hours": 19,
@@ -316,16 +316,22 @@
     "task-3-2": {
       "type": "task",
       "title": "Implement Codex provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
         "estimated_hours": 4,
         "file_path": "src/claude_skills/claude_skills/common/providers/codex.py",
-        "changes": "Wrap Codex invocation semantics and error handling in the provider abstraction."
+        "changes": "Wrap Codex invocation semantics and error handling in the provider abstraction.",
+        "started_at": "2025-11-11T18:19:11.143044Z",
+        "status_note": "Implementing Codex provider",
+        "completed_at": "2025-11-11T18:19:15.262811Z",
+        "needs_journaling": false,
+        "actual_hours": 0.001,
+        "journaled_at": "2025-11-11T18:19:15.273949Z"
       }
     },
     "task-3-3": {
@@ -592,6 +598,15 @@
       "content": "Implemented src/claude_skills/claude_skills/common/providers/gemini.py with CLI command construction, request validation, availability checks, and registry wiring plus re-export plumbing. Added regression coverage in src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py to verify command args, streaming hooks, error handling, create_provider factory, and availability overrides. Validated via pytest src/claude_skills/claude_skills/tests/unit/test_providers.",
       "metadata": {},
       "task_id": "task-3-1"
+    },
+    {
+      "timestamp": "2025-11-11T18:19:15.273921Z",
+      "entry_type": "status_change",
+      "title": "Codex provider implementation",
+      "author": "claude-code",
+      "content": "Added src/claude_skills/claude_skills/common/providers/codex.py to wrap the codex exec CLI: availability probe, sandboxed command wiring, request validation, attachment/image handling, JSONL event parsing with streaming support, and registry registration. Re-exported Codex helpers via common/providers/__init__.py. Added regression tests in src/claude_skills/claude_skills/tests/unit/test_providers/test_codex_provider.py for command construction, streaming chunks, unsupported field validation, factory injection, and availability overrides. Verified with pytest src/claude_skills/claude_skills/tests/unit/test_providers.",
+      "metadata": {},
+      "task_id": "task-3-2"
     }
   ]
 }

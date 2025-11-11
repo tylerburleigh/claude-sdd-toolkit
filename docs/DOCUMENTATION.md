@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:06:43
+**Generated:** 2025-11-11 13:15:14
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 305
-- **Total Lines:** 104915
-- **Total Classes:** 429
-- **Total Functions:** 1314
-- **Avg Complexity:** 4.85
+- **Total Files:** 307
+- **Total Lines:** 105411
+- **Total Classes:** 432
+- **Total Functions:** 1323
+- **Avg Complexity:** 4.83
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -941,6 +941,16 @@ Example:
 
 ---
 
+### `FakeProcess`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:25`
+
+**Methods:**
+- `__init__()`
+
+---
+
 ### `FidelityReport`
 
 **Language:** python
@@ -1048,6 +1058,31 @@ This class will be implemented in Phase 3 (Core Review Logic).
 
 **Description:**
 > Outcome of applying a set of fix actions.
+
+---
+
+### `GeminiProvider`
+
+**Language:** python
+**Inherits from:** `ProviderContext`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:112`
+
+**Description:**
+> ProviderContext implementation backed by the Gemini CLI.
+
+**Methods:**
+- `__init__()`
+- `_first_model_id()`
+- `_ensure_model()`
+- `_validate_request()`
+- `_build_prompt()`
+- `_build_command()`
+- `_run()`
+- `_parse_output()`
+- `_extract_usage()`
+- `_resolve_model()`
+- `_emit_stream_if_requested()`
+- `_execute()`
 
 ---
 
@@ -2660,6 +2695,20 @@ Attributes:
 
 **Description:**
 > Configuration parsed from CLI flags or programmatic callers.
+
+---
+
+### `RunnerProtocol`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:40`
+
+**Description:**
+> Callable signature used for executing Gemini CLI commands.
+
+**Methods:**
+- `__call__()`
 
 ---
 
@@ -9121,6 +9170,20 @@ callers understand that provider execution is not yet wired up.
 
 ---
 
+### `_default_runner(command) -> subprocess.CompletedProcess[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:53`
+**Complexity:** 1
+
+**Description:**
+> Invoke the Gemini CLI via subprocess.
+
+**Parameters:**
+- `command`: Sequence[str]
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -10729,6 +10792,17 @@ Returns:
 **Parameters:**
 - `issue_text`: str
 - `severity`: str
+
+---
+
+### `_payload(content) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:32`
+**Complexity:** 1
+
+**Parameters:**
+- `content`: str
 
 ---
 
@@ -16311,6 +16385,19 @@ Returns:
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
+
+---
+
+### `create_provider() -> GeminiProvider`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:286`
+**Complexity:** 4
+
+**Description:**
+> Factory used by the provider registry.
+
+dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 
 ---
 
@@ -22396,6 +22483,19 @@ Returns:
 
 ---
 
+### `is_gemini_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/gemini.py:258`
+**Complexity:** 4
+
+**Description:**
+> Check whether the Gemini CLI is available.
+
+Respects the GEMINI_CLI_AVAILABLE_OVERRIDE environment variable for tests.
+
+---
+
 ### `is_git_enabled(project_path) -> bool`
 
 **Language:** python
@@ -28023,6 +28123,17 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_create_provider_injects_custom_runner_and_model(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:127`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
 ### `test_default_run_persists_markdown_and_json(stubbed_reviewer, sample_json_spec_simple, monkeypatch) -> None`
 
 **Language:** python
@@ -28656,6 +28767,33 @@ a decision needs to be made about what to implement.
 
 **Parameters:**
 - `tmp_path`: None
+
+---
+
+### `test_gemini_provider_executes_command_and_streams(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:48`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_gemini_provider_rejects_unsupported_fields() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:94`
+**Complexity:** 1
+
+---
+
+### `test_gemini_provider_validates_json_output() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:116`
+**Complexity:** 1
 
 ---
 
@@ -29439,6 +29577,17 @@ a decision needs to be made about what to implement.
 - `tmp_path`: Path
 - `monkeypatch`: pytest.MonkeyPatch
 - `clean_env`: None
+
+---
+
+### `test_is_gemini_available_respects_override(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py:147`
+**Complexity:** 1
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
 
 ---
 
@@ -32474,6 +32623,10 @@ Returns:
 - `base.StreamCallback`
 - `base.StreamChunk`
 - `base.TokenUsage`
+- `gemini.GEMINI_METADATA`
+- `gemini.GeminiProvider`
+- `gemini.create_provider`
+- `gemini.is_gemini_available`
 - `registry.ProviderFactory`
 - `registry.ProviderRegistration`
 - `registry.available_providers`
@@ -32500,6 +32653,34 @@ Returns:
 - `typing.Optional`
 - `typing.Sequence`
 - `typing.Set`
+
+### `src/claude_skills/claude_skills/common/providers/gemini.py`
+
+- `__future__.annotations`
+- `base.GenerationRequest`
+- `base.GenerationResult`
+- `base.ModelDescriptor`
+- `base.ProviderCapability`
+- `base.ProviderContext`
+- `base.ProviderExecutionError`
+- `base.ProviderHooks`
+- `base.ProviderMetadata`
+- `base.ProviderStatus`
+- `base.ProviderTimeoutError`
+- `base.ProviderUnavailableError`
+- `base.StreamChunk`
+- `base.TokenUsage`
+- `json`
+- `os`
+- `registry.register_provider`
+- `shutil`
+- `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Sequence`
 
 ### `src/claude_skills/claude_skills/common/providers/registry.py`
 
@@ -34561,6 +34742,22 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `unittest.mock.Mock`
+
+### `src/claude_skills/claude_skills/tests/unit/test_providers/test_gemini_provider.py`
+
+- `__future__.annotations`
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.gemini.GEMINI_METADATA`
+- `claude_skills.common.providers.gemini.GeminiProvider`
+- `claude_skills.common.providers.gemini.create_provider`
+- `claude_skills.common.providers.gemini.is_gemini_available`
+- `json`
+- `pytest`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_revision.py`
 
