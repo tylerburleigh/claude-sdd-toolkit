@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-11 13:32:49
+**Generated:** 2025-11-11 13:35:37
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 313
-- **Total Lines:** 106832
+- **Total Files:** 314
+- **Total Lines:** 106924
 - **Total Classes:** 439
-- **Total Functions:** 1356
-- **Avg Complexity:** 4.75
+- **Total Functions:** 1360
+- **Avg Complexity:** 4.74
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -10786,6 +10786,24 @@ Returns:
 
 **Parameters:**
 - `normalized`: NormalizedValidationResult
+
+---
+
+### `_orchestrate(prompt, preferred_tools) -> MultiToolResponse`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_provider_orchestration.py:24`
+**Complexity:** 2
+
+**Description:**
+> Simple orchestrator used by the integration tests.
+
+It discovers available tools via detect_available_tools, then executes
+them in parallel using execute_tools_parallel.
+
+**Parameters:**
+- `prompt`: str
+- `preferred_tools`: Iterable[str]
 
 ---
 
@@ -30434,6 +30452,28 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_orchestrator_falls_back_to_available_tool(mocker) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_provider_orchestration.py:64`
+**Complexity:** 1
+
+**Parameters:**
+- `mocker`: None
+
+---
+
+### `test_orchestrator_raises_when_no_tools_available(mocker) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_provider_orchestration.py:85`
+**Complexity:** 1
+
+**Parameters:**
+- `mocker`: None
+
+---
+
 ### `test_output_json_accepts_kwargs_and_positionals(capsys) -> None`
 
 **Language:** python
@@ -30574,6 +30614,17 @@ a decision needs to be made about what to implement.
 
 **Parameters:**
 - `capsys`: pytest.CaptureFixture[str]
+
+---
+
+### `test_parallel_execution_handles_mixed_results(mocker) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/integration/test_provider_orchestration.py:39`
+**Complexity:** 1
+
+**Parameters:**
+- `mocker`: None
 
 ---
 
@@ -34831,6 +34882,19 @@ Returns:
 - `pathlib.Path`
 - `pytest`
 - `tempfile`
+
+### `src/claude_skills/claude_skills/tests/integration/test_provider_orchestration.py`
+
+- `__future__.annotations`
+- `claude_skills.common.ai_tools.MultiToolResponse`
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.common.ai_tools.detect_available_tools`
+- `claude_skills.common.ai_tools.execute_tools_parallel`
+- `pytest`
+- `typing.Dict`
+- `typing.Iterable`
+- `typing.List`
 
 ### `src/claude_skills/claude_skills/tests/integration/test_run_tests_consultation_cli.py`
 
