@@ -49,6 +49,12 @@ from .codex import (
     is_codex_available as codex_is_available,
     CODEX_METADATA,
 )
+from .cursor_agent import (
+    CursorAgentProvider,
+    create_provider as create_cursor_agent_provider,
+    is_cursor_agent_available as cursor_agent_is_available,
+    CURSOR_METADATA,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -86,4 +92,8 @@ __all__ = [
     "create_codex_provider",
     "codex_is_available",
     "CODEX_METADATA",
+    "CursorAgentProvider",
+    "create_cursor_agent_provider",
+    "cursor_agent_is_available",
+    "CURSOR_METADATA",
 ]
