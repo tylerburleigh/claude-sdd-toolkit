@@ -20,6 +20,7 @@ from claude_skills.common.ai_tools import (
     execute_tool,
     execute_tools_parallel,
     detect_available_tools,
+    get_enabled_and_available_tools,
     check_tool_available
 )
 from claude_skills.common.progress import ProgressEmitter
@@ -673,7 +674,7 @@ def consult_ai_on_fidelity(
     try:
         # If no tool specified, detect available tools
         if tool is None:
-            available_tools = detect_available_tools()
+            available_tools = get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
             if not available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
@@ -791,7 +792,7 @@ def consult_multiple_ai_on_fidelity(
             enabled_tool_names = list(enabled_tools_config.keys())
 
             # Detect all available tools
-            all_available_tools = detect_available_tools()
+            all_available_tools = get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
             if not all_available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
@@ -822,9 +823,18 @@ def consult_multiple_ai_on_fidelity(
             unavailable = set(tools) - set(available_tools)
             logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
 
+        enabled_tools_map = get_enabled_fidelity_tools()
+        final_tools_to_consult = [
+            tool for tool in available_tools if tool in enabled_tools_map
+        ]
+        if not final_tools_to_consult:
+            raise NoToolsAvailableError(
+                f"All available tools ({', '.join(available_tools)}) are disabled in the configuration."
+            )
+
         resolved_models_map = ai_config.resolve_models_for_tools(
             FIDELITY_SKILL_NAME,
-            available_tools,
+            final_tools_to_consult,
             override=model,
         )
         models_summary = _summarize_models_map(resolved_models_map)
@@ -881,7 +891,7 @@ def consult_multiple_ai_on_fidelity(
         # Emit ai_consultation event before calling AI tools
         if progress_emitter:
             progress_emitter.emit("ai_consultation", {
-                "tools": available_tools,
+                "tools": final_tools_to_consult,
                 "model": models_summary,
                 "models_summary": models_summary,
                 "models": models_payload,
@@ -896,7 +906,7 @@ def consult_multiple_ai_on_fidelity(
         }
         models_dict = models_dict_raw if models_dict_raw else None
         multi_response = execute_tools_parallel(
-            tools=available_tools,
+            tools=final_tools_to_consult,
             prompt=prompt,
             models=models_dict,
             timeout=timeout

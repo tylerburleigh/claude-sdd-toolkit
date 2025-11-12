@@ -21,6 +21,7 @@ import time
 
 from claude_skills.common.ai_tools import (
     detect_available_tools,
+    get_enabled_and_available_tools,
     execute_tools_parallel,
     execute_tool,
     ToolStatus,
@@ -88,7 +89,7 @@ def get_available_tools() -> List[str]:
     Returns:
         List of available tool names
     """
-    return detect_available_tools()
+    return get_enabled_and_available_tools("code-doc")
 
 
 def get_best_tool(doc_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
@@ -594,15 +595,18 @@ def consult_multi_agent(
         task_areas = "Project Overview, Domain Concepts, Critical Files, Common Workflows, Potential Gotchas, Extension Patterns"
 
     # Print status message before running (this may take a while)
+    enabled_tools_map = ai_config.get_enabled_tools("code-doc")
+    final_agents = [agent for agent in ordered_agents if agent in enabled_tools_map]
+
     if printer:
-        printer.detail(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
-        printer.detail(f"   Tools: {', '.join(ordered_agents)}")
+        printer.detail(f"\n🤖 Consulting {len(final_agents)} AI models in parallel for {task_desc}...")
+        printer.detail(f"   Tools: {', '.join(final_agents)}")
         printer.detail(f"   Analyzing: {task_areas}")
         if verbose:
             printer.info("=" * 60)
     else:
-        print(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
-        print(f"   Tools: {', '.join(ordered_agents)}")
+        print(f"\n🤖 Consulting {len(final_agents)} AI models in parallel for {task_desc}...")
+        print(f"   Tools: {', '.join(final_agents)}")
         print(f"   Analyzing: {task_areas}")
         if verbose:
             print("=" * 60)
@@ -611,7 +615,7 @@ def consult_multi_agent(
     # Use shared utility for parallel execution
     start_time = time.time()
     multi_response = execute_tools_parallel(
-        tools=ordered_agents,
+        tools=final_agents,
         prompt=prompt,
         models=resolved_models,
     )

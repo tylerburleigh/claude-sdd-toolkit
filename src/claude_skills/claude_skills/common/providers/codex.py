@@ -174,7 +174,8 @@ class CodexProvider(ProviderContext):
         return attachments
 
     def _build_command(self, model: str, prompt: str, attachments: List[str]) -> List[str]:
-        command = [self._binary, "exec", "--sandbox", "read-only", "--json"]
+        # Note: codex CLI does not support --json flag, it outputs JSONL by default
+        command = [self._binary, "exec", "--sandbox", "read-only"]
         if model:
             command.extend(["-m", model])
         for path in attachments:

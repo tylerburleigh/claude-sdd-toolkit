@@ -30,6 +30,7 @@ from claude_skills.common.providers import (
     resolve_provider,
     get_provider_detector,
 )
+from claude_skills.common import ai_config
 
 
 class ToolStatus(Enum):
@@ -400,6 +401,21 @@ def detect_available_tools(
     return available
 
 
+def get_enabled_and_available_tools(skill_name: str) -> list[str]:
+    """
+    Return a list of tool names that are both enabled and available.
+
+    Args:
+        skill_name: The skill context for loading configuration.
+
+    Returns:
+        A list of tool names that are ready for use.
+    """
+    enabled_tools = list(ai_config.get_enabled_tools(skill_name).keys())
+    return detect_available_tools(enabled_tools)
+
+
+
 def build_tool_command(
     tool: str,
     prompt: str,
@@ -730,6 +746,7 @@ __all__ = [
     "MultiToolResponse",
     "check_tool_available",
     "detect_available_tools",
+    "get_enabled_and_available_tools",
     "build_tool_command",
     "execute_tool",
     "execute_tools_parallel",

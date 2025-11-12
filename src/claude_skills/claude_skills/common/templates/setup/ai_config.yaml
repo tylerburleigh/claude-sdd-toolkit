@@ -20,6 +20,10 @@ tools:
     command: codex
     enabled: false
     description: Code-level review and bug fixes
+  claude:
+    command: claude
+    enabled: false
+    description: Extended reasoning and analysis with read-only access
 
 models:
   gemini:
@@ -31,6 +35,10 @@ models:
   codex:
     priority:
       - gpt-5-codex
+  claude:
+    priority:
+      - sonnet
+      - haiku
 
 run-tests:
   models:
@@ -38,17 +46,29 @@ run-tests:
       failure_type:
         assertion:
           gemini: gemini-2.5-pro
-        timeout:
+          codex: gpt-5-codex
           cursor-agent: composer-1
+        timeout:
+          gemini: gemini-2.5-flash
+          codex: gpt-5-codex-mini
+          cursor-agent: composer-1
+  consultation:
+    timeout_seconds: 180
 
 code-doc:
   models:
     overrides:
       doc_type:
         architecture:
+          gemini: gemini-2.5-flash
+          codex: gpt-5-codex
           cursor-agent: composer-1
         ai_context:
           gemini: gemini-2.5-pro
+          codex: gpt-5-codex
+          cursor-agent: composer-1
+  consultation:
+    timeout_seconds: 600
 
 sdd-plan-review:
   models:
@@ -56,8 +76,14 @@ sdd-plan-review:
       review_type:
         full:
           gemini: gemini-2.5-pro
-        quick:
+          codex: gpt-5-codex
           cursor-agent: composer-1
+        quick:
+          gemini: gemini-2.5-flash
+          codex: gpt-5-codex-mini
+          cursor-agent: composer-1
+  consultation:
+    timeout_seconds: 600
 
 sdd-render:
   models:
@@ -65,14 +91,21 @@ sdd-render:
       feature:
         executive_summary:
           gemini: gemini-2.5-pro
-        narrative:
+          codex: gpt-5-codex
           cursor-agent: composer-1
+        narrative:
+          gemini: gemini-2.5-flash
+          codex: gpt-5-codex-mini
+          cursor-agent: composer-1
+  consultation:
+    timeout_seconds: 180
 
 consensus:
   agents:
     - cursor-agent
     - gemini
     - codex
+    - claude
   auto_trigger:
     default: false
     assertion: true
@@ -82,6 +115,8 @@ consensus:
     timeout: true
     flaky: false
     multi-file: true
+  consultation:
+    timeout_seconds: 600
 
 consultation:
   timeout_seconds: 600

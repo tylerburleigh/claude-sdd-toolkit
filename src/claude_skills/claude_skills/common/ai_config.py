@@ -449,26 +449,46 @@ def get_preferred_model(skill_name: str, tool_name: str) -> Optional[str]:
 
 
 def get_global_config_path() -> Path:
-    """Get the path to the global AI configuration file.
+    """
+    Get the path to the global AI configuration file by searching upwards from the current directory.
 
-    Searches in multiple locations:
-    1. .claude/ai_config.yaml in current working directory
-    2. .claude/ai_config.yaml relative to project root
+    Searches for `.claude/ai_config.yaml` in the current directory and its parent
+    directories until it finds the file or reaches the filesystem root. This makes
+    the configuration discovery robust to the user's working directory.
 
     Returns:
-        Path to global ai_config.yaml (may not exist)
+        Path to the found ai_config.yaml, or the path where it would be expected
+        in the current directory if not found anywhere.
     """
-    possible_paths = [
-        Path.cwd() / ".claude" / "ai_config.yaml",
-        Path(__file__).parent.parent.parent.parent / ".claude" / "ai_config.yaml",
-    ]
+    current_dir = Path.cwd().resolve()
 
-    for path in possible_paths:
-        if path.exists():
-            return path
+    # Search upwards from the current directory for the config file
+    while True:
+        potential_path = current_dir / ".claude" / "ai_config.yaml"
+        if potential_path.exists():
+            return potential_path
 
-    # Return first path even if it doesn't exist
-    return possible_paths[0]
+        # Stop if we've reached the root of the filesystem
+        if current_dir.parent == current_dir:
+            break
+
+        current_dir = current_dir.parent
+
+    # As a fallback for development, check relative to this source file.
+    try:
+        # This file is in src/claude_skills/claude_skills/common/ai_config.py
+        # The project root is 5 levels up.
+        dev_root = Path(__file__).resolve().parents[4]
+        dev_path = dev_root / ".claude" / "ai_config.yaml"
+        if dev_path.exists():
+            return dev_path
+    except IndexError:
+        # This can fail if the file structure is not as expected.
+        pass
+
+    # If no config is found anywhere, return the default path in the CWD.
+    # This is where a new config would be created.
+    return Path.cwd() / ".claude" / "ai_config.yaml"
 
 
 def load_global_config() -> Dict:
@@ -583,11 +603,20 @@ def load_skill_config(skill_name: str) -> Dict:
         if not global_config:
             return result
 
-        # Extract global defaults (tools, models, consensus, consultation, rendering, enhancement)
         # These are top-level keys that apply to all skills
-        global_defaults = {k: v for k, v in global_config.items() if k not in [
-            'run-tests', 'sdd-fidelity-review', 'sdd-render'
-        ]}
+        KNOWN_GLOBAL_KEYS = {
+            "tools",
+            "models",
+            "consensus",
+            "consultation",
+            "rendering",
+            "enhancement",
+        }
+
+        # Extract global defaults
+        global_defaults = {
+            k: v for k, v in global_config.items() if k in KNOWN_GLOBAL_KEYS
+        }
 
         # Merge global defaults into result
         result = merge_configs(result, global_defaults)

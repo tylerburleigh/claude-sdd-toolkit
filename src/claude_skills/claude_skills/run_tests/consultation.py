@@ -14,7 +14,8 @@ import time
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.ai_tools import (
     build_tool_command, execute_tool, execute_tools_parallel,
-    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools
+    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools,
+    get_enabled_and_available_tools,
 )
 from claude_skills.common import ai_config
 
@@ -296,7 +297,7 @@ def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None
         Tool name to use, or None if no tools available
     """
     if available_tools is None:
-        available_tools = detect_available_tools()
+        available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         return None
@@ -590,7 +591,7 @@ def consult_with_auto_routing(
     routing_plan = _routing_plan_for_failure(failure_type)
 
     # Check tool availability
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         printer.error("No tools available for consultation")
@@ -969,7 +970,7 @@ def consult_multi_agent(
         printer = PrettyPrinter()
 
     configured_agents = _resolve_consensus_agents(agents)
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         printer.error("No tools available for multi-agent consultation")
@@ -1061,8 +1062,13 @@ def consult_multi_agent(
         return 0
 
     # Run consultations in parallel using shared implementation
-    printer.action(f"Consulting {len(agents_to_consult)} agents in parallel...")
-    print(f"Agents: {', '.join(agents_to_consult)}")
+    enabled_tools_map = ai_config.get_enabled_tools("run-tests")
+    final_agents_to_consult = [
+        agent for agent in agents_to_consult if agent in enabled_tools_map
+    ]
+
+    printer.action(f"Consulting {len(final_agents_to_consult)} agents in parallel...")
+    print(f"Agents: {', '.join(final_agents_to_consult)}")
     print("=" * 60)
     print()
 
@@ -1070,7 +1076,7 @@ def consult_multi_agent(
 
     # Use shared execute_tools_parallel() implementation
     multi_response = execute_tools_parallel(
-        tools=agents_to_consult,
+        tools=final_agents_to_consult,
         prompt=prompt,
         models=dict(resolved_models),
         timeout=timeout

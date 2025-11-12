@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
-from claude_skills.common.ai_tools import detect_available_tools
+from claude_skills.common.ai_tools import get_enabled_and_available_tools
 from claude_skills.common import ai_config
 from claude_skills.run_tests.consultation import (
     consult_with_auto_routing,
@@ -92,7 +92,7 @@ def _parse_model_override(values: Optional[List[str]]) -> Optional[Any]:
 
 def cmd_check_tools(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     """Check availability of external AI tools."""
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("run-tests")
 
     if getattr(args, 'json', False):
         result = {
@@ -129,7 +129,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if args.prompt:
         tool = args.tool if args.tool != "auto" else None
         if tool is None:
-            available_tools = detect_available_tools()
+            available_tools = get_enabled_and_available_tools("run-tests")
             if not available_tools:
                 if _maybe_json(args, {"status": "error", "message": "No external tools found"}):
                     return 1

@@ -18,7 +18,7 @@ import json
 
 from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools
 from claude_skills.common.ai_config import resolve_tool_model
-from claude_skills.common.ai_tools import execute_tool, detect_available_tools, ToolStatus
+from claude_skills.common.ai_tools import execute_tool, get_enabled_and_available_tools, ToolStatus
 
 
 @dataclass
@@ -345,8 +345,7 @@ Base your analysis on the spec data provided, including:
             >>> print(f"Available agents: {', '.join(agents)}")
             Available agents: gemini, cursor-agent
         """
-        tools = ["cursor-agent", "gemini", "codex"]
-        return detect_available_tools(tools, check_version=True)
+        return get_enabled_and_available_tools("sdd-render")
 
     def _resolve_model(self, agent: str, *, feature: str) -> Optional[str]:
         return resolve_tool_model(

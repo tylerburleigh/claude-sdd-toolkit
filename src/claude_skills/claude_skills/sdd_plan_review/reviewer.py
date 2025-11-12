@@ -20,25 +20,6 @@ from claude_skills.common.ai_tools import check_tool_available, execute_tools_pa
 from claude_skills.common import ai_config
 
 
-def detect_available_tools() -> List[str]:
-    """
-    Detect which AI CLI tools are installed and available.
-
-    Uses check_tool_available() from common.ai_tools for detection.
-
-    Returns:
-        List of available tool names (gemini, codex, cursor-agent)
-    """
-    # Known AI CLI tools for spec review
-    known_tools = ["gemini", "codex", "cursor-agent"]
-
-    available = []
-    for tool_name in known_tools:
-        if check_tool_available(tool_name, check_version=True):
-            available.append(tool_name)
-    return available
-
-
 def review_with_tools(
     spec_content: str,
     tools: List[str],
@@ -91,19 +72,22 @@ def review_with_tools(
 
     dimensions = review_dimensions.get(review_type, "All standard dimensions")
 
-    print(f"\n   Sending {review_type} review to {len(tools)} external AI model(s): {', '.join(tools)}")
+    enabled_tools_map = ai_config.get_enabled_tools("sdd-plan-review")
+    enabled_tools = [tool for tool in tools if tool in enabled_tools_map]
+
+    print(f"\n   Sending {review_type} review to {len(enabled_tools)} external AI model(s): {', '.join(enabled_tools)}")
     print(f"   Evaluating: {dimensions}")
 
     resolved_models = ai_config.resolve_models_for_tools(
         "sdd-plan-review",
-        tools,
+        enabled_tools,
         override=model_override,
         context={"review_type": review_type} if review_type else None,
     )
 
     # Execute tools in parallel using shared implementation
     multi_response = execute_tools_parallel(
-        tools=tools,
+        tools=enabled_tools,
         prompt=prompt,
         models=dict(resolved_models),
         timeout=600
