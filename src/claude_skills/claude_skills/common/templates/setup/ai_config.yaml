@@ -29,12 +29,14 @@ models:
   gemini:
     priority:
       - gemini-2.5-pro
+      - gemini-2.5-flash
   cursor-agent:
     priority:
       - composer-1
   codex:
     priority:
       - gpt-5-codex
+      - gpt-5-codex-mini
   claude:
     priority:
       - sonnet
@@ -48,12 +50,14 @@ run-tests:
           gemini: gemini-2.5-pro
           codex: gpt-5-codex
           cursor-agent: composer-1
+          claude: haiku
         timeout:
           gemini: gemini-2.5-flash
           codex: gpt-5-codex-mini
           cursor-agent: composer-1
+          claude: haiku
   consultation:
-    timeout_seconds: 180
+    timeout_seconds: 600
 
 code-doc:
   models:
@@ -78,10 +82,12 @@ sdd-plan-review:
           gemini: gemini-2.5-pro
           codex: gpt-5-codex
           cursor-agent: composer-1
+          claude: sonnet
         quick:
           gemini: gemini-2.5-flash
           codex: gpt-5-codex-mini
           cursor-agent: composer-1
+          claude: haiku
   consultation:
     timeout_seconds: 600
 
@@ -93,12 +99,14 @@ sdd-render:
           gemini: gemini-2.5-pro
           codex: gpt-5-codex
           cursor-agent: composer-1
+          claude: haiku
         narrative:
           gemini: gemini-2.5-flash
           codex: gpt-5-codex-mini
           cursor-agent: composer-1
+          claude: haiku
   consultation:
-    timeout_seconds: 180
+    timeout_seconds: 600
 
 consensus:
   agents:
