@@ -79,7 +79,7 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     # Claude Code stores transcripts in project-specific directories
     current_path = cwd.resolve()
     while True:
-        project_dir_name = str(current_path).replace("/", "-")
+        project_dir_name = str(current_path).replace("/", "-").replace("_", "-")
         transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
 
         if transcript_dir.exists():
@@ -318,7 +318,7 @@ def cmd_context(args, printer):
             searched_dirs = []
             current_path = cwd.resolve()
             while True:
-                project_dir_name = str(current_path).replace("/", "-")
+                project_dir_name = str(current_path).replace("/", "-").replace("_", "-")
                 transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
                 if transcript_dir.exists():
                     searched_dirs.append(transcript_dir)
