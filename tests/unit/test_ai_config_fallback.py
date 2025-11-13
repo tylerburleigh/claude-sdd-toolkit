@@ -16,7 +16,7 @@ def test_get_tool_priority_global_default():
 
 def test_get_fallback_config_defaults():
     """Test fallback config returns correct defaults."""
-    config = ai_config.get_fallback_config("run-tests")
+    config = ai_config.get_fallback_config("unknown-skill")
 
     assert config["enabled"] is True
     assert config["max_retries_per_tool"] == 2

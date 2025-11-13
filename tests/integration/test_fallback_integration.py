@@ -1,5 +1,6 @@
 import pytest
 import subprocess
+import os
 
 
 def test_run_tests_fallback_gemini_to_cursor():
@@ -8,8 +9,7 @@ def test_run_tests_fallback_gemini_to_cursor():
     # (This is a simplified example - actual test would need proper setup)
 
     result = subprocess.run(
-        ["python", "-m", "claude_skills.run_tests.cli",
-         "consult", "assertion", "Test failed", "Root cause unknown"],
+        ["sdd", "test", "consult", "assertion", "--error", "Test failed", "--hypothesis", "Root cause unknown"],
         capture_output=True,
         text=True
     )
@@ -23,11 +23,13 @@ def test_run_tests_fallback_gemini_to_cursor():
 def test_sdd_plan_review_with_limits():
     """Test sdd-plan-review respects consultation limits."""
     # Run plan review that might consult multiple models
+    env = os.environ.copy()
+    env["HOME"] = "/tmp/test_home"
     result = subprocess.run(
         ["sdd", "plan-review", "test-spec-id"],
         capture_output=True,
         text=True,
-        env={"HOME": "/tmp/test_home"}  # Use test config
+        env=env  # Use test config
     )
 
     # Parse output to verify tool count

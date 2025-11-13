@@ -14,15 +14,8 @@ import json
 import re
 from copy import deepcopy
 
-from claude_skills.common.ai_tools import (
-    ToolResponse,
-    ToolStatus,
-    execute_tool_with_fallback,
-    execute_tools_parallel,
-    detect_available_tools,
-    get_enabled_and_available_tools,
-    check_tool_available
-)
+from claude_skills.common import ai_tools
+from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common import ai_config
 from claude_skills.common import consultation_limits
@@ -647,7 +640,7 @@ def consult_ai_on_fidelity(
     """
     Consult an AI tool for implementation fidelity review.
 
-    Simplified wrapper around execute_tool_with_fallback() with fidelity-review defaults
+    Simplified wrapper around ai_tools.execute_tool_with_fallback() with fidelity-review defaults
     and comprehensive error handling.
 
     Args:
@@ -677,7 +670,7 @@ def consult_ai_on_fidelity(
     try:
         # If no tool specified, detect available tools
         if tool is None:
-            available_tools = get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
+            available_tools = ai_tools.get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
             if not available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
@@ -687,7 +680,7 @@ def consult_ai_on_fidelity(
             logger.info(f"Using detected tool: {tool}")
 
         # Check if specified tool is available
-        if not check_tool_available(tool):
+        if not ai_tools.check_tool_available(tool):
             raise NoToolsAvailableError(
                 f"Tool '{tool}' not found. "
                 "Please install it or choose a different tool."
@@ -701,7 +694,7 @@ def consult_ai_on_fidelity(
         )
 
         # Execute consultation with fallback
-        response = execute_tool_with_fallback(
+        response = ai_tools.execute_tool_with_fallback(
             skill_name=FIDELITY_SKILL_NAME,
             tool=tool,
             prompt=prompt,
@@ -746,12 +739,12 @@ def consult_multiple_ai_on_fidelity(
     """
     Consult multiple AI tools in parallel for fidelity review.
 
-    Wrapper around execute_tools_parallel() with fidelity-review defaults,
+    Wrapper around ai_tools.execute_tools_parallel() with fidelity-review defaults,
     comprehensive error handling, and optional caching support.
 
     Caching Behavior:
         - First checks cache for existing results (cache hit = instant return)
-        - On cache miss, consults AI tools via execute_tools_parallel()
+        - On cache miss, consults AI tools via ai_tools.execute_tools_parallel()
         - Saves fresh consultation results to cache for future use
         - Cache save failures are non-fatal (logged as warnings)
         - Serialization format preserves tool, status, output, error, model, metadata
@@ -797,7 +790,7 @@ def consult_multiple_ai_on_fidelity(
             enabled_tool_names = list(enabled_tools_config.keys())
 
             # Detect all available tools
-            all_available_tools = get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
+            all_available_tools = ai_tools.get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
             if not all_available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
@@ -818,7 +811,7 @@ def consult_multiple_ai_on_fidelity(
                 logger.info(f"Using enabled tools from config: {', '.join(tools)}")
 
         # Filter to only available tools
-        available_tools = [t for t in tools if check_tool_available(t)]
+        available_tools = [t for t in tools if ai_tools.check_tool_available(t)]
         if not available_tools:
             raise NoToolsAvailableError(
                 f"None of the specified tools are available: {', '.join(tools)}"
@@ -910,7 +903,7 @@ def consult_multiple_ai_on_fidelity(
             if resolved_model
         }
         models_dict = models_dict_raw if models_dict_raw else None
-        multi_response = execute_tools_parallel(
+        multi_response = ai_tools.execute_tools_parallel(
             tools=final_tools_to_consult,
             prompt=prompt,
             models=models_dict,

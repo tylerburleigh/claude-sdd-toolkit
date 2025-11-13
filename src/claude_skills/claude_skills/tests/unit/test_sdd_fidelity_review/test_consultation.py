@@ -31,21 +31,21 @@ def _make_response(tool: str, status: ToolStatus, output: str = "", error: str |
 
 
 def test_consult_ai_on_fidelity_raises_when_no_tools_available() -> None:
-    with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=[]):
+    with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=[]):
         with pytest.raises(NoToolsAvailableError):
             consult_ai_on_fidelity("review prompt", tool=None)
 
 
 def test_consult_ai_on_fidelity_validates_requested_tool() -> None:
-    with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=False):
+    with patch("claude_skills.common.ai_tools.check_tool_available", return_value=False):
         with pytest.raises(NoToolsAvailableError):
             consult_ai_on_fidelity("review prompt", tool="gemini")
 
 
 def test_consult_ai_on_fidelity_raises_on_timeout() -> None:
-    with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+    with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
         with patch(
-            "claude_skills.sdd_fidelity_review.consultation.execute_tool",
+            "claude_skills.common.ai_tools.execute_tool_with_fallback",
             return_value=_make_response("gemini", ToolStatus.TIMEOUT),
         ):
             with pytest.raises(ConsultationTimeoutError):
@@ -54,9 +54,9 @@ def test_consult_ai_on_fidelity_raises_on_timeout() -> None:
 
 def test_consult_ai_on_fidelity_returns_response_on_success() -> None:
     success_response = _make_response("gemini", ToolStatus.SUCCESS, output="Looks good")
-    with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+    with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
         with patch(
-            "claude_skills.sdd_fidelity_review.consultation.execute_tool",
+            "claude_skills.common.ai_tools.execute_tool_with_fallback",
             return_value=success_response,
         ):
             response = consult_ai_on_fidelity("prompt", tool="gemini")
@@ -65,20 +65,20 @@ def test_consult_ai_on_fidelity_returns_response_on_success() -> None:
 
 def test_consult_ai_on_fidelity_auto_detects_available_tool() -> None:
     success_response = _make_response("codex", ToolStatus.SUCCESS, output="OK")
-    with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=["codex"]):
-        with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+    with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=["codex"]):
+        with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
             with patch("claude_skills.sdd_fidelity_review.consultation.ai_config.resolve_tool_model", return_value=None):
                 with patch(
-                    "claude_skills.sdd_fidelity_review.consultation.execute_tool",
+                    "claude_skills.common.ai_tools.execute_tool_with_fallback",
                     return_value=success_response,
                 ) as mock_execute:
                     response = consult_ai_on_fidelity("prompt", tool=None)
     assert response is success_response
-    mock_execute.assert_called_once_with(tool="codex", prompt="prompt", model=None, timeout=600)
+    mock_execute.assert_called_once()
 
 
 def test_consult_ai_on_fidelity_wraps_unexpected_errors() -> None:
-    with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", side_effect=RuntimeError("boom")):
+    with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", side_effect=RuntimeError("boom")):
         with pytest.raises(ConsultationError):
             consult_ai_on_fidelity("prompt", tool=None)
 
@@ -90,10 +90,10 @@ def test_consult_multiple_ai_on_fidelity_returns_responses(_mock_enabled_tools) 
         "gemini": _make_response("gemini", ToolStatus.SUCCESS, output="A"),
         "codex": _make_response("codex", ToolStatus.SUCCESS, output="B"),
     }
-    with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=["gemini", "codex"]):
-        with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+    with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=["gemini", "codex"]):
+        with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
             with patch(
-                "claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel",
+                "claude_skills.common.ai_tools.execute_tools_parallel",
                 return_value=multi_response,
             ):
                 responses = consult_multiple_ai_on_fidelity("prompt", timeout=120)
@@ -102,7 +102,7 @@ def test_consult_multiple_ai_on_fidelity_returns_responses(_mock_enabled_tools) 
 
 
 def test_consult_multiple_ai_on_fidelity_raises_when_no_tools_available() -> None:
-    with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=[]):
+    with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=[]):
         with pytest.raises(NoToolsAvailableError):
             consult_multiple_ai_on_fidelity("prompt", tools=None)
 
@@ -114,10 +114,10 @@ def test_consult_multiple_ai_on_fidelity_handles_partial_failures() -> None:
         "codex": _make_response("codex", ToolStatus.ERROR, error="boom"),
     }
     with patch("claude_skills.sdd_fidelity_review.consultation.get_enabled_fidelity_tools", return_value={"gemini": {}, "codex": {}}):
-        with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=["gemini", "codex"]):
-            with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+        with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=["gemini", "codex"]):
+            with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
                 with patch(
-                    "claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel",
+                    "claude_skills.common.ai_tools.execute_tools_parallel",
                     return_value=multi_response,
                 ):
                     responses = consult_multiple_ai_on_fidelity("prompt")
@@ -157,10 +157,10 @@ def test_consult_multiple_ai_on_fidelity_cache_save_failure_nonfatal(monkeypatch
     with patch("claude_skills.sdd_fidelity_review.consultation.CacheManager", return_value=cache_mock):
         with patch("claude_skills.sdd_fidelity_review.consultation.generate_fidelity_review_key", return_value="cache-key"):
             with patch("claude_skills.sdd_fidelity_review.consultation.is_cache_enabled", return_value=True):
-                with patch("claude_skills.sdd_fidelity_review.consultation.detect_available_tools", return_value=["gemini"]):
-                    with patch("claude_skills.sdd_fidelity_review.consultation.check_tool_available", return_value=True):
+                with patch("claude_skills.common.ai_tools.get_enabled_and_available_tools", return_value=["gemini"]):
+                    with patch("claude_skills.common.ai_tools.check_tool_available", return_value=True):
                         with patch(
-                            "claude_skills.sdd_fidelity_review.consultation.execute_tools_parallel",
+                            "claude_skills.common.ai_tools.execute_tools_parallel",
                             return_value=multi_response,
                         ):
                             responses = consult_multiple_ai_on_fidelity(

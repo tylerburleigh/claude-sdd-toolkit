@@ -30,8 +30,11 @@ def test_fallback_success_first_tool(mock_execute):
 @patch('claude_skills.common.ai_tools.execute_tool')
 def test_fallback_on_timeout(mock_execute):
     """Test fallback to next tool on timeout."""
-    # First call times out, second succeeds
+    # First tool ('gemini') times out on initial call + all retries, second succeeds
     mock_execute.side_effect = [
+        ToolResponse(tool="gemini", status=ToolStatus.TIMEOUT, error="Timed out"),
+        ToolResponse(tool="gemini", status=ToolStatus.TIMEOUT, error="Timed out"),
+        ToolResponse(tool="gemini", status=ToolStatus.TIMEOUT, error="Timed out"),
         ToolResponse(tool="gemini", status=ToolStatus.TIMEOUT, error="Timed out"),
         ToolResponse(tool="cursor-agent", status=ToolStatus.SUCCESS, output="Done")
     ]

@@ -31,7 +31,7 @@ DEFAULT_TOOLS = {
     "codex": {
         "description": "Code-level review and bug fixes",
         "command": "codex",
-        "enabled": False
+        "enabled": True
     },
     "claude": {
         "description": "Extended reasoning and analysis with read-only access",

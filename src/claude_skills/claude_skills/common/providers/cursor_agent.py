@@ -139,21 +139,24 @@ class CursorAgentProvider(ProviderContext):
         return candidate
 
     def _build_command(self, request: GenerationRequest, model: str) -> List[str]:
-        # cursor-agent CLI usage: cursor-agent [options] [prompt]
-        # The prompt is a positional argument, not a flag
-        # For non-interactive/scripting use, need --print flag
-        # For JSON output, need --output-format json
-        command = [self._binary, "--print", "--output-format", "json"]
+        """Assemble the cursor-agent CLI invocation."""
+        command = [self._binary, "chat", "--json"]
 
-        # Note: cursor-agent CLI does not support:
-        # - --temperature flag
-        # - --working-directory flag
-        # - --system flag
-        # - --max-tokens flag
-        # These are not available in the current cursor-agent CLI
+        working_dir = (request.metadata or {}).get("working_directory")
+        if working_dir:
+            command.extend(["--working-directory", str(working_dir)])
+
+        if request.temperature is not None:
+            command.extend(["--temperature", str(request.temperature)])
+
+        if request.max_tokens is not None:
+            command.extend(["--max-tokens", str(request.max_tokens)])
 
         if model:
             command.extend(["--model", model])
+
+        if request.system_prompt:
+            command.extend(["--system", request.system_prompt])
 
         extra_flags = (request.metadata or {}).get("cursor_agent_flags")
         if isinstance(extra_flags, list):
@@ -161,13 +164,7 @@ class CursorAgentProvider(ProviderContext):
                 if isinstance(flag, str) and flag.strip():
                     command.append(flag.strip())
 
-        # Build the full prompt (combine system prompt if provided)
-        prompt = request.prompt
-        if request.system_prompt:
-            prompt = f"{request.system_prompt.strip()}\n\n{prompt}"
-
-        # Prompt is a positional argument (not --prompt flag)
-        command.append(prompt)
+        command.extend(["--prompt", request.prompt])
         return command
 
     def _run(
@@ -193,13 +190,29 @@ class CursorAgentProvider(ProviderContext):
         command: Sequence[str],
         timeout: Optional[int],
     ) -> Tuple[subprocess.CompletedProcess[str], bool]:
-        # Run the command - cursor-agent now uses --output-format json
-        # which should be supported, so we expect JSON output
+        """
+        Execute the command and retry without --json when the CLI lacks support.
+        """
         completed = self._run(command, timeout=timeout)
         if completed.returncode == 0:
             return completed, True
 
-        # If command failed, raise error with details
+        stderr_text = (completed.stderr or "").lower()
+        if "--json" in command and any(
+            phrase in stderr_text for phrase in ("unknown option", "unrecognized option")
+        ):
+            retry_command = [part for part in command if part != "--json"]
+            retry_process = self._run(retry_command, timeout=timeout)
+            if retry_process.returncode == 0:
+                return retry_process, False
+
+            stderr_text = (retry_process.stderr or stderr_text).strip()
+            raise ProviderExecutionError(
+                f"Cursor Agent CLI exited with code {retry_process.returncode}: "
+                f"{stderr_text or 'no stderr'}",
+                provider=self.metadata.provider_name,
+            )
+
         raise ProviderExecutionError(
             f"Cursor Agent CLI exited with code {completed.returncode}: "
             f"{(completed.stderr or '').strip() or 'no stderr'}",

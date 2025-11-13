@@ -72,8 +72,9 @@ def review_with_tools(
 
     dimensions = review_dimensions.get(review_type, "All standard dimensions")
 
-    enabled_tools_map = ai_config.get_enabled_tools("sdd-plan-review")
-    enabled_tools = [tool for tool in tools if tool in enabled_tools_map]
+    enabled_tools = [tool for tool in tools if tool]
+    if not enabled_tools:
+        raise ValueError("No tools specified for plan review execution.")
 
     print(f"\n   Sending {review_type} review to {len(enabled_tools)} external AI model(s): {', '.join(enabled_tools)}")
     print(f"   Evaluating: {dimensions}")
