@@ -36,7 +36,7 @@ class DummyPrinter:
         self.messages.append(("header", msg))
 
     def detail(self, msg: str, indent: int = 1) -> None:
-        self.messages.append(("detail", f"{'  ' * indent}{msg}"))
+        self.messages.append(("detail", f"{ '  ' * indent}{msg}"))
 
 
 @pytest.fixture
@@ -89,7 +89,7 @@ def test_cmd_review_persists_markdown_and_json(tmp_path: Path, spec_setup: Path)
         "type": "quick",
     }
 
-    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["mock-tool"]), \
+    with patch("claude_skills.sdd_plan_review.cli.get_enabled_and_available_tools", return_value=["mock-tool"]), \
          patch("claude_skills.sdd_plan_review.cli.review_with_tools", return_value=mock_review_results()), \
          patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="# Mock Report\n"), \
          patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value=expected_json):
@@ -116,7 +116,7 @@ def test_cmd_review_respects_output_flag_while_persisting_defaults(tmp_path: Pat
 
     expected_json = {"artifact": "plan-review-json"}
 
-    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["mock-tool"]), \
+    with patch("claude_skills.sdd_plan_review.cli.get_enabled_and_available_tools", return_value=["mock-tool"]), \
          patch("claude_skills.sdd_plan_review.cli.review_with_tools", return_value=mock_review_results()), \
          patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="*Mock*\n"), \
          patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value=expected_json):
@@ -151,10 +151,12 @@ def test_cmd_review_passes_model_override(monkeypatch: pytest.MonkeyPatch, tmp_p
         result["models"] = {"gemini": "demo-model", "codex": "codex-model"}
         return result
 
-    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["gemini", "codex"]), \
-         patch("claude_skills.sdd_plan_review.cli.review_with_tools", side_effect=_mock_review_with_tools), \
-         patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="# Report\n"), \
-         patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value={"artifact": "plan-review"}):
+    with (
+        patch("claude_skills.sdd_plan_review.cli.get_enabled_and_available_tools", return_value=["gemini", "codex"]),
+        patch("claude_skills.sdd_plan_review.cli.review_with_tools", side_effect=_mock_review_with_tools),
+        patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="# Report\n"),
+        patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value={"artifact": "plan-review"}),
+    ):
         exit_code = cmd_review(args, printer)
 
     assert exit_code == 0

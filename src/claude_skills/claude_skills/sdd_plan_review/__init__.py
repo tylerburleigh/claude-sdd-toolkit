@@ -4,7 +4,6 @@ __version__ = "1.0.0"
 
 from claude_skills.common.ai_tools import check_tool_available
 from claude_skills.sdd_plan_review.reviewer import (
-    detect_available_tools,
     review_with_tools,
 )
 from claude_skills.sdd_plan_review.prompts import (
@@ -21,7 +20,6 @@ from claude_skills.sdd_plan_review.reporting import (
 
 __all__ = [
     "check_tool_available",
-    "detect_available_tools",
     "review_with_tools",
     "generate_review_prompt",
     "parse_response",

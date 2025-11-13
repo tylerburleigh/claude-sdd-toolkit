@@ -11,68 +11,180 @@ tools:
   gemini:
     command: gemini
     enabled: true
-    description: Strategic analysis and hypothesis validation
   cursor-agent:
     command: cursor-agent
-    enabled: true
-    description: Repository-wide pattern discovery
+    enabled: false
   codex:
     command: codex
+    enabled: true
+  claude:
+    command: claude
     enabled: false
-    description: Code-level review and bug fixes
 
 models:
   gemini:
     priority:
       - gemini-2.5-pro
+      - gemini-2.5-flash
   cursor-agent:
     priority:
       - composer-1
   codex:
     priority:
       - gpt-5-codex
+      - gpt-5-codex-mini
+  claude:
+    priority:
+      - sonnet
+      - haiku
+
+# Tool/provider fallback priority (consulted in order if earlier tools fail)
+tool_priority:
+  default:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
+
+# Fallback and retry configuration
+fallback:
+  enabled: true # Enable automatic fallback to next tool on failure
+  max_retries_per_tool: 2 # Number of retries before moving to next tool
+  retry_on_status: # Status codes that trigger retry (transient errors)
+    - timeout
+    - error
+  skip_on_status: # Status codes that skip to next tool (permanent errors)
+    - not_found
+    - invalid_output
+  retry_delay_seconds: 1 # Delay between retry attempts
+
+# Consultation limits (per skill invocation)
+consultation_limits:
+  max_tools_per_run: 4 # Maximum number of unique tools/providers to consult per skill run
+consultation:
+  timeout_seconds: 600
 
 run-tests:
+  tool_priority:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
   models:
-    overrides:
-      failure_type:
-        assertion:
-          gemini: gemini-2.5-pro
-        timeout:
-          cursor-agent: composer-1
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
+    codex: gpt-5-codex
+    claude: sonnet
+    # Contextual overrides: use specific models based on failure type
+    #overrides:
+    #  failure_type:
+    #    assertion:
+    #      gemini: gemini-2.5-pro
+    #      codex: gpt-5-codex
+    #      cursor-agent: composer-1
+    #      claude: haiku
+    #    timeout:
+    #      gemini: gemini-2.5-flash
+    #      codex: gpt-5-codex-mini
+    #      cursor-agent: composer-1
+    #      claude: haiku
 
 code-doc:
+  tool_priority:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
   models:
-    overrides:
-      doc_type:
-        architecture:
-          cursor-agent: composer-1
-        ai_context:
-          gemini: gemini-2.5-pro
+    gemini: gemini-2.5-flash
+    cursor-agent: composer-1
+    codex: gpt-5-codex
+    claude: haiku
+    # Contextual overrides: use specific models based on documentation type
+    #overrides:
+    #  doc_type:
+    #    architecture:
+    #      gemini: gemini-2.5-flash
+    #      codex: gpt-5-codex
+    #      cursor-agent: composer-1
+    #    ai_context:
+    #      gemini: gemini-2.5-pro
+    #      codex: gpt-5-codex
+    #      cursor-agent: composer-1
 
 sdd-plan-review:
+  tool_priority:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
   models:
-    overrides:
-      review_type:
-        full:
-          gemini: gemini-2.5-pro
-        quick:
-          cursor-agent: composer-1
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
+    codex: gpt-5-codex
+    claude: sonnet
+    # Contextual overrides: use specific models based on review type
+    #overrides:
+    #  review_type:
+    #    full:
+    #      gemini: gemini-2.5-pro
+    #      codex: gpt-5-codex
+    #      cursor-agent: composer-1
+    #      claude: sonnet
+    #    quick:
+    #      gemini: gemini-2.5-flash
+    #      codex: gpt-5-codex-mini
+    #      cursor-agent: composer-1
+    #      claude: haiku
 
 sdd-render:
+  tool_priority:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
   models:
-    overrides:
-      feature:
-        executive_summary:
-          gemini: gemini-2.5-pro
-        narrative:
-          cursor-agent: composer-1
+    gemini: gemini-2.5-flash
+    cursor-agent: composer-1
+    codex: gpt-5-codex-mini
+    claude: haiku
+    # Contextual overrides: use specific models based on feature
+    #overrides:
+    #  feature:
+    #    executive_summary:
+    #      gemini: gemini-2.5-pro
+    #      codex: gpt-5-codex
+    #      cursor-agent: composer-1
+    #      claude: haiku
+    #    narrative:
+    #      gemini: gemini-2.5-flash
+    #      codex: gpt-5-codex-mini
+    #      cursor-agent: composer-1
+    #      claude: haiku
+
+sdd-fidelity-review:
+  tool_priority:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
+  models:
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
+    codex: gpt-5-codex
+    claude: sonnet
 
 consensus:
   agents:
     - cursor-agent
     - gemini
     - codex
+    - claude
+  models:
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
+    codex: gpt-5-codex
+    claude: sonnet
   auto_trigger:
     default: false
     assertion: true
@@ -82,6 +194,3 @@ consensus:
     timeout: true
     flaky: false
     multi-file: true
-
-consultation:
-  timeout_seconds: 600

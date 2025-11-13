@@ -31,7 +31,7 @@ DEFAULT_TOOLS = {
     "codex": {
         "description": "Code-level review and bug fixes",
         "command": "codex",
-        "enabled": False
+        "enabled": True
     },
     "claude": {
         "description": "Extended reasoning and analysis with read-only access",
@@ -238,20 +238,55 @@ def _extract_model_priority(
     tool: str,
     context: Optional[Mapping[str, Any]] = None,
 ) -> List[str]:
-    """Extract model priority list for a tool using configuration and context."""
+    """Extract model priority list for a tool using configuration and context.
+
+    Resolution order:
+    1. Contextual overrides (models.overrides.*)
+    2. Skill-level default (models.gemini: "model-name")
+    3. Global default priority (fallback to DEFAULT_MODELS)
+    """
     if isinstance(models_config, Mapping):
+        # 1. Check contextual overrides first (highest priority)
         overrides = models_config.get("overrides")
         override_priority = _extract_override_priority(overrides, tool, context)
         if override_priority:
             return override_priority
 
-        base_priority = _extract_priority_from_value(models_config.get(tool), tool)
-        if base_priority:
-            return base_priority
+        # 2. Check for simple skill-level default (e.g., models.gemini: "gemini-2.5-flash")
+        # This is a direct string/list value at the tool key level
+        skill_default = models_config.get(tool)
+        if skill_default is not None:
+            # Could be a simple string or a dict with priority key
+            if isinstance(skill_default, str):
+                normalized = skill_default.strip()
+                if normalized:
+                    return [normalized]
+            elif isinstance(skill_default, Sequence) and not isinstance(skill_default, (str, bytes)):
+                priority = _normalize_priority_entry(skill_default)
+                if priority:
+                    return priority
+            elif isinstance(skill_default, Mapping):
+                # Support both simple defaults and legacy priority lists
+                # e.g., models.gemini.priority: [...]
+                priority = _extract_priority_from_value(skill_default, tool)
+                if priority:
+                    return priority
 
-        base_priority = _extract_priority_from_value(models_config.get(tool.lower()), tool)
-        if base_priority:
-            return base_priority
+        # Try lowercase tool name for case-insensitive matching
+        skill_default = models_config.get(tool.lower())
+        if skill_default is not None:
+            if isinstance(skill_default, str):
+                normalized = skill_default.strip()
+                if normalized:
+                    return [normalized]
+            elif isinstance(skill_default, Sequence) and not isinstance(skill_default, (str, bytes)):
+                priority = _normalize_priority_entry(skill_default)
+                if priority:
+                    return priority
+            elif isinstance(skill_default, Mapping):
+                priority = _extract_priority_from_value(skill_default, tool)
+                if priority:
+                    return priority
 
     elif isinstance(models_config, Sequence) and not isinstance(models_config, (str, bytes)):
         # Legacy support where models config may just be a list of priorities.
@@ -357,8 +392,14 @@ def resolve_tool_model(
     Resolution order:
         1. CLI override (global or per-tool)
         2. Skill config contextual overrides (models.overrides.*)
-        3. Skill config base model priority
-        4. DEFAULT_MODELS fallback
+        3. Skill-level default (e.g., code-doc.models.gemini: "gemini-2.5-flash")
+        4. Global default priority (models.gemini.priority[0])
+        5. DEFAULT_MODELS fallback (code defaults)
+
+    The skill-level default provides a simple way to set a default model for a
+    specific tool within a skill, without needing contextual overrides. This
+    overrides the global default but still allows fallback if the model is
+    unavailable.
 
     Returns:
         Model identifier string or None if no model is configured.
@@ -449,26 +490,46 @@ def get_preferred_model(skill_name: str, tool_name: str) -> Optional[str]:
 
 
 def get_global_config_path() -> Path:
-    """Get the path to the global AI configuration file.
+    """
+    Get the path to the global AI configuration file by searching upwards from the current directory.
 
-    Searches in multiple locations:
-    1. .claude/ai_config.yaml in current working directory
-    2. .claude/ai_config.yaml relative to project root
+    Searches for `.claude/ai_config.yaml` in the current directory and its parent
+    directories until it finds the file or reaches the filesystem root. This makes
+    the configuration discovery robust to the user's working directory.
 
     Returns:
-        Path to global ai_config.yaml (may not exist)
+        Path to the found ai_config.yaml, or the path where it would be expected
+        in the current directory if not found anywhere.
     """
-    possible_paths = [
-        Path.cwd() / ".claude" / "ai_config.yaml",
-        Path(__file__).parent.parent.parent.parent / ".claude" / "ai_config.yaml",
-    ]
+    current_dir = Path.cwd().resolve()
 
-    for path in possible_paths:
-        if path.exists():
-            return path
+    # Search upwards from the current directory for the config file
+    while True:
+        potential_path = current_dir / ".claude" / "ai_config.yaml"
+        if potential_path.exists():
+            return potential_path
 
-    # Return first path even if it doesn't exist
-    return possible_paths[0]
+        # Stop if we've reached the root of the filesystem
+        if current_dir.parent == current_dir:
+            break
+
+        current_dir = current_dir.parent
+
+    # As a fallback for development, check relative to this source file.
+    try:
+        # This file is in src/claude_skills/claude_skills/common/ai_config.py
+        # The project root is 5 levels up.
+        dev_root = Path(__file__).resolve().parents[4]
+        dev_path = dev_root / ".claude" / "ai_config.yaml"
+        if dev_path.exists():
+            return dev_path
+    except IndexError:
+        # This can fail if the file structure is not as expected.
+        pass
+
+    # If no config is found anywhere, return the default path in the CWD.
+    # This is where a new config would be created.
+    return Path.cwd() / ".claude" / "ai_config.yaml"
 
 
 def load_global_config() -> Dict:
@@ -583,11 +644,20 @@ def load_skill_config(skill_name: str) -> Dict:
         if not global_config:
             return result
 
-        # Extract global defaults (tools, models, consensus, consultation, rendering, enhancement)
         # These are top-level keys that apply to all skills
-        global_defaults = {k: v for k, v in global_config.items() if k not in [
-            'run-tests', 'sdd-fidelity-review', 'sdd-render'
-        ]}
+        KNOWN_GLOBAL_KEYS = {
+            "tools",
+            "models",
+            "consensus",
+            "consultation",
+            "rendering",
+            "enhancement",
+        }
+
+        # Extract global defaults
+        global_defaults = {
+            k: v for k, v in global_config.items() if k in KNOWN_GLOBAL_KEYS
+        }
 
         # Merge global defaults into result
         result = merge_configs(result, global_defaults)
@@ -813,3 +883,133 @@ def get_routing_config(skill_name: str) -> Dict[str, bool]:
             routing_config[key] = normalized
 
     return routing_config
+
+
+def get_tool_priority(
+    skill_name: str, context: Optional[Mapping[str, Any]] = None
+) -> List[str]:
+    """Get the priority-ordered list of tools/providers for fallback.
+
+    Tools are consulted in priority order when fallback is enabled. If a tool
+    fails, the next tool in the list is tried automatically.
+
+    Args:
+        skill_name: Name of the skill
+        context: Optional context for contextual overrides
+
+    Returns:
+        List of tool names in priority order (highest first)
+    """
+    config = load_skill_config(skill_name)
+    global_config = load_global_config()
+
+    # Try skill-specific tool_priority first
+    if "tool_priority" in config:
+        priority = config["tool_priority"]
+        if isinstance(priority, (list, tuple)):
+            return _dedupe_preserve_order(priority)
+
+    # Try global tool_priority
+    if "tool_priority" in global_config:
+        global_tool_priority = global_config["tool_priority"]
+        if isinstance(global_tool_priority, dict):
+            # Check for context-specific priority
+            if context:
+                for context_key, context_value in context.items():
+                    candidate_keys = _normalize_context_values(context_value)
+                    for candidate_key in candidate_keys:
+                        if candidate_key in global_tool_priority:
+                            priority = global_tool_priority[candidate_key]
+                            if isinstance(priority, (list, tuple)):
+                                return _dedupe_preserve_order(priority)
+
+            # Use default priority from global config
+            if "default" in global_tool_priority:
+                priority = global_tool_priority["default"]
+                if isinstance(priority, (list, tuple)):
+                    return _dedupe_preserve_order(priority)
+
+        # Direct list in global config
+        if isinstance(global_tool_priority, (list, tuple)):
+            return _dedupe_preserve_order(global_tool_priority)
+
+    # Fallback: return all enabled tools
+    enabled_tools = get_enabled_tools(skill_name)
+    return list(enabled_tools.keys())
+
+
+def get_fallback_config(skill_name: str) -> Dict[str, Any]:
+    """Get fallback configuration for the skill.
+
+    Returns configuration for automatic fallback to alternative tools on failure.
+
+    Args:
+        skill_name: Name of the skill
+
+    Returns:
+        Dict with fallback configuration:
+            - enabled (bool): Whether fallback is enabled
+            - max_retries_per_tool (int): Number of retries before moving to next tool
+            - retry_on_status (List[str]): Status codes that trigger retry
+            - skip_on_status (List[str]): Status codes that skip to next tool
+            - retry_delay_seconds (int): Delay between retry attempts
+    """
+    config = load_skill_config(skill_name)
+    global_config = load_global_config()
+
+    # Default fallback config
+    default_fallback = {
+        "enabled": True,
+        "max_retries_per_tool": 2,
+        "retry_on_status": ["timeout", "error"],
+        "skip_on_status": ["not_found", "invalid_output"],
+        "retry_delay_seconds": 1,
+    }
+
+    # Try global fallback config
+    global_fallback = global_config.get("fallback", {})
+    if global_fallback:
+        default_fallback = merge_configs(default_fallback, global_fallback)
+
+    # Try skill-specific fallback config (overrides global)
+    skill_fallback = config.get("fallback", {})
+    if skill_fallback:
+        default_fallback = merge_configs(default_fallback, skill_fallback)
+
+    return default_fallback
+
+
+def get_consultation_limit(skill_name: str) -> Optional[int]:
+    """Get the maximum number of unique tools allowed per skill run.
+
+    This limit controls how many distinct AI tools/providers can be consulted
+    during a single skill invocation. For example, with a limit of 2, the skill
+    might consult gemini and cursor-agent but not codex.
+
+    Args:
+        skill_name: Name of the skill
+
+    Returns:
+        Maximum number of unique tools allowed, or None for unlimited
+    """
+    config = load_skill_config(skill_name)
+    global_config = load_global_config()
+
+    # Try skill-specific consultation_limits first
+    if "consultation_limits" in config:
+        limits = config["consultation_limits"]
+        if isinstance(limits, dict):
+            max_tools = limits.get("max_tools_per_run")
+            if isinstance(max_tools, int) and max_tools > 0:
+                return max_tools
+
+    # Try global consultation_limits
+    if "consultation_limits" in global_config:
+        limits = global_config["consultation_limits"]
+        if isinstance(limits, dict):
+            max_tools = limits.get("max_tools_per_run")
+            if isinstance(max_tools, int) and max_tools > 0:
+                return max_tools
+
+    # No limit configured
+    return None

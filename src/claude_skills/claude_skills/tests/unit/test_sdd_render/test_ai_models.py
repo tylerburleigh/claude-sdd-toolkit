@@ -42,7 +42,7 @@ def test_executive_summary_uses_model_override(monkeypatch: pytest.MonkeyPatch) 
         return SimpleNamespace(success=True, output="Summary", status=None)
 
     monkeypatch.setattr(
-        "claude_skills.sdd_render.executive_summary.execute_tool",
+        "claude_skills.common.ai_tools.execute_tool_with_fallback",
         _mock_execute,
     )
     monkeypatch.setattr(
@@ -79,7 +79,7 @@ def test_narrative_enhancer_uses_model_override(monkeypatch: pytest.MonkeyPatch)
         _mock_resolve,
     )
     monkeypatch.setattr(
-        "claude_skills.sdd_render.narrative_enhancer.execute_tool",
+        "claude_skills.common.ai_tools.execute_tool_with_fallback",
         lambda agent, prompt, *, model=None, timeout=None: SimpleNamespace(
             success=True,
             output="Narrative",

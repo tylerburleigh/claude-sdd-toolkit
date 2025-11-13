@@ -1,266 +1,229 @@
 """
-Pytest fixtures for code-doc tests.
+Shared fixtures for code-doc unit tests.
+
+These helpers provide consistent sample module metadata, temporary project
+structures, and tool execution stubs so the detectors and consultation helpers
+can run without requiring a real repository.
 """
 
-import pytest
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Iterable
+
+import pytest
+
+from claude_skills.code_doc import detectors
+from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 
 
-@pytest.fixture
-def sample_modules():
-    """Sample module data for testing framework and layer detection."""
-    return [
-        {
-            'name': 'main',
-            'file': 'app/main.py',
-            'docstring': 'Main application entry point',
-            'imports': ['fastapi', 'fastapi.FastAPI', 'fastapi.APIRouter'],
-            'classes': ['App'],
-            'functions': ['main', 'create_app'],
-            'lines': 250
-        },
-        {
-            'name': 'config',
-            'file': 'app/config.py',
-            'docstring': 'Application configuration',
-            'imports': ['pydantic', 'pydantic.BaseSettings'],
-            'classes': ['Settings'],
-            'functions': [],
-            'lines': 80
-        },
-        {
-            'name': 'user_router',
-            'file': 'app/routers/users.py',
-            'docstring': None,
-            'imports': ['fastapi.APIRouter', 'app.models.user'],
-            'classes': [],
-            'functions': ['get_user', 'create_user'],
-            'lines': 120
-        },
-        {
-            'name': 'user_model',
-            'file': 'app/models/user.py',
-            'docstring': 'User data models',
-            'imports': ['pydantic.BaseModel', 'sqlalchemy'],
-            'classes': ['User', 'UserCreate'],
-            'functions': [],
-            'lines': 90
-        },
-        {
-            'name': 'user_service',
-            'file': 'app/services/user_service.py',
-            'docstring': 'User business logic',
-            'imports': ['app.models.user', 'app.repositories.user'],
-            'classes': ['UserService'],
-            'functions': ['validate_user'],
-            'lines': 150
-        },
-        {
-            'name': 'user_repository',
-            'file': 'app/repositories/user_repo.py',
-            'docstring': None,
-            'imports': ['sqlalchemy.orm', 'app.models.user'],
-            'classes': ['UserRepository'],
-            'functions': [],
-            'lines': 100
-        },
-        {
-            'name': 'helpers',
-            'file': 'app/utils/helpers.py',
-            'docstring': 'Utility functions',
-            'imports': [],
-            'classes': [],
-            'functions': ['format_date', 'parse_json'],
-            'lines': 60
-        },
-        {
-            'name': 'auth_middleware',
-            'file': 'app/middleware/auth.py',
-            'docstring': 'Authentication middleware',
-            'imports': ['starlette.middleware'],
-            'classes': ['AuthMiddleware'],
-            'functions': [],
-            'lines': 75
-        },
-        {
-            'name': 'test_users',
-            'file': 'tests/test_users.py',
-            'docstring': None,
-            'imports': ['pytest', 'app.routers.users'],
-            'classes': ['TestUserAPI'],
-            'functions': ['test_create_user'],
-            'lines': 200
-        },
-        {
-            'name': 'deep_util',
-            'file': 'app/utils/deep/nested/helper.py',
-            'docstring': None,
-            'imports': [],
-            'classes': [],
-            'functions': ['helper_func'],
-            'lines': 30
-        }
-    ]
-
-
-@pytest.fixture
-def django_modules():
-    """Sample Django module data."""
-    return [
-        {
-            'name': 'settings',
-            'file': 'myproject/settings.py',
-            'docstring': 'Django settings',
-            'imports': ['django.conf', 'django.db'],
-            'classes': [],
-            'functions': [],
-            'lines': 150
-        },
-        {
-            'name': 'views',
-            'file': 'myapp/views.py',
-            'docstring': None,
-            'imports': ['django.views', 'django.http.HttpResponse'],
-            'classes': ['UserView'],
-            'functions': ['index'],
-            'lines': 80
-        }
-    ]
-
-
-@pytest.fixture
-def flask_modules():
-    """Sample Flask module data."""
-    return [
-        {
-            'name': 'app',
-            'file': 'app.py',
-            'docstring': 'Flask application',
-            'imports': ['flask', 'flask.Flask', 'flask.request'],
-            'classes': [],
-            'functions': ['create_app', 'index'],
-            'lines': 100
-        }
-    ]
-
-
-@pytest.fixture
-def plain_modules():
-    """Sample plain Python library (no framework)."""
-    return [
-        {
-            'name': 'core',
-            'file': 'mylib/core.py',
-            'docstring': 'Core functionality',
-            'imports': ['typing', 'dataclasses'],
-            'classes': ['DataProcessor'],
-            'functions': ['process'],
-            'lines': 150
-        },
-        {
-            'name': 'utils',
-            'file': 'mylib/utils.py',
-            'docstring': None,
-            'imports': [],
-            'classes': [],
-            'functions': ['helper'],
-            'lines': 50
-        }
-    ]
-
-
-@pytest.fixture
-def sample_statistics():
-    """Sample code statistics."""
+def _module(
+    file_path: str,
+    *,
+    imports: Iterable[str] | None = None,
+    docstring: str = "",
+    classes: Iterable[dict] | None = None,
+    functions: Iterable[dict] | None = None,
+    lines: int = 100,
+):
+    """Utility to build module dictionaries used by detectors."""
     return {
-        'total_files': 45,
-        'total_lines': 3421,
-        'total_classes': 23,
-        'total_functions': 156,
-        'avg_complexity': 4.2,
-        'max_complexity': 15,
-        'high_complexity_functions': ['process_data (15)', 'validate (12)']
+        "name": file_path.replace("/", ".").rstrip(".py"),
+        "file": file_path,
+        "imports": list(imports or []),
+        "docstring": docstring,
+        "classes": list(classes or []),
+        "functions": list(functions or []),
+        "exports": [],
+        "lines": lines,
     }
 
 
 @pytest.fixture
-def sample_framework_info():
-    """Sample framework detection result."""
+def temp_project_dir(tmp_path: Path) -> Path:
+    """Create a throwaway project directory with a README and entry file."""
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+
+    (project_dir / "README.md").write_text("# Test Project\n\nSample documentation.", encoding="utf-8")
+    (project_dir / "main.py").write_text("def main():\n    return 'ok'\n", encoding="utf-8")
+    (project_dir / "app").mkdir()
+    (project_dir / "app" / "main.py").write_text("from fastapi import FastAPI\napp = FastAPI()\n", encoding="utf-8")
+
+    return project_dir
+
+
+@pytest.fixture
+def sample_modules() -> list[dict]:
+    """Provide representative module metadata for a FastAPI-style project."""
+    return [
+        _module(
+            "app/main.py",
+            imports=["fastapi", "fastapi.FastAPI", "fastapi.APIRouter", "pydantic", "app.config", "app.routers.users"],
+            docstring="FastAPI entry point.",
+            functions=[{"name": "create_app"}],
+        ),
+        _module(
+            "app/config.py",
+            imports=["pydantic"],
+            docstring="Application configuration.",
+            classes=[{"name": "Settings"}],
+        ),
+        _module(
+            "app/routers/users.py",
+            imports=["fastapi", "app.services.user_service"],
+            docstring="User routes.",
+            functions=[{"name": "list_users"}],
+        ),
+        _module(
+            "app/models/user.py",
+            imports=["pydantic"],
+            docstring="User models.",
+            classes=[{"name": "User"}, {"name": "UserCreate"}, {"name": "UserUpdate"}],
+            functions=[{"name": "as_dict"}],
+        ),
+        _module(
+            "app/services/user_service.py",
+            imports=["app.repositories.user_repo"],
+            docstring="Service layer.",
+            functions=[{"name": "get_user"}],
+        ),
+        _module(
+            "app/repositories/user_repo.py",
+            imports=["sqlalchemy"],
+            docstring="Data access layer.",
+            functions=[{"name": "fetch_user"}],
+        ),
+        _module(
+            "app/utils/helpers.py",
+            imports=["logging"],
+            docstring="Helper utilities.",
+            functions=[{"name": "slugify"}],
+        ),
+        _module(
+            "app/middleware/auth.py",
+            imports=["fastapi"],
+            docstring="Auth middleware.",
+            classes=[{"name": "AuthMiddleware"}],
+        ),
+        _module(
+            "tests/test_users.py",
+            imports=["pytest"],
+            docstring="Tests.",
+            functions=[{"name": "test_user_flow"}],
+        ),
+        _module(
+            "app/deep/nested/feature.py",
+            imports=["typing"],
+            docstring="Deep feature file.",
+            functions=[{"name": "feature_flag"}],
+        ),
+    ]
+
+
+@pytest.fixture
+def django_modules() -> list[dict]:
+    """Sample modules that resemble a Django project."""
+    return [
+        _module(
+            "project/settings.py",
+            imports=["django", "django.conf"],
+            docstring="Django settings.",
+        ),
+        _module(
+            "project/urls.py",
+            imports=["django.urls"],
+            docstring="URL configuration.",
+            functions=[{"name": "urlpatterns"}],
+        ),
+    ]
+
+
+@pytest.fixture
+def flask_modules() -> list[dict]:
+    """Sample modules for a Flask project."""
+    return [
+        _module(
+            "app/__init__.py",
+            imports=["flask"],
+            docstring="Flask factory.",
+            functions=[{"name": "create_app"}],
+        ),
+        _module(
+            "app/routes.py",
+            imports=["flask"],
+            docstring="Route definitions.",
+            functions=[{"name": "register_routes"}],
+        ),
+    ]
+
+
+@pytest.fixture
+def plain_modules() -> list[dict]:
+    """Modules with no recognizable framework."""
+    return [
+        _module("lib/core.py", imports=["math"]),
+        _module("lib/helpers.py", imports=["itertools"]),
+    ]
+
+
+@pytest.fixture
+def sample_framework_info(sample_modules: list[dict]) -> dict:
+    """Detect frameworks from the shared sample modules."""
+    return detectors.detect_framework(sample_modules)
+
+
+@pytest.fixture
+def sample_layers(sample_modules: list[dict]) -> dict:
+    """Layer grouping derived from the shared sample modules."""
+    return detectors.detect_layers(sample_modules)
+
+
+@pytest.fixture
+def sample_statistics(sample_modules: list[dict]) -> dict:
+    """Lightweight statistics payload used by context summary tests."""
+    total_classes = sum(len(m.get("classes", [])) for m in sample_modules)
+    total_functions = sum(len(m.get("functions", [])) for m in sample_modules)
+    total_lines = sum(m.get("lines", 0) for m in sample_modules)
     return {
-        'detected': {'FastAPI': True, 'Pydantic': True, 'SQLAlchemy': True},
-        'confidence': {'FastAPI': 1.0, 'Pydantic': 0.67, 'SQLAlchemy': 0.5},
-        'primary': 'FastAPI',
-        'type': 'web'
+        "total_files": len(sample_modules),
+        "total_lines": total_lines or 500,
+        "total_classes": total_classes,
+        "total_functions": total_functions,
+        "avg_complexity": 3.2,
     }
 
 
 @pytest.fixture
-def sample_layers():
-    """Sample layer detection result."""
-    return {
-        'routers': ['app/routers/users.py', 'app/routers/posts.py'],
-        'models': ['app/models/user.py', 'app/models/post.py'],
-        'services': ['app/services/user_service.py'],
-        'repositories': ['app/repositories/user_repo.py'],
-        'utils': ['app/utils/helpers.py'],
-        'middleware': ['app/middleware/auth.py'],
-        'config': ['app/config.py'],
-        'tests': ['tests/test_users.py']
-    }
-
-
-@pytest.fixture
-def mock_execute_tool(monkeypatch):
-    """Mock execute_tool for successful AI consultation."""
-    from claude_skills.common.ai_tools import ToolResponse, ToolStatus
-
-    def _mock(tool, prompt, *, model=None, timeout=90):
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.SUCCESS,
-            output="Mock AI generated documentation content",
-            duration=1.0,
-            model=model,
-            prompt=prompt,
-        )
+def mock_execute_tool(monkeypatch: pytest.MonkeyPatch) -> ToolResponse:
+    """Patch execute_tool_with_fallback to simulate a successful call."""
+    response = ToolResponse(
+        tool="gemini",
+        status=ToolStatus.SUCCESS,
+        output="Mock AI response",
+        duration=1.0,
+    )
 
     monkeypatch.setattr(
-        "claude_skills.code_doc.ai_consultation.execute_tool",
-        _mock,
+        "claude_skills.code_doc.ai_consultation.execute_tool_with_fallback",
+        lambda *args, **kwargs: response,
     )
-    return _mock
+    return response
 
 
 @pytest.fixture
-def mock_execute_tool_failure(monkeypatch):
-    """Mock execute_tool returning a failure response."""
-    from claude_skills.common.ai_tools import ToolResponse, ToolStatus
-
-    def _mock(tool, prompt, *, model=None, timeout=90):
-        return ToolResponse(
-            tool=tool,
-            status=ToolStatus.ERROR,
-            output="",
-            error="AI tool error",
-            duration=0.5,
-            model=model,
-            prompt=prompt,
-        )
+def mock_execute_tool_failure(monkeypatch: pytest.MonkeyPatch) -> ToolResponse:
+    """Patch execute_tool_with_fallback to simulate a failing call."""
+    response = ToolResponse(
+        tool="gemini",
+        status=ToolStatus.ERROR,
+        output="",
+        error="Simulated execution error",
+        duration=1.0,
+    )
 
     monkeypatch.setattr(
-        "claude_skills.code_doc.ai_consultation.execute_tool",
-        _mock,
+        "claude_skills.code_doc.ai_consultation.execute_tool_with_fallback",
+        lambda *args, **kwargs: response,
     )
-    return _mock
-
-
-@pytest.fixture
-def temp_project_dir(tmp_path):
-    """Create a temporary project directory with README."""
-    readme = tmp_path / "README.md"
-    readme.write_text("# Test Project\n\nA test project for documentation generation.")
-
-    main_py = tmp_path / "main.py"
-    main_py.write_text("# Main entry point\ndef main():\n    pass\n")
-
-    return tmp_path
+    return response

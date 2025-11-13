@@ -233,3 +233,143 @@ def test_load_skill_config_promotes_tools_to_providers(monkeypatch: pytest.Monke
     config = ai_config.load_skill_config("skill")
     assert config["providers"]["custom"]["enabled"] is False
     assert config["tools"]["custom"]["enabled"] is False
+
+
+def test_resolve_tool_model_uses_skill_level_default_string(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that skill-level simple string defaults work."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "skill-default-gemini",
+                "codex": "skill-default-codex",
+            }
+        }
+    )
+    result = ai_config.resolve_tool_model("code-doc", "gemini")
+    assert result == "skill-default-gemini"
+
+    result = ai_config.resolve_tool_model("code-doc", "codex")
+    assert result == "skill-default-codex"
+
+
+def test_resolve_tool_model_skill_default_overrides_global(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that skill-level defaults override global defaults."""
+    # Global defaults from DEFAULT_MODELS would be gemini-2.5-flash
+    # But skill config should override it
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "gemini-2.5-pro",  # Override global default
+            }
+        }
+    )
+    result = ai_config.resolve_tool_model("run-tests", "gemini")
+    assert result == "gemini-2.5-pro"
+    assert result != ai_config.DEFAULT_MODELS["gemini"]["priority"][0]
+
+
+def test_resolve_tool_model_contextual_override_beats_skill_default(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that contextual overrides take precedence over skill-level defaults."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "skill-default",  # Skill-level default
+                "overrides": {
+                    "failure_type": {
+                        "assertion": {"gemini": "assertion-specific"}
+                    }
+                },
+            }
+        }
+    )
+    # Without context, should use skill default
+    result = ai_config.resolve_tool_model("run-tests", "gemini")
+    assert result == "skill-default"
+
+    # With context, should use contextual override
+    result = ai_config.resolve_tool_model(
+        "run-tests", "gemini", context={"failure_type": "assertion"}
+    )
+    assert result == "assertion-specific"
+
+
+def test_resolve_tool_model_skill_default_list(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that skill-level defaults can be lists (takes first item)."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": ["gemini-first", "gemini-second"],
+            }
+        }
+    )
+    result = ai_config.resolve_tool_model("skill", "gemini")
+    assert result == "gemini-first"
+
+
+def test_resolve_tool_model_fallback_to_global_when_skill_default_empty(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test fallback to global defaults when skill default is empty."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "",  # Empty string should be ignored
+            }
+        }
+    )
+    result = ai_config.resolve_tool_model("skill", "gemini")
+    # Should fall back to DEFAULT_MODELS
+    assert result == ai_config.DEFAULT_MODELS["gemini"]["priority"][0]
+
+
+def test_resolve_tool_model_case_insensitive_skill_default(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that skill-level defaults work with lowercase tool names."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "gemini-model",  # Lowercase key
+            }
+        }
+    )
+    # Should work with both cases
+    result = ai_config.resolve_tool_model("skill", "gemini")
+    assert result == "gemini-model"
+
+    result = ai_config.resolve_tool_model("skill", "Gemini")
+    assert result == "gemini-model"
+
+
+def test_resolve_models_for_tools_respects_skill_defaults(
+    set_skill_config: Callable[[Dict[str, Any]], None]
+) -> None:
+    """Test that resolve_models_for_tools uses skill-level defaults."""
+    set_skill_config(
+        {
+            "models": {
+                "gemini": "skill-gemini",
+                "codex": "skill-codex",
+                "cursor-agent": "skill-cursor",
+            }
+        }
+    )
+    models = ai_config.resolve_models_for_tools(
+        "code-doc",
+        ["gemini", "codex", "cursor-agent"],
+    )
+    assert models == OrderedDict(
+        [
+            ("gemini", "skill-gemini"),
+            ("codex", "skill-codex"),
+            ("cursor-agent", "skill-cursor"),
+        ]
+    )

@@ -13,10 +13,12 @@ import time
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.ai_tools import (
-    build_tool_command, execute_tool, execute_tools_parallel,
-    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools
+    build_tool_command, execute_tool_with_fallback, execute_tools_parallel,
+    ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools,
+    get_enabled_and_available_tools,
 )
 from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 
 # =============================================================================
@@ -80,7 +82,13 @@ def get_flags_for_tool(tool: str) -> List[str]:
         return TOOL_FLAGS.get(tool, [])
 
     tool_config = model_config[tool]
-    return tool_config.get('flags', TOOL_FLAGS.get(tool, []))
+
+    # Handle case where tool_config is a string (e.g., just a model name)
+    if isinstance(tool_config, dict):
+        return tool_config.get('flags', TOOL_FLAGS.get(tool, []))
+
+    # If not a dict, it can't have flags, so use default
+    return TOOL_FLAGS.get(tool, [])
 
 
 # =============================================================================
@@ -296,7 +304,7 @@ def get_best_tool(failure_type: str, available_tools: Optional[List[str]] = None
         Tool name to use, or None if no tools available
     """
     if available_tools is None:
-        available_tools = detect_available_tools()
+        available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         return None
@@ -450,6 +458,7 @@ def run_consultation(
     printer: Optional[PrettyPrinter] = None,
     failure_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> int:
     """
     Run the external tool consultation.
@@ -461,6 +470,7 @@ def run_consultation(
         printer: PrettyPrinter instance (creates default if None)
         failure_type: Optional failure type for model selection
         model_override: Optional explicit model override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         Exit code from the tool
@@ -494,9 +504,17 @@ def run_consultation(
     print("=" * 60)
     print()
 
-    # Use shared execute_tool() implementation
+    # Use shared execute_tool_with_fallback() implementation
     timeout = get_consultation_timeout()
-    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+    response = execute_tool_with_fallback(
+        skill_name="run-tests",
+        tool=tool,
+        prompt=prompt,
+        model=model,
+        timeout=timeout,
+        context={"failure_type": failure_type} if failure_type else None,
+        tracker=tracker,
+    )
 
     # Handle user interrupt (Ctrl+C) - execute_tool doesn't catch this
     # so we need to keep the try/except here
@@ -590,7 +608,7 @@ def consult_with_auto_routing(
     routing_plan = _routing_plan_for_failure(failure_type)
 
     # Check tool availability
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         printer.error("No tools available for consultation")
@@ -690,6 +708,7 @@ def run_tool_parallel(
     prompt: str,
     failure_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> ConsultationResponse:
     """
     Run a single tool consultation and capture output.
@@ -699,6 +718,7 @@ def run_tool_parallel(
         prompt: Formatted prompt
         failure_type: Optional failure type for model selection
         model_override: Optional explicit model override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         ConsultationResponse with results
@@ -707,8 +727,16 @@ def run_tool_parallel(
     model = get_model_for_tool(tool, failure_type, override=model_override)
     timeout = get_consultation_timeout()
 
-    # Use shared execute_tool() implementation
-    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+    # Use shared execute_tool_with_fallback() implementation
+    response = execute_tool_with_fallback(
+        skill_name="run-tests",
+        tool=tool,
+        prompt=prompt,
+        model=model,
+        timeout=timeout,
+        context={"failure_type": failure_type} if failure_type else None,
+        tracker=tracker,
+    )
 
     # Convert ToolResponse to ConsultationResponse for backward compatibility
     return ConsultationResponse(
@@ -969,7 +997,7 @@ def consult_multi_agent(
         printer = PrettyPrinter()
 
     configured_agents = _resolve_consensus_agents(agents)
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("run-tests")
 
     if not available_tools:
         printer.error("No tools available for multi-agent consultation")
@@ -1061,8 +1089,13 @@ def consult_multi_agent(
         return 0
 
     # Run consultations in parallel using shared implementation
-    printer.action(f"Consulting {len(agents_to_consult)} agents in parallel...")
-    print(f"Agents: {', '.join(agents_to_consult)}")
+    enabled_tools_map = ai_config.get_enabled_tools("run-tests")
+    final_agents_to_consult = [
+        agent for agent in agents_to_consult if agent in enabled_tools_map
+    ]
+
+    printer.action(f"Consulting {len(final_agents_to_consult)} agents in parallel...")
+    print(f"Agents: {', '.join(final_agents_to_consult)}")
     print("=" * 60)
     print()
 
@@ -1070,7 +1103,7 @@ def consult_multi_agent(
 
     # Use shared execute_tools_parallel() implementation
     multi_response = execute_tools_parallel(
-        tools=agents_to_consult,
+        tools=final_agents_to_consult,
         prompt=prompt,
         models=dict(resolved_models),
         timeout=timeout

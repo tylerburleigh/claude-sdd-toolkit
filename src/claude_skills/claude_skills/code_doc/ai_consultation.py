@@ -21,11 +21,13 @@ import time
 
 from claude_skills.common.ai_tools import (
     detect_available_tools,
+    get_enabled_and_available_tools,
     execute_tools_parallel,
-    execute_tool,
+    execute_tool_with_fallback,
     ToolStatus,
 )
 from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 # =============================================================================
 # CONFIGURATION
@@ -88,7 +90,7 @@ def get_available_tools() -> List[str]:
     Returns:
         List of available tool names
     """
-    return detect_available_tools()
+    return get_enabled_and_available_tools("code-doc")
 
 
 def get_best_tool(doc_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:
@@ -399,6 +401,7 @@ def run_consultation(
     printer: Optional['PrettyPrinter'] = None,
     doc_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> Tuple[bool, str]:
     """
     Run consultation with an AI tool.
@@ -411,6 +414,7 @@ def run_consultation(
         printer: Optional PrettyPrinter for consistent output (falls back to print if None)
         doc_type: Optional documentation type for contextual model overrides
         model_override: Optional CLI override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         Tuple of (success: bool, output: str)
@@ -459,7 +463,15 @@ def run_consultation(
             print("=" * 60)
         sys.stdout.flush()
 
-    response = execute_tool(tool, prompt, model=resolved_model, timeout=timeout)
+    response = execute_tool_with_fallback(
+        skill_name="code-doc",
+        tool=tool,
+        prompt=prompt,
+        model=resolved_model,
+        timeout=timeout,
+        context={"doc_type": doc_type} if doc_type else None,
+        tracker=tracker,
+    )
 
     if response.success:
         return True, response.output
@@ -594,15 +606,18 @@ def consult_multi_agent(
         task_areas = "Project Overview, Domain Concepts, Critical Files, Common Workflows, Potential Gotchas, Extension Patterns"
 
     # Print status message before running (this may take a while)
+    enabled_tools_map = ai_config.get_enabled_tools("code-doc")
+    final_agents = [agent for agent in ordered_agents if agent in enabled_tools_map]
+
     if printer:
-        printer.detail(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
-        printer.detail(f"   Tools: {', '.join(ordered_agents)}")
+        printer.detail(f"\n🤖 Consulting {len(final_agents)} AI models in parallel for {task_desc}...")
+        printer.detail(f"   Tools: {', '.join(final_agents)}")
         printer.detail(f"   Analyzing: {task_areas}")
         if verbose:
             printer.info("=" * 60)
     else:
-        print(f"\n🤖 Consulting {len(ordered_agents)} AI models in parallel for {task_desc}...")
-        print(f"   Tools: {', '.join(ordered_agents)}")
+        print(f"\n🤖 Consulting {len(final_agents)} AI models in parallel for {task_desc}...")
+        print(f"   Tools: {', '.join(final_agents)}")
         print(f"   Analyzing: {task_areas}")
         if verbose:
             print("=" * 60)
@@ -611,7 +626,7 @@ def consult_multi_agent(
     # Use shared utility for parallel execution
     start_time = time.time()
     multi_response = execute_tools_parallel(
-        tools=ordered_agents,
+        tools=final_agents,
         prompt=prompt,
         models=resolved_models,
     )

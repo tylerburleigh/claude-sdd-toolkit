@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from claude_skills.common import ai_config
 from claude_skills.common.ai_tools import detect_available_tools
 
 from .cli_runner import run_cli
@@ -165,7 +166,12 @@ def test_consult_prompt_mode_respects_dry_run(mock_tool_env: dict[str, str]) -> 
         env=mock_tool_env,
     )
     assert result.returncode == 0
-    assert "gemini -m gemini-2.5-pro --output-format" in result.stdout
+    expected_model = ai_config.resolve_tool_model("run-tests", "gemini")
+    if expected_model is None:
+        priority = ai_config.DEFAULT_MODELS.get("gemini", {}).get("priority") or []
+        expected_model = priority[0] if priority else None
+    assert expected_model, "Expected run-tests gemini model to be configured"
+    assert f"gemini -m {expected_model} --output-format" in result.stdout
     assert "prompt with" in result.stdout.lower()
 
 

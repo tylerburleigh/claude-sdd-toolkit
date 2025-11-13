@@ -15,10 +15,12 @@ making complex specifications accessible at-a-glance.
 from typing import Dict, Any, Optional, Tuple, List
 from dataclasses import dataclass
 import json
+import inspect
 
-from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools
+from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools, consultation_limits
 from claude_skills.common.ai_config import resolve_tool_model
-from claude_skills.common.ai_tools import execute_tool, detect_available_tools, ToolStatus
+from claude_skills.common import ai_tools
+from claude_skills.common.ai_tools import ToolStatus
 
 
 @dataclass
@@ -345,8 +347,7 @@ Base your analysis on the spec data provided, including:
             >>> print(f"Available agents: {', '.join(agents)}")
             Available agents: gemini, cursor-agent
         """
-        tools = ["cursor-agent", "gemini", "codex"]
-        return detect_available_tools(tools, check_version=True)
+        return ai_tools.get_enabled_and_available_tools("sdd-render")
 
     def _resolve_model(self, agent: str, *, feature: str) -> Optional[str]:
         return resolve_tool_model(
@@ -356,9 +357,34 @@ Base your analysis on the spec data provided, including:
             context={"feature": feature},
         )
 
-    def _invoke_agent(self, agent: str, prompt: str, *, feature: str, timeout: int) :
+    def _invoke_agent(
+        self,
+        agent: str,
+        prompt: str,
+        *,
+        feature: str,
+        timeout: int,
+        tracker: Optional[consultation_limits.ConsultationTracker] = None,
+    ):
         model = self._resolve_model(agent, feature=feature)
-        return execute_tool(agent, prompt, model=model, timeout=timeout)
+        executor = ai_tools.execute_tool_with_fallback
+        params = inspect.signature(executor).parameters
+        if "skill_name" in params:
+            return executor(
+                skill_name="sdd-render",
+                tool=agent,
+                prompt=prompt,
+                model=model,
+                timeout=timeout,
+                context={"feature": feature},
+                tracker=tracker,
+            )
+        return executor(
+            agent,
+            prompt,
+            model=model,
+            timeout=timeout,
+        )
 
     @staticmethod
     def _format_failure(agent: str, response, timeout: int) -> str:

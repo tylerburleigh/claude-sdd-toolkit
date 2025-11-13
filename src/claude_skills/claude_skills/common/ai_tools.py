@@ -30,6 +30,8 @@ from claude_skills.common.providers import (
     resolve_provider,
     get_provider_detector,
 )
+from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 
 class ToolStatus(Enum):
@@ -400,6 +402,21 @@ def detect_available_tools(
     return available
 
 
+def get_enabled_and_available_tools(skill_name: str) -> list[str]:
+    """
+    Return a list of tool names that are both enabled and available.
+
+    Args:
+        skill_name: The skill context for loading configuration.
+
+    Returns:
+        A list of tool names that are ready for use.
+    """
+    enabled_tools = list(ai_config.get_enabled_tools(skill_name).keys())
+    return detect_available_tools(enabled_tools)
+
+
+
 def build_tool_command(
     tool: str,
     prompt: str,
@@ -524,6 +541,132 @@ def _remove_first_occurrence(items: list[str], token: str) -> tuple[list[str], b
 # =============================================================================
 # TOOL EXECUTION FUNCTIONS
 # =============================================================================
+
+
+def execute_tool_with_fallback(
+    skill_name: str,
+    tool: str,
+    prompt: str,
+    *,
+    model: Optional[str] = None,
+    timeout: int = 90,
+    context: Optional[dict] = None,
+    fallback_enabled: Optional[bool] = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
+) -> ToolResponse:
+    """
+    Execute AI tool with automatic fallback to alternative tools on failure.
+
+    This function implements tool-level fallback with hybrid retry strategy:
+    - Retries on transient errors (timeout, generic errors)
+    - Skips to next tool on permanent errors (not_found, invalid_output)
+    - Respects per-invocation consultation limits (max unique tools)
+
+    Args:
+        skill_name: Name of the skill (for config resolution)
+        tool: Primary tool name ("gemini", "codex", "cursor-agent")
+        prompt: The prompt to send to the tool
+        model: Optional model override
+        timeout: Timeout in seconds (default 90)
+        context: Optional context for contextual config resolution
+        fallback_enabled: Override fallback config (None = use config default)
+        tracker: Optional ConsultationTracker instance (None = create new one)
+
+    Returns:
+        ToolResponse from the first successful tool, or the last error if all fail
+
+    Example:
+        >>> tracker = consultation_limits.ConsultationTracker()
+        >>> response = execute_tool_with_fallback(
+        ...     skill_name="run-tests",
+        ...     tool="gemini",
+        ...     prompt="Analyze this failure",
+        ...     timeout=60,
+        ...     tracker=tracker
+        ... )
+        >>> if response.success:
+        ...     print(f"Succeeded with {response.tool}")
+        ... else:
+        ...     print(f"All tools failed: {response.error}")
+    """
+    # Get configuration
+    fallback_config = ai_config.get_fallback_config(skill_name)
+    enabled = fallback_enabled if fallback_enabled is not None else fallback_config.get("enabled", True)
+
+    # If fallback is disabled, just call the tool directly
+    if not enabled:
+        return execute_tool(tool, prompt, model=model, timeout=timeout)
+
+    # Get tool priority list and consultation limit
+    tool_priority = ai_config.get_tool_priority(skill_name, context=context)
+    max_tools = ai_config.get_consultation_limit(skill_name)
+
+    # Get retry configuration
+    max_retries = fallback_config.get("max_retries_per_tool", 2)
+    retry_delay = fallback_config.get("retry_delay_seconds", 1)
+    retry_on_status = fallback_config.get("retry_on_status", ["timeout", "error"])
+    skip_on_status = fallback_config.get("skip_on_status", ["not_found", "invalid_output"])
+
+    # Convert status names to ToolStatus enum values for comparison
+    retry_statuses = {ToolStatus(s) for s in retry_on_status if s in {e.value for e in ToolStatus}}
+    skip_statuses = {ToolStatus(s) for s in skip_on_status if s in {e.value for e in ToolStatus}}
+
+    # Use provided tracker or create a new one for this consultation
+    if tracker is None:
+        tracker = consultation_limits.ConsultationTracker()
+
+    # Ensure the requested tool is first in the priority list
+    if tool in tool_priority:
+        # Move it to front
+        tool_priority = [tool] + [t for t in tool_priority if t != tool]
+    else:
+        # Add it as first priority
+        tool_priority = [tool] + tool_priority
+
+    last_response: Optional[ToolResponse] = None
+
+    # Try each tool in priority order
+    for current_tool in tool_priority:
+        # Check if we've exceeded the consultation limit
+        if not tracker.check_limit(current_tool, max_tools):
+            # Can't consult this tool - would exceed limit
+            continue
+
+        # Record that we're about to consult this tool
+        tracker.record_consultation(current_tool)
+
+        # Try this tool with retries
+        for attempt in range(max_retries + 1):  # +1 for initial attempt
+            response = execute_tool(current_tool, prompt, model=model, timeout=timeout)
+            last_response = response
+
+            # Success! Return immediately
+            if response.success:
+                return response
+
+            # Check if we should retry this tool
+            if attempt < max_retries and response.status in retry_statuses:
+                # Transient error - retry after delay
+                time.sleep(retry_delay)
+                continue
+
+            # Check if we should skip to next tool immediately
+            if response.status in skip_statuses:
+                # Permanent error - skip to next tool without further retries
+                break
+
+            # Non-retryable error or exhausted retries - move to next tool
+            break
+
+    # All tools failed - return the last error response
+    return last_response or ToolResponse(
+        tool=tool,
+        status=ToolStatus.ERROR,
+        error="No tools available for consultation",
+        output="",
+        duration=0.0,
+        timestamp=datetime.now().isoformat(),
+    )
 
 
 def execute_tool(
@@ -730,6 +873,7 @@ __all__ = [
     "MultiToolResponse",
     "check_tool_available",
     "detect_available_tools",
+    "get_enabled_and_available_tools",
     "build_tool_command",
     "execute_tool",
     "execute_tools_parallel",

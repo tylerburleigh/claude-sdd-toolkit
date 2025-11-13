@@ -27,12 +27,11 @@ from .base import (
     StreamChunk,
     TokenUsage,
 )
-from .registry import register_provider
 from .detectors import detect_provider_availability
+from .registry import register_provider
 
 DEFAULT_BINARY = "cursor-agent"
 DEFAULT_TIMEOUT_SECONDS = 360
-DEFAULT_TEMPERATURE = 0.3
 AVAILABILITY_OVERRIDE_ENV = "CURSOR_AGENT_CLI_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "CURSOR_AGENT_CLI_BINARY"
 
@@ -98,8 +97,6 @@ CURSOR_METADATA = ProviderMetadata(
     extra={"cli": "cursor-agent", "command": "cursor-agent chat"},
 )
 
-_JSON_FLAG = "--json"
-
 
 class CursorAgentProvider(ProviderContext):
     """ProviderContext implementation backed by cursor-agent."""
@@ -120,7 +117,9 @@ class CursorAgentProvider(ProviderContext):
         self._binary = binary or os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
         self._env = env
         self._timeout = timeout or DEFAULT_TIMEOUT_SECONDS
-        self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
+        self._model = self._ensure_model(
+            model or metadata.default_model or self._first_model_id()
+        )
 
     def _first_model_id(self) -> str:
         if not self.metadata.models:
@@ -140,17 +139,18 @@ class CursorAgentProvider(ProviderContext):
         return candidate
 
     def _build_command(self, request: GenerationRequest, model: str) -> List[str]:
-        command = [self._binary, "chat", _JSON_FLAG]
+        """Assemble the cursor-agent CLI invocation."""
+        command = [self._binary, "chat", "--json"]
 
-        working_dir = (request.metadata or {}).get("working_directory") if request.metadata else None
+        working_dir = (request.metadata or {}).get("working_directory")
         if working_dir:
             command.extend(["--working-directory", str(working_dir)])
 
-        temperature = request.temperature if request.temperature is not None else DEFAULT_TEMPERATURE
-        command.extend(["--temperature", str(temperature)])
+        if request.temperature is not None:
+            command.extend(["--temperature", str(request.temperature)])
 
         if request.max_tokens is not None:
-            command.extend(["--max-tokens", str(int(request.max_tokens))])
+            command.extend(["--max-tokens", str(request.max_tokens)])
 
         if model:
             command.extend(["--model", model])
@@ -164,8 +164,7 @@ class CursorAgentProvider(ProviderContext):
                 if isinstance(flag, str) and flag.strip():
                     command.append(flag.strip())
 
-        prompt = request.prompt
-        command.extend(["--prompt", prompt])
+        command.extend(["--prompt", request.prompt])
         return command
 
     def _run(
@@ -182,57 +181,38 @@ class CursorAgentProvider(ProviderContext):
                 provider=self.metadata.provider_name,
             ) from exc
         except subprocess.TimeoutExpired as exc:
-            raise ProviderTimeoutError(str(exc), provider=self.metadata.provider_name) from exc
-
-    def _cursor_json_flag_error(self, result: subprocess.CompletedProcess[str]) -> bool:
-        if result.returncode == 0:
-            return False
-        diagnostics = " ".join(
-            part for part in [(result.stderr or ""), (result.stdout or "")]
-        ).lower()
-        if _JSON_FLAG not in diagnostics:
-            return False
-        indicators = [
-            "unrecognized option",
-            "unknown option",
-            "unrecognized argument",
-            "unknown argument",
-            "no such option",
-            "does not support",
-            "not support",
-            "flag provided but not defined",
-            "invalid option",
-        ]
-        return any(indicator in diagnostics for indicator in indicators)
-
-    def _remove_json_flag(self, command: Sequence[str]) -> List[str]:
-        removed = False
-        result: List[str] = []
-        for token in command:
-            if token == _JSON_FLAG and not removed:
-                removed = True
-                continue
-            result.append(token)
-        return result
+            raise ProviderTimeoutError(
+                str(exc), provider=self.metadata.provider_name
+            ) from exc
 
     def _run_with_retry(
         self,
         command: Sequence[str],
         timeout: Optional[int],
     ) -> Tuple[subprocess.CompletedProcess[str], bool]:
+        """
+        Execute the command and retry without --json when the CLI lacks support.
+        """
         completed = self._run(command, timeout=timeout)
         if completed.returncode == 0:
             return completed, True
-        if self._cursor_json_flag_error(completed):
-            retried_command = self._remove_json_flag(command)
-            retry_completed = self._run(retried_command, timeout=timeout)
-            if retry_completed.returncode == 0:
-                return retry_completed, False
+
+        stderr_text = (completed.stderr or "").lower()
+        if "--json" in command and any(
+            phrase in stderr_text for phrase in ("unknown option", "unrecognized option")
+        ):
+            retry_command = [part for part in command if part != "--json"]
+            retry_process = self._run(retry_command, timeout=timeout)
+            if retry_process.returncode == 0:
+                return retry_process, False
+
+            stderr_text = (retry_process.stderr or stderr_text).strip()
             raise ProviderExecutionError(
-                f"Cursor Agent CLI rejected {_JSON_FLAG} and retry failed: "
-                f"{(retry_completed.stderr or '').strip() or 'unknown error'}",
+                f"Cursor Agent CLI exited with code {retry_process.returncode}: "
+                f"{stderr_text or 'no stderr'}",
                 provider=self.metadata.provider_name,
             )
+
         raise ProviderExecutionError(
             f"Cursor Agent CLI exited with code {completed.returncode}: "
             f"{(completed.stderr or '').strip() or 'no stderr'}",
@@ -263,8 +243,12 @@ class CursorAgentProvider(ProviderContext):
     def _usage_from_payload(self, payload: Dict[str, Any]) -> TokenUsage:
         usage = payload.get("usage") or {}
         return TokenUsage(
-            input_tokens=int(usage.get("input_tokens") or usage.get("prompt_tokens") or 0),
-            output_tokens=int(usage.get("output_tokens") or usage.get("completion_tokens") or 0),
+            input_tokens=int(
+                usage.get("input_tokens") or usage.get("prompt_tokens") or 0
+            ),
+            output_tokens=int(
+                usage.get("output_tokens") or usage.get("completion_tokens") or 0
+            ),
             total_tokens=int(usage.get("total_tokens") or 0),
             metadata={"raw_usage": usage} if usage else {},
         )
@@ -282,7 +266,9 @@ class CursorAgentProvider(ProviderContext):
             )
 
         model = self._ensure_model(
-            str(request.metadata.get("model")) if request.metadata and "model" in request.metadata else self._model
+            str(request.metadata.get("model"))
+            if request.metadata and "model" in request.metadata
+            else self._model
         )
 
         command = self._build_command(request, model)
@@ -291,7 +277,8 @@ class CursorAgentProvider(ProviderContext):
 
         if json_mode:
             payload = self._parse_json_payload(completed.stdout)
-            content = str(payload.get("content") or "").strip()
+            # cursor-agent returns content in "result" field
+            content = str(payload.get("result") or payload.get("content") or "").strip()
             if not content and payload.get("messages"):
                 content = " ".join(
                     str(message.get("content") or "")

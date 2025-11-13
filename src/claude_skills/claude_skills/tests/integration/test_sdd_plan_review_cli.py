@@ -63,7 +63,7 @@ def test_cli_creates_dual_artifacts(plan_review_spec: Path) -> None:
     args = make_args(plan_review_spec)
     json_payload = {"artifact": "integration-json"}
 
-    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["mock"]), \
+    with patch("claude_skills.sdd_plan_review.cli.get_enabled_and_available_tools", return_value=["mock"]), \
          patch("claude_skills.sdd_plan_review.cli.review_with_tools", return_value=fake_results()), \
          patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="Integration markdown\n"), \
          patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value=json_payload):
@@ -88,7 +88,7 @@ def test_cli_keeps_explicit_output(plan_review_spec: Path, tmp_path: Path) -> No
     args = make_args(plan_review_spec, output=str(custom_output))
     json_payload = {"artifact": "custom-json"}
 
-    with patch("claude_skills.sdd_plan_review.cli.detect_available_tools", return_value=["mock"]), \
+    with patch("claude_skills.sdd_plan_review.cli.get_enabled_and_available_tools", return_value=["mock"]), \
          patch("claude_skills.sdd_plan_review.cli.review_with_tools", return_value=fake_results()), \
          patch("claude_skills.sdd_plan_review.cli.generate_markdown_report", return_value="Integration markdown\n"), \
          patch("claude_skills.sdd_plan_review.cli.generate_json_report", return_value=json_payload):

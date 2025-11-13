@@ -25,7 +25,7 @@ from .consultation import (
     ConsultationError
 )
 from claude_skills.common.ai_tools import (
-    detect_available_tools,
+    get_enabled_and_available_tools,
     check_tool_available
 )
 from claude_skills.common.progress import ProgressEmitter
@@ -341,7 +341,7 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
     """
     try:
         # Detect all available tools
-        available_tools = detect_available_tools()
+        available_tools = get_enabled_and_available_tools("sdd-fidelity-review")
         all_tools = ["gemini", "codex", "cursor-agent"]
 
         # Build tool status information

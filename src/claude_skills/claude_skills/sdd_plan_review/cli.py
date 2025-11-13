@@ -20,9 +20,9 @@ from claude_skills.common import (
 )
 from claude_skills.sdd_plan_review import (
     check_tool_available,
-    detect_available_tools,
     review_with_tools,
 )
+from claude_skills.common.ai_tools import get_enabled_and_available_tools
 from claude_skills.sdd_plan_review.reporting import (
     generate_markdown_report,
     generate_json_report,
@@ -89,7 +89,7 @@ def cmd_review(args, printer):
     printer.info(f"Reviewing specification: {spec_file}")
 
     # Detect available tools
-    available_tools = detect_available_tools()
+    available_tools = get_enabled_and_available_tools("sdd-plan-review")
 
     if not available_tools:
         printer.error("No AI CLI tools available")
