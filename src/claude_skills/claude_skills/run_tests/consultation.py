@@ -82,7 +82,13 @@ def get_flags_for_tool(tool: str) -> List[str]:
         return TOOL_FLAGS.get(tool, [])
 
     tool_config = model_config[tool]
-    return tool_config.get('flags', TOOL_FLAGS.get(tool, []))
+
+    # Handle case where tool_config is a string (e.g., just a model name)
+    if isinstance(tool_config, dict):
+        return tool_config.get('flags', TOOL_FLAGS.get(tool, []))
+
+    # If not a dict, it can't have flags, so use default
+    return TOOL_FLAGS.get(tool, [])
 
 
 # =============================================================================
