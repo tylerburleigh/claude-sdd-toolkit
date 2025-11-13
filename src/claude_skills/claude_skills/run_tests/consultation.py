@@ -13,11 +13,12 @@ import time
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.ai_tools import (
-    build_tool_command, execute_tool, execute_tools_parallel,
+    build_tool_command, execute_tool_with_fallback, execute_tools_parallel,
     ToolResponse, ToolStatus, MultiToolResponse, detect_available_tools,
     get_enabled_and_available_tools,
 )
 from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 
 # =============================================================================
@@ -451,6 +452,7 @@ def run_consultation(
     printer: Optional[PrettyPrinter] = None,
     failure_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> int:
     """
     Run the external tool consultation.
@@ -462,6 +464,7 @@ def run_consultation(
         printer: PrettyPrinter instance (creates default if None)
         failure_type: Optional failure type for model selection
         model_override: Optional explicit model override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         Exit code from the tool
@@ -495,9 +498,17 @@ def run_consultation(
     print("=" * 60)
     print()
 
-    # Use shared execute_tool() implementation
+    # Use shared execute_tool_with_fallback() implementation
     timeout = get_consultation_timeout()
-    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+    response = execute_tool_with_fallback(
+        skill_name="run-tests",
+        tool=tool,
+        prompt=prompt,
+        model=model,
+        timeout=timeout,
+        context={"failure_type": failure_type} if failure_type else None,
+        tracker=tracker,
+    )
 
     # Handle user interrupt (Ctrl+C) - execute_tool doesn't catch this
     # so we need to keep the try/except here
@@ -691,6 +702,7 @@ def run_tool_parallel(
     prompt: str,
     failure_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> ConsultationResponse:
     """
     Run a single tool consultation and capture output.
@@ -700,6 +712,7 @@ def run_tool_parallel(
         prompt: Formatted prompt
         failure_type: Optional failure type for model selection
         model_override: Optional explicit model override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         ConsultationResponse with results
@@ -708,8 +721,16 @@ def run_tool_parallel(
     model = get_model_for_tool(tool, failure_type, override=model_override)
     timeout = get_consultation_timeout()
 
-    # Use shared execute_tool() implementation
-    response = execute_tool(tool, prompt, model=model, timeout=timeout)
+    # Use shared execute_tool_with_fallback() implementation
+    response = execute_tool_with_fallback(
+        skill_name="run-tests",
+        tool=tool,
+        prompt=prompt,
+        model=model,
+        timeout=timeout,
+        context={"failure_type": failure_type} if failure_type else None,
+        tracker=tracker,
+    )
 
     # Convert ToolResponse to ConsultationResponse for backward compatibility
     return ConsultationResponse(

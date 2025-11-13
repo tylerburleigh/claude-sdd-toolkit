@@ -174,8 +174,8 @@ class CodexProvider(ProviderContext):
         return attachments
 
     def _build_command(self, model: str, prompt: str, attachments: List[str]) -> List[str]:
-        # Note: codex CLI does not support --json flag, it outputs JSONL by default
-        command = [self._binary, "exec", "--sandbox", "read-only"]
+        # Note: codex CLI requires --json flag for JSONL output (non-interactive mode)
+        command = [self._binary, "exec", "--sandbox", "read-only", "--json"]
         if model:
             command.extend(["-m", model])
         for path in attachments:
@@ -213,11 +213,21 @@ class CodexProvider(ProviderContext):
         return ""
 
     def _extract_agent_text(self, payload: Dict[str, Any]) -> str:
+        # Check if this is an item with type="agent_message" or type="reasoning"
+        item_type = payload.get("type")
+        if item_type in ("agent_message", "reasoning"):
+            text = self._flatten_text(payload)
+            if text:
+                return text
+
+        # Check for specific message keys
         for key in ("agent_message", "message", "delta", "content"):
             if key in payload:
                 text = self._flatten_text(payload[key])
                 if text:
                     return text
+
+        # Recurse into nested item
         item = payload.get("item")
         if isinstance(item, dict):
             return self._extract_agent_text(item)

@@ -45,6 +45,25 @@ class ProviderStatus(Enum):
     ERROR = "error"
     CANCELED = "canceled"
 
+    def is_retryable(self) -> bool:
+        """
+        Check if this status represents a transient failure that may succeed on retry.
+
+        Retryable statuses:
+            - TIMEOUT: May succeed with more time or if temporary resource contention resolves
+            - ERROR: Generic errors may be transient (network issues, rate limits, etc.)
+
+        Non-retryable statuses:
+            - SUCCESS: Already succeeded
+            - NOT_FOUND: Provider/tool not available (won't change on retry)
+            - INVALID_OUTPUT: Provider responded but output was malformed (unlikely to fix on retry)
+            - CANCELED: Explicitly canceled (shouldn't retry)
+
+        Returns:
+            True if the status is retryable, False otherwise
+        """
+        return self in (ProviderStatus.TIMEOUT, ProviderStatus.ERROR)
+
 
 class ProviderError(RuntimeError):
     """Base exception for provider orchestration."""

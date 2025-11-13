@@ -17,7 +17,7 @@ from copy import deepcopy
 from claude_skills.common.ai_tools import (
     ToolResponse,
     ToolStatus,
-    execute_tool,
+    execute_tool_with_fallback,
     execute_tools_parallel,
     detect_available_tools,
     get_enabled_and_available_tools,
@@ -25,6 +25,7 @@ from claude_skills.common.ai_tools import (
 )
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 # Import cache modules with fallback
 try:
@@ -640,12 +641,13 @@ def consult_ai_on_fidelity(
     prompt: str,
     tool: Optional[str] = None,
     model: Optional[str] = None,
-    timeout: int = 600
+    timeout: int = 600,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> ToolResponse:
     """
     Consult an AI tool for implementation fidelity review.
 
-    Simplified wrapper around execute_tool() with fidelity-review defaults
+    Simplified wrapper around execute_tool_with_fallback() with fidelity-review defaults
     and comprehensive error handling.
 
     Args:
@@ -654,6 +656,7 @@ def consult_ai_on_fidelity(
               If None, uses first available tool.
         model: Model to request (optional, tool-specific)
         timeout: Timeout in seconds (default: 600)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         ToolResponse object with consultation results
@@ -697,12 +700,14 @@ def consult_ai_on_fidelity(
             override=model,
         )
 
-        # Execute consultation
-        response = execute_tool(
+        # Execute consultation with fallback
+        response = execute_tool_with_fallback(
+            skill_name=FIDELITY_SKILL_NAME,
             tool=tool,
             prompt=prompt,
             model=resolved_model,
-            timeout=timeout
+            timeout=timeout,
+            tracker=tracker,
         )
 
         # Handle timeout status

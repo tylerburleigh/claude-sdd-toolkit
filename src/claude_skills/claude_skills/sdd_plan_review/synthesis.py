@@ -12,7 +12,8 @@ from typing import Dict, Any, List, Optional, Tuple
 from statistics import mean, median
 
 from claude_skills.common import ai_config
-from claude_skills.common.ai_tools import execute_tool, ToolStatus
+from claude_skills.common.ai_tools import execute_tool_with_fallback, ToolStatus
+from claude_skills.common import consultation_limits
 
 
 def parse_response(tool_output: str, tool_name: str) -> Dict[str, Any]:
@@ -65,13 +66,16 @@ def synthesize_with_ai(
     responses: List[Dict[str, Any]],
     spec_id: str,
     spec_title: str,
-    working_dir: str = "/tmp"
+    working_dir: str = "/tmp",
 ) -> Dict[str, Any]:
     """
     Use AI to synthesize multiple model reviews into consensus.
 
     Instead of fragile regex parsing, let AI read natural language reviews
     and create structured synthesis.
+
+    Note: Synthesis always uses exactly 1 tool call (no retries, no fallback)
+    to avoid overcomplexity in the synthesis step.
 
     Args:
         responses: List of response dicts with "tool" and "raw_review" keys
@@ -166,11 +170,19 @@ def synthesize_with_ai(
     )
     timeout = ai_config.get_timeout("sdd-plan-review", "narrative")
 
-    response = execute_tool(
-        tool_name,
-        prompt,
+    # Synthesis: fallback allowed but no retries (1 attempt per tool)
+    # Uses separate tracker so it doesn't count against parallel review limit
+    # Config has max_retries_per_tool: 0 for sdd-plan-review to enforce this
+    synthesis_tracker = consultation_limits.ConsultationTracker()
+
+    response = execute_tool_with_fallback(
+        skill_name="sdd-plan-review",
+        tool=tool_name,
+        prompt=prompt,
         model=model,
         timeout=timeout,
+        context={"feature": "synthesis"},
+        tracker=synthesis_tracker,
     )
 
     if not response.success:
@@ -263,10 +275,49 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
     return data
 
 
+def _extract_dimension_scores_from_reviews(responses: List[Dict[str, Any]]) -> Dict[str, float]:
+    """
+    Extract and average dimension scores from individual model reviews.
+
+    Args:
+        responses: List of response dicts with raw_review text
+
+    Returns:
+        Dictionary mapping dimension names to average scores
+    """
+    dimensions = ["completeness", "clarity", "feasibility", "architecture", "risk_management", "verification"]
+    all_scores = {dim: [] for dim in dimensions}
+
+    for response in responses:
+        raw_review = response.get("raw_review", "")
+        if not raw_review:
+            continue
+
+        # Extract dimension scores from markdown (e.g., "- **Completeness**: 3/10")
+        for dim in dimensions:
+            dim_display = dim.replace("_", " ").title()
+            pattern = rf"\*\*{re.escape(dim_display)}\*\*:\s*(\d+)\s*/\s*10"
+            match = re.search(pattern, raw_review, re.IGNORECASE)
+            if match:
+                try:
+                    score = int(match.group(1))
+                    all_scores[dim].append(score)
+                except (ValueError, IndexError):
+                    pass
+
+    # Calculate averages
+    dimension_scores = {}
+    for dim, scores in all_scores.items():
+        if scores:
+            dimension_scores[dim] = round(sum(scores) / len(scores), 1)
+
+    return dimension_scores
+
+
 def build_consensus(
     responses: List[Dict[str, Any]],
     spec_id: str = "unknown",
-    spec_title: str = "Specification"
+    spec_title: str = "Specification",
 ) -> Dict[str, Any]:
     """
     Build consensus from multiple model responses using AI synthesis.
@@ -287,12 +338,12 @@ def build_consensus(
             "error": "No valid responses to synthesize",
         }
 
-    # Call AI synthesis
+    # Call AI synthesis (always 1 tool call, no fallback)
     synthesis_result = synthesize_with_ai(
         responses=responses,
         spec_id=spec_id,
         spec_title=spec_title,
-        working_dir="/tmp"
+        working_dir="/tmp",
     )
 
     if not synthesis_result.get("success"):
@@ -304,6 +355,9 @@ def build_consensus(
     synthesis_text = synthesis_result.get("synthesis_text", "")
     parsed_data = _parse_synthesis_text(synthesis_text)
 
+    # Extract and average dimension scores from individual reviews
+    dimension_scores = _extract_dimension_scores_from_reviews(responses)
+
     # Return synthesis in format expected by downstream code
     # The synthesis_text contains the full markdown synthesis
     return {
@@ -314,6 +368,7 @@ def build_consensus(
         "overall_score": parsed_data.get("overall_score"),
         "final_recommendation": parsed_data.get("final_recommendation"),
         "consensus_level": parsed_data.get("consensus_level"),
+        "dimension_scores": dimension_scores,
         "all_issues": parsed_data.get("all_issues", []),
         "all_strengths": parsed_data.get("all_strengths", []),
         "all_recommendations": parsed_data.get("all_recommendations", []),

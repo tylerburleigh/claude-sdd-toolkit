@@ -23,10 +23,11 @@ from claude_skills.common.ai_tools import (
     detect_available_tools,
     get_enabled_and_available_tools,
     execute_tools_parallel,
-    execute_tool,
+    execute_tool_with_fallback,
     ToolStatus,
 )
 from claude_skills.common import ai_config
+from claude_skills.common import consultation_limits
 
 # =============================================================================
 # CONFIGURATION
@@ -400,6 +401,7 @@ def run_consultation(
     printer: Optional['PrettyPrinter'] = None,
     doc_type: Optional[str] = None,
     model_override: Any = None,
+    tracker: Optional[consultation_limits.ConsultationTracker] = None,
 ) -> Tuple[bool, str]:
     """
     Run consultation with an AI tool.
@@ -412,6 +414,7 @@ def run_consultation(
         printer: Optional PrettyPrinter for consistent output (falls back to print if None)
         doc_type: Optional documentation type for contextual model overrides
         model_override: Optional CLI override (string or mapping)
+        tracker: Optional ConsultationTracker instance for limiting tool usage
 
     Returns:
         Tuple of (success: bool, output: str)
@@ -460,7 +463,15 @@ def run_consultation(
             print("=" * 60)
         sys.stdout.flush()
 
-    response = execute_tool(tool, prompt, model=resolved_model, timeout=timeout)
+    response = execute_tool_with_fallback(
+        skill_name="code-doc",
+        tool=tool,
+        prompt=prompt,
+        model=resolved_model,
+        timeout=timeout,
+        context={"doc_type": doc_type} if doc_type else None,
+        tracker=tracker,
+    )
 
     if response.success:
         return True, response.output

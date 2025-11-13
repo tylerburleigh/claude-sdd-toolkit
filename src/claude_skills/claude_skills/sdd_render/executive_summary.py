@@ -18,7 +18,8 @@ import json
 
 from claude_skills.common import get_agent_priority, get_timeout, get_enabled_tools
 from claude_skills.common.ai_config import resolve_tool_model
-from claude_skills.common.ai_tools import execute_tool, get_enabled_and_available_tools, ToolStatus
+from claude_skills.common.ai_tools import execute_tool_with_fallback, get_enabled_and_available_tools, ToolStatus
+from claude_skills.common import consultation_limits
 
 
 @dataclass
@@ -355,9 +356,25 @@ Base your analysis on the spec data provided, including:
             context={"feature": feature},
         )
 
-    def _invoke_agent(self, agent: str, prompt: str, *, feature: str, timeout: int) :
+    def _invoke_agent(
+        self,
+        agent: str,
+        prompt: str,
+        *,
+        feature: str,
+        timeout: int,
+        tracker: Optional[consultation_limits.ConsultationTracker] = None,
+    ):
         model = self._resolve_model(agent, feature=feature)
-        return execute_tool(agent, prompt, model=model, timeout=timeout)
+        return execute_tool_with_fallback(
+            skill_name="sdd-render",
+            tool=agent,
+            prompt=prompt,
+            model=model,
+            timeout=timeout,
+            context={"feature": feature},
+            tracker=tracker,
+        )
 
     @staticmethod
     def _format_failure(agent: str, response, timeout: int) -> str:

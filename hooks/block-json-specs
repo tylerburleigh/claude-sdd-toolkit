@@ -20,8 +20,11 @@ if [ -z "$file_path" ]; then
     exit 0
 fi
 
-# Check if file path matches **/specs/**/*.json pattern
-if [[ "$file_path" == *"/specs/"*".json" ]]; then
+# Check if file path matches specs/{active,pending,completed,archived}/**/*.json pattern
+if [[ "$file_path" == *"/specs/active/"*".json" ]] || \
+   [[ "$file_path" == *"/specs/pending/"*".json" ]] || \
+   [[ "$file_path" == *"/specs/completed/"*".json" ]] || \
+   [[ "$file_path" == *"/specs/archived/"*".json" ]]; then
     # Block the read with helpful error message
     cat >&2 <<'EOF'
 
