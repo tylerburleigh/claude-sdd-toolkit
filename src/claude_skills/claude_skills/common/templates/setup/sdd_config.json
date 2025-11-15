@@ -2,7 +2,8 @@
   "_comment": "SDD Output Configuration Template for SDD Toolkit",
   "_description": "Copy this file to sdd_config.json and customize as needed. Controls default output formats for SDD commands.",
   "output": {
-    "json": true,
-    "compact": true
+    "default_mode": "json",
+    "json_compact": true,
+    "default_verbosity": "quiet"
   }
 }

@@ -1,0 +1,1726 @@
+{
+  "spec_id": "cli-verbosity-rollout-2025-11-15-001",
+  "generated": "2025-11-15T14:30:00Z",
+  "last_updated": "2025-11-15T14:41:34.068898Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "CLI Verbosity Filtering Rollout to All Commands",
+      "description": "Apply the verbosity filtering infrastructure to all 60+ SDD command handlers that output JSON, making the three-tier verbosity system (QUIET/NORMAL/VERBOSE) functional in practice and achieving the 40-94% output reduction targets identified in the analysis phase.",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 75,
+      "completed_tasks": 0,
+      "metadata": {
+        "objectives": [
+          "Apply verbosity filtering to all 60+ JSON-outputting commands",
+          "Achieve measured output reductions (40-94% per command in QUIET mode)",
+          "Maintain 100% backward compatibility (NORMAL mode unchanged)",
+          "Verify no regressions in command functionality"
+        ],
+        "success_criteria": [
+          "All commands use prepare_output() for JSON filtering",
+          "Field sets defined for all commands",
+          "QUIET mode achieves target reductions on high-impact commands",
+          "All tests pass with no regressions",
+          "NORMAL mode output identical to before"
+        ],
+        "dependencies": {
+          "prerequisite_specs": [
+            "cli-verbosity-reduction-2025-11-09-001"
+          ],
+          "prerequisite_status": "completed"
+        }
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "High-Impact Commands (Priority 1)",
+      "description": "Apply verbosity filtering to the 8 commands identified in the analysis phase as having the highest output volume and reduction potential. This phase establishes the implementation pattern and validates the approach on the most critical commands.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 15,
+      "completed_tasks": 0,
+      "metadata": {
+        "risk_level": "medium",
+        "estimated_hours": 12
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2",
+          "phase-3",
+          "phase-4",
+          "phase-5"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7",
+        "task-1-8",
+        "task-1-9"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Add missing field sets to output_utils.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-3",
+          "task-1-8"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Define LIST_BLOCKERS_ESSENTIAL/STANDARD and FIND_SPECS_ESSENTIAL/STANDARD field sets"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Define LIST_BLOCKERS field sets",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "notes": "ESSENTIAL: task_id, blocked_by; STANDARD: same as essential (minimal command)"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Define FIND_SPECS field sets",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "notes": "ESSENTIAL: specs_dir; STANDARD: add metadata like auto_detected, exists"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Apply verbosity to list-specs command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Import and use LIST_SPECS_ESSENTIAL/STANDARD, target 60% reduction (7520\u21923000 chars)",
+        "line_reference": "~129"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Apply verbosity to query-tasks command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_query_tasks function, import QUERY_TASKS_ESSENTIAL/STANDARD, target 58% reduction",
+        "line_reference": "~805"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Apply verbosity to prepare-task command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_prepare_task function, import PREPARE_TASK_ESSENTIAL/STANDARD, target 53% reduction",
+        "line_reference": "~791, ~838"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "Apply verbosity to progress command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_progress function, import PROGRESS_ESSENTIAL/STANDARD, target 40% reduction",
+        "line_reference": "~628"
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "Apply verbosity to validate command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_validate function, import VALIDATE_ESSENTIAL/STANDARD, target 94% reduction on success",
+        "line_reference": "~288"
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "Apply verbosity to check-deps command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_check_deps function, import CHECK_DEPS_ESSENTIAL/STANDARD, target 49% reduction",
+        "line_reference": "~534"
+      }
+    },
+    "task-1-8": {
+      "type": "task",
+      "title": "Apply verbosity to list-blockers command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_list_blockers function, use new LIST_BLOCKERS field sets",
+        "line_reference": "~966"
+      }
+    },
+    "task-1-9": {
+      "type": "task",
+      "title": "Add JSON output to find-specs in VERBOSE mode",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": [
+          "task-1-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "cmd_find_specs: keep plain text for QUIET/NORMAL, add JSON output in VERBOSE mode with FIND_SPECS field sets",
+        "line_reference": "~289"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3",
+        "verify-1-4",
+        "verify-1-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Test high-impact commands with all verbosity levels",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Each of 8 commands tested with --quiet, default, and --verbose flags. Output verified for correct field inclusion/omission.",
+        "command": ""
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Verify output size reductions meet targets",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Measure character counts in QUIET mode: list-specs 60%, query-tasks 58%, prepare-task 53%, progress 40%, validate 94%, check-deps 49% reductions achieved",
+        "command": ""
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Verify NORMAL mode backward compatibility",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Compare NORMAL mode output before and after changes. Should be identical (no breaking changes).",
+        "command": ""
+      }
+    },
+    "verify-1-4": {
+      "type": "verify",
+      "title": "Run existing test suite",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/",
+        "expected": "All existing tests pass with no regressions"
+      }
+    },
+    "verify-1-5": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "sdd_next Module Remaining Commands",
+      "description": "Apply verbosity filtering to the remaining 13 commands in sdd_next module that weren't covered in Phase 1.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 16,
+      "completed_tasks": 0,
+      "metadata": {
+        "risk_level": "low",
+        "estimated_hours": 8
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 14,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Define field sets for sdd_next commands",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4",
+        "task-2-1-5",
+        "task-2-1-6",
+        "task-2-1-7",
+        "task-2-1-8",
+        "task-2-1-9",
+        "task-2-1-10",
+        "task-2-1-11",
+        "task-2-1-12",
+        "task-2-1-13"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Add field sets for: next-task, task-info, init-env, validate-spec, find-pattern, detect-project, find-tests, check-environment, find-circular-deps, find-related-files, validate-paths, spec-stats"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "NEXT_TASK field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "TASK_INFO field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "INIT_ENV field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "VALIDATE_SPEC field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-5": {
+      "type": "subtask",
+      "title": "FIND_PATTERN field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-6": {
+      "type": "subtask",
+      "title": "DETECT_PROJECT field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-7": {
+      "type": "subtask",
+      "title": "FIND_TESTS field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-8": {
+      "type": "subtask",
+      "title": "CHECK_ENVIRONMENT field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-9": {
+      "type": "subtask",
+      "title": "FIND_CIRCULAR_DEPS field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-10": {
+      "type": "subtask",
+      "title": "FIND_RELATED_FILES field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-11": {
+      "type": "subtask",
+      "title": "VALIDATE_PATHS field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-12": {
+      "type": "subtask",
+      "title": "SPEC_STATS field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1-13": {
+      "type": "subtask",
+      "title": "FORMAT_PLAN field sets",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Apply verbosity to sdd_next/cli.py commands",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Apply prepare_output pattern to 13 command functions using field sets from task-2-1"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test sdd_next commands with verbosity levels",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sample 3-5 commands from Phase 2 and test with --quiet, default, --verbose. Verify correct filtering.",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "sdd_update Module Remaining Commands",
+      "description": "Apply verbosity filtering to the remaining 16 commands in sdd_update module that weren't covered in Phase 1.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 19,
+      "completed_tasks": 0,
+      "metadata": {
+        "risk_level": "low",
+        "estimated_hours": 8
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2"
+      ],
+      "total_tasks": 17,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Define field sets for sdd_update commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2",
+        "task-3-1-3",
+        "task-3-1-4",
+        "task-3-1-5",
+        "task-3-1-6",
+        "task-3-1-7",
+        "task-3-1-8",
+        "task-3-1-9",
+        "task-3-1-10",
+        "task-3-1-11",
+        "task-3-1-12",
+        "task-3-1-13",
+        "task-3-1-14",
+        "task-3-1-15",
+        "task-3-1-16"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 16,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Add field sets for: add-assumption, list-assumptions, update-estimate, add-task, remove-task, time-report, status-report, audit-spec, get-task, get-journal, list-phases, check-complete, phase-time, reconcile-state, check-journaling, complete-task, create-task-commit"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "ADD_ASSUMPTION field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "LIST_ASSUMPTIONS field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-3": {
+      "type": "subtask",
+      "title": "UPDATE_ESTIMATE field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-4": {
+      "type": "subtask",
+      "title": "ADD_TASK field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-5": {
+      "type": "subtask",
+      "title": "REMOVE_TASK field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-6": {
+      "type": "subtask",
+      "title": "TIME_REPORT field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-7": {
+      "type": "subtask",
+      "title": "STATUS_REPORT field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-8": {
+      "type": "subtask",
+      "title": "AUDIT_SPEC field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-9": {
+      "type": "subtask",
+      "title": "GET_TASK field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-10": {
+      "type": "subtask",
+      "title": "GET_JOURNAL field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-11": {
+      "type": "subtask",
+      "title": "LIST_PHASES field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-12": {
+      "type": "subtask",
+      "title": "CHECK_COMPLETE field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-13": {
+      "type": "subtask",
+      "title": "PHASE_TIME field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-14": {
+      "type": "subtask",
+      "title": "RECONCILE_STATE field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-15": {
+      "type": "subtask",
+      "title": "CHECK_JOURNALING field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1-16": {
+      "type": "subtask",
+      "title": "COMPLETE_TASK and CREATE_TASK_COMMIT field sets",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Apply verbosity to sdd_update/cli.py commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Apply prepare_output pattern to 16 command functions using field sets from task-3-1"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Test sdd_update commands with verbosity levels",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sample 3-5 commands from Phase 3 and test with --quiet, default, --verbose. Verify correct filtering.",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Remaining Module Commands",
+      "description": "Apply verbosity filtering to commands in sdd_validate, context_tracker, cache, and sdd_plan_review modules.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {
+        "risk_level": "low",
+        "estimated_hours": 6
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4",
+        "task-4-5"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Define and apply field sets for sdd_validate commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Commands: fix, stats, analyze-deps"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "FIX_SPEC field sets and application",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~397, ~451"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "STATS field sets and application",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~549"
+      }
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "ANALYZE_DEPS field sets and application",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~600"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Define and apply field sets for context_tracker commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/context_tracker/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Commands using output_json at lines ~283, ~388, ~530"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "CONTEXT field sets and application to all context commands",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "Define and apply field sets for cache commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1",
+        "task-4-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/cache/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Commands: cache-clear, cache-stats"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "CACHE_CLEAR field sets and application",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~39, ~65"
+      }
+    },
+    "task-4-3-2": {
+      "type": "subtask",
+      "title": "CACHE_STATS field sets and application",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~112, ~127, ~137"
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "Define and apply field sets for sdd_plan_review commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Command: list-plan-review-tools"
+      }
+    },
+    "task-4-4-1": {
+      "type": "subtask",
+      "title": "LIST_TOOLS field sets and application",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "line_reference": "~302"
+      }
+    },
+    "task-4-5": {
+      "type": "task",
+      "title": "Update output_utils.py with all Phase 4 field sets",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Centralize all field set definitions from tasks 4-1 through 4-4"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3",
+        "verify-4-4",
+        "verify-4-5"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Test remaining module commands",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sample commands from each module (validate, context, cache, plan_review) with all verbosity levels",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Verify all field sets exported from output_utils.py",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Check output_utils.py exports all defined field sets and they're importable",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Run test suite for affected modules",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/test_sdd_validate.py tests/test_cache.py tests/test_context_tracker.py",
+        "expected": "All module tests pass"
+      }
+    },
+    "verify-4-4": {
+      "type": "verify",
+      "title": "Verify no commands were missed",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Grep for output_json and print_json_output calls, verify all have prepare_output filtering",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-5": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing & Verification",
+      "description": "Comprehensive testing to ensure no regressions, verify verbosity works correctly across all commands, and validate backward compatibility.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1",
+          "phase-2",
+          "phase-3",
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 12,
+      "completed_tasks": 0,
+      "metadata": {
+        "risk_level": "low",
+        "estimated_hours": 6
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "Test Implementation",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Create integration tests for verbosity filtering",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2",
+        "task-5-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_verbosity_rollout.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Test all verbosity levels across sample commands from each phase"
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "Test QUIET mode field filtering",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "notes": "Verify essential fields included, empty fields omitted, standard fields excluded"
+      }
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Test NORMAL mode backward compatibility",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "notes": "Verify output identical to previous implementation (no breaking changes)"
+      }
+    },
+    "task-5-1-3": {
+      "type": "subtask",
+      "title": "Test VERBOSE mode debug info",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "notes": "Verify _debug sections included where appropriate"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Create output size verification tests",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_output_reduction.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Measure character counts for high-impact commands, verify reduction targets met"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Create regression test suite",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_verbosity_regression.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Test commands that should NOT have changed (non-JSON commands, internal utilities)"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Final Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3",
+        "verify-5-4",
+        "verify-5-5",
+        "verify-5-6",
+        "verify-5-7"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Run complete test suite",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/ -v",
+        "expected": "All tests pass including new verbosity tests"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Verify output reduction targets achieved",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/test_output_reduction.py -v",
+        "expected": "High-impact commands meet reduction targets: list-specs 60%, query-tasks 58%, prepare-task 53%, progress 40%, validate 94%, check-deps 49%"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Manual smoke test of critical workflows",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test sdd-next workflow, sdd-update workflow, sdd-validate workflow with --quiet and --verbose flags. All work as expected.",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-4": {
+      "type": "verify",
+      "title": "Verify no commands missed",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Grep for all output_json and print_json_output calls, confirm all have verbosity filtering or are intentionally excluded",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-5": {
+      "type": "verify",
+      "title": "Verify documentation updated",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "README or docs mention --quiet/--verbose flags, verbosity system documented",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-6": {
+      "type": "verify",
+      "title": "Full spec implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-7": {
+      "type": "verify",
+      "title": "Performance impact assessment",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Verify prepare_output() adds negligible overhead (<5ms per command)",
+        "command": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    }
+  }
+}

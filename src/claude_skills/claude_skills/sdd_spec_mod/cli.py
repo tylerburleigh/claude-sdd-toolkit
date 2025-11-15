@@ -64,7 +64,7 @@ def cmd_apply_modifications(args, printer):
     printer.detail(f"From: {mod_file}")
 
     # Load spec
-    spec_data = load_json_spec(str(spec_file))
+    spec_data = load_json_spec(args.spec_id, specs_dir)
     if not spec_data:
         printer.error("Failed to load spec file")
         return 1
