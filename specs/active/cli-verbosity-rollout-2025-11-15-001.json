@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:29:21.826051Z",
+  "last_updated": "2025-11-15T17:30:15.721491Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -583,7 +583,7 @@
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -649,12 +649,19 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "TASK_INFO field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-15T17:29:52.369207Z",
+        "status_note": "Defining TASK_INFO field sets",
+        "completed_at": "2025-11-15T17:30:15.708841Z",
+        "needs_journaling": false,
+        "actual_hours": 0.006,
+        "journaled_at": "2025-11-15T17:30:15.716624Z"
+      }
     },
     "task-2-1-3": {
       "type": "subtask",
@@ -1834,7 +1841,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 21,
+    "progress_percentage": 22,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2008,6 +2015,15 @@
       "content": "Defined NEXT_TASK field sets in output_utils.py. Added NEXT_TASK_ESSENTIAL (task_id, title, status) and NEXT_TASK_STANDARD (task_id, title, status, file_path, estimated_hours) following the established pattern from other commands. File modified: src/claude_skills/claude_skills/cli/sdd/output_utils.py (lines 175-177).",
       "metadata": {},
       "task_id": "task-2-1-1"
+    },
+    {
+      "timestamp": "2025-11-15T17:30:15.716609Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: TASK_INFO field sets",
+      "author": "claude-code",
+      "content": "Defined TASK_INFO field sets in output_utils.py. Added TASK_INFO_ESSENTIAL (type, title, status) and TASK_INFO_STANDARD (type, title, status, parent, children, dependencies, total_tasks, completed_tasks, metadata). File modified: src/claude_skills/claude_skills/cli/sdd/output_utils.py (lines 179-184).",
+      "metadata": {},
+      "task_id": "task-2-1-2"
     }
   ]
 }

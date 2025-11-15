@@ -175,3 +175,10 @@ FIND_SPECS_STANDARD = {'specs_dir', 'auto_detected', 'exists'}
 # next-task command
 NEXT_TASK_ESSENTIAL = {'task_id', 'title', 'status'}
 NEXT_TASK_STANDARD = {'task_id', 'title', 'status', 'file_path', 'estimated_hours'}
+
+# task-info command
+TASK_INFO_ESSENTIAL = {'type', 'title', 'status'}
+TASK_INFO_STANDARD = {
+    'type', 'title', 'status', 'parent', 'children',
+    'dependencies', 'total_tasks', 'completed_tasks', 'metadata'
+}
