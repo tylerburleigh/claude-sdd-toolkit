@@ -598,3 +598,21 @@ DOC_ANALYZE_ESSENTIAL = {'status', 'project', 'statistics'}
 DOC_ANALYZE_STANDARD = {
     'status', 'project', 'statistics'
 }
+
+# run_tests check-tools command
+RUN_TESTS_CHECK_TOOLS_ESSENTIAL = {'available_count', 'available_tools'}
+RUN_TESTS_CHECK_TOOLS_STANDARD = {
+    'tools', 'available_count', 'available_tools'
+}
+
+# run_tests consult command (error responses)
+RUN_TESTS_CONSULT_ESSENTIAL = {'status', 'message'}
+RUN_TESTS_CONSULT_STANDARD = {
+    'status', 'message'
+}
+
+# run_tests run command (error responses)
+RUN_TESTS_RUN_ESSENTIAL = {'status', 'message'}
+RUN_TESTS_RUN_STANDARD = {
+    'status', 'message'
+}

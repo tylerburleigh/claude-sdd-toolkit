@@ -12,6 +12,15 @@ from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.ai_tools import get_enabled_and_available_tools
 from claude_skills.common import ai_config
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    RUN_TESTS_CHECK_TOOLS_ESSENTIAL,
+    RUN_TESTS_CHECK_TOOLS_STANDARD,
+    RUN_TESTS_CONSULT_ESSENTIAL,
+    RUN_TESTS_CONSULT_STANDARD,
+    RUN_TESTS_RUN_ESSENTIAL,
+    RUN_TESTS_RUN_STANDARD,
+)
 from claude_skills.run_tests.consultation import (
     consult_with_auto_routing,
     consult_multi_agent,
@@ -100,6 +109,7 @@ def cmd_check_tools(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             "available_count": len(available_tools),
             "available_tools": available_tools
         }
+        result = prepare_output(result, args, RUN_TESTS_CHECK_TOOLS_ESSENTIAL, RUN_TESTS_CHECK_TOOLS_STANDARD)
         _dump_json(result)
         return 0
 
@@ -131,7 +141,9 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         if tool is None:
             available_tools = get_enabled_and_available_tools("run-tests")
             if not available_tools:
-                if _maybe_json(args, {"status": "error", "message": "No external tools found"}):
+                error_payload = {"status": "error", "message": "No external tools found"}
+                error_payload = prepare_output(error_payload, args, RUN_TESTS_CONSULT_ESSENTIAL, RUN_TESTS_CONSULT_STANDARD)
+                if _maybe_json(args, error_payload):
                     return 1
                 printer.error("No external tools found")
                 printer.info("Install at least one: gemini, codex, or cursor-agent")
@@ -146,13 +158,17 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         )
 
     if not args.failure_type:
-        if _maybe_json(args, {"status": "error", "message": "failure_type is required"}):
+        error_payload = {"status": "error", "message": "failure_type is required"}
+        error_payload = prepare_output(error_payload, args, RUN_TESTS_CONSULT_ESSENTIAL, RUN_TESTS_CONSULT_STANDARD)
+        if _maybe_json(args, error_payload):
             return 1
         printer.error("failure_type is required when not using --prompt")
         return 1
 
     if not args.error or not args.hypothesis:
-        if _maybe_json(args, {"status": "error", "message": "--error and --hypothesis are required"}):
+        error_payload = {"status": "error", "message": "--error and --hypothesis are required"}
+        error_payload = prepare_output(error_payload, args, RUN_TESTS_CONSULT_ESSENTIAL, RUN_TESTS_CONSULT_STANDARD)
+        if _maybe_json(args, error_payload):
             return 1
         printer.error("--error and --hypothesis are required for auto-formatting")
         return 1
@@ -228,7 +244,9 @@ def cmd_run(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         return 0
 
     if args.preset and not validate_preset(args.preset):
-        if _maybe_json(args, {"status": "error", "message": f"Unknown preset: {args.preset}"}):
+        error_payload = {"status": "error", "message": f"Unknown preset: {args.preset}"}
+        error_payload = prepare_output(error_payload, args, RUN_TESTS_RUN_ESSENTIAL, RUN_TESTS_RUN_STANDARD)
+        if _maybe_json(args, error_payload):
             return 1
         printer.error(f"Unknown preset: {args.preset}")
         printer.info("Use --list to see available presets")

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 16:08:29
+**Generated:** 2025-11-15 16:19:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 110631
+- **Total Lines:** 110663
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.71
@@ -8502,7 +8502,7 @@ If a parser's dependencies aren't available, it's skipped silently.
 ### `_basic_doc_validation(doc) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:91`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:100`
 **Complexity:** 2
 
 **Parameters:**
@@ -9579,7 +9579,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:104`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:113`
 **Complexity:** 1
 
 **Parameters:**
@@ -9703,7 +9703,7 @@ Returns:
 ### `_exclude_patterns(extra) -> list[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:116`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:125`
 **Complexity:** 2
 
 **Parameters:**
@@ -10336,7 +10336,7 @@ Example:
 ### `_handle_error(args, printer, exc) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:120`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:129`
 **Complexity:** 3
 
 **Parameters:**
@@ -11251,7 +11251,7 @@ Extracts issues from sections:
 ### `_parse_model_override(values) -> Optional[object]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:130`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:139`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -11507,7 +11507,7 @@ Args:
 ### `_print_if_json(args, payload, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:109`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:118`
 **Complexity:** 2
 
 **Parameters:**
@@ -12102,7 +12102,7 @@ Returns:
 ### `_schema_warning(printer, args, message) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:97`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:106`
 **Complexity:** 2
 
 **Parameters:**
@@ -14669,7 +14669,7 @@ Example:
 ### `cmd_analyze(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:324`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:337`
 **Complexity:** 10
 
 **Parameters:**
@@ -14696,7 +14696,7 @@ Example:
 ### `cmd_analyze_with_ai(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:381`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:395`
 ⚠️ **Complexity:** 17 (High)
 
 **Parameters:**
@@ -15360,7 +15360,7 @@ Returns:
 ### `cmd_generate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:170`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:179`
 **Complexity:** 9
 
 **Parameters:**
@@ -16144,7 +16144,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:225`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:236`
 ⚠️ **Complexity:** 23 (High)
 
 **Parameters:**
@@ -25493,7 +25493,7 @@ Args:
 ### `register_code_doc(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:549`
+**Defined in:** `src/claude_skills/claude_skills/code_doc/cli.py:563`
 **Complexity:** 1
 
 **Description:**
@@ -33855,6 +33855,13 @@ Returns:
 
 - `__future__.annotations`
 - `argparse`
+- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_ANALYZE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_GENERATE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.DOC_VALIDATE_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.code_doc.ai_consultation.compose_ai_context_doc`
 - `claude_skills.code_doc.ai_consultation.compose_architecture_doc`
 - `claude_skills.code_doc.ai_consultation.generate_ai_context_docs`
