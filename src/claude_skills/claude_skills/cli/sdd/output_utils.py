@@ -472,3 +472,111 @@ REFACTOR_CANDIDATES_STANDARD = {
     'candidates', 'total_candidates', 'high_priority',
     'medium_priority', 'low_priority'
 }
+
+# ============================================================================
+# sdd_update metadata commands - 15 field set pairs
+# ============================================================================
+
+# update-status command (sdd_update)
+UPDATE_STATUS_ESSENTIAL = {'success', 'task_id', 'new_status'}
+UPDATE_STATUS_STANDARD = {
+    'success', 'task_id', 'new_status', 'old_status',
+    'updated_at', 'spec_id', 'status_note'
+}
+
+# mark-blocked command (sdd_update)
+MARK_BLOCKED_ESSENTIAL = {'success', 'task_id'}
+MARK_BLOCKED_STANDARD = {
+    'success', 'task_id', 'spec_id', 'blocked_by',
+    'reason', 'marked_at'
+}
+
+# unblock-task command (sdd_update)
+UNBLOCK_TASK_ESSENTIAL = {'success', 'task_id'}
+UNBLOCK_TASK_STANDARD = {
+    'success', 'task_id', 'spec_id', 'unblocked_at',
+    'previously_blocked_by'
+}
+
+# add-journal command (sdd_update)
+ADD_JOURNAL_ESSENTIAL = {'success', 'entry_id'}
+ADD_JOURNAL_STANDARD = {
+    'success', 'entry_id', 'spec_id', 'task_id',
+    'timestamp', 'entry_text'
+}
+
+# add-revision command (sdd_update)
+ADD_REVISION_ESSENTIAL = {'success', 'revision_id'}
+ADD_REVISION_STANDARD = {
+    'success', 'revision_id', 'spec_id', 'task_id',
+    'timestamp', 'revision_text', 'revision_type'
+}
+
+# update-frontmatter command (sdd_update)
+UPDATE_FRONTMATTER_ESSENTIAL = {'success', 'spec_id'}
+UPDATE_FRONTMATTER_STANDARD = {
+    'success', 'spec_id', 'updated_fields', 'updated_at'
+}
+
+# add-verification command (sdd_update)
+ADD_VERIFICATION_ESSENTIAL = {'success', 'verification_id'}
+ADD_VERIFICATION_STANDARD = {
+    'success', 'verification_id', 'spec_id', 'task_id',
+    'verification_type', 'created_at'
+}
+
+# execute-verify command (sdd_update)
+EXECUTE_VERIFY_ESSENTIAL = {'success', 'task_id', 'result'}
+EXECUTE_VERIFY_STANDARD = {
+    'success', 'task_id', 'result', 'spec_id',
+    'verification_type', 'executed_at', 'details'
+}
+
+# format-verification-summary command (sdd_update)
+FORMAT_VERIFICATION_SUMMARY_ESSENTIAL = {'formatted'}
+FORMAT_VERIFICATION_SUMMARY_STANDARD = {
+    'formatted', 'spec_id', 'total_verifications',
+    'passed', 'failed', 'summary_type'
+}
+
+# move-spec command (sdd_update)
+MOVE_SPEC_ESSENTIAL = {'success', 'spec_id', 'new_location'}
+MOVE_SPEC_STANDARD = {
+    'success', 'spec_id', 'old_location', 'new_location',
+    'moved_at', 'backup_created'
+}
+
+# activate-spec command (sdd_update)
+ACTIVATE_SPEC_ESSENTIAL = {'success', 'spec_id'}
+ACTIVATE_SPEC_STANDARD = {
+    'success', 'spec_id', 'old_folder', 'new_folder',
+    'activated_at'
+}
+
+# complete-spec command (sdd_update)
+COMPLETE_SPEC_ESSENTIAL = {'success', 'spec_id'}
+COMPLETE_SPEC_STANDARD = {
+    'success', 'spec_id', 'completed_at', 'total_tasks',
+    'completion_time', 'moved_to'
+}
+
+# bulk-journal command (sdd_update)
+BULK_JOURNAL_ESSENTIAL = {'success', 'entries_added'}
+BULK_JOURNAL_STANDARD = {
+    'success', 'entries_added', 'spec_id', 'task_ids',
+    'timestamp', 'entry_count'
+}
+
+# sync-metadata command (sdd_update)
+SYNC_METADATA_ESSENTIAL = {'success', 'spec_id'}
+SYNC_METADATA_STANDARD = {
+    'success', 'spec_id', 'synced_fields', 'updated_at',
+    'changes_made'
+}
+
+# update-task-metadata command (sdd_update)
+UPDATE_TASK_METADATA_ESSENTIAL = {'success', 'task_id'}
+UPDATE_TASK_METADATA_STANDARD = {
+    'success', 'task_id', 'spec_id', 'updated_fields',
+    'updated_at', 'metadata'
+}

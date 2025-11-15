@@ -1,7 +1,7 @@
 {
   "spec_id": "verbosity-remaining-commands-2025-11-15-001",
   "generated": "2025-11-15T20:30:00Z",
-  "last_updated": "2025-11-15T20:57:31.267440Z",
+  "last_updated": "2025-11-15T21:02:11.228459Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 39,
-      "completed_tasks": 21,
+      "completed_tasks": 22,
       "metadata": {
         "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
         "objectives": [
@@ -706,7 +706,7 @@
       "type": "phase",
       "title": "sdd_update Metadata Commands",
       "description": "Add verbosity filtering to 15 metadata management commands in sdd_update module. These commands typically have smaller outputs but are used in automation workflows.",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -722,20 +722,20 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {}
     },
     "phase-2-files": {
       "type": "group",
       "title": "Implementation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1",
         "task-2-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -748,7 +748,7 @@
     "task-2-1": {
       "type": "task",
       "title": "Define field sets for sdd_update metadata commands",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [],
       "dependencies": {
@@ -759,12 +759,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
         "estimated_hours": 2,
-        "notes": "Add field sets for: update-status, mark-blocked, unblock-task, add-journal, add-revision, update-frontmatter, add-verification, execute-verify, format-verification-summary, move-spec, activate-spec, complete-spec, bulk-journal, sync-metadata, update-task-metadata"
+        "notes": "Add field sets for: update-status, mark-blocked, unblock-task, add-journal, add-revision, update-frontmatter, add-verification, execute-verify, format-verification-summary, move-spec, activate-spec, complete-spec, bulk-journal, sync-metadata, update-task-metadata",
+        "started_at": "2025-11-15T20:57:55.060275Z",
+        "status_note": "Defining field sets for sdd_update metadata commands",
+        "completed_at": "2025-11-15T21:02:11.212493Z",
+        "needs_journaling": false,
+        "actual_hours": 0.071,
+        "journaled_at": "2025-11-15T21:02:11.224701Z"
       }
     },
     "task-2-2": {
@@ -825,7 +831,9 @@
       "metadata": {
         "verification_type": "manual",
         "expected": "Sample 5 metadata commands tested with different verbosity levels. Verify output filtering works correctly.",
-        "command": ""
+        "command": "",
+        "started_at": "2025-11-15T21:00:47.256282Z",
+        "status_note": "Starting manual verification of sdd_update metadata commands with verbosity levels"
       }
     },
     "verify-2-2": {
@@ -1534,11 +1542,20 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-15T21:02:11.224679Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define field sets for sdd_update metadata commands",
+      "author": "claude-code",
+      "content": "Added 15 field set pairs for sdd_update metadata commands to output_utils.py. Field sets defined for: update-status, mark-blocked, unblock-task, add-journal, add-revision, update-frontmatter, add-verification, execute-verify, format-verification-summary, move-spec, activate-spec, complete-spec, bulk-journal, sync-metadata, update-task-metadata. Each command has ESSENTIAL and STANDARD field sets following the same pattern as doc_query commands. File modified: src/claude_skills/claude_skills/cli/sdd/output_utils.py (added lines 476-582).",
+      "metadata": {},
+      "task_id": "task-2-1"
     }
   ],
   "metadata": {
-    "progress_percentage": 53,
+    "progress_percentage": 56,
     "status": "active",
-    "current_phase": "phase-1"
+    "current_phase": "phase-2"
   }
 }
