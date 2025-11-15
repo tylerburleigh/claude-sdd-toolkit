@@ -35,6 +35,11 @@ from claude_skills.common import (
 from claude_skills.common.ui_factory import create_ui
 from claude_skills.common.json_output import output_json
 from claude_skills.common.completion import format_completion_prompt
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    PREPARE_TASK_ESSENTIAL,
+    PREPARE_TASK_STANDARD,
+)
 
 # Import from sdd_next module
 from claude_skills.sdd_next.discovery import (
@@ -788,7 +793,9 @@ def cmd_prepare_task(args, printer):
         completion_info = task_prep.get('completion_info', {})
 
         if args.json:
-            print_json_output(task_prep, compact=args.compact)
+            # Apply verbosity filtering for JSON output
+            filtered_output = prepare_output(task_prep, args, PREPARE_TASK_ESSENTIAL, PREPARE_TASK_STANDARD)
+            output_json(filtered_output, compact=args.compact)
         else:
             # Show completion message
             printer.success("All tasks completed!")
@@ -835,7 +842,9 @@ def cmd_prepare_task(args, printer):
     #   - dependencies: Dependency analysis (blocked_by, soft_depends, blocks)
     #   - doc_context: Optional codebase context from doc-query
     if args.json:
-        print_json_output(task_prep, compact=args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(task_prep, args, PREPARE_TASK_ESSENTIAL, PREPARE_TASK_STANDARD)
+        output_json(filtered_output, compact=args.compact)
     else:
         printer.success(f"Task prepared: {task_prep['task_id']}")
         printer.result("Task", task_prep['task_data'].get('title', ''))
