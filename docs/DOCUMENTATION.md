@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 13:46:00
+**Generated:** 2025-11-15 13:47:20
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109868
+- **Total Lines:** 109889
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -23010,7 +23010,7 @@ Example:
 ### `handle_cache_clear(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:20`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:27`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -23036,7 +23036,7 @@ Returns:
 ### `handle_cache_info(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:94`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:104`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -25474,7 +25474,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_cache(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:184`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:194`
 **Complexity:** 1
 
 **Description:**
@@ -34253,6 +34253,11 @@ Returns:
 ### `src/claude_skills/claude_skills/common/cache/cli.py`
 
 - `argparse`
+- `claude_skills.cli.sdd.output_utils.CACHE_CLEAR_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.CACHE_CLEAR_STANDARD`
+- `claude_skills.cli.sdd.output_utils.CACHE_STATS_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.CACHE_STATS_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.cache.CacheManager`
 - `claude_skills.common.config.get_cache_config`

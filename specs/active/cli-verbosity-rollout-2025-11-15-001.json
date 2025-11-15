@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T18:47:00.905147Z",
+  "last_updated": "2025-11-15T18:47:50.152065Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 55,
+      "completed_tasks": 56,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -1374,7 +1374,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 6
@@ -1393,7 +1393,7 @@
         "task-4-5"
       ],
       "total_tasks": 8,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1523,7 +1523,7 @@
     "task-4-3": {
       "type": "task",
       "title": "Define and apply field sets for cache commands",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-3-1",
@@ -1535,7 +1535,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/cache/cli.py",
         "task_category": "implementation",
@@ -1564,13 +1564,19 @@
     "task-4-3-2": {
       "type": "subtask",
       "title": "CACHE_STATS field sets and application",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-3",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "line_reference": "~112, ~127, ~137"
+        "line_reference": "~112, ~127, ~137",
+        "started_at": "2025-11-15T18:47:27.184539Z",
+        "status_note": "Starting CACHE_STATS field sets application",
+        "completed_at": "2025-11-15T18:47:50.129745Z",
+        "needs_journaling": false,
+        "actual_hours": 0.006,
+        "journaled_at": "2025-11-15T18:47:50.145463Z"
       }
     },
     "task-4-4": {
@@ -2044,7 +2050,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 73,
+    "progress_percentage": 74,
     "current_phase": "phase-4"
   },
   "journal": [
@@ -2623,6 +2629,15 @@
       "content": "Successfully implemented CACHE_CLEAR field sets. Added CACHE_CLEAR_ESSENTIAL and CACHE_CLEAR_STANDARD field set definitions to output_utils.py. Updated cache/cli.py to import and use prepare_output with these field sets in handle_cache_clear function. Essential output includes only entries_deleted, while standard (verbose) output includes entries_deleted and filters object.",
       "metadata": {},
       "task_id": "task-4-3-1"
+    },
+    {
+      "timestamp": "2025-11-15T18:47:50.145441Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: CACHE_STATS field sets and application",
+      "author": "claude-code",
+      "content": "Successfully implemented CACHE_STATS field sets application. The CACHE_STATS_ESSENTIAL and CACHE_STATS_STANDARD field sets were already defined in output_utils.py in task-4-3-1. Updated cache/cli.py handle_cache_stats function to use prepare_output with these field sets. Essential output includes only total_entries and active_entries, while standard (verbose) output includes cache_dir, total_entries, active_entries, expired_entries, total_size_mb, and total_size_bytes.",
+      "metadata": {},
+      "task_id": "task-4-3-2"
     }
   ]
 }

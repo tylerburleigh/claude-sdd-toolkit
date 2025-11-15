@@ -143,8 +143,9 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Check for explicit JSON flag (args.json can be True, False, or None)
         json_output = getattr(args, 'json', None)
         if json_output:
-            # JSON output mode
-            output_json(stats, args.compact)
+            # Apply verbosity filtering
+            filtered_output = prepare_output(stats, args, CACHE_STATS_ESSENTIAL, CACHE_STATS_STANDARD)
+            output_json(filtered_output, args.compact)
             return 0
 
         # Human-readable output
