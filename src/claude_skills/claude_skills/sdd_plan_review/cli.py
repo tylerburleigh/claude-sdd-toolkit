@@ -28,6 +28,11 @@ from claude_skills.sdd_plan_review.reporting import (
     generate_json_report,
 )
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    LIST_TOOLS_ESSENTIAL,
+    LIST_TOOLS_STANDARD,
+)
 
 
 def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
@@ -293,13 +298,16 @@ def cmd_list_tools(args, printer):
 
     # JSON output mode
     if args.json:
-        output = {
+        payload = {
             "available": available,
             "unavailable": unavailable,
             "total": len(tools_to_check),
             "available_count": len(available)
         }
-        output_json(output, args.compact)
+
+        # Apply verbosity filtering
+        filtered_output = prepare_output(payload, args, LIST_TOOLS_ESSENTIAL, LIST_TOOLS_STANDARD)
+        output_json(filtered_output, args.compact)
         if len(available) == 0:
             return 1
         else:

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 13:47:20
+**Generated:** 2025-11-15 13:48:09
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109889
+- **Total Lines:** 109890
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -25474,7 +25474,7 @@ Provides development utilities for maintaining the claude_skills package.
 ### `register_cache(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:194`
+**Defined in:** `src/claude_skills/claude_skills/common/cache/cli.py:195`
 **Complexity:** 1
 
 **Description:**

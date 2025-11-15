@@ -198,6 +198,10 @@ CACHE_STATS_STANDARD = {
     'expired_entries', 'total_size_mb', 'total_size_bytes'
 }
 
+# list-plan-review-tools command (sdd_plan_review)
+LIST_TOOLS_ESSENTIAL = {'available_count', 'total'}
+LIST_TOOLS_STANDARD = {'available', 'unavailable', 'total', 'available_count'}
+
 # check-deps command
 CHECK_DEPS_ESSENTIAL = {'task_id', 'can_start'}
 CHECK_DEPS_STANDARD = {
