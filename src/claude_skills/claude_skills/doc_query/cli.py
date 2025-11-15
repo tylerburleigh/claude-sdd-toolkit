@@ -37,6 +37,10 @@ from claude_skills.cli.sdd.output_utils import (
     REFACTOR_CANDIDATES_STANDARD,
     FIND_CLASS_ESSENTIAL,
     FIND_CLASS_STANDARD,
+    FIND_FUNCTION_ESSENTIAL,
+    FIND_FUNCTION_STANDARD,
+    FIND_MODULE_ESSENTIAL,
+    FIND_MODULE_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -469,9 +473,20 @@ def cmd_find_function(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.find_function(args.name, pattern=args.pattern)
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, FIND_FUNCTION_ESSENTIAL, FIND_FUNCTION_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
