@@ -45,6 +45,32 @@ from claude_skills.cli.sdd.output_utils import (
     CHECK_DEPS_STANDARD,
     FIND_SPECS_ESSENTIAL,
     FIND_SPECS_STANDARD,
+    NEXT_TASK_ESSENTIAL,
+    NEXT_TASK_STANDARD,
+    TASK_INFO_ESSENTIAL,
+    TASK_INFO_STANDARD,
+    INIT_ENV_ESSENTIAL,
+    INIT_ENV_STANDARD,
+    VALIDATE_SPEC_ESSENTIAL,
+    VALIDATE_SPEC_STANDARD,
+    FIND_PATTERN_ESSENTIAL,
+    FIND_PATTERN_STANDARD,
+    DETECT_PROJECT_ESSENTIAL,
+    DETECT_PROJECT_STANDARD,
+    FIND_TESTS_ESSENTIAL,
+    FIND_TESTS_STANDARD,
+    CHECK_ENVIRONMENT_ESSENTIAL,
+    CHECK_ENVIRONMENT_STANDARD,
+    FIND_CIRCULAR_DEPS_ESSENTIAL,
+    FIND_CIRCULAR_DEPS_STANDARD,
+    FIND_RELATED_FILES_ESSENTIAL,
+    FIND_RELATED_FILES_STANDARD,
+    VALIDATE_PATHS_ESSENTIAL,
+    VALIDATE_PATHS_STANDARD,
+    SPEC_STATS_ESSENTIAL,
+    SPEC_STATS_STANDARD,
+    FORMAT_PLAN_ESSENTIAL,
+    FORMAT_PLAN_STANDARD,
 )
 
 # Import from sdd_next module
@@ -379,13 +405,15 @@ def cmd_next_task(args, printer):
     task_id, task_data = next_task
 
     if args.json:
-        print_json_output({
+        output = {
             "task_id": task_id,
             "title": task_data.get("title", ""),
             "status": task_data.get("status", ""),
             "file_path": task_data.get("metadata", {}).get("file_path", ""),
             "estimated_hours": task_data.get("metadata", {}).get("estimated_hours", 0)
-        }, compact=args.compact)
+        }
+        output = prepare_output(output, args, NEXT_TASK_ESSENTIAL, NEXT_TASK_STANDARD)
+        print_json_output(output, compact=args.compact)
     else:
         printer.success("Next task identified")
         printer.result("Task ID", task_id)
@@ -418,7 +446,8 @@ def cmd_task_info(args, printer):
         return 1
 
     if args.json:
-        print_json_output(task_data, compact=args.compact)
+        output = prepare_output(task_data, args, TASK_INFO_ESSENTIAL, TASK_INFO_STANDARD)
+        print_json_output(output, compact=args.compact)
     else:
         printer.success("Task information retrieved")
         printer.result("Task ID", args.task_id)
@@ -689,7 +718,8 @@ def cmd_init_env(args, printer):
         return 1
 
     if args.json:
-        output_json(env)
+        output = prepare_output(env, args, INIT_ENV_ESSENTIAL, INIT_ENV_STANDARD)
+        output_json(output)
     elif args.export:
         # Output as shell export statements
         print(f"export SPECS_DIR='{env['specs_dir']}'")
@@ -933,7 +963,8 @@ def cmd_validate_spec(args, printer):
     validation = validate_spec(spec_file)
 
     if args.json:
-        output_json(validation)
+        output = prepare_output(validation, args, VALIDATE_SPEC_ESSENTIAL, VALIDATE_SPEC_STANDARD)
+        output_json(output)
     else:
         printer.result("Validating", validation['spec_file'])
 
@@ -970,7 +1001,9 @@ def cmd_find_pattern(args, printer):
     matches = find_pattern(args.pattern, directory)
 
     if args.json:
-        output_json({"pattern": args.pattern, "matches": matches})
+        data = {"pattern": args.pattern, "matches": matches}
+        output = prepare_output(data, args, FIND_PATTERN_ESSENTIAL, FIND_PATTERN_STANDARD)
+        output_json(output)
     else:
         if matches:
             printer.success(f"Found {len(matches)} file(s) matching '{args.pattern}'")
@@ -991,7 +1024,8 @@ def cmd_detect_project(args, printer):
     project = detect_project(directory)
 
     if args.json:
-        output_json(project)
+        output = prepare_output(project, args, DETECT_PROJECT_ESSENTIAL, DETECT_PROJECT_STANDARD)
+        output_json(output)
     else:
         printer.success("Project analyzed")
         printer.result("Project Type", project['project_type'])
@@ -1030,7 +1064,8 @@ def cmd_find_tests(args, printer):
     tests = find_tests(directory, args.source_file)
 
     if args.json:
-        output_json(tests)
+        output = prepare_output(tests, args, FIND_TESTS_ESSENTIAL, FIND_TESTS_STANDARD)
+        output_json(output)
     else:
         if tests['test_framework']:
             printer.success("Tests discovered")
@@ -1064,7 +1099,8 @@ def cmd_check_environment(args, printer):
     env = check_environment(directory, required_deps)
 
     if args.json:
-        output_json(env)
+        output = prepare_output(env, args, CHECK_ENVIRONMENT_ESSENTIAL, CHECK_ENVIRONMENT_STANDARD)
+        output_json(output)
     else:
         if env['valid']:
             printer.success("Environment is valid")
@@ -1113,7 +1149,8 @@ def cmd_find_circular_deps(args, printer):
     circular = find_circular_deps(spec_data)
 
     if args.json:
-        output_json(circular)
+        output = prepare_output(circular, args, FIND_CIRCULAR_DEPS_ESSENTIAL, FIND_CIRCULAR_DEPS_STANDARD)
+        output_json(output)
     else:
         if circular['has_circular']:
             printer.error("Circular dependencies detected!")
@@ -1145,7 +1182,8 @@ def cmd_find_related_files(args, printer):
     related = find_related_files(args.file, directory)
 
     if args.json:
-        output_json(related)
+        output = prepare_output(related, args, FIND_RELATED_FILES_ESSENTIAL, FIND_RELATED_FILES_STANDARD)
+        output_json(output)
     else:
         printer.success("Related files found")
         printer.result("Source", related['source_file'])
@@ -1182,7 +1220,8 @@ def cmd_validate_paths(args, printer):
     validation = validate_paths(paths, base_dir)
 
     if args.json:
-        output_json(validation)
+        output = prepare_output(validation, args, VALIDATE_PATHS_ESSENTIAL, VALIDATE_PATHS_STANDARD)
+        output_json(output)
     else:
         if validation['valid_paths']:
             printer.success(f"Valid Paths ({len(validation['valid_paths'])})")
@@ -1209,7 +1248,8 @@ def cmd_spec_stats(args, printer):
     stats = spec_stats(spec_file, json_spec_file)
 
     if args.json:
-        output_json(stats, args.compact)
+        output = prepare_output(stats, args, SPEC_STATS_ESSENTIAL, SPEC_STATS_STANDARD)
+        output_json(output, args.compact)
     else:
         if stats['exists']:
             printer.success("Spec file analyzed")
