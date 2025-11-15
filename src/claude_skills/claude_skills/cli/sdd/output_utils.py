@@ -167,3 +167,7 @@ CHECK_DEPS_STANDARD = {
 # list-blockers command
 LIST_BLOCKERS_ESSENTIAL = {'task_id', 'blocked_by'}
 LIST_BLOCKERS_STANDARD = {'task_id', 'blocked_by'}
+
+# find-specs command
+FIND_SPECS_ESSENTIAL = {'specs_dir'}
+FIND_SPECS_STANDARD = {'specs_dir', 'auto_detected', 'exists'}
