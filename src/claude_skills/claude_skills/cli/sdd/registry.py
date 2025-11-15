@@ -1,4 +1,20 @@
-"""Plugin registration system for subcommands."""
+"""Plugin registration system for subcommands.
+
+This module provides the central registry for all SDD subcommands.
+All registered commands automatically inherit global options including:
+- Verbosity control (--quiet/-q, --verbose/-v)
+- Output formatting (--json, --no-json, --compact, --no-compact)
+- Project paths (--path, --specs-dir)
+- Debug options (--debug, --no-color)
+
+Command Handler Verbosity Interface:
+    All command handlers receive args.verbosity_level automatically set
+    to one of: VerbosityLevel.QUIET, VerbosityLevel.NORMAL, or VerbosityLevel.VERBOSE
+
+    Use output utilities for verbosity-aware output:
+        from claude_skills.cli.sdd.output_utils import prepare_output
+        filtered_output = prepare_output(data, args, essential_fields, standard_fields)
+"""
 import importlib
 import logging
 from typing import Callable, Optional, Sequence, Tuple
@@ -9,6 +25,113 @@ _OPTIONAL_MODULES: Sequence[Tuple[str, str, str]] = (
     ("claude_skills.sdd_render.cli", "register_render", "sdd_render"),
     ("claude_skills.sdd_fidelity_review.cli", "register_commands", "sdd_fidelity_review"),
 )
+
+
+def get_verbosity_level(args):
+    """Get the verbosity level from command arguments.
+
+    Convenience wrapper for accessing the verbosity level in command handlers.
+    The verbosity level is automatically set by the main CLI after parsing.
+
+    Args:
+        args: Parsed argparse.Namespace from command handler
+
+    Returns:
+        VerbosityLevel enum (QUIET, NORMAL, or VERBOSE)
+
+    Example:
+        def my_command_handler(args, printer):
+            from claude_skills.cli.sdd.registry import get_verbosity_level
+            from claude_skills.cli.sdd.verbosity import VerbosityLevel
+
+            level = get_verbosity_level(args)
+            if level == VerbosityLevel.QUIET:
+                # Minimal output
+                return {"status": "ok"}
+            elif level == VerbosityLevel.VERBOSE:
+                # Include debug info
+                return {"status": "ok", "_debug": {...}}
+            else:
+                # Normal output
+                return {"status": "ok", "details": {...}}
+    """
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
+    return getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
+
+
+def is_quiet_mode(args) -> bool:
+    """Check if quiet mode is active.
+
+    Args:
+        args: Parsed argparse.Namespace from command handler
+
+    Returns:
+        True if --quiet flag was specified or verbosity_level is QUIET
+
+    Example:
+        if is_quiet_mode(args):
+            # Omit empty fields and reduce output
+            output = prepare_output(data, args, essential_fields)
+    """
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
+    return get_verbosity_level(args) == VerbosityLevel.QUIET
+
+
+def is_verbose_mode(args) -> bool:
+    """Check if verbose mode is active.
+
+    Args:
+        args: Parsed argparse.Namespace from command handler
+
+    Returns:
+        True if --verbose flag was specified or verbosity_level is VERBOSE
+
+    Example:
+        if is_verbose_mode(args):
+            # Include debug information
+            output['_debug'] = {'timing_ms': elapsed, 'cache_hit': True}
+    """
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
+    return get_verbosity_level(args) == VerbosityLevel.VERBOSE
+
+
+def prepare_command_output(data, args, essential_fields=None, standard_fields=None):
+    """Prepare command output with verbosity filtering.
+
+    Convenience wrapper that applies verbosity-based field filtering to command output.
+    This is the recommended way for command handlers to prepare their output.
+
+    Args:
+        data: Dictionary of output data from the command
+        args: Parsed argparse.Namespace from command handler
+        essential_fields: Optional set of field names always included (even in QUIET)
+        standard_fields: Optional set of field names included in NORMAL/VERBOSE
+
+    Returns:
+        Filtered dictionary with fields appropriate for the verbosity level
+
+    Example:
+        def list_specs_handler(args, printer):
+            # Gather all data
+            data = {
+                'spec_id': spec_id,
+                'title': title,
+                'status': status,
+                'progress_percentage': percentage,
+                'total_tasks': total,
+                'metadata': metadata  # May be empty
+            }
+
+            # Define field categories
+            essential = {'spec_id', 'title', 'status', 'progress_percentage'}
+            standard = essential | {'total_tasks', 'metadata'}
+
+            # Apply verbosity filtering
+            output = prepare_command_output(data, args, essential, standard)
+            return output
+    """
+    from claude_skills.cli.sdd.output_utils import prepare_output
+    return prepare_output(data, args, essential_fields, standard_fields)
 
 
 def register_all_subcommands(subparsers, parent_parser):

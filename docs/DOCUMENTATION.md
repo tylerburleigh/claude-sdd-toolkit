@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-13 09:21:40
+**Generated:** 2025-11-15 09:04:09
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 317
-- **Total Lines:** 108972
-- **Total Classes:** 443
-- **Total Functions:** 1410
-- **Avg Complexity:** 4.68
+- **Total Files:** 319
+- **Total Lines:** 109307
+- **Total Classes:** 444
+- **Total Functions:** 1417
+- **Avg Complexity:** 4.67
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -8360,6 +8360,27 @@ Usage:
 
 ---
 
+### `VerbosityLevel`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/verbosity.py:12`
+
+**Description:**
+> Verbosity levels for CLI output.
+
+Attributes:
+    QUIET: Minimal output - essential data only, omit empty fields
+    NORMAL: Balanced output - all standard fields, current default
+    VERBOSE: Maximum output - includes debug information and metrics
+
+**Methods:**
+- `__str__()`
+- `from_args()`
+- `from_config()`
+
+---
+
 ### `VisualizationBuilder`
 
 **Language:** python
@@ -12459,7 +12480,7 @@ Returns:
 ### `_validate_sdd_config(config) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:83`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:84`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -12659,6 +12680,37 @@ Raises:
 
 ---
 
+### `add_debug_info(data, args, debug_data) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:95`
+**Complexity:** 2
+
+**Description:**
+> Add debug information to output if in VERBOSE mode.
+
+Args:
+    data: Output dictionary to add debug info to
+    args: Parsed command arguments (contains verbosity_level)
+    debug_data: Debug information dictionary
+
+Returns:
+    Output dictionary with _debug section added if appropriate
+
+Example:
+    >>> output = {'spec_id': 'my-spec', 'status': 'active'}
+    >>> debug = {'query_time_ms': 15, 'cache_hit': True}
+    >>> output = add_debug_info(output, args, debug)
+    # In VERBOSE mode: output['_debug'] = debug
+    # In other modes: output unchanged
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `args`: None
+- `debug_data`: Dict[str, Any]
+
+---
+
 ### `add_format_flag(parser, choices, default, help_text) -> argparse.ArgumentParser`
 
 **Language:** python
@@ -12705,7 +12757,7 @@ Raises:
 ### `add_global_options(parser, config) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:23`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:24`
 **Complexity:** 2
 
 **Description:**
@@ -12839,7 +12891,7 @@ Returns:
 ### `add_spec_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:133`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:136`
 **Complexity:** 1
 
 **Description:**
@@ -12894,7 +12946,7 @@ Raises:
 ### `add_task_options(parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:141`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:144`
 **Complexity:** 1
 
 **Description:**
@@ -16775,7 +16827,7 @@ Returns:
 ### `create_global_parent_parser(config) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:5`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:6`
 **Complexity:** 1
 
 **Description:**
@@ -18631,6 +18683,37 @@ Example:
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/test_sdd_plan_review_cli.py:48`
 **Complexity:** 1
+
+---
+
+### `filter_output_fields(data, level, essential_fields, standard_fields) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/verbosity.py:96`
+⚠️ **Complexity:** 14 (High)
+
+**Description:**
+> Filter output fields based on verbosity level.
+
+Implements the field filtering policy from the verbosity specification:
+- QUIET: Include only essential fields, omit null/empty values
+- NORMAL: Include essential and standard fields
+- VERBOSE: Include all fields plus debug info
+
+Args:
+    data: Dictionary of output data
+    level: Current verbosity level
+    essential_fields: Set of field names that are always included (optional)
+    standard_fields: Set of field names included in NORMAL/VERBOSE (optional)
+
+Returns:
+    Filtered dictionary based on verbosity level
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `level`: VerbosityLevel
+- `essential_fields`: set
+- `standard_fields`: set
 
 ---
 
@@ -21337,7 +21420,7 @@ Returns:
 ### `get_config_path(project_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:36`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:37`
 **Complexity:** 6
 
 **Description:**
@@ -21454,7 +21537,7 @@ Returns:
 ### `get_default_format(project_path) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:282`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:283`
 **Complexity:** 1
 
 **Description:**
@@ -21794,7 +21877,7 @@ Returns:
 ### `get_json_compact(project_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:301`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:302`
 **Complexity:** 1
 
 **Description:**
@@ -22202,7 +22285,7 @@ pair names are coerced to `True` so consensus still triggers automatically.
 ### `get_sdd_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:242`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:243`
 **Complexity:** 8
 
 **Description:**
@@ -22853,6 +22936,28 @@ Expected JSON format:
 
 Returns:
     Transcript path from stdin, or None if stdin is a TTY or parsing fails
+
+---
+
+### `get_verbosity_level(args, config) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/options.py:152`
+**Complexity:** 2
+
+**Description:**
+> Get the verbosity level from parsed arguments.
+
+Args:
+    args: Parsed argparse.Namespace
+    config: Optional config dict (for default level)
+
+Returns:
+    VerbosityLevel enum value
+
+**Parameters:**
+- `args`: None
+- `config`: None
 
 ---
 
@@ -23835,7 +23940,7 @@ Returns:
 ### `load_sdd_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:191`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:192`
 **Complexity:** 6
 
 **Description:**
@@ -24704,6 +24809,50 @@ Returns:
 
 **Parameters:**
 - `tmp_path`: Path
+
+---
+
+### `prepare_output(data, args, essential_fields, standard_fields) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:16`
+**Complexity:** 1
+
+**Description:**
+> Prepare command output based on verbosity level.
+
+This is the main entry point for command handlers to filter their
+output according to the user's requested verbosity level.
+
+Args:
+    data: Raw output dictionary from command
+    args: Parsed command arguments (contains verbosity_level)
+    essential_fields: Fields to always include (even in QUIET mode)
+    standard_fields: Fields to include in NORMAL/VERBOSE modes
+
+Returns:
+    Filtered output dictionary based on verbosity level
+
+Example:
+    >>> from claude_skills.cli.sdd.output_utils import prepare_output
+    >>> data = {
+    ...     'spec_id': 'my-spec',
+    ...     'status': 'active',
+    ...     'title': 'My Spec',
+    ...     'total_tasks': 10,
+    ...     'metadata': {}  # empty
+    ... }
+    >>> essential = {'spec_id', 'status', 'title'}
+    >>> output = prepare_output(data, args, essential)
+    # In QUIET mode: only spec_id, status, title (metadata omitted)
+    # In NORMAL mode: all fields except empty ones
+    # In VERBOSE mode: all fields including empty ones
+
+**Parameters:**
+- `data`: Dict[str, Any]
+- `args`: None
+- `essential_fields`: Optional[Set[str]]
+- `standard_fields`: Optional[Set[str]]
 
 ---
 
@@ -26709,6 +26858,26 @@ Example:
 
 ---
 
+### `should_include_debug_info(level) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/verbosity.py:84`
+**Complexity:** 1
+
+**Description:**
+> Check if debug information should be included in output.
+
+Args:
+    level: Current verbosity level
+
+Returns:
+    True if debug info should be included (VERBOSE mode), False otherwise
+
+**Parameters:**
+- `level`: VerbosityLevel
+
+---
+
 ### `should_offer_commit(spec_data, event_type) -> bool`
 
 **Language:** python
@@ -26728,6 +26897,26 @@ Returns:
 **Parameters:**
 - `spec_data`: Dict[str, Any]
 - `event_type`: str
+
+---
+
+### `should_omit_empty_fields(level) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/verbosity.py:72`
+**Complexity:** 1
+
+**Description:**
+> Check if empty/null fields should be omitted from output.
+
+Args:
+    level: Current verbosity level
+
+Returns:
+    True if empty fields should be omitted (QUIET mode), False otherwise
+
+**Parameters:**
+- `level`: VerbosityLevel
 
 ---
 
@@ -26783,6 +26972,40 @@ Example:
 **Parameters:**
 - `spec_data`: Dict
 - `phase_id`: Optional[str]
+
+---
+
+### `should_show_field(args, field_name, value, is_essential, is_standard) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:52`
+**Complexity:** 9
+
+**Description:**
+> Check if a field should be included in output.
+
+Useful for conditional output building in command handlers.
+
+Args:
+    args: Parsed command arguments (contains verbosity_level)
+    field_name: Name of the field
+    value: Value of the field
+    is_essential: True if field is essential (always show in QUIET)
+    is_standard: True if field is standard (show in NORMAL/VERBOSE)
+
+Returns:
+    True if field should be included in output
+
+Example:
+    >>> if should_show_field(args, 'metadata', metadata, is_standard=True):
+    ...     output['metadata'] = metadata
+
+**Parameters:**
+- `args`: None
+- `field_name`: str
+- `value`: Any
+- `is_essential`: bool
+- `is_standard`: bool
 
 ---
 
@@ -33342,6 +33565,7 @@ Returns:
 - `argparse`
 - `claude_skills.cli.sdd.options.add_global_options`
 - `claude_skills.cli.sdd.options.create_global_parent_parser`
+- `claude_skills.cli.sdd.options.get_verbosity_level`
 - `claude_skills.cli.sdd.registry.register_all_subcommands`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.metrics.track_metrics`
@@ -33353,6 +33577,18 @@ Returns:
 ### `src/claude_skills/claude_skills/cli/sdd/options.py`
 
 - `argparse`
+- `claude_skills.cli.sdd.verbosity.VerbosityLevel`
+
+### `src/claude_skills/claude_skills/cli/sdd/output_utils.py`
+
+- `claude_skills.cli.sdd.verbosity.VerbosityLevel`
+- `claude_skills.cli.sdd.verbosity.filter_output_fields`
+- `claude_skills.cli.sdd.verbosity.should_include_debug_info`
+- `claude_skills.cli.sdd.verbosity.should_omit_empty_fields`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+- `typing.Set`
 
 ### `src/claude_skills/claude_skills/cli/sdd/registry.py`
 
@@ -33362,6 +33598,12 @@ Returns:
 - `typing.Optional`
 - `typing.Sequence`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/cli/sdd/verbosity.py`
+
+- `enum.Enum`
+- `typing.Any`
+- `typing.Dict`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py`
 
