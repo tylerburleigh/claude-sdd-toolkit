@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 13:42:53
+**Generated:** 2025-11-15 13:46:00
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109845
+- **Total Lines:** 109868
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -15001,7 +15001,7 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:302`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:307`
 ⚠️ **Complexity:** 14 (High)
 
 **Description:**
@@ -15868,7 +15868,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:286`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:291`
 **Complexity:** 1
 
 **Description:**
@@ -19115,7 +19115,7 @@ Returns:
 ### `find_transcript_by_specific_marker(cwd, marker, max_retries) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:48`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:53`
 ⚠️ **Complexity:** 18 (High)
 
 **Description:**
@@ -19820,7 +19820,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:224`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:229`
 **Complexity:** 2
 
 **Description:**
@@ -19841,7 +19841,7 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path, compact) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:258`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:263`
 **Complexity:** 2
 
 **Description:**
@@ -19864,7 +19864,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:219`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:224`
 **Complexity:** 1
 
 **Description:**
@@ -21021,7 +21021,7 @@ Returns:
 ### `generate_session_marker() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:34`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:39`
 **Complexity:** 1
 
 **Description:**
@@ -22901,7 +22901,7 @@ Returns:
 ### `get_transcript_path(args) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:178`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:183`
 **Complexity:** 8
 
 **Description:**
@@ -22927,7 +22927,7 @@ Returns:
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:149`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:154`
 **Complexity:** 4
 
 **Description:**
@@ -24118,7 +24118,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:453`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:468`
 **Complexity:** 5
 
 **Description:**
@@ -25533,7 +25533,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:411`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:426`
 **Complexity:** 1
 
 **Description:**
@@ -25792,7 +25792,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:393`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:408`
 **Complexity:** 1
 
 **Description:**
@@ -34843,6 +34843,9 @@ Returns:
 ### `src/claude_skills/claude_skills/context_tracker/cli.py`
 
 - `argparse`
+- `claude_skills.cli.sdd.output_utils.CONTEXT_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.CONTEXT_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.json_output.output_json`
 - `claude_skills.context_tracker.parser.parse_transcript`

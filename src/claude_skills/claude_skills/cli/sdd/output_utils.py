@@ -187,6 +187,17 @@ CONTEXT_STANDARD = {
     'total_tokens', 'transcript_path', 'context_percentage_used'
 }
 
+# cache-clear command (cache)
+CACHE_CLEAR_ESSENTIAL = {'entries_deleted'}
+CACHE_CLEAR_STANDARD = {'entries_deleted', 'filters'}
+
+# cache-stats command (cache)
+CACHE_STATS_ESSENTIAL = {'total_entries', 'active_entries'}
+CACHE_STATS_STANDARD = {
+    'cache_dir', 'total_entries', 'active_entries',
+    'expired_entries', 'total_size_mb', 'total_size_bytes'
+}
+
 # check-deps command
 CHECK_DEPS_ESSENTIAL = {'task_id', 'can_start'}
 CHECK_DEPS_STANDARD = {
