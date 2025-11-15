@@ -41,6 +41,8 @@ from claude_skills.cli.sdd.output_utils import (
     PREPARE_TASK_STANDARD,
     PROGRESS_ESSENTIAL,
     PROGRESS_STANDARD,
+    CHECK_DEPS_ESSENTIAL,
+    CHECK_DEPS_STANDARD,
 )
 
 # Import from sdd_next module
@@ -538,7 +540,9 @@ def cmd_check_deps(args, printer, ui=None):
         return 1
 
     if args.json:
-        print_json_output(deps, compact=args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(deps, args, CHECK_DEPS_ESSENTIAL, CHECK_DEPS_STANDARD)
+        output_json(filtered_output, compact=args.compact)
     else:
         printer.success("Dependency analysis complete")
         readiness_message = (

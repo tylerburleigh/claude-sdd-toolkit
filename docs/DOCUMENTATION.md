@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 11:01:48
+**Generated:** 2025-11-15 11:04:19
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109515
+- **Total Lines:** 109522
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -9458,7 +9458,7 @@ callers understand that provider execution is not yet wired up.
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:96`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:101`
 **Complexity:** 2
 
 **Parameters:**
@@ -9626,7 +9626,7 @@ Returns:
 ### `_emit_schema_messages(result, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:149`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:154`
 **Complexity:** 10
 
 **Description:**
@@ -9903,7 +9903,7 @@ Returns:
 ### `_filter_actions_by_selection(actions, selection_criteria) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:131`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:136`
 **Complexity:** 6
 
 **Description:**
@@ -10606,7 +10606,7 @@ Returns:
 ### `_interactive_select_fixes(actions, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:174`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:179`
 **Complexity:** 10
 
 **Description:**
@@ -11133,7 +11133,7 @@ Returns:
 ### `_normalized_to_dict(normalized) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:108`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:113`
 **Complexity:** 1
 
 **Parameters:**
@@ -12018,7 +12018,7 @@ Returns:
 ### `_resolve_spec_file(spec_name_or_path, printer) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:48`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:53`
 **Complexity:** 7
 
 **Description:**
@@ -12130,7 +12130,7 @@ Returns:
 ### `_serialize_fix_action(action) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:112`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:117`
 **Complexity:** 1
 
 **Parameters:**
@@ -12268,7 +12268,7 @@ heading are returned with heading=None.
 ### `_stats_to_dict(stats) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:92`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:97`
 **Complexity:** 1
 
 **Parameters:**
@@ -12279,7 +12279,7 @@ heading are returned with heading=None.
 ### `_status_to_exit_code(status) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:123`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:128`
 **Complexity:** 3
 
 **Parameters:**
@@ -14857,7 +14857,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:575`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:582`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -15285,7 +15285,7 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:349`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:356`
 ⚠️ **Complexity:** 34 (High)
 
 **Description:**
@@ -15814,7 +15814,7 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:482`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:489`
 **Complexity:** 10
 
 **Description:**
@@ -15934,7 +15934,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:549`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:556`
 **Complexity:** 4
 
 **Description:**
@@ -16156,7 +16156,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:219`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:224`
 ⚠️ **Complexity:** 24 (High)
 
 **Description:**
@@ -25879,7 +25879,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:631`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:638`
 **Complexity:** 2
 
 **Description:**
