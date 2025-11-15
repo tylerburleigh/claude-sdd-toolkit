@@ -229,3 +229,101 @@ SPEC_STATS_STANDARD = {
 # format-plan command
 FORMAT_PLAN_ESSENTIAL = {'formatted'}
 FORMAT_PLAN_STANDARD = {'formatted', 'plan_structure', 'sections', 'word_count'}
+
+# add-assumption command
+ADD_ASSUMPTION_ESSENTIAL = {'success', 'assumption_id'}
+ADD_ASSUMPTION_STANDARD = {'success', 'assumption_id', 'spec_id', 'task_id', 'assumption_text'}
+
+# list-assumptions command
+LIST_ASSUMPTIONS_ESSENTIAL = {'assumptions'}
+LIST_ASSUMPTIONS_STANDARD = {'assumptions', 'spec_id', 'count', 'filtered'}
+
+# update-estimate command
+UPDATE_ESTIMATE_ESSENTIAL = {'success', 'task_id'}
+UPDATE_ESTIMATE_STANDARD = {'success', 'task_id', 'old_estimate', 'new_estimate', 'updated_at'}
+
+# add-task command
+ADD_TASK_ESSENTIAL = {'success', 'task_id'}
+ADD_TASK_STANDARD = {'success', 'task_id', 'parent', 'title', 'type', 'spec_id'}
+
+# remove-task command
+REMOVE_TASK_ESSENTIAL = {'success', 'task_id'}
+REMOVE_TASK_STANDARD = {'success', 'task_id', 'removed_count', 'spec_id'}
+
+# time-report command
+TIME_REPORT_ESSENTIAL = {'spec_id', 'total_hours'}
+TIME_REPORT_STANDARD = {
+    'spec_id', 'total_hours', 'estimated_hours', 'variance',
+    'by_phase', 'by_task_type', 'completion_rate'
+}
+
+# status-report command
+STATUS_REPORT_ESSENTIAL = {'spec_id', 'status', 'progress'}
+STATUS_REPORT_STANDARD = {
+    'spec_id', 'status', 'progress', 'current_phase',
+    'blockers', 'recent_activity', 'next_tasks'
+}
+
+# audit-spec command
+AUDIT_SPEC_ESSENTIAL = {'spec_id', 'issues'}
+AUDIT_SPEC_STANDARD = {
+    'spec_id', 'issues', 'warnings', 'suggestions',
+    'integrity_checks', 'metadata_health'
+}
+
+# get-task command
+GET_TASK_ESSENTIAL = {'task_id', 'title', 'status'}
+GET_TASK_STANDARD = {
+    'task_id', 'title', 'status', 'type', 'parent',
+    'metadata', 'dependencies', 'children'
+}
+
+# get-journal command
+GET_JOURNAL_ESSENTIAL = {'entries'}
+GET_JOURNAL_STANDARD = {'entries', 'spec_id', 'count', 'date_range'}
+
+# list-phases command
+LIST_PHASES_ESSENTIAL = {'phases'}
+LIST_PHASES_STANDARD = {'phases', 'spec_id', 'total_phases', 'current_phase'}
+
+# check-complete command
+CHECK_COMPLETE_ESSENTIAL = {'complete', 'node_id'}
+CHECK_COMPLETE_STANDARD = {
+    'complete', 'node_id', 'total_tasks', 'completed_tasks',
+    'percentage', 'remaining_tasks'
+}
+
+# phase-time command
+PHASE_TIME_ESSENTIAL = {'phase_id', 'total_hours'}
+PHASE_TIME_STANDARD = {
+    'phase_id', 'total_hours', 'estimated_hours', 'variance',
+    'task_breakdown', 'completion_rate'
+}
+
+# reconcile-state command
+RECONCILE_STATE_ESSENTIAL = {'success', 'changes_made'}
+RECONCILE_STATE_STANDARD = {
+    'success', 'changes_made', 'spec_id', 'issues_fixed',
+    'warnings', 'backup_created'
+}
+
+# check-journaling command
+CHECK_JOURNALING_ESSENTIAL = {'needs_journaling', 'task_count'}
+CHECK_JOURNALING_STANDARD = {
+    'needs_journaling', 'task_count', 'spec_id',
+    'tasks', 'last_journal_entry'
+}
+
+# complete-task command
+COMPLETE_TASK_ESSENTIAL = {'success', 'task_id'}
+COMPLETE_TASK_STANDARD = {
+    'success', 'task_id', 'completed_at', 'actual_hours',
+    'spec_progress', 'parent_status'
+}
+
+# create-task-commit command
+CREATE_TASK_COMMIT_ESSENTIAL = {'success', 'commit_hash'}
+CREATE_TASK_COMMIT_STANDARD = {
+    'success', 'commit_hash', 'task_id', 'files_committed',
+    'commit_message', 'branch'
+}
