@@ -163,3 +163,7 @@ CHECK_DEPS_STANDARD = {
     'task_id', 'can_start', 'blocked_by',
     'soft_depends', 'blocks'
 }
+
+# list-blockers command
+LIST_BLOCKERS_ESSENTIAL = {'task_id', 'blocked_by'}
+LIST_BLOCKERS_STANDARD = {'task_id', 'blocked_by'}
