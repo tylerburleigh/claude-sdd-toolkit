@@ -19,6 +19,43 @@ from claude_skills.common import execute_verify_task, load_json_spec
 from claude_skills.common.spec import update_node, save_json_spec
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    ADD_ASSUMPTION_ESSENTIAL,
+    ADD_ASSUMPTION_STANDARD,
+    LIST_ASSUMPTIONS_ESSENTIAL,
+    LIST_ASSUMPTIONS_STANDARD,
+    UPDATE_ESTIMATE_ESSENTIAL,
+    UPDATE_ESTIMATE_STANDARD,
+    ADD_TASK_ESSENTIAL,
+    ADD_TASK_STANDARD,
+    REMOVE_TASK_ESSENTIAL,
+    REMOVE_TASK_STANDARD,
+    TIME_REPORT_ESSENTIAL,
+    TIME_REPORT_STANDARD,
+    STATUS_REPORT_ESSENTIAL,
+    STATUS_REPORT_STANDARD,
+    AUDIT_SPEC_ESSENTIAL,
+    AUDIT_SPEC_STANDARD,
+    GET_TASK_ESSENTIAL,
+    GET_TASK_STANDARD,
+    GET_JOURNAL_ESSENTIAL,
+    GET_JOURNAL_STANDARD,
+    LIST_PHASES_ESSENTIAL,
+    LIST_PHASES_STANDARD,
+    CHECK_COMPLETE_ESSENTIAL,
+    CHECK_COMPLETE_STANDARD,
+    PHASE_TIME_ESSENTIAL,
+    PHASE_TIME_STANDARD,
+    RECONCILE_STATE_ESSENTIAL,
+    RECONCILE_STATE_STANDARD,
+    CHECK_JOURNALING_ESSENTIAL,
+    CHECK_JOURNALING_STANDARD,
+    COMPLETE_TASK_ESSENTIAL,
+    COMPLETE_TASK_STANDARD,
+    CREATE_TASK_COMMIT_ESSENTIAL,
+    CREATE_TASK_COMMIT_STANDARD,
+)
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -320,7 +357,8 @@ def cmd_add_assumption(args, printer):
 
         # If JSON output requested, print structured data
         if getattr(args, 'json', False):
-            output_json(result, args.compact)
+            output = prepare_output(result, args, ADD_ASSUMPTION_ESSENTIAL, ADD_ASSUMPTION_STANDARD)
+            output_json(output, args.compact)
 
         return 0
 
@@ -356,7 +394,9 @@ def cmd_list_assumptions(args, printer):
     if not assumptions:
         if use_json:
             # JSON output - empty array
-            output_json([], args.compact)
+            data = {'assumptions': [], 'spec_id': args.spec_id, 'count': 0, 'filtered': bool(assumption_type)}
+            output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
+            output_json(output, args.compact)
         else:
             if assumption_type:
                 printer.info(f"No {assumption_type} assumptions found")
@@ -373,7 +413,9 @@ def cmd_list_assumptions(args, printer):
 
     if use_json:
         # JSON output
-        output_json(assumptions, args.compact)
+        data = {'assumptions': assumptions, 'spec_id': args.spec_id, 'count': len(assumptions), 'filtered': bool(assumption_type)}
+        output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
+        output_json(output, args.compact)
     else:
         # Pretty print for human readability
         for i, assumption in enumerate(assumptions, 1):
