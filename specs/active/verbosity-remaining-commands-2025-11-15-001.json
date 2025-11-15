@@ -1,7 +1,7 @@
 {
   "spec_id": "verbosity-remaining-commands-2025-11-15-001",
   "generated": "2025-11-15T20:30:00Z",
-  "last_updated": "2025-11-15T20:15:18.794073Z",
+  "last_updated": "2025-11-15T20:16:32.674461Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 39,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
         "objectives": [
@@ -40,7 +40,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 21,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "rationale": "doc_query commands return comprehensive codebase information with large JSON outputs. QUIET mode should show only essential identifiers, NORMAL should include basic metadata, VERBOSE should show full details including relationships and metrics."
       },
@@ -76,7 +76,7 @@
         "task-1-18"
       ],
       "total_tasks": 18,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -309,7 +309,7 @@
     "task-1-10": {
       "type": "task",
       "title": "Apply verbosity to stats command (doc_query)",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -320,12 +320,18 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "notes": "Apply prepare_output using DOC_STATS_ESSENTIAL/STANDARD."
+        "notes": "Apply prepare_output using DOC_STATS_ESSENTIAL/STANDARD.",
+        "started_at": "2025-11-15T20:15:50.062677Z",
+        "status_note": "Applying verbosity filtering to doc_query stats command",
+        "completed_at": "2025-11-15T20:16:32.662355Z",
+        "needs_journaling": false,
+        "actual_hours": 0.012,
+        "journaled_at": "2025-11-15T20:16:32.670883Z"
       }
     },
     "task-1-11": {
@@ -1208,10 +1214,19 @@
       "content": "Successfully defined 18 field set pairs for doc_query commands in output_utils.py:\n- FIND_CLASS, FIND_FUNCTION, FIND_MODULE (name only \u2192 +entity_type/file/line)\n- COMPLEXITY (name/complexity \u2192 +entity_type/file/line)\n- DEPENDENCIES (name/imports \u2192 +imported_by/entity_type/file)\n- SEARCH (name \u2192 +entity_type/file/line/relevance_score)\n- CONTEXT_DOC_QUERY (name \u2192 +entity_type/file/line)\n- DESCRIBE_MODULE (name/classes/functions \u2192 +file/imports/docstring/line_count/complexity)\n- STATS_DOC_QUERY (core counts \u2192 +lines/complexity/metadata)\n- LIST_CLASSES, LIST_FUNCTIONS, LIST_MODULES (name \u2192 +file/line/specific fields)\n- CALLERS, CALLEES (name \u2192 +entity_type/file/line)\n- CALL_GRAPH (nodes/edges \u2192 +entry_points/stats)\n- TRACE_ENTRY (entry_point/call_depth \u2192 +execution_paths/totals)\n- TRACE_DATA (data_item/lifecycle_stages \u2192 +locations/total_references)\n- IMPACT (target/impacts \u2192 +affected items/risk/total)\n- REFACTOR_CANDIDATES (candidates \u2192 +total/priorities)\n\nAll field sets follow the pattern: QUIET=essential (name/id), NORMAL=standard (+type/location), VERBOSE=all fields. Implementation complete in src/claude_skills/claude_skills/cli/sdd/output_utils.py:376-474.",
       "metadata": {},
       "task_id": "task-1-1"
+    },
+    {
+      "timestamp": "2025-11-15T20:16:32.670840Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Apply verbosity to stats command (doc_query)",
+      "author": "claude-code",
+      "content": "Applied verbosity filtering to doc_query stats command. Changes made:\n1. Added imports for prepare_output, STATS_DOC_QUERY_ESSENTIAL, and STATS_DOC_QUERY_STANDARD to cli.py\n2. Modified cmd_stats function to apply prepare_output with the new field sets\n3. Filtered output is now used for both JSON and text output\n\nImplementation ensures QUIET mode shows only essential fields (total_files, total_modules, total_classes, total_functions), NORMAL mode adds standard fields (total_lines, complexity metrics, metadata), and VERBOSE mode shows all fields. Modified file: src/claude_skills/claude_skills/doc_query/cli.py:14-18, 549-559.",
+      "metadata": {},
+      "task_id": "task-1-10"
     }
   ],
   "metadata": {
-    "progress_percentage": 2,
+    "progress_percentage": 5,
     "status": "active",
     "current_phase": "phase-1"
   }

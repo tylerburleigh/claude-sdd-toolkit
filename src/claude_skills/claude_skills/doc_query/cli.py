@@ -11,6 +11,11 @@ from typing import Any, Dict, List, Optional
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.sdd_config import get_default_format
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    STATS_DOC_QUERY_ESSENTIAL,
+    STATS_DOC_QUERY_STANDARD,
+)
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
     QueryResult,
@@ -546,8 +551,12 @@ def cmd_stats(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     stats = query.get_stats()
-    if _maybe_json(args, stats):
+    # Apply verbosity filtering
+    filtered_stats = prepare_output(stats, args, STATS_DOC_QUERY_ESSENTIAL, STATS_DOC_QUERY_STANDARD)
+    if _maybe_json(args, filtered_stats):
         return 0
+    # Use filtered_stats for text output
+    stats = filtered_stats
     metadata = stats.get('metadata', {})
     statistics = stats.get('statistics', {})
     print("\nDocumentation Statistics:")
