@@ -31,6 +31,10 @@ from claude_skills.cli.sdd.output_utils import (
     TRACE_ENTRY_STANDARD,
     TRACE_DATA_ESSENTIAL,
     TRACE_DATA_STANDARD,
+    IMPACT_ESSENTIAL,
+    IMPACT_STANDARD,
+    REFACTOR_CANDIDATES_ESSENTIAL,
+    REFACTOR_CANDIDATES_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -1002,17 +1006,20 @@ def cmd_impact(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(impact_result, args, IMPACT_ESSENTIAL, IMPACT_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, impact_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_impact_json(impact_result)
+        output = format_impact_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_impact_text(impact_result)
+    output = format_impact_text(filtered_result)
     print(output)
     return 0
 
@@ -1046,17 +1053,20 @@ def cmd_refactor_candidates(args: argparse.Namespace, printer: PrettyPrinter) ->
         print(msg)
         return 0
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(result, args, REFACTOR_CANDIDATES_ESSENTIAL, REFACTOR_CANDIDATES_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_refactor_json(result)
+        output = format_refactor_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_refactor_text(result)
+    output = format_refactor_text(filtered_result)
     print(output)
     return 0
 
