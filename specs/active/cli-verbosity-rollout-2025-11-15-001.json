@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T18:06:46.948530Z",
+  "last_updated": "2025-11-15T18:06:47.779404Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 41,
+      "completed_tasks": 42,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -951,7 +951,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -967,7 +967,7 @@
         "task-3-2"
       ],
       "total_tasks": 17,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1008,7 +1008,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 10,
+      "completed_tasks": 11,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -1162,12 +1162,16 @@
     "task-3-1-11": {
       "type": "subtask",
       "title": "LIST_PHASES field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T18:06:47.767619Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T18:06:47.773077Z"
+      }
     },
     "task-3-1-12": {
       "type": "subtask",
@@ -1960,7 +1964,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 54,
+    "progress_percentage": 56,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2386,6 +2390,15 @@
       "content": "Defined field set for GET_JOURNAL command in output_utils.py (lines 296-302). Essential fields: entry_count, entries_list. Standard fields: filtered_results, date_range, task_filter, entry_types.",
       "metadata": {},
       "task_id": "task-3-1-10"
+    },
+    {
+      "timestamp": "2025-11-15T18:06:47.773060Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: LIST_PHASES field sets",
+      "author": "claude-code",
+      "content": "Defined field set for LIST_PHASES command in output_utils.py (lines 303-309). Essential fields: phase_list, total_phases. Standard fields: completion_status_per_phase, timeline, dependencies.",
+      "metadata": {},
+      "task_id": "task-3-1-11"
     }
   ]
 }
