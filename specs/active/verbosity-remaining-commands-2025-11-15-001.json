@@ -1,7 +1,7 @@
 {
   "spec_id": "verbosity-remaining-commands-2025-11-15-001",
   "generated": "2025-11-15T20:30:00Z",
-  "last_updated": "2025-11-15T20:32:09.815349Z",
+  "last_updated": "2025-11-15T20:33:49.556126Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 39,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
         "objectives": [
@@ -40,7 +40,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 21,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "rationale": "doc_query commands return comprehensive codebase information with large JSON outputs. QUIET mode should show only essential identifiers, NORMAL should include basic metadata, VERBOSE should show full details including relationships and metrics."
       },
@@ -76,7 +76,7 @@
         "task-1-18"
       ],
       "total_tasks": 18,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -499,7 +499,7 @@
     "task-1-17": {
       "type": "task",
       "title": "Apply verbosity to trace-entry and trace-data commands",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -510,12 +510,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "notes": "Apply prepare_output using TRACE_ESSENTIAL/STANDARD for both commands."
+        "notes": "Apply prepare_output using TRACE_ESSENTIAL/STANDARD for both commands.",
+        "started_at": "2025-11-15T20:32:38.515994Z",
+        "completed_at": "2025-11-15T20:33:49.543895Z",
+        "needs_journaling": false,
+        "actual_hours": 0.02,
+        "journaled_at": "2025-11-15T20:33:49.552098Z"
       }
     },
     "task-1-18": {
@@ -1307,10 +1312,19 @@
       "content": "Applied verbosity filtering to call-graph command. Added CALL_GRAPH_ESSENTIAL and CALL_GRAPH_STANDARD imports. Modified cmd_call_graph to apply prepare_output to filter the graph dictionary based on verbosity level before output.\n\nImplementation details:\n- Filtering applied to graph dict before JSON, dot, and text output\n- Field sets defined: ESSENTIAL={'nodes', 'edges'}, STANDARD={'nodes', 'edges', 'entry_points', 'stats'}\n- Updated both filtered_graph variable and all references in text/dot output\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic)",
       "metadata": {},
       "task_id": "task-1-16"
+    },
+    {
+      "timestamp": "2025-11-15T20:33:49.552080Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Apply verbosity to trace-entry and trace-data commands",
+      "author": "claude-code",
+      "content": "Applied verbosity filtering to trace-entry and trace-data commands. Added TRACE_ENTRY_ESSENTIAL, TRACE_ENTRY_STANDARD, TRACE_DATA_ESSENTIAL, and TRACE_DATA_STANDARD imports. Modified both cmd_trace_entry and cmd_trace_data to apply prepare_output to filter result dictionaries based on verbosity level before output.\n\nImplementation details:\n- trace-entry: Filters trace_result with TRACE_ENTRY field sets before JSON and text output\n- trace-data: Filters trace_result with TRACE_DATA field sets before JSON and text output\n- Field sets applied:\n  - TRACE_ENTRY_ESSENTIAL: entry_point, call_depth\n  - TRACE_ENTRY_STANDARD: adds execution_paths, total_functions, leaf_functions\n  - TRACE_DATA_ESSENTIAL: data_item, lifecycle_stages\n  - TRACE_DATA_STANDARD: adds read_locations, write_locations, total_references\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic for both commands)",
+      "metadata": {},
+      "task_id": "task-1-17"
     }
   ],
   "metadata": {
-    "progress_percentage": 20,
+    "progress_percentage": 23,
     "status": "active",
     "current_phase": "phase-1"
   }

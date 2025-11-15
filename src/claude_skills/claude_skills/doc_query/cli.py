@@ -27,6 +27,10 @@ from claude_skills.cli.sdd.output_utils import (
     CALLEES_STANDARD,
     CALL_GRAPH_ESSENTIAL,
     CALL_GRAPH_STANDARD,
+    TRACE_ENTRY_ESSENTIAL,
+    TRACE_ENTRY_STANDARD,
+    TRACE_DATA_ESSENTIAL,
+    TRACE_DATA_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -904,17 +908,20 @@ def cmd_trace_entry(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(trace_result, args, TRACE_ENTRY_ESSENTIAL, TRACE_ENTRY_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, trace_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_json_output(trace_result)
+        output = format_json_output(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_text_output(trace_result)
+    output = format_text_output(filtered_result)
     print(output)
     return 0
 
@@ -948,17 +955,20 @@ def cmd_trace_data(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(trace_result, args, TRACE_DATA_ESSENTIAL, TRACE_DATA_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, trace_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_trace_data_json(trace_result)
+        output = format_trace_data_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_trace_data_text(trace_result)
+    output = format_trace_data_text(filtered_result)
     print(output)
     return 0
 
