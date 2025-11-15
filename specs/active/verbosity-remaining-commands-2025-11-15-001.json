@@ -1,0 +1,1218 @@
+{
+  "spec_id": "verbosity-remaining-commands-2025-11-15-001",
+  "generated": "2025-11-15T20:30:00Z",
+  "last_updated": "2025-11-15T20:15:18.794073Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Verbosity Filtering - Remaining Commands Rollout",
+      "description": "Complete verbosity filtering implementation for all remaining SDD commands not covered in cli-verbosity-rollout-2025-11-15-001. Focuses on doc_query module (18 commands with large output), sdd_update metadata commands (15 commands), and other high-value commands across code_doc, run_tests, and sdd_spec_mod modules.",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 39,
+      "completed_tasks": 1,
+      "metadata": {
+        "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
+        "objectives": [
+          "Implement verbosity filtering for all doc_query commands (18 commands)",
+          "Add verbosity support to sdd_update metadata commands (15 commands)",
+          "Apply verbosity to code_doc, run_tests, and sdd_spec_mod modules",
+          "Achieve 100% verbosity coverage across all SDD CLI commands",
+          "Reduce output size for automation/AI use cases by 40-60% in QUIET mode"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "doc_query Module - High-Impact Commands",
+      "description": "Implement verbosity filtering for the 18 doc_query commands. These return large result sets and are frequently used by AI agents, making them the highest-priority candidates for output reduction.",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 21,
+      "completed_tasks": 1,
+      "metadata": {
+        "rationale": "doc_query commands return comprehensive codebase information with large JSON outputs. QUIET mode should show only essential identifiers, NORMAL should include basic metadata, VERBOSE should show full details including relationships and metrics."
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6",
+        "task-1-7",
+        "task-1-8",
+        "task-1-9",
+        "task-1-10",
+        "task-1-11",
+        "task-1-12",
+        "task-1-13",
+        "task-1-14",
+        "task-1-15",
+        "task-1-16",
+        "task-1-17",
+        "task-1-18"
+      ],
+      "total_tasks": 18,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Define field sets for doc_query commands",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2",
+          "task-1-3",
+          "task-1-4",
+          "task-1-5",
+          "task-1-6",
+          "task-1-7",
+          "task-1-8",
+          "task-1-9",
+          "task-1-10",
+          "task-1-11",
+          "task-1-12",
+          "task-1-13",
+          "task-1-14",
+          "task-1-15",
+          "task-1-16",
+          "task-1-17",
+          "task-1-18"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Add 18 pairs of ESSENTIAL/STANDARD field sets for: find-class, find-function, find-module, complexity, dependencies, search, context, describe-module, stats, list-classes, list-functions, list-modules, callers, callees, call-graph, trace-entry, trace-data, impact. QUIET=essential (name/id only), NORMAL=standard (add type/location), VERBOSE=all fields",
+        "started_at": "2025-11-15T20:13:42.505087Z",
+        "status_note": "Starting autonomous mode execution - defining 18 field set pairs for doc_query commands",
+        "completed_at": "2025-11-15T20:15:18.786727Z",
+        "needs_journaling": false,
+        "actual_hours": 0.027,
+        "journaled_at": "2025-11-15T20:15:18.791973Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Apply verbosity to find-class command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using FIND_CLASS_ESSENTIAL/STANDARD. Target 60% reduction in QUIET mode."
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Apply verbosity to find-function command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using FIND_FUNCTION_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Apply verbosity to find-module command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using FIND_MODULE_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "Apply verbosity to complexity command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using COMPLEXITY_ESSENTIAL/STANDARD. QUIET shows name+score only."
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "Apply verbosity to dependencies command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using DEPENDENCIES_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-7": {
+      "type": "task",
+      "title": "Apply verbosity to search command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using SEARCH_ESSENTIAL/STANDARD. High-impact command."
+      }
+    },
+    "task-1-8": {
+      "type": "task",
+      "title": "Apply verbosity to context command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using CONTEXT_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-9": {
+      "type": "task",
+      "title": "Apply verbosity to describe-module command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using DESCRIBE_MODULE_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-10": {
+      "type": "task",
+      "title": "Apply verbosity to stats command (doc_query)",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using DOC_STATS_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-11": {
+      "type": "task",
+      "title": "Apply verbosity to list-classes command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using LIST_CLASSES_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-12": {
+      "type": "task",
+      "title": "Apply verbosity to list-functions command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using LIST_FUNCTIONS_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-13": {
+      "type": "task",
+      "title": "Apply verbosity to list-modules command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using LIST_MODULES_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-14": {
+      "type": "task",
+      "title": "Apply verbosity to callers command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using CALLERS_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-15": {
+      "type": "task",
+      "title": "Apply verbosity to callees command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using CALLEES_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-16": {
+      "type": "task",
+      "title": "Apply verbosity to call-graph command",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using CALL_GRAPH_ESSENTIAL/STANDARD."
+      }
+    },
+    "task-1-17": {
+      "type": "task",
+      "title": "Apply verbosity to trace-entry and trace-data commands",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using TRACE_ESSENTIAL/STANDARD for both commands."
+      }
+    },
+    "task-1-18": {
+      "type": "task",
+      "title": "Apply verbosity to impact and refactor-candidates commands",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "notes": "Apply prepare_output using IMPACT_ESSENTIAL/STANDARD and REFACTOR_CANDIDATES_ESSENTIAL/STANDARD."
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Test doc_query commands with all verbosity levels",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All 18 doc_query commands tested with --quiet, default, and --verbose flags. Output verified for correct field inclusion/omission.",
+        "command": "Test commands: sdd doc search 'query' --quiet/--verbose, sdd doc list-classes --quiet/--verbose, etc."
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Measure output reduction for doc_query commands",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sample 5 doc_query commands and measure character count reduction. QUIET mode should show 50-70% reduction compared to VERBOSE.",
+        "command": ""
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "sdd_update Metadata Commands",
+      "description": "Add verbosity filtering to 15 metadata management commands in sdd_update module. These commands typically have smaller outputs but are used in automation workflows.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Define field sets for sdd_update metadata commands",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Add field sets for: update-status, mark-blocked, unblock-task, add-journal, add-revision, update-frontmatter, add-verification, execute-verify, format-verification-summary, move-spec, activate-spec, complete-spec, bulk-journal, sync-metadata, update-task-metadata"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Apply verbosity to sdd_update metadata commands",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Apply prepare_output pattern to 15 metadata command functions using field sets from task-2-1"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test sdd_update metadata commands with verbosity",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Sample 5 metadata commands tested with different verbosity levels. Verify output filtering works correctly.",
+        "command": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Other High-Value Modules",
+      "description": "Add verbosity support to code_doc, run_tests, and sdd_spec_mod modules. These modules have moderate output sizes but are used in critical workflows.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Add verbosity to code_doc commands (generate, validate, analyze)",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/code_doc/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Define field sets and apply prepare_output for 3 code_doc commands"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Add verbosity to run_tests commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/run_tests/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Define field sets and apply prepare_output for run, discover, consult, check-tools commands"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Add verbosity to sdd_spec_mod commands",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_spec_mod/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "notes": "Define field sets and apply prepare_output for apply-modifications and parse-review commands"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Test Phase 3 module commands with verbosity",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Test representative commands from code_doc, run_tests, and sdd_spec_mod modules with different verbosity levels",
+        "command": ""
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Low-Priority Utility Commands",
+      "description": "Add verbosity to remaining low-priority commands that have minimal output or are primarily interactive (sdd_plan, sdd_plan_review, sdd_pr, sdd_render, context_tracker, verify-tools, report).",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "rationale": "These commands have minimal output or are primarily human-focused, so verbosity provides less value. Including for completeness and consistency."
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "Add verbosity to miscellaneous commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "Multiple files",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Add minimal verbosity support to: sdd_plan (create, analyze, template), sdd_plan_review (review), sdd_pr (create-pr), sdd_render (render), sdd_validate (report), sdd_next (verify-tools)"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "Add verbosity to context_tracker commands",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/context_tracker/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "notes": "Add verbosity support to session-marker and context commands (already have some filtering but could be enhanced)"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Testing and Documentation",
+      "description": "Create comprehensive tests for all verbosity implementations and update documentation to reflect 100% verbosity coverage.",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Create integration tests for doc_query verbosity",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_doc_query_verbosity.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "notes": "Test all doc_query commands with QUIET/NORMAL/VERBOSE modes. Verify field filtering and output reduction."
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Create output reduction measurement tests",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_verbosity_output_reduction.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Measure character count reduction for sample commands. Verify 40-60% reduction targets met in QUIET mode."
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "Update verbosity documentation",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/verbosity-system.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "notes": "Document complete verbosity coverage, field sets for all commands, usage examples, and best practices for AI/automation workflows."
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Run all verbosity integration tests",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_doc_query_verbosity.py tests/test_verbosity_output_reduction.py -v",
+        "expected": ""
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Verify 100% command coverage",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "All ~90 SDD CLI commands have verbosity support. No commands missing --quiet/--verbose flags or field filtering.",
+        "command": ""
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Complete spec implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root"
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-15T20:15:18.791961Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define field sets for doc_query commands",
+      "author": "claude-code",
+      "content": "Successfully defined 18 field set pairs for doc_query commands in output_utils.py:\n- FIND_CLASS, FIND_FUNCTION, FIND_MODULE (name only \u2192 +entity_type/file/line)\n- COMPLEXITY (name/complexity \u2192 +entity_type/file/line)\n- DEPENDENCIES (name/imports \u2192 +imported_by/entity_type/file)\n- SEARCH (name \u2192 +entity_type/file/line/relevance_score)\n- CONTEXT_DOC_QUERY (name \u2192 +entity_type/file/line)\n- DESCRIBE_MODULE (name/classes/functions \u2192 +file/imports/docstring/line_count/complexity)\n- STATS_DOC_QUERY (core counts \u2192 +lines/complexity/metadata)\n- LIST_CLASSES, LIST_FUNCTIONS, LIST_MODULES (name \u2192 +file/line/specific fields)\n- CALLERS, CALLEES (name \u2192 +entity_type/file/line)\n- CALL_GRAPH (nodes/edges \u2192 +entry_points/stats)\n- TRACE_ENTRY (entry_point/call_depth \u2192 +execution_paths/totals)\n- TRACE_DATA (data_item/lifecycle_stages \u2192 +locations/total_references)\n- IMPACT (target/impacts \u2192 +affected items/risk/total)\n- REFACTOR_CANDIDATES (candidates \u2192 +total/priorities)\n\nAll field sets follow the pattern: QUIET=essential (name/id), NORMAL=standard (+type/location), VERBOSE=all fields. Implementation complete in src/claude_skills/claude_skills/cli/sdd/output_utils.py:376-474.",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ],
+  "metadata": {
+    "progress_percentage": 2,
+    "status": "active",
+    "current_phase": "phase-1"
+  }
+}

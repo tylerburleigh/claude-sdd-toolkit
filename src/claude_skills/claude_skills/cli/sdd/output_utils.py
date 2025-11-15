@@ -372,3 +372,103 @@ CREATE_TASK_COMMIT_STANDARD = {
     'success', 'commit_hash', 'task_id', 'files_committed',
     'commit_message', 'branch'
 }
+
+# ============================================================================
+# doc_query commands - 18 field set pairs
+# ============================================================================
+
+# find-class command (doc_query)
+FIND_CLASS_ESSENTIAL = {'name'}
+FIND_CLASS_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# find-function command (doc_query)
+FIND_FUNCTION_ESSENTIAL = {'name'}
+FIND_FUNCTION_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# find-module command (doc_query)
+FIND_MODULE_ESSENTIAL = {'name'}
+FIND_MODULE_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# complexity command (doc_query)
+COMPLEXITY_ESSENTIAL = {'name', 'complexity'}
+COMPLEXITY_STANDARD = {'name', 'complexity', 'entity_type', 'file', 'line'}
+
+# dependencies command (doc_query)
+DEPENDENCIES_ESSENTIAL = {'name', 'imports'}
+DEPENDENCIES_STANDARD = {'name', 'imports', 'imported_by', 'entity_type', 'file'}
+
+# search command (doc_query)
+SEARCH_ESSENTIAL = {'name'}
+SEARCH_STANDARD = {'name', 'entity_type', 'file', 'line', 'relevance_score'}
+
+# context command (doc_query)
+CONTEXT_DOC_QUERY_ESSENTIAL = {'name'}
+CONTEXT_DOC_QUERY_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# describe-module command (doc_query)
+DESCRIBE_MODULE_ESSENTIAL = {'name', 'classes', 'functions'}
+DESCRIBE_MODULE_STANDARD = {
+    'name', 'file', 'classes', 'functions', 'imports',
+    'docstring', 'line_count', 'complexity'
+}
+
+# stats command (doc_query)
+STATS_DOC_QUERY_ESSENTIAL = {'total_files', 'total_modules', 'total_classes', 'total_functions'}
+STATS_DOC_QUERY_STANDARD = {
+    'total_files', 'total_modules', 'total_classes', 'total_functions',
+    'total_lines', 'avg_complexity', 'max_complexity', 'high_complexity_count',
+    'generated_at', 'metadata', 'statistics'
+}
+
+# list-classes command (doc_query)
+LIST_CLASSES_ESSENTIAL = {'name'}
+LIST_CLASSES_STANDARD = {'name', 'file', 'line', 'methods', 'bases'}
+
+# list-functions command (doc_query)
+LIST_FUNCTIONS_ESSENTIAL = {'name'}
+LIST_FUNCTIONS_STANDARD = {'name', 'file', 'line', 'complexity', 'params'}
+
+# list-modules command (doc_query)
+LIST_MODULES_ESSENTIAL = {'name'}
+LIST_MODULES_STANDARD = {'name', 'file', 'classes', 'functions'}
+
+# callers command (doc_query)
+CALLERS_ESSENTIAL = {'name'}
+CALLERS_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# callees command (doc_query)
+CALLEES_ESSENTIAL = {'name'}
+CALLEES_STANDARD = {'name', 'entity_type', 'file', 'line'}
+
+# call-graph command (doc_query)
+CALL_GRAPH_ESSENTIAL = {'nodes', 'edges'}
+CALL_GRAPH_STANDARD = {'nodes', 'edges', 'entry_points', 'stats'}
+
+# trace-entry command (doc_query)
+TRACE_ENTRY_ESSENTIAL = {'entry_point', 'call_depth'}
+TRACE_ENTRY_STANDARD = {
+    'entry_point', 'call_depth', 'execution_paths',
+    'total_functions', 'leaf_functions'
+}
+
+# trace-data command (doc_query)
+TRACE_DATA_ESSENTIAL = {'data_item', 'lifecycle_stages'}
+TRACE_DATA_STANDARD = {
+    'data_item', 'lifecycle_stages', 'read_locations',
+    'write_locations', 'total_references'
+}
+
+# impact command (doc_query)
+IMPACT_ESSENTIAL = {'target', 'direct_impact', 'indirect_impact'}
+IMPACT_STANDARD = {
+    'target', 'direct_impact', 'indirect_impact',
+    'affected_modules', 'affected_classes', 'affected_functions',
+    'risk_level', 'total_affected'
+}
+
+# refactor-candidates command (doc_query) - combined with impact as task-1-18
+REFACTOR_CANDIDATES_ESSENTIAL = {'candidates'}
+REFACTOR_CANDIDATES_STANDARD = {
+    'candidates', 'total_candidates', 'high_priority',
+    'medium_priority', 'low_priority'
+}
