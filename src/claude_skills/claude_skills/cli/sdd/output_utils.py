@@ -580,3 +580,21 @@ UPDATE_TASK_METADATA_STANDARD = {
     'success', 'task_id', 'spec_id', 'updated_fields',
     'updated_at', 'metadata'
 }
+
+# code_doc generate command
+DOC_GENERATE_ESSENTIAL = {'status', 'project', 'output_dir'}
+DOC_GENERATE_STANDARD = {
+    'status', 'project', 'output_dir', 'format'
+}
+
+# code_doc validate command
+DOC_VALIDATE_ESSENTIAL = {'status', 'message'}
+DOC_VALIDATE_STANDARD = {
+    'status', 'message', 'schema'
+}
+
+# code_doc analyze command
+DOC_ANALYZE_ESSENTIAL = {'status', 'project', 'statistics'}
+DOC_ANALYZE_STANDARD = {
+    'status', 'project', 'statistics'
+}

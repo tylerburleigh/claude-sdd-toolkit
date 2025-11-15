@@ -42,6 +42,15 @@ from typing import Iterable, Optional
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.schema_loader import load_json_schema
 from claude_skills.common.metrics import track_metrics
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    DOC_GENERATE_ESSENTIAL,
+    DOC_GENERATE_STANDARD,
+    DOC_VALIDATE_ESSENTIAL,
+    DOC_VALIDATE_STANDARD,
+    DOC_ANALYZE_ESSENTIAL,
+    DOC_ANALYZE_STANDARD,
+)
 from claude_skills.code_doc.generator import DocumentationGenerator
 from claude_skills.code_doc.parsers import Language, create_parser_factory
 from claude_skills.code_doc.calculator import calculate_statistics
@@ -209,12 +218,14 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             format_type=args.format,
             verbose=getattr(args, 'verbose', False),
         )
-        if _print_if_json(args, {
+        output_data = {
             "status": "ok",
             "project": project_name,
             "output_dir": str(output_dir.resolve()),
             "format": args.format,
-        }, printer):
+        }
+        output_data = prepare_output(output_data, args, DOC_GENERATE_ESSENTIAL, DOC_GENERATE_STANDARD)
+        if _print_if_json(args, output_data, printer):
             return 0
         printer.success(f"Documentation generated at {output_dir}")
         return 0
@@ -252,6 +263,7 @@ def cmd_validate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         if errors is not None:
             schema_info["errors"] = errors
         payload = {"status": status, "message": message, "schema": schema_info}
+        payload = prepare_output(payload, args, DOC_VALIDATE_ESSENTIAL, DOC_VALIDATE_STANDARD)
         if _print_if_json(args, payload, printer):
             return 0 if status == "ok" else 1
         if status == "ok":
@@ -264,6 +276,7 @@ def cmd_validate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         if errors is not None:
             schema_info["errors"] = errors
         payload = {"status": "error", "message": message, "schema": schema_info}
+        payload = prepare_output(payload, args, DOC_VALIDATE_ESSENTIAL, DOC_VALIDATE_STANDARD)
         if _print_if_json(args, payload, printer):
             return 1
         printer.error(message)
@@ -345,6 +358,7 @@ def cmd_analyze(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             "project": args.name or project_dir.name,
             "statistics": statistics,
         }
+        payload = prepare_output(payload, args, DOC_ANALYZE_ESSENTIAL, DOC_ANALYZE_STANDARD)
         if _print_if_json(args, payload, printer):
             return 0
 
