@@ -53,7 +53,7 @@ class PlainUi:
         collect_messages: Whether to collect messages for deferred rendering
         _messages: Collection of structured messages
         _context_stack: Stack of context dictionaries for message tagging
-        quiet: Whether to suppress non-error output
+        quiet: Whether to suppress non-critical output (errors and warnings always print)
         file: Output file object (default stdout)
     """
 
@@ -68,14 +68,14 @@ class PlainUi:
 
         Args:
             collect_messages: Whether to collect messages for deferred rendering
-            quiet: Suppress non-error output (errors always print)
+            quiet: Suppress non-critical output (errors and warnings always print)
             file: Output file object (default sys.stdout)
 
         Example:
             # Standard output
             ui = PlainUi()
 
-            # Quiet mode (errors only)
+            # Quiet mode (errors and warnings only)
             ui = PlainUi(quiet=True)
 
             # Collection mode
@@ -472,7 +472,7 @@ class PlainUi:
         """
         Output text to file or collect as message.
 
-        Respects quiet mode (errors always print).
+        Respects quiet mode (errors and warnings always print).
 
         Args:
             text: Text to output
@@ -482,8 +482,8 @@ class PlainUi:
         if self.collect_messages:
             self._add_message(level, text, metadata)
         else:
-            # Check quiet mode
-            if self.quiet and level != MessageLevel.ERROR:
+            # Check quiet mode - always allow errors and warnings through
+            if self.quiet and level not in (MessageLevel.ERROR, MessageLevel.WARNING):
                 return
 
             self._write(text)

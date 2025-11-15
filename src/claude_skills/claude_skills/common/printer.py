@@ -192,7 +192,9 @@ class PrettyPrinter:
         """
         Print a warning message (non-blocking issue).
 
-        Warnings are printed to stderr.
+        Warnings always print regardless of verbosity level (QUIET, NORMAL, VERBOSE).
+        This ensures important non-blocking issues are never silently suppressed.
+        Printed to stderr.
 
         Args:
             msg: Warning message to display
@@ -201,14 +203,15 @@ class PrettyPrinter:
             printer.warning("Deprecated configuration format detected")
             printer.warning("Task has no estimated_hours metadata")
         """
-        if not self.quiet:
-            self._ui.print_status(msg, level=MessageLevel.WARNING)
+        # Warnings always print (ignore quiet mode) - users need to see issues
+        self._ui.print_status(msg, level=MessageLevel.WARNING)
 
     def error(self, msg: str) -> None:
         """
         Print an error message (blocking issue).
 
-        Errors always print regardless of quiet mode.
+        Errors always print regardless of verbosity level (QUIET, NORMAL, VERBOSE).
+        Critical issues must never be suppressed.
         Printed to stderr.
 
         Args:
@@ -218,7 +221,7 @@ class PrettyPrinter:
             printer.error("Spec file not found")
             printer.error("Invalid task ID format")
         """
-        # Errors always print (ignore quiet mode)
+        # Errors always print (ignore verbosity level) - critical issues must be visible
         self._ui.print_status(msg, level=MessageLevel.ERROR)
 
     def header(self, msg: str) -> None:

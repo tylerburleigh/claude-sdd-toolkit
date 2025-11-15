@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 09:09:36
+**Generated:** 2025-11-15 09:11:46
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109430
+- **Total Lines:** 109465
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.66
@@ -2188,7 +2188,7 @@ Attributes:
 ### `PrettyPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/printer.py:27`
+**Defined in:** `src/claude_skills/claude_skills/common/printer.py:30`
 
 **Description:**
 > Utility for consistent, pretty console output optimized for Claude Code.
@@ -2204,10 +2204,17 @@ The Ui backend (RichUi or PlainUi) is automatically selected based on:
 All original methods are preserved with identical signatures, ensuring
 100% backward compatibility with existing code.
 
+Verbosity Control:
+- Supports both legacy boolean flags (quiet, verbose) and new VerbosityLevel enum
+- VerbosityLevel.QUIET: Errors only, minimal output
+- VerbosityLevel.NORMAL: Standard output (default)
+- VerbosityLevel.VERBOSE: Detailed output including info messages
+
 Attributes:
     use_color: Whether to use ANSI color codes (auto-disabled if not TTY)
-    verbose: Whether to show detailed info messages
-    quiet: Whether to suppress non-error output
+    verbose: Whether to show detailed info messages (legacy, use verbosity_level)
+    quiet: Whether to suppress non-error output (legacy, use verbosity_level)
+    verbosity_level: VerbosityLevel enum (QUIET, NORMAL, or VERBOSE)
     _ui: Internal Ui backend (RichUi or PlainUi)
 
 **Methods:**
@@ -34431,6 +34438,7 @@ Returns:
 
 - `sys`
 - `typing.Optional`
+- `typing.TYPE_CHECKING`
 - `ui_factory.create_ui`
 - `ui_protocol.MessageLevel`
 - `ui_protocol.Ui`
