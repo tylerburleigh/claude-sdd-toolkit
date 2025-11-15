@@ -157,6 +157,28 @@ VALIDATE_STANDARD = {
     'auto_fixable_issues', 'schema'
 }
 
+# fix command (sdd_validate)
+FIX_SPEC_ESSENTIAL = {'spec_id', 'applied_action_count', 'post_status'}
+FIX_SPEC_STANDARD = {
+    'spec_id', 'applied_action_count', 'skipped_action_count',
+    'migration_action_count', 'backup_path', 'remaining_errors',
+    'remaining_warnings', 'post_status', 'migrated_tasks'
+}
+
+# stats command (sdd_validate)
+STATS_ESSENTIAL = {'spec_id', 'totals', 'status_counts'}
+STATS_STANDARD = {
+    'spec_id', 'title', 'version', 'status', 'totals',
+    'status_counts', 'max_depth', 'avg_tasks_per_phase',
+    'verification_coverage', 'progress', 'file_size_kb'
+}
+
+# analyze-deps command (sdd_validate)
+ANALYZE_DEPS_ESSENTIAL = {'status'}
+ANALYZE_DEPS_STANDARD = {
+    'cycles', 'orphaned', 'deadlocks', 'bottlenecks', 'status'
+}
+
 # check-deps command
 CHECK_DEPS_ESSENTIAL = {'task_id', 'can_start'}
 CHECK_DEPS_STANDARD = {
