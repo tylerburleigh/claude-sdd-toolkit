@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:30:15.721491Z",
+  "last_updated": "2025-11-15T17:31:31.526712Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 17,
+      "completed_tasks": 18,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -583,7 +583,7 @@
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -666,12 +666,19 @@
     "task-2-1-3": {
       "type": "subtask",
       "title": "INIT_ENV field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-15T17:30:25.268577Z",
+        "status_note": "Defining INIT_ENV, VALIDATE_SPEC, and remaining field sets for sdd_next commands",
+        "completed_at": "2025-11-15T17:31:31.514735Z",
+        "needs_journaling": false,
+        "actual_hours": 0.018,
+        "journaled_at": "2025-11-15T17:31:31.523569Z"
+      }
     },
     "task-2-1-4": {
       "type": "subtask",
@@ -1841,7 +1848,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 22,
+    "progress_percentage": 24,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2024,6 +2031,15 @@
       "content": "Defined TASK_INFO field sets in output_utils.py. Added TASK_INFO_ESSENTIAL (type, title, status) and TASK_INFO_STANDARD (type, title, status, parent, children, dependencies, total_tasks, completed_tasks, metadata). File modified: src/claude_skills/claude_skills/cli/sdd/output_utils.py (lines 179-184).",
       "metadata": {},
       "task_id": "task-2-1-2"
+    },
+    {
+      "timestamp": "2025-11-15T17:31:31.523551Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: INIT_ENV field sets",
+      "author": "claude-code",
+      "content": "Defined INIT_ENV field set for sdd_next commands in output_utils.py: essential (success), standard (success, spec_id, spec_file, variables, exported)",
+      "metadata": {},
+      "task_id": "task-2-1-3"
     }
   ]
 }

@@ -182,3 +182,50 @@ TASK_INFO_STANDARD = {
     'type', 'title', 'status', 'parent', 'children',
     'dependencies', 'total_tasks', 'completed_tasks', 'metadata'
 }
+
+# init-env command
+INIT_ENV_ESSENTIAL = {'success'}
+INIT_ENV_STANDARD = {'success', 'spec_id', 'spec_file', 'variables', 'exported'}
+
+# validate-spec command
+VALIDATE_SPEC_ESSENTIAL = {'valid', 'errors'}
+VALIDATE_SPEC_STANDARD = {'valid', 'errors', 'warnings', 'spec_id', 'schema_version'}
+
+# find-pattern command
+FIND_PATTERN_ESSENTIAL = {'pattern', 'matches'}
+FIND_PATTERN_STANDARD = {'pattern', 'matches', 'files_searched', 'search_paths'}
+
+# detect-project command
+DETECT_PROJECT_ESSENTIAL = {'project_type'}
+DETECT_PROJECT_STANDARD = {'project_type', 'confidence', 'indicators', 'project_root'}
+
+# find-tests command
+FIND_TESTS_ESSENTIAL = {'test_files'}
+FIND_TESTS_STANDARD = {'test_files', 'test_framework', 'test_count', 'test_directories'}
+
+# check-environment command
+CHECK_ENVIRONMENT_ESSENTIAL = {'status'}
+CHECK_ENVIRONMENT_STANDARD = {'status', 'python_version', 'dependencies', 'missing', 'warnings'}
+
+# find-circular-deps command
+FIND_CIRCULAR_DEPS_ESSENTIAL = {'has_cycles', 'cycles'}
+FIND_CIRCULAR_DEPS_STANDARD = {'has_cycles', 'cycles', 'total_tasks', 'analyzed'}
+
+# find-related-files command
+FIND_RELATED_FILES_ESSENTIAL = {'task_id', 'related_files'}
+FIND_RELATED_FILES_STANDARD = {'task_id', 'related_files', 'file_types', 'relationships'}
+
+# validate-paths command
+VALIDATE_PATHS_ESSENTIAL = {'valid', 'invalid_paths'}
+VALIDATE_PATHS_STANDARD = {'valid', 'invalid_paths', 'validated_count', 'warnings'}
+
+# spec-stats command
+SPEC_STATS_ESSENTIAL = {'spec_id', 'total_tasks', 'completed_tasks'}
+SPEC_STATS_STANDARD = {
+    'spec_id', 'total_tasks', 'completed_tasks', 'percentage',
+    'phases', 'task_types', 'estimated_hours', 'actual_hours'
+}
+
+# format-plan command
+FORMAT_PLAN_ESSENTIAL = {'formatted'}
+FORMAT_PLAN_STANDARD = {'formatted', 'plan_structure', 'sections', 'word_count'}
