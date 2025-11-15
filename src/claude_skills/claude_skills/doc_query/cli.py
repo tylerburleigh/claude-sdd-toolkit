@@ -19,6 +19,8 @@ from claude_skills.cli.sdd.output_utils import (
     LIST_CLASSES_STANDARD,
     LIST_FUNCTIONS_ESSENTIAL,
     LIST_FUNCTIONS_STANDARD,
+    LIST_MODULES_ESSENTIAL,
+    LIST_MODULES_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -706,9 +708,19 @@ def cmd_list_modules(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if hasattr(args, 'limit') and args.limit:
         results = results[:args.limit]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, LIST_MODULES_ESSENTIAL, LIST_MODULES_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
