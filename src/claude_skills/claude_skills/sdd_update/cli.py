@@ -52,6 +52,8 @@ from claude_skills.cli.sdd.output_utils import (
     prepare_output,
     QUERY_TASKS_ESSENTIAL,
     QUERY_TASKS_STANDARD,
+    LIST_BLOCKERS_ESSENTIAL,
+    LIST_BLOCKERS_STANDARD,
 )
 from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
@@ -973,7 +975,12 @@ def cmd_list_blockers(args, printer):
     )
 
     if args.json and blockers is not None:
-        output_json(blockers, args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_blockers = [
+            prepare_output(blocker, args, LIST_BLOCKERS_ESSENTIAL, LIST_BLOCKERS_STANDARD)
+            for blocker in blockers
+        ]
+        output_json(filtered_blockers, args.compact)
 
     return 0 if blockers is not None else 1
 
