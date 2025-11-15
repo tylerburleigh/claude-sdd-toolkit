@@ -1,5 +1,6 @@
 """Shared argument groups for unified CLI."""
 import argparse
+from claude_skills.cli.sdd.verbosity import VerbosityLevel
 
 
 def create_global_parent_parser(config=None):
@@ -32,10 +33,17 @@ def add_global_options(parser, config=None):
         from claude_skills.common.sdd_config import load_sdd_config
         config = load_sdd_config()
 
-    parser.add_argument(
+    # Verbosity options - mutually exclusive
+    verbosity_group = parser.add_mutually_exclusive_group()
+    verbosity_group.add_argument(
         '--quiet', '-q',
         action='store_true',
-        help='Suppress non-essential output'
+        help='Minimal output - essential data only, omit empty fields'
+    )
+    verbosity_group.add_argument(
+        '--verbose', '-v',
+        action='store_true',
+        help='Detailed output - includes debug information and metrics'
     )
 
     # JSON output - use mutually exclusive group for proper default handling
@@ -119,11 +127,6 @@ def add_global_options(parser, config=None):
         help='Enable debug mode with full stack traces'
     )
     parser.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Show detailed output (info messages)'
-    )
-    parser.add_argument(
         '--no-color',
         action='store_true',
         help='Disable colored output'
@@ -144,3 +147,20 @@ def add_task_options(parser):
         'task_id',
         help='Task ID'
     )
+
+
+def get_verbosity_level(args, config=None):
+    """Get the verbosity level from parsed arguments.
+
+    Args:
+        args: Parsed argparse.Namespace
+        config: Optional config dict (for default level)
+
+    Returns:
+        VerbosityLevel enum value
+    """
+    try:
+        return VerbosityLevel.from_args(args)
+    except ValueError as e:
+        # Both --quiet and --verbose specified
+        raise argparse.ArgumentTypeError(str(e))
