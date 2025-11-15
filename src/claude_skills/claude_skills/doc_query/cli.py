@@ -25,6 +25,8 @@ from claude_skills.cli.sdd.output_utils import (
     CALLERS_STANDARD,
     CALLEES_ESSENTIAL,
     CALLEES_STANDARD,
+    CALL_GRAPH_ESSENTIAL,
+    CALL_GRAPH_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -831,36 +833,39 @@ def cmd_call_graph(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         print(f"\nFunction '{args.function_name}' not found in documentation")
         return 1
 
+    # Apply verbosity filtering to the graph
+    filtered_graph = prepare_output(graph, args, CALL_GRAPH_ESSENTIAL, CALL_GRAPH_STANDARD)
+
     # Handle output format
     output_format = getattr(args, 'format', 'text')
 
-    if output_format == 'json' or _maybe_json(args, graph):
+    if output_format == 'json' or _maybe_json(args, filtered_graph):
         return 0
 
     if output_format == 'dot':
-        print(format_call_graph_as_dot(graph))
+        print(format_call_graph_as_dot(filtered_graph))
         return 0
 
     # Text output (default)
     print(f"\nCall Graph for '{args.function_name}':")
-    print(f"  Direction: {graph['direction']}")
-    print(f"  Max Depth: {graph['max_depth']}")
-    print(f"  Nodes: {len(graph.get('nodes', {}))}")
-    print(f"  Edges: {len(graph.get('edges', []))}")
+    print(f"  Direction: {filtered_graph['direction']}")
+    print(f"  Max Depth: {filtered_graph['max_depth']}")
+    print(f"  Nodes: {len(filtered_graph.get('nodes', {}))}")
+    print(f"  Edges: {len(filtered_graph.get('edges', []))}")
 
-    if graph.get('truncated'):
+    if filtered_graph.get('truncated'):
         print(f"  ⚠️  Graph truncated at max depth")
 
     print("\nNodes:")
-    for node_name, node_data in graph.get('nodes', {}).items():
+    for node_name, node_data in filtered_graph.get('nodes', {}).items():
         depth = node_data.get('depth', 0)
         indent = "  " * (depth + 1)
         file_info = f" ({node_data.get('file', 'unknown')})" if node_data.get('file') else ""
-        marker = "→ " if node_name == graph['root'] else "  "
+        marker = "→ " if node_name == filtered_graph['root'] else "  "
         print(f"{indent}{marker}{node_name}{file_info}")
 
     print("\nEdges:")
-    for edge in graph.get('edges', []):
+    for edge in filtered_graph.get('edges', []):
         from_node = edge.get('from', 'unknown')
         to_node = edge.get('to', 'unknown')
         call_type = edge.get('call_type', 'unknown')
