@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 10:50:04
+**Generated:** 2025-11-15 10:52:35
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109476
+- **Total Lines:** 109492
 - **Total Classes:** 444
 - **Total Functions:** 1421
-- **Avg Complexity:** 4.66
+- **Avg Complexity:** 4.67
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -9276,7 +9276,7 @@ Returns:
 ### `_create_progress_bar_plain(percentage, width) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:12`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:17`
 **Complexity:** 1
 
 **Description:**
@@ -11566,7 +11566,7 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_print_specs_text(specs_info, verbose, printer, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:136`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:151`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -15964,7 +15964,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_sync_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1203`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1204`
 **Complexity:** 3
 
 **Description:**
@@ -16129,7 +16129,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update_task_metadata(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1222`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1223`
 ⚠️ **Complexity:** 25 (High)
 
 **Description:**
@@ -23815,8 +23815,8 @@ Args:
 ### `list_specs() -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:36`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:41`
+⚠️ **Complexity:** 12 (High)
 
 **Description:**
 > List specification files with optional filtering.
@@ -23828,6 +23828,7 @@ Args:
     verbose: Include detailed information
     printer: PrettyPrinter instance for output
     ui: UI instance for console output (optional)
+    args: Command arguments (for verbosity filtering)
 
 Returns:
     List of spec info dictionaries
@@ -25859,7 +25860,7 @@ Args:
 ### `register_update(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1312`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/cli.py:1313`
 **Complexity:** 1
 
 **Description:**
@@ -35893,6 +35894,9 @@ Returns:
 
 ### `src/claude_skills/claude_skills/sdd_update/list_specs.py`
 
+- `claude_skills.cli.sdd.output_utils.LIST_SPECS_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.LIST_SPECS_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.find_specs_directory`
 - `claude_skills.common.json_output.output_json`
