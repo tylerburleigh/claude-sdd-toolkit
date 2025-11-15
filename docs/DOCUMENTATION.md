@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 13:48:09
+**Generated:** 2025-11-15 13:49:24
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109890
+- **Total Lines:** 109902
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -11282,7 +11282,7 @@ entries in the form `tool=model` or `tool:model`.
 ### `_parse_model_override(values) -> Optional[object]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:33`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:38`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -15543,7 +15543,7 @@ Returns:
 ### `cmd_list_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:280`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:285`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -15829,7 +15829,7 @@ Returns:
 ### `cmd_review(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:73`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:78`
 ⚠️ **Complexity:** 32 (High)
 
 **Description:**
@@ -25701,7 +25701,7 @@ Args:
 ### `register_plan_review(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:353`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:361`
 **Complexity:** 1
 
 **Description:**
@@ -35373,6 +35373,9 @@ Returns:
 ### `src/claude_skills/claude_skills/sdd_plan_review/cli.py`
 
 - `argparse`
+- `claude_skills.cli.sdd.output_utils.LIST_TOOLS_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.LIST_TOOLS_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.ai_tools.get_enabled_and_available_tools`
 - `claude_skills.common.ensure_reviews_directory`
