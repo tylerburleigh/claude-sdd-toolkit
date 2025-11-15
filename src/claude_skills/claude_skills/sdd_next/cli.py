@@ -39,6 +39,8 @@ from claude_skills.cli.sdd.output_utils import (
     prepare_output,
     PREPARE_TASK_ESSENTIAL,
     PREPARE_TASK_STANDARD,
+    PROGRESS_ESSENTIAL,
+    PROGRESS_STANDARD,
 )
 
 # Import from sdd_next module
@@ -630,7 +632,9 @@ def cmd_progress(args, printer):
     progress = get_progress_summary(spec_data)
 
     if args.json:
-        print_json_output(progress, compact=args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(progress, args, PROGRESS_ESSENTIAL, PROGRESS_STANDARD)
+        output_json(filtered_output, compact=args.compact)
     else:
         printer.success("Progress calculated")
         printer.result("Spec", f"{progress['title']} ({progress['spec_id']})")
