@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T18:06:47.779404Z",
+  "last_updated": "2025-11-15T18:06:48.561645Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 42,
+      "completed_tasks": 43,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -951,7 +951,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -967,7 +967,7 @@
         "task-3-2"
       ],
       "total_tasks": 17,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1008,7 +1008,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -1176,12 +1176,16 @@
     "task-3-1-12": {
       "type": "subtask",
       "title": "CHECK_COMPLETE field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T18:06:48.551330Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T18:06:48.557890Z"
+      }
     },
     "task-3-1-13": {
       "type": "subtask",
@@ -1964,7 +1968,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 56,
+    "progress_percentage": 57,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2399,6 +2403,15 @@
       "content": "Defined field set for LIST_PHASES command in output_utils.py (lines 303-309). Essential fields: phase_list, total_phases. Standard fields: completion_status_per_phase, timeline, dependencies.",
       "metadata": {},
       "task_id": "task-3-1-11"
+    },
+    {
+      "timestamp": "2025-11-15T18:06:48.557874Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: CHECK_COMPLETE field sets",
+      "author": "claude-code",
+      "content": "Defined field set for CHECK_COMPLETE command in output_utils.py (lines 310-316). Essential fields: is_complete, missing_tasks, blockers. Standard fields: completion_percentage, pending_verifications, ready_for_next_phase.",
+      "metadata": {},
+      "task_id": "task-3-1-12"
     }
   ]
 }
