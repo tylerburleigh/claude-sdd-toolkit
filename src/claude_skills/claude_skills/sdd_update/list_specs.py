@@ -7,6 +7,11 @@ from typing import Optional, List, Dict, Any
 from claude_skills.common import load_json_spec, find_specs_directory, PrettyPrinter
 from claude_skills.common.json_output import output_json
 from claude_skills.common.ui_factory import create_ui
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    LIST_SPECS_ESSENTIAL,
+    LIST_SPECS_STANDARD,
+)
 
 
 def _create_progress_bar_plain(percentage: int, width: int = 10) -> str:
@@ -42,6 +47,7 @@ def list_specs(
     printer: Optional[PrettyPrinter] = None,
     compact: bool = False,
     ui=None,
+    args=None,
 ) -> List[Dict[str, Any]]:
     """
     List specification files with optional filtering.
@@ -53,6 +59,7 @@ def list_specs(
         verbose: Include detailed information
         printer: PrettyPrinter instance for output
         ui: UI instance for console output (optional)
+        args: Command arguments (for verbosity filtering)
 
     Returns:
         List of spec info dictionaries
@@ -126,7 +133,15 @@ def list_specs(
 
     # Output results
     if output_format == "json":
-        output_json(specs_info, compact=compact)
+        # Apply verbosity filtering for JSON output
+        if args:
+            filtered_specs = [
+                prepare_output(spec, args, LIST_SPECS_ESSENTIAL, LIST_SPECS_STANDARD)
+                for spec in specs_info
+            ]
+            output_json(filtered_specs, compact=compact)
+        else:
+            output_json(specs_info, compact=compact)
     else:
         _print_specs_text(specs_info, verbose, printer, ui)
 

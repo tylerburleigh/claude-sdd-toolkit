@@ -1195,6 +1195,7 @@ def cmd_list_specs(args, printer):
         verbose=args.detailed,
         printer=printer,
         compact=getattr(args, 'compact', False),
+        args=args,
     )
 
     return 0
