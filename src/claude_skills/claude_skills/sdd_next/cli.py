@@ -43,6 +43,8 @@ from claude_skills.cli.sdd.output_utils import (
     PROGRESS_STANDARD,
     CHECK_DEPS_ESSENTIAL,
     CHECK_DEPS_STANDARD,
+    FIND_SPECS_ESSENTIAL,
+    FIND_SPECS_STANDARD,
 )
 
 # Import from sdd_next module
@@ -297,13 +299,34 @@ def cmd_verify_tools(args, printer):
 
 def cmd_find_specs(args, printer):
     """Find specs directories."""
-    printer.action("Searching for specs directory...")
+    # Check if verbose mode requests JSON output
+    verbose_json = args.verbose and getattr(args, 'json', False)
+
+    if not verbose_json:
+        printer.action("Searching for specs directory...")
+
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
 
     if not specs_dir:
-        printer.error("No specs/active directory found")
+        if not verbose_json:
+            printer.error("No specs/active directory found")
         return 1
 
+    # VERBOSE mode with JSON output
+    if verbose_json:
+        # Build payload with metadata
+        payload = {
+            "specs_dir": str(specs_dir),
+            "exists": specs_dir.exists(),
+            "auto_detected": True,  # find_specs_directory auto-detects
+        }
+
+        # Apply verbosity filtering
+        filtered_output = prepare_output(payload, args, FIND_SPECS_ESSENTIAL, FIND_SPECS_STANDARD)
+        output_json(filtered_output, compact=getattr(args, 'compact', False))
+        return 0
+
+    # QUIET/NORMAL mode - plain text output
     printer.success("Found specs directory")
     print(f"{specs_dir}")
 
