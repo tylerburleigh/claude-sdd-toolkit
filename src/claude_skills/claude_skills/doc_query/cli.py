@@ -21,6 +21,8 @@ from claude_skills.cli.sdd.output_utils import (
     LIST_FUNCTIONS_STANDARD,
     LIST_MODULES_ESSENTIAL,
     LIST_MODULES_STANDARD,
+    CALLERS_ESSENTIAL,
+    CALLERS_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -736,17 +738,23 @@ def cmd_callers(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_line=True
     )
 
-    if _maybe_json(args, callers):
+    # Apply verbosity filtering to each caller
+    filtered_callers = [
+        prepare_output(caller, args, CALLERS_ESSENTIAL, CALLERS_STANDARD)
+        for caller in callers
+    ]
+
+    if _maybe_json(args, filtered_callers):
         return 0
 
     # Text output
-    if not callers:
+    if not filtered_callers:
         print(f"\nNo callers found for function '{args.function_name}'")
         print("(Note: Requires schema v2.0 documentation with cross-reference data)")
         return 0
 
-    print(f"\nFound {len(callers)} caller(s) for '{args.function_name}':\n")
-    for idx, caller in enumerate(callers, 1):
+    print(f"\nFound {len(filtered_callers)} caller(s) for '{args.function_name}':\n")
+    for idx, caller in enumerate(filtered_callers, 1):
         name = caller.get('name', 'unknown')
         call_type = caller.get('call_type', 'unknown')
         file_path = caller.get('file', '')
