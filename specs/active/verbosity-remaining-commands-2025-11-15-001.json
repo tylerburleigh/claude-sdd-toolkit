@@ -1,7 +1,7 @@
 {
   "spec_id": "verbosity-remaining-commands-2025-11-15-001",
   "generated": "2025-11-15T20:30:00Z",
-  "last_updated": "2025-11-15T20:28:03.835488Z",
+  "last_updated": "2025-11-15T20:29:25.049982Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 39,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
         "objectives": [
@@ -40,7 +40,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 21,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "rationale": "doc_query commands return comprehensive codebase information with large JSON outputs. QUIET mode should show only essential identifiers, NORMAL should include basic metadata, VERBOSE should show full details including relationships and metrics."
       },
@@ -76,7 +76,7 @@
         "task-1-18"
       ],
       "total_tasks": 18,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -445,7 +445,7 @@
     "task-1-15": {
       "type": "task",
       "title": "Apply verbosity to callees command",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -456,12 +456,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "notes": "Apply prepare_output using CALLEES_ESSENTIAL/STANDARD."
+        "notes": "Apply prepare_output using CALLEES_ESSENTIAL/STANDARD.",
+        "started_at": "2025-11-15T20:28:31.872869Z",
+        "completed_at": "2025-11-15T20:29:25.033272Z",
+        "needs_journaling": false,
+        "actual_hours": 0.015,
+        "journaled_at": "2025-11-15T20:29:25.045413Z"
       }
     },
     "task-1-16": {
@@ -1279,10 +1284,19 @@
       "content": "Applied verbosity filtering to callers command. Added CALLERS_ESSENTIAL and CALLERS_STANDARD imports. Modified cmd_callers to apply prepare_output to filter each caller dictionary based on verbosity level.\n\nManual verification performed:\n- --quiet: Shows only 'name' field (essential)\n- Standard: Shows name, file, line (standard fields)\n- --verbose: Shows all fields including call_type\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic)",
       "metadata": {},
       "task_id": "task-1-14"
+    },
+    {
+      "timestamp": "2025-11-15T20:29:25.045385Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Apply verbosity to callees command",
+      "author": "claude-code",
+      "content": "Applied verbosity filtering to callees command. Added CALLEES_ESSENTIAL and CALLEES_STANDARD imports. Modified cmd_callees to apply prepare_output to filter each callee dictionary based on verbosity level.\n\nManual verification performed:\n- --quiet: Shows only 'name' field (essential)\n- Standard: Shows name, file, line (standard fields)\n- --verbose: Shows all fields including call_type\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic)",
+      "metadata": {},
+      "task_id": "task-1-15"
     }
   ],
   "metadata": {
-    "progress_percentage": 15,
+    "progress_percentage": 17,
     "status": "active",
     "current_phase": "phase-1"
   }

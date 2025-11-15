@@ -23,6 +23,8 @@ from claude_skills.cli.sdd.output_utils import (
     LIST_MODULES_STANDARD,
     CALLERS_ESSENTIAL,
     CALLERS_STANDARD,
+    CALLEES_ESSENTIAL,
+    CALLEES_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -780,17 +782,23 @@ def cmd_callees(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_line=True
     )
 
-    if _maybe_json(args, callees):
+    # Apply verbosity filtering to each callee
+    filtered_callees = [
+        prepare_output(callee, args, CALLEES_ESSENTIAL, CALLEES_STANDARD)
+        for callee in callees
+    ]
+
+    if _maybe_json(args, filtered_callees):
         return 0
 
     # Text output
-    if not callees:
+    if not filtered_callees:
         print(f"\nNo callees found for function '{args.function_name}'")
         print("(Note: Requires schema v2.0 documentation with cross-reference data)")
         return 0
 
-    print(f"\nFound {len(callees)} function(s) called by '{args.function_name}':\n")
-    for idx, callee in enumerate(callees, 1):
+    print(f"\nFound {len(filtered_callees)} function(s) called by '{args.function_name}':\n")
+    for idx, callee in enumerate(filtered_callees, 1):
         name = callee.get('name', 'unknown')
         call_type = callee.get('call_type', 'unknown')
         file_path = callee.get('file', '')
