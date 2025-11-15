@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 09:11:46
+**Generated:** 2025-11-15 09:18:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109465
+- **Total Lines:** 109468
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.66
@@ -2161,7 +2161,7 @@ Attributes:
     collect_messages: Whether to collect messages for deferred rendering
     _messages: Collection of structured messages
     _context_stack: Stack of context dictionaries for message tagging
-    quiet: Whether to suppress non-error output
+    quiet: Whether to suppress non-critical output (errors and warnings always print)
     file: Output file object (default stdout)
 
 **Methods:**
