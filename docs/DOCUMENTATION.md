@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 09:04:09
+**Generated:** 2025-11-15 09:09:36
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 109307
+- **Total Lines:** 109430
 - **Total Classes:** 444
-- **Total Functions:** 1417
-- **Avg Complexity:** 4.67
+- **Total Functions:** 1421
+- **Avg Complexity:** 4.66
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -11798,7 +11798,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:69`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:192`
 **Complexity:** 1
 
 **Description:**
@@ -11813,7 +11813,7 @@ Returns:
 ### `_register_optional_modules(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:125`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:248`
 **Complexity:** 6
 
 **Description:**
@@ -11828,7 +11828,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:107`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:230`
 **Complexity:** 1
 
 **Description:**
@@ -11843,7 +11843,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:89`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:212`
 **Complexity:** 1
 
 **Description:**
@@ -22961,6 +22961,45 @@ Returns:
 
 ---
 
+### `get_verbosity_level(args) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:30`
+**Complexity:** 1
+
+**Description:**
+> Get the verbosity level from command arguments.
+
+Convenience wrapper for accessing the verbosity level in command handlers.
+The verbosity level is automatically set by the main CLI after parsing.
+
+Args:
+    args: Parsed argparse.Namespace from command handler
+
+Returns:
+    VerbosityLevel enum (QUIET, NORMAL, or VERBOSE)
+
+Example:
+    def my_command_handler(args, printer):
+        from claude_skills.cli.sdd.registry import get_verbosity_level
+        from claude_skills.cli.sdd.verbosity import VerbosityLevel
+
+        level = get_verbosity_level(args)
+        if level == VerbosityLevel.QUIET:
+            # Minimal output
+            return {"status": "ok"}
+        elif level == VerbosityLevel.VERBOSE:
+            # Include debug info
+            return {"status": "ok", "_debug": {...}}
+        else:
+            # Normal output
+            return {"status": "ok", "details": {...}}
+
+**Parameters:**
+- `args`: None
+
+---
+
 ### `handle_cache_clear(args, printer) -> None`
 
 **Language:** python
@@ -23487,6 +23526,31 @@ Returns:
 
 ---
 
+### `is_quiet_mode(args) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:62`
+**Complexity:** 1
+
+**Description:**
+> Check if quiet mode is active.
+
+Args:
+    args: Parsed argparse.Namespace from command handler
+
+Returns:
+    True if --quiet flag was specified or verbosity_level is QUIET
+
+Example:
+    if is_quiet_mode(args):
+        # Omit empty fields and reduce output
+        output = prepare_output(data, args, essential_fields)
+
+**Parameters:**
+- `args`: None
+
+---
+
 ### `is_task_complete(task_node) -> bool`
 
 **Language:** python
@@ -23582,6 +23646,31 @@ Returns:
 - `spec_data`: Dict
 - `task_id`: str
 - `task_data`: Dict
+
+---
+
+### `is_verbose_mode(args) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:80`
+**Complexity:** 1
+
+**Description:**
+> Check if verbose mode is active.
+
+Args:
+    args: Parsed argparse.Namespace from command handler
+
+Returns:
+    True if --verbose flag was specified or verbosity_level is VERBOSE
+
+Example:
+    if is_verbose_mode(args):
+        # Include debug information
+        output['_debug'] = {'timing_ms': elapsed, 'cache_hit': True}
+
+**Parameters:**
+- `args`: None
 
 ---
 
@@ -24812,6 +24901,55 @@ Returns:
 
 ---
 
+### `prepare_command_output(data, args, essential_fields, standard_fields) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:98`
+**Complexity:** 1
+
+**Description:**
+> Prepare command output with verbosity filtering.
+
+Convenience wrapper that applies verbosity-based field filtering to command output.
+This is the recommended way for command handlers to prepare their output.
+
+Args:
+    data: Dictionary of output data from the command
+    args: Parsed argparse.Namespace from command handler
+    essential_fields: Optional set of field names always included (even in QUIET)
+    standard_fields: Optional set of field names included in NORMAL/VERBOSE
+
+Returns:
+    Filtered dictionary with fields appropriate for the verbosity level
+
+Example:
+    def list_specs_handler(args, printer):
+        # Gather all data
+        data = {
+            'spec_id': spec_id,
+            'title': title,
+            'status': status,
+            'progress_percentage': percentage,
+            'total_tasks': total,
+            'metadata': metadata  # May be empty
+        }
+
+        # Define field categories
+        essential = {'spec_id', 'title', 'status', 'progress_percentage'}
+        standard = essential | {'total_tasks', 'metadata'}
+
+        # Apply verbosity filtering
+        output = prepare_command_output(data, args, essential, standard)
+        return output
+
+**Parameters:**
+- `data`: None
+- `args`: None
+- `essential_fields`: None
+- `standard_fields`: None
+
+---
+
 ### `prepare_output(data, args, essential_fields, standard_fields) -> Dict[str, Any]`
 
 **Language:** python
@@ -25285,7 +25423,7 @@ Args:
 ### `register_all_subcommands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:14`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:137`
 **Complexity:** 2
 
 **Description:**
