@@ -47,6 +47,8 @@ from claude_skills.cli.sdd.output_utils import (
     DEPENDENCIES_STANDARD,
     SEARCH_ESSENTIAL,
     SEARCH_STANDARD,
+    CONTEXT_DOC_QUERY_ESSENTIAL,
+    CONTEXT_DOC_QUERY_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -622,9 +624,23 @@ def cmd_context(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_docstrings=args.include_docstrings,
         include_stats=args.include_stats,
     )
-    if _maybe_json(args, _context_to_json(context)):
+
+    # Apply verbosity filtering to each result's data in each category
+    filtered_context = {
+        key: [
+            QueryResult(
+                entity_type=result.entity_type,
+                name=result.name,
+                data=prepare_output(result.data, args, CONTEXT_DOC_QUERY_ESSENTIAL, CONTEXT_DOC_QUERY_STANDARD)
+            )
+            for result in value
+        ]
+        for key, value in context.items()
+    }
+
+    if _maybe_json(args, _context_to_json(filtered_context)):
         return 0
-    print_context(context, verbose=args.verbose)
+    print_context(filtered_context, verbose=args.verbose)
     return 0
 
 
