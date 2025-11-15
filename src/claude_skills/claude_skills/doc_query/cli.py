@@ -49,6 +49,8 @@ from claude_skills.cli.sdd.output_utils import (
     SEARCH_STANDARD,
     CONTEXT_DOC_QUERY_ESSENTIAL,
     CONTEXT_DOC_QUERY_STANDARD,
+    DESCRIBE_MODULE_ESSENTIAL,
+    DESCRIBE_MODULE_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -654,9 +656,13 @@ def cmd_describe_module(args: argparse.Namespace, printer: PrettyPrinter) -> int
         include_docstrings=args.include_docstrings,
         include_dependencies=not args.skip_dependencies,
     )
-    if _maybe_json(args, summary):
+
+    # Apply verbosity filtering
+    filtered_summary = prepare_output(summary, args, DESCRIBE_MODULE_ESSENTIAL, DESCRIBE_MODULE_STANDARD)
+
+    if _maybe_json(args, filtered_summary):
         return 0
-    print_module_summary(summary, verbose=args.verbose)
+    print_module_summary(filtered_summary, verbose=args.verbose)
     return 0
 
 
