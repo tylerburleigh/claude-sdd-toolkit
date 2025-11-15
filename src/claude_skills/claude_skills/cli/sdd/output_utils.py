@@ -179,6 +179,14 @@ ANALYZE_DEPS_STANDARD = {
     'cycles', 'orphaned', 'deadlocks', 'bottlenecks', 'status'
 }
 
+# context command (context_tracker)
+CONTEXT_ESSENTIAL = {'context_percentage_used'}
+CONTEXT_STANDARD = {
+    'context_length', 'context_percentage', 'max_context',
+    'input_tokens', 'output_tokens', 'cached_tokens',
+    'total_tokens', 'transcript_path', 'context_percentage_used'
+}
+
 # check-deps command
 CHECK_DEPS_ESSENTIAL = {'task_id', 'can_start'}
 CHECK_DEPS_STANDARD = {

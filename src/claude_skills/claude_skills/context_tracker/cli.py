@@ -29,6 +29,11 @@ from pathlib import Path
 from claude_skills.context_tracker.parser import parse_transcript
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    CONTEXT_ESSENTIAL,
+    CONTEXT_STANDARD,
+)
 
 
 def generate_session_marker() -> str:
@@ -377,15 +382,25 @@ def cmd_context(args, printer):
 
     # Output the metrics
     if args.json:
-        # Check if verbose mode is requested (inherited from global --verbose flag)
-        if args.verbose:
-            # Full output with all fields
-            format_metrics_json(metrics, args.max_context, transcript_path, compact=args.compact)
-        else:
-            # Simplified output: just percentage as whole number
-            context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
-            simplified = {"context_percentage_used": round(context_pct)}
-            output_json(simplified, compact=args.compact)
+        # Build the full payload
+        context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
+        payload = {
+            "context_length": metrics.context_length,
+            "context_percentage": round(context_pct, 2),
+            "context_percentage_used": round(context_pct),
+            "max_context": args.max_context,
+            "input_tokens": metrics.input_tokens,
+            "output_tokens": metrics.output_tokens,
+            "cached_tokens": metrics.cached_tokens,
+            "total_tokens": metrics.total_tokens,
+        }
+
+        if transcript_path:
+            payload["transcript_path"] = transcript_path
+
+        # Apply verbosity filtering
+        filtered_output = prepare_output(payload, args, CONTEXT_ESSENTIAL, CONTEXT_STANDARD)
+        output_json(filtered_output, compact=args.compact)
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
@@ -524,10 +539,10 @@ when running multiple concurrent Claude Code sessions.
 
     # Output the metrics
     if args.json:
-        # Note: main() doesn't have --verbose flag, so always use simplified output
+        # main() doesn't have --verbose flag, so always output essential fields only
         context_pct = (metrics.context_length / args.max_context * 100) if args.max_context > 0 else 0
-        simplified = {"context_percentage_used": round(context_pct)}
-        output_json(simplified, compact=getattr(args, 'compact', True))
+        payload = {"context_percentage_used": round(context_pct)}
+        output_json(payload, compact=getattr(args, 'compact', True))
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
 
