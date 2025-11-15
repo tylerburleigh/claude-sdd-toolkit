@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 16:19:03
+**Generated:** 2025-11-15 16:20:42
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 110663
+- **Total Lines:** 110699
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.71
@@ -9601,7 +9601,7 @@ Returns:
 ### `_dump_json(payload) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:32`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:41`
 **Complexity:** 1
 
 **Parameters:**
@@ -10910,7 +10910,7 @@ Args:
 ### `_maybe_json(args, payload) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:37`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:46`
 **Complexity:** 2
 
 **Parameters:**
@@ -11265,7 +11265,7 @@ Extracts issues from sections:
 ### `_parse_model_override(values) -> Optional[Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:44`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:53`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -14932,7 +14932,7 @@ Returns:
 ### `cmd_check_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:93`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:102`
 **Complexity:** 4
 
 **Description:**
@@ -14989,7 +14989,7 @@ Returns:
 ### `cmd_consult(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:122`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:132`
 ⚠️ **Complexity:** 23 (High)
 
 **Parameters:**
@@ -15132,7 +15132,7 @@ Returns:
 ### `cmd_discover(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:213`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:229`
 **Complexity:** 1
 
 **Parameters:**
@@ -15844,7 +15844,7 @@ Returns:
 ### `cmd_run(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:225`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:241`
 **Complexity:** 5
 
 **Parameters:**
@@ -25780,7 +25780,7 @@ Args:
 ### `register_run_tests(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:251`
+**Defined in:** `src/claude_skills/claude_skills/run_tests/cli.py:269`
 **Complexity:** 3
 
 **Parameters:**
@@ -35057,6 +35057,13 @@ Returns:
 
 - `__future__.annotations`
 - `argparse`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_CHECK_TOOLS_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_CHECK_TOOLS_STANDARD`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_CONSULT_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_CONSULT_STANDARD`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_RUN_ESSENTIAL`
+- `claude_skills.cli.sdd.output_utils.RUN_TESTS_RUN_STANDARD`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.ai_config`
 - `claude_skills.common.ai_tools.get_enabled_and_available_tools`
