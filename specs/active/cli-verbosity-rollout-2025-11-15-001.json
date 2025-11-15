@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:31:36.241732Z",
+  "last_updated": "2025-11-15T17:31:36.817104Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 26,
+      "completed_tasks": 27,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -583,7 +583,7 @@
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 11,
+      "completed_tasks": 12,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -795,12 +795,16 @@
     "task-2-1-12": {
       "type": "subtask",
       "title": "SPEC_STATS field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T17:31:36.809049Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T17:31:36.813474Z"
+      }
     },
     "task-2-1-13": {
       "type": "subtask",
@@ -1880,7 +1884,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 34,
+    "progress_percentage": 36,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2144,6 +2148,15 @@
       "content": "Defined VALIDATE_PATHS field set for sdd_next commands: essential (valid, invalid_paths), standard (valid, invalid_paths, validated_count, warnings)",
       "metadata": {},
       "task_id": "task-2-1-11"
+    },
+    {
+      "timestamp": "2025-11-15T17:31:36.813457Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: SPEC_STATS field sets",
+      "author": "claude-code",
+      "content": "Defined SPEC_STATS field set for sdd_next commands: essential (spec_id, total_tasks, completed_tasks), standard (spec_id, total_tasks, completed_tasks, percentage, phases, task_types, estimated_hours, actual_hours)",
+      "metadata": {},
+      "task_id": "task-2-1-12"
     }
   ]
 }
