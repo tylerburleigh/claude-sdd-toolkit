@@ -171,3 +171,7 @@ LIST_BLOCKERS_STANDARD = {'task_id', 'blocked_by'}
 # find-specs command
 FIND_SPECS_ESSENTIAL = {'specs_dir'}
 FIND_SPECS_STANDARD = {'specs_dir', 'auto_detected', 'exists'}
+
+# next-task command
+NEXT_TASK_ESSENTIAL = {'task_id', 'title', 'status'}
+NEXT_TASK_STANDARD = {'task_id', 'title', 'status', 'file_path', 'estimated_hours'}

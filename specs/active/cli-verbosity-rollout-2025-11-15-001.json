@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:28:08.353463Z",
+  "last_updated": "2025-11-15T17:29:21.826051Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -551,7 +551,7 @@
       "type": "phase",
       "title": "sdd_next Module Remaining Commands",
       "description": "Apply verbosity filtering to the remaining 13 commands in sdd_next module that weren't covered in Phase 1.",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -576,14 +576,14 @@
     "phase-2-files": {
       "type": "group",
       "title": "Implementation",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1",
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -596,7 +596,7 @@
     "task-2-1": {
       "type": "task",
       "title": "Define field sets for sdd_next commands",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -632,12 +632,19 @@
     "task-2-1-1": {
       "type": "subtask",
       "title": "NEXT_TASK field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "started_at": "2025-11-15T17:28:43.737623Z",
+        "status_note": "Defining NEXT_TASK field sets in output_utils.py",
+        "completed_at": "2025-11-15T17:29:21.813806Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-15T17:29:21.822808Z"
+      }
     },
     "task-2-1-2": {
       "type": "subtask",
@@ -1827,8 +1834,8 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 20,
-    "current_phase": "phase-1"
+    "progress_percentage": 21,
+    "current_phase": "phase-2"
   },
   "journal": [
     {
@@ -1992,6 +1999,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-15T17:29:21.822790Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: NEXT_TASK field sets",
+      "author": "claude-code",
+      "content": "Defined NEXT_TASK field sets in output_utils.py. Added NEXT_TASK_ESSENTIAL (task_id, title, status) and NEXT_TASK_STANDARD (task_id, title, status, file_path, estimated_hours) following the established pattern from other commands. File modified: src/claude_skills/claude_skills/cli/sdd/output_utils.py (lines 175-177).",
+      "metadata": {},
+      "task_id": "task-2-1-1"
     }
   ]
 }
