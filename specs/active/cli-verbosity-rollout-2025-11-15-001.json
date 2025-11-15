@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:31:33.210554Z",
+  "last_updated": "2025-11-15T17:31:33.760819Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 21,
+      "completed_tasks": 22,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -583,7 +583,7 @@
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -725,12 +725,16 @@
     "task-2-1-7": {
       "type": "subtask",
       "title": "FIND_TESTS field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T17:31:33.749456Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T17:31:33.755051Z"
+      }
     },
     "task-2-1-8": {
       "type": "subtask",
@@ -1860,7 +1864,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 28,
+    "progress_percentage": 29,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2079,6 +2083,15 @@
       "content": "Defined DETECT_PROJECT field set for sdd_next commands: essential (project_type), standard (project_type, confidence, indicators, project_root)",
       "metadata": {},
       "task_id": "task-2-1-6"
+    },
+    {
+      "timestamp": "2025-11-15T17:31:33.755036Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: FIND_TESTS field sets",
+      "author": "claude-code",
+      "content": "Defined FIND_TESTS field set for sdd_next commands: essential (test_files), standard (test_files, test_framework, test_count, test_directories)",
+      "metadata": {},
+      "task_id": "task-2-1-7"
     }
   ]
 }
