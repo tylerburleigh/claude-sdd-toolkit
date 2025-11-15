@@ -27,6 +27,11 @@ try:
     )
     from claude_skills.common.sdd_config import get_default_format
     from claude_skills.common.json_output import output_json
+    from claude_skills.cli.sdd.output_utils import (
+        prepare_output,
+        VALIDATE_ESSENTIAL,
+        VALIDATE_STANDARD,
+    )
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -285,7 +290,9 @@ def cmd_validate(args, printer):
         if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
             payload["schema"] = schema_info
 
-        output_json(payload)
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(payload, args, VALIDATE_ESSENTIAL, VALIDATE_STANDARD)
+        output_json(filtered_output)
     else:
         if not args.quiet:
             print()
