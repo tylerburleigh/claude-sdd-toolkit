@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T18:06:37.353260Z",
+  "last_updated": "2025-11-15T18:06:44.907489Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 37,
+      "completed_tasks": 38,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -951,7 +951,7 @@
         "depends": []
       },
       "total_tasks": 19,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -967,7 +967,7 @@
         "task-3-2"
       ],
       "total_tasks": 17,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1008,7 +1008,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -1106,12 +1106,16 @@
     "task-3-1-7": {
       "type": "subtask",
       "title": "STATUS_REPORT field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T18:06:44.895112Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T18:06:44.901147Z"
+      }
     },
     "task-3-1-8": {
       "type": "subtask",
@@ -1944,7 +1948,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 49,
+    "progress_percentage": 50,
     "current_phase": "phase-3"
   },
   "journal": [
@@ -2334,6 +2338,15 @@
       "content": "Defined field set for TIME_REPORT command in output_utils.py (lines 268-274). Essential fields: total_hours, completed_hours, remaining_hours. Standard fields: phase_breakdown, task_breakdown, burndown_data.",
       "metadata": {},
       "task_id": "task-3-1-6"
+    },
+    {
+      "timestamp": "2025-11-15T18:06:44.901130Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: STATUS_REPORT field sets",
+      "author": "claude-code",
+      "content": "Defined field set for STATUS_REPORT command in output_utils.py (lines 275-281). Essential fields: overall_status, phase_status_list. Standard fields: task_status_breakdown, blocked_count, completion_percentage.",
+      "metadata": {},
+      "task_id": "task-3-1-7"
     }
   ]
 }
