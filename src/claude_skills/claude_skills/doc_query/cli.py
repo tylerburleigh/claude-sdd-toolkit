@@ -41,6 +41,8 @@ from claude_skills.cli.sdd.output_utils import (
     FIND_FUNCTION_STANDARD,
     FIND_MODULE_ESSENTIAL,
     FIND_MODULE_STANDARD,
+    COMPLEXITY_ESSENTIAL,
+    COMPLEXITY_STANDARD,
 )
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
@@ -540,9 +542,20 @@ def cmd_complexity(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             for item in filtered
         ]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=True)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, COMPLEXITY_ESSENTIAL, COMPLEXITY_STANDARD),
+            relevance_score=result.relevance_score
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=True)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 

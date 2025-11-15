@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-15 15:37:50
+**Generated:** 2025-11-15 15:38:51
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 319
-- **Total Lines:** 110116
+- **Total Lines:** 110127
 - **Total Classes:** 444
 - **Total Functions:** 1421
 - **Avg Complexity:** 4.67
@@ -14766,7 +14766,7 @@ Returns:
 ### `cmd_call_graph(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:853`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:864`
 **Complexity:** 9
 
 **Description:**
@@ -14781,7 +14781,7 @@ Returns:
 ### `cmd_callees(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:811`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:822`
 **Complexity:** 5
 
 **Description:**
@@ -14796,7 +14796,7 @@ Returns:
 ### `cmd_callers(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:769`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:780`
 **Complexity:** 5
 
 **Description:**
@@ -14977,7 +14977,7 @@ Returns:
 ### `cmd_complexity(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:504`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:515`
 **Complexity:** 5
 
 **Parameters:**
@@ -15020,7 +15020,7 @@ Args:
 ### `cmd_context(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:565`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:576`
 **Complexity:** 3
 
 **Parameters:**
@@ -15093,7 +15093,7 @@ Returns:
 ### `cmd_dependencies(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:538`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:549`
 **Complexity:** 3
 
 **Parameters:**
@@ -15105,7 +15105,7 @@ Returns:
 ### `cmd_describe_module(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:581`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:592`
 **Complexity:** 3
 
 **Parameters:**
@@ -15417,7 +15417,7 @@ Returns:
 ### `cmd_impact(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1008`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1019`
 **Complexity:** 8
 
 **Description:**
@@ -15477,7 +15477,7 @@ Returns:
 ### `cmd_list_classes(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:628`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:639`
 **Complexity:** 7
 
 **Parameters:**
@@ -15489,7 +15489,7 @@ Returns:
 ### `cmd_list_functions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:675`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:686`
 **Complexity:** 7
 
 **Parameters:**
@@ -15501,7 +15501,7 @@ Returns:
 ### `cmd_list_modules(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:722`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:733`
 **Complexity:** 7
 
 **Parameters:**
@@ -15758,7 +15758,7 @@ The completion_info dict structure (from should_prompt_completion):
 ### `cmd_refactor_candidates(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1055`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1066`
 **Complexity:** 8
 
 **Description:**
@@ -15856,7 +15856,7 @@ Returns:
 ### `cmd_search(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:549`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:560`
 **Complexity:** 5
 
 **Parameters:**
@@ -15922,7 +15922,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:597`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:608`
 **Complexity:** 4
 
 **Parameters:**
@@ -16024,7 +16024,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_trace_data(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:961`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:972`
 **Complexity:** 8
 
 **Description:**
@@ -16039,7 +16039,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_trace_entry(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:914`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:925`
 **Complexity:** 8
 
 **Description:**
@@ -25566,7 +25566,7 @@ Args:
 ### `register_doc_query(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1107`
+**Defined in:** `src/claude_skills/claude_skills/doc_query/cli.py:1118`
 **Complexity:** 6
 
 **Description:**

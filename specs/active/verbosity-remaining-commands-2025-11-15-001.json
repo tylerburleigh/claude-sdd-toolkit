@@ -1,7 +1,7 @@
 {
   "spec_id": "verbosity-remaining-commands-2025-11-15-001",
   "generated": "2025-11-15T20:30:00Z",
-  "last_updated": "2025-11-15T20:38:21.801179Z",
+  "last_updated": "2025-11-15T20:39:37.626348Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 39,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "context": "This spec completes the verbosity rollout started in cli-verbosity-rollout-2025-11-15-001, which covered 45 commands. This spec addresses the remaining ~45 commands, with priority on commands that return large JSON outputs used frequently by AI agents.",
         "objectives": [
@@ -40,7 +40,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 21,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "rationale": "doc_query commands return comprehensive codebase information with large JSON outputs. QUIET mode should show only essential identifiers, NORMAL should include basic metadata, VERBOSE should show full details including relationships and metrics."
       },
@@ -76,7 +76,7 @@
         "task-1-18"
       ],
       "total_tasks": 18,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -214,7 +214,7 @@
     "task-1-5": {
       "type": "task",
       "title": "Apply verbosity to complexity command",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [],
       "dependencies": {
@@ -225,12 +225,17 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/doc_query/cli.py",
         "task_category": "implementation",
         "estimated_hours": 0.5,
-        "notes": "Apply prepare_output using COMPLEXITY_ESSENTIAL/STANDARD. QUIET shows name+score only."
+        "notes": "Apply prepare_output using COMPLEXITY_ESSENTIAL/STANDARD. QUIET shows name+score only.",
+        "started_at": "2025-11-15T20:38:58.410839Z",
+        "completed_at": "2025-11-15T20:39:37.603398Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-15T20:39:37.617207Z"
       }
     },
     "task-1-6": {
@@ -1377,10 +1382,19 @@
       "content": "Applied verbosity filtering to find-module command. Added FIND_MODULE_ESSENTIAL and FIND_MODULE_STANDARD imports. Modified cmd_find_module to apply prepare_output to filter each result's data dictionary based on verbosity level.\n\nImplementation follows the same pattern as find-class and find-function commands - filtering each QueryResult's data dict before output.\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic)",
       "metadata": {},
       "task_id": "task-1-4"
+    },
+    {
+      "timestamp": "2025-11-15T20:39:37.617151Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Apply verbosity to complexity command",
+      "author": "claude-code",
+      "content": "Applied verbosity filtering to complexity command. Added COMPLEXITY_ESSENTIAL and COMPLEXITY_STANDARD imports. Modified cmd_complexity to apply prepare_output to filter each result's data dictionary based on verbosity level, while preserving the relevance_score (complexity value).\n\nImplementation preserves the relevance_score field which is important for this command to show complexity rankings.\n\nFiles modified:\n- src/claude_skills/claude_skills/doc_query/cli.py (added imports and filtering logic)",
+      "metadata": {},
+      "task_id": "task-1-5"
     }
   ],
   "metadata": {
-    "progress_percentage": 33,
+    "progress_percentage": 35,
     "status": "active",
     "current_phase": "phase-1"
   }
