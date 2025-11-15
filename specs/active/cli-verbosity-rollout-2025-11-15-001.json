@@ -1,7 +1,7 @@
 {
   "spec_id": "cli-verbosity-rollout-2025-11-15-001",
   "generated": "2025-11-15T14:30:00Z",
-  "last_updated": "2025-11-15T17:31:36.817104Z",
+  "last_updated": "2025-11-15T17:31:37.345726Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "phase-5"
       ],
       "total_tasks": 75,
-      "completed_tasks": 27,
+      "completed_tasks": 28,
       "metadata": {
         "objectives": [
           "Apply verbosity filtering to all 60+ JSON-outputting commands",
@@ -567,7 +567,7 @@
         "depends": []
       },
       "total_tasks": 16,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "risk_level": "low",
         "estimated_hours": 8
@@ -583,7 +583,7 @@
         "task-2-2"
       ],
       "total_tasks": 14,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -596,7 +596,7 @@
     "task-2-1": {
       "type": "task",
       "title": "Define field sets for sdd_next commands",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -621,7 +621,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 12,
+      "completed_tasks": 13,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/output_utils.py",
         "task_category": "implementation",
@@ -809,12 +809,16 @@
     "task-2-1-13": {
       "type": "subtask",
       "title": "FORMAT_PLAN field sets",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-15T17:31:37.337713Z",
+        "needs_journaling": false,
+        "journaled_at": "2025-11-15T17:31:37.342222Z"
+      }
     },
     "task-2-2": {
       "type": "task",
@@ -1884,7 +1888,7 @@
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-15T15:46:41.107177Z",
-    "progress_percentage": 36,
+    "progress_percentage": 37,
     "current_phase": "phase-2"
   },
   "journal": [
@@ -2157,6 +2161,15 @@
       "content": "Defined SPEC_STATS field set for sdd_next commands: essential (spec_id, total_tasks, completed_tasks), standard (spec_id, total_tasks, completed_tasks, percentage, phases, task_types, estimated_hours, actual_hours)",
       "metadata": {},
       "task_id": "task-2-1-12"
+    },
+    {
+      "timestamp": "2025-11-15T17:31:37.342206Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: FORMAT_PLAN field sets",
+      "author": "claude-code",
+      "content": "Defined FORMAT_PLAN field set for sdd_next commands: essential (formatted), standard (formatted, plan_structure, sections, word_count). All remaining field sets (task-2-1-3 through task-2-1-13) for sdd_next commands in output_utils.py (lines 186-231) now complete.",
+      "metadata": {},
+      "task_id": "task-2-1-13"
     }
   ]
 }
