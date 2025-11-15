@@ -104,6 +104,22 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 - **< 75%**: Safe to continue
 - **≥ 75%**: Stop and recommend to the user that they `/clear` and then `/sdd-begin` for the next task
 
+### CRITICAL: Never Anticipate Context Usage
+
+⚠️ **ONLY check actual context percentage – NEVER speculate about future consumption:**
+
+❌ DO NOT stop early because:
+  - "Phase 2 implementation will consume context"
+  - "File reading tasks are coming"
+  - "I predict I'll hit 75% during the next phase"
+  - "I should have buffer space for future work"
+
+✅ DO ONLY stop when:
+  - Context is CURRENTLY at or above 75%
+  - You have JUST checked context and confirmed actual usage
+
+**Rationale:** Predicting context usage is unreliable and defeats the purpose of checking. The threshold (75%) is designed to give adequate headroom; stopping earlier wastes that safety margin.
+
 ### When to Check Context
 
 - **Autonomous mode**: After EVERY task completion (REQUIRED)
@@ -381,8 +397,11 @@ For each task in current phase:
    sdd context --session-marker "SESSION_MARKER_<hash>"
    ```
 
-   - If context ≥75%: **STOP**, exit loop, go to Summary
+   **Check ACTUAL context percentage reported, do NOT speculate:**
+   - If context ACTUALLY ≥75% (as reported by command): **STOP**, exit loop, go to Summary
    - If context <75%: Continue to next iteration
+
+   **CRITICAL:** Do not stop based on predictions like "upcoming work will use context" or "I should have buffer space for the next phase." Only stop when actual usage reaches the threshold. The 75% threshold already provides safety margin.
 
 10. **Check phase completion:**
     - If current phase complete: Exit loop, go to Summary
@@ -427,6 +446,8 @@ Current context: {context_percentage}%
 **DO:**
 - ✅ Check context after EVERY task completion
 - ✅ Stop immediately when context ≥75%
+- ✅ Base stopping decisions on ACTUAL context percentage, never predictions
+- ✅ Use the full safety margin (continue until ≥75% reported)
 - ✅ Stop for blocked tasks (don't auto-pivot)
 - ✅ Stop for plan deviations (don't auto-revise)
 - ✅ Create detailed internal plans
@@ -436,6 +457,7 @@ Current context: {context_percentage}%
 - ❌ Cross phase boundaries
 - ❌ Skip plan creation (always plan, just don't show)
 - ❌ Continue past 75% context
+- ❌ Stop early based on predictions of future context usage
 - ❌ Auto-resolve blockers
 - ❌ Auto-revise plans on deviations
 - ❌ Batch task completions

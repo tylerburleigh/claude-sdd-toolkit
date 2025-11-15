@@ -10,7 +10,7 @@ from pathlib import Path
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.sdd_config import load_sdd_config
-from claude_skills.cli.sdd.options import add_global_options, create_global_parent_parser
+from claude_skills.cli.sdd.options import add_global_options, create_global_parent_parser, get_verbosity_level
 from claude_skills.cli.sdd.registry import register_all_subcommands
 
 
@@ -207,6 +207,9 @@ def main():
             args.json = config['output']['default_mode'] == 'json'
         if args.compact is None:
             args.compact = config['output']['json_compact']
+
+        # Determine verbosity level from flags and store in args for command handlers
+        args.verbosity_level = get_verbosity_level(args, config)
 
     except SystemExit as e:
         # Check if it's an invalid command error and provide helpful suggestion
