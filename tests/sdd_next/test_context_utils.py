@@ -4,6 +4,7 @@ from claude_skills.sdd_next.context_utils import (
     get_phase_context,
     get_sibling_files,
     get_task_journal_summary,
+    collect_phase_task_ids,
 )
 
 
@@ -110,6 +111,59 @@ def build_spec_with_nested_phase():
             "children": [],
         },
     }
+    return {"hierarchy": hierarchy}
+
+
+def build_phase_with_nested_tasks():
+    hierarchy = {
+        "phase-alpha": {
+            "id": "phase-alpha",
+            "type": "phase",
+            "title": "Alpha",
+            "status": "in_progress",
+            "parent": "spec-root",
+            "children": ["group-alpha", "task-alpha-verification"],
+        },
+        "group-alpha": {
+            "id": "group-alpha",
+            "type": "group",
+            "status": "in_progress",
+            "parent": "phase-alpha",
+            "children": ["task-alpha-1", "group-alpha-sub"],
+        },
+        "group-alpha-sub": {
+            "id": "group-alpha-sub",
+            "type": "group",
+            "status": "pending",
+            "parent": "group-alpha",
+            "children": ["task-alpha-2"],
+        },
+        "task-alpha-1": {
+            "id": "task-alpha-1",
+            "type": "task",
+            "title": "First task",
+            "status": "completed",
+            "parent": "group-alpha",
+            "children": [],
+        },
+        "task-alpha-2": {
+            "id": "task-alpha-2",
+            "type": "subtask",
+            "title": "Nested subtask",
+            "status": "pending",
+            "parent": "group-alpha-sub",
+            "children": [],
+        },
+        "task-alpha-verification": {
+            "id": "task-alpha-verification",
+            "type": "verify",
+            "title": "Verify alpha",
+            "status": "pending",
+            "parent": "phase-alpha",
+            "children": [],
+        },
+    }
+
     return {"hierarchy": hierarchy}
 
 
@@ -256,6 +310,18 @@ def test_get_phase_context_returns_none_when_no_phase():
     assert get_phase_context(spec_data, "task-1-2") is None
 
 
+def test_get_phase_context_handles_missing_progress_values():
+    spec_data = build_spec_with_nested_phase()
+    phase = spec_data["hierarchy"]["phase-2"]
+    phase.pop("completed_tasks", None)
+    phase["total_tasks"] = 0
+
+    context = get_phase_context(spec_data, "task-2-1")
+
+    assert context is not None
+    assert context["percentage"] is None
+
+
 def test_get_sibling_files_returns_file_entries():
     spec_data = build_spec_with_siblings()
 
@@ -338,3 +404,23 @@ def test_get_task_journal_summary_truncates_content():
     summary = get_task_journal_summary(spec_data, "task-1-1", max_entries=1)
 
     assert len(summary["entries"][0]["summary"]) == 160
+
+
+def test_collect_phase_task_ids_includes_nested_tasks_and_verifications():
+    spec_data = build_phase_with_nested_tasks()
+
+    task_ids = collect_phase_task_ids(spec_data, "phase-alpha")
+
+    assert set(task_ids) == {
+        "task-alpha-1",
+        "task-alpha-2",
+        "task-alpha-verification",
+    }
+
+
+def test_collect_phase_task_ids_handles_invalid_input():
+    spec_data = build_phase_with_nested_tasks()
+
+    assert collect_phase_task_ids(spec_data, None) == []
+    assert collect_phase_task_ids(spec_data, "missing-phase") == []
+    assert collect_phase_task_ids({}, "phase-alpha") == []
