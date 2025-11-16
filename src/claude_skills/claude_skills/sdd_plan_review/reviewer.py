@@ -28,6 +28,7 @@ def review_with_tools(
     spec_title: str = "Specification",
     parallel: bool = True,
     model_override: Any = None,
+    silent: bool = False,
 ) -> Dict[str, Any]:
     """
     Review a spec using multiple AI tools with full synthesis.
@@ -76,8 +77,9 @@ def review_with_tools(
     if not enabled_tools:
         raise ValueError("No tools specified for plan review execution.")
 
-    print(f"\n   Sending {review_type} review to {len(enabled_tools)} external AI model(s): {', '.join(enabled_tools)}")
-    print(f"   Evaluating: {dimensions}")
+    if not silent:
+        print(f"\n   Sending {review_type} review to {len(enabled_tools)} external AI model(s): {', '.join(enabled_tools)}")
+        print(f"   Evaluating: {dimensions}")
 
     resolved_models = ai_config.resolve_models_for_tools(
         "sdd-plan-review",
@@ -106,10 +108,12 @@ def review_with_tools(
 
         if response.success:
             results["raw_responses"].append(result)
-            print(f"   ✓ {tool} completed ({response.duration:.1f}s)")
+            if not silent:
+                print(f"   ✓ {tool} completed ({response.duration:.1f}s)")
         else:
             results["failures"].append(result)
-            print(f"   ✗ {tool} failed: {response.error or 'unknown error'}")
+            if not silent:
+                print(f"   ✗ {tool} failed: {response.error or 'unknown error'}")
 
     # Parse responses using synthesis module
     for raw_response in results["raw_responses"]:

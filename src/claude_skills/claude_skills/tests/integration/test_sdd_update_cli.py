@@ -120,6 +120,34 @@ class TestQueryTasksCLI:
         except json.JSONDecodeError:
             pytest.fail("Output is not valid JSON")
 
+    def test_query_tasks_compact_and_pretty_output(self, sample_json_spec_simple, specs_structure):
+        """Test query-tasks with compact vs pretty JSON flags."""
+        compact_result = run_cli(
+             "--json", "--compact",
+             "query-tasks",
+             "--path", str(specs_structure),
+             "simple-spec-2025-01-01-001",
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode == 0
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+        assert isinstance(compact_data, list)
+        assert any(item["id"] == "task-1-1" for item in compact_data)
+
+        pretty_result = run_cli(
+             "--json", "--no-compact",
+             "query-tasks",
+             "--path", str(specs_structure),
+             "simple-spec-2025-01-01-001",
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode == 0
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
     def test_query_tasks_invalid_spec(self, specs_structure):
         """Test query-tasks with invalid spec_id."""
         result = run_cli( "query-tasks",
@@ -220,6 +248,34 @@ class TestListPhasesCLI:
             assert len(data) >= 1
         except json.JSONDecodeError:
             pytest.fail("Output is not valid JSON")
+
+    def test_list_phases_compact_and_pretty(self, sample_json_spec_simple, specs_structure):
+        """Ensure list-phases obeys compact flags."""
+        compact_result = run_cli(
+             "list-phases",
+             "--path", str(specs_structure),
+             "simple-spec-2025-01-01-001",
+             "--json", "--compact",
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode == 0
+        compact_lines = compact_result.stdout.strip().splitlines()
+        assert len(compact_lines) == 1
+        compact_data = json.loads(compact_result.stdout)
+        assert isinstance(compact_data, list)
+
+        pretty_result = run_cli(
+             "list-phases",
+             "--path", str(specs_structure),
+             "simple-spec-2025-01-01-001",
+             "--json", "--no-compact",
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode == 0
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
 
     def test_list_phases_help(self):
         """Test list-phases help output."""

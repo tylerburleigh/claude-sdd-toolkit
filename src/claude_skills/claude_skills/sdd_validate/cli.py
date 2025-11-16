@@ -27,6 +27,17 @@ try:
     )
     from claude_skills.common.sdd_config import get_default_format
     from claude_skills.common.json_output import output_json
+    from claude_skills.cli.sdd.output_utils import (
+        prepare_output,
+        VALIDATE_ESSENTIAL,
+        VALIDATE_STANDARD,
+        FIX_SPEC_ESSENTIAL,
+        FIX_SPEC_STANDARD,
+        STATS_ESSENTIAL,
+        STATS_STANDARD,
+        ANALYZE_DEPS_ESSENTIAL,
+        ANALYZE_DEPS_STANDARD,
+    )
     from claude_skills.sdd_validate import (
         NormalizedValidationResult,
         format_validation_summary,
@@ -285,7 +296,9 @@ def cmd_validate(args, printer):
         if schema_info["source"] or schema_info["errors"] or schema_info["warnings"]:
             payload["schema"] = schema_info
 
-        output_json(payload)
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(payload, args, VALIDATE_ESSENTIAL, VALIDATE_STANDARD)
+        output_json(filtered_output, compact=getattr(args, "compact", False))
     else:
         if not args.quiet:
             print()
@@ -394,7 +407,7 @@ def cmd_fix(args, printer):
                 "skipped": len(actions),
                 "status": "preview",
             }
-            output_json(payload)
+            output_json(payload, compact=getattr(args, "compact", False))
         else:
             printer.info(f"Found {len(actions)} auto-fixable issue(s):")
             print()
@@ -448,7 +461,10 @@ def cmd_fix(args, printer):
         }
         if migration_actions:
             payload["migrated_tasks"] = [a.id.replace("file_path.remove_placeholder:", "") for a in migration_actions]
-        output_json(payload)
+
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(payload, args, FIX_SPEC_ESSENTIAL, FIX_SPEC_STANDARD)
+        output_json(filtered_output, compact=getattr(args, "compact", False))
     else:
         if report.applied_actions:
             printer.success(f"Applied {len(report.applied_actions)} fix(es)")
@@ -561,11 +577,28 @@ def cmd_stats(args, printer):
         return 2
 
     stats = calculate_statistics(spec_data)
-    output = render_statistics(stats, json_output=args.json)
 
     if args.json:
-        print(output)
+        # Build the stats payload
+        payload = {
+            "spec_id": stats.spec_id,
+            "title": stats.title,
+            "version": stats.version,
+            "status": stats.status,
+            "totals": stats.totals,
+            "status_counts": stats.status_counts,
+            "max_depth": stats.max_depth,
+            "avg_tasks_per_phase": stats.avg_tasks_per_phase,
+            "verification_coverage": stats.verification_coverage,
+            "progress": stats.progress,
+            "file_size_kb": stats.file_size_kb,
+        }
+
+        # Apply verbosity filtering
+        filtered_output = prepare_output(payload, args, STATS_ESSENTIAL, STATS_STANDARD)
+        output_json(filtered_output, compact=getattr(args, "compact", False))
     else:
+        output = render_statistics(stats, json_output=False)
         print()
         print(output)
 
@@ -597,7 +630,10 @@ def cmd_check_deps(args, printer):
             "bottlenecks": analysis.bottlenecks,
             "status": analysis.status,
         }
-        output_json(payload)
+
+        # Apply verbosity filtering for JSON output
+        filtered_output = prepare_output(payload, args, ANALYZE_DEPS_ESSENTIAL, ANALYZE_DEPS_STANDARD)
+        output_json(filtered_output, compact=getattr(args, "compact", False))
     else:
         printer.success("Dependency Analysis:")
         if analysis.cycles:

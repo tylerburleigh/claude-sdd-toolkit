@@ -10,6 +10,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from datetime import datetime, timezone
 
 # Add parent directory to path for sdd_common imports
 
@@ -19,6 +20,74 @@ from claude_skills.common import execute_verify_task, load_json_spec
 from claude_skills.common.spec import update_node, save_json_spec
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    ADD_ASSUMPTION_ESSENTIAL,
+    ADD_ASSUMPTION_STANDARD,
+    LIST_ASSUMPTIONS_ESSENTIAL,
+    LIST_ASSUMPTIONS_STANDARD,
+    UPDATE_ESTIMATE_ESSENTIAL,
+    UPDATE_ESTIMATE_STANDARD,
+    ADD_TASK_ESSENTIAL,
+    ADD_TASK_STANDARD,
+    REMOVE_TASK_ESSENTIAL,
+    REMOVE_TASK_STANDARD,
+    TIME_REPORT_ESSENTIAL,
+    TIME_REPORT_STANDARD,
+    STATUS_REPORT_ESSENTIAL,
+    STATUS_REPORT_STANDARD,
+    AUDIT_SPEC_ESSENTIAL,
+    AUDIT_SPEC_STANDARD,
+    GET_TASK_ESSENTIAL,
+    GET_TASK_STANDARD,
+    GET_JOURNAL_ESSENTIAL,
+    GET_JOURNAL_STANDARD,
+    LIST_PHASES_ESSENTIAL,
+    LIST_PHASES_STANDARD,
+    CHECK_COMPLETE_ESSENTIAL,
+    CHECK_COMPLETE_STANDARD,
+    PHASE_TIME_ESSENTIAL,
+    PHASE_TIME_STANDARD,
+    RECONCILE_STATE_ESSENTIAL,
+    RECONCILE_STATE_STANDARD,
+    CHECK_JOURNALING_ESSENTIAL,
+    CHECK_JOURNALING_STANDARD,
+    COMPLETE_TASK_ESSENTIAL,
+    COMPLETE_TASK_STANDARD,
+    CREATE_TASK_COMMIT_ESSENTIAL,
+    CREATE_TASK_COMMIT_STANDARD,
+    UPDATE_STATUS_ESSENTIAL,
+    UPDATE_STATUS_STANDARD,
+    MARK_BLOCKED_ESSENTIAL,
+    MARK_BLOCKED_STANDARD,
+    UNBLOCK_TASK_ESSENTIAL,
+    UNBLOCK_TASK_STANDARD,
+    ADD_JOURNAL_ESSENTIAL,
+    ADD_JOURNAL_STANDARD,
+    ADD_REVISION_ESSENTIAL,
+    ADD_REVISION_STANDARD,
+    UPDATE_FRONTMATTER_ESSENTIAL,
+    UPDATE_FRONTMATTER_STANDARD,
+    ADD_VERIFICATION_ESSENTIAL,
+    ADD_VERIFICATION_STANDARD,
+    EXECUTE_VERIFY_ESSENTIAL,
+    EXECUTE_VERIFY_STANDARD,
+    FORMAT_VERIFICATION_SUMMARY_ESSENTIAL,
+    FORMAT_VERIFICATION_SUMMARY_STANDARD,
+    MOVE_SPEC_ESSENTIAL,
+    MOVE_SPEC_STANDARD,
+    ACTIVATE_SPEC_ESSENTIAL,
+    ACTIVATE_SPEC_STANDARD,
+    COMPLETE_SPEC_ESSENTIAL,
+    COMPLETE_SPEC_STANDARD,
+    BULK_JOURNAL_ESSENTIAL,
+    BULK_JOURNAL_STANDARD,
+    SYNC_METADATA_ESSENTIAL,
+    SYNC_METADATA_STANDARD,
+    UPDATE_TASK_METADATA_ESSENTIAL,
+    UPDATE_TASK_METADATA_STANDARD,
+)
+from claude_skills.cli.sdd.verbosity import VerbosityLevel
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -48,25 +117,56 @@ from claude_skills.sdd_update.query import (
     list_blockers,
 )
 from claude_skills.sdd_update.query_tasks import format_tasks_table
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    QUERY_TASKS_ESSENTIAL,
+    QUERY_TASKS_STANDARD,
+    LIST_BLOCKERS_ESSENTIAL,
+    LIST_BLOCKERS_STANDARD,
+)
 from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
 
 
+def _emit_json_output(data, args, essential_fields=None, standard_fields=None):
+    """
+    Helper to emit JSON respecting compact flag and verbosity filtering.
+    """
+    if not getattr(args, 'json', False):
+        return
+
+    payload = data
+    if essential_fields or standard_fields:
+        payload = prepare_output(
+            data,
+            args,
+            essential_fields,
+            standard_fields,
+        )
+
+    output_json(payload, getattr(args, 'compact', False))
+
+
 def cmd_execute_verify(args, printer):
     """Execute a verification task automatically (Priority 1 Integration)."""
-    printer.action(f"Executing verification task {args.verify_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Executing verification task {args.verify_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     # Load JSON spec file
     spec_data = load_json_spec(args.spec_id, specs_dir)
     if not spec_data:
-        printer.error(f"Could not load JSON spec file for {args.spec_id}")
+        if not use_json:
+            printer.error(f"Could not load JSON spec file for {args.spec_id}")
         return 1
 
     # Show on_failure configuration before execution
@@ -93,18 +193,19 @@ def cmd_execute_verify(args, printer):
 
     # Display results
     if result["success"]:
-        printer.success(f"Verification {args.verify_id} PASSED")
-        if result.get("retry_count", 0) > 0:
-            printer.info(f"Succeeded after {result['retry_count']} retry attempt(s)")
-        if result["output"]:
-            printer.detail(f"Output:\n{result['output'][:500]}")
-        if result["skill_used"]:
-            printer.info(f"Executed using skill: {result['skill_used']}")
-        printer.info(f"Duration: {result['duration']:.2f}s")
+        if not use_json:
+            printer.success(f"Verification {args.verify_id} PASSED")
+            if result.get("retry_count", 0) > 0:
+                printer.info(f"Succeeded after {result['retry_count']} retry attempt(s)")
+            if result["output"]:
+                printer.detail(f"Output:\n{result['output'][:500]}")
+            if result["skill_used"]:
+                printer.info(f"Executed using skill: {result['skill_used']}")
+            printer.info(f"Duration: {result['duration']:.2f}s")
 
-        # Show actions taken if any
-        if result.get("actions_taken"):
-            printer.info(f"Actions: {', '.join(result['actions_taken'])}")
+            # Show actions taken if any
+            if result.get("actions_taken"):
+                printer.info(f"Actions: {', '.join(result['actions_taken'])}")
 
         # Automatically record the result if --record flag is set
         if args.record:
@@ -116,33 +217,53 @@ def cmd_execute_verify(args, printer):
                 command=result.get("skill_used") or "automated execution",
                 output=result["output"][:500] if result["output"] else None,
                 specs_dir=specs_dir,
-                printer=printer
+                printer=printer if not use_json else None
             )
+
+        if use_json:
+            json_result = {
+                'success': True,
+                'task_id': args.verify_id,
+                'result': 'PASSED',
+                'spec_id': args.spec_id,
+                'verification_type': 'auto',
+                'executed_at': datetime.now(timezone.utc).isoformat(),
+                'details': {
+                    'output': result["output"][:500] if result["output"] else None,
+                    'skill_used': result.get("skill_used"),
+                    'duration': result['duration'],
+                    'retry_count': result.get("retry_count", 0),
+                    'actions_taken': result.get("actions_taken", [])
+                }
+            }
+            output = prepare_output(json_result, args, EXECUTE_VERIFY_ESSENTIAL, EXECUTE_VERIFY_STANDARD)
+            output_json(output, args.compact)
 
         return 0
     else:
-        printer.error(f"Verification {args.verify_id} FAILED")
-        if result["errors"]:
-            printer.error("Errors:")
-            for error in result["errors"]:
-                printer.error(f"  - {error}")
-        if result["output"]:
-            printer.detail(f"Output:\n{result['output'][:500]}")
-        if result.get("retry_count", 0) > 0:
-            printer.warning(f"Failed after {result['retry_count']} retry attempt(s)")
+        if not use_json:
+            printer.error(f"Verification {args.verify_id} FAILED")
+            if result["errors"]:
+                printer.error("Errors:")
+                for error in result["errors"]:
+                    printer.error(f"  - {error}")
+            if result["output"]:
+                printer.detail(f"Output:\n{result['output'][:500]}")
+            if result.get("retry_count", 0) > 0:
+                printer.warning(f"Failed after {result['retry_count']} retry attempt(s)")
 
-        # Show actions taken if any
-        if result.get("actions_taken"):
-            printer.info(f"Actions taken: {', '.join(result['actions_taken'])}")
+            # Show actions taken if any
+            if result.get("actions_taken"):
+                printer.info(f"Actions taken: {', '.join(result['actions_taken'])}")
 
-        # Show on_failure recommendations
-        if result.get("on_failure"):
-            on_failure = result["on_failure"]
-            printer.info("\nFailure handling:")
-            if on_failure.get("consult"):
-                printer.info("💡 AI consultation recommended - consider using run-tests skill")
-            if on_failure.get("revert_status"):
-                printer.info(f"🔄 Task will revert to: {on_failure['revert_status']}")
+            # Show on_failure recommendations
+            if result.get("on_failure"):
+                on_failure = result["on_failure"]
+                printer.info("\nFailure handling:")
+                if on_failure.get("consult"):
+                    printer.info("💡 AI consultation recommended - consider using run-tests skill")
+                if on_failure.get("revert_status"):
+                    printer.info(f"🔄 Task will revert to: {on_failure['revert_status']}")
 
         # Auto-record failure if --record flag is set
         if args.record:
@@ -155,20 +276,53 @@ def cmd_execute_verify(args, printer):
                 output=result["output"][:500] if result["output"] else None,
                 issues="\n".join(result["errors"]),
                 specs_dir=specs_dir,
-                printer=printer
+                printer=printer if not use_json else None
             )
+
+        if use_json:
+            json_result = {
+                'success': False,
+                'task_id': args.verify_id,
+                'result': 'FAILED',
+                'spec_id': args.spec_id,
+                'verification_type': 'auto',
+                'executed_at': datetime.now(timezone.utc).isoformat(),
+                'details': {
+                    'errors': result["errors"],
+                    'output': result["output"][:500] if result["output"] else None,
+                    'skill_used': result.get("skill_used"),
+                    'duration': result.get('duration'),
+                    'retry_count': result.get("retry_count", 0),
+                    'actions_taken': result.get("actions_taken", []),
+                    'on_failure': result.get("on_failure")
+                }
+            }
+            output = prepare_output(json_result, args, EXECUTE_VERIFY_ESSENTIAL, EXECUTE_VERIFY_STANDARD)
+            output_json(output, args.compact)
 
         return 1
 
 
 def cmd_update_status(args, printer):
     """Update task status."""
-    printer.action(f"Updating status for {args.task_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Updating status for {args.task_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
+
+    #  Load spec to get old status before update
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    old_status = None
+    if spec_data:
+        hierarchy = spec_data.get("hierarchy", {})
+        if args.task_id in hierarchy:
+            old_status = hierarchy[args.task_id].get("status", "unknown")
 
     success = update_task_status(
         spec_id=args.spec_id,
@@ -178,19 +332,36 @@ def cmd_update_status(args, printer):
         note=args.note,
         dry_run=args.dry_run,
         verify=args.verify if hasattr(args, 'verify') else False,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'task_id': args.task_id,
+            'new_status': args.status,
+            'old_status': old_status,
+            'updated_at': datetime.now(timezone.utc).isoformat() if success else None,
+            'spec_id': args.spec_id,
+            'status_note': args.note
+        }
+        output = prepare_output(result, args, UPDATE_STATUS_ESSENTIAL, UPDATE_STATUS_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_mark_blocked(args, printer):
     """Mark task as blocked."""
-    printer.action(f"Marking task {args.task_id} as blocked...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Marking task {args.task_id} as blocked...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     success = mark_task_blocked(
@@ -201,19 +372,35 @@ def cmd_mark_blocked(args, printer):
         blocker_type=args.type,
         ticket=args.ticket,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'task_id': args.task_id,
+            'spec_id': args.spec_id,
+            'blocked_by': args.reason,
+            'reason': args.reason,
+            'marked_at': datetime.now(timezone.utc).isoformat() if success else None
+        }
+        output = prepare_output(result, args, MARK_BLOCKED_ESSENTIAL, MARK_BLOCKED_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_unblock_task(args, printer):
     """Unblock a task."""
-    printer.action(f"Unblocking task {args.task_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Unblocking task {args.task_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     success = unblock_task(
@@ -222,20 +409,39 @@ def cmd_unblock_task(args, printer):
         resolution=args.resolution,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'task_id': args.task_id,
+            'spec_id': args.spec_id,
+            'unblocked_at': datetime.now(timezone.utc).isoformat() if success else None,
+            'previously_blocked_by': args.resolution
+        }
+        output = prepare_output(result, args, UNBLOCK_TASK_ESSENTIAL, UNBLOCK_TASK_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_add_journal(args, printer):
     """Add journal entry."""
-    printer.action("Adding journal entry...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action("Adding journal entry...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
+
+    # Generate entry ID
+    timestamp = datetime.now(timezone.utc)
+    entry_id = f"journal-{timestamp.strftime('%Y%m%d%H%M%S')}"
 
     success = add_journal_entry(
         spec_id=args.spec_id,
@@ -246,20 +452,40 @@ def cmd_add_journal(args, printer):
         author=args.author,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'entry_id': entry_id if success else None,
+            'spec_id': args.spec_id,
+            'task_id': args.task_id,
+            'timestamp': timestamp.isoformat() if success else None,
+            'entry_text': args.content
+        }
+        output = prepare_output(result, args, ADD_JOURNAL_ESSENTIAL, ADD_JOURNAL_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_add_revision(args, printer):
     """Add revision entry."""
-    printer.action("Adding revision entry...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action("Adding revision entry...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
+
+    # Generate revision ID
+    timestamp = datetime.now(timezone.utc)
+    revision_id = f"revision-{args.version.replace('.', '-')}"
 
     success = add_revision_entry(
         spec_id=args.spec_id,
@@ -268,8 +494,21 @@ def cmd_add_revision(args, printer):
         author=args.author,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer,
+        printer=printer if not use_json else None,
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'revision_id': revision_id if success else None,
+            'spec_id': args.spec_id,
+            'task_id': None,  # Revisions are spec-level, not task-level
+            'timestamp': timestamp.isoformat() if success else None,
+            'revision_text': args.changes,
+            'revision_type': 'manual'
+        }
+        output = prepare_output(result, args, ADD_REVISION_ESSENTIAL, ADD_REVISION_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
@@ -303,6 +542,14 @@ def cmd_add_assumption(args, printer):
             printer.detail(f"  ID: {result['assumption_id']}")
             printer.detail(f"  Type: {args.type}")
             printer.detail(f"  Text: {args.text}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                ADD_ASSUMPTION_ESSENTIAL,
+                ADD_ASSUMPTION_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -311,9 +558,12 @@ def cmd_add_assumption(args, printer):
         printer.success(result['message'])
         printer.info(f"Assumption ID: {result['assumption_id']}")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            ADD_ASSUMPTION_ESSENTIAL,
+            ADD_ASSUMPTION_STANDARD,
+        )
 
         return 0
 
@@ -345,11 +595,26 @@ def cmd_list_assumptions(args, printer):
 
     # Check if JSON output is enabled (set by options.py from config)
     use_json = getattr(args, 'json', False)
+    verbosity_level = getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
+    show_metadata = verbosity_level == VerbosityLevel.VERBOSE
+
+    def _emit_json_output(items):
+        """Emit JSON either as a bare list (quiet/normal) or detailed dict (verbose)."""
+        if show_metadata:
+            data = {
+                'assumptions': items,
+                'spec_id': args.spec_id,
+                'count': len(items),
+                'filtered': bool(assumption_type)
+            }
+            output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
+            output_json(output, getattr(args, 'compact', False))
+        else:
+            output_json(items, getattr(args, 'compact', False))
 
     if not assumptions:
         if use_json:
-            # JSON output - empty array
-            output_json([], args.compact)
+            _emit_json_output([])
         else:
             if assumption_type:
                 printer.info(f"No {assumption_type} assumptions found")
@@ -365,26 +630,26 @@ def cmd_list_assumptions(args, printer):
             printer.success(f"Found {len(assumptions)} assumption(s):")
 
     if use_json:
-        # JSON output
-        output_json(assumptions, args.compact)
-    else:
-        # Pretty print for human readability
-        for i, assumption in enumerate(assumptions, 1):
-            # Handle both legacy string format and new structured format
-            if isinstance(assumption, str):
-                # Legacy format: just a string
-                print(f"\n{i}. {assumption}")
-            elif isinstance(assumption, dict):
-                # New structured format
-                print(f"\n{assumption.get('id', f'assumption-{i}')}:")
-                printer.detail(f"Type: {assumption.get('type', 'unknown')}")
-                printer.detail(f"Text: {assumption.get('text', '')}")
-                printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
-                printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
-                if 'updated_at' in assumption:
-                    printer.detail(f"Updated at: {assumption['updated_at']}")
-            else:
-                printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
+        _emit_json_output(assumptions)
+        return 0
+
+    # Pretty print for human readability
+    for i, assumption in enumerate(assumptions, 1):
+        # Handle both legacy string format and new structured format
+        if isinstance(assumption, str):
+            # Legacy format: just a string
+            print(f"\n{i}. {assumption}")
+        elif isinstance(assumption, dict):
+            # New structured format
+            print(f"\n{assumption.get('id', f'assumption-{i}')}:")
+            printer.detail(f"Type: {assumption.get('type', 'unknown')}")
+            printer.detail(f"Text: {assumption.get('text', '')}")
+            printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
+            printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
+            if 'updated_at' in assumption:
+                printer.detail(f"Updated at: {assumption['updated_at']}")
+        else:
+            printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
 
     return 0
 
@@ -418,6 +683,14 @@ def cmd_update_estimate(args, printer):
             printer.detail(f"  Task: {result['task_id']} - {result['task_title']}")
             for key, value in result['updates'].items():
                 printer.detail(f"  {key}: {value}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                UPDATE_ESTIMATE_ESSENTIAL,
+                UPDATE_ESTIMATE_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -425,9 +698,12 @@ def cmd_update_estimate(args, printer):
 
         printer.success(result['message'])
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            UPDATE_ESTIMATE_ESSENTIAL,
+            UPDATE_ESTIMATE_STANDARD,
+        )
 
         return 0
 
@@ -470,6 +746,14 @@ def cmd_add_task(args, printer):
             printer.detail(f"  Parent: {result['parent_id']}")
             if args.description:
                 printer.detail(f"  Description: {args.description[:50]}...")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                ADD_TASK_ESSENTIAL,
+                ADD_TASK_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -478,9 +762,12 @@ def cmd_add_task(args, printer):
         printer.success(result['message'])
         printer.info(f"Task ID: {result['task_id']}")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            ADD_TASK_ESSENTIAL,
+            ADD_TASK_STANDARD,
+        )
 
         return 0
 
@@ -517,6 +804,14 @@ def cmd_remove_task(args, printer):
             printer.detail(f"  ID: {result['task_id']}")
             printer.detail(f"  Title: {result['task_title']}")
             printer.detail(f"  Removed count: {result['removed_count']}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                REMOVE_TASK_ESSENTIAL,
+                REMOVE_TASK_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -526,9 +821,12 @@ def cmd_remove_task(args, printer):
         if result['removed_count'] > 1:
             printer.info(f"Removed {result['removed_count']} task(s) total (including children)")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            REMOVE_TASK_ESSENTIAL,
+            REMOVE_TASK_STANDARD,
+        )
 
         return 0
 
@@ -539,7 +837,10 @@ def cmd_remove_task(args, printer):
 
 def cmd_update_frontmatter(args, printer):
     """Update metadata field in JSON spec."""
-    printer.action(f"Updating metadata field '{args.key}'...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Updating metadata field '{args.key}'...")
 
     spec_file = Path(args.spec_file).resolve()
 
@@ -555,20 +856,38 @@ def cmd_update_frontmatter(args, printer):
         value=args.value,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'spec_id': spec_id,
+            'updated_fields': [args.key] if success else [],
+            'updated_at': datetime.now(timezone.utc).isoformat() if success else None
+        }
+        output = prepare_output(result, args, UPDATE_FRONTMATTER_ESSENTIAL, UPDATE_FRONTMATTER_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_add_verification(args, printer):
     """Add verification result."""
-    printer.action(f"Recording verification result for {args.verify_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Recording verification result for {args.verify_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
+
+    # Generate verification ID
+    timestamp = datetime.now(timezone.utc)
+    verification_id = f"{args.verify_id}-{timestamp.strftime('%Y%m%d%H%M%S')}"
 
     success = add_verification_result(
         spec_id=args.spec_id,
@@ -580,94 +899,173 @@ def cmd_add_verification(args, printer):
         notes=args.notes,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'verification_id': verification_id if success else None,
+            'spec_id': args.spec_id,
+            'task_id': args.verify_id,
+            'verification_type': args.status.lower(),
+            'created_at': timestamp.isoformat() if success else None
+        }
+        output = prepare_output(result, args, ADD_VERIFICATION_ESSENTIAL, ADD_VERIFICATION_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_format_verification_summary(args, printer):
     """Format verification results summary."""
+    use_json = getattr(args, 'json', False)
+
     # Read JSON input
     if args.json_file:
         try:
             with open(args.json_file, 'r') as f:
                 verification_results = json.load(f)
         except Exception as e:
-            printer.error(f"Failed to read JSON file: {e}")
+            if not use_json:
+                printer.error(f"Failed to read JSON file: {e}")
             return 1
     elif args.json_input:
         try:
             verification_results = json.loads(args.json_input)
         except Exception as e:
-            printer.error(f"Failed to parse JSON input: {e}")
+            if not use_json:
+                printer.error(f"Failed to parse JSON input: {e}")
             return 1
     else:
-        printer.error("Must provide either --json-file or --json-input")
+        if not use_json:
+            printer.error("Must provide either --json-file or --json-input")
         return 1
 
     # Validate input
     if not isinstance(verification_results, list):
-        printer.error("JSON input must be a list of verification results")
+        if not use_json:
+            printer.error("JSON input must be a list of verification results")
         return 1
 
     # Format the summary
     formatted = format_verification_summary(verification_results)
 
-    # Print the formatted summary
-    print(formatted)
+    if use_json:
+        # Calculate summary stats
+        total_verifications = len(verification_results)
+        passed = sum(1 for v in verification_results if v.get('status') == 'PASSED')
+        failed = sum(1 for v in verification_results if v.get('status') == 'FAILED')
+
+        result = {
+            'formatted': formatted,
+            'spec_id': verification_results[0].get('spec_id') if verification_results else None,
+            'total_verifications': total_verifications,
+            'passed': passed,
+            'failed': failed,
+            'summary_type': 'verification'
+        }
+        output = prepare_output(result, args, FORMAT_VERIFICATION_SUMMARY_ESSENTIAL, FORMAT_VERIFICATION_SUMMARY_STANDARD)
+        output_json(output, args.compact)
+    else:
+        # Print the formatted summary
+        print(formatted)
+
     return 0
 
 
 def cmd_move_spec(args, printer):
     """Move spec to another folder."""
-    printer.action(f"Moving spec to {args.target}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Moving spec to {args.target}...")
 
     spec_file = Path(args.spec_file).resolve()
+    old_location = str(spec_file.parent.name)
+    new_location = args.target
 
     success = move_spec(
         spec_file=spec_file,
         target_folder=args.target,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'spec_id': spec_file.stem,
+            'old_location': old_location,
+            'new_location': new_location,
+            'moved_at': datetime.now(timezone.utc).isoformat() if success else None,
+            'backup_created': False  # move_spec doesn't create backups
+        }
+        output = prepare_output(result, args, MOVE_SPEC_ESSENTIAL, MOVE_SPEC_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_activate_spec(args, printer):
     """Activate a pending spec by moving it to active folder."""
-    printer.action(f"Activating spec {args.spec_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Activating spec {args.spec_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     success = activate_spec(
         spec_id=args.spec_id,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
 
-    if success:
+    if success and not use_json:
         printer.success("Spec activated and moved to active/. You can now start working on it with sdd next-task.")
+
+    if use_json:
+        result = {
+            'success': success,
+            'spec_id': args.spec_id,
+            'old_folder': 'pending',
+            'new_folder': 'active',
+            'activated_at': datetime.now(timezone.utc).isoformat() if success else None
+        }
+        output = prepare_output(result, args, ACTIVATE_SPEC_ESSENTIAL, ACTIVATE_SPEC_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_complete_spec(args, printer):
     """Mark spec as completed and move to completed folder."""
-    printer.action(f"Completing spec {args.spec_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Completing spec {args.spec_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     # If spec_file is provided, use it; otherwise let complete_spec find it
     spec_file = Path(args.spec_file).resolve() if args.spec_file else None
+
+    # Load spec to get task count
+    spec_data = load_json_spec(args.spec_id, specs_dir)
+    total_tasks = 0
+    if spec_data:
+        hierarchy = spec_data.get("hierarchy", {})
+        total_tasks = sum(1 for node in hierarchy.values() if node.get("type") == "task")
 
     success = complete_spec(
         spec_id=args.spec_id,
@@ -675,8 +1073,20 @@ def cmd_complete_spec(args, printer):
         specs_dir=specs_dir,
         skip_doc_regen=getattr(args, 'skip_doc_regen', False),
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'spec_id': args.spec_id,
+            'completed_at': datetime.now(timezone.utc).isoformat() if success else None,
+            'total_tasks': total_tasks,
+            'completion_time': None,  # Would need to calculate from spec metadata
+            'moved_to': 'completed'
+        }
+        output = prepare_output(result, args, COMPLETE_SPEC_ESSENTIAL, COMPLETE_SPEC_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
@@ -699,10 +1109,15 @@ def cmd_time_report(args, printer):
 
     if args.json:
         if report is not None:
-            output_json(report, args.compact)
+            _emit_json_output(
+                report,
+                args,
+                TIME_REPORT_ESSENTIAL,
+                TIME_REPORT_STANDARD,
+            )
         else:
             # Fallback for None (shouldn't happen with updated generate_time_report)
-            output_json({"error": "Failed to generate report"}, args.compact)
+            _emit_json_output({"error": "Failed to generate report"}, args)
             return 1
 
     return 0 if report else 1
@@ -727,7 +1142,12 @@ def cmd_status_report(args, printer):
     )
 
     if args.json and report:
-        output_json(report, args.compact)
+        _emit_json_output(
+            report,
+            args,
+            STATUS_REPORT_ESSENTIAL,
+            STATUS_REPORT_STANDARD,
+        )
 
     return 0 if report else 1
 
@@ -749,7 +1169,12 @@ def cmd_audit_spec(args, printer):
     )
 
     if args.json:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            AUDIT_SPEC_ESSENTIAL,
+            AUDIT_SPEC_STANDARD,
+        )
 
     return 0 if result.get("validation_passed", False) else 1
 
@@ -802,7 +1227,12 @@ def cmd_query_tasks(args, printer):
         for task in results:
             print(task["id"])
     elif json_mode and results:
-        output_json(results, args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_tasks = [
+            prepare_output(task, args, QUERY_TASKS_ESSENTIAL, QUERY_TASKS_STANDARD)
+            for task in results
+        ]
+        output_json(filtered_tasks, args.compact)
 
     return 0 if results is not None else 1
 
@@ -918,7 +1348,12 @@ def cmd_check_complete(args, printer):
     )
 
     if args.json:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            CHECK_COMPLETE_ESSENTIAL,
+            CHECK_COMPLETE_STANDARD,
+        )
 
     return 0 if result.get("is_complete", False) else 1
 
@@ -941,7 +1376,12 @@ def cmd_phase_time(args, printer):
     )
 
     if args.json and result:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            PHASE_TIME_ESSENTIAL,
+            PHASE_TIME_STANDARD,
+        )
 
     return 0 if result else 1
 
@@ -963,7 +1403,12 @@ def cmd_list_blockers(args, printer):
     )
 
     if args.json and blockers is not None:
-        output_json(blockers, args.compact)
+        # Apply verbosity filtering for JSON output
+        filtered_blockers = [
+            prepare_output(blocker, args, LIST_BLOCKERS_ESSENTIAL, LIST_BLOCKERS_STANDARD)
+            for blocker in blockers
+        ]
+        output_json(filtered_blockers, args.compact)
 
     return 0 if blockers is not None else 1
 
@@ -978,7 +1423,7 @@ def cmd_reconcile_state(args, printer):
         if not args.json:
             printer.error("Specs directory not found")
         else:
-            output_json({"error": "Specs directory not found"}, args.compact)
+            _emit_json_output({"error": "Specs directory not found"}, args)
         return 1
 
     # Pass None for printer in JSON mode
@@ -992,12 +1437,17 @@ def cmd_reconcile_state(args, printer):
     # Handle JSON output
     if args.json:
         if isinstance(result, dict):
-            output_json(result, args.compact)
+            _emit_json_output(
+                result,
+                args,
+                RECONCILE_STATE_ESSENTIAL,
+                RECONCILE_STATE_STANDARD,
+            )
             # Return error if there was an error in the result
             return 1 if "error" in result else 0
         else:
             # Fallback for unexpected return type
-            output_json({"success": bool(result)}, args.compact)
+            _emit_json_output({"success": bool(result)}, args)
             return 0 if result else 1
 
     # Non-JSON mode returns boolean
@@ -1046,11 +1496,15 @@ def cmd_check_journaling(args, printer):
 
 def cmd_bulk_journal(args, printer):
     """Bulk journal completed tasks."""
-    printer.action("Bulk journaling tasks...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action("Bulk journaling tasks...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     # Parse task_ids if provided
@@ -1063,10 +1517,22 @@ def cmd_bulk_journal(args, printer):
         specs_dir=specs_dir,
         task_ids=task_ids,
         dry_run=args.dry_run,
-        printer=printer,
+        printer=printer if not use_json else None,
         template=args.template,
         template_metadata={"author": args.template_author} if args.template_author else None,
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'entries_added': len(task_ids) if task_ids and success else 0,
+            'spec_id': args.spec_id,
+            'task_ids': task_ids if task_ids else [],
+            'timestamp': datetime.now(timezone.utc).isoformat() if success else None,
+            'entry_count': len(task_ids) if task_ids and success else 0
+        }
+        output = prepare_output(result, args, BULK_JOURNAL_ESSENTIAL, BULK_JOURNAL_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
@@ -1140,7 +1606,12 @@ def cmd_create_task_commit(args, printer):
             "task_id": args.task_id,
             "task_title": task_title
         }
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            CREATE_TASK_COMMIT_ESSENTIAL,
+            CREATE_TASK_COMMIT_STANDARD,
+        )
 
     return 0
 
@@ -1195,6 +1666,7 @@ def cmd_list_specs(args, printer):
         verbose=args.detailed,
         printer=printer,
         compact=getattr(args, 'compact', False),
+        args=args,
     )
 
     return 0
@@ -1202,34 +1674,53 @@ def cmd_list_specs(args, printer):
 
 def cmd_sync_metadata(args, printer):
     """Synchronize spec metadata with hierarchy data."""
-    printer.action("Synchronizing metadata from hierarchy...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action("Synchronizing metadata from hierarchy...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
+        if not use_json:
+            printer.error("Specs directory not found")
         return 1
 
     success = sync_metadata_from_state(
         spec_id=args.spec_id,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer
+        printer=printer if not use_json else None
     )
+
+    if use_json:
+        result = {
+            'success': success,
+            'spec_id': args.spec_id,
+            'synced_fields': ['status', 'progress', 'current_phase'] if success else [],
+            'updated_at': datetime.now(timezone.utc).isoformat() if success else None,
+            'changes_made': success
+        }
+        output = prepare_output(result, args, SYNC_METADATA_ESSENTIAL, SYNC_METADATA_STANDARD)
+        output_json(output, args.compact)
 
     return 0 if success else 1
 
 
 def cmd_update_task_metadata(args, printer):
     """Update task metadata fields."""
-    printer.action(f"Updating metadata for task {args.task_id}...")
+    use_json = getattr(args, 'json', False)
+
+    if not use_json:
+        printer.action(f"Updating metadata for task {args.task_id}...")
 
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
-        printer.error("Specs directory not found")
-        printer.info("\nNext steps:")
-        printer.detail("1. Verify you're in the project root directory")
-        printer.detail("2. Check that specs/ folder exists with subfolders: pending/, active/, completed/, archived/")
-        printer.detail("3. Or specify path: --specs-dir /path/to/specs")
+        if not use_json:
+            printer.error("Specs directory not found")
+            printer.info("\nNext steps:")
+            printer.detail("1. Verify you're in the project root directory")
+            printer.detail("2. Check that specs/ folder exists with subfolders: pending/, active/, completed/, archived/")
+            printer.detail("3. Or specify path: --specs-dir /path/to/specs")
         return 1
 
     # Collect metadata updates from args (8 fields)
@@ -1301,10 +1792,23 @@ def cmd_update_task_metadata(args, printer):
         return 1
 
     # Success message
-    printer.success(f"Task {args.task_id} metadata updated successfully")
-    printer.info("Updated fields:")
-    for key, value in metadata_updates.items():
-        printer.detail(f"  {key}: {value}")
+    if not use_json:
+        printer.success(f"Task {args.task_id} metadata updated successfully")
+        printer.info("Updated fields:")
+        for key, value in metadata_updates.items():
+            printer.detail(f"  {key}: {value}")
+
+    if use_json:
+        result = {
+            'success': True,
+            'task_id': args.task_id,
+            'spec_id': args.spec_id,
+            'updated_fields': list(metadata_updates.keys()),
+            'updated_at': datetime.now(timezone.utc).isoformat(),
+            'metadata': metadata_updates
+        }
+        output = prepare_output(result, args, UPDATE_TASK_METADATA_ESSENTIAL, UPDATE_TASK_METADATA_STANDARD)
+        output_json(output, args.compact)
 
     return 0
 

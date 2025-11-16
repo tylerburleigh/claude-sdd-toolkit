@@ -10,6 +10,12 @@ from claude_skills.common import (
     ensure_human_readable_directory,
     PrettyPrinter
 )
+from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    RENDER_SPEC_ESSENTIAL,
+    RENDER_SPEC_STANDARD,
+)
 from .renderer import SpecRenderer
 from .orchestrator import AIEnhancedRenderer
 
@@ -52,6 +58,15 @@ def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
     return default_override
 
 
+def _render_output_json(data: dict[str, Any], args) -> bool:
+    """Emit filtered JSON output if requested."""
+    if getattr(args, 'json', False):
+        payload = prepare_output(data, args, RENDER_SPEC_ESSENTIAL, RENDER_SPEC_STANDARD)
+        output_json(payload, getattr(args, 'compact', False))
+        return True
+    return False
+
+
 def cmd_render(args, printer: PrettyPrinter) -> int:
     """Render JSON spec to human-readable markdown.
 
@@ -84,15 +99,17 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     if enhancement_level is None:
         enhancement_level = 'standard'
 
-    if mode == 'enhanced':
-        if enhancement_level == 'summary':
-            printer.action("Rendering spec with executive summary only...")
-        elif enhancement_level == 'standard':
-            printer.action("Rendering spec with standard enhancements...")
-        else:  # full
-            printer.action("Rendering spec with full AI enhancements...")
-    else:
-        printer.action("Rendering spec to markdown...")
+    show_progress = getattr(args, 'verbose', False) and not getattr(args, 'json', False)
+    if show_progress:
+        if mode == 'enhanced':
+            if enhancement_level == 'summary':
+                printer.action("Rendering spec with executive summary only...")
+            elif enhancement_level == 'standard':
+                printer.action("Rendering spec with standard enhancements...")
+            else:  # full
+                printer.action("Rendering spec with full AI enhancements...")
+        else:
+            printer.action("Rendering spec to markdown...")
 
     spec_id = args.spec_id
 
@@ -169,6 +186,9 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
             output_path = output_dir / f"{spec_data.get('spec_id', spec_id)}.md"
 
     # Render spec to markdown
+    fallback_used = False
+    fallback_reason: Optional[str] = None
+
     try:
         # Choose renderer based on mode
         if mode == 'enhanced':
@@ -205,8 +225,11 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
 
             except Exception as ai_error:
                 # AI enhancement failed - fall back to basic rendering
-                printer.warning(f"AI enhancement failed: {ai_error}")
-                printer.info("Falling back to basic rendering...")
+                fallback_used = True
+                fallback_reason = str(ai_error)
+                if show_progress:
+                    printer.warning(f"AI enhancement failed: {ai_error}")
+                    printer.info("Falling back to basic rendering...")
 
                 if args.debug:
                     import traceback
@@ -227,13 +250,30 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
         # Write output
         output_path.write_text(markdown, encoding='utf-8')
 
+        task_count = spec_data.get('hierarchy', {}).get('spec-root', {}).get('total_tasks', 0)
+        result = {
+            'spec_id': spec_data.get('spec_id', spec_id),
+            'output_path': str(output_path),
+            'mode': mode,
+            'enhancement_level': enhancement_level,
+            'fallback_used': fallback_used,
+            'fallback_reason': fallback_reason,
+            'model_override': model_override,
+            'output_size': len(markdown),
+            'task_count': task_count,
+        }
+
+        if _render_output_json(result, args):
+            return 0
+
         printer.success(f"✓ Rendered spec to {output_path}")
 
         if args.verbose:
-            total_tasks = spec_data.get('hierarchy', {}).get('spec-root', {}).get('total_tasks', 0)
-            printer.detail(f"Total tasks: {total_tasks}")
+            printer.detail(f"Total tasks: {task_count}")
             printer.detail(f"Output size: {len(markdown)} characters")
             printer.detail(f"Rendering mode: {mode}")
+            if fallback_used:
+                printer.detail("Fallback renderer used due to AI enhancement failure")
 
         return 0
 

@@ -138,6 +138,55 @@ class TestListSpecsCLI:
         assert spec_info["completed_tasks"] == 1
         assert "progress_percentage" in spec_info
 
+    def test_list_specs_compact_json_output(self, tmp_path):
+        """Test list-specs with compact JSON output."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Compact Test"},
+            "hierarchy": {
+                "phase-1": {"type": "phase", "status": "in_progress", "children": ["task-1-1"]}
+            }
+        }
+        (active_dir / "compact-001.json").write_text(json.dumps(spec_data, indent=2))
+
+        result = run_cli("--json", "--compact", "list-specs", "--path", str(specs_dir),
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert len(result.stdout.strip().splitlines()) == 1
+        data = json.loads(result.stdout)
+        assert data[0]["spec_id"] == "compact-001"
+
+    def test_list_specs_pretty_json_output(self, tmp_path):
+        """Test list-specs with --no-compact flag."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        spec_data = {
+            "metadata": {"title": "Pretty Test"},
+            "hierarchy": {
+                "phase-1": {"type": "phase", "status": "in_progress", "children": ["task-1-1"]}
+            }
+        }
+        (active_dir / "pretty-001.json").write_text(json.dumps(spec_data, indent=2))
+
+        result = run_cli("--json", "--no-compact", "list-specs", "--path", str(specs_dir),
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        lines = result.stdout.strip().splitlines()
+        assert len(lines) > 1
+        data = json.loads(result.stdout)
+        assert data[0]["spec_id"] == "pretty-001"
+
     def test_list_specs_empty_directory(self, tmp_path):
         """Test list-specs with empty specs directory."""
         specs_dir = tmp_path / "specs"

@@ -18,10 +18,13 @@ Migration Path:
 """
 
 import sys
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from .ui_factory import create_ui
 from .ui_protocol import Ui, MessageLevel
+
+if TYPE_CHECKING:
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
 
 
 class PrettyPrinter:
@@ -39,10 +42,17 @@ class PrettyPrinter:
     All original methods are preserved with identical signatures, ensuring
     100% backward compatibility with existing code.
 
+    Verbosity Control:
+    - Supports both legacy boolean flags (quiet, verbose) and new VerbosityLevel enum
+    - VerbosityLevel.QUIET: Errors only, minimal output
+    - VerbosityLevel.NORMAL: Standard output (default)
+    - VerbosityLevel.VERBOSE: Detailed output including info messages
+
     Attributes:
         use_color: Whether to use ANSI color codes (auto-disabled if not TTY)
-        verbose: Whether to show detailed info messages
-        quiet: Whether to suppress non-error output
+        verbose: Whether to show detailed info messages (legacy, use verbosity_level)
+        quiet: Whether to suppress non-error output (legacy, use verbosity_level)
+        verbosity_level: VerbosityLevel enum (QUIET, NORMAL, or VERBOSE)
         _ui: Internal Ui backend (RichUi or PlainUi)
     """
 
@@ -51,6 +61,7 @@ class PrettyPrinter:
         use_color: bool = True,
         verbose: bool = False,
         quiet: bool = False,
+        verbosity_level: Optional['VerbosityLevel'] = None,
         _ui_backend: Optional[Ui] = None
     ):
         """
@@ -58,26 +69,50 @@ class PrettyPrinter:
 
         Args:
             use_color: Enable ANSI color codes (auto-disabled if not a TTY)
-            verbose: Show detailed output including info messages
-            quiet: Minimal output (errors only)
+            verbose: Show detailed output including info messages (deprecated, use verbosity_level)
+            quiet: Minimal output (errors only) (deprecated, use verbosity_level)
+            verbosity_level: Optional VerbosityLevel enum (QUIET, NORMAL, VERBOSE).
+                           If provided, overrides quiet/verbose flags.
             _ui_backend: Internal parameter for testing (not for public use)
 
         Example:
             # Standard usage (auto-detects environment)
             printer = PrettyPrinter()
 
-            # Verbose mode
+            # Verbose mode (legacy)
             printer = PrettyPrinter(verbose=True)
 
-            # Quiet mode (errors only)
+            # Quiet mode (legacy)
             printer = PrettyPrinter(quiet=True)
+
+            # New verbosity level API
+            from claude_skills.cli.sdd.verbosity import VerbosityLevel
+            printer = PrettyPrinter(verbosity_level=VerbosityLevel.QUIET)
 
             # Disable colors
             printer = PrettyPrinter(use_color=False)
         """
         self.use_color = use_color and sys.stdout.isatty()
-        self.verbose = verbose
-        self.quiet = quiet
+
+        # Support both legacy boolean flags and new verbosity_level enum
+        if verbosity_level is not None:
+            # New API: use verbosity_level enum
+            from claude_skills.cli.sdd.verbosity import VerbosityLevel
+            self.verbosity_level = verbosity_level
+            self.quiet = (verbosity_level == VerbosityLevel.QUIET)
+            self.verbose = (verbosity_level == VerbosityLevel.VERBOSE)
+        else:
+            # Legacy API: use quiet/verbose booleans
+            # Infer verbosity_level from boolean flags for internal consistency
+            from claude_skills.cli.sdd.verbosity import VerbosityLevel
+            self.quiet = quiet
+            self.verbose = verbose
+            if quiet:
+                self.verbosity_level = VerbosityLevel.QUIET
+            elif verbose:
+                self.verbosity_level = VerbosityLevel.VERBOSE
+            else:
+                self.verbosity_level = VerbosityLevel.NORMAL
 
         # Create or use provided Ui backend
         if _ui_backend is not None:
@@ -88,7 +123,7 @@ class PrettyPrinter:
             force_plain = not self.use_color
             self._ui = create_ui(
                 force_plain=force_plain,
-                quiet=quiet
+                quiet=self.quiet
             )
 
     def _colorize(self, text: str, color_code: str) -> str:
@@ -157,7 +192,9 @@ class PrettyPrinter:
         """
         Print a warning message (non-blocking issue).
 
-        Warnings are printed to stderr.
+        Warnings always print regardless of verbosity level (QUIET, NORMAL, VERBOSE).
+        This ensures important non-blocking issues are never silently suppressed.
+        Printed to stderr.
 
         Args:
             msg: Warning message to display
@@ -166,14 +203,15 @@ class PrettyPrinter:
             printer.warning("Deprecated configuration format detected")
             printer.warning("Task has no estimated_hours metadata")
         """
-        if not self.quiet:
-            self._ui.print_status(msg, level=MessageLevel.WARNING)
+        # Warnings always print (ignore quiet mode) - users need to see issues
+        self._ui.print_status(msg, level=MessageLevel.WARNING)
 
     def error(self, msg: str) -> None:
         """
         Print an error message (blocking issue).
 
-        Errors always print regardless of quiet mode.
+        Errors always print regardless of verbosity level (QUIET, NORMAL, VERBOSE).
+        Critical issues must never be suppressed.
         Printed to stderr.
 
         Args:
@@ -183,7 +221,7 @@ class PrettyPrinter:
             printer.error("Spec file not found")
             printer.error("Invalid task ID format")
         """
-        # Errors always print (ignore quiet mode)
+        # Errors always print (ignore verbosity level) - critical issues must be visible
         self._ui.print_status(msg, level=MessageLevel.ERROR)
 
     def header(self, msg: str) -> None:

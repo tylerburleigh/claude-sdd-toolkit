@@ -31,8 +31,22 @@ from claude_skills.common.ai_tools import (
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    LIST_TOOLS_ESSENTIAL,
+    LIST_TOOLS_STANDARD,
+    FIDELITY_REVIEW_ESSENTIAL,
+    FIDELITY_REVIEW_STANDARD,
+)
 from claude_skills.common import ai_config
 from claude_skills.common.paths import find_specs_directory, ensure_fidelity_reviews_directory
+
+
+def _fidelity_output_json(data: Dict[str, Any], args) -> int:
+    """Emit fidelity summary respecting verbosity settings."""
+    payload = prepare_output(data, args, FIDELITY_REVIEW_ESSENTIAL, FIDELITY_REVIEW_STANDARD)
+    output_json(payload, getattr(args, 'compact', False))
+    return 0
 
 
 def _slugify_component(value: Optional[str]) -> str:
@@ -127,14 +141,21 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
     Returns:
         Exit code (0 for success, non-zero for error)
     """
+    json_requested = getattr(args, 'json', False)
+
     try:
         # Step 1: Initialize FidelityReviewer
         if hasattr(args, 'verbose') and args.verbose:
             print(f"Loading specification: {args.spec_id}", file=sys.stderr)
 
+        base_specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+        if base_specs_dir is None:
+            print("Error: Could not find specs directory", file=sys.stderr)
+            return 1
+
         # Check if incremental mode is requested
         incremental = args.incremental if hasattr(args, 'incremental') else False
-        reviewer = FidelityReviewer(args.spec_id, incremental=incremental)
+        reviewer = FidelityReviewer(args.spec_id, spec_path=base_specs_dir, incremental=incremental)
 
         if reviewer.spec_data is None:
             print(f"Error: Failed to load specification {args.spec_id}", file=sys.stderr)
@@ -156,8 +177,30 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             base_branch=args.base_branch
         )
 
+        scope_info = {
+            "task": task_id,
+            "phase": phase_id,
+            "files": file_paths,
+        }
+
         # If no-ai flag, just show prompt and exit
         if args.no_ai:
+            summary_payload = {
+                "spec_id": args.spec_id,
+                "mode": "no-ai",
+                "format": "prompt",
+                "artifacts": [],
+                "issue_counts": {},
+                "models_consulted": {},
+                "consensus": {},
+                "scope": scope_info,
+                "prompt_included": True,
+                "recommendation": None,
+            }
+            if json_requested:
+                summary_payload["prompt_excerpt"] = prompt[:200]
+                return _fidelity_output_json(summary_payload, args)
+
             print("\n" + "=" * 80)
             print("REVIEW PROMPT (--no-ai mode)")
             print("=" * 80)
@@ -289,7 +332,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             if _write_report_artifact(requested_path, output_format, get_markdown, get_json_text):
                 saved_paths.append(requested_path)
         else:
-            specs_dir = find_specs_directory()
+            specs_dir = base_specs_dir or find_specs_directory()
             if specs_dir:
                 fidelity_dir = ensure_fidelity_reviews_directory(specs_dir)
                 base_name = _build_output_basename(args.spec_id, task_id, phase_id, file_paths)
@@ -299,6 +342,50 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
                 markdown_path = fidelity_dir / f"{base_name}.md"
                 if _write_report_artifact(markdown_path, "markdown", get_markdown, get_json_text):
                     saved_paths.append(markdown_path)
+
+        issue_counts = {key: len(value) for key, value in categorized_issues.items()}
+        recommendation = metadata.get("recommendation") if metadata else None
+        models_summary = {
+            "count": models_metadata.get("count"),
+            "summary": models_metadata.get("summary"),
+            "tools": dict(models_metadata.get("tools", {})),
+        }
+        if isinstance(consensus, dict):
+            consensus_verdict = consensus.get("consensus_verdict")
+            agreement_rate = consensus.get("agreement_rate")
+            model_count = consensus.get("model_count")
+            recommendations = consensus.get("consensus_recommendations")
+        else:
+            consensus_verdict = getattr(consensus, "consensus_verdict", None)
+            agreement_rate = getattr(consensus, "agreement_rate", None)
+            model_count = getattr(consensus, "model_count", None)
+            recommendations = getattr(consensus, "consensus_recommendations", None)
+
+        if hasattr(consensus_verdict, "value"):
+            consensus_verdict = consensus_verdict.value
+
+        consensus_info = {
+            "verdict": consensus_verdict,
+            "agreement_rate": agreement_rate,
+            "model_count": model_count,
+            "recommendations": recommendations,
+        }
+
+        summary_payload = {
+            "spec_id": args.spec_id,
+            "mode": "no-ai" if args.no_ai else "full",
+            "format": args.format if hasattr(args, "format") else "text",
+            "artifacts": [str(path) for path in saved_paths],
+            "issue_counts": issue_counts,
+            "models_consulted": models_summary,
+            "consensus": consensus_info,
+            "scope": scope_info,
+            "prompt_included": not args.no_ai,
+            "recommendation": recommendation,
+        }
+
+        if json_requested:
+            return _fidelity_output_json(summary_payload, args)
 
         # Step 8: Emit console output in requested format
         if output_format == "json":
@@ -312,9 +399,6 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             print("\nFidelity review artifact(s) saved to:", file=sys.stderr)
             for path in saved_paths:
                 print(f"  {path}", file=sys.stderr)
-            if hasattr(args, "verbose") and args.verbose:
-                for path in saved_paths:
-                    print(f"Full path: {path.resolve()}", file=sys.stderr)
 
         return 0
 
@@ -355,16 +439,23 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
                 "status": status
             })
 
-        # Output in requested format
+        available_list = [entry for entry in tool_status if entry["available"]]
+        unavailable_list = [entry for entry in tool_status if not entry["available"]]
+        result = {
+            "available": available_list,
+            "unavailable": unavailable_list,
+            "available_count": len(available_list),
+            "total": len(all_tools),
+        }
+
+        json_requested = getattr(args, 'json', False)
         output_format = args.format if hasattr(args, 'format') else 'text'
+        if json_requested:
+            output_format = 'json'
 
         if output_format == 'json':
-            result = {
-                "tools": tool_status,
-                "available_count": len(available_tools),
-                "total_count": len(all_tools)
-            }
-            output_json(result, getattr(args, 'compact', False))
+            payload = prepare_output(result, args, LIST_TOOLS_ESSENTIAL, LIST_TOOLS_STANDARD)
+            output_json(payload, getattr(args, 'compact', False))
         else:  # text format
             print("\n" + "=" * 60)
             print("AI CONSULTATION TOOLS STATUS")

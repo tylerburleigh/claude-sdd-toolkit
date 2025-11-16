@@ -28,6 +28,19 @@ from claude_skills.sdd_plan_review.reporting import (
     generate_json_report,
 )
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    LIST_TOOLS_ESSENTIAL,
+    LIST_TOOLS_STANDARD,
+    PLAN_REVIEW_SUMMARY_ESSENTIAL,
+    PLAN_REVIEW_SUMMARY_STANDARD,
+)
+
+
+def _plan_review_output_json(data, args):
+    payload = prepare_output(data, args, PLAN_REVIEW_SUMMARY_ESSENTIAL, PLAN_REVIEW_SUMMARY_STANDARD)
+    output_json(payload, getattr(args, 'compact', False))
+    return 0
 
 
 def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
@@ -72,6 +85,8 @@ def _parse_model_override(values: Optional[list[str]]) -> Optional[object]:
 
 def cmd_review(args, printer):
     """Review a specification file using multiple AI models."""
+    json_requested = getattr(args, 'json', False)
+
     # Find specs directory
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
     if not specs_dir:
@@ -86,7 +101,8 @@ def cmd_review(args, printer):
         printer.detail(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
         return 1
 
-    printer.info(f"Reviewing specification: {spec_file}")
+    if not json_requested:
+        printer.info(f"Reviewing specification: {spec_file}")
 
     # Detect available tools
     available_tools = get_enabled_and_available_tools("sdd-plan-review")
@@ -110,7 +126,8 @@ def cmd_review(args, printer):
     else:
         tools_to_use = available_tools
 
-    printer.info(f"Using {len(tools_to_use)} tool(s): {', '.join(tools_to_use)}")
+    if not json_requested:
+        printer.info(f"Using {len(tools_to_use)} tool(s): {', '.join(tools_to_use)}")
 
     model_override = _parse_model_override(getattr(args, "model", None))
 
@@ -126,6 +143,24 @@ def cmd_review(args, printer):
         if args.output:
             printer.detail(f"Output: {args.output}")
         printer.detail(f"Cache: {'Yes' if args.cache else 'No'}")
+        if json_requested:
+            dry_payload = {
+                'spec_id': spec_id,
+                'review_type': args.type,
+                'recommendation': None,
+                'overall_score': None,
+                'artifacts': [],
+                'issue_count': 0,
+                'models_responded': 0,
+                'models_requested': len(tools_to_use),
+                'models_consulted': {},
+                'failures': 0,
+                'execution_time': 0,
+                'consensus_level': None,
+                'dimension_scores': None,
+                'dry_run': True,
+            }
+            return _plan_review_output_json(dry_payload, args)
         return 0
 
     # Load spec
@@ -149,7 +184,8 @@ def cmd_review(args, printer):
         pass
 
     # Run review
-    printer.info(f"\nStarting {args.type} review...")
+    if not json_requested:
+        printer.info(f"\nStarting {args.type} review...")
 
     results = review_with_tools(
         spec_content=spec_content,
@@ -159,20 +195,22 @@ def cmd_review(args, printer):
         spec_title=spec_title,
         parallel=True,
         model_override=model_override,
+        silent=json_requested,
     )
 
     # Display execution summary
-    printer.header("\nReview Complete")
-    printer.info(f"Execution time: {results['execution_time']:.1f}s")
-    printer.success(f"Models responded: {len(results['parsed_responses'])}/{len(tools_to_use)}")
-    resolved_models = results.get("models")
-    if resolved_models:
-        printer.detail(f"Resolved models: {resolved_models}")
+    if not json_requested:
+        printer.header("\nReview Complete")
+        printer.info(f"Execution time: {results['execution_time']:.1f}s")
+        printer.success(f"Models responded: {len(results['parsed_responses'])}/{len(tools_to_use)}")
+        resolved_models = results.get("models")
+        if resolved_models:
+            printer.detail(f"Resolved models: {resolved_models}")
 
-    if results['failures']:
-        printer.warning(f"Failed: {len(results['failures'])} tool(s)")
-        for failure in results['failures']:
-            printer.detail(f"  {failure['tool']}: {failure['error']}")
+        if results['failures']:
+            printer.warning(f"Failed: {len(results['failures'])} tool(s)")
+            for failure in results['failures']:
+                printer.detail(f"  {failure['tool']}: {failure['error']}")
 
     # Check if we have consensus
     consensus = results.get('consensus')
@@ -183,7 +221,8 @@ def cmd_review(args, printer):
         return 1
 
     # Generate and display markdown report
-    printer.info("\n" + "=" * 60)
+    if not json_requested:
+        printer.info("\n" + "=" * 60)
     markdown_report = generate_markdown_report(
         consensus,
         spec_id,
@@ -191,7 +230,8 @@ def cmd_review(args, printer):
         args.type,
         parsed_responses=results.get('parsed_responses', [])
     )
-    print(markdown_report)
+    if not json_requested:
+        print(markdown_report)
 
     def sanitize_component(component: str) -> str:
         cleaned = "".join(c if c.isalnum() or c in ("-", "_") else "-" for c in component.strip())
@@ -263,6 +303,30 @@ def cmd_review(args, printer):
             printer.warning(f"Failed to write {label} artifact to {destination}: {write_error}")
             failed_artifacts.append((label, destination, write_error))
 
+    artifact_paths = [str(path) for _, path in saved_artifacts]
+
+    summary_payload = {
+        'spec_id': spec_id,
+        'review_type': args.type,
+        'recommendation': consensus.get('final_recommendation'),
+        'overall_score': consensus.get('overall_score'),
+        'artifacts': artifact_paths,
+        'issue_count': len(consensus.get('all_issues') or []),
+        'models_responded': len(results['parsed_responses']),
+        'models_requested': len(tools_to_use),
+        'models_consulted': results.get('models', {}),
+        'failures': len(results['failures']),
+        'execution_time': results.get('execution_time'),
+        'consensus_level': consensus.get('consensus_level'),
+        'dimension_scores': consensus.get('dimension_scores'),
+        'dry_run': False,
+    }
+    if failed_artifacts:
+        summary_payload['artifact_failures'] = len(failed_artifacts)
+
+    if json_requested:
+        return _plan_review_output_json(summary_payload, args)
+
     if saved_artifacts:
         printer.success("\nSaved review artifacts:")
         for label, path in saved_artifacts:
@@ -293,13 +357,16 @@ def cmd_list_tools(args, printer):
 
     # JSON output mode
     if args.json:
-        output = {
+        payload = {
             "available": available,
             "unavailable": unavailable,
             "total": len(tools_to_check),
             "available_count": len(available)
         }
-        output_json(output, args.compact)
+
+        # Apply verbosity filtering
+        filtered_output = prepare_output(payload, args, LIST_TOOLS_ESSENTIAL, LIST_TOOLS_STANDARD)
+        output_json(filtered_output, args.compact)
         if len(available) == 0:
             return 1
         else:

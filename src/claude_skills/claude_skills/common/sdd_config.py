@@ -24,6 +24,7 @@ DEFAULT_SDD_CONFIG = {
     "output": {
         "default_mode": "rich",  # Unified output format: "rich" (formatted), "plain" (simple text), or "json"
         "json_compact": True,  # Use compact JSON formatting (only affects JSON output)
+        "default_verbosity": "quiet",  # Default verbosity level: "quiet", "normal", or "verbose"
 
         # Deprecated (kept for backward compatibility - will be removed in future version)
         "json": None,  # DEPRECATED: Use default_mode="json" instead

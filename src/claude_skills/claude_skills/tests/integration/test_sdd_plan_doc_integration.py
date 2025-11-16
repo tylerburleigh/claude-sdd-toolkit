@@ -72,6 +72,30 @@ class TestSddPlanDocIntegration:
         except json.JSONDecodeError:
             pytest.fail("detect-project did not return valid JSON")
 
+    def test_detect_project_compact_vs_pretty(self):
+        """detect-project should honor compact formatting flags."""
+        compact_result = run_cli(
+            "--json",
+            "--compact",
+            "detect-project",
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode == 0
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+
+        pretty_result = run_cli(
+            "--json",
+            "--no-compact",
+            "detect-project",
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode == 0
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
     @patch('claude_skills.common.doc_integration.check_doc_availability')
     def test_docs_available_workflow(self, mock_check_doc):
         """

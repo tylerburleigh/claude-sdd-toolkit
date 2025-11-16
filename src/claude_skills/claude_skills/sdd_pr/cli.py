@@ -11,6 +11,14 @@ from pathlib import Path
 from claude_skills.common import find_specs_directory
 from claude_skills.common.printer import PrettyPrinter
 from claude_skills.common.spec import find_spec_file
+from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    PR_CONTEXT_ESSENTIAL,
+    PR_CONTEXT_STANDARD,
+    PR_CREATE_ESSENTIAL,
+    PR_CREATE_STANDARD,
+)
 from claude_skills.sdd_pr.pr_context import gather_pr_context
 from claude_skills.sdd_pr.pr_creation import (
     show_pr_draft_and_wait,
@@ -19,6 +27,15 @@ from claude_skills.sdd_pr.pr_creation import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _pr_output_json(data, args, essential_fields, standard_fields):
+    """Emit filtered JSON payload if --json is enabled."""
+    if getattr(args, 'json', False):
+        payload = prepare_output(data, args, essential_fields, standard_fields)
+        output_json(payload, getattr(args, 'compact', False))
+        return True
+    return False
 
 
 def cmd_create_pr(args, printer: PrettyPrinter) -> int:
@@ -41,7 +58,6 @@ def cmd_create_pr(args, printer: PrettyPrinter) -> int:
         Exit code: 0 for success, 1 for error
     """
     printer.header("SDD PR - AI-Powered Pull Request Creation")
-    printer.info("")
 
     # Find specs directory
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
@@ -57,9 +73,6 @@ def cmd_create_pr(args, printer: PrettyPrinter) -> int:
         printer.info(f"Searched in: {specs_dir}")
         return 1
 
-    printer.action(f"Loading spec: {args.spec_id}")
-    printer.info("")
-
     try:
         # Gather all context
         context = gather_pr_context(
@@ -74,32 +87,60 @@ def cmd_create_pr(args, printer: PrettyPrinter) -> int:
             return 1
 
         printer.success("Spec loaded successfully")
-        printer.info("")
+
+        context_counts = {
+            'commits': len(context['commits']),
+            'tasks': len(context['tasks']),
+            'phases': len(context['phases']),
+            'journals': len(context['journals']),
+        }
+        diff_bytes = len(context['git_diff'].encode('utf-8')) if context.get('git_diff') else 0
+        draft_payload = {
+            'mode': 'draft',
+            'spec_id': args.spec_id,
+            'branch_name': context['branch_name'],
+            'base_branch': context['base_branch'],
+            'context_counts': context_counts,
+            'diff_bytes': diff_bytes,
+            'repo_root': str(context['repo_root']),
+        }
 
         # MODE 1: Draft-only (show context and draft)
         if getattr(args, 'draft_only', False):
-            printer.info("Draft-only mode: No PR will be created")
-            printer.info("")
-            printer.info("Context gathered:")
-            printer.detail(f"  Commits: {len(context['commits'])}")
-            printer.detail(f"  Tasks: {len(context['tasks'])}")
-            printer.detail(f"  Phases: {len(context['phases'])}")
-            printer.detail(f"  Journals: {len(context['journals'])}")
-            printer.detail(f"  Diff size: {len(context['git_diff'])} bytes")
-            printer.info("")
-            printer.info("Agent should now analyze this context and generate PR description")
-            printer.info("")
+            if _pr_output_json(draft_payload, args, PR_CONTEXT_ESSENTIAL, PR_CONTEXT_STANDARD):
+                return 0
+
+            diff_kb = diff_bytes / 1024 if diff_bytes else 0
+            printer.success("Draft mode: context gathered")
+            printer.info(
+                "Commits: {commits} • Tasks: {tasks} • Phases: {phases} • "
+                "Journals: {journals} • Diff: {diff:.1f} KB".format(
+                    commits=context_counts['commits'],
+                    tasks=context_counts['tasks'],
+                    phases=context_counts['phases'],
+                    journals=context_counts['journals'],
+                    diff=diff_kb,
+                )
+            )
+            printer.info(f"Branch: {context['branch_name']} → {context['base_branch']}")
+            printer.info("Provide --description and run with --approve to create the PR.")
             return 0
 
         # MODE 2: Full creation (requires --approve and description)
         if not getattr(args, 'approve', False):
             printer.error("PR creation requires --approve flag")
-            printer.info("")
-            printer.info("Workflow:")
-            printer.info("  1. Agent analyzes context and generates description")
-            printer.info("  2. Agent shows draft to user for approval")
-            printer.info("  3. Run with --approve flag to create PR")
-            printer.info("")
+            printer.info("Run draft mode first, then rerun with --approve and --description.")
+            error_payload = {
+                'success': False,
+                'spec_id': args.spec_id,
+                'pr_url': None,
+                'pr_number': None,
+                'branch_name': context['branch_name'],
+                'base_branch': context['base_branch'],
+                'pr_title': None,
+                'error': 'approve flag missing',
+            }
+            _pr_output_json(error_payload, args, PR_CREATE_ESSENTIAL, PR_CREATE_STANDARD)
             return 1
 
         # Get PR title and body from args
@@ -110,16 +151,26 @@ def cmd_create_pr(args, printer: PrettyPrinter) -> int:
             # Use spec title as default
             pr_title = context['metadata'].get('title', args.spec_id)
             printer.info(f"Using spec title as PR title: {pr_title}")
-            printer.info("")
 
         if not pr_body:
             printer.error("PR body is required for creation")
             printer.info("Agent should provide --description with AI-generated PR body")
+            error_payload = {
+                'success': False,
+                'spec_id': args.spec_id,
+                'pr_url': None,
+                'pr_number': None,
+                'branch_name': context['branch_name'],
+                'base_branch': context['base_branch'],
+                'pr_title': pr_title,
+                'error': 'missing PR body',
+            }
+            _pr_output_json(error_payload, args, PR_CREATE_ESSENTIAL, PR_CREATE_STANDARD)
             return 1
 
         # Create PR immediately (user has already approved via agent)
         # The --approve flag signals that the user reviewed the draft and approved
-        success = create_pr_with_ai_description(
+        success, pr_result = create_pr_with_ai_description(
             repo_root=context['repo_root'],
             branch_name=context['branch_name'],
             base_branch=context['base_branch'],
@@ -130,6 +181,10 @@ def cmd_create_pr(args, printer: PrettyPrinter) -> int:
             specs_dir=specs_dir,
             printer=printer
         )
+
+        pr_result.setdefault('spec_id', args.spec_id)
+        if _pr_output_json(pr_result, args, PR_CREATE_ESSENTIAL, PR_CREATE_STANDARD):
+            return 0 if success else 1
 
         return 0 if success else 1
 

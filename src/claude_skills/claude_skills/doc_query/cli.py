@@ -4,13 +4,53 @@
 from __future__ import annotations
 
 import argparse
-import json
-import sys
 from typing import Any, Dict, List, Optional
 
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.json_output import output_json
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.sdd_config import get_default_format
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    STATS_DOC_QUERY_ESSENTIAL,
+    STATS_DOC_QUERY_STANDARD,
+    LIST_CLASSES_ESSENTIAL,
+    LIST_CLASSES_STANDARD,
+    LIST_FUNCTIONS_ESSENTIAL,
+    LIST_FUNCTIONS_STANDARD,
+    LIST_MODULES_ESSENTIAL,
+    LIST_MODULES_STANDARD,
+    CALLERS_ESSENTIAL,
+    CALLERS_STANDARD,
+    CALLEES_ESSENTIAL,
+    CALLEES_STANDARD,
+    CALL_GRAPH_ESSENTIAL,
+    CALL_GRAPH_STANDARD,
+    TRACE_ENTRY_ESSENTIAL,
+    TRACE_ENTRY_STANDARD,
+    TRACE_DATA_ESSENTIAL,
+    TRACE_DATA_STANDARD,
+    IMPACT_ESSENTIAL,
+    IMPACT_STANDARD,
+    REFACTOR_CANDIDATES_ESSENTIAL,
+    REFACTOR_CANDIDATES_STANDARD,
+    FIND_CLASS_ESSENTIAL,
+    FIND_CLASS_STANDARD,
+    FIND_FUNCTION_ESSENTIAL,
+    FIND_FUNCTION_STANDARD,
+    FIND_MODULE_ESSENTIAL,
+    FIND_MODULE_STANDARD,
+    COMPLEXITY_ESSENTIAL,
+    COMPLEXITY_STANDARD,
+    DEPENDENCIES_ESSENTIAL,
+    DEPENDENCIES_STANDARD,
+    SEARCH_ESSENTIAL,
+    SEARCH_STANDARD,
+    CONTEXT_DOC_QUERY_ESSENTIAL,
+    CONTEXT_DOC_QUERY_STANDARD,
+    DESCRIBE_MODULE_ESSENTIAL,
+    DESCRIBE_MODULE_STANDARD,
+)
 from claude_skills.doc_query.doc_query_lib import (
     DocumentationQuery,
     QueryResult,
@@ -44,14 +84,9 @@ from claude_skills.doc_query.workflows.refactor_candidates import (
 # ---------------------------------------------------------------------------
 
 
-def _dump_json(payload: Any) -> None:
-    json.dump(payload, sys.stdout, indent=2)
-    sys.stdout.write("\n")
-
-
 def _maybe_json(args: argparse.Namespace, payload: Any) -> bool:
     if getattr(args, 'json', False):
-        _dump_json(payload)
+        output_json(payload, compact=getattr(args, 'compact', False))
         return True
     return False
 
@@ -420,9 +455,20 @@ def cmd_find_class(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.find_class(args.name, pattern=args.pattern)
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, FIND_CLASS_ESSENTIAL, FIND_CLASS_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -431,9 +477,20 @@ def cmd_find_function(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.find_function(args.name, pattern=args.pattern)
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, FIND_FUNCTION_ESSENTIAL, FIND_FUNCTION_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -442,9 +499,20 @@ def cmd_find_module(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.find_module(args.name, pattern=args.pattern)
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, FIND_MODULE_ESSENTIAL, FIND_MODULE_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -476,9 +544,20 @@ def cmd_complexity(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             for item in filtered
         ]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=True)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, COMPLEXITY_ESSENTIAL, COMPLEXITY_STANDARD),
+            relevance_score=result.relevance_score
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=True)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -487,9 +566,20 @@ def cmd_dependencies(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     results = query.get_dependencies(args.module, reverse=args.reverse)
-    if _maybe_json(args, _results_to_json(results, include_meta=True)):
+
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, DEPENDENCIES_ESSENTIAL, DEPENDENCIES_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=True)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -503,9 +593,20 @@ def cmd_search(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if hasattr(args, 'limit') and args.limit is not None:
         results = results[:args.limit]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=True)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, SEARCH_ESSENTIAL, SEARCH_STANDARD),
+            relevance_score=result.relevance_score
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=True)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -519,9 +620,23 @@ def cmd_context(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_docstrings=args.include_docstrings,
         include_stats=args.include_stats,
     )
-    if _maybe_json(args, _context_to_json(context)):
+
+    # Apply verbosity filtering to each result's data in each category
+    filtered_context = {
+        key: [
+            QueryResult(
+                entity_type=result.entity_type,
+                name=result.name,
+                data=prepare_output(result.data, args, CONTEXT_DOC_QUERY_ESSENTIAL, CONTEXT_DOC_QUERY_STANDARD)
+            )
+            for result in value
+        ]
+        for key, value in context.items()
+    }
+
+    if _maybe_json(args, _context_to_json(filtered_context)):
         return 0
-    print_context(context, verbose=args.verbose)
+    print_context(filtered_context, verbose=args.verbose)
     return 0
 
 
@@ -535,9 +650,13 @@ def cmd_describe_module(args: argparse.Namespace, printer: PrettyPrinter) -> int
         include_docstrings=args.include_docstrings,
         include_dependencies=not args.skip_dependencies,
     )
-    if _maybe_json(args, summary):
+
+    # Apply verbosity filtering
+    filtered_summary = prepare_output(summary, args, DESCRIBE_MODULE_ESSENTIAL, DESCRIBE_MODULE_STANDARD)
+
+    if _maybe_json(args, filtered_summary):
         return 0
-    print_module_summary(summary, verbose=args.verbose)
+    print_module_summary(filtered_summary, verbose=args.verbose)
     return 0
 
 
@@ -546,8 +665,12 @@ def cmd_stats(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if not query:
         return 1
     stats = query.get_stats()
-    if _maybe_json(args, stats):
+    # Apply verbosity filtering
+    filtered_stats = prepare_output(stats, args, STATS_DOC_QUERY_ESSENTIAL, STATS_DOC_QUERY_STANDARD)
+    if _maybe_json(args, filtered_stats):
         return 0
+    # Use filtered_stats for text output
+    stats = filtered_stats
     metadata = stats.get('metadata', {})
     statistics = stats.get('statistics', {})
     print("\nDocumentation Statistics:")
@@ -599,9 +722,19 @@ def cmd_list_classes(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if hasattr(args, 'limit') and args.limit:
         results = results[:args.limit]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, LIST_CLASSES_ESSENTIAL, LIST_CLASSES_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -636,9 +769,19 @@ def cmd_list_functions(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if hasattr(args, 'limit') and args.limit:
         results = results[:args.limit]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, LIST_FUNCTIONS_ESSENTIAL, LIST_FUNCTIONS_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -673,9 +816,19 @@ def cmd_list_modules(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     if hasattr(args, 'limit') and args.limit:
         results = results[:args.limit]
 
-    if _maybe_json(args, _results_to_json(results, include_meta=False)):
+    # Apply verbosity filtering to each result's data
+    filtered_results = [
+        QueryResult(
+            entity_type=result.entity_type,
+            name=result.name,
+            data=prepare_output(result.data, args, LIST_MODULES_ESSENTIAL, LIST_MODULES_STANDARD)
+        )
+        for result in results
+    ]
+
+    if _maybe_json(args, _results_to_json(filtered_results, include_meta=False)):
         return 0
-    _print_results(args, results)
+    _print_results(args, filtered_results)
     return 0
 
 
@@ -691,17 +844,23 @@ def cmd_callers(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_line=True
     )
 
-    if _maybe_json(args, callers):
+    # Apply verbosity filtering to each caller
+    filtered_callers = [
+        prepare_output(caller, args, CALLERS_ESSENTIAL, CALLERS_STANDARD)
+        for caller in callers
+    ]
+
+    if _maybe_json(args, filtered_callers):
         return 0
 
     # Text output
-    if not callers:
+    if not filtered_callers:
         print(f"\nNo callers found for function '{args.function_name}'")
         print("(Note: Requires schema v2.0 documentation with cross-reference data)")
         return 0
 
-    print(f"\nFound {len(callers)} caller(s) for '{args.function_name}':\n")
-    for idx, caller in enumerate(callers, 1):
+    print(f"\nFound {len(filtered_callers)} caller(s) for '{args.function_name}':\n")
+    for idx, caller in enumerate(filtered_callers, 1):
         name = caller.get('name', 'unknown')
         call_type = caller.get('call_type', 'unknown')
         file_path = caller.get('file', '')
@@ -727,17 +886,23 @@ def cmd_callees(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         include_line=True
     )
 
-    if _maybe_json(args, callees):
+    # Apply verbosity filtering to each callee
+    filtered_callees = [
+        prepare_output(callee, args, CALLEES_ESSENTIAL, CALLEES_STANDARD)
+        for callee in callees
+    ]
+
+    if _maybe_json(args, filtered_callees):
         return 0
 
     # Text output
-    if not callees:
+    if not filtered_callees:
         print(f"\nNo callees found for function '{args.function_name}'")
         print("(Note: Requires schema v2.0 documentation with cross-reference data)")
         return 0
 
-    print(f"\nFound {len(callees)} function(s) called by '{args.function_name}':\n")
-    for idx, callee in enumerate(callees, 1):
+    print(f"\nFound {len(filtered_callees)} function(s) called by '{args.function_name}':\n")
+    for idx, callee in enumerate(filtered_callees, 1):
         name = callee.get('name', 'unknown')
         call_type = callee.get('call_type', 'unknown')
         file_path = callee.get('file', '')
@@ -770,36 +935,39 @@ def cmd_call_graph(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         print(f"\nFunction '{args.function_name}' not found in documentation")
         return 1
 
+    # Apply verbosity filtering to the graph
+    filtered_graph = prepare_output(graph, args, CALL_GRAPH_ESSENTIAL, CALL_GRAPH_STANDARD)
+
     # Handle output format
     output_format = getattr(args, 'format', 'text')
 
-    if output_format == 'json' or _maybe_json(args, graph):
+    if output_format == 'json' or _maybe_json(args, filtered_graph):
         return 0
 
     if output_format == 'dot':
-        print(format_call_graph_as_dot(graph))
+        print(format_call_graph_as_dot(filtered_graph))
         return 0
 
     # Text output (default)
     print(f"\nCall Graph for '{args.function_name}':")
-    print(f"  Direction: {graph['direction']}")
-    print(f"  Max Depth: {graph['max_depth']}")
-    print(f"  Nodes: {len(graph.get('nodes', {}))}")
-    print(f"  Edges: {len(graph.get('edges', []))}")
+    print(f"  Direction: {filtered_graph['direction']}")
+    print(f"  Max Depth: {filtered_graph['max_depth']}")
+    print(f"  Nodes: {len(filtered_graph.get('nodes', {}))}")
+    print(f"  Edges: {len(filtered_graph.get('edges', []))}")
 
-    if graph.get('truncated'):
+    if filtered_graph.get('truncated'):
         print(f"  ⚠️  Graph truncated at max depth")
 
     print("\nNodes:")
-    for node_name, node_data in graph.get('nodes', {}).items():
+    for node_name, node_data in filtered_graph.get('nodes', {}).items():
         depth = node_data.get('depth', 0)
         indent = "  " * (depth + 1)
         file_info = f" ({node_data.get('file', 'unknown')})" if node_data.get('file') else ""
-        marker = "→ " if node_name == graph['root'] else "  "
+        marker = "→ " if node_name == filtered_graph['root'] else "  "
         print(f"{indent}{marker}{node_name}{file_info}")
 
     print("\nEdges:")
-    for edge in graph.get('edges', []):
+    for edge in filtered_graph.get('edges', []):
         from_node = edge.get('from', 'unknown')
         to_node = edge.get('to', 'unknown')
         call_type = edge.get('call_type', 'unknown')
@@ -838,17 +1006,20 @@ def cmd_trace_entry(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(trace_result, args, TRACE_ENTRY_ESSENTIAL, TRACE_ENTRY_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, trace_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_json_output(trace_result)
+        output = format_json_output(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_text_output(trace_result)
+    output = format_text_output(filtered_result)
     print(output)
     return 0
 
@@ -882,17 +1053,20 @@ def cmd_trace_data(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(trace_result, args, TRACE_DATA_ESSENTIAL, TRACE_DATA_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, trace_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_trace_data_json(trace_result)
+        output = format_trace_data_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_trace_data_text(trace_result)
+    output = format_trace_data_text(filtered_result)
     print(output)
     return 0
 
@@ -926,17 +1100,20 @@ def cmd_impact(args: argparse.Namespace, printer: PrettyPrinter) -> int:
         printer.error(error_msg)
         return 1
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(impact_result, args, IMPACT_ESSENTIAL, IMPACT_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, impact_result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_impact_json(impact_result)
+        output = format_impact_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_impact_text(impact_result)
+    output = format_impact_text(filtered_result)
     print(output)
     return 0
 
@@ -970,17 +1147,20 @@ def cmd_refactor_candidates(args: argparse.Namespace, printer: PrettyPrinter) ->
         print(msg)
         return 0
 
+    # Apply verbosity filtering
+    filtered_result = prepare_output(result, args, REFACTOR_CANDIDATES_ESSENTIAL, REFACTOR_CANDIDATES_STANDARD)
+
     # Handle output format
-    if _maybe_json(args, result):
+    if _maybe_json(args, filtered_result):
         return 0
 
     if output_format == 'json':
-        output = format_refactor_json(result)
+        output = format_refactor_json(filtered_result)
         print(output)
         return 0
 
     # Text output (default)
-    output = format_refactor_text(result)
+    output = format_refactor_text(filtered_result)
     print(output)
     return 0
 

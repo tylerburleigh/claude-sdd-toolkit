@@ -15,6 +15,13 @@ from claude_skills.common import PrettyPrinter
 from claude_skills.common.cache import CacheManager
 from claude_skills.common.config import get_cache_config, is_cache_enabled
 from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    CACHE_CLEAR_ESSENTIAL,
+    CACHE_CLEAR_STANDARD,
+    CACHE_STATS_ESSENTIAL,
+    CACHE_STATS_STANDARD,
+)
 
 
 def handle_cache_clear(args, printer: PrettyPrinter):
@@ -54,15 +61,18 @@ def handle_cache_clear(args, printer: PrettyPrinter):
 
         # Format output
         if getattr(args, 'json', None):
-            result = {
+            payload = {
                 "entries_deleted": count,
                 "filters": {}
             }
             if spec_id:
-                result["filters"]["spec_id"] = spec_id
+                payload["filters"]["spec_id"] = spec_id
             if review_type:
-                result["filters"]["review_type"] = review_type
-            output_json(result, args.compact)
+                payload["filters"]["review_type"] = review_type
+
+            # Apply verbosity filtering
+            filtered_output = prepare_output(payload, args, CACHE_CLEAR_ESSENTIAL, CACHE_CLEAR_STANDARD)
+            output_json(filtered_output, args.compact)
         else:
             # Human-readable output
             if count == 0:
@@ -133,8 +143,9 @@ def handle_cache_info(args, printer: PrettyPrinter):
         # Check for explicit JSON flag (args.json can be True, False, or None)
         json_output = getattr(args, 'json', None)
         if json_output:
-            # JSON output mode
-            output_json(stats, args.compact)
+            # Apply verbosity filtering
+            filtered_output = prepare_output(stats, args, CACHE_STATS_ESSENTIAL, CACHE_STATS_STANDARD)
+            output_json(filtered_output, args.compact)
             return 0
 
         # Human-readable output

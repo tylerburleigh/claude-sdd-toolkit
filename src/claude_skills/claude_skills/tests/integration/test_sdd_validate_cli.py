@@ -61,6 +61,18 @@ class TestValidateCommand:
         assert "schema" in data
         assert "source" in data["schema"]
 
+    def test_validate_compact_vs_pretty(self):
+        """Validate command should honor compact flags."""
+        compact_result = run_cli("--json", "--compact", "validate", str(CLEAN_SPEC))
+        assert compact_result.returncode == 0
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+
+        pretty_result = run_cli("--json", "--no-compact", "validate", str(CLEAN_SPEC))
+        assert pretty_result.returncode == 0
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
     def test_validate_json_verbose(self):
         """Test --json --verbose output includes issues array."""
         result = run_cli("--json", "--verbose", "validate", str(WARNINGS_SPEC))
@@ -222,6 +234,14 @@ class TestFixCommand:
         assert "actions" in data or "skipped" in data
         assert "status" in data
 
+    def test_fix_preview_compact_json(self):
+        """Fix preview should emit compact JSON when requested."""
+        result = run_cli("--json", "--compact", "fix", str(AUTOFIX_SPEC), "--preview")
+        assert result.returncode == 0
+        assert len(result.stdout.strip().splitlines()) == 1
+        data = json.loads(result.stdout)
+        assert data["status"] in {"preview", "dry_run"}
+
     def test_fix_dry_run(self):
         """Test --dry-run is alias for --preview."""
         result = run_cli_no_json("fix", str(AUTOFIX_SPEC), "--dry-run")
@@ -345,6 +365,18 @@ class TestStatsCommand:
         assert "max_depth" in data
         assert "progress" in data
 
+    def test_stats_compact_vs_pretty(self):
+        """Stats output should respect compact flags."""
+        compact_result = run_cli("--json", "--compact", "stats", str(CLEAN_SPEC))
+        assert compact_result.returncode == 0
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+
+        pretty_result = run_cli("--json", "--no-compact", "stats", str(CLEAN_SPEC))
+        assert pretty_result.returncode == 0
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
     def test_stats_deep_hierarchy(self):
         """Test stats on deep hierarchy spec."""
         result = run_cli("--json", "stats", str(DEEP_HIERARCHY_SPEC))
@@ -387,6 +419,18 @@ class TestCheckDepsCommand:
         assert "deadlocks" in data
         assert "bottlenecks" in data
         assert "status" in data
+
+    def test_check_deps_compact_vs_pretty(self):
+        """check-deps should emit compact JSON on demand."""
+        compact_result = run_cli("--json", "--compact", "analyze-deps", str(DEPENDENCY_SPEC))
+        assert compact_result.returncode in (0, 1)
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+
+        pretty_result = run_cli("--json", "--no-compact", "analyze-deps", str(DEPENDENCY_SPEC))
+        assert pretty_result.returncode in (0, 1)
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
 
     def test_check_deps_with_bottleneck_threshold(self):
         """Test check-deps with custom bottleneck threshold."""

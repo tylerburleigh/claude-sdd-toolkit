@@ -106,6 +106,23 @@ class TestNextTaskCommand:
         assert "task_id" in data
         assert data["task_id"] == "task-1-1"
 
+    def test_next_task_compact_output(self, sample_json_spec_simple, specs_structure):
+        """Test next-task respects compact JSON flag."""
+        result = run_cli(
+            "next-task",
+            "simple-spec-2025-01-01-001",
+            "--path", str(specs_structure),
+            "--json",
+            "--compact",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert len(result.stdout.strip().splitlines()) == 1
+        data = json.loads(result.stdout)
+        assert data["task_id"] == "task-1-1"
+
     def test_next_task_nonexistent_spec(self, specs_structure):
         """Test next-task with non-existent spec."""
         result = run_cli( "next-task", "nonexistent-spec",
@@ -215,6 +232,36 @@ class TestProgressCommand:
         assert "total_tasks" in data
         assert "completed_tasks" in data
         assert "percentage" in data
+
+    def test_progress_compact_and_pretty_output(self, sample_json_spec_simple, specs_structure):
+        """Test progress honors compact and no-compact flags."""
+        compact_result = run_cli(
+            "progress",
+            "simple-spec-2025-01-01-001",
+            "--path", str(specs_structure),
+            "--json",
+            "--compact",
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode in (0, 1)
+        compact_lines = compact_result.stdout.strip().splitlines()
+        assert len(compact_lines) == 1
+        compact_data = json.loads(compact_result.stdout)
+
+        pretty_result = run_cli(
+            "progress",
+            "simple-spec-2025-01-01-001",
+            "--path", str(specs_structure),
+            "--json",
+            "--no-compact",
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode in (0, 1)
+        pretty_lines = pretty_result.stdout.strip().splitlines()
+        assert len(pretty_lines) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
 
 
 
@@ -375,3 +422,148 @@ class TestCompletionDetection:
         assert "remaining" in result.stdout.lower() or "no actionable" in result.stdout.lower()
         # Should NOT show completion prompt since blocked tasks exist
         assert not ("mark spec as complete" in result.stdout.lower())
+
+
+class TestUtilityCommands:
+    """Tests for misc utility subcommands."""
+
+    def test_find_pattern_compact_and_pretty(self, tmp_path):
+        """find-pattern should honor compact flags."""
+        target_dir = tmp_path / "project"
+        target_dir.mkdir()
+        (target_dir / "foo.py").write_text("print('hi')\n")
+        (target_dir / "bar.txt").write_text("text")
+
+        compact_result = run_cli(
+            "--json",
+            "--compact",
+            "find-pattern",
+            "*.py",
+            "--directory", str(target_dir),
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode in (0, 1)
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+        assert compact_data["pattern"] == "*.py"
+        assert any(p.endswith("foo.py") for p in compact_data["matches"])
+
+        pretty_result = run_cli(
+            "--json",
+            "--no-compact",
+            "find-pattern",
+            "*.py",
+            "--directory", str(target_dir),
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode in (0, 1)
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
+    def test_find_tests_compact_and_pretty(self, tmp_path):
+        """find-tests should toggle between compact and pretty JSON."""
+        project_dir = tmp_path / "proj"
+        src_dir = project_dir / "src"
+        tests_dir = project_dir / "tests"
+        src_dir.mkdir(parents=True)
+        tests_dir.mkdir()
+        (src_dir / "example.py").write_text("def example():\n    pass\n")
+        (tests_dir / "test_example.py").write_text("def test_example():\n    pass\n")
+
+        compact_result = run_cli(
+            "--json",
+            "--compact",
+            "find-tests",
+            "--directory", str(project_dir),
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode in (0, 1)
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+        assert any(path.endswith("test_example.py") for path in compact_data["test_files"])
+
+        pretty_result = run_cli(
+            "--json",
+            "--no-compact",
+            "find-tests",
+            "--directory", str(project_dir),
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode in (0, 1)
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
+    def test_validate_paths_compact_and_pretty(self, tmp_path):
+        """validate-paths should honor compact flags."""
+        project_dir = tmp_path / "proj"
+        project_dir.mkdir()
+        sample_file = project_dir / "sample.txt"
+        sample_file.write_text("hello\n")
+
+        compact_result = run_cli(
+            "--json",
+            "--compact",
+            "validate-paths",
+            "sample.txt",
+            "missing.txt",
+            "--base-directory", str(project_dir),
+            capture_output=True,
+            text=True
+        )
+        assert compact_result.returncode in (0, 1)
+        assert len(compact_result.stdout.strip().splitlines()) == 1
+        compact_data = json.loads(compact_result.stdout)
+        assert "invalid_paths" in compact_data
+
+        pretty_result = run_cli(
+            "--json",
+            "--no-compact",
+            "validate-paths",
+            "sample.txt",
+            "missing.txt",
+            "--base-directory", str(project_dir),
+            capture_output=True,
+            text=True
+        )
+        assert pretty_result.returncode in (0, 1)
+        assert len(pretty_result.stdout.strip().splitlines()) > 1
+        assert json.loads(pretty_result.stdout) == compact_data
+
+
+class TestInitEnvCommand:
+    """Tests for init-env command output modes."""
+
+    def test_init_env_text_output(self, specs_structure):
+        """init-env should show human-readable output by default."""
+        result = run_cli(
+            "--no-json",
+            "--path", str(specs_structure),
+            "init-env",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert "Environment initialized" in result.stdout
+
+    def test_init_env_json_compact(self, specs_structure):
+        """init-env should respect --json and --compact flags."""
+        result = run_cli(
+            "--path", str(specs_structure),
+            "init-env",
+            "--json", "--compact",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert len(result.stdout.strip().splitlines()) == 1
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        assert data["specs_dir"].endswith("specs")
+        assert data["active_dir"].endswith("active")
+        assert data["state_dir"].endswith(".state")
