@@ -190,7 +190,7 @@ Use this workflow when the Work Mode selection is **Single Task Mode**. Stop aft
 ### 3.1 Choose the Spec
 
 - If user supplies spec id, confirm it exists via `sdd progress {spec-id}`
-- Otherwise list candidates: `sdd find-specs --verbose`
+- Otherwise list candidates: `sdd find-specs`
 - Apply recommendation heuristic:
   - Prefer `status: active` with non-zero progress (started but incomplete)
   - If multiple qualify, pick highest completion % or with `in_progress` tasks
@@ -630,7 +630,7 @@ Ask via `AskUserQuestion`: continue to next phase, perform phase review, or stop
 
 **Solution:**
 - Provide absolute path: `sdd prepare-task {spec-id} --path /absolute/path/to/specs`
-- Run `sdd find-specs --verbose` to discover available specs
+- Run `sdd find-specs` to discover available specs
 
 ### All Tasks Blocked
 
@@ -650,7 +650,7 @@ sdd check-complete {spec-id}
 
 ```bash
 # Discovery
-sdd find-specs --verbose
+sdd find-specs
 sdd progress {spec-id}
 sdd list-phases {spec-id}
 
