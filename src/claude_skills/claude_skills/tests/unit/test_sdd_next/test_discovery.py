@@ -4,6 +4,7 @@ Unit tests for sdd-next discovery operations.
 Tests: get_next_task, get_task_info, check_dependencies, prepare_task.
 """
 
+import json
 import pytest
 from pathlib import Path
 
@@ -221,6 +222,11 @@ class TestPrepareTask:
         assert task_prep.get("success") is True or "task_id" in task_prep
         assert "task_id" in task_prep
         assert "task_data" in task_prep
+        context = task_prep.get("context")
+        assert isinstance(context, dict)
+        assert "phase" in context
+        assert "task_journal" in context
+        assert isinstance(context.get("sibling_files"), list)
 
     def test_prepare_task_includes_dependencies(self, sample_json_spec_simple, specs_structure):
         """Test that prepare_task includes dependency information."""
@@ -253,6 +259,47 @@ class TestPrepareTask:
         if task_prep and task_prep.get("success") is not False:
             assert "task_id" in task_prep
             assert task_prep["task_id"] == "task-1-1"
+
+    def test_prepare_task_include_full_journal(self, sample_json_spec_simple, specs_structure):
+        """Flag should return previous sibling journal entries when requested."""
+        spec_path = sample_json_spec_simple
+        spec_data = json.loads(spec_path.read_text())
+        spec_data["journal"] = [
+            {
+                "task_id": "task-1-1",
+                "timestamp": "2025-11-16T10:00:00Z",
+                "entry_type": "note",
+                "title": "Initial note",
+                "content": "Captured baseline details",
+            },
+            {
+                "task_id": "task-1-1",
+                "timestamp": "2025-11-16T11:00:00Z",
+                "entry_type": "decision",
+                "title": "Follow-up",
+                "content": "Decided on companion tasks",
+            },
+        ]
+        spec_path.write_text(json.dumps(spec_data, indent=2))
+
+        task_prep = prepare_task(
+            "simple-spec-2025-01-01-001",
+            specs_structure,
+            "task-1-2",
+            include_full_journal=True,
+            include_phase_history=True,
+            include_spec_overview=True,
+        )
+
+        extended = task_prep.get("extended_context")
+        assert extended
+        assert len(extended["previous_sibling_journal"]) == 2
+        phase_entries = extended.get("phase_journal")
+        assert phase_entries is not None
+        assert len(phase_entries) == 2
+        spec_overview = extended.get("spec_overview")
+        assert spec_overview is not None
+        assert spec_overview.get("total_tasks")
 
 
 @pytest.mark.integration

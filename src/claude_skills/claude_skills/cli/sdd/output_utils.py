@@ -13,6 +13,27 @@ from claude_skills.cli.sdd.verbosity import (
 )
 
 
+def get_bool_arg(args, name: str, default: bool = False) -> bool:
+    """Safely read a boolean argparse flag from args.
+
+    Handles mock objects and missing attributes by falling back to default.
+    """
+    if args is None:
+        return default
+    value = getattr(args, name, default)
+    return value if isinstance(value, bool) else default
+
+
+def is_json_mode(args) -> bool:
+    """Return True when --json (or json mode) is explicitly enabled."""
+    return get_bool_arg(args, 'json', False)
+
+
+def is_quiet_mode(args) -> bool:
+    """Return True when quiet mode is explicitly enabled."""
+    return get_bool_arg(args, 'quiet', False)
+
+
 def prepare_output(data: Dict[str, Any], args,
                    essential_fields: Optional[Set[str]] = None,
                    standard_fields: Optional[Set[str]] = None) -> Dict[str, Any]:
@@ -46,6 +67,11 @@ def prepare_output(data: Dict[str, Any], args,
         # In VERBOSE mode: all fields including empty ones
     """
     verbosity_level = getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
+
+    if is_json_mode(args) and not is_quiet_mode(args):
+        if verbosity_level == VerbosityLevel.QUIET:
+            verbosity_level = VerbosityLevel.NORMAL
+
     return filter_output_fields(data, verbosity_level, essential_fields, standard_fields)
 
 

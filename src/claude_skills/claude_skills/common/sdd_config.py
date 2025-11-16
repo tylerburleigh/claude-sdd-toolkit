@@ -165,6 +165,22 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
         else:
             validated["output"]["json_compact"] = True
 
+        # Validate default_verbosity field
+        if "default_verbosity" in output:
+            value = output["default_verbosity"]
+            allowed_levels = ["quiet", "normal", "verbose"]
+            if isinstance(value, str) and value in allowed_levels:
+                validated["output"]["default_verbosity"] = value
+            else:
+                logger.warning(
+                    f"Invalid value for sdd config 'output.default_verbosity': expected one of {allowed_levels}, "
+                    f"got {value!r}. Using default: 'quiet'"
+                )
+                validated["output"]["default_verbosity"] = "quiet"
+        else:
+            # Not specified, use default
+            validated["output"]["default_verbosity"] = "quiet"
+
         # Store deprecated values for backward compatibility (set to None to mark as deprecated)
         validated["output"]["json"] = None
         validated["output"]["compact"] = None
@@ -174,6 +190,7 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
         # No output section - use all defaults
         validated["output"]["default_mode"] = "rich"
         validated["output"]["json_compact"] = True
+        validated["output"]["default_verbosity"] = "quiet"
         validated["output"]["json"] = None
         validated["output"]["compact"] = None
         validated["output"]["default_format"] = None

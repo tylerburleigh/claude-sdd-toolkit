@@ -25,15 +25,16 @@ class VerbosityLevel(Enum):
         return self.value
 
     @classmethod
-    def from_args(cls, args) -> 'VerbosityLevel':
+    def from_args(cls, args, config: Dict[str, Any] = None) -> 'VerbosityLevel':
         """Determine verbosity level from parsed command-line arguments.
 
         Args:
             args: Parsed argparse.Namespace with quiet and verbose flags
+            config: Optional configuration dictionary for default verbosity fallback
 
         Returns:
             VerbosityLevel based on flags (QUIET if --quiet, VERBOSE if --verbose,
-            NORMAL otherwise)
+            config default if available, NORMAL otherwise)
 
         Raises:
             ValueError: If both --quiet and --verbose are specified
@@ -48,6 +49,9 @@ class VerbosityLevel(Enum):
             return cls.QUIET
         elif has_verbose:
             return cls.VERBOSE
+        elif config is not None:
+            # Fall back to config default when no CLI flags provided
+            return cls.from_config(config)
         else:
             return cls.NORMAL
 
@@ -118,29 +122,29 @@ def filter_output_fields(data: Dict[str, Any], level: VerbosityLevel,
 
     # Build field classification if not provided
     if essential_fields is None:
-        # Default: all non-empty fields are essential in QUIET mode
         essential_fields = set()
 
     if standard_fields is None:
-        # Default: all fields are standard
         standard_fields = set(data.keys())
 
-    filtered = {}
+    filtered: Dict[str, Any] = {}
+    included_keys = set()
 
     for key, value in data.items():
-        # Always include essential fields (unless empty in QUIET mode)
         if key in essential_fields:
             if level == VerbosityLevel.QUIET:
-                # Omit null/empty values in QUIET mode
-                if value is not None and value != [] and value != {}:
-                    filtered[key] = value
-            else:
-                filtered[key] = value
-        # Include standard fields in NORMAL and VERBOSE
+                if value is None or value == [] or value == {}:
+                    continue
+            filtered[key] = value
+            included_keys.add(key)
         elif key in standard_fields and level != VerbosityLevel.QUIET:
             filtered[key] = value
-        # Optional fields (like _debug) only in VERBOSE
-        elif key.startswith('_') and level == VerbosityLevel.VERBOSE:
+            included_keys.add(key)
+
+    if level == VerbosityLevel.NORMAL:
+        for key, value in data.items():
+            if key in included_keys or key.startswith('_'):
+                continue
             filtered[key] = value
 
     return filtered

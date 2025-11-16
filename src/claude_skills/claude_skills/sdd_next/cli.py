@@ -790,7 +790,18 @@ def cmd_prepare_task(args, printer):
 
     # Call prepare_task() - this is where completion detection happens
     # Returns completion signals when spec is finished or blocked
-    task_prep = prepare_task(args.spec_id, specs_dir, args.task_id)
+    include_full_journal = getattr(args, 'include_full_journal', False)
+    include_phase_history = getattr(args, 'include_phase_history', False)
+    include_spec_overview = getattr(args, 'include_spec_overview', False)
+    task_prep = prepare_task(
+        args.spec_id,
+        specs_dir,
+        args.task_id,
+        include_full_journal=include_full_journal,
+        include_phase_history=include_phase_history,
+        include_spec_overview=include_spec_overview,
+    )
+    requested_extended_context = include_full_journal or include_phase_history or include_spec_overview
 
     # ==========================================
     # Documentation Generation Prompt (Proactive)
@@ -909,6 +920,8 @@ def cmd_prepare_task(args, printer):
     if args.json:
         # Apply verbosity filtering for JSON output
         filtered_output = prepare_output(task_prep, args, PREPARE_TASK_ESSENTIAL, PREPARE_TASK_STANDARD)
+        if requested_extended_context and task_prep.get('extended_context'):
+            filtered_output['extended_context'] = task_prep['extended_context']
         output_json(filtered_output, compact=args.compact)
     else:
         printer.success(f"Task prepared: {task_prep['task_id']}")
@@ -935,6 +948,35 @@ def cmd_prepare_task(args, printer):
                 for dep in deps['soft_depends']:
                     status_mark = "✓" if dep['status'] == 'completed' else "○"
                     printer.detail(f"{status_mark} {dep['id']}: {dep['title']}")
+
+        if requested_extended_context and task_prep.get('extended_context'):
+            ext = task_prep['extended_context']
+            print("\n🔎 Extended Context")
+            prev_entries = ext.get('previous_sibling_journal')
+            if prev_entries is not None:
+                print(f"  Previous sibling journal entries: {len(prev_entries)}")
+                for entry in prev_entries:
+                    printer.detail(
+                        f"    {entry.get('timestamp', 'unknown')} [{entry.get('entry_type', 'note')}] "
+                        f"{entry.get('title', '')}"
+                    )
+            phase_entries = ext.get('phase_journal')
+            if phase_entries is not None:
+                print(f"  Phase journal entries: {len(phase_entries)}")
+            spec_overview = ext.get('spec_overview')
+            if spec_overview:
+                print("  Spec overview:")
+                printer.detail(
+                    f"    {spec_overview.get('completed_tasks', 0)}/"
+                    f"{spec_overview.get('total_tasks', 0)} tasks completed"
+                )
+                current_phase = spec_overview.get('current_phase') or {}
+                if current_phase:
+                    printer.detail(
+                        f"    Current phase: {current_phase.get('title', '')}"
+                        f" ({current_phase.get('completed', 0)}/"
+                        f"{current_phase.get('total', 0)})"
+                    )
 
     return 0
 
@@ -1335,6 +1377,21 @@ def register_next(subparsers, parent_parser):
     parser_prepare = subparsers.add_parser('prepare-task', parents=[parent_parser], help='Prepare task for implementation')
     parser_prepare.add_argument('spec_id', help='Specification ID')
     parser_prepare.add_argument('task_id', nargs='?', help='Task ID (optional, finds next task if not provided)')
+    parser_prepare.add_argument(
+        '--include-full-journal',
+        action='store_true',
+        help='Add full previous-sibling journal entries to extended_context (default output only shows summaries)'
+    )
+    parser_prepare.add_argument(
+        '--include-phase-history',
+        action='store_true',
+        help='Include all journal entries for tasks in the current phase (extended_context.phase_journal)'
+    )
+    parser_prepare.add_argument(
+        '--include-spec-overview',
+        action='store_true',
+        help='Attach spec-wide progress snapshot (extended_context.spec_overview) for quick reporting'
+    )
     parser_prepare.set_defaults(func=cmd_prepare_task)
 
     # format-plan

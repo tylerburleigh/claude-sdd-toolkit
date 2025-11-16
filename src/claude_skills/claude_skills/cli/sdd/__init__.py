@@ -200,7 +200,10 @@ def main():
         # This allows config-driven testing with temporary configs
         if hasattr(args, 'path') and args.path and args.path != '.':
             from pathlib import Path
-            config = load_sdd_config(project_path=Path(args.path))
+            project_root = Path(args.path)
+            project_config = project_root / ".claude" / "sdd_config.json"
+            if project_config.exists():
+                config = load_sdd_config(project_path=project_root)
 
         # Apply config defaults for args that weren't specified (are None)
         if args.json is None:
@@ -232,9 +235,14 @@ def main():
 
     # Initialize printer based on parsed global flags
     # When JSON output is requested, suppress all printer output (quiet mode)
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
+    verbosity = args.verbosity_level
+    if getattr(args, 'json', False):
+        # Force quiet mode when JSON output is enabled
+        verbosity = VerbosityLevel.QUIET
+
     printer = PrettyPrinter(
-        quiet=getattr(args, 'quiet', False) or getattr(args, 'json', False),
-        verbose=getattr(args, 'verbose', False),
+        verbosity_level=verbosity,
         use_color=not getattr(args, 'no_color', False)
     )
     # Note: JSON output is handled by individual handlers checking args.json

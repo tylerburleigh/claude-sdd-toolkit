@@ -332,7 +332,7 @@ def cmd_update_status(args, printer):
         note=args.note,
         dry_run=args.dry_run,
         verify=args.verify if hasattr(args, 'verify') else False,
-        printer=printer if not use_json else None
+        printer=printer  # Always pass printer (it's already configured for quiet mode when JSON is enabled)
     )
 
     if use_json:

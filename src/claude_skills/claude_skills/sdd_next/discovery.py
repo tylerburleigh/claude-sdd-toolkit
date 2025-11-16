@@ -7,7 +7,15 @@ from typing import Optional, Dict, Tuple
 import logging
 
 # Clean imports
-from claude_skills.common import load_json_spec, get_node
+from claude_skills.common import load_json_spec, get_node, get_progress_summary
+from .context_utils import (
+    get_previous_sibling,
+    get_parent_context,
+    get_phase_context,
+    get_sibling_files,
+    get_task_journal_summary,
+    collect_phase_task_ids,
+)
 from claude_skills.common import (
     validate_spec_before_proceed,
     get_task_context_from_docs,
@@ -247,7 +255,14 @@ def check_dependencies(spec_data: Dict, task_id: str) -> Dict:
     return result
 
 
-def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -> Dict:
+def prepare_task(
+    spec_id: str,
+    specs_dir: Path,
+    task_id: Optional[str] = None,
+    include_full_journal: bool = False,
+    include_phase_history: bool = False,
+    include_spec_overview: bool = False,
+) -> Dict:
     """
     Prepare complete context for task implementation.
 
@@ -298,6 +313,8 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
         "suggested_commit_cadence": None,
         "spec_complete": False,
         "completion_info": None,
+        "context": None,
+        "extended_context": None,
         "error": None
     }
 
@@ -438,6 +455,80 @@ def prepare_task(spec_id: str, specs_dir: Path, task_id: Optional[str] = None) -
                 result["doc_context"]["message"] = (
                     f"Found {len(doc_context['files'])} relevant files from codebase documentation"
                 )
+
+    # Phase 4: Prepare enhanced context payload (defensive)
+    try:
+        hierarchy = spec_data.get("hierarchy", {})
+        task_node = hierarchy.get(task_id, {})
+        previous_sibling = get_previous_sibling(spec_data, task_id)
+        parent_task = get_parent_context(spec_data, task_id)
+        phase_context = get_phase_context(spec_data, task_id)
+        sibling_files = get_sibling_files(spec_data, task_id)
+        task_journal = get_task_journal_summary(spec_data, task_id)
+        parent_warning = None
+        parent_pointer = task_node.get("parent") if isinstance(task_node, dict) else None
+        if parent_task is None:
+            if parent_pointer is None:
+                parent_warning = {"parent_missing": True}
+            elif parent_pointer not in hierarchy:
+                parent_warning = {
+                    "parent_missing": True,
+                    "missing_parent_id": parent_pointer,
+                }
+
+        result["context"] = {
+            "previous_sibling": previous_sibling,
+            "parent_task": parent_task,
+            "phase": phase_context,
+            "sibling_files": sibling_files,
+            "task_journal": task_journal,
+        }
+        if parent_warning:
+            result["context"]["parent_task_warning"] = parent_warning
+
+        extended_context = {}
+        if include_full_journal:
+            prev_journal_entries = []
+            if previous_sibling and previous_sibling.get("id"):
+                prev_id = previous_sibling["id"]
+                prev_journal_entries = [
+                    entry for entry in spec_data.get("journal", []) or []
+                    if entry.get("task_id") == prev_id
+                ]
+            extended_context["previous_sibling_journal"] = prev_journal_entries
+
+        if include_phase_history and phase_context and phase_context.get("id"):
+            phase_id = phase_context["id"]
+            phase_task_ids = collect_phase_task_ids(spec_data, phase_id)
+            phase_journal = [
+                entry for entry in spec_data.get("journal", []) or []
+                if entry.get("task_id") in phase_task_ids
+            ]
+            extended_context["phase_journal"] = phase_journal
+
+        if include_spec_overview:
+            extended_context["spec_overview"] = get_progress_summary(spec_data)
+
+        if extended_context:
+            result["extended_context"] = extended_context
+    except Exception as exc:  # pragma: no cover - best effort logging
+        logger.warning(f"Context gathering failed for {task_id}: {exc}")
+        result["context"] = {
+            "previous_sibling": None,
+            "parent_task": None,
+            "phase": None,
+            "sibling_files": [],
+            "task_journal": {"entry_count": 0, "entries": []},
+        }
+        if include_full_journal or include_phase_history or include_spec_overview:
+            fallback = {}
+            if include_full_journal:
+                fallback["previous_sibling_journal"] = []
+            if include_phase_history:
+                fallback["phase_journal"] = []
+            if include_spec_overview:
+                fallback["spec_overview"] = {}
+            result["extended_context"] = fallback
 
     # Note: All task details are already in task_data from the JSON spec
     # The spec_file and task_details fields are kept for backwards compatibility

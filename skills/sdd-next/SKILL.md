@@ -60,6 +60,43 @@ Post-Implementation Checklist -> Phase Loop (optional) -> Finish
 
 ### User Interaction Requirements
 
+### Context Gathering Best Practices
+
+**Default workflow (stick to this unless spec says otherwise)**
+1. Run `sdd prepare-task` with no flags. The returned `context` block already includes the previous sibling, parent metadata, phase progress, sibling files, and the latest journal summary.
+2. Only call `sdd task-info`, `sdd get-task`, or `sdd progress` if the spec explicitly asks for extra metadata or you need files that are not exposed in `context`.
+3. After completing the task, re-run `sdd prepare-task` to surface the next recommendation and refreshed context.
+
+**When to use enhancement flags (`extended_context`)**
+- `--include-full-journal`: You need the full journal history for the previous sibling (long-running refactors, nuanced design notes).
+- `--include-phase-history`: You are preparing phase summaries or retrospectives and need every entry tied to the current phase.
+- `--include-spec-overview`: You must report spec-wide progress without running `sdd progress`.
+- Combine flags only when you plan to read the extra data—each flag increases the JSON payload.
+
+**Decision guide**
+- Need additional detail beyond `context`?
+  - **Yes → Task metadata/files**: `sdd task-info {spec_id} {task_id}` (or `sdd get-task` if the spec mentions nested metadata).
+  - **Yes → Journal history**: Use `--include-full-journal` (previous sibling) or `sdd get-journal` for arbitrary tasks.
+  - **Yes → Phase backlog/alternatives**: `sdd query-tasks --parent {phase_id}` when presenting options to the user.
+  - **No**: Stick with prepare-task output; avoid redundant commands.
+
+**Anti-patterns to avoid**
+- Running `task-info`, `check-deps`, and `get-task` back-to-back “just in case.” Call them only when `context` is insufficient.
+- Re-running `sdd progress` or `sdd list-phases` after every plan change. Use `context.phase` for quick updates and run `sdd progress` only before reporting global status.
+- Fetching the entire spec or invoking doc-query before inspecting the prepare-task payload.
+
+#### Command Value Matrix
+
+| Command | Returns | Use when | Redundant / Notes |
+| --- | --- | --- | --- |
+| `sdd prepare-task` | Recommended task plus `context` (previous sibling, parent, phase, sibling files, journal summary) | **Always** – first call for every task | N/A |
+| `sdd task-info` | Raw task metadata straight from the spec | Spec explicitly references metadata not surfaced in `context` (acceptance criteria, detailed instructions) | Usually covered by `prepare-task`; only call when spec requires |
+| `sdd get-task` | Full JSON node, including deep metadata blobs | Rare audits where you must inspect the spec data exactly as stored | Redundant with `task-info` for normal flows |
+| `sdd progress` | Spec-wide counts, percentages, current phase | Preparing a status report or verifying completion prompts | `context.phase` already shows local progress; only run when reporting overall stats |
+| `sdd list-phases` | Every phase with completion % | Re-prioritizing phases or presenting alternate scopes to the user | Typically unnecessary after `progress`; use only on request |
+| `sdd get-journal` | Journal entries for any task | Need history beyond summaries (retro write-ups, deep audits) | `--include-full-journal` adds previous sibling history; `get-journal` is for arbitrary tasks |
+
+
 **Gate key decisions with `AskUserQuestion` (MANDATORY):**
 - Spec selection (when multiple available)
 - Task selection (recommended vs alternatives)
@@ -128,12 +165,32 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 
 ---
 
+## Session Kickoff & Work Mode Selection
+
+Before running `sdd-next`, follow the start-helper workflow documented in `commands/sdd-begin.md`:
+1. Use `sdd skills-dev start-helper` commands (permissions → git → format-output) to surface active specs.
+2. Present the user with the Work Mode `AskUserQuestion` immediately after they choose a spec or resume task.
+   - **Options (exact text from sdd-begin.md):**
+     1. Single Task Mode (Plan and execute one task at a time)
+     2. Autonomous Mode (Complete all tasks in current phase within context limits)
+3. If the user selects Autonomous Mode, run the two-step context check **before** calling `sdd-next`:
+   ```bash
+   sdd session-marker
+   sdd context --session-marker "SESSION_MARKER_<hash>" --json
+   ```
+   - If `context_percentage_used > 75`, warn the user and use `AskUserQuestion` to confirm whether to stay in Autonomous Mode or switch to Single Task Mode.
+4. Record the chosen mode. Single Task Mode uses Sections 3.1–3.6. Autonomous Mode uses the dedicated section later in this document. Do not switch modes mid-task unless the user explicitly requests it.
+
+---
+
 ## Single Task Workflow
+
+Use this workflow when the Work Mode selection is **Single Task Mode**. Stop after each task, gather confirmation, and re-run the Work Mode prompt if the user wants to continue.
 
 ### 3.1 Choose the Spec
 
 - If user supplies spec id, confirm it exists via `sdd progress {spec-id}`
-- Otherwise list candidates: `sdd find-specs --verbose`
+- Otherwise list candidates: `sdd find-specs`
 - Apply recommendation heuristic:
   - Prefer `status: active` with non-zero progress (started but incomplete)
   - If multiple qualify, pick highest completion % or with `in_progress` tasks
@@ -155,15 +212,53 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 
 ### 3.4 Deep Dive & Plan Approval
 
-Gather details:
+Gather every detail with a single call (omit `{task-id}` to accept the recommended task):
 ```bash
-sdd task-info {spec-id} {task-id}
-sdd check-deps {spec-id} {task-id}
-# Only when full metadata required:
-sdd get-task {spec-id} {task-id} --json
+sdd prepare-task {spec-id} {task-id}
 ```
 
-Draft execution plan referencing spec intent and dependencies.
+That response already contains everything you need:
+- `task_data` → title, metadata, instructions pulled from the spec
+- `dependencies` → current blocking status plus any downstream tasks
+- `context` → stitched data from the previous sibling, parent task, current phase, sibling files, and the latest journal summary
+
+Treat `context` as the authoritative source rather than chaining `sdd task-info`, `sdd check-deps`, and `sdd get-task`. Typical fields:
+
+```json
+"context": {
+  "previous_sibling": {
+    "task_id": "task-3-1-2",
+    "title": "Tighten plan creation language",
+    "summary": "Updated scope guardrails for Section 3.3"
+  },
+  "parent_task": {
+    "task_id": "task-3-1",
+    "title": "Polish the planning workflow",
+    "position_label": "Phase 3 · Task 1"
+  },
+  "phase": {
+    "name": "Implementation",
+    "percentage": 58,
+    "blockers": []
+  },
+  "sibling_files": [
+    {"path": "skills/sdd-next/SKILL.md", "reason": "Touched by previous sibling"}
+  ]
+}
+```
+
+- `context.previous_sibling`: reference recent work for continuity or reuse its journal summary when explaining why the new task matters (`context.previous_sibling.title`).
+- `context.parent_task`: verify how this subtask fits into the backlog; use `context.parent_task.position_label` to show progress.
+- `context.phase`: surface phase health (`context.phase.percentage`, `context.phase.blockers`) without calling `sdd progress`.
+- `context.sibling_files`: prime file navigation by reviewing whatever the spec already touched before opening new files.
+
+Only fall back to `sdd task-info` or `sdd check-deps` when the spec explicitly calls for metadata that is not surfaced through the standard payload.
+
+Draft the execution plan around the spec intent, dependency gates, and the insights above. Example:
+1. Confirm previous edits in `context.sibling_files` to maintain consistent tone.
+2. Align deliverables with `context.parent_task.title`/`position_label`.
+3. Call out open risks or blockers via `context.phase`.
+4. Reference `context.previous_sibling.summary` if you need to explain how the work continues an earlier change.
 
 **Present plan and get approval via `AskUserQuestion`:**
 - Options: "Approve & Start", "Request Changes", "More Details", "Defer"
@@ -252,6 +347,23 @@ Task(
 )
 ```
 
+### 3.7 Journal vs Git History
+
+| Use the Spec Journal When… | Use Git History When… |
+|----------------------------|------------------------|
+| Closing **any** SDD task (journaling is mandatory and captures intent, verification, and follow-ups). | Investigating merge conflicts, bisects, or broader repo archaeology unrelated to a single spec task. |
+| You need implementation details, test results, deviations, or next-task hints (`journal.entries[]` already hold this context in structured JSON). | You must inspect low-level commit metadata, e.g., to see who touched a file outside the spec workflow. |
+| Preparing status updates: previous sibling journal summaries come bundled in `sdd prepare-task`. | You’re debugging historical code paths predating the current spec. |
+
+**Anti-pattern:** Running `git log` / `git show` to understand a recently completed SDD task when the journal already documents the work. That wastes time and risks contradicting the canonical record. Start with the spec journal; escalate to git history only if a fact is missing or you are diagnosing repo-level issues (rebases, conflicts, regressions).
+
+**Journal advantages**
+- Full implementation narrative (what changed and why) tied to `task_id`.
+- Test and verification results in one place, ready for audits.
+- Deviations, blockers, and next-task hints captured while they are fresh.
+- Structured JSON makes it trivial for `sdd prepare-task` to surface the latest context without extra commands.
+- Archives context even if commits are squashed or rebased later.
+
 ---
 
 ## ⚠️ CRITICAL: Verification Tasks
@@ -324,6 +436,8 @@ After completing a task:
 ---
 
 ## Autonomous Mode (Phase Completion)
+
+Use this workflow only when the Work Mode selection is **Autonomous Mode** and the initial context check (from the Work Mode step) has confirmed there is enough headroom. If the user switches back to Single Task Mode, jump to Section 3.
 
 ### When to Use
 
@@ -516,7 +630,7 @@ Ask via `AskUserQuestion`: continue to next phase, perform phase review, or stop
 
 **Solution:**
 - Provide absolute path: `sdd prepare-task {spec-id} --path /absolute/path/to/specs`
-- Run `sdd find-specs --verbose` to discover available specs
+- Run `sdd find-specs` to discover available specs
 
 ### All Tasks Blocked
 
@@ -536,7 +650,7 @@ sdd check-complete {spec-id}
 
 ```bash
 # Discovery
-sdd find-specs --verbose
+sdd find-specs
 sdd progress {spec-id}
 sdd list-phases {spec-id}
 
