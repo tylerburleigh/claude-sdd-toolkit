@@ -11,6 +11,7 @@ from claude_skills.common import PrettyPrinter, find_spec_file, find_specs_direc
 from claude_skills.common.json_output import output_json
 from claude_skills.cli.sdd.output_utils import (
     prepare_output,
+    is_json_mode,
     SPEC_MOD_APPLY_ESSENTIAL,
     SPEC_MOD_APPLY_STANDARD,
     SPEC_MOD_DRY_RUN_ESSENTIAL,
@@ -23,7 +24,7 @@ from claude_skills.sdd_spec_mod import apply_modifications, parse_review_report,
 
 def _spec_mod_output_json(data, args, essential_fields, standard_fields):
     """Emit filtered JSON output when --json flag is present."""
-    if getattr(args, 'json', False):
+    if is_json_mode(args):
         payload = prepare_output(data, args, essential_fields, standard_fields)
         output_json(payload, getattr(args, 'compact', False))
         return True
@@ -47,7 +48,7 @@ def cmd_apply_modifications(args, printer):
     Returns:
         Exit code (0 for success, 1 for error)
     """
-    json_mode = getattr(args, 'json', False)
+    json_mode = is_json_mode(args)
 
     # Find specs directory
     specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
@@ -241,7 +242,7 @@ def cmd_parse_review(args, printer):
     Returns:
         Exit code (0 for success, 1 for error)
     """
-    json_mode = getattr(args, 'json', False)
+    json_mode = is_json_mode(args)
 
     # Verify review report exists
     review_file = Path(args.review)
@@ -277,10 +278,24 @@ def cmd_parse_review(args, printer):
         printer.success(
             f"Issues found: {total_issues} • Recommendation: {recommendation or 'UNKNOWN'}"
         )
+        score = metadata.get("overall_score")
+        if score is not None:
+            printer.detail(f"Overall Score: {score}")
+        if recommendation:
+            printer.warning(f"Recommendation: {recommendation}")
+
+        severity_handlers = {
+            'critical': printer.error,
+            'high': printer.warning,
+            'medium': printer.detail,
+            'low': printer.detail,
+        }
         for severity, count in issues_by_severity.items():
-            if count:
-                label = severity.upper()
-                printer.detail(f"  {label}: {count} issue(s)")
+            if not count:
+                continue
+            label = severity.upper()
+            handler = severity_handlers.get(severity, printer.detail)
+            handler(f"{label}: {count} issue(s)")
 
     # Generate modification suggestions
     if not json_mode:

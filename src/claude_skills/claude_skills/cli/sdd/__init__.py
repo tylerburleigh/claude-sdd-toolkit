@@ -200,7 +200,10 @@ def main():
         # This allows config-driven testing with temporary configs
         if hasattr(args, 'path') and args.path and args.path != '.':
             from pathlib import Path
-            config = load_sdd_config(project_path=Path(args.path))
+            project_root = Path(args.path)
+            project_config = project_root / ".claude" / "sdd_config.json"
+            if project_config.exists():
+                config = load_sdd_config(project_path=project_root)
 
         # Apply config defaults for args that weren't specified (are None)
         if args.json is None:
