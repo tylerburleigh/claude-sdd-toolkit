@@ -117,6 +117,24 @@ def test_prepare_task_context_includes_realistic_values(sample_json_spec_simple,
     assert task_journal["entries"][0]["title"] == "Latest note"
 
 
+def test_prepare_task_context_warns_when_parent_missing(sample_json_spec_simple, specs_structure):
+    spec_path = sample_json_spec_simple
+    spec_data = json.loads(spec_path.read_text())
+    hierarchy = spec_data["hierarchy"]
+    hierarchy["task-1-2"]["parent"] = None
+    spec_path.write_text(json.dumps(spec_data, indent=2))
+
+    with patch(
+        "claude_skills.sdd_next.discovery.validate_spec_before_proceed",
+        return_value={"valid": True, "errors": [], "warnings": [], "can_autofix": False, "autofix_command": ""},
+    ):
+        result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-2")
+
+    context = result["context"]
+    assert context["parent_task"] is None
+    assert context["parent_task_warning"] == {"parent_missing": True}
+
+
 def test_prepare_task_context_overhead_under_30ms(sample_json_spec_simple, specs_structure):
     def measure_call(repetitions: int = 3) -> float:
         timings = []

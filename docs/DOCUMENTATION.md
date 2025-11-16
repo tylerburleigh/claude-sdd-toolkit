@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-16 14:35:41
+**Generated:** 2025-11-16 14:52:58
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 324
-- **Total Lines:** 112674
+- **Total Lines:** 112694
 - **Total Classes:** 447
 - **Total Functions:** 1448
-- **Avg Complexity:** 4.74
+- **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -8995,7 +8995,7 @@ Raises:
 ### `_calculate_percentage(completed, total) -> Optional[int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:275`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:281`
 **Complexity:** 4
 
 **Description:**
@@ -10050,7 +10050,7 @@ Returns:
 ### `_find_phase_node(hierarchy, task_node) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:259`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:265`
 **Complexity:** 5
 
 **Description:**
@@ -10276,7 +10276,7 @@ binaries without leaking to the developer's real tools.
 ### `_get_latest_journal_excerpt(journal_entries, task_id, limit) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:175`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:181`
 **Complexity:** 6
 
 **Description:**
@@ -10351,7 +10351,7 @@ Returns:
 ### `_get_sibling_ids(hierarchy, parent_id, parent_node) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:158`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:164`
 **Complexity:** 3
 
 **Description:**
@@ -16496,7 +16496,7 @@ Returns:
 ### `collect_phase_task_ids(spec_data, phase_id) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:282`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:288`
 **Complexity:** 9
 
 **Description:**
@@ -22287,7 +22287,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:13`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Return contextual information about the parent node for a task.
@@ -22333,7 +22333,7 @@ This function attempts to get the parser by:
 ### `get_phase_context(spec_data, task_id) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:203`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:209`
 **Complexity:** 10
 
 **Description:**
@@ -22451,7 +22451,7 @@ Returns:
 ### `get_previous_sibling(spec_data, task_id) -> Optional[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:95`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:102`
 **Complexity:** 9
 
 **Description:**
@@ -22707,7 +22707,7 @@ Examples:
 ### `get_sibling_files(spec_data, task_id) -> List[Dict[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:313`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:319`
 **Complexity:** 10
 
 **Description:**
@@ -23094,7 +23094,7 @@ Returns:
 ### `get_task_journal_summary(spec_data, task_id, max_entries, summary_limit) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:368`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/context_utils.py:374`
 **Complexity:** 10
 
 **Description:**
@@ -25374,7 +25374,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/discovery.py:258`
-⚠️ **Complexity:** 35 (High)
+⚠️ **Complexity:** 39 (High)
 
 **Description:**
 > Prepare complete context for task implementation.

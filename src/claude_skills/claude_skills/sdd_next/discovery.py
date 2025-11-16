@@ -458,11 +458,23 @@ def prepare_task(
 
     # Phase 4: Prepare enhanced context payload (defensive)
     try:
+        hierarchy = spec_data.get("hierarchy", {})
+        task_node = hierarchy.get(task_id, {})
         previous_sibling = get_previous_sibling(spec_data, task_id)
         parent_task = get_parent_context(spec_data, task_id)
         phase_context = get_phase_context(spec_data, task_id)
         sibling_files = get_sibling_files(spec_data, task_id)
         task_journal = get_task_journal_summary(spec_data, task_id)
+        parent_warning = None
+        parent_pointer = task_node.get("parent") if isinstance(task_node, dict) else None
+        if parent_task is None:
+            if parent_pointer is None:
+                parent_warning = {"parent_missing": True}
+            elif parent_pointer not in hierarchy:
+                parent_warning = {
+                    "parent_missing": True,
+                    "missing_parent_id": parent_pointer,
+                }
 
         result["context"] = {
             "previous_sibling": previous_sibling,
@@ -471,6 +483,8 @@ def prepare_task(
             "sibling_files": sibling_files,
             "task_journal": task_journal,
         }
+        if parent_warning:
+            result["context"]["parent_task_warning"] = parent_warning
 
         extended_context = {}
         if include_full_journal:

@@ -227,12 +227,34 @@ def test_get_previous_sibling_handles_parent_without_children_list():
     assert previous["id"] == "task-1-1"
 
 
+def test_get_previous_sibling_preserves_declared_order():
+    spec_data = build_spec_with_siblings()
+    hierarchy = spec_data["hierarchy"]
+    hierarchy["task-1-10"] = {
+        "id": "task-1-10",
+        "type": "task",
+        "title": "Late addition",
+        "status": "pending",
+        "parent": "phase-1",
+        "children": [],
+        "metadata": {},
+    }
+    hierarchy["phase-1"]["children"] = ["task-1-2", "task-1-10"]
+
+    previous = get_previous_sibling(spec_data, "task-1-10")
+
+    assert previous is not None
+    assert previous["id"] == "task-1-2"
+
+
 def test_get_parent_context_for_task_parent():
     spec_data = build_spec_with_siblings()
     # Make task-1-1 the parent of a subtask
     hierarchy = spec_data["hierarchy"]
     hierarchy["task-1-1"]["children"] = ["task-1-1-1", "task-1-1-2"]
     hierarchy["task-1-1"]["metadata"]["description"] = "Parent description"
+    hierarchy["task-1-1"]["completed_tasks"] = 1
+    hierarchy["task-1-1"]["total_tasks"] = 3
     hierarchy["task-1-1-1"] = {
         "id": "task-1-1-1",
         "type": "subtask",
@@ -259,6 +281,7 @@ def test_get_parent_context_for_task_parent():
     assert context["description"] == "Parent description"
     assert context["position_label"] == "2 of 2 subtasks"
     assert len(context["children"]) == 2
+    assert context["remaining_tasks"] == 2
 
 
 def test_get_parent_context_for_group_without_children_array():
@@ -377,6 +400,24 @@ def test_get_task_journal_summary_returns_recent_entries():
 
     assert summary["entry_count"] == 2
     assert summary["entries"][0]["title"] == "Marked completed"
+
+
+def test_get_task_journal_summary_includes_three_entries_by_default():
+    spec_data = build_spec_with_siblings()
+    for idx in range(3):
+        spec_data["journal"].append(
+            {
+                "task_id": "task-1-1",
+                "timestamp": f"2025-11-16T15:2{idx}:00Z",
+                "entry_type": "note",
+                "title": f"Entry {idx}",
+                "content": f"Detail {idx}",
+            }
+        )
+
+    summary = get_task_journal_summary(spec_data, "task-1-1")
+
+    assert len(summary["entries"]) == 3
 
 
 def test_get_task_journal_summary_handles_empty_journal():

@@ -78,6 +78,12 @@ def get_parent_context(spec_data: Dict[str, Any], task_id: str) -> Optional[Dict
         label = "subtasks" if parent.get("type") == "task" else "children"
         position_label = f"{index} of {total} {label}"
 
+    remaining_tasks = None
+    completed_tasks = parent.get("completed_tasks")
+    total_tasks = parent.get("total_tasks")
+    if isinstance(completed_tasks, int) and isinstance(total_tasks, int):
+        remaining_tasks = max(total_tasks - completed_tasks, 0)
+
     return {
         "id": parent_id,
         "title": parent.get("title", ""),
@@ -85,8 +91,9 @@ def get_parent_context(spec_data: Dict[str, Any], task_id: str) -> Optional[Dict
         "status": parent.get("status", ""),
         "description": description,
         "notes": notes,
-        "completed_tasks": parent.get("completed_tasks"),
-        "total_tasks": parent.get("total_tasks"),
+        "completed_tasks": completed_tasks,
+        "total_tasks": total_tasks,
+        "remaining_tasks": remaining_tasks,
         "position_label": position_label,
         "children": children_entries,
     }
@@ -125,15 +132,14 @@ def get_previous_sibling(spec_data: Dict[str, Any], task_id: str) -> Optional[Di
         return None
 
     try:
-        ordered_ids = sorted(sibling_ids)
-        task_index = ordered_ids.index(task_id)
+        task_index = sibling_ids.index(task_id)
     except ValueError:
         return None
 
     if task_index == 0:
         return None
 
-    previous_id = ordered_ids[task_index - 1]
+    previous_id = sibling_ids[task_index - 1]
     previous_task = hierarchy.get(previous_id)
     if not previous_task:
         return None
@@ -368,7 +374,7 @@ def get_sibling_files(spec_data: Dict[str, Any], task_id: str) -> List[Dict[str,
 def get_task_journal_summary(
     spec_data: Dict[str, Any],
     task_id: str,
-    max_entries: int = 2,
+    max_entries: int = 3,
     summary_limit: int = 160,
 ) -> Dict[str, Any]:
     """
