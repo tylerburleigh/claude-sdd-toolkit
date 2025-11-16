@@ -87,6 +87,7 @@ from claude_skills.cli.sdd.output_utils import (
     UPDATE_TASK_METADATA_ESSENTIAL,
     UPDATE_TASK_METADATA_STANDARD,
 )
+from claude_skills.cli.sdd.verbosity import VerbosityLevel
 
 # Import operations from scripts directory
 from claude_skills.sdd_update.status import (
@@ -127,6 +128,25 @@ from claude_skills.sdd_update.list_phases import format_phases_table
 from claude_skills.sdd_spec_mod.assumptions import add_assumption, list_assumptions
 from claude_skills.sdd_spec_mod.estimates import update_task_estimate
 from claude_skills.sdd_spec_mod.task_operations import add_task, remove_task
+
+
+def _emit_json_output(data, args, essential_fields=None, standard_fields=None):
+    """
+    Helper to emit JSON respecting compact flag and verbosity filtering.
+    """
+    if not getattr(args, 'json', False):
+        return
+
+    payload = data
+    if essential_fields or standard_fields:
+        payload = prepare_output(
+            data,
+            args,
+            essential_fields,
+            standard_fields,
+        )
+
+    output_json(payload, getattr(args, 'compact', False))
 
 
 def cmd_execute_verify(args, printer):
@@ -522,6 +542,14 @@ def cmd_add_assumption(args, printer):
             printer.detail(f"  ID: {result['assumption_id']}")
             printer.detail(f"  Type: {args.type}")
             printer.detail(f"  Text: {args.text}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                ADD_ASSUMPTION_ESSENTIAL,
+                ADD_ASSUMPTION_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -530,10 +558,12 @@ def cmd_add_assumption(args, printer):
         printer.success(result['message'])
         printer.info(f"Assumption ID: {result['assumption_id']}")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output = prepare_output(result, args, ADD_ASSUMPTION_ESSENTIAL, ADD_ASSUMPTION_STANDARD)
-            output_json(output, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            ADD_ASSUMPTION_ESSENTIAL,
+            ADD_ASSUMPTION_STANDARD,
+        )
 
         return 0
 
@@ -565,13 +595,26 @@ def cmd_list_assumptions(args, printer):
 
     # Check if JSON output is enabled (set by options.py from config)
     use_json = getattr(args, 'json', False)
+    verbosity_level = getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
+    show_metadata = verbosity_level == VerbosityLevel.VERBOSE
+
+    def _emit_json_output(items):
+        """Emit JSON either as a bare list (quiet/normal) or detailed dict (verbose)."""
+        if show_metadata:
+            data = {
+                'assumptions': items,
+                'spec_id': args.spec_id,
+                'count': len(items),
+                'filtered': bool(assumption_type)
+            }
+            output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
+            output_json(output, getattr(args, 'compact', False))
+        else:
+            output_json(items, getattr(args, 'compact', False))
 
     if not assumptions:
         if use_json:
-            # JSON output - empty array
-            data = {'assumptions': [], 'spec_id': args.spec_id, 'count': 0, 'filtered': bool(assumption_type)}
-            output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
-            output_json(output, args.compact)
+            _emit_json_output([])
         else:
             if assumption_type:
                 printer.info(f"No {assumption_type} assumptions found")
@@ -587,28 +630,26 @@ def cmd_list_assumptions(args, printer):
             printer.success(f"Found {len(assumptions)} assumption(s):")
 
     if use_json:
-        # JSON output
-        data = {'assumptions': assumptions, 'spec_id': args.spec_id, 'count': len(assumptions), 'filtered': bool(assumption_type)}
-        output = prepare_output(data, args, LIST_ASSUMPTIONS_ESSENTIAL, LIST_ASSUMPTIONS_STANDARD)
-        output_json(output, args.compact)
-    else:
-        # Pretty print for human readability
-        for i, assumption in enumerate(assumptions, 1):
-            # Handle both legacy string format and new structured format
-            if isinstance(assumption, str):
-                # Legacy format: just a string
-                print(f"\n{i}. {assumption}")
-            elif isinstance(assumption, dict):
-                # New structured format
-                print(f"\n{assumption.get('id', f'assumption-{i}')}:")
-                printer.detail(f"Type: {assumption.get('type', 'unknown')}")
-                printer.detail(f"Text: {assumption.get('text', '')}")
-                printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
-                printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
-                if 'updated_at' in assumption:
-                    printer.detail(f"Updated at: {assumption['updated_at']}")
-            else:
-                printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
+        _emit_json_output(assumptions)
+        return 0
+
+    # Pretty print for human readability
+    for i, assumption in enumerate(assumptions, 1):
+        # Handle both legacy string format and new structured format
+        if isinstance(assumption, str):
+            # Legacy format: just a string
+            print(f"\n{i}. {assumption}")
+        elif isinstance(assumption, dict):
+            # New structured format
+            print(f"\n{assumption.get('id', f'assumption-{i}')}:")
+            printer.detail(f"Type: {assumption.get('type', 'unknown')}")
+            printer.detail(f"Text: {assumption.get('text', '')}")
+            printer.detail(f"Added by: {assumption.get('added_by', 'unknown')}")
+            printer.detail(f"Added at: {assumption.get('added_at', 'unknown')}")
+            if 'updated_at' in assumption:
+                printer.detail(f"Updated at: {assumption['updated_at']}")
+        else:
+            printer.warning(f"\n{i}. Invalid assumption format: {type(assumption)}")
 
     return 0
 
@@ -642,6 +683,14 @@ def cmd_update_estimate(args, printer):
             printer.detail(f"  Task: {result['task_id']} - {result['task_title']}")
             for key, value in result['updates'].items():
                 printer.detail(f"  {key}: {value}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                UPDATE_ESTIMATE_ESSENTIAL,
+                UPDATE_ESTIMATE_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -649,9 +698,12 @@ def cmd_update_estimate(args, printer):
 
         printer.success(result['message'])
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            UPDATE_ESTIMATE_ESSENTIAL,
+            UPDATE_ESTIMATE_STANDARD,
+        )
 
         return 0
 
@@ -694,6 +746,14 @@ def cmd_add_task(args, printer):
             printer.detail(f"  Parent: {result['parent_id']}")
             if args.description:
                 printer.detail(f"  Description: {args.description[:50]}...")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                ADD_TASK_ESSENTIAL,
+                ADD_TASK_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -702,9 +762,12 @@ def cmd_add_task(args, printer):
         printer.success(result['message'])
         printer.info(f"Task ID: {result['task_id']}")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            ADD_TASK_ESSENTIAL,
+            ADD_TASK_STANDARD,
+        )
 
         return 0
 
@@ -741,6 +804,14 @@ def cmd_remove_task(args, printer):
             printer.detail(f"  ID: {result['task_id']}")
             printer.detail(f"  Title: {result['task_title']}")
             printer.detail(f"  Removed count: {result['removed_count']}")
+            dry_run_result = dict(result)
+            dry_run_result["dry_run"] = True
+            _emit_json_output(
+                dry_run_result,
+                args,
+                REMOVE_TASK_ESSENTIAL,
+                REMOVE_TASK_STANDARD,
+            )
             return 0
 
         # Save spec
@@ -750,9 +821,12 @@ def cmd_remove_task(args, printer):
         if result['removed_count'] > 1:
             printer.info(f"Removed {result['removed_count']} task(s) total (including children)")
 
-        # If JSON output requested, print structured data
-        if getattr(args, 'json', False):
-            output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            REMOVE_TASK_ESSENTIAL,
+            REMOVE_TASK_STANDARD,
+        )
 
         return 0
 
@@ -1035,10 +1109,15 @@ def cmd_time_report(args, printer):
 
     if args.json:
         if report is not None:
-            output_json(report, args.compact)
+            _emit_json_output(
+                report,
+                args,
+                TIME_REPORT_ESSENTIAL,
+                TIME_REPORT_STANDARD,
+            )
         else:
             # Fallback for None (shouldn't happen with updated generate_time_report)
-            output_json({"error": "Failed to generate report"}, args.compact)
+            _emit_json_output({"error": "Failed to generate report"}, args)
             return 1
 
     return 0 if report else 1
@@ -1063,7 +1142,12 @@ def cmd_status_report(args, printer):
     )
 
     if args.json and report:
-        output_json(report, args.compact)
+        _emit_json_output(
+            report,
+            args,
+            STATUS_REPORT_ESSENTIAL,
+            STATUS_REPORT_STANDARD,
+        )
 
     return 0 if report else 1
 
@@ -1085,7 +1169,12 @@ def cmd_audit_spec(args, printer):
     )
 
     if args.json:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            AUDIT_SPEC_ESSENTIAL,
+            AUDIT_SPEC_STANDARD,
+        )
 
     return 0 if result.get("validation_passed", False) else 1
 
@@ -1259,7 +1348,12 @@ def cmd_check_complete(args, printer):
     )
 
     if args.json:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            CHECK_COMPLETE_ESSENTIAL,
+            CHECK_COMPLETE_STANDARD,
+        )
 
     return 0 if result.get("is_complete", False) else 1
 
@@ -1282,7 +1376,12 @@ def cmd_phase_time(args, printer):
     )
 
     if args.json and result:
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            PHASE_TIME_ESSENTIAL,
+            PHASE_TIME_STANDARD,
+        )
 
     return 0 if result else 1
 
@@ -1324,7 +1423,7 @@ def cmd_reconcile_state(args, printer):
         if not args.json:
             printer.error("Specs directory not found")
         else:
-            output_json({"error": "Specs directory not found"}, args.compact)
+            _emit_json_output({"error": "Specs directory not found"}, args)
         return 1
 
     # Pass None for printer in JSON mode
@@ -1338,12 +1437,17 @@ def cmd_reconcile_state(args, printer):
     # Handle JSON output
     if args.json:
         if isinstance(result, dict):
-            output_json(result, args.compact)
+            _emit_json_output(
+                result,
+                args,
+                RECONCILE_STATE_ESSENTIAL,
+                RECONCILE_STATE_STANDARD,
+            )
             # Return error if there was an error in the result
             return 1 if "error" in result else 0
         else:
             # Fallback for unexpected return type
-            output_json({"success": bool(result)}, args.compact)
+            _emit_json_output({"success": bool(result)}, args)
             return 0 if result else 1
 
     # Non-JSON mode returns boolean
@@ -1502,7 +1606,12 @@ def cmd_create_task_commit(args, printer):
             "task_id": args.task_id,
             "task_title": task_title
         }
-        output_json(result, args.compact)
+        _emit_json_output(
+            result,
+            args,
+            CREATE_TASK_COMMIT_ESSENTIAL,
+            CREATE_TASK_COMMIT_STANDARD,
+        )
 
     return 0
 

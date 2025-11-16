@@ -55,7 +55,7 @@ def test_copy_template_to_supports_directory_and_file_paths(tmp_path: Path) -> N
     assert copied_from_dir.exists()
 
     copied_data = json.loads(copied_from_dir.read_text())
-    assert copied_data["output"]["json"] is True
+    assert copied_data["output"]["default_mode"] == "json"
 
     destination_file = tmp_path / "custom_settings.json"
     copy_template_to("settings.local.json", destination_file)

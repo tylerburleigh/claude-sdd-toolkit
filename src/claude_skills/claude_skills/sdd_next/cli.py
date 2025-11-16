@@ -306,7 +306,7 @@ def cmd_verify_tools(args, printer):
             "optional": optional_tools_status,
             "all_available": all(optional_tools_status.values())
         }
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
         return 0
 
     # Rich UI mode
@@ -446,7 +446,11 @@ def cmd_task_info(args, printer):
         return 1
 
     if args.json:
-        output = prepare_output(task_data, args, TASK_INFO_ESSENTIAL, TASK_INFO_STANDARD)
+        # Include the requested task ID explicitly so callers don't have to
+        # infer it from context (the hierarchy nodes don't store their id).
+        output_data = dict(task_data)
+        output_data.setdefault("id", args.task_id)
+        output = prepare_output(output_data, args, TASK_INFO_ESSENTIAL, TASK_INFO_STANDARD)
         print_json_output(output, compact=args.compact)
     else:
         printer.success("Task information retrieved")
@@ -719,7 +723,7 @@ def cmd_init_env(args, printer):
 
     if args.json:
         output = prepare_output(env, args, INIT_ENV_ESSENTIAL, INIT_ENV_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, "compact", False))
     elif args.export:
         # Output as shell export statements
         print(f"export SPECS_DIR='{env['specs_dir']}'")
@@ -964,7 +968,7 @@ def cmd_validate_spec(args, printer):
 
     if args.json:
         output = prepare_output(validation, args, VALIDATE_SPEC_ESSENTIAL, VALIDATE_SPEC_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         printer.result("Validating", validation['spec_file'])
 
@@ -1003,7 +1007,7 @@ def cmd_find_pattern(args, printer):
     if args.json:
         data = {"pattern": args.pattern, "matches": matches}
         output = prepare_output(data, args, FIND_PATTERN_ESSENTIAL, FIND_PATTERN_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         if matches:
             printer.success(f"Found {len(matches)} file(s) matching '{args.pattern}'")
@@ -1025,7 +1029,7 @@ def cmd_detect_project(args, printer):
 
     if args.json:
         output = prepare_output(project, args, DETECT_PROJECT_ESSENTIAL, DETECT_PROJECT_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         printer.success("Project analyzed")
         printer.result("Project Type", project['project_type'])
@@ -1065,7 +1069,7 @@ def cmd_find_tests(args, printer):
 
     if args.json:
         output = prepare_output(tests, args, FIND_TESTS_ESSENTIAL, FIND_TESTS_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         if tests['test_framework']:
             printer.success("Tests discovered")
@@ -1100,7 +1104,7 @@ def cmd_check_environment(args, printer):
 
     if args.json:
         output = prepare_output(env, args, CHECK_ENVIRONMENT_ESSENTIAL, CHECK_ENVIRONMENT_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         if env['valid']:
             printer.success("Environment is valid")
@@ -1150,7 +1154,7 @@ def cmd_find_circular_deps(args, printer):
 
     if args.json:
         output = prepare_output(circular, args, FIND_CIRCULAR_DEPS_ESSENTIAL, FIND_CIRCULAR_DEPS_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         if circular['has_circular']:
             printer.error("Circular dependencies detected!")
@@ -1183,7 +1187,7 @@ def cmd_find_related_files(args, printer):
 
     if args.json:
         output = prepare_output(related, args, FIND_RELATED_FILES_ESSENTIAL, FIND_RELATED_FILES_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         printer.success("Related files found")
         printer.result("Source", related['source_file'])
@@ -1221,7 +1225,7 @@ def cmd_validate_paths(args, printer):
 
     if args.json:
         output = prepare_output(validation, args, VALIDATE_PATHS_ESSENTIAL, VALIDATE_PATHS_STANDARD)
-        output_json(output)
+        output_json(output, compact=getattr(args, 'compact', False))
     else:
         if validation['valid_paths']:
             printer.success(f"Valid Paths ({len(validation['valid_paths'])})")
@@ -1389,4 +1393,3 @@ def register_next(subparsers, parent_parser):
     parser_spec_stats.add_argument('spec_file', help='Path to spec markdown file')
     parser_spec_stats.add_argument('--spec-file', dest='spec_file_json', help='Optional path to JSON spec')
     parser_spec_stats.set_defaults(func=cmd_spec_stats)
-

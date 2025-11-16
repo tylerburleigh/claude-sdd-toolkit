@@ -125,7 +125,8 @@ LIST_SPECS_ESSENTIAL = {'spec_id', 'status', 'title', 'progress_percentage'}
 LIST_SPECS_STANDARD = {
     'spec_id', 'status', 'title', 'progress_percentage',
     'total_tasks', 'completed_tasks', 'current_phase',
-    'version', 'created_at', 'updated_at'
+    'version', 'created_at', 'updated_at',
+    'description', 'author', 'file_path'
 }
 
 # query-tasks command
@@ -143,15 +144,21 @@ PROGRESS_STANDARD = {
 }
 
 # prepare-task command
-PREPARE_TASK_ESSENTIAL = {'success', 'task_id', 'task_data', 'dependencies'}
+PREPARE_TASK_ESSENTIAL = {
+    'task_id', 'task_data', 'dependencies',
+    'needs_branch_creation', 'suggested_branch_name',
+    'dirty_tree_status', 'validation_warnings',
+    'spec_complete'
+}
 PREPARE_TASK_STANDARD = {
     'success', 'task_id', 'task_data', 'dependencies',
     'repo_root', 'needs_branch_creation', 'dirty_tree_status',
-    'needs_commit_cadence', 'spec_complete'
+    'needs_commit_cadence', 'spec_complete',
+    'completion_info', 'doc_context'
 }
 
 # validate command
-VALIDATE_ESSENTIAL = {'status'}
+VALIDATE_ESSENTIAL = {'status', 'errors', 'warnings', 'auto_fixable_issues'}
 VALIDATE_STANDARD = {
     'status', 'spec_id', 'errors', 'warnings',
     'auto_fixable_issues', 'schema'
@@ -203,34 +210,41 @@ LIST_TOOLS_ESSENTIAL = {'available_count', 'total'}
 LIST_TOOLS_STANDARD = {'available', 'unavailable', 'total', 'available_count'}
 
 # check-deps command
-CHECK_DEPS_ESSENTIAL = {'task_id', 'can_start'}
+CHECK_DEPS_ESSENTIAL = {'can_start', 'blocked_by'}
 CHECK_DEPS_STANDARD = {
     'task_id', 'can_start', 'blocked_by',
     'soft_depends', 'blocks'
 }
 
 # list-blockers command
-LIST_BLOCKERS_ESSENTIAL = {'task_id', 'blocked_by'}
-LIST_BLOCKERS_STANDARD = {'task_id', 'blocked_by'}
+LIST_BLOCKERS_ESSENTIAL = {
+    'id', 'title', 'type', 'blocked_at',
+    'blocker_type', 'blocker_description'
+}
+LIST_BLOCKERS_STANDARD = {
+    'id', 'title', 'type', 'blocked_at',
+    'blocker_type', 'blocker_description',
+    'blocker_ticket', 'blocked_by_external'
+}
 
 # find-specs command
 FIND_SPECS_ESSENTIAL = {'specs_dir'}
 FIND_SPECS_STANDARD = {'specs_dir', 'auto_detected', 'exists'}
 
 # next-task command
-NEXT_TASK_ESSENTIAL = {'task_id', 'title', 'status'}
+NEXT_TASK_ESSENTIAL = {'task_id', 'title'}
 NEXT_TASK_STANDARD = {'task_id', 'title', 'status', 'file_path', 'estimated_hours'}
 
 # task-info command
-TASK_INFO_ESSENTIAL = {'type', 'title', 'status'}
+TASK_INFO_ESSENTIAL = {'title', 'status', 'dependencies', 'metadata'}
 TASK_INFO_STANDARD = {
-    'type', 'title', 'status', 'parent', 'children',
+    'id', 'type', 'title', 'status', 'parent', 'children',
     'dependencies', 'total_tasks', 'completed_tasks', 'metadata'
 }
 
 # init-env command
-INIT_ENV_ESSENTIAL = {'success'}
-INIT_ENV_STANDARD = {'success', 'spec_id', 'spec_file', 'variables', 'exported'}
+INIT_ENV_ESSENTIAL = {'success', 'specs_dir', 'active_dir'}
+INIT_ENV_STANDARD = {'success', 'specs_dir', 'active_dir', 'state_dir'}
 
 # validate-spec command
 VALIDATE_SPEC_ESSENTIAL = {'valid', 'errors'}
@@ -277,7 +291,7 @@ FORMAT_PLAN_STANDARD = {'formatted', 'plan_structure', 'sections', 'word_count'}
 
 # add-assumption command
 ADD_ASSUMPTION_ESSENTIAL = {'success', 'assumption_id'}
-ADD_ASSUMPTION_STANDARD = {'success', 'assumption_id', 'spec_id', 'task_id', 'assumption_text'}
+ADD_ASSUMPTION_STANDARD = {'success', 'assumption_id', 'spec_id', 'task_id', 'assumption_text', 'message'}
 
 # list-assumptions command
 LIST_ASSUMPTIONS_ESSENTIAL = {'assumptions'}
@@ -378,42 +392,48 @@ CREATE_TASK_COMMIT_STANDARD = {
 # ============================================================================
 
 # find-class command (doc_query)
-FIND_CLASS_ESSENTIAL = {'name'}
+FIND_CLASS_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 FIND_CLASS_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # find-function command (doc_query)
-FIND_FUNCTION_ESSENTIAL = {'name'}
+FIND_FUNCTION_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 FIND_FUNCTION_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # find-module command (doc_query)
-FIND_MODULE_ESSENTIAL = {'name'}
+FIND_MODULE_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 FIND_MODULE_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # complexity command (doc_query)
-COMPLEXITY_ESSENTIAL = {'name', 'complexity'}
+COMPLEXITY_ESSENTIAL = {'name', 'complexity', 'entity_type', 'file', 'line'}
 COMPLEXITY_STANDARD = {'name', 'complexity', 'entity_type', 'file', 'line'}
 
 # dependencies command (doc_query)
-DEPENDENCIES_ESSENTIAL = {'name', 'imports'}
+DEPENDENCIES_ESSENTIAL = {'name', 'imports', 'imported_by', 'entity_type', 'file'}
 DEPENDENCIES_STANDARD = {'name', 'imports', 'imported_by', 'entity_type', 'file'}
 
 # search command (doc_query)
-SEARCH_ESSENTIAL = {'name'}
+SEARCH_ESSENTIAL = {'name', 'entity_type', 'file', 'line', 'relevance_score'}
 SEARCH_STANDARD = {'name', 'entity_type', 'file', 'line', 'relevance_score'}
 
 # context command (doc_query)
-CONTEXT_DOC_QUERY_ESSENTIAL = {'name'}
+CONTEXT_DOC_QUERY_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 CONTEXT_DOC_QUERY_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # describe-module command (doc_query)
-DESCRIBE_MODULE_ESSENTIAL = {'name', 'classes', 'functions'}
+DESCRIBE_MODULE_ESSENTIAL = {
+    'name', 'file', 'classes', 'functions',
+    'imports', 'docstring', 'line_count', 'complexity'
+}
 DESCRIBE_MODULE_STANDARD = {
     'name', 'file', 'classes', 'functions', 'imports',
     'docstring', 'line_count', 'complexity'
 }
 
 # stats command (doc_query)
-STATS_DOC_QUERY_ESSENTIAL = {'total_files', 'total_modules', 'total_classes', 'total_functions'}
+STATS_DOC_QUERY_ESSENTIAL = {
+    'total_files', 'total_modules', 'total_classes', 'total_functions',
+    'generated_at', 'metadata', 'statistics'
+}
 STATS_DOC_QUERY_STANDARD = {
     'total_files', 'total_modules', 'total_classes', 'total_functions',
     'total_lines', 'avg_complexity', 'max_complexity', 'high_complexity_count',
@@ -421,45 +441,52 @@ STATS_DOC_QUERY_STANDARD = {
 }
 
 # list-classes command (doc_query)
-LIST_CLASSES_ESSENTIAL = {'name'}
+LIST_CLASSES_ESSENTIAL = {'name', 'file', 'line', 'methods', 'bases'}
 LIST_CLASSES_STANDARD = {'name', 'file', 'line', 'methods', 'bases'}
 
 # list-functions command (doc_query)
-LIST_FUNCTIONS_ESSENTIAL = {'name'}
+LIST_FUNCTIONS_ESSENTIAL = {'name', 'file', 'line', 'complexity', 'params'}
 LIST_FUNCTIONS_STANDARD = {'name', 'file', 'line', 'complexity', 'params'}
 
 # list-modules command (doc_query)
-LIST_MODULES_ESSENTIAL = {'name'}
+LIST_MODULES_ESSENTIAL = {'name', 'file', 'classes', 'functions'}
 LIST_MODULES_STANDARD = {'name', 'file', 'classes', 'functions'}
 
 # callers command (doc_query)
-CALLERS_ESSENTIAL = {'name'}
+CALLERS_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 CALLERS_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # callees command (doc_query)
-CALLEES_ESSENTIAL = {'name'}
+CALLEES_ESSENTIAL = {'name', 'entity_type', 'file', 'line'}
 CALLEES_STANDARD = {'name', 'entity_type', 'file', 'line'}
 
 # call-graph command (doc_query)
-CALL_GRAPH_ESSENTIAL = {'nodes', 'edges'}
+CALL_GRAPH_ESSENTIAL = {'nodes', 'edges', 'entry_points', 'stats'}
 CALL_GRAPH_STANDARD = {'nodes', 'edges', 'entry_points', 'stats'}
 
 # trace-entry command (doc_query)
-TRACE_ENTRY_ESSENTIAL = {'entry_point', 'call_depth'}
+TRACE_ENTRY_ESSENTIAL = {'entry_point', 'call_depth', 'execution_paths', 'total_functions', 'leaf_functions'}
 TRACE_ENTRY_STANDARD = {
     'entry_point', 'call_depth', 'execution_paths',
     'total_functions', 'leaf_functions'
 }
 
 # trace-data command (doc_query)
-TRACE_DATA_ESSENTIAL = {'data_item', 'lifecycle_stages'}
+TRACE_DATA_ESSENTIAL = {
+    'data_item', 'lifecycle_stages',
+    'read_locations', 'write_locations', 'total_references'
+}
 TRACE_DATA_STANDARD = {
     'data_item', 'lifecycle_stages', 'read_locations',
     'write_locations', 'total_references'
 }
 
 # impact command (doc_query)
-IMPACT_ESSENTIAL = {'target', 'direct_impact', 'indirect_impact'}
+IMPACT_ESSENTIAL = {
+    'target', 'direct_impact', 'indirect_impact',
+    'affected_modules', 'affected_classes', 'affected_functions',
+    'risk_level', 'total_affected'
+}
 IMPACT_STANDARD = {
     'target', 'direct_impact', 'indirect_impact',
     'affected_modules', 'affected_classes', 'affected_functions',
@@ -467,7 +494,10 @@ IMPACT_STANDARD = {
 }
 
 # refactor-candidates command (doc_query) - combined with impact as task-1-18
-REFACTOR_CANDIDATES_ESSENTIAL = {'candidates'}
+REFACTOR_CANDIDATES_ESSENTIAL = {
+    'candidates', 'total_candidates',
+    'high_priority', 'medium_priority', 'low_priority'
+}
 REFACTOR_CANDIDATES_STANDARD = {
     'candidates', 'total_candidates', 'high_priority',
     'medium_priority', 'low_priority'

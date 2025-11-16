@@ -4,11 +4,10 @@
 from __future__ import annotations
 
 import argparse
-import json
-import sys
 from typing import Any, Dict, List, Optional
 
 from claude_skills.common import PrettyPrinter
+from claude_skills.common.json_output import output_json
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.sdd_config import get_default_format
 from claude_skills.cli.sdd.output_utils import (
@@ -85,14 +84,9 @@ from claude_skills.doc_query.workflows.refactor_candidates import (
 # ---------------------------------------------------------------------------
 
 
-def _dump_json(payload: Any) -> None:
-    json.dump(payload, sys.stdout, indent=2)
-    sys.stdout.write("\n")
-
-
 def _maybe_json(args: argparse.Namespace, payload: Any) -> bool:
     if getattr(args, 'json', False):
-        _dump_json(payload)
+        output_json(payload, compact=getattr(args, 'compact', False))
         return True
     return False
 

@@ -1,320 +1,321 @@
-"""Integration tests for doc_query module verbosity filtering.
+"""Verbosity filtering tests for doc_query field sets.
 
-Tests verify that all doc_query commands properly respect verbosity levels:
-1. QUIET mode - only essential fields
-2. NORMAL mode - essential + standard fields
-3. VERBOSE mode - all fields including empty ones
-
-Commands tested:
-- sdd doc-query search
-- sdd doc-query get-function
-- sdd doc-query get-class
-- sdd doc-query list-modules
-- sdd doc-query stats
-- sdd doc-query analyze-imports
+These tests validate that the doc_query-specific field classifications in
+`claude_skills.cli.sdd.output_utils` behave as expected in QUIET/NORMAL/VERBOSE
+verbosity levels. Each test uses a representative payload that mirrors the
+per-entity dictionaries returned by the doc_query CLI commands.
 """
 
-import pytest
 import argparse
-from unittest.mock import Mock, patch, MagicMock
 
 from claude_skills.cli.sdd.verbosity import VerbosityLevel
 from claude_skills.cli.sdd.output_utils import (
     prepare_output,
-    DOC_QUERY_SEARCH_ESSENTIAL,
-    DOC_QUERY_SEARCH_STANDARD,
-    DOC_QUERY_GET_FUNCTION_ESSENTIAL,
-    DOC_QUERY_GET_FUNCTION_STANDARD,
-    DOC_QUERY_GET_CLASS_ESSENTIAL,
-    DOC_QUERY_GET_CLASS_STANDARD,
-    DOC_QUERY_LIST_MODULES_ESSENTIAL,
-    DOC_QUERY_LIST_MODULES_STANDARD,
-    DOC_QUERY_STATS_ESSENTIAL,
-    DOC_QUERY_STATS_STANDARD,
-    DOC_QUERY_ANALYZE_IMPORTS_ESSENTIAL,
-    DOC_QUERY_ANALYZE_IMPORTS_STANDARD,
+    SEARCH_ESSENTIAL,
+    SEARCH_STANDARD,
+    FIND_FUNCTION_ESSENTIAL,
+    FIND_FUNCTION_STANDARD,
+    FIND_CLASS_ESSENTIAL,
+    FIND_CLASS_STANDARD,
+    LIST_CLASSES_ESSENTIAL,
+    LIST_CLASSES_STANDARD,
+    LIST_MODULES_ESSENTIAL,
+    LIST_MODULES_STANDARD,
+    STATS_DOC_QUERY_ESSENTIAL,
+    STATS_DOC_QUERY_STANDARD,
+    DEPENDENCIES_ESSENTIAL,
+    DEPENDENCIES_STANDARD,
 )
 
 
 class TestDocQuerySearchVerbosity:
-    """Test verbosity filtering for doc-query search command."""
+    """Tests for the doc-query `search` command field filtering."""
 
-    def test_search_quiet_mode_filters_non_essential(self):
-        """QUIET mode should only include essential fields."""
+    def test_search_quiet_filters_non_standard_fields(self):
+        """QUIET mode should keep only the scored entity fields."""
         data = {
-            'matches': [{'name': 'foo', 'file': 'foo.py'}],
-            'total_matches': 1,
-            'query': 'foo',
-            'search_time_ms': 45,
+            'name': 'UserController',
+            'entity_type': 'class',
+            'file': 'src/controllers/user.py',
+            'line': 128,
+            'relevance_score': 0.92,
+            'docstring': 'Handles user endpoints',
+            'metadata': {'module': 'controllers'},
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_SEARCH_ESSENTIAL, DOC_QUERY_SEARCH_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, SEARCH_ESSENTIAL, SEARCH_STANDARD)
 
-        assert 'matches' in result
-        assert 'total_matches' in result
-        # Non-essential fields should be filtered
-        assert 'query' not in result or result['query']  # Only filtered if empty
-        assert 'search_time_ms' not in result
+        assert set(result.keys()) == SEARCH_ESSENTIAL
+        assert 'docstring' not in result
+        assert 'metadata' not in result
 
-    def test_search_normal_mode_includes_standard(self):
-        """NORMAL mode should include essential + standard fields."""
+    def test_search_verbose_preserves_optional_fields(self):
+        """VERBOSE mode should include all fields, even optional ones."""
         data = {
-            'matches': [{'name': 'foo', 'file': 'foo.py'}],
-            'total_matches': 1,
-            'query': 'foo',
-            'search_time_ms': 45,
+            'name': 'UserController',
+            'entity_type': 'class',
+            'file': 'src/controllers/user.py',
+            'line': 128,
+            'relevance_score': 0.92,
+            'docstring': '',
+            'metadata': {'module': 'controllers'},
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.NORMAL)
-        result = prepare_output(data, args, DOC_QUERY_SEARCH_ESSENTIAL, DOC_QUERY_SEARCH_STANDARD)
+        verbose_args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
+        result = prepare_output(data, verbose_args, SEARCH_ESSENTIAL, SEARCH_STANDARD)
 
-        assert 'matches' in result
-        assert 'total_matches' in result
-        assert 'query' in result
-        assert 'search_time_ms' in result
-
-    def test_search_verbose_mode_includes_all(self):
-        """VERBOSE mode should include all fields including empty ones."""
-        data = {
-            'matches': [],
-            'total_matches': 0,
-            'query': 'nonexistent',
-            'search_time_ms': 12,
-            'metadata': {},
-        }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
-        result = prepare_output(data, args, DOC_QUERY_SEARCH_ESSENTIAL, DOC_QUERY_SEARCH_STANDARD)
-
-        assert 'matches' in result
-        assert 'total_matches' in result
-        assert 'query' in result
-        assert 'search_time_ms' in result
-        assert 'metadata' in result  # Empty dict included in VERBOSE
+        assert 'docstring' in result and result['docstring'] == ''
+        assert 'metadata' in result
 
 
-class TestDocQueryGetFunctionVerbosity:
-    """Test verbosity filtering for doc-query get-function command."""
+class TestDocQueryFindFunctionVerbosity:
+    """Tests for the doc-query `find-function` command."""
 
-    def test_get_function_quiet_mode(self):
-        """QUIET mode should only include essential function fields."""
+    def test_find_function_quiet_mode(self):
+        """QUIET mode should include only essential function identifiers."""
         data = {
             'name': 'calculate_total',
+            'entity_type': 'function',
+            'file': 'src/utils/maths.py',
+            'line': 42,
             'signature': 'calculate_total(items: List[Item]) -> float',
-            'file_path': 'src/utils.py',
-            'docstring': 'Calculate total price',
-            'line_number': 45,
-            'complexity': 3,
+            'complexity': 5,
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_GET_FUNCTION_ESSENTIAL, DOC_QUERY_GET_FUNCTION_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, FIND_FUNCTION_ESSENTIAL, FIND_FUNCTION_STANDARD)
 
-        assert 'name' in result
-        assert 'signature' in result
-        assert 'file_path' in result
-        # Non-essential should be filtered
+        assert set(result.keys()) == FIND_FUNCTION_ESSENTIAL
+        assert 'signature' not in result
         assert 'complexity' not in result
 
-    def test_get_function_verbose_with_empty_docstring(self):
-        """VERBOSE mode should include empty docstring."""
+    def test_find_function_verbose_mode(self):
+        """VERBOSE mode should keep optional metadata for debugging."""
         data = {
-            'name': 'helper',
-            'signature': 'helper() -> None',
-            'file_path': 'src/helpers.py',
-            'docstring': '',  # Empty docstring
-            'line_number': 12,
+            'name': 'calculate_total',
+            'entity_type': 'function',
+            'file': 'src/utils/maths.py',
+            'line': 42,
+            'signature': 'calculate_total(items: List[Item]) -> float',
+            'complexity': 5,
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
-        result = prepare_output(data, args, DOC_QUERY_GET_FUNCTION_ESSENTIAL, DOC_QUERY_GET_FUNCTION_STANDARD)
+        verbose_args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
+        result = prepare_output(data, verbose_args, FIND_FUNCTION_ESSENTIAL, FIND_FUNCTION_STANDARD)
 
-        assert 'docstring' in result
-        assert result['docstring'] == ''
+        assert 'signature' in result
+        assert 'complexity' in result
 
 
-class TestDocQueryGetClassVerbosity:
-    """Test verbosity filtering for doc-query get-class command."""
+class TestDocQueryFindClassVerbosity:
+    """Tests for the doc-query `find-class` command."""
 
-    def test_get_class_normal_mode(self):
-        """NORMAL mode should include standard class fields."""
+    def test_find_class_normal_mode_reports_location_only(self):
+        """NORMAL mode should only include identifier/location data."""
         data = {
             'name': 'UserService',
-            'file_path': 'src/services/user.py',
-            'docstring': 'Handle user operations',
-            'methods': ['create', 'update', 'delete'],
-            'line_number': 10,
-            'base_classes': ['BaseService'],
+            'entity_type': 'class',
+            'file': 'src/services/user.py',
+            'line': 15,
+            'docstring': 'Service for user logic',
+            'methods': ['create_user'],
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.NORMAL)
-        result = prepare_output(data, args, DOC_QUERY_GET_CLASS_ESSENTIAL, DOC_QUERY_GET_CLASS_STANDARD)
+        normal_args = argparse.Namespace(verbosity_level=VerbosityLevel.NORMAL)
+        result = prepare_output(data, normal_args, FIND_CLASS_ESSENTIAL, FIND_CLASS_STANDARD)
 
-        assert 'name' in result
-        assert 'file_path' in result
-        assert 'docstring' in result
-        assert 'methods' in result
+        assert set(result.keys()) == FIND_CLASS_ESSENTIAL
+        assert 'docstring' not in result
+        assert 'methods' not in result
 
-    def test_get_class_quiet_omits_empty_lists(self):
-        """QUIET mode should omit empty lists."""
+    def test_find_class_quiet_matches_normal_output(self):
+        """QUIET mode should be identical since only minimal fields are standard."""
         data = {
-            'name': 'EmptyClass',
-            'file_path': 'src/empty.py',
-            'docstring': 'Empty class',
-            'methods': [],  # Empty list
-            'base_classes': [],  # Empty list
+            'name': 'EmptyService',
+            'entity_type': 'class',
+            'file': 'src/services/empty.py',
+            'line': 1,
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_GET_CLASS_ESSENTIAL, DOC_QUERY_GET_CLASS_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, FIND_CLASS_ESSENTIAL, FIND_CLASS_STANDARD)
 
-        assert 'name' in result
-        # Empty lists should be omitted in QUIET
-        assert 'methods' not in result or result['methods'] == []
-        assert 'base_classes' not in result or result['base_classes'] == []
+        assert set(result.keys()) == FIND_CLASS_ESSENTIAL
+
+
+class TestDocQueryListClassesVerbosity:
+    """Tests for the doc-query `list-classes` command."""
+
+    def test_list_classes_quiet_mode_keeps_structure(self):
+        """QUIET mode should retain class structure fields."""
+        data = {
+            'name': 'InvoiceService',
+            'file': 'src/services/invoice.py',
+            'line': 50,
+            'methods': ['generate', 'send'],
+            'bases': ['BaseService'],
+            'docstring': 'Invoice helpers',
+        }
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, LIST_CLASSES_ESSENTIAL, LIST_CLASSES_STANDARD)
+
+        assert 'methods' in result
+        assert 'bases' in result
+        assert 'docstring' not in result
+
+    def test_list_classes_quiet_drops_empty_lists(self):
+        """Empty method/base lists should be omitted in QUIET mode."""
+        data = {
+            'name': 'Placeholder',
+            'file': 'src/services/placeholder.py',
+            'line': 5,
+            'methods': [],
+            'bases': [],
+        }
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, LIST_CLASSES_ESSENTIAL, LIST_CLASSES_STANDARD)
+
+        assert 'methods' not in result
+        assert 'bases' not in result
 
 
 class TestDocQueryListModulesVerbosity:
-    """Test verbosity filtering for doc-query list-modules command."""
+    """Tests for the doc-query `list-modules` command."""
 
     def test_list_modules_quiet_mode(self):
-        """QUIET mode should only include essential module info."""
+        """QUIET mode keeps only the module summary fields."""
         data = {
-            'modules': [
-                {'name': 'utils', 'file': 'utils.py'},
-                {'name': 'services', 'file': 'services.py'},
-            ],
-            'total_modules': 2,
-            'filter_applied': 'python',
-            'scan_time_ms': 123,
+            'name': 'services.payments',
+            'file': 'src/services/payments/__init__.py',
+            'classes': ['PaymentService'],
+            'functions': ['process_payment'],
+            'docstring': 'Payment module helpers',
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_LIST_MODULES_ESSENTIAL, DOC_QUERY_LIST_MODULES_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, LIST_MODULES_ESSENTIAL, LIST_MODULES_STANDARD)
 
-        assert 'modules' in result
-        assert 'total_modules' in result
-        # Non-essential fields filtered
-        assert 'scan_time_ms' not in result
+        assert 'docstring' not in result
+        assert set(result.keys()) == LIST_MODULES_ESSENTIAL
 
 
 class TestDocQueryStatsVerbosity:
-    """Test verbosity filtering for doc-query stats command."""
+    """Tests for the doc-query `stats` command."""
 
-    def test_stats_normal_mode(self):
-        """NORMAL mode should include standard stats fields."""
+    def test_stats_normal_mode_includes_extended_metrics(self):
+        """NORMAL mode should include the extended statistics."""
         data = {
-            'total_functions': 145,
-            'total_classes': 32,
-            'total_modules': 18,
-            'language_breakdown': {'python': 15, 'javascript': 3},
-            'complexity_stats': {'avg': 4.2, 'max': 15},
-            'cache_hit_rate': 0.85,
+            'total_files': 50,
+            'total_modules': 12,
+            'total_classes': 30,
+            'total_functions': 180,
+            'generated_at': '2025-11-15T10:00:00Z',
+            'metadata': {'project_name': 'sample', 'version': '1.0.0'},
+            'statistics': {'languages': ['python']},
+            'total_lines': 12000,
+            'avg_complexity': 4.1,
+            'max_complexity': 12,
+            'high_complexity_count': 6,
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.NORMAL)
-        result = prepare_output(data, args, DOC_QUERY_STATS_ESSENTIAL, DOC_QUERY_STATS_STANDARD)
+        normal_args = argparse.Namespace(verbosity_level=VerbosityLevel.NORMAL)
+        result = prepare_output(data, normal_args, STATS_DOC_QUERY_ESSENTIAL, STATS_DOC_QUERY_STANDARD)
 
-        assert 'total_functions' in result
-        assert 'total_classes' in result
-        assert 'total_modules' in result
-        assert 'language_breakdown' in result
+        assert 'total_lines' in result
+        assert 'avg_complexity' in result
+        assert 'max_complexity' in result
+        assert 'high_complexity_count' in result
 
-    def test_stats_quiet_mode_minimal_output(self):
-        """QUIET mode should provide minimal stats."""
+    def test_stats_quiet_mode_strips_optional_metrics(self):
+        """QUIET mode should omit derived metrics while keeping aggregates."""
         data = {
-            'total_functions': 145,
-            'total_classes': 32,
-            'total_modules': 18,
-            'language_breakdown': {'python': 15},
-            'complexity_stats': {},  # Empty
-            'cache_hit_rate': 0.85,
+            'total_files': 50,
+            'total_modules': 12,
+            'total_classes': 30,
+            'total_functions': 180,
+            'generated_at': '2025-11-15T10:00:00Z',
+            'metadata': {'project_name': 'sample', 'version': '1.0.0'},
+            'statistics': {'languages': ['python']},
+            'total_lines': 12000,
+            'avg_complexity': 4.1,
+            'max_complexity': 12,
+            'high_complexity_count': 6,
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_STATS_ESSENTIAL, DOC_QUERY_STATS_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, STATS_DOC_QUERY_ESSENTIAL, STATS_DOC_QUERY_STANDARD)
 
-        assert 'total_functions' in result
-        assert 'total_classes' in result
-        assert 'total_modules' in result
-        # Empty complexity_stats omitted in QUIET
-        assert 'complexity_stats' not in result or result['complexity_stats'] == {}
+        assert 'total_lines' not in result
+        assert 'avg_complexity' not in result
+        assert 'max_complexity' not in result
+        assert 'high_complexity_count' not in result
+        assert 'metadata' in result
 
 
-class TestDocQueryAnalyzeImportsVerbosity:
-    """Test verbosity filtering for doc-query analyze-imports command."""
+class TestDocQueryDependenciesVerbosity:
+    """Tests for the doc-query `dependencies` command."""
 
-    def test_analyze_imports_verbose_mode(self):
-        """VERBOSE mode should include all import analysis data."""
+    def test_dependencies_quiet_mode(self):
+        """QUIET mode should keep only imports/imported_by information."""
         data = {
-            'imports': ['os', 'sys', 'pathlib'],
-            'external_imports': ['requests', 'numpy'],
-            'import_graph': {},  # Empty but should be included
-            'circular_dependencies': [],
-            'unused_imports': [],
-        }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
-        result = prepare_output(data, args, DOC_QUERY_ANALYZE_IMPORTS_ESSENTIAL, DOC_QUERY_ANALYZE_IMPORTS_STANDARD)
-
-        assert 'imports' in result
-        assert 'external_imports' in result
-        assert 'import_graph' in result  # Empty dict included
-        assert 'circular_dependencies' in result  # Empty list included
-        assert 'unused_imports' in result  # Empty list included
-
-    def test_analyze_imports_quiet_mode(self):
-        """QUIET mode should only show essential import data."""
-        data = {
-            'imports': ['os', 'sys'],
+            'name': 'src/services/payments.py',
+            'entity_type': 'module',
+            'file': 'src/services/payments.py',
+            'imports': ['src.utils.currency', 'src.models.invoice'],
+            'imported_by': ['src/routes/payments'],
             'external_imports': ['requests'],
-            'import_graph': {'os': ['pathlib']},
-            'circular_dependencies': [],
-            'unused_imports': [],
         }
-        args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
-        result = prepare_output(data, args, DOC_QUERY_ANALYZE_IMPORTS_ESSENTIAL, DOC_QUERY_ANALYZE_IMPORTS_STANDARD)
+        quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
+        result = prepare_output(data, quiet_args, DEPENDENCIES_ESSENTIAL, DEPENDENCIES_STANDARD)
 
         assert 'imports' in result
-        # Empty lists omitted in QUIET
-        assert 'circular_dependencies' not in result or result['circular_dependencies'] == []
-        assert 'unused_imports' not in result or result['unused_imports'] == []
+        assert 'imported_by' in result
+        assert 'external_imports' not in result
+
+    def test_dependencies_verbose_mode(self):
+        """VERBOSE mode includes optional dependency metadata."""
+        data = {
+            'name': 'src/services/payments.py',
+            'entity_type': 'module',
+            'file': 'src/services/payments.py',
+            'imports': ['src.utils.currency', 'src.models.invoice'],
+            'imported_by': ['src/routes/payments'],
+            'external_imports': ['requests'],
+        }
+        verbose_args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
+        result = prepare_output(data, verbose_args, DEPENDENCIES_ESSENTIAL, DEPENDENCIES_STANDARD)
+
+        assert 'external_imports' in result
 
 
 class TestDocQueryVerbosityIntegration:
-    """Integration tests for doc_query verbosity across all commands."""
+    """Lightweight integration checks for doc_query field sets."""
 
-    def test_all_commands_respect_verbosity_levels(self):
-        """Verify all doc_query commands have field sets defined."""
-        # Verify field sets exist
-        assert DOC_QUERY_SEARCH_ESSENTIAL is not None
-        assert DOC_QUERY_SEARCH_STANDARD is not None
-        assert DOC_QUERY_GET_FUNCTION_ESSENTIAL is not None
-        assert DOC_QUERY_GET_FUNCTION_STANDARD is not None
-        assert DOC_QUERY_GET_CLASS_ESSENTIAL is not None
-        assert DOC_QUERY_GET_CLASS_STANDARD is not None
-        assert DOC_QUERY_LIST_MODULES_ESSENTIAL is not None
-        assert DOC_QUERY_LIST_MODULES_STANDARD is not None
-        assert DOC_QUERY_STATS_ESSENTIAL is not None
-        assert DOC_QUERY_STATS_STANDARD is not None
-        assert DOC_QUERY_ANALYZE_IMPORTS_ESSENTIAL is not None
-        assert DOC_QUERY_ANALYZE_IMPORTS_STANDARD is not None
+    def test_field_sets_defined(self):
+        """Ensure constants exist for the key doc_query commands."""
+        assert SEARCH_ESSENTIAL
+        assert FIND_FUNCTION_ESSENTIAL
+        assert FIND_CLASS_ESSENTIAL
+        assert LIST_MODULES_ESSENTIAL
+        assert STATS_DOC_QUERY_ESSENTIAL
+        assert DEPENDENCIES_ESSENTIAL
 
-    def test_essential_is_subset_of_standard(self):
-        """Essential fields should be a subset of standard fields."""
-        assert DOC_QUERY_SEARCH_ESSENTIAL.issubset(DOC_QUERY_SEARCH_STANDARD)
-        assert DOC_QUERY_GET_FUNCTION_ESSENTIAL.issubset(DOC_QUERY_GET_FUNCTION_STANDARD)
-        assert DOC_QUERY_GET_CLASS_ESSENTIAL.issubset(DOC_QUERY_GET_CLASS_STANDARD)
-        assert DOC_QUERY_LIST_MODULES_ESSENTIAL.issubset(DOC_QUERY_LIST_MODULES_STANDARD)
-        assert DOC_QUERY_STATS_ESSENTIAL.issubset(DOC_QUERY_STATS_STANDARD)
-        assert DOC_QUERY_ANALYZE_IMPORTS_ESSENTIAL.issubset(DOC_QUERY_ANALYZE_IMPORTS_STANDARD)
+    def test_essential_subset_of_standard(self):
+        """Essential fields should always be a subset of the standard fields."""
+        assert SEARCH_ESSENTIAL.issubset(SEARCH_STANDARD)
+        assert FIND_FUNCTION_ESSENTIAL.issubset(FIND_FUNCTION_STANDARD)
+        assert FIND_CLASS_ESSENTIAL.issubset(FIND_CLASS_STANDARD)
+        assert LIST_MODULES_ESSENTIAL.issubset(LIST_MODULES_STANDARD)
+        assert STATS_DOC_QUERY_ESSENTIAL.issubset(STATS_DOC_QUERY_STANDARD)
+        assert DEPENDENCIES_ESSENTIAL.issubset(DEPENDENCIES_STANDARD)
 
-    def test_field_filtering_reduces_output_size(self):
-        """Verify that QUIET mode produces smaller output than VERBOSE."""
-        large_data = {
-            'matches': [{'name': f'func{i}', 'file': f'file{i}.py'} for i in range(100)],
-            'total_matches': 100,
-            'query': 'test_query',
-            'search_time_ms': 456,
-            'metadata': {'cache_hit': True, 'database_queries': 5},
-            'debug_info': {'sql_queries': ['SELECT *...']},
+    def test_quiet_vs_verbose_size_difference(self):
+        """QUIET mode should yield fewer keys than VERBOSE mode for doc_query entries."""
+        data = {
+            'name': 'NotificationService',
+            'entity_type': 'class',
+            'file': 'src/services/notifications.py',
+            'line': 77,
+            'relevance_score': 0.81,
+            'docstring': 'Handles notification dispatching',
+            'metadata': {'module': 'notifications'},
         }
-
         quiet_args = argparse.Namespace(verbosity_level=VerbosityLevel.QUIET)
         verbose_args = argparse.Namespace(verbosity_level=VerbosityLevel.VERBOSE)
 
-        quiet_result = prepare_output(large_data, quiet_args, DOC_QUERY_SEARCH_ESSENTIAL, DOC_QUERY_SEARCH_STANDARD)
-        verbose_result = prepare_output(large_data, verbose_args, DOC_QUERY_SEARCH_ESSENTIAL, DOC_QUERY_SEARCH_STANDARD)
+        quiet_result = prepare_output(data, quiet_args, SEARCH_ESSENTIAL, SEARCH_STANDARD)
+        verbose_result = prepare_output(data, verbose_args, SEARCH_ESSENTIAL, SEARCH_STANDARD)
 
-        # QUIET should have fewer keys than VERBOSE
-        assert len(quiet_result.keys()) <= len(verbose_result.keys())
+        assert len(quiet_result) < len(verbose_result)

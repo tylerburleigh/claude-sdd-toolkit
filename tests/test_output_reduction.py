@@ -124,6 +124,7 @@ class TestQueryTasksOutputReduction:
         # Essential fields present (using 'id' not 'task_id')
         assert 'id' in quiet_output
         assert 'status' in quiet_output
+        assert 'metadata' not in quiet_output
 
 
 class TestPrepareTaskOutputReduction:
@@ -152,11 +153,21 @@ class TestPrepareTaskOutputReduction:
                 'soft_depends': ['task-2-1'],
                 'blocks': ['task-3-1']
             },
+            'spec_complete': True,
+            'validation_warnings': ['Missing verification plan'],
             'repo_root': '/home/user/project',
             'needs_branch_creation': False,
             'dirty_tree_status': {
                 'is_dirty': False,
                 'message': 'Clean'
+            },
+            'completion_info': {
+                'should_prompt': True,
+                'reason': 'All tasks finished'
+            },
+            'doc_context': {
+                'files': ['src/api/routes.py'],
+                'summary': 'API routes documentation excerpt'
             }
         }
 
@@ -176,9 +187,10 @@ class TestPrepareTaskOutputReduction:
         # Should achieve at least 20% reduction (target is 53%, actual may vary based on data)
         assert reduction_percent >= 20, f"Expected ≥20% reduction, got {reduction_percent:.1f}%"
 
-        # Essential fields present
-        assert 'success' in quiet_output
+        # Essential fields present while optional noise stays out
         assert 'task_id' in quiet_output
+        assert 'doc_context' not in quiet_output
+        assert 'completion_info' not in quiet_output
 
 
 class TestProgressOutputReduction:
@@ -342,9 +354,10 @@ class TestCheckDepsOutputReduction:
         # Should achieve at least 30% reduction (target is 49%)
         assert reduction_percent >= 30, f"Expected ≥30% reduction, got {reduction_percent:.1f}%"
 
-        # Essential fields present
-        assert 'task_id' in quiet_output
+        # Essential fields present/omitted appropriately
         assert 'can_start' in quiet_output
+        assert 'task_id' not in quiet_output
+        assert 'blocks' not in quiet_output
 
 
 class TestListBlockersOutputReduction:
@@ -353,17 +366,22 @@ class TestListBlockersOutputReduction:
     def test_list_blockers_quiet_mode_reduction(self):
         """Test list-blockers output reduction in QUIET mode.
 
-        Note: LIST_BLOCKERS_ESSENTIAL is {'task_id', 'blocked_by'} which applies to
-        individual blocker items. QUIET mode omits empty fields, so empty 'blocked_by' is omitted.
+        Note: LIST_BLOCKERS_ESSENTIAL tracks core blocker fields
+        (id/title/type/blocked_at + blocker_* metadata). QUIET mode omits empty
+        values for these fields.
         """
         # Individual blocker item structure with NON-EMPTY blocked_by
         data = {
-            'task_id': 'task-2-1',
-            'blocked_by': ['task-1-1'],  # Non-empty so it will be included
-            'blocked_tasks': ['task-3-1', 'task-3-2'],
-            'blocker_type': 'dependency',
-            'severity': 'high',
+            'id': 'blocker-1',
             'title': 'Database migration',
+            'type': 'dependency',
+            'blocked_at': '2025-11-10T10:00:00Z',
+            'blocker_type': 'dependency',
+            'blocker_description': 'Schema approval pending',
+            'blocker_ticket': 'OPS-123',
+            'blocked_by_external': False,
+            'blocked_tasks': ['task-3-1', 'task-3-2'],
+            'severity': 'high',
             'metadata': {
                 'created_at': '2025-11-10T10:00:00Z',
                 'notes': 'Waiting for schema approval'
@@ -386,9 +404,12 @@ class TestListBlockersOutputReduction:
         # Should achieve some reduction (may be small if essential fields contain most data)
         assert reduction_percent >= 0, f"Expected ≥0% reduction, got {reduction_percent:.1f}%"
 
-        # Essential fields present (both non-empty)
-        assert 'task_id' in quiet_output
-        assert 'blocked_by' in quiet_output
+        # Essential fields present (non-empty)
+        assert 'title' in quiet_output
+        assert 'blocker_type' in quiet_output
+        # Non-essential context removed
+        assert 'blocker_ticket' not in quiet_output
+        assert 'blocked_by_external' not in quiet_output
 
 
 class TestOutputReductionComparison:
