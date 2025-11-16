@@ -160,7 +160,7 @@ def get_verbosity_level(args, config=None):
         VerbosityLevel enum value
     """
     try:
-        return VerbosityLevel.from_args(args)
+        return VerbosityLevel.from_args(args, config)
     except ValueError as e:
         # Both --quiet and --verbose specified
         raise argparse.ArgumentTypeError(str(e))

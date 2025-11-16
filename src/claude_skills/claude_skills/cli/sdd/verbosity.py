@@ -25,15 +25,16 @@ class VerbosityLevel(Enum):
         return self.value
 
     @classmethod
-    def from_args(cls, args) -> 'VerbosityLevel':
+    def from_args(cls, args, config: Dict[str, Any] = None) -> 'VerbosityLevel':
         """Determine verbosity level from parsed command-line arguments.
 
         Args:
             args: Parsed argparse.Namespace with quiet and verbose flags
+            config: Optional configuration dictionary for default verbosity fallback
 
         Returns:
             VerbosityLevel based on flags (QUIET if --quiet, VERBOSE if --verbose,
-            NORMAL otherwise)
+            config default if available, NORMAL otherwise)
 
         Raises:
             ValueError: If both --quiet and --verbose are specified
@@ -48,6 +49,9 @@ class VerbosityLevel(Enum):
             return cls.QUIET
         elif has_verbose:
             return cls.VERBOSE
+        elif config is not None:
+            # Fall back to config default when no CLI flags provided
+            return cls.from_config(config)
         else:
             return cls.NORMAL
 

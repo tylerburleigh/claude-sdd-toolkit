@@ -232,9 +232,14 @@ def main():
 
     # Initialize printer based on parsed global flags
     # When JSON output is requested, suppress all printer output (quiet mode)
+    from claude_skills.cli.sdd.verbosity import VerbosityLevel
+    verbosity = args.verbosity_level
+    if getattr(args, 'json', False):
+        # Force quiet mode when JSON output is enabled
+        verbosity = VerbosityLevel.QUIET
+
     printer = PrettyPrinter(
-        quiet=getattr(args, 'quiet', False) or getattr(args, 'json', False),
-        verbose=getattr(args, 'verbose', False),
+        verbosity_level=verbosity,
         use_color=not getattr(args, 'no_color', False)
     )
     # Note: JSON output is handled by individual handlers checking args.json

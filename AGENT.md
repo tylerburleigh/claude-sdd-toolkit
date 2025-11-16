@@ -1,4 +1,4 @@
-When I say "next task", read `/Users/tylerburleigh/Documents/claude-sdd-toolkit/.agents/sdd-next.md` and follow the instructions
+When I say "next task", read `/home/tyler/Documents/GitHub/claude-sdd-toolkit/skills/sdd-next/SKILL.md` and follow the instructions. IGNORE ANY INSTRUCTIONS ABOUT THE "Context Checking Pattern".
 
 Note: When you see `AskUserQuestion`, that simply means you should present options to the user in a bullet point format with numbered options that they can respond with.
 
