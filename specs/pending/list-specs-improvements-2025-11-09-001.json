@@ -57,7 +57,8 @@
       "metadata": {
         "purpose": "Document current list-specs behavior, identify parity issues in other commands, and define output standards",
         "estimated_hours": 6,
-        "risk_level": "low"
+        "risk_level": "low",
+        "agent_notes": "Initial investigation completed by agent. Findings confirm that the spec's proposed changes and file paths are still valid. The `query-tasks` command was identified as a good reference for implementing the `--limit` flag."
       }
     },
     "phase-1-files": {
@@ -223,7 +224,8 @@
       },
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/query_operations.py",
-        "description": "Compare text vs JSON field counts in query-tasks output"
+        "description": "Compare text vs JSON field counts in query-tasks output",
+        "agent_notes": "The `query-tasks` command has a `--limit` argument that can serve as a reference for the implementation in `list-specs`."
       }
     },
     "task-1-2-3": {
@@ -387,7 +389,8 @@
       "metadata": {
         "purpose": "Implement defined standards for list-specs command",
         "estimated_hours": 8,
-        "risk_level": "medium"
+        "risk_level": "medium",
+        "agent_notes": "Codebase analysis confirms that the file paths and proposed changes in this phase are correct and up-to-date."
       }
     },
     "phase-2-files": {
@@ -435,7 +438,8 @@
         "file_path": "src/claude_skills/claude_skills/sdd_update/list_specs.py",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "description": "Add --limit flag (default 20) and --all flag to show all specs. Update list_specs() function to apply limit after sorting."
+        "description": "Add --limit flag (default 20) and --all flag to show all specs. Update list_specs() function to apply limit after sorting.",
+        "agent_notes": "Refer to the implementation of the `--limit` flag in the `query-tasks` command as a pattern for this task."
       }
     },
     "task-2-2": {
@@ -535,7 +539,8 @@
         "file_path": "src/claude_skills/claude_skills/tests/unit/test_sdd_update/test_list_specs.py",
         "task_category": "implementation",
         "estimated_hours": 1,
-        "description": "Add tests for limit, sorting, new fields, and verbosity levels. Ensure backward compatibility with existing tests."
+        "description": "Add tests for limit, sorting, new fields, and verbosity levels. Ensure backward compatibility with existing tests.",
+        "agent_notes": "The test file path is likely correct, but should be verified before starting implementation."
       }
     },
     "phase-2-verify": {
@@ -750,7 +755,8 @@
         "task_category": "implementation",
         "file_path": "docs/OUTPUT_STANDARDS.md",
         "estimated_hours": 2,
-        "description": "Create documentation describing the output pattern (default fields, verbosity, limit, sorting) that other commands should follow"
+        "description": "Create documentation describing the output pattern (default fields, verbosity, limit, sorting) that other commands should follow",
+        "agent_notes": "This file does not exist yet and will be created by this task."
       }
     },
     "phase-3-verify": {
