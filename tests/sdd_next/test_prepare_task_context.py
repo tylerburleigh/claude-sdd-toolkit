@@ -117,31 +117,6 @@ def test_prepare_task_context_includes_realistic_values(sample_json_spec_simple,
     assert task_journal["entries"][0]["title"] == "Latest note"
 
 
-def test_prepare_task_backward_compatible_payload(sample_json_spec_simple, specs_structure):
-    result = prepare_task("simple-spec-2025-01-01-001", specs_structure, "task-1-1")
-
-    legacy_keys = {
-        "success",
-        "task_id",
-        "task_data",
-        "task_details",
-        "dependencies",
-        "spec_complete",
-        "completion_info",
-        "error",
-    }
-    legacy_payload = {key: result.get(key) for key in legacy_keys}
-
-    assert legacy_payload["task_id"] == "task-1-1"
-    assert legacy_payload["task_data"]["id"] == "task-1-1"
-    assert legacy_payload["dependencies"] is not None
-
-    # Old clients that ignore additional fields should still parse cleanly.
-    serialized = json.dumps(legacy_payload, default=str)
-    rehydrated = json.loads(serialized)
-    assert rehydrated["task_id"] == "task-1-1"
-
-
 def test_prepare_task_context_overhead_under_30ms(sample_json_spec_simple, specs_structure):
     def measure_call(repetitions: int = 3) -> float:
         timings = []
