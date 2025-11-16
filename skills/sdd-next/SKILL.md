@@ -347,6 +347,23 @@ Task(
 )
 ```
 
+### 3.7 Journal vs Git History
+
+| Use the Spec Journal When… | Use Git History When… |
+|----------------------------|------------------------|
+| Closing **any** SDD task (journaling is mandatory and captures intent, verification, and follow-ups). | Investigating merge conflicts, bisects, or broader repo archaeology unrelated to a single spec task. |
+| You need implementation details, test results, deviations, or next-task hints (`journal.entries[]` already hold this context in structured JSON). | You must inspect low-level commit metadata, e.g., to see who touched a file outside the spec workflow. |
+| Preparing status updates: previous sibling journal summaries come bundled in `sdd prepare-task`. | You’re debugging historical code paths predating the current spec. |
+
+**Anti-pattern:** Running `git log` / `git show` to understand a recently completed SDD task when the journal already documents the work. That wastes time and risks contradicting the canonical record. Start with the spec journal; escalate to git history only if a fact is missing or you are diagnosing repo-level issues (rebases, conflicts, regressions).
+
+**Journal advantages**
+- Full implementation narrative (what changed and why) tied to `task_id`.
+- Test and verification results in one place, ready for audits.
+- Deviations, blockers, and next-task hints captured while they are fresh.
+- Structured JSON makes it trivial for `sdd prepare-task` to surface the latest context without extra commands.
+- Archives context even if commits are squashed or rebased later.
+
 ---
 
 ## ⚠️ CRITICAL: Verification Tasks

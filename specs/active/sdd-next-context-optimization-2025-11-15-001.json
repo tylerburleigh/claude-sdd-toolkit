@@ -1,7 +1,7 @@
 {
   "spec_id": "sdd-next-context-optimization-2025-11-15-001",
   "generated": "2025-11-15T19:00:00Z",
-  "last_updated": "2025-11-16T19:21:00.957651Z",
+  "last_updated": "2025-11-16T19:22:52.531861Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4"
       ],
       "total_tasks": 30,
-      "completed_tasks": 24,
+      "completed_tasks": 25,
       "metadata": {
         "objectives": [
           "Eliminate 'horse blinders' problem where agents make 20+ redundant tool calls",
@@ -735,7 +735,7 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "purpose": "Update sdd-next SKILL.md to guide agents to use new context efficiently",
         "estimated_hours": 3
@@ -744,14 +744,18 @@
     "phase-3-files": {
       "type": "group",
       "title": "Documentation Tasks",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1"
       ],
       "total_tasks": 4,
-      "completed_tasks": 3,
-      "metadata": {},
+      "completed_tasks": 4,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-16T19:22:52.523735Z",
+        "journaled_at": "2025-11-16T19:22:52.531795Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-3-verify"
@@ -761,7 +765,7 @@
     "task-3-1": {
       "type": "task",
       "title": "skills/sdd-next/SKILL.md",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -775,7 +779,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "file_path": "skills/sdd-next/SKILL.md",
         "task_category": "implementation",
@@ -849,7 +853,7 @@
     "task-3-1-4": {
       "type": "subtask",
       "title": "Add 'Journal vs Git History' guidance",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "dependencies": {
@@ -858,9 +862,13 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "description": "Add section explaining when to use spec journal (SDD tasks - always, richer context) vs git history (merge conflicts, bug archaeology). Show anti-pattern of using git log/show when journal already contains implementation details. Explain journal advantages: implementation details, test results, next task hints, deviations, all in structured JSON."
+        "description": "Add section explaining when to use spec journal (SDD tasks - always, richer context) vs git history (merge conflicts, bug archaeology). Show anti-pattern of using git log/show when journal already contains implementation details. Explain journal advantages: implementation details, test results, next task hints, deviations, all in structured JSON.",
+        "completed_at": "2025-11-16T19:22:52.523654Z",
+        "needs_journaling": false,
+        "status_note": "Added Section 3.7 covering spec journal vs git history usage, including table, anti-pattern warning, and journal advantages list.",
+        "journaled_at": "2025-11-16T19:22:52.526884Z"
       }
     },
     "phase-3-verify": {
@@ -1072,10 +1080,28 @@
       "content": "Task task-3-1-3 marked as completed. \nNote: Updated Section 3.4 to emphasize prepare-task context payload, added JSON example covering previous_sibling/parent_task/phase/sibling_files, and provided plan checklist referencing those fields.",
       "metadata": {},
       "task_id": "task-3-1-3"
+    },
+    {
+      "timestamp": "2025-11-16T19:22:52.526868Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add 'Journal vs Git History' guidance",
+      "author": "claude-code",
+      "content": "Task task-3-1-4 marked as completed. \nNote: Added Section 3.7 covering spec journal vs git history usage, including table, anti-pattern warning, and journal advantages list.",
+      "metadata": {},
+      "task_id": "task-3-1-4"
+    },
+    {
+      "timestamp": "2025-11-16T19:22:52.531779Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Documentation Tasks",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-3-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-3-files"
     }
   ],
   "metadata": {
-    "progress_percentage": 80,
+    "progress_percentage": 83,
     "status": "active",
     "current_phase": "phase-3"
   }
