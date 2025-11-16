@@ -289,6 +289,80 @@ SPEC_STATS_STANDARD = {
 FORMAT_PLAN_ESSENTIAL = {'formatted'}
 FORMAT_PLAN_STANDARD = {'formatted', 'plan_structure', 'sections', 'word_count'}
 
+# sdd-plan commands
+PLAN_CREATE_ESSENTIAL = {'success', 'spec_id', 'spec_path', 'message'}
+PLAN_CREATE_STANDARD = {
+    'success', 'spec_id', 'spec_path', 'message',
+    'template', 'phase_count', 'estimated_hours', 'default_category'
+}
+PLAN_ANALYZE_ESSENTIAL = {'directory', 'has_specs', 'documentation_available'}
+PLAN_ANALYZE_STANDARD = {
+    'directory', 'has_specs', 'specs_directory',
+    'documentation_available', 'analysis_success',
+    'analysis_error', 'doc_stats'
+}
+PLAN_TEMPLATE_LIST_ESSENTIAL = {'templates'}
+PLAN_TEMPLATE_LIST_STANDARD = {'templates', 'count', 'usage_hint'}
+PLAN_TEMPLATE_SHOW_ESSENTIAL = {'template_id', 'template', 'message'}
+PLAN_TEMPLATE_SHOW_STANDARD = {'template_id', 'template', 'message'}
+
+# sdd-render command
+RENDER_SPEC_ESSENTIAL = {'spec_id', 'output_path', 'mode', 'enhancement_level', 'fallback_used'}
+RENDER_SPEC_STANDARD = {
+    'spec_id', 'output_path', 'mode', 'enhancement_level',
+    'fallback_used', 'fallback_reason', 'model_override',
+    'output_size', 'task_count'
+}
+
+# sdd-pr command
+PR_CONTEXT_ESSENTIAL = {'spec_id', 'mode', 'branch_name', 'context_counts'}
+PR_CONTEXT_STANDARD = {
+    'spec_id', 'mode', 'branch_name', 'base_branch',
+    'context_counts', 'diff_bytes', 'repo_root'
+}
+PR_CREATE_ESSENTIAL = {'success', 'spec_id', 'pr_url', 'pr_number'}
+PR_CREATE_STANDARD = {
+    'success', 'spec_id', 'pr_url', 'pr_number',
+    'branch_name', 'base_branch', 'pr_title', 'error'
+}
+
+# sdd-spec-mod commands
+SPEC_MOD_APPLY_ESSENTIAL = {
+    'success', 'spec_id', 'total_operations',
+    'successful_operations', 'failed_operations', 'dry_run'
+}
+SPEC_MOD_APPLY_STANDARD = {
+    'success', 'spec_id', 'total_operations',
+    'successful_operations', 'failed_operations', 'dry_run',
+    'output_file', 'source_file', 'operation_summary', 'error'
+}
+SPEC_MOD_DRY_RUN_ESSENTIAL = {'spec_id', 'dry_run', 'operation_count'}
+SPEC_MOD_DRY_RUN_STANDARD = {
+    'spec_id', 'dry_run', 'operation_count',
+    'sample_operations', 'source_file'
+}
+SPEC_MOD_PARSE_REVIEW_ESSENTIAL = {
+    'spec_id', 'suggestion_count', 'issues_total',
+    'recommendation', 'display_mode'
+}
+SPEC_MOD_PARSE_REVIEW_STANDARD = {
+    'spec_id', 'suggestion_count', 'issues_total',
+    'recommendation', 'display_mode',
+    'issues_by_severity', 'output_file', 'review_file'
+}
+
+# sdd-fidelity-review command
+FIDELITY_REVIEW_ESSENTIAL = {
+    'spec_id', 'mode', 'format', 'artifacts',
+    'issue_counts', 'consensus', 'recommendation'
+}
+FIDELITY_REVIEW_STANDARD = {
+    'spec_id', 'mode', 'format', 'artifacts',
+    'issue_counts', 'models_consulted',
+    'consensus', 'scope', 'prompt_included',
+    'recommendation'
+}
+
 # add-assumption command
 ADD_ASSUMPTION_ESSENTIAL = {'success', 'assumption_id'}
 ADD_ASSUMPTION_STANDARD = {'success', 'assumption_id', 'spec_id', 'task_id', 'assumption_text', 'message'}
@@ -645,4 +719,16 @@ RUN_TESTS_CONSULT_STANDARD = {
 RUN_TESTS_RUN_ESSENTIAL = {'status', 'message'}
 RUN_TESTS_RUN_STANDARD = {
     'status', 'message'
+}
+# sdd-plan-review command
+PLAN_REVIEW_SUMMARY_ESSENTIAL = {
+    'spec_id', 'review_type', 'recommendation',
+    'artifacts', 'issue_count', 'models_responded'
+}
+PLAN_REVIEW_SUMMARY_STANDARD = {
+    'spec_id', 'review_type', 'recommendation', 'overall_score',
+    'artifacts', 'issue_count', 'models_responded',
+    'models_requested', 'models_consulted', 'failures',
+    'execution_time', 'consensus_level', 'dimension_scores',
+    'dry_run', 'artifact_failures'
 }

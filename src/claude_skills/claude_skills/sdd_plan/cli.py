@@ -5,9 +5,20 @@ SDD Plan CLI - Specification creation and planning commands.
 
 import argparse
 import sys
-import json
 from pathlib import Path
 from claude_skills.common import PrettyPrinter, find_specs_directory, ensure_reports_directory
+from claude_skills.common.json_output import output_json
+from claude_skills.cli.sdd.output_utils import (
+    prepare_output,
+    PLAN_CREATE_ESSENTIAL,
+    PLAN_CREATE_STANDARD,
+    PLAN_ANALYZE_ESSENTIAL,
+    PLAN_ANALYZE_STANDARD,
+    PLAN_TEMPLATE_LIST_ESSENTIAL,
+    PLAN_TEMPLATE_LIST_STANDARD,
+    PLAN_TEMPLATE_SHOW_ESSENTIAL,
+    PLAN_TEMPLATE_SHOW_STANDARD,
+)
 from claude_skills.sdd_plan import (
     list_templates,
     get_template_description,
@@ -17,51 +28,65 @@ from claude_skills.sdd_plan import (
 )
 
 
+def _plan_output_json(data, args, essential_fields, standard_fields):
+    """Output filtered JSON if --json is enabled."""
+    if getattr(args, 'json', False):
+        payload = prepare_output(data, args, essential_fields, standard_fields)
+        output_json(payload, getattr(args, 'compact', False))
+        return True
+    return False
+
+
 def cmd_create(args, printer):
     """Create a new specification."""
-    printer.info(f"Creating new specification: {args.name}")
+    if getattr(args, 'verbose', False) and not getattr(args, 'json', False):
+        printer.action(f"Creating new specification: {args.name}")
 
-    # Determine template
     template = args.template or "medium"
-
-    # Extract category from args (if provided)
     default_category = getattr(args, 'category', None)
 
-    # Find specs directory
-    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None))
+    base_path = getattr(args, 'specs_dir', None) or getattr(args, 'path', '.')
+    specs_dir = find_specs_directory(base_path)
     if not specs_dir:
-        printer.warning("No specs/ directory found, creating specs/active/")
-        specs_dir = Path("specs")
+        specs_dir = Path(base_path) / "specs"
 
-    # Ensure .reports/ directory exists (defensive)
     ensure_reports_directory(specs_dir)
 
-    # Create spec (in pending subfolder)
+    pending_dir = specs_dir / "pending"
     success, message, spec = create_spec_interactive(
         title=args.name,
         template=template,
-        specs_dir=specs_dir / "pending",
+        specs_dir=pending_dir,
         default_category=default_category
     )
 
+    spec_path = pending_dir / f"{spec['spec_id']}.json" if success and spec else None
+    phase_count = len([node for node in spec.get('hierarchy', {}).values() if node.get('type') == 'phase']) if spec else 0
+    estimated_hours = spec.get('metadata', {}).get('estimated_hours') if spec else None
+
+    result = {
+        'success': success,
+        'spec_id': spec['spec_id'] if spec else None,
+        'spec_path': str(spec_path.resolve()) if spec_path else None,
+        'message': message,
+        'template': template,
+        'phase_count': phase_count,
+        'estimated_hours': estimated_hours,
+        'default_category': default_category,
+    }
+
     if not success:
         printer.error(message)
+        _plan_output_json(result, args, PLAN_CREATE_ESSENTIAL, PLAN_CREATE_STANDARD)
         return 1
 
-    printer.success(f"Spec created in pending/. {message}")
+    if _plan_output_json(result, args, PLAN_CREATE_ESSENTIAL, PLAN_CREATE_STANDARD):
+        return 0
 
-    # Show spec info
-    printer.detail(f"Template: {template}")
-    printer.detail(f"Spec ID: {spec['spec_id']}")
-    printer.detail(f"Phases: {len([k for k in spec['hierarchy'] if k.startswith('phase-')])}")
-    printer.detail(f"Estimated hours: {spec['metadata']['estimated_hours']}")
-
-    printer.info("\nNext steps:")
-    printer.detail("1. Edit the spec file to add detailed tasks")
-    printer.detail(f"2. Validate: sdd validate {spec['spec_id']}")
-    printer.detail("3. Review: sdd review (if sdd-plan-review is available)")
-    printer.detail(f"4. Activate: sdd activate-spec {spec['spec_id']}")
-    printer.detail("5. Start work: sdd next-task")
+    printer.success(f"Created spec {result['spec_id']} using '{template}' template")
+    printer.info(f"Phases: {phase_count} • Estimated hours: {estimated_hours}")
+    printer.info(f"Saved to: {result['spec_path']}")
+    printer.info(f"Next: sdd validate {result['spec_id']} → sdd activate-spec {result['spec_id']}")
 
     return 0
 
@@ -74,51 +99,44 @@ def cmd_analyze(args, printer):
         printer.error(f"Directory not found: {directory}")
         return 1
 
-    printer.info(f"Analyzing codebase: {directory}")
-
-    # Get project context
     context = get_project_context(directory)
+    analysis = context.get("codebase_analysis") or {}
+    doc_available = analysis.get("has_documentation", False)
+    result = {
+        'directory': str(directory),
+        'has_specs': context.get("has_specs", False),
+        'specs_directory': context.get("specs_directory"),
+        'documentation_available': doc_available,
+        'analysis_success': analysis.get("success", False),
+        'analysis_error': analysis.get("error"),
+        'doc_stats': analysis.get("stats", {}),
+    }
 
-    # Display results
-    printer.header("Project Context")
+    if _plan_output_json(result, args, PLAN_ANALYZE_ESSENTIAL, PLAN_ANALYZE_STANDARD):
+        return 0
 
-    if context["has_specs"]:
-        printer.success(f"✓ Specs directory: {context['specs_directory']}")
+    specs_line = (
+        f"Specs directory: {context['specs_directory']}"
+        if context.get("has_specs")
+        else "Specs directory: not found"
+    )
+    (printer.success if context.get("has_specs") else printer.warning)(specs_line)
+
+    if doc_available:
+        printer.success("Documentation: available via doc-query")
     else:
-        printer.warning("✗ No specs directory found")
-        printer.detail("  Consider creating: mkdir -p specs/active")
+        reason = analysis.get("error") or "No doc-query data detected"
+        printer.warning(f"Documentation: missing ({reason})")
+        printer.info("Tip: run 'codebase-documentation generate' for richer planning data")
 
-    # Codebase analysis
-    analysis = context["codebase_analysis"]
-
-    printer.header("\nCodebase Documentation")
-
-    if analysis["success"] and analysis["has_documentation"]:
-        printer.success("✓ Documentation available (doc-query)")
-
-        stats = analysis["stats"]
-        printer.detail(f"  Total modules: {stats.get('total_modules', 'N/A')}")
-        printer.detail(f"  Total classes: {stats.get('total_classes', 'N/A')}")
-        printer.detail(f"  Total functions: {stats.get('total_functions', 'N/A')}")
-        printer.detail(f"  Average complexity: {stats.get('average_complexity', 'N/A')}")
-
-        printer.info("\nYou can use doc-query for faster spec planning:")
-        printer.detail("  doc-query search <keyword>")
-        printer.detail("  doc-query context <feature>")
-        printer.detail("  doc-query dependencies <file>")
-
-    else:
-        printer.warning("✗ No documentation found")
-        printer.detail(f"  Reason: {analysis.get('error', 'Unknown')}")
-
-        if analysis.get("error") == "doc-query not installed":
-            printer.info("\nInstall doc-query for faster analysis:")
-            printer.detail("  pip install tree-sitter tree-sitter-python")
-            printer.detail("  Then run: codebase-documentation generate")
-        else:
-            printer.info("\nGenerate documentation for faster analysis:")
-            printer.detail("  codebase-documentation generate")
-            printer.detail("\nThis enables 10x faster spec planning")
+    if doc_available and getattr(args, 'verbose', False):
+        stats = analysis.get("stats", {})
+        printer.detail(
+            f"Modules: {stats.get('total_modules', 'N/A')} • "
+            f"Classes: {stats.get('total_classes', 'N/A')} • "
+            f"Functions: {stats.get('total_functions', 'N/A')} • "
+            f"Avg. complexity: {stats.get('average_complexity', 'N/A')}"
+        )
 
     return 0
 
@@ -128,18 +146,33 @@ def cmd_template(args, printer):
     action = args.action
 
     if action == "list":
-        printer.header("Available Templates")
-
         templates = list_templates()
-        for template_id, template_info in templates.items():
-            printer.info(f"\n{template_id}")
-            printer.detail(f"  Name: {template_info['name']}")
-            printer.detail(f"  Description: {template_info['description']}")
-            printer.detail(f"  Phases: {template_info['phases']}")
-            printer.detail(f"  Est. hours: {template_info['estimated_hours']}")
-            printer.detail(f"  Recommended for: {template_info['recommended_for']}")
+        condensed = [
+            {
+                'id': template_id,
+                'name': template_info['name'],
+                'phases': template_info['phases'],
+                'estimated_hours': template_info['estimated_hours'],
+                'recommended_for': template_info['recommended_for'],
+            }
+            for template_id, template_info in sorted(templates.items())
+        ]
+        data = {
+            'templates': condensed,
+            'count': len(condensed),
+            'usage_hint': "sdd create <name> --template <template-id>",
+        }
 
-        printer.info("\nUsage: sdd create <name> --template <template-id>")
+        if _plan_output_json(data, args, PLAN_TEMPLATE_LIST_ESSENTIAL, PLAN_TEMPLATE_LIST_STANDARD):
+            return 0
+
+        printer.info("Templates:")
+        for entry in condensed:
+            printer.info(
+                f"{entry['id']:<8} {entry['phases']} phases / "
+                f"{entry['estimated_hours']}h — {entry['recommended_for']}"
+            )
+        printer.info("Use: sdd create <name> --template <template-id>")
 
     elif action == "show":
         # Require template name
@@ -148,8 +181,24 @@ def cmd_template(args, printer):
             printer.detail("Usage: sdd template show <template-name>")
             return 1
 
-        template_desc = get_template_description(args.template_name)
-        printer.info(template_desc)
+        templates = list_templates()
+        template = templates.get(args.template_name)
+        if not template:
+            message = f"Template not found: {args.template_name}"
+            printer.error(message)
+            _plan_output_json(
+                {'template_id': args.template_name, 'template': None, 'message': message},
+                args,
+                PLAN_TEMPLATE_SHOW_ESSENTIAL,
+                PLAN_TEMPLATE_SHOW_STANDARD,
+            )
+            return 1
+
+        payload = {'template_id': args.template_name, 'template': template, 'message': "ok"}
+        if _plan_output_json(payload, args, PLAN_TEMPLATE_SHOW_ESSENTIAL, PLAN_TEMPLATE_SHOW_STANDARD):
+            return 0
+
+        printer.info(get_template_description(args.template_name))
 
     elif action == "apply":
         printer.warning("'apply' action not yet implemented")

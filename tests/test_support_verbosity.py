@@ -25,6 +25,8 @@ from claude_skills.cli.sdd.output_utils import (
     CACHE_STATS_STANDARD,
     LIST_TOOLS_ESSENTIAL,
     LIST_TOOLS_STANDARD,
+    PLAN_REVIEW_SUMMARY_ESSENTIAL,
+    PLAN_REVIEW_SUMMARY_STANDARD,
 )
 
 
@@ -153,3 +155,37 @@ class TestPlanReviewVerbosity:
         result = prepare_output(data, _verbose(), LIST_TOOLS_ESSENTIAL, LIST_TOOLS_STANDARD)
         assert 'available' in result
         assert 'unavailable' in result
+
+    def test_review_summary_quiet_mode(self):
+        data = {
+            'spec_id': 'demo',
+            'review_type': 'full',
+            'recommendation': 'APPROVE',
+            'artifacts': ['review.md'],
+            'issue_count': 2,
+            'models_responded': 3,
+            'models_requested': 4,
+            'dry_run': False,
+        }
+        result = prepare_output(data, _quiet(), PLAN_REVIEW_SUMMARY_ESSENTIAL, PLAN_REVIEW_SUMMARY_STANDARD)
+        assert set(result.keys()) == PLAN_REVIEW_SUMMARY_ESSENTIAL
+
+    def test_review_summary_verbose_mode(self):
+        data = {
+            'spec_id': 'demo',
+            'review_type': 'full',
+            'recommendation': 'REVISE',
+            'artifacts': ['review.md'],
+            'issue_count': 5,
+            'models_responded': 2,
+            'models_requested': 4,
+            'models_consulted': {'gemini': 'pro'},
+            'failures': 1,
+            'execution_time': 23.5,
+            'consensus_level': 'moderate',
+            'dimension_scores': {'clarity': 8},
+            'dry_run': False,
+        }
+        result = prepare_output(data, _verbose(), PLAN_REVIEW_SUMMARY_ESSENTIAL, PLAN_REVIEW_SUMMARY_STANDARD)
+        assert 'models_consulted' in result
+        assert 'execution_time' in result

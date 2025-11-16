@@ -104,8 +104,18 @@ def create_pr_with_ai_description(
         printer: PrettyPrinter instance for formatted output
 
     Returns:
-        True if PR created successfully and metadata updated, False otherwise
+        Tuple of (success flag, result payload)
     """
+    result_payload = {
+        "success": False,
+        "spec_id": spec_id,
+        "branch_name": branch_name,
+        "base_branch": base_branch,
+        "pr_title": pr_title,
+        "pr_url": None,
+        "pr_number": None,
+        "error": None,
+    }
     printer.info("")
     printer.header("Creating Pull Request")
     printer.info("="*70)
@@ -121,7 +131,8 @@ def create_pr_with_ai_description(
         printer.info(f"  1. Push branch: git push -u origin {branch_name}")
         printer.info(f"  2. Visit: https://github.com/{{owner}}/{{repo}}/compare/{branch_name}")
         printer.info("")
-        return False
+        result_payload["error"] = "GitHub CLI not found"
+        return False, result_payload
 
     # Step 1: Push branch to remote
     printer.action(f"Pushing branch '{branch_name}' to remote...")
@@ -133,10 +144,12 @@ def create_pr_with_ai_description(
         printer.info("Try pushing manually:")
         printer.result("  git push -u origin", branch_name)
         printer.info("")
-        return False
+        result_payload["error"] = push_error
+        return False, result_payload
 
     printer.success("Branch pushed successfully")
     printer.info("")
+    result_payload["push_success"] = True
 
     # Step 2: Create PR via gh CLI
     printer.action("Creating pull request via gh CLI...")
@@ -153,7 +166,8 @@ def create_pr_with_ai_description(
         printer.info("Create PR manually:")
         printer.info(f"  Visit: https://github.com/{{owner}}/{{repo}}/compare/{branch_name}")
         printer.info("")
-        return False
+        result_payload["error"] = pr_error
+        return False, result_payload
 
     printer.success(f"Pull request created: {pr_url}")
     printer.info(f"PR #{pr_number}")
@@ -164,7 +178,14 @@ def create_pr_with_ai_description(
     printer.info(f"View PR: {pr_url}")
     printer.info("")
 
-    return True
+    result_payload.update({
+        "success": True,
+        "pr_url": pr_url,
+        "pr_number": pr_number,
+        "error": None,
+    })
+
+    return True, result_payload
 
 
 def validate_pr_readiness(
