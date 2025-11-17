@@ -114,20 +114,33 @@ def cmd_render(args, printer: PrettyPrinter) -> int:
     spec_id = args.spec_id
 
     # Check if spec_id is a direct path to JSON file
-    if spec_id.endswith('.json') and Path(spec_id).exists():
-        spec_file = Path(spec_id)
-        spec_id = spec_file.stem  # Extract spec_id from filename
-        try:
-            with open(spec_file) as f:
-                spec_data = json.load(f)
-        except json.JSONDecodeError as e:
-            printer.error(f"Invalid JSON in spec file: {e}")
-            printer.info("The spec file contains malformed JSON. Please check the file syntax.")
-            return 1
-        except Exception as e:
-            printer.error(f"Failed to load spec file: {e}")
-            return 1
-    else:
+    # Try to resolve relative paths first, fall back to spec name lookup if not found
+    spec_file = None
+    if spec_id.endswith('.json'):
+        path = Path(spec_id)
+        # Resolve path (handles both absolute and relative paths)
+        resolved_path = path.resolve()
+        
+        if resolved_path.exists():
+            spec_file = resolved_path
+            spec_id = spec_file.stem  # Extract spec_id from filename
+            try:
+                with open(spec_file) as f:
+                    spec_data = json.load(f)
+            except json.JSONDecodeError as e:
+                printer.error(f"Invalid JSON in spec file: {e}")
+                printer.info("The spec file contains malformed JSON. Please check the file syntax.")
+                return 1
+            except Exception as e:
+                printer.error(f"Failed to load spec file: {e}")
+                return 1
+        # If file doesn't exist at resolved path, fall through to spec name lookup
+        # Extract spec name from path (e.g., "specs/pending/my-spec.json" -> "my-spec")
+        if spec_file is None:
+            spec_id = path.stem
+    
+    # If we didn't load from a direct file path, treat it as a spec name and search
+    if spec_file is None:
         # Find specs directory and load spec
         specs_dir = find_specs_directory(args.path)
         if not specs_dir:
