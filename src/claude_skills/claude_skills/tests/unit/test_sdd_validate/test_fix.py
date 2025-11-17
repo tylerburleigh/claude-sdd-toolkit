@@ -18,6 +18,7 @@ from claude_skills.sdd_validate.fix import (
     _build_hierarchy_action,
     _build_date_action,
     _build_status_action,
+    _build_bidirectional_deps_action,
     _normalize_timestamp,
     _normalize_status,
 )
@@ -1114,3 +1115,56 @@ def test_build_placeholder_file_path_action_preview_shows_category():
     assert "task_category" in action.preview.lower()
     # Should use arrow notation
     assert "→" in action.preview or "->" in action.preview
+
+
+def test_build_bidirectional_deps_action_missing_dependencies():
+    """Test bidirectional deps action with missing dependencies structure."""
+    error = EnhancedError(
+        message="Node 'task-1' blocks 'task-2', but 'task-2' doesn't list 'task-1' in blocked_by",
+        severity="error",
+        category="dependency",
+        auto_fixable=True,
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                # No dependencies key at all
+            },
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                # No dependencies key at all
+            },
+        }
+    }
+
+    action = _build_bidirectional_deps_action(error, spec_data)
+
+    assert action is not None
+    assert action.category == "dependency"
+    assert action.auto_apply is True
+    assert callable(action.apply)
+
+    # Apply the action and verify it creates complete dependencies structure
+    action.apply(spec_data)
+
+    # Verify task-1 has complete dependencies with task-2 in blocks
+    assert "dependencies" in spec_data["hierarchy"]["task-1"]
+    task1_deps = spec_data["hierarchy"]["task-1"]["dependencies"]
+    assert isinstance(task1_deps, dict)
+    assert "blocks" in task1_deps
+    assert "blocked_by" in task1_deps
+    assert "depends" in task1_deps
+    assert "task-2" in task1_deps["blocks"]
+
+    # Verify task-2 has complete dependencies with task-1 in blocked_by
+    assert "dependencies" in spec_data["hierarchy"]["task-2"]
+    task2_deps = spec_data["hierarchy"]["task-2"]["dependencies"]
+    assert isinstance(task2_deps, dict)
+    assert "blocks" in task2_deps
+    assert "blocked_by" in task2_deps
+    assert "depends" in task2_deps
+    assert "task-1" in task2_deps["blocked_by"]
