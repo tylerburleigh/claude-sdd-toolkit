@@ -1,21 +1,21 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-16 14:52:58
+**Generated:** 2025-11-17 07:35:39
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 324
-- **Total Lines:** 112694
+- **Total Lines:** 112750
 - **Total Classes:** 447
-- **Total Functions:** 1448
+- **Total Functions:** 1451
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
-  - _handle_fidelity_review (51)
+  - _handle_fidelity_review (53)
   - parse_review_response (50)
   - complete_task_workflow (45)
   - cmd_review (42)
@@ -8840,7 +8840,7 @@ Example output:
 ### `_build_output_basename(spec_id, task_id, phase_id, file_paths) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:60`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:61`
 **Complexity:** 7
 
 **Parameters:**
@@ -9304,7 +9304,7 @@ Args:
 ### `_create_fidelity_report(reviewer, parsed_responses, consensus, categorized_issues, models_metadata) -> FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:91`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:92`
 **Complexity:** 1
 
 **Parameters:**
@@ -9998,7 +9998,7 @@ Returns:
 ### `_fidelity_output_json(data, args) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:45`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:46`
 **Complexity:** 1
 
 **Description:**
@@ -10506,8 +10506,8 @@ Example:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:126`
-⚠️ **Complexity:** 51 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:127`
+⚠️ **Complexity:** 53 (High)
 
 **Description:**
 > Handle fidelity-review command execution.
@@ -10535,7 +10535,7 @@ Returns:
 ### `_handle_list_review_tools(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:413`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:425`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -12433,7 +12433,7 @@ Returns:
 ### `_slugify_component(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:52`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:53`
 **Complexity:** 3
 
 **Parameters:**
@@ -12444,7 +12444,7 @@ Returns:
 ### `_spec_mod_output_json(data, args, essential_fields, standard_fields) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:24`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:25`
 **Complexity:** 2
 
 **Description:**
@@ -12806,7 +12806,7 @@ Returns:
 ### `_write_report_artifact(path, format, get_markdown, get_json_text) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:108`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:109`
 **Complexity:** 3
 
 **Parameters:**
@@ -12914,7 +12914,7 @@ Raises:
 ### `add_debug_info(data, args, debug_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:95`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:121`
 **Complexity:** 2
 
 **Description:**
@@ -14932,7 +14932,7 @@ Example:
 ### `cmd_apply_modifications(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:33`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:34`
 ⚠️ **Complexity:** 34 (High)
 
 **Description:**
@@ -15842,8 +15842,8 @@ Returns:
 ### `cmd_parse_review(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:227`
-⚠️ **Complexity:** 23 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:228`
+⚠️ **Complexity:** 25 (High)
 
 **Description:**
 > Parse a review report and generate modification suggestions.
@@ -18936,7 +18936,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/verbosity.py:100`
-⚠️ **Complexity:** 14 (High)
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Filter output fields based on verbosity level.
@@ -21520,6 +21520,24 @@ Returns:
 
 ---
 
+### `get_bool_arg(args, name, default) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:16`
+**Complexity:** 2
+
+**Description:**
+> Safely read a boolean argparse flag from args.
+
+Handles mock objects and missing attributes by falling back to default.
+
+**Parameters:**
+- `args`: None
+- `name`: str
+- `default`: bool
+
+---
+
 ### `get_cache_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
@@ -23890,6 +23908,20 @@ Returns:
 
 ---
 
+### `is_json_mode(args) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:27`
+**Complexity:** 1
+
+**Description:**
+> Return True when --json (or json mode) is explicitly enabled.
+
+**Parameters:**
+- `args`: None
+
+---
+
 ### `is_metrics_enabled() -> bool`
 
 **Language:** python
@@ -23898,6 +23930,20 @@ Returns:
 
 **Description:**
 > Check if metrics collection is enabled (not in test environment).
+
+---
+
+### `is_quiet_mode(args) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:32`
+**Complexity:** 1
+
+**Description:**
+> Return True when quiet mode is explicitly enabled.
+
+**Parameters:**
+- `args`: None
 
 ---
 
@@ -24474,7 +24520,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/__init__.py:142`
-⚠️ **Complexity:** 23 (High)
+⚠️ **Complexity:** 24 (High)
 
 **Decorators:** `@track_metrics('sdd')`
 
@@ -24535,7 +24581,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:658`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:670`
 **Complexity:** 3
 
 **Description:**
@@ -25329,8 +25375,8 @@ Example:
 ### `prepare_output(data, args, essential_fields, standard_fields) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:16`
-**Complexity:** 1
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:37`
+**Complexity:** 4
 
 **Description:**
 > Prepare command output based on verbosity level.
@@ -25879,7 +25925,7 @@ Args:
 ### `register_commands(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:640`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:652`
 **Complexity:** 1
 
 **Description:**
@@ -25952,7 +25998,7 @@ Args:
 ### `register_fidelity_review_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:495`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:507`
 **Complexity:** 1
 
 **Description:**
@@ -26012,7 +26058,7 @@ Args:
 ### `register_list_review_tools_command(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:611`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:623`
 **Complexity:** 2
 
 **Description:**
@@ -26197,7 +26243,7 @@ Args:
 ### `register_spec_mod(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:358`
+**Defined in:** `src/claude_skills/claude_skills/sdd_spec_mod/cli.py:373`
 **Complexity:** 1
 
 **Description:**
@@ -27496,7 +27542,7 @@ Example:
 ### `should_show_field(args, field_name, value, is_essential, is_standard) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:52`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:78`
 **Complexity:** 9
 
 **Description:**
@@ -35631,6 +35677,7 @@ Returns:
 - `claude_skills.cli.sdd.output_utils.FIDELITY_REVIEW_STANDARD`
 - `claude_skills.cli.sdd.output_utils.LIST_TOOLS_ESSENTIAL`
 - `claude_skills.cli.sdd.output_utils.LIST_TOOLS_STANDARD`
+- `claude_skills.cli.sdd.output_utils.is_json_mode`
 - `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.ai_config`
 - `claude_skills.common.ai_tools.check_tool_available`
@@ -36314,6 +36361,7 @@ Returns:
 - `claude_skills.cli.sdd.output_utils.SPEC_MOD_DRY_RUN_STANDARD`
 - `claude_skills.cli.sdd.output_utils.SPEC_MOD_PARSE_REVIEW_ESSENTIAL`
 - `claude_skills.cli.sdd.output_utils.SPEC_MOD_PARSE_REVIEW_STANDARD`
+- `claude_skills.cli.sdd.output_utils.is_json_mode`
 - `claude_skills.cli.sdd.output_utils.prepare_output`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.find_spec_file`

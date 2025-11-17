@@ -39,12 +39,7 @@ Missing permissions:
   • 4 bash/git permissions
 ```
 
-Then use the AskUserQuestion tool:
-- **Header**: "Permissions"
-- **Question**: "Would you like to add the missing permissions now?"
-- **Options**:
-  1. Yes, add missing permissions
-  2. No, continue anyway
+Ask the user if they would like to add the missing permissions now, with options to add them or continue anyway.
 
 **If user chooses "Yes, add missing permissions":**
 ```bash
@@ -72,12 +67,7 @@ Hi! I noticed this project needs SDD permission setup.
 Before we can work with specifications, I need to configure project-level permissions for SDD tools.
 ```
 
-Then use the AskUserQuestion tool:
-- **Header**: "Action"
-- **Question**: "Would you like me to set up SDD permissions now?"
-- **Options**:
-  1. Yes, set up permissions (auto-runs setup)
-  2. No, skip for now (continue without setup)
+Ask the user if they would like to set up SDD permissions now, with options to set up permissions (auto-runs setup) or skip for now.
 
 **If user chooses "Yes, set up permissions":**
 ```bash
@@ -112,12 +102,7 @@ I noticed git integration hasn't been configured yet.
 Git integration enables automatic branch creation, commits, and AI-powered PR generation. Would you like to set it up now?
 ```
 
-Then use the AskUserQuestion tool:
-- **Header**: "Git Setup"
-- **Question**: "Configure git integration?"
-- **Options**:
-  1. Yes, configure now (runs interactive wizard)
-  2. No, skip for now (continue without git features)
+Ask the user if they would like to configure git integration, with options to configure now (runs interactive wizard) or skip for now.
 
 **If user chooses "Yes, configure now":**
 ```bash
@@ -192,28 +177,22 @@ sdd skills-dev start-helper get-session-info
 
 First check if there are pending specs using the get-session-info output (check `pending_specs` array).
 
-Present these options with AskUserQuestion tool:
-- **Header**: "Action"
-- **Question**: "What would you like to do?"
-- **Options**:
-  1. Resume last task (auto-runs sdd-next with specific task)
-  2. Continue with next task (auto-runs sdd-next)
-  3. Write new spec (auto-runs sdd-plan)
-  4. View pending backlog (M specs) - **Only show if pending_specs array has items**
-  5. Something else (exit)
+Ask the user what they would like to do, with options:
+1. Resume last task (auto-runs sdd-next with specific task)
+2. Continue with next task (auto-runs sdd-next)
+3. Write new spec (auto-runs sdd-plan)
+4. View pending backlog (M specs) - **Only show if pending_specs array has items**
+5. Something else (exit)
 
 **If NO last-accessed task:**
 
 First check if there are pending specs using the get-session-info output (check `pending_specs` array).
 
-Present these options:
-- **Header**: "Action"
-- **Question**: "What would you like to do?"
-- **Options**:
-  1. Continue with next task (auto-runs sdd-next)
-  2. Write new spec (auto-runs sdd-plan)
-  3. View pending backlog (M specs) - **Only show if pending_specs array has items**
-  4. Something else (exit)
+Ask the user what they would like to do, with options:
+1. Continue with next task (auto-runs sdd-next)
+2. Write new spec (auto-runs sdd-plan)
+3. View pending backlog (M specs) - **Only show if pending_specs array has items**
+4. Something else (exit)
 
 **If NO active work found:**
 
@@ -229,12 +208,7 @@ Display this, then ask:
 What would you like to do?
 ```
 
-Then use AskUserQuestion tool with options:
-- **Header**: "Action"
-- **Question**: "What would you like to do?"
-- **Options**:
-  1. Write new spec (auto-runs sdd-plan)
-  2. Something else (exit)
+Ask the user what they would like to do, with options to write a new spec (auto-runs sdd-plan) or something else (exit).
 
 ### Phase 5: Execute User's Choice
 
@@ -242,119 +216,25 @@ Based on the user's selection:
 
 **Option 1: "Resume last task"** (if last-accessed task available)
 ```bash
-# Get the last task info from get-session-info output
-# Then ask the user how they want to work
-
 I'll help you resume work on task [task-id] from [spec-name]...
 ```
 
-**Ask the user to configure the work mode:**
-
-Use AskUserQuestion tool:
-- **Header**: "Work Mode"
-- **Question**: "How would you like to work on this task?"
-- **Options**:
-  1. Single Task Mode (Plan and execute one task at a time)
-  2. Autonomous Mode (Complete all tasks in current phase within context limits)
-
-**If user selects Autonomous Mode, check context first:**
-
-Use the two-command session marker pattern:
-```bash
-# Step 1: Generate session marker
-sdd session-marker
-
-# Step 2: Check context using the marker (in SEPARATE command)
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
-```
-
-Parse the JSON output to extract the `context_percentage_used` field (returns whole number, e.g., 78).
-
-If context percentage > 50%:
-```
-⚠️  Context usage is already at X%
-
-Autonomous mode works best with lower context usage to ensure you can complete multiple tasks within the 75% limit.
-```
-
-Use AskUserQuestion:
-- **Header**: "High Context"
-- **Question**: "Context is already at X%. How would you like to proceed?"
-- **Options**:
-  1. Continue with Autonomous Mode (May hit 75% limit quickly)
-  2. Switch to Single Task Mode (Safer option)
-
-**Then invoke sdd-next based on the final selected mode:**
-
 Use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
 
-**IMPORTANT**: When invoking sdd-next:
-- Mention the spec_id from the last_task data
-- Mention the task_id if known
-- **Mention the selected work mode** in the prompt:
-  - For Single Task Mode: "Execute sdd-next for [spec-id] in single-task mode"
-  - For Autonomous Mode: "Execute sdd-next for [spec-id] in autonomous mode - complete all tasks in current phase"
-- This helps sdd-next know which workflow to use
+**IMPORTANT**: When invoking sdd-next, mention the spec_id from the last_task data and the task_id if known.
 
 **Option 2: "Continue with next task"**
 ```bash
-# If multiple specs, ask which one (if not obvious)
-# Then ask the user how they want to work
-
-I'll use the sdd-next skill to find and prepare the next task from [spec-name]...
+I'll use the sdd-next skill to find and prepare the next task...
 ```
-
-**Ask the user to configure the work mode:**
-
-Use AskUserQuestion tool:
-- **Header**: "Work Mode"
-- **Question**: "How would you like to work on this task?"
-- **Options**:
-  1. Single Task Mode (Plan and execute one task at a time)
-  2. Autonomous Mode (Complete all tasks in current phase within context limits)
-
-**If user selects Autonomous Mode, check context first:**
-
-Use the two-command session marker pattern:
-```bash
-# Step 1: Generate session marker
-sdd session-marker
-
-# Step 2: Check context using the marker (in SEPARATE command)
-sdd context --session-marker "SESSION_MARKER_<hash>" --json
-```
-
-Parse the JSON output to extract the `context_percentage_used` field (returns whole number, e.g., 78).
-
-If context percentage > 50%:
-```
-⚠️  Context usage is already at X%
-
-Autonomous mode works best with lower context usage to ensure you can complete multiple tasks within the 75% limit.
-```
-
-Use AskUserQuestion:
-- **Header**: "High Context"
-- **Question**: "Context is already at X%. How would you like to proceed?"
-- **Options**:
-  1. Continue with Autonomous Mode (May hit 75% limit quickly)
-  2. Switch to Single Task Mode (Safer option)
-
-**Then invoke sdd-next based on the final selected mode:**
 
 Use the Skill tool to invoke sdd-next:
 ```
 Skill(sdd-toolkit:sdd-next)
 ```
-
-**IMPORTANT**: When invoking sdd-next:
-- **Mention the selected work mode** in the prompt:
-  - For Single Task Mode: "Execute sdd-next for [spec-id] in single-task mode"
-  - For Autonomous Mode: "Execute sdd-next for [spec-id] in autonomous mode - complete all tasks in current phase"
-- This helps sdd-next know which workflow to use
 
 **Option 3: "Write new spec"**
 ```bash
@@ -391,27 +271,7 @@ Example display:
    Title: Monitoring Dashboard Implementation
 ```
 
-Then use AskUserQuestion to let user select which spec to activate:
-```javascript
-AskUserQuestion(
-  questions: [{
-    question: "Which pending spec would you like to activate?",
-    header: "Activate",
-    multiSelect: false,
-    options: [
-      {
-        label: "spec-1-id",
-        description: "Spec 1 title"
-      },
-      {
-        label: "spec-2-id",
-        description: "Spec 2 title"
-      },
-      // ... one option for each pending spec (up to 4 max for AskUserQuestion)
-    ]
-  }]
-)
-```
+Ask the user which pending spec they would like to activate, presenting each spec ID as an option with its title as the description (up to 4 max for AskUserQuestion).
 
 **After user selects a spec:**
 ```bash
@@ -459,59 +319,3 @@ Use AskUserQuestion to let them choose the spec, then invoke sdd-next with that 
 - **Fast**: Discovery should complete in <500ms using helper commands
 - **Robust**: Handle missing directories or malformed JSON spec files gracefully
 - **Token efficiency**: Helper scripts parse specs efficiently - reading 50KB JSON files wastes tokens
-
-## Helper Script Reference
-
-The `skills-dev start-helper` CLI provides:
-- `check-permissions` - Check if SDD permissions are configured (returns JSON)
-- `check-git-config` - Check if git integration is configured (returns JSON)
-- `setup-git-config` - Interactive git configuration wizard
-- `format-output` - Returns human-readable formatted text with last-accessed task info (PREFERRED - use this for display)
-- `get-session-info` - Returns session state with last-accessed task as JSON (for programmatic access)
-- `find-active-work` - Returns JSON with all resumable specs (for programmatic use)
-
-**Always use `format-output` for presenting information to the user** - it ensures proper newlines, indentation, and formatting. Use `get-session-info` when you need programmatic access to last-accessed task data.
-
-**Note**: All commands use the unified CLI: `sdd skills-dev start-helper <command>`
-
-## Example Output
-
-```json
-{
-  "active_work_found": true,
-  "specs": [
-    {
-      "spec_id": "user-auth-2025-10-18-001",
-      "spec_file": "/path/to/specs/active/user-auth-2025-10-18-001.json",
-      "title": "User Authentication System",
-      "progress": {
-        "completed": 15,
-        "total": 23,
-        "percentage": 65
-      },
-      "current_phase": "phase-2",
-      "phase_title": "Authentication Service",
-      "next_task": "task-2-1",
-      "next_task_file": "src/services/authService.ts",
-      "status": "in_progress",
-      "last_updated": "2025-10-20T14:30:00Z",
-      "resumability_score": 100
-    }
-  ]
-}
-```
-
-## Error Handling
-
-- If specs directory not found: Show friendly message, offer to run sdd-plan
-- If spec files malformed: Skip that spec, show warning
-- If helper script fails: Gracefully degrade to manual mode
-
-## Integration
-
-This command is designed to work seamlessly with:
-- `sdd-plan` skill (creating specifications)
-- `sdd-next` skill (finding next tasks)
-- `sdd-update` skill (updating progress)
-
-After tasks are completed with sdd-update, this command will automatically detect the updated state next time it's run.

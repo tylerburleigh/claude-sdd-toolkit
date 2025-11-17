@@ -989,7 +989,7 @@ def cmd_move_spec(args, printer):
         spec_file=spec_file,
         target_folder=args.target,
         dry_run=args.dry_run,
-        printer=printer if not use_json else None
+        printer=printer
     )
 
     if use_json:
@@ -1024,7 +1024,7 @@ def cmd_activate_spec(args, printer):
         spec_id=args.spec_id,
         specs_dir=specs_dir,
         dry_run=args.dry_run,
-        printer=printer if not use_json else None
+        printer=printer
     )
 
     if success and not use_json:
