@@ -711,12 +711,22 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
             }
             blocked_deps = blocked["dependencies"]
 
-        # Sync blocks/blocked_by (Cases 3 & 4: setdefault handles partial/complete)
-        blocks_list = blocker_deps.setdefault("blocks", [])
+        # Ensure all three dependency fields exist on both nodes (Cases 3 & 4)
+        # This handles partial dependencies - setdefault adds missing fields
+        blocker_deps.setdefault("blocks", [])
+        blocker_deps.setdefault("blocked_by", [])
+        blocker_deps.setdefault("depends", [])
+
+        blocked_deps.setdefault("blocks", [])
+        blocked_deps.setdefault("blocked_by", [])
+        blocked_deps.setdefault("depends", [])
+
+        # Sync the relationship between the two nodes
+        blocks_list = blocker_deps["blocks"]
         if blocked_id not in blocks_list:
             blocks_list.append(blocked_id)
 
-        blocked_by_list = blocked_deps.setdefault("blocked_by", [])
+        blocked_by_list = blocked_deps["blocked_by"]
         if blocker_id not in blocked_by_list:
             blocked_by_list.append(blocker_id)
 
