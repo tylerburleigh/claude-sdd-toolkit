@@ -1,0 +1,669 @@
+{
+  "spec_id": "enhance-sdd-fix-deps-2025-11-17-001",
+  "generated": "2025-11-17T10:00:00Z",
+  "last_updated": "2025-11-17T16:42:18.393812Z",
+  "metadata": {
+    "title": "Enhance sdd fix Robustness for Missing Dependencies",
+    "description": "Improve the sdd fix command's handling of missing, malformed, and partial dependency structures in the _build_bidirectional_deps_action function",
+    "priority": "high",
+    "risk_level": "low",
+    "estimated_total_hours": 6
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Enhance sdd fix Robustness for Missing Dependencies",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 18,
+      "completed_tasks": 0,
+      "metadata": {
+        "objectives": [
+          "Fix inconsistent dependency initialization in bidirectional dependency repair",
+          "Handle all edge cases: missing, malformed, partial, and empty dependencies",
+          "Align with patterns in _build_missing_deps_structure_action",
+          "Add comprehensive test coverage for the changes",
+          "Improve maintainability and reduce fragility"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Code Analysis & Preparation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Understand the current implementation, identify exact changes needed, and prepare for implementation",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "Investigation Tasks",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Analyze current _build_bidirectional_deps_action implementation",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "focus_areas": [
+          "Current dependency initialization logic (lines 685-687)",
+          "How setdefault is currently used",
+          "Edge cases that aren't handled"
+        ]
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Read and understand _build_bidirectional_deps_action function",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/sdd_validate/fix.py",
+        "lines": "685-708"
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Identify exact lines that need modification",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Review _build_missing_deps_structure_action pattern",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "file_path": "src/claude_skills/sdd_validate/fix.py",
+        "lines": "709-742",
+        "purpose": "Understand the pattern we should align with"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "Review defensive patterns in dependency_analysis.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "file_path": "src/claude_skills/sdd_common/dependency_analysis.py",
+        "focus_lines": [
+          "60-66",
+          "109-114",
+          "121-125"
+        ],
+        "purpose": "Understand defensive isinstance checks used elsewhere"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Examine current test coverage in test_fix.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "file_path": "claude_skills/tests/unit/test_sdd_validate/test_fix.py",
+        "purpose": "Understand test structure and identify where to add new tests"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Analysis complete and implementation plan clear",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Current implementation understood",
+          "Target pattern identified",
+          "Exact lines to modify known",
+          "Test structure understood",
+          "Ready to implement changes"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Apply the proposed code changes to fix dependency handling",
+        "risk_level": "low"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "Code Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Modify _build_bidirectional_deps_action in fix.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/sdd_validate/fix.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "target_lines": "686-687"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Replace dependency initialization logic with robust solution",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "changes": "Replace lines 686-687 with the proposed robust solution. Handle missing dependencies by creating complete structure. Handle malformed dependencies by replacing null/non-dict. Handle partial dependencies by adding missing fields with setdefault. Handle complete dependencies by preserving existing structure."
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Add inline comments explaining the logic",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Document the four edge cases being handled"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Decision: Extract _ensure_complete_dependencies helper",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "decision",
+        "estimated_hours": 0.5,
+        "decision_criteria": [
+          "Would it improve code reuse?",
+          "Would it make the code clearer?",
+          "Is it worth the additional abstraction?",
+          "Should this be done now or as future refactoring?"
+        ],
+        "options": [
+          "Extract helper function now",
+          "Keep inline and note as future refactoring opportunity",
+          "Extract but keep as private function in same file"
+        ]
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Code follows existing patterns and conventions",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Aligns with _build_missing_deps_structure_action pattern",
+          "Uses isinstance checks like dependency_analysis.py",
+          "Handles all four edge cases (missing, malformed, partial, complete)",
+          "Code is well-commented",
+          "Follows existing code style"
+        ],
+        "command": "",
+        "expected": ""
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "No syntax errors in modified code",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m py_compile src/claude_skills/sdd_validate/fix.py",
+        "expected": "No syntax errors"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Testing & Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Add comprehensive test coverage and validate the changes work correctly",
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "Test Additions",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ]
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Add test case 1: Missing dependencies structure",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "claude_skills/tests/unit/test_sdd_validate/test_fix.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "test_function": "test_build_bidirectional_deps_action_missing_dependencies",
+        "test_scenario": "Node completely missing dependencies object"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "Add test case 2: Partial dependencies structure",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "claude_skills/tests/unit/test_sdd_validate/test_fix.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "test_function": "test_build_bidirectional_deps_action_partial_dependencies",
+        "test_scenario": "Node has partial dependencies (only 'blocks', missing 'blocked_by' and 'depends')"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "Add test case 3: Malformed dependencies",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "claude_skills/tests/unit/test_sdd_validate/test_fix.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "test_function": "test_build_bidirectional_deps_action_malformed_dependencies",
+        "test_scenario": "Node has null or non-dict dependencies"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "Add test case 4: Both nodes missing dependencies",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "claude_skills/tests/unit/test_sdd_validate/test_fix.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "test_function": "test_build_bidirectional_deps_action_both_missing",
+        "test_scenario": "Both blocker and blocked nodes missing dependencies"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Run new tests and verify they pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest claude_skills/tests/unit/test_sdd_validate/test_fix.py -k bidirectional_deps_action -v",
+        "expected": "All 4 new test cases pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Run full test suite to check for regressions",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest claude_skills/tests/unit/test_sdd_validate/test_fix.py -v",
+        "expected": "All existing tests still pass, no regressions"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    }
+  }
+}

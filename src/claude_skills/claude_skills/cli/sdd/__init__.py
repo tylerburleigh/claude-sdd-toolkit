@@ -141,8 +141,10 @@ COMMAND_SUGGESTIONS = {
 @track_metrics('sdd')
 def main():
     """Main entry point for unified SDD CLI."""
+    # Store original command line for --no-json detection
+    original_cmd_line = sys.argv[1:]
     # Reorder arguments to support global options before subcommand
-    cmd_line = reorder_args_for_subcommand(sys.argv[1:])
+    cmd_line = reorder_args_for_subcommand(original_cmd_line)
 
     # Check for common --entry-type completion mistake BEFORE parsing
     # This allows us to provide a better error message
@@ -206,7 +208,13 @@ def main():
                 config = load_sdd_config(project_path=project_root)
 
         # Apply config defaults for args that weren't specified (are None)
-        if args.json is None:
+        # Only apply default if json was not explicitly set (None means not set)
+        # False means --no-json was used, True means --json was used
+        # Check both original and reordered command line for --no-json to handle case
+        # where it appears before subcommand and argparse sets args.json to None instead of False
+        if '--no-json' in original_cmd_line or '--no-json' in cmd_line:
+            args.json = False
+        elif args.json is None:
             args.json = config['output']['default_mode'] == 'json'
         if args.compact is None:
             args.compact = config['output']['json_compact']
