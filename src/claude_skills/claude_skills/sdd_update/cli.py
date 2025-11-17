@@ -1073,7 +1073,7 @@ def cmd_complete_spec(args, printer):
         specs_dir=specs_dir,
         skip_doc_regen=getattr(args, 'skip_doc_regen', False),
         dry_run=args.dry_run,
-        printer=printer if not use_json else None
+        printer=printer
     )
 
     if use_json:

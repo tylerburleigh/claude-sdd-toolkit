@@ -75,6 +75,47 @@ JSON output supports verbosity filtering:
 4. **Exclusive Fields**: JSON includes `version` and `created_at` which are not displayed in text mode
 5. **Task Details**: JSON exposes separate `total_tasks` and `completed_tasks`, while text combines them in Progress column
 
+## Limit and Sorting Behavior
+
+### No Default Limit
+
+The `sdd list-specs` command returns **all specifications** with no default limit:
+
+- **Current behavior**: Returns all specs across all status folders (36 specs as of 2025-11-17)
+- **No pagination**: No built-in limit or pagination parameters
+- **Full traversal**: Scans all status directories (active, completed, archived, pending)
+
+**Implementation Reference:** `/src/claude_skills/claude_skills/sdd_update/list_specs.py:85-132`
+
+### Sorting Behavior
+
+Specs are sorted **alphabetically by filename** within each status folder:
+
+- **Sorting implementation**: Uses `sorted(status_dir.glob("*.json"))` on line 92
+- **Sort order**: Lexicographic (alphabetical) ordering of JSON filenames
+- **No custom sorting options**: No CLI parameters for alternative sort orders (e.g., by date, progress, title)
+- **Multi-folder ordering**: Results include specs from multiple status folders in order: active → completed → archived → pending
+
+**Example ordering:**
+```
+1. add-pending-folder-support-for-2025-10-30-0847 (active)
+2. list-specs-improvements-2025-11-09-001 (active)
+3. add-pending-folder-support-for-2025-10-30-0847 (completed)
+4. ai-consultation-refactor-2025-11-05-001 (completed)
+...
+```
+
+### Available Filtering
+
+While there is no limit or custom sorting, the command supports:
+
+- **Status filtering**: `--status {active,completed,archived,pending,all}` - Filter by folder
+- **Verbosity levels**: `--quiet`, `--verbose` - Control output detail
+- **Output format**: `--json` / `--no-json` - Toggle between text table and JSON array
+- **Detailed mode**: `--detailed` - Show additional information
+
+**CLI Reference:** `sdd list-specs --help`
+
 ## Discrepancy Note
 
 The task description originally stated that text mode shows "2 fields (ID, Title)", but the actual implementation shows **6 display columns** in a formatted table. This documentation reflects the current implementation as of analysis date.
