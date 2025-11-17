@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 11:55:21
+**Generated:** 2025-11-17 12:09:52
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113023
+- **Total Lines:** 113014
 - **Total Classes:** 447
 - **Total Functions:** 1455
 - **Avg Complexity:** 4.76
@@ -8769,7 +8769,7 @@ Example output:
 ### `_build_leaf_count_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:765`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:770`
 **Complexity:** 9
 
 **Description:**
@@ -8796,7 +8796,7 @@ Example output:
 ### `_build_missing_deps_structure_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:729`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:734`
 **Complexity:** 7
 
 **Description:**
@@ -8826,7 +8826,7 @@ Example output:
 ### `_build_orphan_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:798`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:803`
 **Complexity:** 9
 
 **Description:**
@@ -8855,7 +8855,7 @@ Example output:
 ### `_build_placeholder_file_path_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:844`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:849`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -12915,7 +12915,7 @@ Raises:
 ### `add_debug_info(data, args, debug_data) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:121`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:117`
 **Complexity:** 2
 
 **Description:**
@@ -15226,8 +15226,8 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:307`
-⚠️ **Complexity:** 14 (High)
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:295`
+⚠️ **Complexity:** 16 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -16114,7 +16114,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:291`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:276`
 **Complexity:** 1
 
 **Description:**
@@ -19373,11 +19373,11 @@ Returns:
 
 ---
 
-### `find_transcript_by_specific_marker(cwd, marker, max_retries) -> str | None`
+### `find_transcript_by_specific_marker(cwd, marker, max_retries, verbosity_level) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:53`
-⚠️ **Complexity:** 18 (High)
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:51`
+⚠️ **Complexity:** 19 (High)
 
 **Description:**
 > Search transcripts for a specific SESSION_MARKER to identify current session.
@@ -19401,7 +19401,7 @@ Args:
     cwd: Current working directory (used to find project-specific transcripts)
     marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
     max_retries: Maximum number of retry attempts (default: 10)
-
+    verbosity_level: Verbosity level to control output (optional)
 Returns:
     Path to transcript containing the marker, or None if not found
 
@@ -19409,6 +19409,7 @@ Returns:
 - `cwd`: Path
 - `marker`: str
 - `max_retries`: int
+- `verbosity_level`: None
 
 ---
 
@@ -20081,7 +20082,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:229`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:220`
 **Complexity:** 2
 
 **Description:**
@@ -20102,7 +20103,7 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path, compact) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:263`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:250`
 **Complexity:** 2
 
 **Description:**
@@ -20125,7 +20126,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:224`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:216`
 **Complexity:** 1
 
 **Description:**
@@ -21282,7 +21283,7 @@ Returns:
 ### `generate_session_marker() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:39`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:38`
 **Complexity:** 1
 
 **Description:**
@@ -23306,10 +23307,10 @@ Returns:
 
 ---
 
-### `get_transcript_path(args) -> str | None`
+### `get_transcript_path(args, verbosity_level) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:183`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:176`
 **Complexity:** 8
 
 **Description:**
@@ -23323,19 +23324,20 @@ Priority:
 
 Args:
     args: Parsed CLI arguments
-
+    verbosity_level: Verbosity level to control output (optional)
 Returns:
     Transcript path string, or None if not found
 
 **Parameters:**
 - `args`: None
+- `verbosity_level`: None
 
 ---
 
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:154`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:148`
 **Complexity:** 4
 
 **Description:**
@@ -24585,7 +24587,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:468`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:461`
 **Complexity:** 5
 
 **Description:**
@@ -25457,7 +25459,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:37`
-**Complexity:** 4
+**Complexity:** 1
 
 **Description:**
 > Prepare command output based on verbosity level.
@@ -26031,7 +26033,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:426`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:420`
 **Complexity:** 1
 
 **Description:**
@@ -26309,7 +26311,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:408`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:403`
 **Complexity:** 1
 
 **Description:**
@@ -27642,7 +27644,7 @@ Example:
 ### `should_show_field(args, field_name, value, is_essential, is_standard) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:78`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/output_utils.py:74`
 **Complexity:** 9
 
 **Description:**
@@ -35498,8 +35500,10 @@ Returns:
 - `claude_skills.cli.sdd.output_utils.CONTEXT_ESSENTIAL`
 - `claude_skills.cli.sdd.output_utils.CONTEXT_STANDARD`
 - `claude_skills.cli.sdd.output_utils.prepare_output`
+- `claude_skills.cli.sdd.verbosity.VerbosityLevel`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.json_output.output_json`
+- `claude_skills.common.sdd_config.load_sdd_config`
 - `claude_skills.context_tracker.parser.parse_transcript`
 - `json`
 - `os`
