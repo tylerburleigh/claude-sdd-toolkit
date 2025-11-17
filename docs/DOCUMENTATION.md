@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 11:48:28
+**Generated:** 2025-11-17 11:55:21
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113003
+- **Total Lines:** 113023
 - **Total Classes:** 447
 - **Total Functions:** 1455
-- **Avg Complexity:** 4.75
+- **Avg Complexity:** 4.76
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -8599,7 +8599,7 @@ Args:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:649`
-⚠️ **Complexity:** 11 (High)
+⚠️ **Complexity:** 15 (High)
 
 **Description:**
 > Synchronize bidirectional dependency relationships.
@@ -8769,7 +8769,7 @@ Example output:
 ### `_build_leaf_count_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:745`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:765`
 **Complexity:** 9
 
 **Description:**
@@ -8796,7 +8796,7 @@ Example output:
 ### `_build_missing_deps_structure_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:709`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:729`
 **Complexity:** 7
 
 **Description:**
@@ -8826,7 +8826,7 @@ Example output:
 ### `_build_orphan_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:778`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:798`
 **Complexity:** 9
 
 **Description:**
@@ -8855,7 +8855,7 @@ Example output:
 ### `_build_placeholder_file_path_action(error, spec_data) -> Optional[FixAction]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:824`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/fix.py:844`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**

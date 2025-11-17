@@ -686,10 +686,14 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
         if not isinstance(blocker, dict) or not isinstance(blocked, dict):
             return
 
-        # Ensure dependencies dicts exist and are valid
-        # Handle missing, null, or malformed dependencies
+        # Robustly handle dependencies structure - four edge cases:
+        # 1. Missing dependencies key: Create complete structure
+        # 2. Null/malformed dependencies (non-dict): Replace with complete structure
+        # 3. Partial dependencies (missing blocks/blocked_by/depends): setdefault adds them below
+        # 4. Complete dependencies: Preserve existing structure
         blocker_deps = blocker.get("dependencies")
         if not isinstance(blocker_deps, dict):
+            # Cases 1 & 2: Create complete dependencies structure
             blocker["dependencies"] = {
                 "blocks": [],
                 "blocked_by": [],
@@ -699,6 +703,7 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
 
         blocked_deps = blocked.get("dependencies")
         if not isinstance(blocked_deps, dict):
+            # Cases 1 & 2: Create complete dependencies structure
             blocked["dependencies"] = {
                 "blocks": [],
                 "blocked_by": [],
@@ -706,7 +711,7 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
             }
             blocked_deps = blocked["dependencies"]
 
-        # Sync blocks/blocked_by
+        # Sync blocks/blocked_by (Cases 3 & 4: setdefault handles partial/complete)
         blocks_list = blocker_deps.setdefault("blocks", [])
         if blocked_id not in blocks_list:
             blocks_list.append(blocked_id)
