@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Default SDD configuration (fallback if config file not found)
 DEFAULT_SDD_CONFIG = {
+    "work_mode": "single",  # Work mode for sdd-next: "single" (one task at a time with approval) or "autonomous" (complete phase automatically)
     "output": {
         "default_mode": "rich",  # Unified output format: "rich" (formatted), "plain" (simple text), or "json"
         "json_compact": True,  # Use compact JSON formatting (only affects JSON output)
@@ -97,6 +98,22 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """
     import copy
     validated = {"output": {}}
+
+    # Validate work_mode field
+    if "work_mode" in config:
+        value = config["work_mode"]
+        allowed_modes = ["single", "autonomous"]
+        if isinstance(value, str) and value in allowed_modes:
+            validated["work_mode"] = value
+        else:
+            logger.warning(
+                f"Invalid value for sdd config 'work_mode': expected one of {allowed_modes}, "
+                f"got {value!r}. Using default: 'single'"
+            )
+            validated["work_mode"] = "single"
+    else:
+        # Not specified, use default
+        validated["work_mode"] = "single"
 
     # Validate output section
     if "output" in config and isinstance(config["output"], dict):
@@ -196,7 +213,7 @@ def _validate_sdd_config(config: Dict[str, Any]) -> Dict[str, Any]:
         validated["output"]["default_format"] = None
 
     # Warn about unknown keys (but don't fail)
-    known_keys = {"output"}
+    known_keys = {"output", "work_mode", "_comment", "_description", "_work_mode_options"}
     unknown_keys = set(config.keys()) - known_keys
     if unknown_keys:
         logger.warning(
@@ -330,3 +347,26 @@ def get_json_compact(project_path: Optional[Path] = None) -> bool:
         json.dumps(data, indent=None if compact else 2)
     """
     return get_sdd_setting("output.json_compact", project_path, default=True)
+
+
+def get_work_mode(project_path: Optional[Path] = None) -> str:
+    """Get the work mode preference from configuration.
+
+    The work mode controls how sdd-next executes tasks:
+    - "single": Plan and execute one task at a time with explicit approval
+    - "autonomous": Complete all tasks in current phase automatically
+
+    Args:
+        project_path: Path to project root (optional)
+
+    Returns:
+        Work mode string: "single" or "autonomous"
+
+    Example:
+        work_mode = get_work_mode()
+        if work_mode == "autonomous":
+            # Execute all phase tasks automatically
+        else:
+            # Request approval for each task
+    """
+    return get_sdd_setting("work_mode", project_path, default="single")

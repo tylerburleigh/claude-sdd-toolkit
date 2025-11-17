@@ -17,18 +17,52 @@ description: Task preparation skill for spec-driven workflows. Reads specificati
 Start
   |
   v
-Discover Specs -> Gather Context -> Select Task
-  |                         |
-  |                     Alternatives?
-  |                     /         \
-  |            yes -> Browse   no -> Prepare Recommended Task
-  |                     \         /
-  v                      v       v
-Draft Plan -> Seek Approval -> Implementation Handoff
+Read Work Mode Config (Step 0)
   |
-  v
-Post-Implementation Checklist -> Phase Loop (optional) -> Finish
+  +-- single mode --> Discover Specs -> Gather Context -> Select Task
+  |                     |                         |
+  |                     |                     Alternatives?
+  |                     |                     /         \
+  |                     |            yes -> Browse   no -> Prepare Recommended Task
+  |                     |                     \         /
+  |                     v                      v       v
+  |                   Draft Plan -> Seek Approval -> Implementation Handoff
+  |                     |
+  |                     v
+  |                   Post-Implementation Checklist -> Surface Next -> Finish
+  |
+  +-- autonomous mode --> Phase Loop (auto-complete all tasks) -> Finish
 ```
+
+---
+
+## Step 0: Read Work Mode Configuration
+
+**CRITICAL: This must be the FIRST step when sdd-next is invoked.**
+
+Before doing anything else, read the work mode from the user's configuration:
+
+```bash
+sdd get-work-mode --json
+```
+
+**Expected output:**
+```json
+{"work_mode": "single"}
+```
+or
+```json
+{"work_mode": "autonomous"}
+```
+
+**Routing based on work_mode:**
+- If `"single"`: Follow **Single Task Workflow** (Sections 3.1-3.6)
+  - Plan and execute one task at a time with explicit user approval
+  - After task completion, surface next recommendation and wait for user decision
+- If `"autonomous"`: Follow **Autonomous Mode Workflow** (Section starting at line 438)
+  - Complete all tasks in current phase automatically within context limits
+  - Check context after EVERY task completion
+  - Stop only for blockers, plan deviations, or when context ≥75%
 
 ---
 
@@ -165,27 +199,28 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 
 ---
 
-## Session Kickoff & Work Mode Selection
+## Work Mode Behavior
 
-Before running `sdd-next`, follow the start-helper workflow documented in `commands/sdd-begin.md`:
-1. Use `sdd skills-dev start-helper` commands (permissions → git → format-output) to surface active specs.
-2. Present the user with the Work Mode `AskUserQuestion` immediately after they choose a spec or resume task.
-   - **Options (exact text from sdd-begin.md):**
-     1. Single Task Mode (Plan and execute one task at a time)
-     2. Autonomous Mode (Complete all tasks in current phase within context limits)
-3. If the user selects Autonomous Mode, run the two-step context check **before** calling `sdd-next`:
-   ```bash
-   sdd session-marker
-   sdd context --session-marker "SESSION_MARKER_<hash>" --json
-   ```
-   - If `context_percentage_used > 75`, warn the user and use `AskUserQuestion` to confirm whether to stay in Autonomous Mode or switch to Single Task Mode.
-4. Record the chosen mode. Single Task Mode uses Sections 3.1–3.6. Autonomous Mode uses the dedicated section later in this document. Do not switch modes mid-task unless the user explicitly requests it.
+When sdd-next is invoked, it automatically reads the `work_mode` setting from `.claude/sdd_config.json` (see Step 0) and routes to the appropriate workflow:
+
+**Single Task Mode** (`"work_mode": "single"`) - Default
+- Follows Sections 3.1–3.6 below
+- Plan and execute one task at a time with explicit user approval
+- After task completion, surface next recommendation and wait for user decision
+- User maintains full control over which tasks to execute and when
+
+**Autonomous Mode** (`"work_mode": "autonomous"`)
+- Follows dedicated Autonomous Mode section (later in this document)
+- Complete all tasks in current phase automatically within context limits
+- Check context after EVERY task completion (required)
+- Stop only for blockers, plan deviations, or when context ≥75%
+- Continues until phase is complete or manual intervention needed
 
 ---
 
 ## Single Task Workflow
 
-Use this workflow when the Work Mode selection is **Single Task Mode**. Stop after each task, gather confirmation, and re-run the Work Mode prompt if the user wants to continue.
+Use this workflow when the configured work mode is **Single Task Mode** (`"work_mode": "single"` in config). Execute one task at a time with explicit user approval for each step.
 
 ### 3.1 Choose the Spec
 
@@ -437,13 +472,13 @@ After completing a task:
 
 ## Autonomous Mode (Phase Completion)
 
-Use this workflow only when the Work Mode selection is **Autonomous Mode** and the initial context check (from the Work Mode step) has confirmed there is enough headroom. If the user switches back to Single Task Mode, jump to Section 3.
+Use this workflow when the configured work mode is **Autonomous Mode** (`"work_mode": "autonomous"` in config). If the user changes the config to Single Task Mode mid-session, switch to Section 3 (Single Task Workflow).
 
 ### When to Use
 
-- User explicitly requests "autonomous mode" during session setup
-- Invocation mentions "autonomous mode" or "complete all tasks in current phase"
-- User wants to complete multiple tasks without per-task approval
+- Config file has `"work_mode": "autonomous"` set
+- User wants to complete multiple tasks in current phase without per-task approval
+- User has sufficient context headroom (check context before starting)
 
 ### Key Characteristics
 

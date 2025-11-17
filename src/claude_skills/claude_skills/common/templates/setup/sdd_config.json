@@ -1,6 +1,8 @@
 {
   "_comment": "SDD Output Configuration Template for SDD Toolkit",
   "_description": "Copy this file to sdd_config.json and customize as needed. Controls default output formats for SDD commands.",
+  "work_mode": "single",
+  "_work_mode_options": "Values: 'single' (plan and execute one task at a time with approval) or 'autonomous' (complete all tasks in current phase automatically)",
   "output": {
     "default_mode": "json",
     "json_compact": true,
