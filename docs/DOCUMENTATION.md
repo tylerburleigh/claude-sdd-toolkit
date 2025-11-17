@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 12:14:03
+**Generated:** 2025-11-17 12:15:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113068
+- **Total Lines:** 113120
 - **Total Classes:** 447
-- **Total Functions:** 1456
+- **Total Functions:** 1457
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -28727,6 +28727,17 @@ Returns:
 
 **Description:**
 > Test bidirectional deps action with missing dependencies structure.
+
+---
+
+### `test_build_bidirectional_deps_action_partial_dependencies() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1173`
+**Complexity:** 1
+
+**Description:**
+> Test bidirectional deps action with partial dependencies structure.
 
 ---
 

@@ -1220,3 +1220,55 @@ def test_build_bidirectional_deps_action_partial_dependencies():
     assert "blocked_by" in task2_deps
     assert "depends" in task2_deps  # Added by setdefault
     assert "task-1" in task2_deps["blocked_by"]
+
+
+def test_build_bidirectional_deps_action_malformed_dependencies():
+    """Test bidirectional deps action with malformed dependencies (null or non-dict)."""
+    error = EnhancedError(
+        message="Node 'task-1' blocks 'task-2', but 'task-2' doesn't list 'task-1' in blocked_by",
+        severity="error",
+        category="dependency",
+        auto_fixable=True,
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "dependencies": None,  # Malformed: null value
+            },
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "dependencies": ["some", "list"],  # Malformed: list instead of dict
+            },
+        }
+    }
+
+    action = _build_bidirectional_deps_action(error, spec_data)
+
+    assert action is not None
+    assert action.category == "dependency"
+    assert action.auto_apply is True
+
+    # Apply the action
+    action.apply(spec_data)
+
+    # Verify task-1's malformed (null) dependencies was replaced with complete structure
+    assert "dependencies" in spec_data["hierarchy"]["task-1"]
+    task1_deps = spec_data["hierarchy"]["task-1"]["dependencies"]
+    assert isinstance(task1_deps, dict)
+    assert "blocks" in task1_deps
+    assert "blocked_by" in task1_deps
+    assert "depends" in task1_deps
+    assert "task-2" in task1_deps["blocks"]
+
+    # Verify task-2's malformed (list) dependencies was replaced with complete structure
+    assert "dependencies" in spec_data["hierarchy"]["task-2"]
+    task2_deps = spec_data["hierarchy"]["task-2"]["dependencies"]
+    assert isinstance(task2_deps, dict)
+    assert "blocks" in task2_deps
+    assert "blocked_by" in task2_deps
+    assert "depends" in task2_deps
+    assert "task-1" in task2_deps["blocked_by"]
