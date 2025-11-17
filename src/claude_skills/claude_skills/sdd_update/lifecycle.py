@@ -88,6 +88,39 @@ def move_spec(
         return False
 
 
+def move_spec_by_id(
+    spec_id: str,
+    target_folder: str,
+    specs_dir: Path,
+    dry_run: bool = False,
+    printer: Optional[PrettyPrinter] = None
+) -> bool:
+    """
+    Move a spec file between lifecycle folders using spec ID.
+
+    Args:
+        spec_id: Specification ID
+        target_folder: Target folder name (active, completed, archived)
+        specs_dir: Path to specs directory
+        dry_run: If True, show move without executing
+        printer: Optional printer for output
+
+    Returns:
+        True if successful, False otherwise
+    """
+    if not printer:
+        printer = PrettyPrinter()
+
+    # Find the spec file by ID
+    spec_file = find_spec_file(spec_id, specs_dir)
+    if not spec_file:
+        printer.error(f"Spec file not found: {spec_id}")
+        return False
+
+    # Call existing move_spec function
+    return move_spec(spec_file, target_folder, dry_run, printer)
+
+
 def activate_spec(
     spec_id: str,
     specs_dir: Path,

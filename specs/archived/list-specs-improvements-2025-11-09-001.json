@@ -2,7 +2,7 @@
   "spec_id": "list-specs-improvements-2025-11-09-001",
   "title": "list-specs Output Improvements & Command Parity Analysis",
   "generated": "2025-11-09T00:00:00Z",
-  "last_updated": "2025-11-17T13:14:37.527196Z",
+  "last_updated": "2025-11-17T13:32:39.823813Z",
   "metadata": {
     "description": "Fix list-specs output inconsistencies (no limit, no sorting, field parity mismatch) and investigate similar issues in other commands to establish standardized output patterns.",
     "estimated_hours": 18,
@@ -16,7 +16,8 @@
     "status": "active",
     "activated_date": "2025-11-17T12:35:25.298137Z",
     "progress_percentage": 17,
-    "current_phase": "phase-1"
+    "current_phase": "phase-1",
+    "author": "Claude Code"
   },
   "hierarchy": {
     "spec-root": {

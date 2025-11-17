@@ -676,7 +676,7 @@ class TestGetSessionState:
 
     @patch("claude_skills.common.paths.find_specs_directory")
     def test_active_specs_found(self, mock_find, tmp_path):
-        """Test finding active specs with in-progress tasks."""
+        """Test finding active specs with in-progress tasks using hierarchy structure."""
         # Setup test directories
         specs_dir = tmp_path / "specs"
         active_dir = specs_dir / "active"
@@ -684,20 +684,25 @@ class TestGetSessionState:
 
         mock_find.return_value = str(specs_dir)
 
-        # Create real JSON spec file
+        # Create real JSON spec file with modern hierarchy structure
         json_spec_file = active_dir / "test-001.json"
         spec_data = {
             "spec_id": "test-001",
-            "title": "Test Feature",
-            "status": "in_progress",
-            "tasks": {
+            "hierarchy": {
+                "spec-root": {
+                    "title": "Test Feature",
+                    "status": "in_progress",
+                    "type": "spec"
+                },
                 "task-1-1": {
                     "title": "Task 1",
-                    "status": "in_progress"
+                    "status": "in_progress",
+                    "type": "task"
                 },
                 "task-1-2": {
                     "title": "Task 2",
-                    "status": "pending"
+                    "status": "pending",
+                    "type": "task"
                 }
             }
         }
@@ -707,28 +712,34 @@ class TestGetSessionState:
 
         assert len(result["active_specs"]) == 1
         assert result["active_specs"][0]["spec_id"] == "test-001"
+        assert result["active_specs"][0]["title"] == "Test Feature"
+        assert result["active_specs"][0]["status"] == "in_progress"
         assert result["active_specs"][0]["in_progress_tasks"] == 1
         assert result["in_progress_count"] == 1
         assert result["last_task"] is not None
         assert result["last_task"]["task_id"] == "task-1-1"
+        assert result["last_task"]["title"] == "Task 1"
 
     @patch("claude_skills.common.paths.find_specs_directory")
     def test_multiple_in_progress_tasks(self, mock_find, tmp_path):
-        """Test with multiple in-progress tasks across specs."""
+        """Test with multiple in-progress tasks across specs using hierarchy structure."""
         specs_dir = tmp_path / "specs"
         active_dir = specs_dir / "active"
         active_dir.mkdir(parents=True)
 
         mock_find.return_value = str(specs_dir)
 
-        # Create two real JSON specs
+        # Create two real JSON specs with hierarchy structure
         json_spec_file1 = active_dir / "test-001.json"
         spec_data1 = {
             "spec_id": "test-001",
-            "title": "Feature A",
-            "status": "in_progress",
-            "tasks": {
-                "task-1-1": {"title": "Task 1", "status": "in_progress"}
+            "hierarchy": {
+                "spec-root": {
+                    "title": "Feature A",
+                    "status": "in_progress",
+                    "type": "spec"
+                },
+                "task-1-1": {"title": "Task 1", "status": "in_progress", "type": "task"}
             }
         }
         json_spec_file1.write_text(json.dumps(spec_data1))
@@ -736,10 +747,13 @@ class TestGetSessionState:
         json_spec_file2 = active_dir / "test-002.json"
         spec_data2 = {
             "spec_id": "test-002",
-            "title": "Feature B",
-            "status": "in_progress",
-            "tasks": {
-                "task-2-1": {"title": "Task 2", "status": "in_progress"}
+            "hierarchy": {
+                "spec-root": {
+                    "title": "Feature B",
+                    "status": "in_progress",
+                    "type": "spec"
+                },
+                "task-2-1": {"title": "Task 2", "status": "in_progress", "type": "task"}
             }
         }
         json_spec_file2.write_text(json.dumps(spec_data2))
@@ -752,7 +766,7 @@ class TestGetSessionState:
 
     @patch("claude_skills.common.paths.find_specs_directory")
     def test_completed_specs_ignored(self, mock_find, tmp_path):
-        """Test that completed specs are ignored."""
+        """Test that completed specs are ignored using hierarchy structure."""
         specs_dir = tmp_path / "specs"
         active_dir = specs_dir / "active"
         active_dir.mkdir(parents=True)
@@ -762,9 +776,13 @@ class TestGetSessionState:
         json_spec_file = active_dir / "test-001.json"
         spec_data = {
             "spec_id": "test-001",
-            "title": "Completed Feature",
-            "status": "completed",
-            "tasks": {}
+            "hierarchy": {
+                "spec-root": {
+                    "title": "Completed Feature",
+                    "status": "completed",
+                    "type": "spec"
+                }
+            }
         }
         json_spec_file.write_text(json.dumps(spec_data))
 
@@ -772,6 +790,42 @@ class TestGetSessionState:
 
         assert len(result["active_specs"]) == 0
         assert result["in_progress_count"] == 0
+
+    @patch("claude_skills.common.paths.find_specs_directory")
+    def test_backward_compat_legacy_tasks_structure(self, mock_find, tmp_path):
+        """Test backward compatibility with legacy tasks structure."""
+        specs_dir = tmp_path / "specs"
+        active_dir = specs_dir / "active"
+        active_dir.mkdir(parents=True)
+
+        mock_find.return_value = str(specs_dir)
+
+        # Create spec with legacy tasks structure (no hierarchy)
+        json_spec_file = active_dir / "legacy-001.json"
+        spec_data = {
+            "spec_id": "legacy-001",
+            "title": "Legacy Feature",
+            "status": "in_progress",
+            "tasks": {
+                "task-1": {
+                    "title": "Legacy Task",
+                    "status": "in_progress"
+                }
+            }
+        }
+        json_spec_file.write_text(json.dumps(spec_data))
+
+        result = get_session_state(str(specs_dir))
+
+        # Should still work with legacy structure
+        assert len(result["active_specs"]) == 1
+        assert result["active_specs"][0]["spec_id"] == "legacy-001"
+        assert result["active_specs"][0]["title"] == "Legacy Feature"
+        assert result["active_specs"][0]["status"] == "in_progress"
+        assert result["active_specs"][0]["in_progress_tasks"] == 1
+        assert result["in_progress_count"] == 1
+        assert result["last_task"] is not None
+        assert result["last_task"]["task_id"] == "task-1"
 
     @patch("claude_skills.common.paths.find_specs_directory")
     def test_invalid_json_specs_skipped(self, mock_find, tmp_path):

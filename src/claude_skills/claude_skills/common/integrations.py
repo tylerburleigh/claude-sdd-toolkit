@@ -6,6 +6,7 @@ Includes spec validation, verification task execution, and session state managem
 """
 
 import json
+import logging
 import subprocess
 import time
 from typing import Optional
@@ -13,6 +14,8 @@ from pathlib import Path
 from datetime import datetime
 
 from .hierarchy_validation import validate_spec_hierarchy
+
+logger = logging.getLogger(__name__)
 
 
 def validate_spec_before_proceed(spec_path: str, quiet: bool = False) -> dict:
@@ -443,41 +446,65 @@ def get_session_state(specs_dir: Optional[str] = None) -> dict:
                 with open(spec_file, 'r') as f:
                     spec_data = json.load(f)
 
+                # Get hierarchy and spec-root for modern spec structure
+                hierarchy = spec_data.get("hierarchy", {})
+                spec_root = hierarchy.get("spec-root", {})
+
                 # Check if spec is active (not completed/archived)
-                spec_status = spec_data.get("status", "pending")
+                # Try hierarchy first, fall back to top-level for backward compatibility
+                spec_status = spec_root.get("status", spec_data.get("status", "pending"))
 
                 if spec_status in ["pending", "in_progress"]:
                     spec_id = spec_data.get("spec_id", spec_file.stem)
 
                     # Count in-progress tasks
                     in_progress_tasks = []
-                    tasks = spec_data.get("tasks", {})
 
-                    for task_id, task_data in tasks.items():
-                        if task_data.get("status") == "in_progress":
-                            # Get modification time
+                    # Iterate through hierarchy to find in-progress tasks (modern structure)
+                    for node_id, node_data in hierarchy.items():
+                        node_type = node_data.get("type", "")
+                        if node_type == "task" and node_data.get("status") == "in_progress":
+                            # Use file mtime as proxy for task modification time
                             mtime = spec_file.stat().st_mtime
 
                             in_progress_tasks.append({
                                 "spec_id": spec_id,
-                                "task_id": task_id,
-                                "title": task_data.get("title", "Untitled"),
+                                "task_id": node_id,
+                                "title": node_data.get("title", "Untitled"),
                                 "modified": datetime.fromtimestamp(mtime).isoformat(),
                                 "mtime": mtime
                             })
 
+                    # Fall back to legacy tasks structure for backward compatibility
+                    if not in_progress_tasks:
+                        tasks = spec_data.get("tasks", {})
+                        for task_id, task_data in tasks.items():
+                            if task_data.get("status") == "in_progress":
+                                mtime = spec_file.stat().st_mtime
+                                in_progress_tasks.append({
+                                    "spec_id": spec_id,
+                                    "task_id": task_id,
+                                    "title": task_data.get("title", "Untitled"),
+                                    "modified": datetime.fromtimestamp(mtime).isoformat(),
+                                    "mtime": mtime
+                                })
+
                     # Add to active specs list
+                    # Get title from hierarchy first, fall back to top-level
+                    spec_title = spec_root.get("title", spec_data.get("title", "Untitled Spec"))
+
                     active_specs.append({
                         "spec_id": spec_id,
-                        "title": spec_data.get("title", "Untitled Spec"),
+                        "title": spec_title,
                         "status": spec_status,
                         "in_progress_tasks": len(in_progress_tasks)
                     })
 
                     all_in_progress_tasks.extend(in_progress_tasks)
 
-            except Exception:
-                # Skip invalid JSON specs
+            except Exception as e:
+                # Skip invalid JSON specs, but log the error
+                logger.warning(f"Skipping spec {spec_file.name}: {str(e)}")
                 continue
 
         result["active_specs"] = active_specs
@@ -501,7 +528,7 @@ def get_session_state(specs_dir: Optional[str] = None) -> dict:
             result["timestamp"] = last_task["modified"]
 
     except Exception as e:
-        # Return empty result on error
-        pass
+        # Log error but return partial results
+        logger.error(f"Error in get_session_state: {str(e)}")
 
     return result

@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 # Add parent directory to path for sdd_common imports
 
 # Import shared utilities
-from claude_skills.common import find_specs_directory, PrettyPrinter
+from claude_skills.common import find_specs_directory, find_spec_file, PrettyPrinter
 from claude_skills.common import execute_verify_task, load_json_spec
 from claude_skills.common.spec import update_node, save_json_spec
 from claude_skills.common.sdd_config import get_default_format
@@ -105,7 +105,7 @@ from claude_skills.sdd_update.journal import (
     add_revision_entry,
 )
 from claude_skills.sdd_update.verification import add_verification_result, format_verification_summary
-from claude_skills.sdd_update.lifecycle import move_spec, complete_spec, activate_spec
+from claude_skills.sdd_update.lifecycle import move_spec, move_spec_by_id, complete_spec, activate_spec
 from claude_skills.sdd_update.time_tracking import track_time, generate_time_report
 from claude_skills.sdd_update.validation import validate_spec, get_status_report, audit_spec, reconcile_state, detect_unjournaled_tasks
 from claude_skills.sdd_update.query import (
@@ -842,16 +842,14 @@ def cmd_update_frontmatter(args, printer):
     if not use_json:
         printer.action(f"Updating metadata field '{args.key}'...")
 
-    spec_file = Path(args.spec_file).resolve()
-
-    # Extract spec_id from file path (remove .json or .md extension)
-    spec_id = spec_file.stem
-
-    # Get specs directory (parent of spec file)
-    specs_dir = spec_file.parent
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        if not use_json:
+            printer.error("Specs directory not found")
+        return 1
 
     success = update_metadata(
-        spec_id=spec_id,
+        spec_id=args.spec_id,
         key=args.key,
         value=args.value,
         specs_dir=specs_dir,
@@ -862,7 +860,7 @@ def cmd_update_frontmatter(args, printer):
     if use_json:
         result = {
             'success': success,
-            'spec_id': spec_id,
+            'spec_id': args.spec_id,
             'updated_fields': [args.key] if success else [],
             'updated_at': datetime.now(timezone.utc).isoformat() if success else None
         }
@@ -981,13 +979,21 @@ def cmd_move_spec(args, printer):
     if not use_json:
         printer.action(f"Moving spec to {args.target}...")
 
-    spec_file = Path(args.spec_file).resolve()
-    old_location = str(spec_file.parent.name)
+    specs_dir = find_specs_directory(getattr(args, 'specs_dir', None) or getattr(args, 'path', '.'))
+    if not specs_dir:
+        if not use_json:
+            printer.error("Specs directory not found")
+        return 1
+
+    # Find the spec file to determine old location before moving
+    spec_file = find_spec_file(args.spec_id, specs_dir)
+    old_location = str(spec_file.parent.name) if spec_file else "unknown"
     new_location = args.target
 
-    success = move_spec(
-        spec_file=spec_file,
+    success = move_spec_by_id(
+        spec_id=args.spec_id,
         target_folder=args.target,
+        specs_dir=specs_dir,
         dry_run=args.dry_run,
         printer=printer
     )
@@ -995,7 +1001,7 @@ def cmd_move_spec(args, printer):
     if use_json:
         result = {
             'success': success,
-            'spec_id': spec_file.stem,
+            'spec_id': args.spec_id,
             'old_location': old_location,
             'new_location': new_location,
             'moved_at': datetime.now(timezone.utc).isoformat() if success else None,
@@ -1862,7 +1868,7 @@ def register_update(subparsers, parent_parser):
 
     # update-frontmatter command
     p_front = subparsers.add_parser("update-frontmatter", help="Update spec frontmatter", parents=[parent_parser])
-    p_front.add_argument("spec_file", help="Path to spec file")
+    p_front.add_argument("spec_id", help="Specification ID")
     p_front.add_argument("key", help="Frontmatter key")
     p_front.add_argument("value", help="New value")
     p_front.add_argument("--dry-run", action="store_true", help="Preview change")
@@ -1896,7 +1902,7 @@ def register_update(subparsers, parent_parser):
 
     # move-spec command
     p_move = subparsers.add_parser("move-spec", help="Move spec to another folder", parents=[parent_parser])
-    p_move.add_argument("spec_file", help="Path to spec file")
+    p_move.add_argument("spec_id", help="Specification ID")
     p_move.add_argument("target", choices=["active", "completed", "archived"])
     p_move.add_argument("--dry-run", action="store_true", help="Preview move")
     p_move.set_defaults(func=cmd_move_spec)
