@@ -68,10 +68,6 @@ def prepare_output(data: Dict[str, Any], args,
     """
     verbosity_level = getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
 
-    if is_json_mode(args) and not is_quiet_mode(args):
-        if verbosity_level == VerbosityLevel.QUIET:
-            verbosity_level = VerbosityLevel.NORMAL
-
     return filter_output_fields(data, verbosity_level, essential_fields, standard_fields)
 
 
