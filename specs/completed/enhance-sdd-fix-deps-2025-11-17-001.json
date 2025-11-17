@@ -1,7 +1,7 @@
 {
   "spec_id": "enhance-sdd-fix-deps-2025-11-17-001",
   "generated": "2025-11-17T10:00:00Z",
-  "last_updated": "2025-11-17T17:29:17.551354Z",
+  "last_updated": "2025-11-17T17:32:40.108283Z",
   "metadata": {
     "title": "Enhance sdd fix Robustness for Missing Dependencies",
     "description": "Improve the sdd fix command's handling of missing, malformed, and partial dependency structures in the _build_bidirectional_deps_action function",
@@ -11,7 +11,10 @@
     "status": "completed",
     "activated_date": "2025-11-17T16:48:03.694437Z",
     "progress_percentage": 100,
-    "current_phase": "phase-3"
+    "current_phase": "phase-3",
+    "completed_date": "2025-11-17T17:32:21.470080Z",
+    "actual_hours": 0.079,
+    "git.branch_name": "better_fix_deps"
   },
   "hierarchy": {
     "spec-root": {

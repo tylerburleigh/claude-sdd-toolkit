@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 12:18:37
+**Generated:** 2025-11-17 12:32:22
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113182
+- **Total Lines:** 113246
 - **Total Classes:** 447
 - **Total Functions:** 1458
 - **Avg Complexity:** 4.75
