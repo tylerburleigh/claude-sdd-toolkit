@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 12:09:52
+**Generated:** 2025-11-17 12:14:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113014
+- **Total Lines:** 113068
 - **Total Classes:** 447
-- **Total Functions:** 1455
-- **Avg Complexity:** 4.76
+- **Total Functions:** 1456
+- **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -28407,7 +28407,7 @@ Returns:
 ### `test_apply_fix_actions_dry_run() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:374`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:375`
 **Complexity:** 1
 
 **Description:**
@@ -28418,7 +28418,7 @@ Returns:
 ### `test_apply_fix_actions_handles_errors() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:450`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:451`
 **Complexity:** 1
 
 **Description:**
@@ -28429,7 +28429,7 @@ Returns:
 ### `test_apply_fix_actions_real_apply(mock_backup, mock_save, mock_validate, mock_recalc) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:401`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:402`
 **Complexity:** 1
 
 **Decorators:** `@patch('claude_skills.sdd_validate.fix.recalculate_progress')`, `@patch('claude_skills.sdd_validate.fix.validate_spec_hierarchy')`, `@patch('claude_skills.sdd_validate.fix.save_json_spec')`, `@patch('claude_skills.sdd_validate.fix.backup_json_spec')`
@@ -28719,6 +28719,17 @@ Returns:
 
 ---
 
+### `test_build_bidirectional_deps_action_missing_dependencies() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1120`
+**Complexity:** 1
+
+**Description:**
+> Test bidirectional deps action with missing dependencies structure.
+
+---
+
 ### `test_build_call_graph_both_directions(tmp_path) -> None`
 
 **Language:** python
@@ -28876,7 +28887,7 @@ Returns:
 ### `test_build_counts_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:65`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:66`
 **Complexity:** 1
 
 **Description:**
@@ -28887,7 +28898,7 @@ Returns:
 ### `test_build_date_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:282`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:283`
 **Complexity:** 1
 
 **Description:**
@@ -28898,7 +28909,7 @@ Returns:
 ### `test_build_hierarchy_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:246`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:247`
 **Complexity:** 1
 
 **Description:**
@@ -28909,7 +28920,7 @@ Returns:
 ### `test_build_metadata_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:91`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:92`
 **Complexity:** 1
 
 **Description:**
@@ -28920,7 +28931,7 @@ Returns:
 ### `test_build_metadata_action_verify() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:123`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:124`
 **Complexity:** 1
 
 **Description:**
@@ -28931,7 +28942,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_all_placeholders() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:667`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:668`
 **Complexity:** 2
 
 **Description:**
@@ -28942,7 +28953,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_case_insensitive() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:620`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:621`
 **Complexity:** 2
 
 **Description:**
@@ -28953,7 +28964,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_category_mapping() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:986`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:987`
 **Complexity:** 2
 
 **Description:**
@@ -28964,7 +28975,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_category_name() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:522`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:523`
 **Complexity:** 1
 
 **Description:**
@@ -28975,7 +28986,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_generic_placeholder_uses_title() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1041`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1042`
 **Complexity:** 1
 
 **Description:**
@@ -28986,7 +28997,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_no_file_path() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:743`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:744`
 **Complexity:** 1
 
 **Description:**
@@ -28997,7 +29008,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_non_placeholder() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:707`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:708`
 **Complexity:** 2
 
 **Description:**
@@ -29008,7 +29019,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_non_task_node() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:815`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:816`
 **Complexity:** 2
 
 **Description:**
@@ -29019,7 +29030,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_preserves_existing_category() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:845`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:846`
 **Complexity:** 1
 
 **Description:**
@@ -29030,7 +29041,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_preview_shows_category() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1087`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:1088`
 **Complexity:** 2
 
 **Description:**
@@ -29041,7 +29052,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_subtask() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:770`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:771`
 **Complexity:** 1
 
 **Description:**
@@ -29052,7 +29063,7 @@ Returns:
 ### `test_build_placeholder_file_path_action_tbd() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:571`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:572`
 **Complexity:** 1
 
 **Description:**
@@ -29066,7 +29077,7 @@ a decision needs to be made about what to implement.
 ### `test_build_placeholder_file_path_action_tbd_maps_to_decision() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:941`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:942`
 **Complexity:** 1
 
 **Description:**
@@ -29077,7 +29088,7 @@ a decision needs to be made about what to implement.
 ### `test_build_placeholder_file_path_action_whitespace() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:897`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:898`
 **Complexity:** 1
 
 **Description:**
@@ -29088,7 +29099,7 @@ a decision needs to be made about what to implement.
 ### `test_build_status_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:309`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:310`
 **Complexity:** 1
 
 **Description:**
@@ -29099,7 +29110,7 @@ a decision needs to be made about what to implement.
 ### `test_build_task_category_action() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:154`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:155`
 **Complexity:** 1
 
 **Description:**
@@ -29110,7 +29121,7 @@ a decision needs to be made about what to implement.
 ### `test_build_task_category_action_investigation() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:201`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:202`
 **Complexity:** 1
 
 **Description:**
@@ -29748,7 +29759,7 @@ a decision needs to be made about what to implement.
 ### `test_collect_fix_actions_deduplicates() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:483`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:484`
 **Complexity:** 1
 
 **Description:**
@@ -29759,7 +29770,7 @@ a decision needs to be made about what to implement.
 ### `test_collect_fix_actions_empty() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:26`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:27`
 **Complexity:** 1
 
 **Description:**
@@ -29784,7 +29795,7 @@ a decision needs to be made about what to implement.
 ### `test_collect_fix_actions_with_enhanced_errors() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:40`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:41`
 **Complexity:** 1
 
 **Description:**
@@ -32127,7 +32138,7 @@ a decision needs to be made about what to implement.
 ### `test_normalize_status() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:354`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:355`
 **Complexity:** 1
 
 **Description:**
@@ -32138,7 +32149,7 @@ a decision needs to be made about what to implement.
 ### `test_normalize_timestamp() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:343`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_sdd_validate/test_fix.py:344`
 **Complexity:** 1
 
 **Description:**
@@ -38314,6 +38325,7 @@ Returns:
 - `claude_skills.common.validation.JsonSpecValidationResult`
 - `claude_skills.sdd_validate.fix.FixAction`
 - `claude_skills.sdd_validate.fix.FixReport`
+- `claude_skills.sdd_validate.fix._build_bidirectional_deps_action`
 - `claude_skills.sdd_validate.fix._build_counts_action`
 - `claude_skills.sdd_validate.fix._build_date_action`
 - `claude_skills.sdd_validate.fix._build_hierarchy_action`

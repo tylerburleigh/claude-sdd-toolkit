@@ -1168,3 +1168,55 @@ def test_build_bidirectional_deps_action_missing_dependencies():
     assert "blocked_by" in task2_deps
     assert "depends" in task2_deps
     assert "task-1" in task2_deps["blocked_by"]
+
+
+def test_build_bidirectional_deps_action_partial_dependencies():
+    """Test bidirectional deps action with partial dependencies structure."""
+    error = EnhancedError(
+        message="Node 'task-1' blocks 'task-2', but 'task-2' doesn't list 'task-1' in blocked_by",
+        severity="error",
+        category="dependency",
+        auto_fixable=True,
+    )
+
+    spec_data = {
+        "hierarchy": {
+            "task-1": {
+                "id": "task-1",
+                "type": "task",
+                "dependencies": {
+                    "blocks": [],  # Partial: only blocks, missing blocked_by and depends
+                },
+            },
+            "task-2": {
+                "id": "task-2",
+                "type": "task",
+                "dependencies": {
+                    "blocked_by": [],  # Partial: only blocked_by, missing blocks and depends
+                },
+            },
+        }
+    }
+
+    action = _build_bidirectional_deps_action(error, spec_data)
+
+    assert action is not None
+    assert action.category == "dependency"
+    assert action.auto_apply is True
+
+    # Apply the action
+    action.apply(spec_data)
+
+    # Verify setdefault added missing fields to task-1's dependencies
+    task1_deps = spec_data["hierarchy"]["task-1"]["dependencies"]
+    assert "blocks" in task1_deps
+    assert "blocked_by" in task1_deps  # Added by setdefault
+    assert "depends" in task1_deps  # Added by setdefault
+    assert "task-2" in task1_deps["blocks"]
+
+    # Verify setdefault added missing fields to task-2's dependencies
+    task2_deps = spec_data["hierarchy"]["task-2"]["dependencies"]
+    assert "blocks" in task2_deps  # Added by setdefault
+    assert "blocked_by" in task2_deps
+    assert "depends" in task2_deps  # Added by setdefault
+    assert "task-1" in task2_deps["blocked_by"]
