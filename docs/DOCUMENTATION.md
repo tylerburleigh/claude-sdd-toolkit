@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 07:39:27
+**Generated:** 2025-11-17 08:12:49
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 324
-- **Total Lines:** 112750
+- **Total Files:** 325
+- **Total Lines:** 112845
 - **Total Classes:** 447
-- **Total Functions:** 1451
-- **Avg Complexity:** 4.75
+- **Total Functions:** 1454
+- **Avg Complexity:** 4.74
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -11983,7 +11983,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:192`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:194`
 **Complexity:** 1
 
 **Description:**
@@ -11998,7 +11998,7 @@ Returns:
 ### `_register_optional_modules(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:248`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:250`
 **Complexity:** 6
 
 **Description:**
@@ -12013,7 +12013,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:230`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:232`
 **Complexity:** 1
 
 **Description:**
@@ -12028,7 +12028,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:212`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:214`
 **Complexity:** 1
 
 **Description:**
@@ -12697,8 +12697,8 @@ Returns:
 ### `_validate_sdd_config(config) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:84`
-⚠️ **Complexity:** 22 (High)
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:85`
+⚠️ **Complexity:** 25 (High)
 
 **Description:**
 > Validate and sanitize SDD configuration values.
@@ -15631,6 +15631,27 @@ Returns:
 
 **Description:**
 > Get detailed task information.
+
+**Parameters:**
+- `args`: None
+- `printer`: None
+
+---
+
+### `cmd_get_work_mode(args, printer) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/work_mode.py:21`
+**Complexity:** 1
+
+**Description:**
+> Handler for 'sdd get-work-mode' command.
+
+Reads the work_mode setting from .claude/sdd_config.json and outputs it as JSON.
+
+Args:
+    args: Parsed arguments from ArgumentParser
+    printer: PrettyPrinter instance for output (not used for JSON-only command)
 
 **Parameters:**
 - `args`: None
@@ -21684,7 +21705,7 @@ Returns:
 ### `get_config_path(project_path) -> Optional[Path]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:37`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:38`
 **Complexity:** 6
 
 **Description:**
@@ -21801,7 +21822,7 @@ Returns:
 ### `get_default_format(project_path) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:300`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:317`
 **Complexity:** 1
 
 **Description:**
@@ -22141,7 +22162,7 @@ Returns:
 ### `get_json_compact(project_path) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:319`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:336`
 **Complexity:** 1
 
 **Description:**
@@ -22626,7 +22647,7 @@ pair names are coerced to `True` so consensus still triggers automatically.
 ### `get_sdd_setting(key, project_path, default) -> Any`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:260`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:277`
 **Complexity:** 8
 
 **Description:**
@@ -23390,6 +23411,37 @@ Example:
 
 **Parameters:**
 - `args`: None
+
+---
+
+### `get_work_mode(project_path) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:352`
+**Complexity:** 1
+
+**Description:**
+> Get the work mode preference from configuration.
+
+The work mode controls how sdd-next executes tasks:
+- "single": Plan and execute one task at a time with explicit approval
+- "autonomous": Complete all tasks in current phase automatically
+
+Args:
+    project_path: Path to project root (optional)
+
+Returns:
+    Work mode string: "single" or "autonomous"
+
+Example:
+    work_mode = get_work_mode()
+    if work_mode == "autonomous":
+        # Execute all phase tasks automatically
+    else:
+        # Request approval for each task
+
+**Parameters:**
+- `project_path`: Optional[Path]
 
 ---
 
@@ -24451,7 +24503,7 @@ Returns:
 ### `load_sdd_config(project_path) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:209`
+**Defined in:** `src/claude_skills/claude_skills/common/sdd_config.py:226`
 **Complexity:** 6
 
 **Description:**
@@ -26018,6 +26070,25 @@ Args:
 
 **Description:**
 > Register gendocs command.
+
+**Parameters:**
+- `subparsers`: None
+- `parent_parser`: None
+
+---
+
+### `register_get_work_mode(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/work_mode.py:38`
+**Complexity:** 1
+
+**Description:**
+> Register 'get-work-mode' subcommand for unified SDD CLI.
+
+Args:
+    subparsers: ArgumentParser subparsers object
+    parent_parser: Parent parser with global options
 
 **Parameters:**
 - `subparsers`: None
@@ -34284,6 +34355,11 @@ Returns:
 - `enum.Enum`
 - `typing.Any`
 - `typing.Dict`
+
+### `src/claude_skills/claude_skills/cli/sdd/work_mode.py`
+
+- `claude_skills.common.json_output.output_json`
+- `claude_skills.common.sdd_config.get_work_mode`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/gendocs.py`
 
