@@ -682,9 +682,29 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
         if not blocker or not blocked:
             return
 
-        # Ensure dependencies dicts exist
-        blocker_deps = blocker.setdefault("dependencies", {})
-        blocked_deps = blocked.setdefault("dependencies", {})
+        # Validate nodes are dicts before modifying structure
+        if not isinstance(blocker, dict) or not isinstance(blocked, dict):
+            return
+
+        # Ensure dependencies dicts exist and are valid
+        # Handle missing, null, or malformed dependencies
+        blocker_deps = blocker.get("dependencies")
+        if not isinstance(blocker_deps, dict):
+            blocker["dependencies"] = {
+                "blocks": [],
+                "blocked_by": [],
+                "depends": [],
+            }
+            blocker_deps = blocker["dependencies"]
+
+        blocked_deps = blocked.get("dependencies")
+        if not isinstance(blocked_deps, dict):
+            blocked["dependencies"] = {
+                "blocks": [],
+                "blocked_by": [],
+                "depends": [],
+            }
+            blocked_deps = blocked["dependencies"]
 
         # Sync blocks/blocked_by
         blocks_list = blocker_deps.setdefault("blocks", [])
