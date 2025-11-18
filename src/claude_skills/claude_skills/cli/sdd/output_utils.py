@@ -744,13 +744,13 @@ RUN_TESTS_RUN_STANDARD = {
 }
 # sdd-plan-review command
 PLAN_REVIEW_SUMMARY_ESSENTIAL = {
-    'spec_id', 'review_type', 'recommendation',
-    'artifacts', 'issue_count', 'models_responded'
+    'spec_id', 'review_type', 'blocker_count',
+    'models_responded', 'artifacts'
 }
 PLAN_REVIEW_SUMMARY_STANDARD = {
-    'spec_id', 'review_type', 'recommendation', 'overall_score',
-    'artifacts', 'issue_count', 'models_responded',
-    'models_requested', 'models_consulted', 'failures',
-    'execution_time', 'consensus_level', 'dimension_scores',
-    'dry_run', 'artifact_failures'
+    'spec_id', 'review_type', 'artifacts',
+    'blocker_count', 'suggestion_count', 'question_count',
+    'models_responded', 'models_requested', 'models_consulted',
+    'execution_time', 'consensus_level',
+    'failures', 'dry_run'
 }

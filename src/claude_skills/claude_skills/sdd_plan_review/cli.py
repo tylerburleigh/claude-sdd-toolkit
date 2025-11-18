@@ -148,8 +148,6 @@ def cmd_review(args, printer):
             dry_payload = {
                 'spec_id': args.spec_id,
                 'review_type': args.type,
-                'recommendation': None,  # Deprecated
-                'overall_score': None,  # Deprecated
                 'artifacts': [],
                 'blocker_count': 0,
                 'suggestion_count': 0,
@@ -160,7 +158,6 @@ def cmd_review(args, printer):
                 'failures': 0,
                 'execution_time': 0,
                 'consensus_level': None,
-                'dimension_scores': {},  # Deprecated
                 'dry_run': True,
             }
             return _plan_review_output_json(dry_payload, args)
@@ -311,8 +308,6 @@ def cmd_review(args, printer):
     summary_payload = {
         'spec_id': spec_id,
         'review_type': args.type,
-        'recommendation': None,  # Deprecated
-        'overall_score': None,  # Deprecated
         'artifacts': artifact_paths,
         'blocker_count': len(consensus.get('critical_blockers') or []),
         'suggestion_count': len(consensus.get('major_suggestions') or []),
@@ -323,7 +318,6 @@ def cmd_review(args, printer):
         'failures': len(results['failures']),
         'execution_time': results.get('execution_time'),
         'consensus_level': consensus.get('consensus_level'),
-        'dimension_scores': {},  # Deprecated
         'dry_run': False,
     }
     if failed_artifacts:
