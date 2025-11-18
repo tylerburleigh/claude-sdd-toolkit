@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 18:11:27
+**Generated:** 2025-11-18 18:18:53
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113889
+- **Total Lines:** 113901
 - **Total Classes:** 448
 - **Total Functions:** 1465
 - **Avg Complexity:** 4.75
@@ -17,8 +17,8 @@
   - generate_report (55)
   - _handle_fidelity_review (51)
   - parse_review_response (50)
+  - cmd_review (46)
   - complete_task_workflow (45)
-  - cmd_review (44)
 
 
 
@@ -15839,7 +15839,7 @@ Args:
 ### `cmd_list_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:349`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:361`
 ⚠️ **Complexity:** 20 (High)
 
 **Description:**
@@ -16126,7 +16126,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:87`
-⚠️ **Complexity:** 44 (High)
+⚠️ **Complexity:** 46 (High)
 
 **Description:**
 > Review a specification file using multiple AI models.
@@ -26338,7 +26338,7 @@ Args:
 ### `register_plan_review(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:441`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:453`
 **Complexity:** 1
 
 **Description:**

@@ -146,7 +146,7 @@ def cmd_review(args, printer):
         printer.detail(f"Cache: {'Yes' if args.cache else 'No'}")
         if json_requested:
             dry_payload = {
-                'spec_id': spec_id,
+                'spec_id': args.spec_id,
                 'review_type': args.type,
                 'recommendation': None,  # Deprecated
                 'overall_score': None,  # Deprecated
