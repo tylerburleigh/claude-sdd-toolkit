@@ -12,11 +12,11 @@ from typing import Optional
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.integrations import get_session_state
+from claude_skills.common.json_output import format_compact_output
+from claude_skills.common.sdd_config import get_default_format
 from claude_skills.cli.skills_dev.git_config_helper import (
-    cmd_check_git_config,
     cmd_setup_git_config,
     detect_git_config_state,
-    format_git_config_summary,
 )
 from claude_skills.common.setup_templates import load_json_template_clean
 
@@ -209,35 +209,6 @@ def _render_active_work(specs: list[dict], session_state: dict) -> str:
     return "\n".join(lines)
 
 
-def cmd_check_permissions(args, printer: PrettyPrinter) -> int:
-    """Check if SDD permissions are configured for the project."""
-    # Note: CLAUDE_TRANSCRIPT_PATH env var is automatically set by session-start hook
-    # and inherited by all child processes. No cache or validation needed.
-
-    project_root = Path(args.project_root) if args.project_root else Path.cwd()
-    project_root = project_root.resolve()
-
-    status = _get_permissions_status(project_root)
-    needs_setup = not status.get("configured", False)
-
-    result = {
-        "has_specs_dir": status.get("has_specs", False),
-        "needs_setup": needs_setup,
-        "project_root": str(project_root),
-        "status": status.get("status"),
-    }
-
-    if args.json:
-        print(json.dumps(result, indent=2))
-    else:
-        if needs_setup:
-            printer.warning("SDD permissions need setup")
-        else:
-            printer.success("SDD permissions are configured")
-
-    return 0 if not needs_setup else 1
-
-
 def cmd_find_active_work(args, printer: PrettyPrinter) -> int:
     """Find all active SDD specifications with resumable work."""
     project_root = Path(args.project_root) if args.project_root else Path.cwd()
@@ -245,67 +216,6 @@ def cmd_find_active_work(args, printer: PrettyPrinter) -> int:
 
     result = _collect_specs_info(project_root)
     result["project_root"] = str(project_root)
-
-    print(json.dumps(result, indent=2))
-    return 0
-
-
-def cmd_format_output(args, printer: PrettyPrinter) -> int:
-    """Format active work as human-readable text with last-accessed task info."""
-    project_root = Path(args.project_root) if args.project_root else Path.cwd()
-    project_root = project_root.resolve()
-
-    specs_info = _collect_specs_info(project_root)
-    session_state = get_session_state(str(project_root / "specs"))
-    text = _render_active_work(specs_info.get("specs", []), session_state or {})
-    print(text)
-    return 0
-
-
-def cmd_get_session_info(args, printer: PrettyPrinter) -> int:
-    """Get session state information as JSON."""
-    project_root = Path(args.project_root) if args.project_root else Path.cwd()
-    project_root = project_root.resolve()
-
-    specs_dir = project_root / "specs"
-
-    if not specs_dir.exists():
-        result = {
-            "has_specs": False,
-            "message": "No specs directory found"
-        }
-        print(json.dumps(result, indent=2))
-        return 0
-
-    # Get session state
-    session_state = get_session_state(str(specs_dir))
-
-    # Build pending_specs list from specs in pending folder
-    specs_pending = specs_dir / "pending"
-    pending_specs = []
-    if specs_pending.exists():
-        for spec_file in specs_pending.glob("*.json"):
-            try:
-                with open(spec_file, 'r') as f:
-                    spec_data = json.load(f)
-                hierarchy = spec_data.get('hierarchy', {})
-                spec_root = hierarchy.get('spec-root', {})
-                pending_specs.append({
-                    "spec_id": spec_data.get('spec_id'),
-                    "title": spec_root.get('title', 'Unknown')
-                })
-            except Exception:
-                continue
-
-    # Combine with active work info
-    result = {
-        "has_specs": True,
-        "last_task": session_state.get("last_task"),
-        "active_specs": session_state.get("active_specs", []),
-        "pending_specs": pending_specs,
-        "in_progress_count": session_state.get("in_progress_count", 0),
-        "timestamp": session_state.get("timestamp")
-    }
 
     print(json.dumps(result, indent=2))
     return 0
@@ -378,8 +288,10 @@ def cmd_session_summary(args, printer: PrettyPrinter) -> int:
         "session_state": session_state,
     }
 
-    if args.json:
-        print(json.dumps(result, indent=2))
+    should_output_json = args.json or get_default_format(project_root) == 'json'
+
+    if should_output_json:
+        print(format_compact_output(result, command_type='session-summary'))
     else:
         perm_status = permissions.get("status", "unknown")
         git_msg = "configured" if git_status.get("configured") else "needs setup"
@@ -454,15 +366,6 @@ def register_start_helper(subparsers, parent_parser):
         required=True
     )
 
-    # check-permissions command
-    check_perms = start_helper_subparsers.add_parser(
-        'check-permissions',
-        parents=[parent_parser],
-        help='Check if SDD permissions are configured'
-    )
-    check_perms.add_argument('project_root', nargs='?', help='Project root directory')
-    check_perms.set_defaults(func=cmd_check_permissions)
-
     # find-active-work command
     find_work = start_helper_subparsers.add_parser(
         'find-active-work',
@@ -471,24 +374,6 @@ def register_start_helper(subparsers, parent_parser):
     )
     find_work.add_argument('project_root', nargs='?', help='Project root directory')
     find_work.set_defaults(func=cmd_find_active_work)
-
-    # format-output command
-    format_out = start_helper_subparsers.add_parser(
-        'format-output',
-        parents=[parent_parser],
-        help='Format active work as human-readable text'
-    )
-    format_out.add_argument('project_root', nargs='?', help='Project root directory')
-    format_out.set_defaults(func=cmd_format_output)
-
-    # get-session-info command
-    session_info = start_helper_subparsers.add_parser(
-        'get-session-info',
-        parents=[parent_parser],
-        help='Get session state with last-accessed task (JSON)'
-    )
-    session_info.add_argument('project_root', nargs='?', help='Project root directory')
-    session_info.set_defaults(func=cmd_get_session_info)
 
     # session-summary command
     session_summary = start_helper_subparsers.add_parser(
@@ -516,15 +401,6 @@ def register_start_helper(subparsers, parent_parser):
     )
     ensure_sdd_config.add_argument('project_root', nargs='?', help='Project root directory')
     ensure_sdd_config.set_defaults(func=cmd_ensure_sdd_config)
-
-    # check-git-config command
-    check_git = start_helper_subparsers.add_parser(
-        'check-git-config',
-        parents=[parent_parser],
-        help='Check if git configuration is set up'
-    )
-    check_git.add_argument('project_root', nargs='?', help='Project root directory')
-    check_git.set_defaults(func=cmd_check_git_config)
 
     # setup-git-config command
     setup_git = start_helper_subparsers.add_parser(

@@ -435,3 +435,79 @@ def extract_next_task_contract(next_task_output: Dict[str, Any]) -> Dict[str, An
     contract["title"] = next_task_output.get("title", "")
 
     return contract
+
+
+def extract_session_summary_contract(summary_output: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract minimal contract from `sdd start-helper session-summary` output.
+
+    Purpose:
+        Determine the state of the environment and active work to guide the user.
+        Decisions:
+        1. Permissions OK? -> If not, stop.
+        2. Git OK? -> If not, offer setup.
+        3. Work Found? -> Show text, offer Resume/Backlog.
+
+    Field Inclusion Rules:
+
+        ALWAYS INCLUDE (Essential):
+        - permissions.status: Gatekeeper for tool usage
+        - git.needs_setup: Gatekeeper for git wizard
+        - active_work.found: Boolean toggle for options
+        - active_work.text: Pre-rendered summary for display
+
+        CONDITIONALLY INCLUDE (Optional):
+        - git.settings: Only if configured (for info)
+        - active_work.pending_specs: Only if present (for backlog menu)
+        - session_state.last_task: Only if present (for resume option)
+
+        OMIT (Redundant/Not Needed):
+        - project_root: Known from env
+        - permissions.settings_file, exists, has_specs: Debug info
+        - git.git_config_file, exists, enabled: Debug info
+        - active_work.specs, message, count: Redundant with text
+        - session_state.active_specs, timestamp: Redundant
+
+    Args:
+        summary_output: Full output from sdd start-helper session-summary
+
+    Returns:
+        Minimal contract dict with essential session information
+    """
+    contract = {}
+
+    # Permissions - only status is essential
+    permissions = summary_output.get("permissions", {})
+    contract["permissions"] = {
+        "status": permissions.get("status", "unknown")
+    }
+
+    # Git - needs_setup is essential, settings optional
+    git = summary_output.get("git", {})
+    git_contract = {
+        "needs_setup": git.get("needs_setup", False)
+    }
+    if "settings" in git:
+        git_contract["settings"] = git["settings"]
+    contract["git"] = git_contract
+
+    # Active Work - found and text are essential
+    active_work = summary_output.get("active_work", {})
+    aw_contract = {
+        "found": active_work.get("active_work_found", False),
+        "text": active_work.get("text", "")
+    }
+    # Include pending_specs only if present (for backlog menu)
+    pending = active_work.get("pending_specs")
+    if pending:
+        aw_contract["pending_specs"] = pending
+    contract["active_work"] = aw_contract
+
+    # Session State - only last_task if present
+    session_state = summary_output.get("session_state")
+    if session_state:
+        last_task = session_state.get("last_task")
+        if last_task:
+            contract["session_state"] = {"last_task": last_task}
+
+    return contract

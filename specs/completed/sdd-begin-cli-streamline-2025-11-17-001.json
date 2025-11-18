@@ -1,0 +1,413 @@
+{
+  "spec_id": "sdd-begin-cli-streamline-2025-11-17-001",
+  "generated": "2025-11-17T00:00:00Z",
+  "last_updated": "2025-11-18T10:15:00Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Optimize sdd-begin with Contract Extraction & Cleanup",
+      "status": "completed",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 10,
+      "completed_tasks": 10,
+      "metadata": {
+        "description": "Optimize the existing sdd-begin workflow by applying contract extraction to the 'session-summary' command and removing legacy/redundant commands.",
+        "objectives": [
+          "Apply contract extraction to 'session-summary' for 60-80% token reduction",
+          "Remove 4 deprecated CLI commands (format-output, get-session-info, check-permissions, check-git-config)",
+          "Ensure sdd-begin workflow remains robust and efficient"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Optimize session-summary Command",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 4,
+      "metadata": {
+        "purpose": "Reduce token usage of the primary discovery command",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ]
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/contracts.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/contracts.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Implement `extract_session_summary_contract` function. Extract minimal data: permissions status, git needs_setup/settings, active_work text/pending_specs, session_state last_task.",
+        "completed_at": "2025-11-18T10:05:00Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/json_output.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/json_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Register 'session-summary' contract in `format_compact_output` mapping.",
+        "completed_at": "2025-11-18T10:06:00Z"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Verify Contract Extraction",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/test_start_helper_contracts.py",
+        "expected": "New contract extractor works and reduces size significantly.",
+        "completed_at": "2025-11-18T10:10:00Z"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Phase 1 Fidelity Review",
+      "status": "completed",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "completed_at": "2025-11-18T10:12:00Z"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Cleanup Legacy Commands",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 4,
+      "metadata": {
+        "purpose": "Remove redundant code",
+        "risk_level": "medium"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ]
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "Implementation",
+      "status": "completed",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ]
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+      "status": "completed",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/skills_dev/start_helper.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1,
+        "completed_at": "2025-11-18T10:08:00Z"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Remove deprecated command functions",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Remove cmd_check_permissions, cmd_format_output, cmd_get_session_info, cmd_check_git_config"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Remove command registrations",
+      "status": "completed",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "description": "Remove argparse registrations for deprecated commands"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Verify Removal",
+      "status": "completed",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "grep -E 'check-permissions|format-output' src/claude_skills/claude_skills/cli/skills_dev/start_helper.py || echo 'Clean'",
+        "expected": "No matches found in source file",
+        "completed_at": "2025-11-18T10:09:00Z"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Phase 2 Fidelity Review",
+      "status": "completed",
+      "parent": "phase-2-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "completed_at": "2025-11-18T10:12:00Z"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Final Verification",
+      "status": "completed",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-verify"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {
+        "purpose": "Ensure overall system health",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2"
+        ]
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "completed",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 2,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Run Test Suite",
+      "status": "completed",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/",
+        "expected": "All tests pass",
+        "completed_at": "2025-11-18T10:13:00Z"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Spec Fidelity Review",
+      "status": "completed",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "completed_at": "2025-11-18T10:15:00Z"
+      }
+    }
+  }
+}

@@ -156,14 +156,14 @@ Based on user preferences from Step 2:
 Check if git integration is configured:
 
 ```bash
-sdd skills-dev start-helper check-git-config .
+sdd skills-dev start-helper session-summary . --json
 ```
 
-The script will return JSON with a `needs_setup` field.
+The script will return JSON with a `git.needs_setup` field.
 
 ### Step 5: Configure Git if Needed
 
-**If `needs_setup: false`:**
+**If `git.needs_setup: false`:**
 
 Display message with current settings:
 ```
@@ -181,7 +181,7 @@ Current Git Configuration:
 ```
 
 To generate this display:
-1. Parse the `settings` object from check-git-config JSON output
+1. Parse the `git.settings` object from session-summary JSON output
 2. Use the formatting pattern shown above
 3. Show actual values from the user's configuration
 

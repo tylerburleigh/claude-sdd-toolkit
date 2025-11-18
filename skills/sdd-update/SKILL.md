@@ -364,7 +364,7 @@ When completing a task and git integration is enabled, the workflow follows thes
 
 **1. Check Commit Cadence**
 
-First, confirm whether automatic commits are enabled for the current event type. `sdd-update` reads `.claude/git_config.json` at runtime, so you only need to inspect the configuration (for example: `sdd start-helper check-git-config --json`) to see whether the cadence is set to `task`, `phase`, or `manual`.
+First, confirm whether automatic commits are enabled for the current event type. `sdd-update` reads `.claude/git_config.json` at runtime, so you only need to inspect the configuration (for example: `sdd skills-dev start-helper session-summary . --json`) to see whether the cadence is set to `task`, `phase`, or `manual`.
 
 **2. Check for Changes**
 

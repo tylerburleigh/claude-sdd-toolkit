@@ -42,8 +42,6 @@ Use this single payload to decide what to do next:
 3. **Git already configured**:
    - Optionally display a short summary, e.g., `Git integration: ✅ Enabled (auto-branch, auto-commit per task, AI PRs)`.
 
-This single command replaces the older sequence of `check-permissions`, `setup-permissions`, `check-git-config`, and `get-session-info` calls.
-
 ---
 
 ### Phase 2: Review Active Work (No Extra Commands)

@@ -29,13 +29,14 @@ from claude_skills.common.contracts import (
     extract_task_info_contract,
     extract_check_deps_contract,
     extract_progress_contract,
-    extract_next_task_contract
+    extract_next_task_contract,
+    extract_session_summary_contract
 )
 
 logger = logging.getLogger(__name__)
 
 # Type alias for supported command types
-CommandType = Literal['prepare-task', 'task-info', 'check-deps', 'progress', 'next-task']
+CommandType = Literal['prepare-task', 'task-info', 'check-deps', 'progress', 'next-task', 'session-summary']
 
 
 def format_json_output(
@@ -158,7 +159,8 @@ def format_compact_output(
         'task-info': extract_task_info_contract,
         'check-deps': extract_check_deps_contract,
         'progress': extract_progress_contract,
-        'next-task': extract_next_task_contract
+        'next-task': extract_next_task_contract,
+        'session-summary': extract_session_summary_contract
     }
 
     # Validate command_type
