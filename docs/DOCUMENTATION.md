@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 17:51:01
+**Generated:** 2025-11-18 17:52:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114031
+- **Total Lines:** 114020
 - **Total Classes:** 448
 - **Total Functions:** 1469
 - **Avg Complexity:** 4.75
@@ -10199,7 +10199,7 @@ Returns:
 ### `_generate_feasibility_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:247`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:236`
 **Complexity:** 1
 
 **Description:**
@@ -10231,7 +10231,7 @@ Returns:
 ### `_generate_quick_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:152`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:141`
 **Complexity:** 1
 
 **Description:**
@@ -10247,7 +10247,7 @@ Returns:
 ### `_generate_security_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:189`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:178`
 **Complexity:** 1
 
 **Description:**
@@ -23019,7 +23019,7 @@ Example:
 ### `get_stance_instruction(stance) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:297`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:286`
 **Complexity:** 3
 
 **Description:**

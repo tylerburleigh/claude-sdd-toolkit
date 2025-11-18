@@ -52,9 +52,10 @@ What the spec does well.
 ---
 
 **Important**:
-- Use category tags: [Completeness], [Clarity], [Feasibility], [Architecture], [Risk Management], [Verification]
+- Use category tags: [Completeness], [Architecture], [Data Model], [Interface Design], [Security], [Verification]
 - Include all sections even if empty (write "None identified" for empty sections)
 - Be specific and actionable in all feedback
+- For clarity issues, use Questions section rather than creating a separate category
 - Attribution: In multi-model reviews, prefix items with "Flagged by [model-name]:" when applicable
 """
 
@@ -115,13 +116,13 @@ Effective reviews combine critical analysis with actionable guidance.
 - ✅ "Strong design choice here because..."
 - ✅ "Clarification needed: how does this handle scenario X?"
 
-**Evaluate across 6 dimensions:**
+**Evaluate across 6 technical dimensions:**
 
 1. **Completeness** - Identify missing sections, undefined requirements, ambiguous tasks
-2. **Clarity** - Find vague descriptions, unclear acceptance criteria, ambiguous language
-3. **Feasibility** - Identify unrealistic estimates, impossible dependencies, resource constraints
-4. **Architecture** - Find design issues, coupling concerns, missing abstractions, scalability considerations
-5. **Risk Management** - Identify unaddressed risks, missing edge cases, failure modes
+2. **Architecture** - Find design issues, coupling concerns, missing abstractions, scalability considerations
+3. **Data Model** - Evaluate data structures, relationships, consistency, migration strategies
+4. **Interface Design** - Review API contracts, component boundaries, integration patterns
+5. **Security** - Identify authentication, authorization, data protection, and vulnerability concerns
 6. **Verification** - Find testing gaps, missing verification steps, coverage opportunities
 
 **SPECIFICATION TO REVIEW:**
