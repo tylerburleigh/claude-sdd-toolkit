@@ -140,27 +140,32 @@ Effective reviews combine critical analysis with actionable guidance.
 
 
 def _generate_quick_review_prompt(spec_content: str, spec_id: str, title: str) -> str:
-    """Generate quick review prompt focusing on completeness and clarity."""
+    """Generate quick review prompt focusing on blockers and questions."""
     return f"""You are conducting a quick technical review of a software specification.
 
 **Spec**: {spec_id}
 **Title**: {title}
-**Review Type**: Quick (focus on completeness and clarity)
+**Review Type**: Quick (focus on blockers and questions)
 
-**Your role**: Identify critical gaps and ambiguities that would block implementation.
+**Your role**: Identify critical blockers and key questions that need resolution before implementation.
 
-**This specification likely has problems. Find them:**
+**Focus on finding:**
 
-1. **Completeness**: List all missing sections, undefined requirements, gaps
-2. **Clarity**: Identify vague descriptions, unclear acceptance criteria
-3. **Critical Issues**: Find blockers that prevent implementation
+1. **Critical Blockers**: What would prevent implementation from starting?
+   - Missing required sections or requirements
+   - Undefined dependencies or integrations
+   - Unresolved technical decisions
+   - Incomplete acceptance criteria
 
-**Focus on these questions**:
-- What information is missing?
-- What is ambiguous or unclear?
-- What would block a developer from implementing this?
-- Are acceptance criteria defined?
-- Are dependencies stated?
+2. **Key Questions**: What needs clarification?
+   - Ambiguous requirements or acceptance criteria
+   - Unclear technical approaches
+   - Missing context or rationale
+   - Edge cases not addressed
+
+**Evaluation areas**:
+- **Completeness**: Are all necessary sections and requirements present?
+- **Questions**: What clarifications are needed?
 
 **SPECIFICATION TO REVIEW:**
 
@@ -172,7 +177,7 @@ def _generate_quick_review_prompt(spec_content: str, spec_id: str, title: str) -
 
 {RESPONSE_SCHEMA}
 
-**Note**: Focus primarily on completeness and clarity dimensions. Other dimensions can have brief notes.
+**Note**: Focus primarily on Critical Blockers and Questions sections. Brief notes for other sections are sufficient.
 """
 
 
@@ -184,41 +189,36 @@ def _generate_security_review_prompt(spec_content: str, spec_id: str, title: str
 **Title**: {title}
 **Review Type**: Security (focus on vulnerabilities and risks)
 
-**Your role**: You are a security auditor who assumes malicious users and identifies vulnerabilities.
+**Your role**: Security specialist helping identify and mitigate potential vulnerabilities.
 
-**This specification has security vulnerabilities. Find them:**
+**Focus on security considerations:**
 
-1. **Identify CRITICAL security issues**:
-   - Authentication/authorization flaws
-   - Data validation gaps
-   - Secrets management problems
-   - Access control weaknesses
-   - Injection vulnerabilities
+1. **Authentication & Authorization**:
+   - Are authentication mechanisms properly designed?
+   - Is authorization enforced at appropriate boundaries?
+   - Does access control follow principle of least privilege?
 
-2. **Identify HIGH security issues**:
-   - Missing audit logging
-   - Insufficient error handling
-   - Insecure defaults
-   - Privacy concerns
-   - Compliance gaps
+2. **Data Protection**:
+   - Is input validation comprehensive?
+   - Are secrets managed securely?
+   - Is data encrypted at rest and in transit?
+   - Do error messages avoid leaking sensitive information?
 
-3. **Identify MEDIUM/LOW security issues**:
-   - Rate limiting needs
-   - Input sanitization improvements
-   - Security headers
-   - Encryption opportunities
+3. **Common Vulnerabilities**:
+   - Are injection attacks (SQL, command, XSS, CSRF) prevented?
+   - Are security headers and protections in place?
+   - Is rate limiting and DoS protection addressed?
+   - Are insecure defaults avoided?
 
-**Security evaluation checklist**:
-- [ ] Authentication/authorization properly designed?
-- [ ] Input validation comprehensive?
-- [ ] Secrets management secure?
-- [ ] Access control principle of least privilege?
-- [ ] Audit logging sufficient?
-- [ ] Error messages don't leak information?
-- [ ] Data encryption at rest and in transit?
-- [ ] SQL/command injection prevented?
-- [ ] CSRF/XSS protections in place?
-- [ ] Rate limiting and DoS protection?
+4. **Audit & Compliance**:
+   - Is audit logging sufficient for security events?
+   - Are privacy concerns addressed?
+   - Are relevant compliance requirements considered?
+
+**Evaluation areas**:
+- **Security**: Authentication, authorization, data protection, vulnerability prevention
+- **Architecture**: Security-relevant design decisions
+- **Data Model**: Data sensitivity, encryption, access patterns
 
 **SPECIFICATION TO REVIEW:**
 
@@ -230,45 +230,49 @@ def _generate_security_review_prompt(spec_content: str, spec_id: str, title: str
 
 {RESPONSE_SCHEMA}
 
-**Emphasize the risk_management dimension in your scoring.**
+**Note**: Focus primarily on Security category feedback. Include Critical Blockers for any security issues that must be addressed before implementation.
 """
 
 
 def _generate_feasibility_review_prompt(spec_content: str, spec_id: str, title: str) -> str:
-    """Generate feasibility-focused review prompt."""
-    return f"""You are conducting a feasibility review of a software specification.
+    """Generate technical complexity review prompt."""
+    return f"""You are conducting a technical complexity review of a software specification.
 
 **Spec**: {spec_id}
 **Title**: {title}
-**Review Type**: Feasibility (focus on realistic implementation)
+**Review Type**: Technical Complexity (focus on implementation challenges)
 
-**Your role**: You are a pragmatic engineer who identifies unrealistic estimates and impossible dependencies.
+**Your role**: Pragmatic engineer helping identify technical challenges and implementation risks.
 
-**These estimates are likely wrong. Find the problems:**
+**Focus on technical considerations:**
 
-1. **Identify underestimated tasks**:
-   - Which tasks will take longer than estimated?
-   - What hidden complexity exists?
-   - What dependencies are missing?
+1. **Hidden Complexity**:
+   - What technical challenges might not be obvious?
+   - Where does complexity concentrate?
+   - What edge cases increase difficulty?
 
-2. **Identify overestimated tasks**:
-   - Which tasks are simpler than stated?
-   - Where can work be parallelized?
+2. **Dependencies & Integration**:
+   - Are all required dependencies identified?
+   - Are external services/APIs available and documented?
+   - Are integration points well-defined?
+   - What dependency risks exist?
 
-3. **Identify impossible requirements**:
-   - What dependencies don't exist?
-   - What technical constraints block this?
-   - What skills are required but not available?
+3. **Technical Constraints**:
+   - What technical limitations could impact the design?
+   - Are performance requirements achievable?
+   - Are there scalability considerations?
+   - What infrastructure requirements exist?
 
-**Feasibility evaluation checklist**:
-- [ ] Time estimates realistic for each task?
-- [ ] Dependencies available and accessible?
-- [ ] Required skills present in team?
-- [ ] External services/APIs exist and documented?
-- [ ] Performance requirements achievable?
-- [ ] Complexity accurately assessed?
-- [ ] Blockers identified and mitigated?
-- [ ] Resource requirements feasible?
+4. **Implementation Risks**:
+   - What could go wrong during implementation?
+   - Where are the highest-risk technical areas?
+   - What mitigation strategies are needed?
+
+**Evaluation areas**:
+- **Completeness**: Are technical requirements fully specified?
+- **Architecture**: Is the technical approach sound?
+- **Data Model**: Are data complexity factors addressed?
+- **Interface Design**: Are integration points well-defined?
 
 **SPECIFICATION TO REVIEW:**
 
@@ -280,7 +284,7 @@ def _generate_feasibility_review_prompt(spec_content: str, spec_id: str, title: 
 
 {RESPONSE_SCHEMA}
 
-**Emphasize the feasibility dimension in your scoring. Identify specific tasks with unrealistic estimates.**
+**Note**: Focus on technical challenges and risks. Identify Major Suggestions for areas of hidden complexity and Critical Blockers for missing technical requirements.
 """
 
 

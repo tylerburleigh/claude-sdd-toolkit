@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 17:52:18
+**Generated:** 2025-11-18 17:53:18
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114020
+- **Total Lines:** 114021
 - **Total Classes:** 448
 - **Total Functions:** 1469
 - **Avg Complexity:** 4.75
@@ -10199,7 +10199,7 @@ Returns:
 ### `_generate_feasibility_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:236`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:237`
 **Complexity:** 1
 
 **Description:**
@@ -10215,7 +10215,7 @@ Returns:
 ### `_generate_full_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:90`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:91`
 **Complexity:** 1
 
 **Description:**
@@ -10231,7 +10231,7 @@ Returns:
 ### `_generate_quick_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:141`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:142`
 **Complexity:** 1
 
 **Description:**
@@ -10247,7 +10247,7 @@ Returns:
 ### `_generate_security_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:178`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:179`
 **Complexity:** 1
 
 **Description:**
@@ -21402,7 +21402,7 @@ Returns:
 ### `generate_review_prompt(spec_content, review_type, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:62`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:63`
 **Complexity:** 4
 
 **Description:**
@@ -23019,7 +23019,7 @@ Example:
 ### `get_stance_instruction(stance) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:286`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:287`
 **Complexity:** 3
 
 **Description:**
