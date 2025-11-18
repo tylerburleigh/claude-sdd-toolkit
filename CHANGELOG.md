@@ -6,6 +6,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.6.0] - 2025-11-18
+
+### Added
+
+**Three-Tier Verbosity System (#25):**
+- New verbosity levels: QUIET, NORMAL, VERBOSE for controlling CLI output detail
+  - QUIET: Minimal output with ~50% reduction, essential fields only
+  - NORMAL: Balanced output (current default, backward compatible)
+  - VERBOSE: Maximum output with debug information
+- Field-level filtering with essential/standard field sets
+- Applied across 100+ CLI commands
+- CLI flags: `--quiet` and `--verbose`
+- Configuration: `output.default_verbosity` in `.claude/sdd_config.json`
+
+**AI Consultation Enhancements (#24):**
+- Fallback and retry logic for AI tool consultations
+- Per-invocation consultation limits via `consultation_limits.max_tools_per_run`
+- ConsultationTracker for thread-safe tracking across parallel consultations
+- Configurable retry/skip behavior based on error types (timeout, error, not_found, invalid_output)
+- Skill-level default model configuration for all AI providers
+- Tool priority and fallback order resolution
+- Hybrid retry strategy (transient errors retry, permanent errors skip to next tool)
+
+**Work Mode Configuration:**
+- New `work_mode` field in `.claude/sdd_config.json`
+  - "single": Plan and execute one task at a time with explicit approval (default)
+  - "autonomous": Complete all tasks in current phase automatically within context limits
+- Eliminates interruptions for mode selection
+- Persistent preference across sessions
+- New CLI command: `sdd get-work-mode`
+
+**High-Level Task Operations:**
+- Convenience operations in sdd-modify: update_task, update_metadata, add_verification, batch_update
+- Eliminates need for custom Python scripts for bulk spec modifications
+- Matches documented API for task-centric operations
+
+### Changed
+
+**Context Optimization (#26):**
+- Enhanced context_utils.py with deduplication and file grouping
+- Optimized sdd-next context gathering to reduce redundant CLI calls
+- Improved dependency analysis in discovery.py
+- Better performance for task preparation workflows
+
+**User Guidance:**
+- Enhanced error messages for blocked operations
+- Improved hook feedback with modification workflow examples
+- Better guidance when agents encounter CLI errors
+
+**Documentation:**
+- Added Journal vs Git History guidance
+- Updated Deep Dive & Plan Approval section
+- Multiple fidelity reviews and improvements
+- Output field parity verification across commands
+
+### Fixed
+- Transcript path resolution issues
+- Various small bugs and edge cases
+
+### Performance
+- ~50% output reduction in QUIET mode for token optimization
+- Reduced redundant CLI calls in sdd-next context gathering
+- Improved context preparation performance
+
+### Notes
+- Verbosity NORMAL mode maintains backward compatibility with previous output
+- All existing tests passing
+- Configuration changes are backward compatible
+- AI consultation fallback respects tool availability and configuration
+
 ## [0.5.1] - 2025-11-11
 
 ### Added

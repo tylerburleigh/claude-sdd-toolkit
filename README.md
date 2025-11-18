@@ -1,1019 +1,992 @@
-# SDD Toolkit - Claude Code Plugin
+# SDD Toolkit - Spec-Driven Development for Claude Code
 
-> Plan-first development with Claude - systematic, trackable, and organized
+> Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.5.1-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.6.0-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
 ## What is This?
 
-The SDD Toolkit is a set of Claude skills and Python CLI tools that enable spec-driven development. It puts Claude on guardrails by having it work from machine-readable JSON specs that define tasks, dependencies, and track progress.
+The SDD Toolkit is a Python library and CLI toolkit for Spec-Driven Development (SDD). It structures AI-assisted development around machine-readable JSON specifications that define tasks, dependencies, and track progress.
 
-**What it includes:**
-- **Claude skills** - Interactive workflows like `sdd-plan`, `sdd-next`, and `sdd-update`
-- **Python CLI** - Commands for creating, reading, and updating spec files
-- **Integration** - Skills invoke CLI commands to systematically work through tasks
+**Architecture**: 183 Python modules, 154 classes, and 915 functions organized into independent, composable skills.
 
-This was built to keep Claude focused on one task at a time while maintaining a complete record of what's planned, what's done, and what's next.
+### Components
+
+**For Claude Code:**
+- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `code-doc`, `doc-query`, etc.)
+- Slash Commands - Quick actions (`/sdd-begin`, `/sdd-setup`)
+- Subagent System - Specialized agents for multi-step tasks
+
+**For CLI:**
+- Unified `sdd` command for SDD, documentation, testing, and validation operations
+- Multi-provider support for Gemini, Codex, Cursor Agent, and Claude
+- Output modes: Rich (terminal-enhanced), plain text, or JSON
+
+**Integration**:
+Claude skills orchestrate workflows → Python CLI executes operations → Results inform next steps
 
 ## Why Use This?
 
-Working on complex projects with Claude can lead to scope drift, forgotten requirements, and lost context. The toolkit addresses this by:
+AI-assisted development without structure can lead to scope drift, lost context, unclear progress, and difficulty resuming work.
 
-- Defining all work upfront in a spec before implementation starts
-- Breaking execution into atomic tasks (one file per task) with approval gates
-- Tracking progress automatically so you can resume anytime
-- Journaling decisions and changes for a complete project record
+SDD Toolkit provides:
 
-Specs live in your project as JSON files, giving you a machine-readable history of what was planned and what was actually done.
+- Plan-first workflow with validated specifications
+- Atomic task breakdown with dependency tracking
+- Automatic progress tracking with status updates and time recording
+- Multi-model AI consultation for quality reviews
+- AST-based code analysis with AI enhancement
+- Version control integration through JSON files
 
-## Installation
+## Quick Start
 
-1. Launch Claude Code (`claude` command)
-2. Type `/plugin` and press Enter
-3. Select **"Add from marketplace"**
-4. Enter: `tylerburleigh/claude-sdd-toolkit`
-5. Wait for the repository to clone
-6. Click **"Install"** when prompted
-7. **Exit Claude Code completely**
-8. Install Python dependencies:
+### Installation
+
+1. **Install Plugin**:
+   ```
+   claude  # Launch Claude Code
+   /plugin → Add from marketplace → tylerburleigh/claude-sdd-toolkit
+   ```
+
+2. **Install Python Package**:
    ```bash
    cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
    pip install -e .
    ```
-9. **Restart Claude Code**
-10. **Configure your project**: Open your project in Claude Code and run:
-    ```
-    /sdd-setup
-    ```
-    This configures the necessary permissions for SDD tools to work in your project.
 
-That's it! The plugin is now ready to use.
+3. **Configure Project** (in Claude Code):
+   ```
+   /sdd-setup
+   ```
 
-## Quick Start
-
-### Your First Workflow
-
-In Claude Code, try this:
+### First Workflow
 
 ```
-Create a spec for a command line Pomodoro/task timer.
+You: Create a spec for a CLI Pomodoro timer
+
+Claude: [Analyzes codebase, creates specs/pending/pomodoro-timer-001.json]
+
+You: /sdd-begin
+
+Claude: Found pending spec "pomodoro-timer-001"
+        Ready to activate and start implementing?
+
+You: Yes
+
+Claude: [Moves to specs/active/, starts first task]
+        Task 1-1: Create Timer class with start/pause/stop methods
+        [Implements task, updates status]
+
+You: /sdd-begin
+
+Claude: Task 1-2: Add notification system...
+        [Continues through tasks]
 ```
 
-Claude will:
-1. Explore your codebase (if you have one)
-2. Create a detailed specification
-3. Break it into actionable tasks
-4. Save it as `specs/pending/{spec-id}.json`
+See [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a complete workflow example.
 
-Resume anytime with:
+## Architecture
+
+### Modular Skill-Based Design
+
+Each major capability is implemented as an independent skill module:
 
 ```
-/sdd-begin
+┌─────────────────────────────────────────────────────────────────┐
+│                      Skill Architecture                         │
+└─────────────────────────────────────────────────────────────────┘
+
+         Core Workflow Skills (Main)
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  sdd-plan    │  │  sdd-next    │  │  sdd-update  │
+│              │  │              │  │              │
+│  Create      │  │  Orchestrate │  │  Track       │
+│  Specs       │  │  Tasks       │  │  Progress    │
+└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+    ┌────────────────────┼────────────────────┐
+    │                    │                    │
+┌───▼────┐         ┌─────▼─────┐       ┌─────▼─────┐
+│ code-  │         │    doc-   │       │   run-    │
+│ doc    │         │   query   │       │   tests   │
+│        │         │           │       │           │
+│ Docs   │         │  Analyze  │       │  Testing  │
+└───┬────┘         └─────┬─────┘       └─────┬─────┘
+    │                    │                   │
+    └────────────────────┼───────────────────┘
+                         │
+              Supporting Skills
+    ┌────────────────────┼────────────────────┐
+    │                    │                    │
+┌───▼──────────┐  ┌──────▼──────┐   ┌────────▼──────┐
+│ sdd-validate │  │ sdd-fidelity│   │ sdd-plan-     │
+│ sdd-render   │  │    -review  │   │    review     │
+│ sdd-modify   │  │             │   │               │
+└──────────────┘  └─────────────┘   └───────────────┘
+                         │
+                  ┌──────▼──────┐
+                  │   common    │
+                  │             │
+                  │  Shared     │
+                  │  Utilities  │
+                  └─────────────┘
 ```
 
-### See It In Action
+**Core Workflow:**
+- **sdd-plan** - Create specifications with tasks and dependencies
+- **sdd-next** - Orchestrate workflow, find next actionable task
+- **sdd-update** - Track progress, update status, journal decisions
 
-Want to see a complete workflow from start to finish? Check out [docs/examples/complete_task_workflow.md](docs/examples/complete_task_workflow.md) for a real-world demonstration. It shows the full interaction between a user and Claude after the user runs `/sdd-begin` until the first task is completed and journaled. This example gives you a sense of what you can expect using this tool.
+**Supporting Skills:**
+- Documentation: `code-doc`, `doc-query`
+- Quality: `sdd-validate`, `sdd-fidelity-review`, `sdd-plan-review`, `sdd-modify`
+- Testing: `run-tests`
+- Utilities: `sdd-render`, `context-tracker`, `sdd-pr`
 
-(NOTE: This example was generated using version 0.1.0)
+Benefits:
+- Independent development and testing
+- Clear separation of concerns
+- Extensible without breaking changes
+- Composable workflows
 
-## Latest Updates
+### Provider Abstraction Layer
 
-**Version 0.5.1** introduces a unified provider abstraction layer for AI tool orchestration with four provider implementations (Gemini, Codex, Cursor Agent, Claude). The Claude provider features read-only tool restrictions for secure execution. All providers now use correct, CLI-supported model names with increased 360s default timeouts for extended reasoning. See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+Unified interface for multiple AI tools:
 
-**Version 0.5.0** introduces Plain UI mode for better terminal compatibility, modernizes the configuration system with `default_mode` (rich/plain/json) and centralized AI config in `.claude/ai_config.yaml`, and adds optional JSON Schema validation. Includes workflow guardrails with pre-tool hooks that enforce structured CLI usage, preventing direct spec JSON access. Test suite reorganized to package namespace with comprehensive integration coverage.
+```python
+# All providers implement ProviderContext
+providers = ["gemini", "cursor-agent", "codex", "claude"]
 
-**Version 0.4.5** refactors AI consultation infrastructure with a unified `ai_tools` module, eliminating code duplication across run-tests, sdd-plan-review, and code-doc skills. Provides type-safe interfaces, parallel execution support, and comprehensive test coverage.
+# Parallel consultation
+results = consult_multi_agent(
+    prompt=prompt,
+    providers=["gemini", "cursor-agent"],
+    mode="parallel"
+)
+```
 
-**Version 0.4.2** introduces compact mode with estimated 30% token savings from `sdd` command output. Configure via `.claude/sdd_config.json` or use `--compact`/`--no-compact` flags.
+**Supported Providers:**
+- **Gemini** - Google's Gemini 2.5 Pro/Flash models
+- **Cursor Agent** - Cursor IDE's AI with 1M context (Composer)
+- **Codex** - Anthropic Codex CLI
+- **Claude** - Anthropic Claude with read-only restrictions (Sonnet 4.5/Haiku 4.5)
 
-**Version 0.4.1** adds agent-controlled file staging and AI-powered PR creation with the new `sdd-pr` skill.
+**Security**: Claude provider enforces read-only tool access (allows Read, Grep, Glob, WebSearch; blocks Write, Edit, Bash).
 
-**Important:** After updating the toolkit, you must reinstall the Python package to get the latest CLI commands. See [Updating the Toolkit](#updating-the-toolkit) below.
+### Data Flow
+
+**Primary State: JSON Specifications**
+
+```
+specs/
+├── pending/      # Planned work
+├── active/       # Current implementation
+├── completed/    # Finished features
+└── archived/     # Cancelled work
+```
+
+**Lifecycle:**
+```
+Plan → Validate → Activate → Implement → Track → Review → Complete
+  ↓        ↓          ↓           ↓         ↓        ↓         ↓
+sdd-plan  validate  activate  sdd-next  update  fidelity      PR
+```
+
+All specs are Git-trackable JSON files.
+
+## Skills Reference
+
+### Planning & Workflow
+
+| Skill | Purpose | Example Usage |
+|-------|---------|---------------|
+| **sdd-plan** | Create specifications | "Plan a user authentication feature" |
+| **sdd-next** | Find next actionable task | "What should I work on next?" |
+| **sdd-update** | Update status, journal, move specs between folders | "Mark task complete" "Add journal entry" "Move spec to completed" |
+| **sdd-validate** | Check spec validity | "Validate my spec for errors" |
+| **sdd-render** | Generate markdown docs | "Render spec with AI insights" |
+
+### Quality Assurance
+
+| Skill | Purpose | Example Usage |
+|-------|---------|---------------|
+| **sdd-plan-review** | Multi-model spec review | "Review my spec before implementing" |
+| **sdd-fidelity-review** | Verify implementation | "Did I implement what the spec said?" |
+| **sdd-modify** | Apply review feedback | "Apply review suggestions to spec" |
+| **run-tests** | Test with AI debugging | "Run tests and fix failures" |
+
+### Documentation & Analysis
+
+| Skill | Purpose | Example Usage |
+|-------|---------|---------------|
+| **code-doc** | Generate codebase docs | "Document this codebase" |
+| **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" |
+| **context-tracker** | Monitor Claude usage | "Show my context consumption" |
+
+### Workflow Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/sdd-begin` | Resume work (shows pending/active specs) |
+| `/sdd-setup` | Configure project permissions |
 
 ## Core Concepts
 
 ### Specifications (Specs)
 
-A **spec** is a JSON file containing:
-- Feature overview and goals
-- File-by-file implementation plan
-- Task breakdown with dependencies
-- Verification steps
-- Edge cases and considerations
+**Structure:**
+```json
+{
+  "metadata": {
+    "name": "User Authentication",
+    "version": "1.0.0",
+    "complexity": "medium"
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Core Auth System",
+      "tasks": [...]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1-1",
+      "title": "Create User model",
+      "phase_id": "phase-1",
+      "dependencies": [],
+      "status": "pending",
+      "verification": ["Model validates email", "Password hashing works"]
+    }
+  ],
+  "journal": []
+}
+```
 
-Specs live in your project's `specs/` directory:
-- `specs/pending/` - Backlog of planned work awaiting activation (specs are created here by default)
-- `specs/active/` - Current work (you can have multiple specs representing parallel work streams)
-- `specs/completed/` - Finished features
-- `specs/archived/` - Old/cancelled work
+**Schema**: Validated against `specification-schema.json`
 
-When you create a spec, it starts in `pending/`. This allows you to plan multiple features without cluttering your active workspace. When you run `/sdd-begin`, Claude will show you pending specs and offer to activate them when you're ready to start working.
+**Lifecycle Folders:**
+- `pending/` - Backlog awaiting activation
+- `active/` - Current work (supports parallel specs)
+- `completed/` - Finished features
+- `archived/` - Cancelled/deprecated
 
-### Design Principles
+### Tasks: Atomic Work Units
 
-**Atomic Tasks**: Each task represents a single, focused change to one file. This design:
-- Enables precise dependency tracking between tasks
-- Allows granular progress monitoring
-- Supports parallel implementation when tasks are independent
-- Makes verification and rollback straightforward
-- Prevents scope creep within individual tasks
+Each task represents a single, focused change.
 
-When a feature requires changes across multiple files, decompose it into multiple tasks or use subtasks with proper dependencies. See [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for detailed guidance.
+**Task Structure:**
+```json
+{
+  "id": "task-1-1",
+  "title": "Implement JWT token generation",
+  "description": "Create TokenService.generateToken() method...",
+  "phase_id": "phase-1",
+  "dependencies": ["task-1-0"],
+  "verification": [
+    "Token contains user ID and expiry",
+    "Token passes signature validation"
+  ],
+  "status": "pending",
+  "category": "implementation",
+  "estimated_hours": 2.0,
+  "actual_hours": null,
+  "started_at": null,
+  "completed_at": null
+}
+```
 
-**Task Categories**: Each task can be categorized to improve organization and reporting:
-- `investigation` - Exploring codebase, understanding existing systems
-- `implementation` - Writing new code or features
-- `refactoring` - Improving existing code structure
-- `decision` - Architecture or design decisions
-- `research` - External research, learning new technologies
+**Automatic Time Tracking:**
+- `started_at` recorded when status changes to `in-progress`
+- `completed_at` recorded when status changes to `completed`
+- `actual_hours` calculated from timestamps
+- Spec totals aggregated from all tasks
 
-Categories help with progress tracking and post-project analysis.
+**Categories:**
+- `investigation` - Explore codebase
+- `implementation` - Write new code
+- `refactoring` - Improve structure
+- `decision` - Architecture choices
+- `research` - External research
 
-**Automatic Time Tracking**: The toolkit automatically tracks time spent on tasks using timestamps:
-- When a task transitions to `in_progress`, `started_at` timestamp is recorded
-- When marked `completed`, `completed_at` timestamp is recorded
-- `actual_hours` is automatically calculated from the duration
-- Spec-level totals are aggregated from all task times
+### Dependencies & Orchestration
 
-No manual time entry needed - the toolkit handles it automatically based on when you actually work on tasks.
+**Dependency Resolution:**
+```json
+{
+  "id": "task-2-1",
+  "dependencies": ["task-1-1", "task-1-2"]
+}
+```
 
-**Documentation Integration**: Several skills leverage generated codebase documentation for better context:
-- **sdd-plan**: Understands existing code patterns when creating specs
-- **sdd-next**: Provides relevant code context when preparing tasks
-- **run-tests**: Uses docs to understand test relationships and dependencies
+`sdd-next` uses dependencies to:
+- Determine which tasks are ready vs blocked
+- Provide correct execution order
+- Enable parallel work on independent tasks
 
-Best practice: Ask Claude to "Document this codebase" before creating specs to enable enhanced context. Skills gracefully degrade to Explore/Glob/Grep when docs are unavailable.
+**Validation**: `sdd-validate` detects circular dependencies. Use `sdd validate <spec> --show-graph` for visualization.
 
-**Context Tracking**: The toolkit monitors your Claude conversation token usage to prevent hitting the 160k "usable context" limit (80% of 200k total before auto-compaction). `sdd-next` automatically checks context after completing tasks and warns when usage exceeds safe thresholds.
+### Multi-Model Consultation
 
-### Provider Abstraction
+Skills using multi-agent consultation:
+- `sdd-plan-review` - Spec quality assessment
+- `sdd-fidelity-review` - Implementation verification
+- `code-doc` - Architecture analysis
 
-Model providers (Gemini, Codex, Cursor Agent, Claude) plug into a shared layer under `claude_skills.common.providers`. Each provider subclasses `ProviderContext`, exposes supported capabilities/models through `ProviderMetadata` + `ModelDescriptor`, and receives lifecycle hooks (`ProviderHooks`) so skills can stream output, collect token usage, and normalize failures. The registry helpers (`register_provider`, `register_lazy_provider`, `resolve_provider`) manage discovery, while detectors coordinate PATH lookups and environment overrides (`CLAUDE_SKILLS_TOOL_PATH`, `*_CLI_BINARY`, `*_CLI_AVAILABLE_OVERRIDE`) before instantiating providers.
+**Process:**
+1. Parallel consultation of 2+ AI models (default: cursor-agent + gemini)
+2. Independent analysis by each model
+3. Consensus detection for common findings
+4. Synthesis into unified report
+5. Results cached to reduce API costs
 
-**Claude Provider:** Uses the `claude` CLI with read-only tool restrictions for security (allows Read, Grep, Glob, WebSearch, WebFetch, Task, Explore; blocks Write, Edit, Bash). Supports Sonnet 4.5 and Haiku 4.5 models with 360-second default timeout.
+**Trade-offs:**
+- Higher API cost (mitigated by caching)
+- Multiple perspectives reduce bias
+- Parallel execution minimizes latency
 
-Test providers in isolation with the CLI runner:
+### Documentation Integration
+
+**Generated Documentation:**
 
 ```bash
-# Test Gemini provider
-python -m claude_skills.cli.provider_runner --provider gemini --prompt "Summarize the release notes" --json
-
-# Test Claude provider with read-only access
-python -m claude_skills.cli.provider_runner --provider claude --prompt "Analyze code structure" --json
+sdd doc analyze-with-ai . --name "MyProject" --version "1.0.0"
 ```
 
-The runner wires hooks, handles streaming, and returns a normalized `GenerationResult` payload. To add a new provider, expose a `create_provider()` factory that returns your `ProviderContext` subclass, register it (lazily if desired), and describe its models/capabilities so routing heuristics can pick the right tool.
+**Outputs:**
+- `docs/DOCUMENTATION.md` - Structural reference
+- `docs/documentation.json` - Machine-readable data (AST, dependencies, metrics)
+- `docs/ARCHITECTURE.md` - Architecture overview
+- `docs/AI_CONTEXT.md` - AI assistant reference
 
-### Skills
+**Used By:**
+- `sdd-plan` - Understands existing patterns
+- `sdd-next` - Provides code context for tasks
+- `doc-query` - Fast queries without re-parsing
 
-**Skills** extend Claude's capabilities. The toolkit provides:
-
-| Skill | What It Does | When To Use |
-|-------|-------------|-------------|
-| `sdd-plan` | Create specifications | "Plan a feature for rate limiting" |
-| `sdd-next` | Find next task | "What should I work on next?" |
-| `sdd-update` | Track progress | Automatic when tasks complete |
-| `sdd-validate` | Check spec validity | "Is my spec valid?" |
-| `sdd-render` | Render specs to markdown | Generate human-readable documentation with AI enhancement (3 modes: basic/summary/standard/full) |
-| `sdd-plan-review` | Multi-model review | "Review my spec" |
-| `sdd-fidelity-review` | Review implementation fidelity | "Did I implement what the spec actually said?" "Check implementation against task requirements" |
-| `sdd-modify` | Apply spec modifications systematically | "Apply review feedback to spec" "Update task descriptions from review report" |
-| `code-doc` | Generate docs | "Document this codebase" |
-| `doc-query` | Query docs & analyze relationships | "What calls this function?" "Show call graph" "Find refactor candidates" |
-| `run-tests` | Run & debug tests | "Run tests and fix failures" |
-
-Claude uses skills automatically based on your requests.
-
-### Spec Modification & Review
-
-Specs are living documents that evolve during implementation. The toolkit provides comprehensive tools for validating specs, reviewing implementation fidelity, and applying feedback systematically.
-
-**Validation Workflow:**
-
+**Query Capabilities:**
 ```bash
-# Validate spec structure
-sdd validate-spec spec-id
-
-# Auto-fix common issues
-sdd validate-spec spec-id --fix
-
-# Generate validation report
-sdd validate-spec spec-id --report
+sdd doc stats                       # Project statistics
+sdd doc search "authentication"     # Find code
+sdd doc complexity --threshold 10   # High-complexity functions
+sdd doc dependencies src/auth.py    # Module dependencies
+sdd doc callers authenticate_user   # Function callers
+sdd doc callees authenticate_user   # Function callees
+sdd doc call-graph login_endpoint   # Call relationships
+sdd doc impact change_function      # Refactoring impact
+sdd doc refactor-candidates         # Complex code
 ```
 
-**Fidelity Review Workflow:**
+### Context Tracking
 
-```bash
-# Review entire spec implementation
-sdd fidelity-review spec-id
+Claude Code context limits:
+- 200k total context window
+- 160k usable before auto-compaction (80% threshold)
 
-# Review specific phase or task
-sdd fidelity-review spec-id --phase phase-2
-sdd fidelity-review spec-id --task task-3-1
+Automatic monitoring during `sdd-next`:
+```
+Claude: [Completes task-1-1]
+        Context: 45% (72k/160k tokens)
 
-# Use specific AI tools for review
-sdd fidelity-review spec-id --ai-tools gemini codex
+        [Completes task-1-2]
+        Context: 62% (99k/160k)
 
-# Output to file
-sdd fidelity-review spec-id --output review.md --format markdown
+        Warning: Above 50% - consider saving progress
 ```
 
-**Systematic Modification Workflow:**
-
-After reviews identify issues, apply fixes systematically.
-
-**When using sdd-next:** Modifications are orchestrated by sdd-next after verification tasks complete. sdd-next presents options to the user and invokes `sdd-modify-subagent` when approved.
-
-**For manual workflows or direct CLI use:**
-
-```bash
-# Parse review feedback into structured modifications
-sdd parse-review spec-id --review review-report.md --output suggestions.json
-
-# Preview modifications before applying
-sdd apply-modifications spec-id --from suggestions.json --dry-run
-
-# Apply modifications with automatic backup and validation
-sdd apply-modifications spec-id --from suggestions.json
-```
-
-**Complete Closed-Loop (Manual):**
-
-```bash
-# 1. Review implementation
-sdd fidelity-review spec-id --output review.md
-
-# 2. Parse feedback
-sdd parse-review spec-id --review review.md
-
-# 3. Preview modifications
-sdd apply-modifications spec-id --from spec-id-suggestions.json --dry-run
-
-# 4. Apply modifications
-sdd apply-modifications spec-id --from spec-id-suggestions.json
-
-# 5. Re-review to confirm fixes
-sdd fidelity-review spec-id
-```
-
-**Complete Closed-Loop (via sdd-next):**
-
-```
-1. sdd-next triggers fidelity review verification
-2. Review identifies spec improvements
-3. sdd-next presents options: Apply/Manual/Defer
-4. If Apply: sdd-next invokes sdd-modify-subagent
-5. sdd-modify applies changes with backup & validation
-6. sdd-next documents and offers re-verification
-```
-
-**Key Capabilities:**
-
-- **Validation** - Check spec structure, detect circular dependencies, verify task relationships
-- **Auto-fixing** - Automatically fix common issues like missing fields or incorrect metadata
-- **Fidelity Review** - Compare implementation against spec using AI consultation
-- **Consensus Analysis** - Multiple AI models review and identify deviations
-- **Systematic Feedback** - Step-by-step workflow for applying review feedback
-
-**When to Use:**
-
-- ✅ After completing each phase (verify implementation matches spec)
-- ✅ Before creating pull requests (ensure quality and alignment)
-- ✅ After manual spec edits (validate structure and dependencies)
-- ✅ When implementation deviates from plan (document and review changes)
-
-**Documentation:**
-
-- [docs/spec-modification.md](docs/spec-modification.md) - Complete modification and validation guide
-- [docs/review-workflow.md](docs/review-workflow.md) - Fidelity review workflow and best practices
+Clear context with `/clear` and resume with `/sdd-begin` when usage exceeds 80%.
 
 ### Subagent Architecture
 
-Some skills use **Claude Code's subagent system** for orchestration. Subagents are specialized instances of Claude that handle complex, multi-step tasks autonomously.
-
-**How it works:**
-
-When you invoke certain skills (like `sdd-validate`, `run-tests`, or `code-doc`), Claude launches a subagent using the `Task` tool:
+Some skills launch subagents - specialized Claude instances for multi-step tasks:
 
 ```
-Task(
-  subagent_type: "sdd-toolkit:sdd-validate-subagent",
-  prompt: "Validate specs/active/my-spec.json",
-  description: "Validate spec file"
-)
+User Request → Main Claude → Task Tool → Subagent → Execute → Report Back
 ```
 
-**Workflow diagram:**
+**Skills Using Subagents:**
+- `sdd-validate`, `sdd-plan-review`, `sdd-fidelity-review`
+- `sdd-update`, `run-tests`, `code-doc`, `sdd-modify`
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Subagent Workflow                        │
-└─────────────────────────────────────────────────────────────┘
-
-User: "Validate my spec"
-  │
-  ▼
-┌──────────────────┐
-│  Main Claude     │  Recognizes validation needed
-│  (sdd-next)      │
-└────────┬─────────┘
-         │ Invokes Task tool
-         ▼
-┌──────────────────┐
-│  Task Tool       │  Launches specialized subagent
-│  (Claude Code)   │
-└────────┬─────────┘
-         │ Creates subagent
-         ▼
-┌──────────────────┐
-│  Subagent        │  Autonomous Claude instance
-│  (sdd-validate)  │  - Specialized context
-└────────┬─────────┘  - Focused tools
-         │ Executes commands
-         ▼
-┌──────────────────┐
-│  SDD CLI         │  Runs validation commands
-│  (sdd validate)  │  - Checks spec structure
-└────────┬─────────┘  - Validates dependencies
-         │ Returns results
-         ▼
-┌──────────────────┐
-│  Subagent        │  Analyzes results
-│  (sdd-validate)  │  - Summarizes findings
-└────────┬─────────┘  - Formats report
-         │ Reports back
-         ▼
-┌──────────────────┐
-│  Main Claude     │  Receives report
-│  (sdd-next)      │  - Presents to user
-└────────┬─────────┘  - Continues workflow
-         │
-         ▼
-User: Sees validation results
-```
-
-**Benefits of subagents:**
-
-- **Autonomous execution**: Subagents work independently to complete complex tasks
-- **Specialized context**: Each subagent has focused tools and instructions
-- **Parallel work**: Multiple subagents can run concurrently
-- **Clean handoffs**: Main Claude receives results without context pollution
-
-**Which skills use subagents:**
-
-- `sdd-validate` → Launches validation subagent for spec quality checks
-- `sdd-plan-review` → Launches review subagent for multi-model feedback
-- `sdd-fidelity-review` → Launches fidelity review subagent for implementation verification
-- `sdd-update` → Launches update subagent for progress tracking and journaling
-- `run-tests` → Launches testing subagent for test execution and debugging
-- `code-doc` → Launches documentation subagent for codebase analysis
-
-**Other skills** (`sdd-plan`, `sdd-next`, `doc-query`) run directly in the main conversation for tighter integration with your workflow.
-
-### Commands
-
-**Commands** are interactive workflows you invoke with `/`:
-
-- `/sdd-begin` - Resume work (shows both pending and active specs with options to activate or continue)
-- `/sdd-setup` - Configure project permissions
-
-Type `/` in Claude Code to see all available commands.
-
-### The SDD Workflow
-
-```
-1. Create Spec
-   "Plan feature X"
-   ↓
-2. Review & Refine
-   Claude generates detailed spec
-   ↓
-3. Implement Tasks
-   /sdd-begin → pick next task
-   ↓
-4. Track Progress
-   Tasks auto-marked as complete
-   ↓
-5. Resume Anytime
-   /sdd-begin shows progress
-```
+**Skills Running Directly:**
+- `sdd-plan`, `sdd-next`, `doc-query`
 
 ## Common Workflows
 
-### Create and Implement a Feature
+### Plan and Implement a Feature
 
 ```
-You: Create a spec for adding rate limiting to the API
+You: Create a spec for rate limiting on the API
 
-Claude: [Creates detailed spec at specs/pending/rate-limiting-001.json]
+Claude: [Creates specs/pending/rate-limiting-001.json]
 
 You: /sdd-begin
 
-Claude: Found pending spec "rate-limiting-001"
-        Would you like to activate it and start working?
+Claude: Found pending spec: rate-limiting-001
+        Activate and start implementing?
 
 You: Yes
 
-Claude: [Moves spec to specs/active/]
-        Task 1: Create RateLimiter middleware class
-        [Implements the task]
+Claude: [Moves to specs/active/]
+        Task 1-1: Create RateLimiter middleware class
+        [Implements, marks complete]
 
-You: /sdd-begin
+        ...
 
-Claude: Task 2: Add rate limit configuration...
-        [Continues through all tasks]
-
-        ✅ All tasks completed (7/7 = 100%)
-        This spec is ready to be finalized. Move to completed/?
+        All tasks complete (7/7)
+        Move to completed/?
 
 You: Yes
 
-Claude: [Moves spec to specs/completed/]
+Claude: [Moves to specs/completed/rate-limiting-001.json]
 ```
 
-### Resume Work After a Break
+### Resume After Break
 
 ```
 You: /sdd-begin
 
 Claude: Found 2 active specs:
-        1. rate-limiting-001 (3/7 tasks complete)
-        2. user-auth-002 (1/5 tasks complete)
+        1. rate-limiting-001 (3/7 tasks, 43%)
+        2. user-auth-002 (1/5 tasks, 20%)
 
-        Which would you like to continue?
+        Which spec?
 
 You: 1
 
-Claude: Continuing rate-limiting-001
-        Next task: Add rate limit headers to responses
-        [Shows task details and helps implement]
+Claude: Resuming rate-limiting-001
+        Next: Task 1-4 - Add rate limit headers
 ```
 
-### Generate and Query Documentation
+### Generate & Query Documentation
 
 ```
-You: Document this codebase
+You: Document this codebase with AI enhancement
 
-Claude: [Uses code-doc skill to generate docs/documentation.json]
+Claude: [Uses code-doc skill]
+        Analyzing 183 files...
+        Consulting cursor-agent and gemini...
+
+        Generated:
+        - docs/DOCUMENTATION.md
+        - docs/documentation.json
+        - docs/ARCHITECTURE.md
+        - docs/AI_CONTEXT.md
 
 You: What classes handle authentication?
 
-Claude: [Uses doc-query skill to search documentation]
-        Found 3 classes:
-        - AuthManager (src/auth/manager.py)
-        - TokenValidator (src/auth/tokens.py)
-        - SessionStore (src/auth/sessions.py)
+Claude: Found 3 authentication classes:
+
+        1. AuthManager (src/auth/manager.py:15)
+           - Methods: authenticate(), validateToken(), refreshToken()
+           - Complexity: 8
+
+        2. TokenValidator (src/auth/tokens.py:23)
+           - Methods: validate(), decode(), verify()
+           - Complexity: 5
+
+        3. SessionStore (src/auth/sessions.py:45)
+           - Methods: create(), get(), delete()
+           - Complexity: 4
+
+You: Show call graph for authenticate()
+
+Claude: AuthManager.authenticate()
+        ├── TokenValidator.validate()
+        │   ├── decode()
+        │   └── verify()
+        ├── UserRepository.findByEmail()
+        └── SessionStore.create()
+            └── RedisClient.set()
 ```
 
-### Get Multi-Model Review
+### Multi-Model Review
 
 ```
-You: Review my spec with multiple AI models
+You: Review my authentication spec
 
 Claude: [Uses sdd-plan-review skill]
-        Consulting Gemini, GPT-5, and Codex...
+        Consulting cursor-agent and gemini...
 
-        Feedback summary:
-        - All models agree on the approach
-        - Gemini suggests adding retry logic
-        - GPT-5 recommends error boundary patterns
-        - Codex warns about performance implications
+        cursor-agent completed (34.2s)
+        gemini completed (36.8s)
+
+        Consensus findings:
+        - Overall approach is sound
+        - Task breakdown is appropriate
+
+        cursor-agent suggests:
+        - Add retry logic for token validation
+        - Consider rate limiting on auth endpoints
+
+        gemini suggests:
+        - Add session timeout handling
+        - Consider multi-factor authentication hooks
 ```
 
-### Monitor Context Usage
+### Verify Implementation Fidelity
 
 ```
-You: /sdd-begin
+You: Did I implement what the spec said?
 
-Claude: [Completes task-1-1]
-        Context usage: 45% (72k/160k tokens)
-        Continue to next task?
+Claude: [Uses sdd-fidelity-review skill]
+        Reviewing implementation...
+        Consulting cursor-agent and gemini...
 
-You: Yes
+        Phase 1: Core Auth (3 tasks)
+        ✅ task-1-1: User model - COMPLIANT
+        ✅ task-1-2: Password hashing - COMPLIANT
+        ⚠️ task-1-3: Token generation - DEVIATION
 
-Claude: [Completes task-1-2]
-        Context usage: 62% (99k/160k tokens)
+        Deviation in task-1-3:
+        - Spec: JWT with 24h expiry
+        - Implemented: JWT with 1h expiry
 
-        ⚠️ Context usage above 50% - consider saving progress
-        Options:
-        1. Continue with next task (not recommended above 80%)
-        2. Save progress and clear context (/clear, then /sdd-begin to resume)
+        Recommendation: Update spec or change code to 24h
 ```
 
-### Validate and Fix a Spec
+### Debug Test Failures
 
 ```
-You: Validate my spec
+You: Run tests and fix failures
 
-Claude: [Uses sdd-validate skill]
-        Found 12 issues:
-        - 3 circular dependencies
-        - 5 missing dependencies
-        - 4 schema violations
+Claude: [Uses run-tests skill]
+        Running pytest...
 
-        Auto-fix available. Apply fixes?
+        3 tests failed
 
-You: Yes
+        Consulting gemini...
 
-Claude: Fixed 8 issues automatically
-        Remaining 4 issues require manual review:
-        [Details of unfixable issues]
-```
+        test_authenticate_user FAILED
+        - Issue: Missing mock for UserRepository
+        - Fix: Add @patch('auth.UserRepository')
 
-### Analyze Code Relationships
-
-```
-You: What calls the authenticateUser function?
-
-Claude: [Uses doc-query skill]
-        Found 5 callers:
-        - LoginController.login() (src/controllers/auth.py:45)
-        - APIMiddleware.verify() (src/middleware/api.py:23)
-        - WebSocketHandler.connect() (src/ws/handler.py:89)
-        - AdminPanel.authorize() (src/admin/panel.py:156)
-        - TestAuthFlow.test_login() (tests/test_auth.py:34)
-
-You: Show me the call graph starting from the login endpoint
-
-Claude: [Generates call graph visualization]
-        LoginController.login()
-        ├── authenticateUser()
-        │   ├── validateCredentials()
-        │   ├── checkUserStatus()
-        │   └── generateToken()
-        └── createSession()
-            └── persistSession()
+        test_validate_token FAILED
+        - Issue: Token expiry not mocked
+        - Fix: Use freezegun to control time
 ```
 
 ## Project Structure
 
-After using the toolkit, your project will have:
-
 ```
 your-project/
-├── specs/                    # Specifications
-│   ├── pending/             # Backlog (planned work)
-│   │   └── future-feature.json
-│   ├── active/              # Current work
-│   │   └── feature-001.json
-│   ├── completed/           # Finished
-│   ├── archived/            # Old/cancelled
+├── specs/
+│   ├── pending/
+│   ├── active/
+│   ├── completed/
+│   ├── archived/
 │   │
-│   ├── .reports/            # Validation reports (gitignored)
-│   ├── .reviews/            # Multi-model reviews (gitignored)
-│   ├── .backups/            # Spec backups (gitignored)
-│   └── .human-readable/     # Rendered markdown (gitignored)
+│   ├── .reports/              # Gitignored
+│   ├── .reviews/              # Gitignored
+│   ├── .backups/              # Gitignored
+│   └── .human-readable/       # Gitignored
 │
-├── .claude/                 # Project settings (optional)
-│   ├── settings.local.json  # Permissions
-│   ├── sdd_config.json      # CLI output preferences
-│   └── ai_config.yaml       # AI tool defaults
+├── .claude/
+│   ├── settings.local.json    # Created by /sdd-setup
+│   ├── sdd_config.json        # CLI preferences
+│   └── ai_config.yaml         # AI defaults
 │
-└── docs/                    # Generated docs (optional)
-    ├── documentation.json   # Machine-readable
-    └── documentation.md     # Human-readable
+├── docs/                      # Optional
+│   ├── documentation.json
+│   ├── DOCUMENTATION.md
+│   ├── ARCHITECTURE.md
+│   └── AI_CONTEXT.md
+│
+└── [source code]
 ```
-
-The `specs/` directory can be:
-- **Gitignored** for personal use
-- **Committed** for team collaboration
 
 ## Configuration
 
-### Project Setup (Recommended)
-
-Run the setup command in your project:
+### Project Setup
 
 ```
 /sdd-setup
 ```
 
-This automatically:
-- Creates `.claude/settings.local.json` in your project
-- Adds all required permissions for SDD skills and tools
-- Seeds `.claude/sdd_config.json` and `.claude/ai_config.yaml` from the packaged setup templates
-- Prepares your project for spec-driven development
+This creates:
+- `.claude/settings.local.json` - Required permissions
+- `.claude/sdd_config.json` - Output preferences
+- `.claude/ai_config.yaml` - AI model defaults
 
-You only need to run this once per project.
+**Optional**: Create `.claude/git_config.json` for git integration settings (auto-branch, auto-commit, auto-push). Template available at `claude_skills/common/templates/setup/git_config.json`.
 
-### What Gets Configured
+Run once per project.
 
-The setup creates `.claude/settings.local.json` with permissions like:
+### CLI Configuration
+
+**File**: `.claude/sdd_config.json`
 
 ```json
 {
-  "permissions": {
-    "allow": [
-      "Skill(sdd-toolkit:sdd-plan)",
-      "Skill(sdd-toolkit:sdd-next)",
-      "Write(//**/specs/active/**)",
-      "Write(//**/specs/pending/**)"
-    ]
-  }
-}
-```
-
-All three setup files (`settings.local.json`, `sdd_config.json`, and `ai_config.yaml`) start from the packaged defaults bundled in `claude_skills.common.templates.setup`. You can access or copy them programmatically through `claude_skills.common.setup_templates` (for example, `load_json_template("sdd_config.json")` or `copy_template_to("settings.local.json", <path>)`) whenever you need to reset a project or inspect the baseline configuration.
-
-### SDD CLI Configuration (Optional)
-
-The SDD CLI supports optional configuration files that control output formatting defaults. During project setup, you'll be prompted to configure your preferences interactively.
-
-**Configuration file location:**
-- Project-local: `.claude/sdd_config.json` (recommended)
-- Global: `~/.claude/sdd_config.json`
-
-**What it configures:**
-- `output.default_mode` - Default output format: `"rich"` (formatted with colors), `"plain"` (simple text), or `"json"` (structured JSON)
-- `output.json_compact` - Use compact JSON formatting (`true` or `false`)
-
-**Example configuration:**
-```json
-{
+  "work_mode": "single",
   "output": {
-    "default_mode": "rich",
-    "json_compact": true
+    "default_mode": "json",        // "rich", "plain", or "json"
+    "json_compact": true,           // Compact JSON (~30% token savings)
+    "default_verbosity": "quiet"    // "quiet", "normal", or "verbose"
   }
 }
 ```
 
-This allows you to set your output preferences once rather than passing `--json` or `--compact` flags on every command.
+**Settings:**
+- `work_mode`: "single" (one task at a time) or "autonomous" (complete all tasks in phase)
+- `output.default_mode`: Default output format
+- `output.json_compact`: Use compact JSON formatting
+- `output.default_verbosity`: Default verbosity level
 
-**Legacy format** (still supported for backward compatibility):
-```json
-{
-  "output": {
-    "json": true,
-    "compact": true
-  }
-}
+**Precedence:**
+1. CLI flags (`--json`, `--compact`, `--verbose`, `--quiet`)
+2. Config file
+3. Built-in defaults
+
+**Token Savings:**
+
+| Output | Normal | Compact | Savings |
+|--------|--------|---------|---------|
+| `sdd progress` | ~120 | ~84 | 30% |
+| `sdd prepare-task` | ~400 | ~280 | 30% |
+| `sdd next-task` | ~55 | ~37 | 33% |
+
+### AI Model Configuration
+
+**File**: `.claude/ai_config.yaml`
+
+```yaml
+# Tool/provider fallback priority
+tool_priority:
+  default:
+    - gemini
+    - cursor-agent
+    - codex
+    - claude
+
+# Per-skill configuration
+run-tests:
+  tool_priority:
+    - gemini
+    - cursor-agent
+  models:
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
+
+code-doc:
+  tool_priority:
+    - gemini
+    - cursor-agent
+  models:
+    gemini: gemini-2.5-flash
+    cursor-agent: composer-1
+
+sdd-plan-review:
+  tool_priority:
+    - gemini
+    - cursor-agent
+  models:
+    gemini: gemini-2.5-pro
+    cursor-agent: composer-1
 ```
 
-### AI Model Overrides
+**Key settings:**
+- `tool_priority.default`: Fallback order when tool fails
+- Per-skill `tool_priority`: Tool consultation order for that skill
+- Per-skill `models`: Default model for each tool
 
-The same setup process seeds `.claude/ai_config.yaml`, which now centralizes tool priorities and example per-skill overrides for:
-
-- `run-tests` consultation failure types
-- `code-doc` architecture vs AI context generations
-- `sdd-plan-review` review modes
-- `sdd-render` executive-summary and narrative passes
-
-You can tweak these defaults directly in the YAML or override them per run with `--model` flags. The flag accepts either a single model (applied to every tool) or tool-specific entries:
-
+**CLI Override:**
 ```bash
-# Force a single model
-run-tests consult failing-test --model gemini-2.5-pro
+# Single model for all operations
+sdd test run --model gemini-2.5-pro
 
-# Mix tool-specific and fallback overrides
-sdd doc analyze-with-ai spec.json --model gemini=gemini-2.5-flash --model cursor-agent=composer-2 --model composer-1
+# Tool-specific overrides
+sdd doc analyze-with-ai . \
+  --model gemini=gemini-2.5-flash \
+  --model cursor-agent=composer-2
 ```
 
-The same syntax is supported by `sdd plan-review review` and `sdd render --mode enhanced`, ensuring the resolved model map is surfaced in verbose/dry-run output for easy debugging.
+### Git Integration Configuration (Optional)
+
+**File**: `.claude/git_config.json`
+
+```json
+{
+  "enabled": false,
+  "auto_branch": true,
+  "auto_commit": true,
+  "auto_push": false,
+  "auto_pr": false,
+  "commit_cadence": "task"
+}
+```
+
+**Settings:**
+- `enabled`: Master switch for git integration (default: false)
+- `auto_branch`: Create feature branches when starting specs (default: true)
+- `auto_commit`: Commit changes when completing tasks (default: true)
+- `auto_push`: Push commits to remote automatically (default: false)
+- `auto_pr`: Create pull requests when specs complete (default: false)
+- `commit_cadence`: When to commit - "task", "phase", or "manual" (default: "task")
+
+**Note**: This file is not created by `/sdd-setup`. Copy from template at `claude_skills/common/templates/setup/git_config.json` if needed.
+
+## Advanced Topics
+
+### Design Patterns
+
+From architecture analysis:
+
+1. **Command Pattern** - CLI commands as operations
+2. **Factory Pattern** - Language parser creation
+3. **Strategy Pattern** - AI tool selection
+4. **Facade Pattern** - Documentation query interface
+5. **Provider Pattern** - AI tool abstraction
+6. **Repository Pattern** - Spec file operations
+7. **Mediator Pattern** - Output formatting
+
+### Technology Stack
+
+**Core:**
+- Python 3.9+ (183 modules, 154 classes, 915 functions)
+- JSON for specs and schemas
+- Rich for terminal UI
+- tree-sitter for AST parsing
+
+**AI Integration:**
+- External CLI tools (gemini, cursor-agent, codex, claude)
+- Provider abstraction layer
+- Parallel consultation
+
+**Testing:**
+- pytest framework
+- Integration coverage
+
+### Performance
+
+**Scalability:**
+- Documentation: Linear with codebase size
+- Spec validation: O(n) dependency analysis
+- Doc queries: Fast JSON traversal
+- AI calls: Parallel execution, cached results
+
+**Optimization:**
+- Parallel AI consultation
+- TTL-based caching
+- Lazy loading
+- Progressive rendering
+
+### Extension Points
+
+**Add a Skill:**
+1. Create `src/claude_skills/<skill_name>/`
+2. Implement `cli.py`
+3. Use `common` utilities
+4. Register in main CLI
+5. Add tests
+
+**Add a Language Parser:**
+1. Install tree-sitter grammar
+2. Create parser in `code_doc/parsers/`
+3. Update factory
+4. Add detection
+5. Test
+
+**Add an AI Provider:**
+1. Extend `ProviderContext`
+2. Register in `providers/registry.py`
+3. Add detection
+4. Update config templates
+5. Test
 
 ## Troubleshooting
 
 ### Skills Not Working
 
 ```bash
-# Verify skills are installed
 ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
-
-# Should show: sdd-plan, sdd-next, sdd-update, etc.
-
-# If missing, reinstall the plugin from marketplace
+# Should show: sdd-plan, sdd-next, code-doc, etc.
 ```
 
 ### CLI Commands Not Found
 
-If `sdd`, `doc`, or `test` commands are not found:
-
 ```bash
-# Reinstall the Python package
 cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 pip install -e .
-
-# Verify installation (ONLY for troubleshooting - you should never run these directly)
-# Normal workflow: interact with Claude using natural language
-sdd --help
-doc --help
-test --help
 ```
 
-### Updated Plugin But Commands Still Old
+### After Plugin Update
 
-If you updated the plugin (via `git pull` or marketplace update) but CLI commands seem outdated or broken:
+Always reinstall Python package:
 
 ```bash
-# Reinstall to get latest CLI changes
 cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 pip install -e .
-
-# Restart Claude Code to reload skills
+# Restart Claude Code
 ```
-
-**Why this happens:** The Python package is installed in editable mode, but updates require reinstallation. See [Updating the Toolkit](#updating-the-toolkit) for details.
 
 ### Permission Errors
 
-```bash
-# Use the slash command in Claude Code:
+```
 /sdd-setup
-
-# Or ask Claude to set up permissions for your project
 ```
 
-### Hooks Not Running
+### Validation Errors
 
 ```bash
-# Check if hooks are executable
-ls -l ~/.claude/hooks/
-
-# Make them executable
-chmod +x ~/.claude/hooks/*
+sdd validate <spec.json>
+sdd validate <spec.json> --fix
+sdd validate <spec.json> --show-graph
 ```
+
+### AI Tool Failures
+
+```bash
+sdd test check-tools
+```
+
+Common issues: rate limits, API key not configured, tool not in PATH.
+
+Multi-agent consultation succeeds if at least one model succeeds.
+
+## CLI Reference
+
+For toolkit developers. Regular users should use natural language with Claude or slash commands.
+
+<details>
+<summary>Show CLI commands</summary>
+
+### Spec Operations
+```bash
+sdd create <name>
+sdd activate-spec <spec-id>
+sdd next-task <spec-id>
+sdd prepare-task <spec-id> <task-id>
+sdd update-status <spec> <task>
+sdd complete-task <spec-id> <task-id>
+sdd complete-spec <spec-id>
+sdd validate <spec.json>
+sdd list-specs [--status STATUS]
+```
+
+### Documentation
+```bash
+sdd doc generate .
+sdd doc analyze-with-ai .
+sdd doc stats
+sdd doc search "pattern"
+sdd doc complexity --threshold 10
+sdd doc callers "function"
+sdd doc callees "function"
+sdd doc call-graph "entry"
+sdd doc impact "function"
+sdd doc refactor-candidates
+```
+
+### Testing
+```bash
+sdd test run tests/
+sdd test debug --test <name>
+sdd test check-tools
+```
+
+### Reviews
+```bash
+sdd plan-review <spec>
+sdd fidelity-review <spec>
+sdd render <spec>
+```
+
+</details>
 
 ## Updating the Toolkit
 
-To update to the latest version:
+1. **Update Marketplace**: `/plugins → Manage marketplaces → claude-sdd-toolkit → Update`
+2. **Update Plugin**: `/plugins → Manage and uninstall → Update now`
+3. **Restart Claude Code**
+4. **Reinstall Package**:
+   ```bash
+   cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+   pip install -e .
+   ```
 
-### Step 1: Update the Plugin Marketplace
+## Version History
 
-1. In Claude Code, type `/plugins` and press Enter
-2. Select **"Manage marketplaces"**
-3. Select **`claude-sdd-toolkit`**
-4. Select **"Update marketplace"**
-5. Wait for the update to complete
+**0.6.0** - Three-tier verbosity system (QUIET/NORMAL/VERBOSE) with ~50% output reduction. AI consultation enhancements with fallback and retry logic. Context optimization for sdd-next. Work mode configuration. High-level task operations.
 
-### Step 2: Update the Installed Plugin
+**0.5.1** - Provider abstraction with Gemini, Codex, Cursor Agent, Claude. Claude provider has read-only restrictions. 360s timeout for extended reasoning.
 
-1. Type `/plugins` again
-2. Select **"Manage and uninstall plugins"**
-3. Select **`claude-sdd-toolkit`**
-4. Select **`sdd-toolkit`**
-5. Select **"Update now"**
-6. Wait for the update to complete
+**0.5.0** - Plain UI mode, modernized configuration, JSON Schema validation, workflow guardrails.
 
-### Step 3: Restart Claude Code
+**0.4.5** - Unified AI consultation infrastructure, type-safe interfaces, parallel execution.
 
-Exit Claude Code completely and restart it.
+**0.4.2** - Compact mode with 30% token savings.
 
-### Step 4: Reinstall Python Package
+**0.4.1** - AI-powered PR creation.
 
-The plugin files are now updated, but you must reinstall the Python CLI tools:
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
-```bash
-cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
-pip install -e .
-```
+## Documentation
 
-**Why all these steps?** The marketplace update gets the latest plugin code, the plugin update installs it to Claude Code, the restart loads the new skills, and the reinstall updates the CLI commands. Skipping any step will leave you with mismatched versions.
-
-**How to verify:** When you start Claude Code, the session-start hook will automatically check for version mismatches and warn you if the update wasn't completed properly.
-
-## Advanced Usage
+### For Users
+- [INSTALLATION.md](INSTALLATION.md) - Setup guide
+- [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) - Development guidance
+- [docs/examples/](docs/examples/) - Workflow examples
+- [docs/spec-modification.md](docs/spec-modification.md) - Validation
+- [docs/review-workflow.md](docs/review-workflow.md) - Fidelity review
 
 ### For Developers
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
+- [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md) - AI assistant reference
+- [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) - Structural reference
 
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System documentation (generated by the `code-doc` skill from this system)
-
-### CLI Reference
-
-**⚠️ For Developers and Advanced Troubleshooting Only**
-
-This CLI reference is for toolkit developers and debugging purposes. **Regular users should NEVER run these commands directly.**
-
-Instead, interact with Claude using:
-- Natural language: "Create a spec for X", "What should I work on next?"
-- Slash commands: `/sdd-begin`, `/sdd-setup`
-
-The commands below are used internally by the skills. They're documented here for developers working on the toolkit itself or for advanced troubleshooting.
-
-```bash
-# SDD workflows
-sdd create <name>                     # Create new spec in pending/
-sdd activate-spec <spec-id>           # Move spec from pending to active
-sdd next-task <spec-id>               # Find next task
-sdd prepare-task <spec-id> <task-id>  # Get full context for task
-sdd update-status <spec> <task>       # Update progress
-sdd complete-task <spec-id> <task-id> # Mark task complete with journal entry
-sdd complete-spec <spec-id>           # Move spec to completed/
-sdd validate <spec.json>              # Validate spec
-sdd render <spec-id|spec.json>        # Render spec to markdown
-sdd list-specs [--status STATUS]      # List specs by status
-sdd update-task-metadata <spec> <task> --field value  # Update task metadata
-
-# Documentation
-sdd doc generate .                    # Generate docs with cross-references
-sdd doc query "search term"           # Search docs
-sdd doc callers "function_name"       # Who calls this function?
-sdd doc callees "function_name"       # What does this function call?
-sdd doc call-graph "entry_point"      # Visualize call relationships
-sdd doc trace-entry "endpoint"        # Trace request flow from entry point
-sdd doc trace-data "Model.field"      # Trace data flow through system
-sdd doc impact "function_name"        # Analyze refactoring impact
-sdd doc refactor-candidates           # Find complex code needing refactoring
-
-# Testing
-sdd test run tests/                   # Run tests with AI debugging
-
-# Context Monitoring
-sdd session-marker                    # Generate session marker (Step 1)
-sdd context --session-marker <marker> # Check context using marker (Step 2)
-sdd context --json                    # Get JSON output
-
-# Development tools
-sdd skills-dev setup-permissions -- update .   # Set up permissions
-sdd skills-dev gendocs -- <skill-name>         # Generate skill docs
-```
-
-### Compact vs Pretty-Print JSON Output
-
-SDD CLI commands support both **compact** (single-line) and **pretty-print** (multi-line indented) JSON output formatting. This flexibility allows you to optimize for either token efficiency (compact) or human readability (pretty-print).
-
-**Output Modes:**
-- **Compact**: Single-line JSON with no whitespace or indentation - optimized for token efficiency
-- **Pretty-Print**: Multi-line JSON with 2-space indentation - optimized for human readability
-
-**Commands with JSON output formatting:**
-- `sdd prepare-task`, `sdd task-info`, `sdd check-deps`, `sdd progress`, `sdd next-task`
-- `sdd list-phases`, `sdd query-tasks`, `sdd check-complete`
-- `sdd cache info`, `sdd list-plan-review-tools`
-- And all other commands that support `--json` output
-
-**CLI Flags:**
-```bash
-# Compact output (single-line, minified)
-sdd progress my-spec-001 --json --compact
-
-# Pretty-print output (multi-line, indented)
-sdd progress my-spec-001 --json --no-compact
-
-# Default behavior (uses config setting, or compact if no config)
-sdd progress my-spec-001 --json
-```
-
-**Token Savings:**
-
-Compact output achieves approximately **30% token reduction** across commands (measured with tiktoken cl100k_base encoding):
-
-| Command | Normal Tokens | Compact Tokens | Savings |
-|---------|--------------|----------------|---------|
-| prepare-task | ~400-600 | ~280-420 | ~28-32% |
-| task-info | ~130-240 | ~90-170 | ~28-30% |
-| check-deps | ~40-210 | ~30-140 | ~27-35% |
-| progress | ~95-130 | ~65-85 | ~31-36% |
-| next-task | ~50-55 | ~34-37 | ~30-32% |
-
-*Measured across 3 different spec types (in-progress, pending, completed) with minimal variance (~3.5%), confirming consistency.*
-
-**When to use each mode:**
-
-**Use Compact (`--compact`) for:**
-- ✅ Agent workflows (sdd-next, sdd-plan, automated tools)
-- ✅ Programmatic parsing where whitespace doesn't matter
-- ✅ High-volume command execution (reduces context consumption)
-- ✅ CI/CD pipelines and automation scripts
-
-**Use Pretty-Print (`--no-compact`) for:**
-- ✅ Manual debugging and inspection
-- ✅ Development and testing
-- ✅ When you need to visually verify JSON structure
-- ✅ Logging output that humans will read
-
-**Configuration Precedence:**
-
-Output formatting follows this precedence chain (highest to lowest):
-1. **CLI flags** - `--compact` or `--no-compact` (overrides everything)
-2. **Config file** - `.claude/sdd_config.json` settings
-3. **Built-in defaults** - Compact mode
-
-**Example configuration** (`.claude/sdd_config.json`):
-```json
-{
-  "output": {
-    "default_mode": "rich",
-    "json_compact": false
-  }
-}
-```
-
-With this config, all commands output pretty-print JSON by default, but you can still override with `--compact` flag when needed.
-
-### Practical Examples: Seeing the Difference
-
-Here's a real-world example showing the difference between compact and pretty-print modes:
-
-**Command:**
-```bash
-sdd progress json-output-standardization-2025-11-08-001 --json
-```
-
-**Compact output (`--compact`):**
-```json
-{"node_id":"spec-root","spec_id":"json-output-standardization-2025-11-08-001","title":"JSON Output Format Standardization","type":"spec","status":"in_progress","total_tasks":41,"completed_tasks":36,"percentage":87,"remaining_tasks":5,"current_phase":{"id":"phase-6","title":"Documentation & Finalization","completed":1,"total":6}}
-```
-**Tokens:** ~84 tokens
-
-**Pretty-print output (`--no-compact`):**
-```json
-{
-  "node_id": "spec-root",
-  "spec_id": "json-output-standardization-2025-11-08-001",
-  "title": "JSON Output Format Standardization",
-  "type": "spec",
-  "status": "in_progress",
-  "total_tasks": 41,
-  "completed_tasks": 36,
-  "percentage": 87,
-  "remaining_tasks": 5,
-  "current_phase": {
-    "id": "phase-6",
-    "title": "Documentation & Finalization",
-    "completed": 1,
-    "total": 6
-  }
-}
-```
-**Tokens:** ~120 tokens
-
-**Result:** Compact saves ~36 tokens (30% reduction) while delivering identical data.
-
-**Quick Comparison:**
-
-| Aspect | Compact | Pretty-Print |
-|--------|---------|--------------|
-| **Format** | Single line | Multi-line with indentation |
-| **Tokens** | ~84 | ~120 |
-| **Savings** | 30% reduction | - |
-| **Best for** | Agent workflows, automation | Human review, debugging |
-| **Readability** | Low (for humans) | High (for humans) |
-| **Parse speed** | Same | Same |
-
-**Testing Your Configuration:**
-
-To verify your configuration is working:
-
-```bash
-# Check what your current config produces
-sdd progress YOUR-SPEC-ID --json
-
-# Explicitly test compact mode
-sdd progress YOUR-SPEC-ID --json --compact
-
-# Explicitly test pretty-print mode
-sdd progress YOUR-SPEC-ID --json --no-compact
-```
+### Stats
+- 183 Python modules
+- 154 classes
+- 915 functions
+- 72,268 lines of code
+- Average complexity: 6.93
 
 ## Prerequisites
 
 ### Required
-- **Claude Code** - Latest version
-- **Python 3.9+** - For CLI tools
-- **pip** - Python package manager
+- Claude Code (latest)
+- Python 3.9+
+- pip
 
 ### Optional
-- **Git** - For version control and spec collaboration
-- **tree-sitter** libraries - For enhanced code documentation:
-  - `tree-sitter-python`, `tree-sitter-javascript`, `tree-sitter-typescript`
-  - `tree-sitter-go`, `tree-sitter-html`, `tree-sitter-css`
-- **External AI CLIs** - For AI-enhanced features:
-  - `gemini` - Fast structured analysis
-  - `codex` - Code understanding
-  - `cursor-agent` - Large codebase analysis (1M context with cheetah model)
+- Git
+- tree-sitter libraries (`tree-sitter-python`, `tree-sitter-javascript`, etc.)
+- AI CLIs (`gemini`, `codex`, `cursor-agent`)
 
 ## Getting Help
 
-- **Issues**: Report bugs at [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
-- **Docs**: Full Claude Code documentation at [Claude Code Docs](https://docs.claude.com/claude-code)
+- Issues: [GitHub Issues](https://github.com/tylerburleigh/claude-sdd-toolkit/issues)
+- Docs: [Claude Code Documentation](https://docs.claude.com/claude-code)
+- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
-## What's Included
-
-The plugin installs these components:
+## Components
 
 **In `~/.claude/`:**
-- `skills/` - 8 specialized skills for Claude
-- `commands/` - Slash commands like `/sdd-begin`
-- `hooks/` - Automatic session detection
-- `src/claude_skills/` - Python CLI tools
+- `skills/` - 12+ skills
+- `commands/` - Slash commands
+- `hooks/` - Session detection
+- `src/claude_skills/` - Python CLI
 
-**In your PATH:**
-- `sdd` - Unified CLI for all SDD, documentation, testing, and development commands
+**In PATH:**
+- `sdd` - Unified CLI
 
 ## Next Steps
 
-Ready to get started?
+1. Install plugin and Python package
+2. Run `/sdd-setup` in your project
+3. Create a spec: "Create a spec for [feature]"
+4. Implement: `/sdd-begin`
+5. Track progress automatically
+6. Review with multi-model consultation
+7. Create PR with AI
 
-1. ✅ Install the plugin (see above)
-2. ✅ Verify installation works
-3. 📝 Create your first spec: "Plan a feature for X"
-4. 🚀 Implement with `/sdd-begin`
-5. 🎉 Track progress and stay organized
-
-**Questions?** Check [INSTALLATION.md](INSTALLATION.md) for detailed setup or [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for development guidance.
+See [INSTALLATION.md](INSTALLATION.md) for setup or [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for development guidance.
 
 ---
 
-**Version**: 0.5.1 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.6.0 | **License**: MIT | **Author**: Tyler Burleigh
