@@ -229,8 +229,14 @@
               "description": "Primary file impacted by the node."
             },
             "details": {
-              "type": "string",
-              "description": "Free-form detail text for subtasks and tasks."
+              "oneOf": [
+                {"type": "string"},
+                {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              ],
+              "description": "Free-form detail text for subtasks and tasks. Can be a string or array of strings."
             },
             "changes": {
               "type": "string",

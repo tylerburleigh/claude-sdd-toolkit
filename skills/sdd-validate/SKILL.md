@@ -255,6 +255,11 @@ When error count stays the same for 2+ passes:
 3. Manually fix issues that need context or human judgment
 4. Re-validate after manual fixes
 
+**Understanding Spec Requirements:**
+- Run `sdd schema` to see the complete spec structure, required fields, and valid values
+- The schema shows all field types, enum values (like `status`, `type`, `verification_type`), and optional vs required fields
+- Use this when validation errors reference unknown fields or invalid values
+
 **Common manual-only issues:**
 - Circular dependencies (remove one dependency edge)
 - Orphaned dependencies (fix task ID typos)

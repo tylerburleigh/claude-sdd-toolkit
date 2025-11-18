@@ -36,11 +36,31 @@ sdd skills-dev setup-permissions check .
 
 The script will return JSON with a `configured` field indicating whether permissions are set up.
 
-### Step 2: Configure Permissions if Needed
+### Step 2: Gather User Preferences (If Setup Needed)
+
+**Only if permissions need to be configured** (i.e., `configured: false`), use the AskUserQuestion tool to gather user preferences:
+
+**Question 1 - Git Integration:**
+- **Header**: "Git Setup"
+- **Question**: "Do you want to enable git integration? This adds permissions for git commands."
+- **Options**:
+  1. **Yes, enable git integration** - Adds read-only git permissions (git status, log, diff, etc.)
+  2. **No, skip git integration** - No git permissions (can be added manually later)
+
+**Question 2 - Git Write Operations** (only if Question 1 = Yes):
+- **Header**: "Git Write"
+- **Question**: "Enable git write operations? (⚠️  Allows Claude to create commits and push changes)"
+- **Options**:
+  1. **Yes, enable write operations** - Adds commit/push permissions with approval requirements for dangerous operations
+  2. **No, read-only access** - Only safe read operations
+
+Store these preferences to pass as CLI parameters in Step 3.
+
+### Step 3: Configure Permissions if Needed
 
 **If `configured: true` AND `status: "fully_configured"`:**
 
-Display message and proceed to Step 3:
+Display message and proceed to Step 4:
 ```
 ✅ SDD permissions are fully configured!
 ```
@@ -62,82 +82,76 @@ Use AskUserQuestion tool:
   2. No, continue with current permissions
 
 **If user chooses "Yes, add missing permissions":**
+
+First, gather git preferences using the AskUserQuestion tool as described in Step 2.
+
+Then run with user preferences:
 ```bash
-sdd skills-dev setup-permissions update .
+# Example with git enabled and write operations:
+sdd skills-dev setup-permissions update . --non-interactive --enable-git --git-write
+
+# Example with git enabled but read-only:
+sdd skills-dev setup-permissions update . --non-interactive --enable-git --no-git-write
+
+# Example with no git integration:
+sdd skills-dev setup-permissions update . --non-interactive --no-enable-git
 ```
 
 This will:
 - Add only the missing permissions
 - Preserve all existing permissions
+- Use non-interactive mode with explicit git preferences
 - Show what's being added
 
 **If user chooses "No, continue with current permissions":**
 ```
 ⚠️  Proceeding with partial permissions. Some features may not work.
 ```
-Then proceed to Step 3.
+Then proceed to Step 4.
 
 **If `configured: false` AND `status: "not_configured"`:**
 
-Inform the user and run the setup:
+First, gather user preferences using the AskUserQuestion tool as described in Step 2.
+
+Then inform the user and run the setup:
 ```
 Setting up SDD permissions for this project...
 ```
 
-Then run:
+Run with user preferences:
 ```bash
-sdd skills-dev setup-permissions update .
+# Example with git enabled and write operations:
+sdd skills-dev setup-permissions update . --non-interactive --enable-git --git-write
+
+# Example with git enabled but read-only:
+sdd skills-dev setup-permissions update . --non-interactive --enable-git --no-git-write
+
+# Example with no git integration:
+sdd skills-dev setup-permissions update . --non-interactive --no-enable-git
 ```
 
 This will:
 - Create `.claude/settings.local.json` if it doesn't exist
-- Prompt for SDD CLI output preferences (if not already configured)
 - Add all required SDD permissions to the `allow` list
-- **Interactively prompt for git integration permissions** (see Git Permission Prompts below)
+- Add git permissions based on user preferences (non-interactive)
 - Preserve any existing permissions
 
-#### Git Permission Prompts
+#### Git Permissions Added
 
-During permission setup, you'll be prompted about git integration:
+Based on user preferences from Step 2:
 
-**Prompt 1: Enable git integration?**
-- If **Yes**: Automatically adds safe read-only permissions:
+**If git integration is enabled (read-only):**
+- Adds safe read-only permissions:
   - `git status`, `git log`, `git branch`, `git diff`, `git show`, etc.
   - `gh pr view` (GitHub CLI read operations)
-- If **No**: Skips all git permissions (can be added manually later)
 
-**Prompt 2: Enable git write operations?** (only if Prompt 1 = Yes)
-- Shows risk warning about repository modifications
-- If **Yes**: Adds write permissions using **three-tier model**:
+**If git write operations are enabled:**
+- Adds write permissions using **three-tier model**:
   - **ALLOW list** (local writes): `git checkout`, `git add`, `git commit`, `git mv`
   - **ASK list (approval-only)**: `git push`, `git rm`, `gh pr create`
   - **ASK list (dangerous ops)**: force push, hard reset, rebase, history rewriting, force deletions
-- If **No**: Keeps read-only git access only
 
-**Risk Warning Displayed:**
-```
-⚠️  Git Write Operations
-
-Write operations allow Claude to:
-  • Switch branches (git checkout)
-  • Stage changes (git add)
-  • Create commits (git commit)
-  • Push to remote (git push)
-  • Remove files (git rm)
-  • Create pull requests (gh pr create)
-
-RISK: These operations can modify your repository and push changes.
-Always review Claude's proposed changes before approval.
-
-Dangerous operations requiring approval:
-  • Force push (git push --force)
-  • Hard reset (git reset --hard)
-  • Rebase operations (git rebase)
-  • History rewriting (git commit --amend)
-  • Force deletion (git branch -D, git clean -f)
-```
-
-### Step 3: Check Git Configuration
+### Step 4: Check Git Configuration
 
 Check if git integration is configured:
 
@@ -147,7 +161,7 @@ sdd skills-dev start-helper check-git-config .
 
 The script will return JSON with a `needs_setup` field.
 
-### Step 4: Configure Git if Needed
+### Step 5: Configure Git if Needed
 
 **If `needs_setup: false`:**
 
@@ -171,7 +185,7 @@ To generate this display:
 2. Use the formatting pattern shown above
 3. Show actual values from the user's configuration
 
-Then proceed to Step 5.
+Then proceed to Step 6.
 
 **If `needs_setup: true`:**
 
@@ -204,7 +218,7 @@ Gather all git configuration preferences using AskUserQuestion (you can ask up t
 
 **If user chooses "No, disable"** on the Git Features prompt:
 
-Write minimal config and skip to Step 5:
+Write minimal config and skip to Step 6:
 ```bash
 sdd skills-dev start-helper setup-git-config . --non-interactive --no-enabled
 ```
@@ -214,7 +228,7 @@ Display:
 ✅ Git integration disabled. Config saved to .claude/git_config.json
 ```
 
-Then proceed to Step 5.
+Then proceed to Step 6.
 
 **If user chooses "Yes, enable":**
 
@@ -239,7 +253,7 @@ sdd skills-dev start-helper setup-git-config . --non-interactive --enabled --aut
 Note: AI PRs always use the Sonnet model for optimal balance of quality and speed.
 
 After the command completes successfully, check the return code:
-- **Exit code 0**: Success - proceed to Step 5
+- **Exit code 0**: Success - proceed to Step 6
 - **Exit code non-zero**: Error - display error message and provide manual instructions
 
 **On error:**
@@ -254,13 +268,13 @@ See error output above for details.
 
 **If user chooses "No, skip for now":**
 
-Display message and proceed to Step 5:
+Display message and proceed to Step 6:
 ```
 ⏭️  Skipping git configuration. You can configure it later by running:
    sdd skills-dev start-helper setup-git-config .
 ```
 
-### Step 5: Configure SDD CLI Output Settings
+### Step 6: Configure SDD CLI Output Settings
 
 Check if `.claude/sdd_config.json` exists and create it if missing.
 
@@ -282,9 +296,11 @@ If Python fallback fails for some reason, fall back to `Write` tool with the def
 
 ```json
 {
+  "work_mode": "single",
   "output": {
-    "json": true,
-    "compact": true
+    "default_mode": "json",
+    "json_compact": true,
+    "default_verbosity": "quiet"
   }
 }
 ```
@@ -292,7 +308,7 @@ If Python fallback fails for some reason, fall back to `Write` tool with the def
 Display:
 ```
 ✅ Created .claude/sdd_config.json with recommended settings
-   (json: true, compact: true for ~30% token savings)
+   (default_mode: json, json_compact: true, verbosity: quiet for ~50% output reduction)
 ```
 
 **If file already exists:**
@@ -303,7 +319,7 @@ Display:
    (Modify manually as needed)
 ```
 
-### Step 6: Show Success & Next Steps
+### Step 7: Show Success & Next Steps
 
 After successful configuration, display a summary:
 
@@ -484,26 +500,32 @@ Example configuration:
 The setup creates a configuration file for SDD CLI output formatting:
 
 **Output Settings:**
-- `output.json` - Output JSON format (default: `true`)
-- `output.compact` - Use compact JSON formatting (default: `true`)
+- `output.default_mode` - Output format (default: `"json"`, options: "json", "text", "markdown")
+- `output.json_compact` - Use compact JSON formatting (default: `true`)
+- `output.default_verbosity` - Verbosity level (default: `"quiet"`, options: "quiet", "normal", "verbose")
+
+**Work Mode:**
+- `work_mode` - Task execution mode (default: `"single"`, options: "single", "autonomous")
 
 **Benefits:**
-- ~30% token savings with compact JSON output
+- ~50% output reduction with compact JSON and quiet verbosity
 - Consistent output formatting across all SDD commands
-- Can be overridden with CLI flags (`--json`, `--compact`, etc.)
+- Can be overridden with CLI flags (`--json`, `--compact`, `--verbose`, etc.)
 
 **Default configuration:**
 ```json
 {
+  "work_mode": "single",
   "output": {
-    "json": true,
-    "compact": true
+    "default_mode": "json",
+    "json_compact": true,
+    "default_verbosity": "quiet"
   }
 }
 ```
 
 **Configuration precedence:**
-1. Built-in defaults (`json: true`, `compact: true`)
+1. Built-in defaults (`default_mode: "json"`, `json_compact: true`, `default_verbosity: "quiet"`)
 2. Global config (`~/.claude/sdd_config.json`)
 3. Project config (`./.claude/sdd_config.json`)
 4. CLI arguments (highest priority)

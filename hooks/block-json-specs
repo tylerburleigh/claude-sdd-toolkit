@@ -41,6 +41,14 @@ HOW TO FIX:
   Use sdd CLI commands to query spec information without reading the JSON file.
   Efficient alternatives depend on what you need:
 
+  - Simple metadata updates (like adding a title field):
+    Bash(sdd update-frontmatter <spec-id> <key> <value> [--dry-run])
+    Example: sdd update-frontmatter my-spec-001 title "My Title"
+
+  - Understand spec structure (get schema from plugin):
+    Bash(sdd schema)
+    This outputs the complete spec schema JSON from the plugin installation.
+
   - Get the next task to work on:
     Bash(sdd next-task <spec-id>)
 
@@ -74,6 +82,13 @@ EXAMPLES:
 
   Modifying: Instead of Read + Edit JSON file
     Use: Bash(sdd apply-modifications my-spec-001 --from mods.json)
+
+  Simple metadata: Instead of Read + Python json.load to add title
+    Use: Bash(sdd update-frontmatter my-spec-001 title "My Title")
+
+⚠️  CRITICAL: Do not use Python, cat, jq, or any other method to bypass this
+   restriction. ALL spec file access must go through sdd CLI commands.
+   If Read() is blocked, it means you MUST use sdd commands instead.
 
 This hook enforces proper SDD workflow and prevents token waste.
 

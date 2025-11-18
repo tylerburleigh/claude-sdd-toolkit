@@ -63,8 +63,19 @@ This skill is part of the **Spec-Driven Development** workflow:
 - ✅ **ALWAYS** use `sdd` commands to read/query spec files
 - ❌ **NEVER** use `Read()` tool on .json spec files - bypasses hooks and wastes context tokens
 - ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `head`, `tail`, `grep`, `jq`)
+- ❌ **NEVER** use Python to directly read/write spec JSON files (e.g., `python << EOF ... json.load()`, `open()`)
+- ❌ **NEVER** bypass the Read() hook by using alternative file access methods
 - The `sdd` CLI provides efficient, structured access with proper parsing and validation
 - Spec files can be 50KB+ and reading them directly wastes valuable context window space
+
+**To understand spec structure without reading the spec:**
+- ✅ Get the schema: `sdd schema` - outputs the complete spec schema JSON
+- This shows all required and optional fields, including metadata structure
+
+**For simple metadata updates (like adding a title field):**
+- ✅ Use: `sdd update-frontmatter <spec-id> <key> <value> [--dry-run]`
+- Example: `sdd update-frontmatter my-spec-001 title "My Specification Title"`
+- This is faster and safer than using `sdd apply-modifications` for single-field updates
 
 ## Command Execution Best Practices (CRITICAL)
 

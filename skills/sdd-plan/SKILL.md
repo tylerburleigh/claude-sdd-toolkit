@@ -52,7 +52,7 @@ Use `Skill(sdd-toolkit:sdd-plan)` (this skill) for:
 Create a detailed specification document before writing any code.
 
 Start by reading the JSON schema for the JSON you will be generating:
-`~/.claude/plugins/cache/sdd-toolkit/src/claude_skills/schemas/sdd-spec-schema.json`
+Run `sdd schema` to get the complete spec schema JSON.
 
 This will tell you what fields are required and optional in the specification, and what data types are expected for each field.
 

@@ -21,7 +21,8 @@ from setup_permissions import (
     GIT_WRITE_PERMISSIONS,
     GIT_DANGEROUS_PERMISSIONS,
     GIT_APPROVAL_PERMISSIONS,
-    _prompt_for_git_permissions
+    _prompt_for_git_permissions,
+    cmd_update,
 )
 
 
@@ -206,3 +207,227 @@ class TestPermissionApplication:
             assert ":*)" in perm or ":*)" in perm, f"Invalid pattern: {perm}"
             # Should not contain invalid wildcards in the middle
             assert "* --" not in perm and " *:" not in perm, f"Invalid wildcard in pattern: {perm}"
+
+
+class TestNonInteractiveMode:
+    """Tests for non-interactive mode with CLI parameters."""
+
+    @patch('setup_permissions.Path')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('json.dump')
+    @patch('sys.stdin')
+    def test_non_interactive_flag_prevents_prompts(self, mock_stdin, mock_json_dump, mock_json_load, mock_file_open, mock_path):
+        """Test that --non-interactive flag prevents interactive prompts."""
+        mock_stdin.isatty.return_value = True  # Even with TTY, non-interactive flag should prevent prompts
+
+        # Mock args
+        mock_args = MagicMock()
+        mock_args.project_root = "."
+        mock_args.json = False
+        mock_args.non_interactive = True
+        mock_args.enable_git = False
+        mock_args.git_write = False
+
+        # Mock printer
+        mock_printer = MagicMock()
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path_instance.resolve.return_value = Path("/tmp/test")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.__truediv__ = lambda self, other: mock_path_instance
+        mock_path.return_value = mock_path_instance
+
+        # Mock existing settings
+        mock_json_load.return_value = {"permissions": {"allow": [], "ask": [], "deny": []}}
+
+        with patch('builtins.input') as mock_input:
+            # This should NOT be called in non-interactive mode
+            mock_input.side_effect = AssertionError("Prompt should not be called in non-interactive mode")
+
+            # Should not raise AssertionError
+            result = cmd_update(mock_args, mock_printer)
+
+            # Verify input was never called
+            mock_input.assert_not_called()
+
+    @patch('setup_permissions.Path')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('json.dump')
+    @patch('sys.stdin')
+    def test_tty_detection_triggers_non_interactive(self, mock_stdin, mock_json_dump, mock_json_load, mock_file_open, mock_path):
+        """Test that non-TTY environment automatically triggers non-interactive mode."""
+        mock_stdin.isatty.return_value = False  # No TTY available
+
+        # Mock args without explicit non_interactive flag
+        mock_args = MagicMock()
+        mock_args.project_root = "."
+        mock_args.json = False
+        mock_args.non_interactive = False
+        mock_args.enable_git = False
+        mock_args.git_write = False
+
+        # Mock printer
+        mock_printer = MagicMock()
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path_instance.resolve.return_value = Path("/tmp/test")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.__truediv__ = lambda self, other: mock_path_instance
+        mock_path.return_value = mock_path_instance
+
+        # Mock existing settings
+        mock_json_load.return_value = {"permissions": {"allow": [], "ask": [], "deny": []}}
+
+        with patch('builtins.input') as mock_input:
+            # This should NOT be called when no TTY is available
+            mock_input.side_effect = AssertionError("Prompt should not be called without TTY")
+
+            # Should not raise AssertionError
+            result = cmd_update(mock_args, mock_printer)
+
+            # Verify input was never called
+            mock_input.assert_not_called()
+
+    @patch('setup_permissions.Path')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('json.dump')
+    @patch('sys.stdin')
+    def test_enable_git_read_only(self, mock_stdin, mock_json_dump, mock_json_load, mock_file_open, mock_path):
+        """Test that --enable-git without --git-write adds read-only permissions."""
+        mock_stdin.isatty.return_value = False
+
+        # Mock args
+        mock_args = MagicMock()
+        mock_args.project_root = "."
+        mock_args.json = False
+        mock_args.non_interactive = True
+        mock_args.enable_git = True
+        mock_args.git_write = False
+
+        # Mock printer
+        mock_printer = MagicMock()
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path_instance.resolve.return_value = Path("/tmp/test")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.__truediv__ = lambda self, other: mock_path_instance
+        mock_path.return_value = mock_path_instance
+
+        # Mock existing settings
+        mock_json_load.return_value = {"permissions": {"allow": [], "ask": [], "deny": []}}
+
+        # Call function
+        cmd_update(mock_args, mock_printer)
+
+        # Verify json.dump was called
+        assert mock_json_dump.called
+
+        # Get the settings that were written
+        written_settings = mock_json_dump.call_args[0][0]
+
+        # Verify git read permissions were added to allow list
+        for perm in GIT_READ_PERMISSIONS:
+            assert perm in written_settings["permissions"]["allow"], f"Missing read permission: {perm}"
+
+        # Verify no write or dangerous permissions in allow list
+        for perm in GIT_WRITE_PERMISSIONS:
+            assert perm not in written_settings["permissions"]["allow"], f"Write permission should not be in allow: {perm}"
+
+        # Verify no dangerous operations in ask list
+        assert len(written_settings["permissions"]["ask"]) == 0
+
+    @patch('setup_permissions.Path')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('json.dump')
+    @patch('sys.stdin')
+    def test_enable_git_with_write(self, mock_stdin, mock_json_dump, mock_json_load, mock_file_open, mock_path):
+        """Test that --enable-git --git-write adds full permissions."""
+        mock_stdin.isatty.return_value = False
+
+        # Mock args
+        mock_args = MagicMock()
+        mock_args.project_root = "."
+        mock_args.json = False
+        mock_args.non_interactive = True
+        mock_args.enable_git = True
+        mock_args.git_write = True
+
+        # Mock printer
+        mock_printer = MagicMock()
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path_instance.resolve.return_value = Path("/tmp/test")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.__truediv__ = lambda self, other: mock_path_instance
+        mock_path.return_value = mock_path_instance
+
+        # Mock existing settings
+        mock_json_load.return_value = {"permissions": {"allow": [], "ask": [], "deny": []}}
+
+        # Call function
+        cmd_update(mock_args, mock_printer)
+
+        # Get the settings that were written
+        written_settings = mock_json_dump.call_args[0][0]
+
+        # Verify git read and write permissions were added to allow list
+        for perm in GIT_READ_PERMISSIONS:
+            assert perm in written_settings["permissions"]["allow"], f"Missing read permission: {perm}"
+        for perm in GIT_WRITE_PERMISSIONS:
+            assert perm in written_settings["permissions"]["allow"], f"Missing write permission: {perm}"
+
+        # Verify dangerous operations are in ask list
+        for perm in GIT_APPROVAL_PERMISSIONS:
+            assert perm in written_settings["permissions"]["ask"], f"Missing approval permission: {perm}"
+        for perm in GIT_DANGEROUS_PERMISSIONS:
+            assert perm in written_settings["permissions"]["ask"], f"Missing dangerous permission: {perm}"
+
+    @patch('setup_permissions.Path')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('json.load')
+    @patch('json.dump')
+    @patch('sys.stdin')
+    def test_no_git_permissions_when_disabled(self, mock_stdin, mock_json_dump, mock_json_load, mock_file_open, mock_path):
+        """Test that no git permissions are added when --no-enable-git is used."""
+        mock_stdin.isatty.return_value = False
+
+        # Mock args
+        mock_args = MagicMock()
+        mock_args.project_root = "."
+        mock_args.json = False
+        mock_args.non_interactive = True
+        mock_args.enable_git = False
+        mock_args.git_write = False
+
+        # Mock printer
+        mock_printer = MagicMock()
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path_instance.resolve.return_value = Path("/tmp/test")
+        mock_path_instance.exists.return_value = True
+        mock_path_instance.__truediv__ = lambda self, other: mock_path_instance
+        mock_path.return_value = mock_path_instance
+
+        # Mock existing settings
+        mock_json_load.return_value = {"permissions": {"allow": [], "ask": [], "deny": []}}
+
+        # Call function
+        cmd_update(mock_args, mock_printer)
+
+        # Get the settings that were written
+        written_settings = mock_json_dump.call_args[0][0]
+
+        # Verify no git permissions were added
+        for perm in GIT_READ_PERMISSIONS:
+            assert perm not in written_settings["permissions"]["allow"], f"Read permission should not be added: {perm}"
+        for perm in GIT_WRITE_PERMISSIONS:
+            assert perm not in written_settings["permissions"]["allow"], f"Write permission should not be added: {perm}"

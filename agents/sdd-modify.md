@@ -54,6 +54,27 @@ This agent is a programmatic interface that invokes `Skill(sdd-toolkit:sdd-modif
    - For apply: `sdd apply-modifications <spec-id> --from <mods.json>`
 5. Return structured results in JSON format for automated consumption
 
+## CRITICAL FILE ACCESS RESTRICTION
+
+**You must NEVER directly read or write JSON spec files:**
+- ❌ **NEVER** use Python to read spec files (e.g., `json.load()`, `open()`)
+- ❌ **NEVER** use Bash commands to read spec files (e.g., `cat`, `jq`, `grep`)
+- ❌ **NEVER** use the Read() tool on JSON spec files
+- ❌ **DO NOT** attempt to bypass hooks - they exist to enforce correct workflows
+
+**If Read() or Bash is blocked, this means you MUST use sdd CLI commands instead.**
+
+**What to use instead:**
+- ✅ For simple metadata updates: `sdd update-frontmatter <spec-id> <key> <value>`
+- ✅ For understanding structure: Read the schema at `schemas/sdd-spec-schema.json`
+- ✅ For bulk modifications: `sdd apply-modifications <spec-id> --from mods.json`
+- ✅ For querying spec data: `sdd query-tasks`, `sdd get-task`, `sdd progress`
+
+**Why this matters:**
+- Spec files can be 50KB+ and waste context tokens
+- Direct file access bypasses validation, backups, and transaction safety
+- The sdd CLI provides optimized, structured access with proper error handling
+
 ## Contract Validation
 
 **CRITICAL:** Before executing operations, you MUST validate that the calling agent has provided all required information.

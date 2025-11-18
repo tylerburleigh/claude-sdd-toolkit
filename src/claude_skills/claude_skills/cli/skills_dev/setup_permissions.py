@@ -345,23 +345,19 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> dict:
 
 def cmd_update(args, printer: PrettyPrinter) -> int:
     """Update .claude/settings.local.json with SDD permissions."""
+    import sys
+
     project_path = Path(args.project_root).resolve()
     settings_file = project_path / ".claude" / "settings.local.json"
 
     # Create .claude directory if it doesn't exist
     settings_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Check if sdd_config.json already exists
-    config_file = project_path / ".claude" / "sdd_config.json"
-    config_exists = config_file.exists()
+    # Detect non-interactive mode
+    non_interactive = getattr(args, "non_interactive", False) or not sys.stdin.isatty()
 
-    # Prompt for configuration if not in JSON mode and config doesn't exist
-    if not args.json and not config_exists:
-        printer.info("")
-        config = _prompt_for_config(printer)
-        _create_config_file(project_path, config, printer)
-    elif not config_exists:
-        copy_template_to("sdd_config.json", config_file)
+    # Note: sdd_config.json creation is now delegated to 'sdd skills-dev start-helper ensure-sdd-config'
+    # This keeps setup-permissions focused solely on permission management
 
     # Load existing settings or start from the packaged template
     settings_existed = settings_file.exists()
@@ -401,8 +397,46 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
             printer.info(f"  ... and {len(new_permissions) - 5} more")
         printer.info("")
 
-    # Prompt for git permissions (if not in JSON mode)
-    if not args.json:
+    # Handle git permissions based on mode
+    if non_interactive:
+        # Non-interactive mode: use CLI parameters
+        enable_git = getattr(args, "enable_git", None)
+        git_write = getattr(args, "git_write", None)
+
+        if enable_git:
+            # Add git read permissions
+            git_permissions = {"allow": list(GIT_READ_PERMISSIONS), "ask": []}
+
+            if git_write:
+                # Add git write permissions to allow list
+                git_permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
+                # Add approval-required and dangerous operations to ask list
+                git_permissions["ask"].extend(GIT_APPROVAL_PERMISSIONS)
+                git_permissions["ask"].extend(GIT_DANGEROUS_PERMISSIONS)
+
+                if not args.json:
+                    printer.info("✓ Git integration enabled with write permissions")
+            else:
+                if not args.json:
+                    printer.info("✓ Git integration enabled (read-only)")
+
+            # Add git permissions to allow list (avoid duplicates)
+            for perm in git_permissions["allow"]:
+                if perm not in existing_allow:
+                    new_permissions.append(perm)
+                    permissions["allow"].append(perm)
+                    existing_allow.add(perm)
+
+            # Add git permissions that require approval (avoid duplicates)
+            for perm in git_permissions["ask"]:
+                if perm not in existing_ask:
+                    new_ask_permissions.append(perm)
+                    permissions["ask"].append(perm)
+                    existing_ask.add(perm)
+        # If enable_git is None or False, don't add any git permissions
+
+    else:
+        # Interactive mode: prompt user for git permissions
         git_permissions = _prompt_for_git_permissions(printer)
 
         # Add git permissions to allow list (avoid duplicates)
@@ -604,7 +638,58 @@ def register_setup_permissions(subparsers, parent_parser):
         help="Update project settings with SDD permissions",
     )
     update_cmd.add_argument("project_root", help='Project root directory (e.g., "." for current)')
-    update_cmd.set_defaults(func=cmd_update)
+
+    # Non-interactive mode
+    update_cmd.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Skip interactive prompts (use with other flags to specify config)",
+    )
+
+    # SDD config options
+    update_cmd.add_argument(
+        "--default-mode",
+        choices=["json", "text", "markdown"],
+        help="Default output mode for sdd_config.json",
+    )
+    update_cmd.add_argument(
+        "--verbosity",
+        choices=["quiet", "normal", "verbose"],
+        help="Default verbosity level",
+    )
+    update_cmd.add_argument(
+        "--work-mode",
+        choices=["single", "autonomous"],
+        help="Work mode (single task or autonomous phase completion)",
+    )
+
+    # Git permission options
+    update_cmd.add_argument(
+        "--enable-git",
+        action="store_true",
+        dest="enable_git",
+        help="Add git read permissions to settings",
+    )
+    update_cmd.add_argument(
+        "--no-enable-git",
+        action="store_false",
+        dest="enable_git",
+        help="Do not add git permissions",
+    )
+    update_cmd.add_argument(
+        "--git-write",
+        action="store_true",
+        dest="git_write",
+        help="Add git write permissions (requires --enable-git)",
+    )
+    update_cmd.add_argument(
+        "--no-git-write",
+        action="store_false",
+        dest="git_write",
+        help="Do not add git write permissions",
+    )
+
+    update_cmd.set_defaults(func=cmd_update, enable_git=None, git_write=None)
 
     # check command
     check_cmd = setup_perms_subparsers.add_parser(

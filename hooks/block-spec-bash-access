@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# PreToolUse hook to block Bash commands that directly access .json spec files
+# Prevents bypassing the Read() hook by using any file I/O method
+
+set -euo pipefail
+
+# Read JSON input from stdin
+input=$(cat)
+
+# Extract command from tool_input using jq (or fall back to grep/sed if jq unavailable)
+if command -v jq &> /dev/null; then
+    bash_command=$(echo "$input" | jq -r '.tool_input.command // empty')
+else
+    # Fallback: simple extraction using grep/sed
+    bash_command=$(echo "$input" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | head -1)
+fi
+
+# If no command found, allow
+if [ -z "$bash_command" ]; then
+    exit 0
+fi
+
+# Check for any pattern that indicates direct spec file access
+# Patterns cover: Python (json.load/open), bash tools (cat/head/tail/etc), jq, and other file I/O
+if echo "$bash_command" | grep -qE "(python.*json\.load.*specs/(active|pending|completed|archived))|(python.*open\(['\"].*specs/(active|pending|completed|archived))|((cat|head|tail|less|more|sed|awk|grep).*specs/(active|pending|completed|archived)/.*\.json)|(jq.*specs/(active|pending|completed|archived)/.*\.json)"; then
+    cat >&2 <<'EOF'
+
+╔════════════════════════════════════════════════════════════════════════╗
+║                  ⛔ SPEC FILE ACCESS BLOCKED                           ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+WHAT: You attempted to directly access a .json specification file via Bash command.
+
+WHY: This bypasses the Read() hook and wastes context tokens.
+     JSON specs are often very large (50KB+). The SDD toolkit provides
+     optimized tools for working with specs efficiently.
+
+HOW TO FIX:
+  Use sdd CLI commands to query spec information without accessing the JSON file.
+  Efficient alternatives depend on what you need:
+
+  - Get the next task to work on:
+    Bash(sdd next-task <spec-id>)
+
+  - Query tasks by status, type, or parent:
+    Bash(sdd query-tasks <spec-id> --status pending --limit 5)
+
+  - Get detailed info on a specific task:
+    Bash(sdd get-task <spec-id> <task-id> --include-journal)
+
+  - Check overall progress:
+    Bash(sdd progress <spec-id>)
+
+  - Understand spec structure (get schema from plugin):
+    Bash(sdd schema)
+    This outputs the complete spec schema JSON from the plugin installation.
+
+  - View decision journal:
+    Bash(sdd get-journal <spec-id>)
+
+  - Modify spec structure (bulk operations):
+    Bash(sdd apply-modifications <spec-id> --from modifications.json)
+
+  - Parse review feedback into modifications:
+    Bash(sdd parse-review <spec-id> --review report.md --output mods.json)
+
+  - Update single task metadata field:
+    Bash(sdd update-task-metadata <spec-id> <task-id> --description "new desc")
+
+  - Update spec-level metadata:
+    Bash(sdd update-frontmatter <spec-id> <key> <value> [--dry-run])
+
+  - Get spec statistics and structure:
+    Bash(sdd spec-stats <path-to-spec.md>)
+
+EXAMPLES:
+  Querying: Instead of python -c "import json; ..." or jq
+    Use: Bash(sdd query-tasks my-spec-001 --status pending --json)
+
+  Modifying: Instead of Python script or sed/awk
+    Use: Bash(sdd apply-modifications my-spec-001 --from mods.json)
+
+  Reading: Instead of cat specs/active/my-spec.json
+    Use: Bash(sdd next-task my-spec-001)
+
+⚠️  CRITICAL: ALL spec file access must go through sdd CLI commands.
+   If Read() is blocked, Bash file I/O is also blocked. Use sdd commands.
+
+This hook enforces proper SDD workflow and prevents token waste.
+
+EOF
+    exit 2
+fi
+
+# Allow all other bash commands
+exit 0

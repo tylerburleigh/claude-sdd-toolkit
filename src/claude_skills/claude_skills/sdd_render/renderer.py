@@ -208,10 +208,14 @@ class SpecRenderer:
             lines.append(f"**Reasoning:** {task_metadata['reasoning']}  ")
 
         if task_metadata.get('details'):
-            lines.extend([
-                "",
-                f"**Details:** {task_metadata['details']}"
-            ])
+            details = task_metadata['details']
+            lines.append("")
+            if isinstance(details, list):
+                lines.append("**Details:**")
+                for detail in details:
+                    lines.append(f"- {detail}")
+            else:
+                lines.append(f"**Details:** {details}")
 
         # Render dependencies
         deps = task.get('dependencies', {})
