@@ -42,7 +42,8 @@ Use `Skill(sdd-toolkit:sdd-validate)` to:
 ### Exit Codes
 - `0` - Validation passed (no errors)
 - `1` - Warnings only (usable but has issues)
-- `2` - Errors detected (requires fixes) - **This is expected when spec has issues, not a command failure**
+- `2` - Errors detected in spec content (requires fixes) - **This is expected when spec has issues, not a command failure**
+- `3` - File not found or cannot be accessed (system/file access error)
 
 ### Always Re-validate After Fixing
 Fixing issues often reveals new problems that were previously hidden. Always run `sdd validate` after `sdd fix` to see the current state.

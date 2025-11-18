@@ -75,12 +75,12 @@ def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
 
         if not spec_file.exists():
             printer.error(f"Spec file not found: {spec_file}")
-            sys.exit(2)
+            sys.exit(3)
 
         if spec_file.suffix != '.json':
             printer.error(f"Expected JSON file, got: {spec_file.suffix}")
             printer.info("JSON specs are now the single source of truth")
-            sys.exit(2)
+            sys.exit(3)
 
         return spec_file
 
@@ -94,7 +94,7 @@ def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
             if spec_file.suffix != '.json':
                 printer.error(f"Expected JSON file, got: {spec_file.suffix}")
                 printer.info("JSON specs are now the single source of truth")
-                sys.exit(2)
+                sys.exit(3)
             return spec_file
         # File doesn't exist at resolved path - extract spec name for fallback lookup
         # Extract spec name from path (e.g., "specs/pending/my-spec.json" -> "my-spec")
@@ -105,13 +105,13 @@ def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
     if not specs_dir:
         printer.error("Specs directory not found")
         printer.info("Run from a project with a specs/ directory or provide a full path")
-        sys.exit(2)
+        sys.exit(3)
 
     spec_file = find_spec_file(search_name, specs_dir)
     if not spec_file:
         printer.error(f"Spec file not found for spec name: {search_name}")
         printer.info(f"Searched in: {specs_dir}/pending, {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
-        sys.exit(2)
+        sys.exit(3)
 
     return spec_file
 

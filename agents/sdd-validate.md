@@ -124,17 +124,20 @@ Skill(sdd-toolkit:sdd-validate) with prompt:
 The sdd-validate CLI uses exit codes to communicate validation status:
 - **Exit code 0**: Spec is valid (no errors)
 - **Exit code 1**: Spec has warnings only (usable but has issues)
-- **Exit code 2**: Spec has errors (EXPECTED when validating specs with issues)
+- **Exit code 2**: Spec has errors in content (EXPECTED when validating specs with issues)
+- **Exit code 3**: File not found or cannot be accessed (system/file access error)
 
-**IMPORTANT**: Exit code 2 is NOT a command failure. It means the validation successfully detected errors in the spec. This is the normal workflow:
+**IMPORTANT**: Exit code 2 is NOT a command failure. It means the validation successfully detected errors in the spec content. This is the normal workflow:
 1. Initial validation (finds errors) → exit code 2
 2. Apply fixes with `sdd fix`
 3. Re-validate (fewer/no errors) → exit code 0
 
-Only treat the command as failed if:
+Exit code 3 indicates an actual command failure:
 - The spec file cannot be found
-- The JSON is malformed and cannot be parsed
-- The validation logic itself crashes
+- The file path is invalid
+- The specs directory cannot be located
+
+Other failures (JSON malformed, validation logic crashes) will have different exit codes.
 
 ## Spec File Identifier Format
 

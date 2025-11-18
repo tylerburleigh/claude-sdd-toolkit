@@ -16,12 +16,13 @@ def find_specs_directory(provided_path: Optional[str] = None) -> Optional[Path]:
         provided_path: Optional explicit path to specs directory or file
 
     Returns:
-        Absolute Path to specs directory (containing active/completed/archived), or None if not found
+        Absolute Path to specs directory (containing pending/active/completed/archived), or None if not found
     """
     def is_valid_specs_dir(p: Path) -> bool:
         """Check if a directory is a valid specs directory."""
         # Check for at least one of the spec subdirectories
-        return ((p / "active").is_dir() or
+        return ((p / "pending").is_dir() or
+                (p / "active").is_dir() or
                 (p / "completed").is_dir() or
                 (p / "archived").is_dir())
 
@@ -371,7 +372,7 @@ def ensure_reports_directory(specs_dir: Path) -> Path:
     the directory structure is always available.
 
     Args:
-        specs_dir: Path to the specs directory (containing active/completed/archived)
+        specs_dir: Path to the specs directory (containing pending/, active/, completed/, archived/)
 
     Returns:
         Path to the .reports directory
@@ -434,7 +435,7 @@ def ensure_reviews_directory(specs_dir: Path) -> Path:
     the directory structure is always available.
 
     Args:
-        specs_dir: Path to the specs directory (containing active/completed/archived)
+        specs_dir: Path to the specs directory (containing pending/, active/, completed/, archived/)
 
     Returns:
         Path to the .reviews directory
@@ -497,7 +498,7 @@ def ensure_backups_directory(specs_dir: Path) -> Path:
     the directory structure is always available.
 
     Args:
-        specs_dir: Path to the specs directory (containing active/completed/archived)
+        specs_dir: Path to the specs directory (containing pending/, active/, completed/, archived/)
 
     Returns:
         Path to the .backups directory
@@ -560,7 +561,7 @@ def ensure_human_readable_directory(specs_dir: Path) -> Path:
     the directory structure is always available.
 
     Args:
-        specs_dir: Path to the specs directory (containing active/completed/archived)
+        specs_dir: Path to the specs directory (containing pending/, active/, completed/, archived/)
 
     Returns:
         Path to the .human-readable directory
@@ -623,7 +624,7 @@ def ensure_fidelity_reviews_directory(specs_dir: Path) -> Path:
     the directory structure is always available.
 
     Args:
-        specs_dir: Path to the specs directory (containing active/completed/archived)
+        specs_dir: Path to the specs directory (containing pending/, active/, completed/, archived/)
 
     Returns:
         Path to the .fidelity-reviews directory

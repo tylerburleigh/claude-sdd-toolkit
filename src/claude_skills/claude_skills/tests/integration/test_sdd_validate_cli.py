@@ -89,9 +89,9 @@ class TestValidateCommand:
         assert "ERROR" in result.stdout or "WARN" in result.stdout or len(result.stdout) > 100
 
     def test_validate_nonexistent_file(self):
-        """Test validation of nonexistent file returns exit 2."""
+        """Test validation of nonexistent file returns exit 3."""
         result = run_cli_no_json("validate", "/nonexistent/file.json")
-        assert result.returncode == 2
+        assert result.returncode == 3
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
         assert "not found" in combined_output.lower()
 
@@ -209,6 +209,46 @@ class TestValidateCommand:
         data = json.loads(result.stdout)
         assert data["schema"]["source"].endswith("sdd-spec-schema.json") or data["schema"]["source"].startswith("package:")
         assert data["schema"]["errors"] or data["schema"]["warnings"]
+
+    def test_validate_pending_only_directory(self, tmp_path):
+        """Test that specs directory with only pending/ subdirectory is recognized."""
+        # Create a specs directory with only pending/ subdirectory
+        specs_dir = tmp_path / "specs"
+        pending_dir = specs_dir / "pending"
+        pending_dir.mkdir(parents=True)
+
+        # Copy a clean spec to the pending directory
+        spec_copy = pending_dir / "test_spec.json"
+        shutil.copy(CLEAN_SPEC, spec_copy)
+
+        # Should be able to find and validate the spec by name from the tmp_path directory
+        import os
+        original_dir = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = run_cli_no_json("validate", "test_spec")
+            assert result.returncode == 0
+        finally:
+            os.chdir(original_dir)
+
+    def test_fix_pending_only_directory_save(self, tmp_path):
+        """Test that fix can save to specs directory with only pending/ subdirectory."""
+        # Create a specs directory with only pending/ subdirectory
+        specs_dir = tmp_path / "specs"
+        pending_dir = specs_dir / "pending"
+        pending_dir.mkdir(parents=True)
+
+        # Copy a fixable spec to the pending directory
+        spec_copy = pending_dir / "test_spec.json"
+        shutil.copy(AUTOFIX_SPEC, spec_copy)
+
+        # Apply fixes
+        result = run_cli_no_json("fix", str(spec_copy), "--no-backup")
+
+        # Should succeed without "Spec file not found" error
+        assert result.returncode == 0
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "Spec file not found" not in combined_output
 
 
 class TestFixCommand:
