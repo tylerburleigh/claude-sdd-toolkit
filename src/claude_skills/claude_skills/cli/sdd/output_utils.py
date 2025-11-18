@@ -745,7 +745,7 @@ RUN_TESTS_RUN_STANDARD = {
 # sdd-plan-review command
 PLAN_REVIEW_SUMMARY_ESSENTIAL = {
     'spec_id', 'review_type', 'blocker_count',
-    'models_responded', 'artifacts'
+    'suggestion_count', 'models_responded', 'artifacts'
 }
 PLAN_REVIEW_SUMMARY_STANDARD = {
     'spec_id', 'review_type', 'artifacts',
