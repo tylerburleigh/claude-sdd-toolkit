@@ -1,21 +1,21 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 16:46:17
+**Generated:** 2025-11-18 17:47:51
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114120
+- **Total Lines:** 114041
 - **Total Classes:** 448
 - **Total Functions:** 1469
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
-  - _handle_fidelity_review (53)
+  - _handle_fidelity_review (51)
   - parse_review_response (50)
   - complete_task_workflow (45)
   - cmd_review (42)
@@ -1095,7 +1095,6 @@ This class will be implemented in Phase 4 (Report Generation).
 - `_format_models_display()`
 - `_get_report_metadata()`
 - `_convert_to_dict()`
-- `generate_markdown()`
 - `generate_json()`
 - `print_console()`
 - `print_console_rich()`
@@ -8860,7 +8859,7 @@ Example output:
 ### `_build_output_basename(spec_id, task_id, phase_id, file_paths) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:61`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:66`
 **Complexity:** 7
 
 **Parameters:**
@@ -9335,7 +9334,7 @@ Args:
 ### `_create_fidelity_report(reviewer, parsed_responses, consensus, categorized_issues, models_metadata) -> FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:92`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:97`
 **Complexity:** 1
 
 **Parameters:**
@@ -10030,7 +10029,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:46`
-**Complexity:** 1
+**Complexity:** 2
 
 **Description:**
 > Emit fidelity summary respecting verbosity settings.
@@ -10559,8 +10558,8 @@ Example:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:127`
-⚠️ **Complexity:** 53 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:132`
+⚠️ **Complexity:** 51 (High)
 
 **Description:**
 > Handle fidelity-review command execution.
@@ -12128,7 +12127,7 @@ Returns a tuple of (new_list, removed_flag).
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:183`
-**Complexity:** 5
+**Complexity:** 9
 
 **Parameters:**
 - `specs`: list[dict]
@@ -12498,7 +12497,7 @@ Returns:
 ### `_slugify_component(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:53`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:58`
 **Complexity:** 3
 
 **Parameters:**
@@ -12885,7 +12884,7 @@ Returns:
 ### `_write_report_artifact(path, format, get_markdown, get_json_text) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:109`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:114`
 **Complexity:** 3
 
 **Parameters:**
@@ -12913,7 +12912,7 @@ Returns:
 ### `_write_sdd_config(config_path, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:306`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:327`
 **Complexity:** 2
 
 **Parameters:**
@@ -15446,7 +15445,7 @@ Returns:
 ### `cmd_ensure_sdd_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:320`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:341`
 **Complexity:** 4
 
 **Description:**
@@ -15476,7 +15475,7 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:212`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:233`
 **Complexity:** 1
 
 **Description:**
@@ -15778,7 +15777,7 @@ Args:
 ### `cmd_inspect_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:224`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:245`
 **Complexity:** 4
 
 **Description:**
@@ -16236,7 +16235,7 @@ Args:
 ### `cmd_session_summary(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:268`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:289`
 **Complexity:** 4
 
 **Description:**
@@ -26571,7 +26570,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:352`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:373`
 **Complexity:** 1
 
 **Description:**
@@ -36075,6 +36074,7 @@ Returns:
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.progress.ProgressEmitter`
 - `claude_skills.common.sdd_config.get_default_format`
+- `claude_skills.common.sdd_config.get_json_compact`
 - `collections.OrderedDict`
 - `consultation.ConsultationError`
 - `consultation.ConsultationTimeoutError`
