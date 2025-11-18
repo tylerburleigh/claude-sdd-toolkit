@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 18:02:08
+**Generated:** 2025-11-18 18:03:08
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113981
+- **Total Lines:** 113939
 - **Total Classes:** 448
-- **Total Functions:** 1468
+- **Total Functions:** 1467
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -9836,26 +9836,6 @@ Returns:
 
 ---
 
-### `_extract_dimension_scores_from_reviews(responses) -> Dict[str, float]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:272`
-**Complexity:** 8
-
-**Description:**
-> Extract and average dimension scores from individual model reviews.
-
-Args:
-    responses: List of response dicts with raw_review text
-
-Returns:
-    Dictionary mapping dimension names to average scores
-
-**Parameters:**
-- `responses`: List[Dict[str, Any]]
-
----
-
 ### `_extract_issues_from_markdown(content) -> Dict[str, List[Dict[str, Any]]]`
 
 **Language:** python
@@ -13909,7 +13889,7 @@ Yields:
 ### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:311`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:272`
 **Complexity:** 3
 
 **Description:**
