@@ -343,7 +343,19 @@ def cmd_review(args, printer):
         for label, path, error in failed_artifacts:
             printer.warning(f"Artifact write skipped for {label} ({path}): {error}")
 
-    return 0
+    # Exit code mapping for automation (replaces APPROVE/REVISE/REJECT verdicts)
+    # Exit 1: Critical blockers found (equivalent to REJECT)
+    # Exit 2: Multiple major suggestions (equivalent to REVISE)
+    # Exit 0: No significant issues (equivalent to APPROVE)
+    blocker_count = summary_payload.get('blocker_count', 0)
+    suggestion_count = summary_payload.get('suggestion_count', 0)
+
+    if blocker_count > 0:
+        return 1  # Critical blockers must be fixed
+    elif suggestion_count > 3:
+        return 2  # Significant revisions recommended
+    else:
+        return 0  # Ready to proceed
 
 
 def cmd_list_tools(args, printer):

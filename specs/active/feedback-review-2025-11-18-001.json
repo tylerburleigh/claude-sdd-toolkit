@@ -2,7 +2,7 @@
   "spec_id": "feedback-review-2025-11-18-001",
   "title": "Refactor sdd-plan-review from Evaluation to Feedback Focus",
   "generated": "2025-11-18T21:46:00Z",
-  "last_updated": "2025-11-18T23:11:05.850694Z",
+  "last_updated": "2025-11-18T23:12:09.863241Z",
   "metadata": {
     "description": "Transform sdd-plan-review from a gate-keeping evaluation system (with scores and approve/reject) into a collaborative feedback system focused on actionable improvements",
     "objectives": [
@@ -22,7 +22,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-18T22:47:32.061836Z",
-    "progress_percentage": 77,
+    "progress_percentage": 81,
     "current_phase": "phase-4"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-5"
       ],
       "total_tasks": 27,
-      "completed_tasks": 21,
+      "completed_tasks": 22,
       "metadata": {}
     },
     "phase-1": {
@@ -939,7 +939,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Update CLI and reviewer.py to handle feedback-focused output format",
         "risk_level": "medium"
@@ -948,7 +948,7 @@
     "phase-4-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4",
       "children": [
         "task-4-1",
@@ -956,8 +956,12 @@
         "task-4-3"
       ],
       "total_tasks": 3,
-      "completed_tasks": 2,
-      "metadata": {},
+      "completed_tasks": 3,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-18T23:12:09.856412Z",
+        "journaled_at": "2025-11-18T23:12:09.863220Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-4-verify"
@@ -1036,7 +1040,7 @@
     "task-4-3": {
       "type": "task",
       "title": "cli.py - Add exit code mapping for automation",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [],
       "dependencies": {
@@ -1047,7 +1051,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/sdd_plan_review/cli.py",
         "task_category": "implementation",
@@ -1057,7 +1061,13 @@
           "Map Major Suggestions > 3 \u2192 exit code 2 (REVISE equivalent)",
           "No blockers/suggestions \u2192 exit code 0 (APPROVE equivalent)",
           "Document mapping in CLI help text"
-        ]
+        ],
+        "started_at": "2025-11-18T23:11:33.142434Z",
+        "status_note": "Adding exit code mapping based on feedback categories",
+        "completed_at": "2025-11-18T23:12:09.856253Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-18T23:12:09.859951Z"
       }
     },
     "phase-4-verify": {
@@ -1551,6 +1561,24 @@
       "content": "Updated CLI output display logic to use category-based feedback. Changes:\n\n**Updated dry_payload (lines 148-165):**\n- Line 151: Set 'recommendation': None with \"# Deprecated\" comment\n- Line 152: Set 'overall_score': None with \"# Deprecated\" comment\n- Line 163: Set 'dimension_scores': {} with \"# Deprecated\" comment\n- Removed: 'issue_count': 0\n- Added: 'blocker_count': 0 (line 154)\n- Added: 'suggestion_count': 0 (line 155)\n- Added: 'question_count': 0 (line 156)\n\n**Updated summary_payload (lines 309-326):**\n- Line 312: Set 'recommendation': None with \"# Deprecated\" comment  \n- Line 313: Set 'overall_score': None with \"# Deprecated\" comment\n- Line 324: Set 'dimension_scores': {} with \"# Deprecated\" comment\n- Removed: 'issue_count': len(consensus.get('all_issues') or [])\n- Added: 'blocker_count': len(consensus.get('critical_blockers') or []) (line 315)\n- Added: 'suggestion_count': len(consensus.get('major_suggestions') or []) (line 316)\n- Added: 'question_count': len(consensus.get('questions') or []) (line 317)\n\nBoth payloads now provide category-based counts (blockers, suggestions, questions) instead of score-based fields, while maintaining deprecated fields as None/{} for backward compatibility.\n\nModified file: src/claude_skills/claude_skills/sdd_plan_review/cli.py:148-326",
       "metadata": {},
       "task_id": "task-4-2"
+    },
+    {
+      "timestamp": "2025-11-18T23:12:09.859946Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: cli.py - Add exit code mapping for automation",
+      "author": "claude-code",
+      "content": "Added exit code mapping for automation based on feedback categories. Changes:\n\n**Added exit code logic (lines 346-358):**\n- Line 346-349: Added comment block documenting exit code mapping:\n  - Exit 1: Critical blockers found (equivalent to REJECT)\n  - Exit 2: Multiple major suggestions (equivalent to REVISE)\n  - Exit 0: No significant issues (equivalent to APPROVE)\n- Line 350-351: Extract blocker_count and suggestion_count from summary_payload\n- Line 353-354: Return exit code 1 if blocker_count > 0 (critical blockers must be fixed)\n- Line 355-356: Return exit code 2 if suggestion_count > 3 (significant revisions recommended)\n- Line 357-358: Return exit code 0 otherwise (ready to proceed)\n\n**Replaced previous behavior:**\n- Changed from: \"return 0\" unconditionally (line 346)\n- Changed to: Category-based exit code logic that provides meaningful automation signals\n\nExit codes now enable CI/CD integration without relying on deprecated APPROVE/REVISE/REJECT verdicts. Automation can check exit codes to determine whether specs have critical blockers (1), need revision (2), or are ready (0).\n\nModified file: src/claude_skills/claude_skills/sdd_plan_review/cli.py:346-358",
+      "metadata": {},
+      "task_id": "task-4-3"
+    },
+    {
+      "timestamp": "2025-11-18T23:12:09.863215Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-4-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-4-files"
     }
   ]
 }
