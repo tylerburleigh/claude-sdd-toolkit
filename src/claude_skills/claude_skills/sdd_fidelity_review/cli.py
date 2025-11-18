@@ -29,7 +29,7 @@ from claude_skills.common.ai_tools import (
     check_tool_available
 )
 from claude_skills.common.progress import ProgressEmitter
-from claude_skills.common.sdd_config import get_default_format
+from claude_skills.common.sdd_config import get_default_format, get_json_compact
 from claude_skills.common.json_output import output_json
 from claude_skills.cli.sdd.output_utils import (
     prepare_output,
@@ -46,7 +46,12 @@ from claude_skills.common.paths import find_specs_directory, ensure_fidelity_rev
 def _fidelity_output_json(data: Dict[str, Any], args) -> int:
     """Emit fidelity summary respecting verbosity settings."""
     payload = prepare_output(data, args, FIDELITY_REVIEW_ESSENTIAL, FIDELITY_REVIEW_STANDARD)
-    output_json(payload, getattr(args, 'compact', False))
+    
+    compact = getattr(args, "compact", None)
+    if compact is None:
+        compact = get_json_compact()
+        
+    output_json(payload, compact)
     return 0
 
 
@@ -280,15 +285,10 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             (resp.tool, resp.model)
             for resp in response_list
         )
-        models_metadata: Dict[str, Any] = {
-            "count": len(models_ordered),
-            "tools": models_ordered,
-        }
-        if models_ordered:
-            models_metadata["summary"] = "|".join(
-                f"{tool}:{model if model is not None else 'none'}"
-                for tool, model in models_ordered.items()
-            )
+            models_metadata = {
+                "count": len(models_ordered),
+                "tools": models_ordered,
+            }
 
         report = _create_fidelity_report(
             reviewer,
@@ -298,18 +298,14 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             models_metadata,
         )
 
-        compact = bool(getattr(args, "compact", False))
+        compact = getattr(args, "compact", None)
+        if compact is None:
+            compact = get_json_compact()
+        
         output_format = args.format if hasattr(args, "format") else "text"
 
-        markdown_cache: Optional[str] = None
         json_payload_cache = None
         json_text_cache: Optional[str] = None
-
-        def get_markdown() -> str:
-            nonlocal markdown_cache
-            if markdown_cache is None:
-                markdown_cache = report.generate_markdown()
-            return markdown_cache
 
         def get_json_payload():
             nonlocal json_payload_cache
@@ -334,23 +330,30 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             if requested_path.suffix == "":
                 if output_format == "json":
                     requested_path = requested_path.with_suffix(".json")
-                elif output_format == "markdown":
-                    requested_path = requested_path.with_suffix(".md")
                 else:
                     requested_path = requested_path.with_suffix(".txt")
-            if _write_report_artifact(requested_path, output_format, get_markdown, get_json_text):
-                saved_paths.append(requested_path)
+            
+            # Only support writing JSON or text artifacts manually if needed, 
+            # but for now only JSON is fully supported via get_json_text
+            if output_format == "json" or requested_path.suffix == ".json":
+                 try:
+                    requested_path.parent.mkdir(parents=True, exist_ok=True)
+                    requested_path.write_text(get_json_text())
+                    saved_paths.append(requested_path)
+                 except (OSError, PermissionError) as e:
+                    print(f"Error writing to {requested_path}: {e}", file=sys.stderr)
         else:
             specs_dir = base_specs_dir or find_specs_directory()
             if specs_dir:
                 fidelity_dir = ensure_fidelity_reviews_directory(specs_dir)
                 base_name = _build_output_basename(args.spec_id, task_id, phase_id, file_paths)
                 json_path = fidelity_dir / f"{base_name}.json"
-                if _write_report_artifact(json_path, "json", get_markdown, get_json_text):
+                try:
+                    json_path.parent.mkdir(parents=True, exist_ok=True)
+                    json_path.write_text(get_json_text())
                     saved_paths.append(json_path)
-                markdown_path = fidelity_dir / f"{base_name}.md"
-                if _write_report_artifact(markdown_path, "markdown", get_markdown, get_json_text):
-                    saved_paths.append(markdown_path)
+                except (OSError, PermissionError) as e:
+                    print(f"Error writing to {json_path}: {e}", file=sys.stderr)
 
         report_data = getattr(report, "results", {})
         metadata = report_data.get("metadata")
@@ -359,7 +362,6 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         recommendation = metadata.get("recommendation") if metadata else None
         models_summary = {
             "count": models_metadata.get("count"),
-            "summary": models_metadata.get("summary"),
             "tools": dict(models_metadata.get("tools", {})),
         }
         if isinstance(consensus, dict):
@@ -402,8 +404,6 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
         # Step 8: Emit console output in requested format
         if output_format == "json":
             output_json(get_json_payload(), compact)
-        elif output_format == "markdown":
-            print(get_markdown())
         else:
             report.print_console_rich(verbose=getattr(args, "verbose", False))
 
@@ -646,7 +646,7 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
     default_format = get_default_format()
     parser.add_argument(
         "--format",
-        choices=["text", "json", "markdown"],
+        choices=["text", "json"],
         default=default_format,
         help=f"Output format (default: {default_format} from config)"
     )

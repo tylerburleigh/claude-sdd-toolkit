@@ -169,12 +169,6 @@ class FidelityReport:
     @staticmethod
     def _coerce_models_metadata(raw: Any, default_count: int) -> Dict[str, Any]:
         """Normalize models_consulted data into a structured dictionary."""
-        def _build_summary(tools_map: Dict[str, Any]) -> str:
-            return "|".join(
-                f"{tool}:{(str(value).strip() if value not in (None, '') else 'none')}"
-                for tool, value in tools_map.items()
-            )
-
         if isinstance(raw, dict):
             tools_raw = raw.get("tools", {})
             tools: Dict[str, Any] = {}
@@ -191,11 +185,6 @@ class FidelityReport:
                 "count": int(count),
                 "tools": tools,
             }
-            summary = raw.get("summary")
-            if summary:
-                metadata["summary"] = str(summary)
-            elif tools:
-                metadata["summary"] = _build_summary(tools)
             return metadata
 
         if isinstance(raw, list):
@@ -204,8 +193,6 @@ class FidelityReport:
                 "count": len(tools),
                 "tools": tools,
             }
-            if tools:
-                metadata["summary"] = _build_summary(tools)
             return metadata
 
         if isinstance(raw, (int, float)):
@@ -246,7 +233,6 @@ class FidelityReport:
         return {
             "generated_at": datetime.utcnow().isoformat() + "Z",
             "spec_id": self.spec_id,
-            "models_consulted": self.models_metadata,
             "report_version": "1.0"
         }
 
@@ -270,74 +256,6 @@ class FidelityReport:
             return {key: self._convert_to_dict(value) for key, value in obj.items()}
         else:
             return obj
-
-    def generate_markdown(self) -> str:
-        """
-        Generate markdown-formatted report.
-
-        Returns:
-            Markdown string containing the formatted report with:
-            - Header with spec ID and models consulted
-            - Consensus verdict and agreement rate
-            - Issues identified (organized by severity)
-            - Recommendations from consensus
-            - Optional: Individual model responses section
-
-        Example:
-            >>> report = FidelityReport(review_results)
-            >>> markdown = report.generate_markdown()
-            >>> with open("report.md", "w") as f:
-            ...     f.write(markdown)
-        """
-        output = []
-
-        # Header section
-        output.append("# Implementation Fidelity Review\n")
-        output.append(f"**Spec:** {self.spec_id}\n")
-        output.append(f"**Models Consulted:** {self._format_models_display()}\n")
-
-        # Get consensus data (handle both dict and object)
-        consensus_dict = self._convert_to_dict(self.consensus)
-        consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
-        agreement_rate = consensus_dict.get("agreement_rate", 0.0)
-        consensus_issues = consensus_dict.get("consensus_issues", [])
-        consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
-
-        # Consensus verdict section
-        output.append(f"\n## Consensus Verdict: {consensus_verdict.upper()}\n")
-        output.append(f"**Agreement Rate:** {agreement_rate:.1%}\n")
-
-        # Issues section (if any)
-        categorized_issues_list = self._convert_to_dict(self.categorized_issues)
-        if categorized_issues_list:
-            output.append("\n## Issues Identified (Consensus)\n")
-            # Handle both dict and list formats for categorized issues
-            if isinstance(categorized_issues_list, dict):
-                # Format: {"severity_level": [issues], ...}
-                for severity, issues in categorized_issues_list.items():
-                    if isinstance(issues, list):
-                        for cat_issue in issues:
-                            if isinstance(cat_issue, dict):
-                                issue_text = cat_issue.get("issue", "")
-                                issue_severity = cat_issue.get("severity", severity)
-                                output.append(f"\n### [{issue_severity.upper()}] {issue_text}\n")
-                    elif isinstance(issues, str) and issues:
-                        output.append(f"\n### [{severity.upper()}] {issues}\n")
-            else:
-                # Format: [{"issue": "...", "severity": "..."}, ...]
-                for cat_issue in categorized_issues_list:
-                    if isinstance(cat_issue, dict):
-                        issue_text = cat_issue.get("issue", "")
-                        severity = cat_issue.get("severity", "unknown")
-                        output.append(f"\n### [{severity.upper()}] {issue_text}\n")
-
-        # Recommendations section (if any)
-        if consensus_recommendations:
-            output.append("\n## Recommendations\n")
-            for rec in consensus_recommendations:
-                output.append(f"- {rec}\n")
-
-        return "".join(output)
 
     def generate_json(self) -> Dict[str, Any]:
         """
@@ -394,6 +312,7 @@ class FidelityReport:
         consensus_dict = self._convert_to_dict(self.consensus)
         consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
         agreement_rate = consensus_dict.get("agreement_rate", 0.0)
+        consensus_issues = consensus_dict.get("consensus_issues", [])
         consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
 
         # Header
@@ -419,11 +338,12 @@ class FidelityReport:
 
         # Issues section (if any)
         categorized_issues_list = self._convert_to_dict(self.categorized_issues)
+        
+        # Collect valid issues to print
+        valid_issues = []
+        
+        # 1. Try categorized issues first
         if categorized_issues_list:
-            print(f"\n{'-' * 80}")
-            print(printer.bold("ISSUES IDENTIFIED (Consensus):"))
-            print(f"{'-' * 80}")
-            # Handle both dict and list formats for categorized issues
             if isinstance(categorized_issues_list, dict):
                 # Format: {"severity_level": [issues], ...}
                 for severity, issues in categorized_issues_list.items():
@@ -432,22 +352,41 @@ class FidelityReport:
                             if isinstance(cat_issue, dict):
                                 issue_text = cat_issue.get("issue", "")
                                 issue_severity = cat_issue.get("severity", severity)
-                                severity_upper = issue_severity.upper()
-                                severity_colored = printer.severity_color(issue_severity, f"[{severity_upper}]")
-                                print(f"\n{severity_colored} {issue_text}")
+                                valid_issues.append((issue_severity, issue_text))
                     elif isinstance(issues, str) and issues:
-                        severity_upper = severity.upper()
-                        severity_colored = printer.severity_color(severity, f"[{severity_upper}]")
-                        print(f"\n{severity_colored} {issues}")
+                        valid_issues.append((severity, issues))
             else:
                 # Format: [{"issue": "...", "severity": "..."}, ...]
                 for cat_issue in categorized_issues_list:
                     if isinstance(cat_issue, dict):
                         issue_text = cat_issue.get("issue", "")
                         severity = cat_issue.get("severity", "unknown")
-                        severity_upper = severity.upper()
-                        severity_colored = printer.severity_color(severity, f"[{severity_upper}]")
-                        print(f"\n{severity_colored} {issue_text}")
+                        valid_issues.append((severity, issue_text))
+        
+        # 2. If no categorized issues found, fallback to consensus.all_issues
+        if not valid_issues:
+            all_issues = consensus_dict.get("all_issues", [])
+            if all_issues:
+                for issue in all_issues:
+                    valid_issues.append(("unknown", issue if isinstance(issue, str) else str(issue)))
+        
+        # 3. If still no issues, check consensus_issues
+        if not valid_issues and consensus_issues:
+            for issue in consensus_issues:
+                valid_issues.append(("unknown", issue if isinstance(issue, str) else str(issue)))
+
+        if valid_issues:
+            print(f"\n{'-' * 80}")
+            print(printer.bold("ISSUES IDENTIFIED (Consensus):"))
+            print(f"{'-' * 80}")
+            
+            for severity, issue_text in valid_issues:
+                if severity.lower() == "unknown":
+                    print(f"\n• {issue_text}")
+                else:
+                    severity_upper = severity.upper()
+                    severity_colored = printer.severity_color(severity, f"[{severity_upper}]")
+                    print(f"\n{severity_colored} {issue_text}")
 
         # Recommendations section (if any)
         if consensus_recommendations:
@@ -502,6 +441,7 @@ class FidelityReport:
         consensus_dict = self._convert_to_dict(self.consensus)
         consensus_verdict = consensus_dict.get("consensus_verdict", "unknown")
         agreement_rate = consensus_dict.get("agreement_rate", 0.0)
+        consensus_issues = consensus_dict.get("consensus_issues", [])
         consensus_recommendations = consensus_dict.get("consensus_recommendations", [])
 
         # Header
@@ -542,44 +482,67 @@ class FidelityReport:
 
         # Group issues by severity
         categorized_issues_list = self._convert_to_dict(self.categorized_issues)
+        
+        # Collect valid issues list
+        valid_issues_list = []
+        
+        # 1. Try categorized issues
         if categorized_issues_list:
-            issues_by_severity = {
-                "critical": [],
-                "high": [],
-                "medium": [],
-                "low": []
-            }
-
-            # Flatten issues from dict or list format
-            flat_issues = []
             if isinstance(categorized_issues_list, dict):
                 # Format: {"severity_level": [issues], ...}
                 for severity, issues in categorized_issues_list.items():
                     if isinstance(issues, list):
                         for cat_issue in issues:
                             if isinstance(cat_issue, dict):
-                                flat_issues.append(cat_issue)
+                                # Ensure severity is set
+                                if "severity" not in cat_issue:
+                                    cat_issue["severity"] = severity
+                                valid_issues_list.append(cat_issue)
                     elif isinstance(issues, str) and issues:
-                        flat_issues.append({"issue": issues, "severity": severity})
+                        valid_issues_list.append({"issue": issues, "severity": severity})
             else:
                 # Format: [{"issue": "...", "severity": "..."}, ...]
-                flat_issues = [item for item in categorized_issues_list if isinstance(item, dict)]
+                valid_issues_list = [item for item in categorized_issues_list if isinstance(item, dict)]
 
-            for cat_issue in flat_issues:
+        # 2. Fallback to consensus.all_issues
+        if not valid_issues_list:
+            all_issues = consensus_dict.get("all_issues", [])
+            if all_issues:
+                for issue in all_issues:
+                    valid_issues_list.append({"issue": issue if isinstance(issue, str) else str(issue), "severity": "unknown"})
+
+        # 3. Fallback to consensus_issues
+        if not valid_issues_list and consensus_issues:
+            for issue in consensus_issues:
+                valid_issues_list.append({"issue": issue if isinstance(issue, str) else str(issue), "severity": "unknown"})
+
+        if valid_issues_list:
+            issues_by_severity = {
+                "critical": [],
+                "high": [],
+                "medium": [],
+                "low": [],
+                "unknown": []
+            }
+
+            for cat_issue in valid_issues_list:
                 severity = cat_issue.get("severity", "unknown").lower()
                 issue_text = cat_issue.get("issue", "")
                 if severity in issues_by_severity:
                     issues_by_severity[severity].append(issue_text)
+                else:
+                    issues_by_severity["unknown"].append(issue_text)
 
             # Display issues in severity panels
             severity_config = {
                 "critical": {"title": "CRITICAL ISSUES", "style": "red", "icon": "🔴"},
                 "high": {"title": "HIGH PRIORITY ISSUES", "style": "yellow", "icon": "🟡"},
                 "medium": {"title": "MEDIUM PRIORITY ISSUES", "style": "blue", "icon": "🔵"},
-                "low": {"title": "LOW PRIORITY ISSUES", "style": "cyan", "icon": "⚪"}
+                "low": {"title": "LOW PRIORITY ISSUES", "style": "cyan", "icon": "⚪"},
+                "unknown": {"title": "UNCATEGORIZED ISSUES", "style": "magenta", "icon": "❓"}
             }
 
-            for severity in ["critical", "high", "medium", "low"]:
+            for severity in ["critical", "high", "medium", "low", "unknown"]:
                 issues = issues_by_severity[severity]
                 if issues:
                     config = severity_config[severity]
