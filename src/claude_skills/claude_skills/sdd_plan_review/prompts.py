@@ -13,18 +13,6 @@ from typing import Dict, Any
 RESPONSE_SCHEMA = """
 # Review Summary
 
-Overall Score: <1-10>/10
-Recommendation: <APPROVE|REVISE|REJECT>
-
-## Dimension Scores
-
-- **Completeness**: <1-10>/10 - <brief notes on what's missing or well-defined>
-- **Clarity**: <1-10>/10 - <brief notes on clarity issues or strengths>
-- **Feasibility**: <1-10>/10 - <brief notes on realistic estimates>
-- **Architecture**: <1-10>/10 - <brief notes on design quality>
-- **Risk Management**: <1-10>/10 - <brief notes on risk handling>
-- **Verification**: <1-10>/10 - <brief notes on testing approach>
-
 ## Critical Issues
 
 - **[CRITICAL]** <Issue title>
