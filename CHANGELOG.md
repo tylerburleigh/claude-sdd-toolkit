@@ -93,7 +93,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - CLI runner with streaming support and error handling
   - Four provider implementations: Gemini, Codex, Cursor Agent, Claude
 - `ai_config_setup.ensure_ai_config()` helper shared by setup workflows to seed `.claude/ai_config.yaml` with packaged defaults.
-- `sdd fidelity-review` now auto-saves both Markdown and JSON reports when no output path is provided, making it easier to reuse results across tooling.
+- `sdd fidelity-review` now auto-saves JSON reports when no output path is provided, making it easier to reuse results across tooling.
 - Centralized setup templates bundled under `claude_skills.common.templates.setup` with a public `setup_templates` helper module for loading or copying packaged defaults.
 - Unit and integration coverage that exercises the new setup templates, including `tests/unit/test_common/test_setup_templates.py` and the updated `skills-dev setup-permissions` integration flow.
 - Provider abstraction documentation that explains the `ProviderContext` contract, registry/detector workflow, and how to exercise providers via the `provider_runner` CLI.

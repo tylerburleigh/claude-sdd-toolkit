@@ -232,7 +232,7 @@ Fidelity reviews can be triggered at multiple points in the development workflow
 
 ### Review Outcome Handling
 
-The `sdd-fidelity-review` skill hands its synthesized results—JSON findings plus the saved Markdown report reference—directly back to the caller. The invoking workflow decides what to do next. Common follow-up actions the main agent may optionally consider include journaling deviations, planning remediation work, running regression tests, or proposing spec updates after stakeholder review. No automatic delegation occurs; the fidelity-review skill’s responsibility ends once it delivers the consensus results and report pointer.
+The `sdd-fidelity-review` skill hands its synthesized results—JSON findings plus the saved JSON report reference—directly back to the caller. The invoking workflow decides what to do next. Common follow-up actions the main agent may optionally consider include journaling deviations, planning remediation work, running regression tests, or proposing spec updates after stakeholder review. No automatic delegation occurs; the fidelity-review skill’s responsibility ends once it delivers the consensus results and report pointer.
 
 ### Report Handoff
 
@@ -240,8 +240,8 @@ Fidelity review generates a detailed report comparing implementation against spe
 
 **Usage Pattern:**
 1. Skill executes `sdd fidelity-review` CLI tool
-2. CLI analyzes implementation, generates JSON output, and saves both the JSON and Markdown consensus reports in `.fidelity-reviews/`
-3. Skill parses the JSON, presents the summarized findings, and surfaces the stored report paths to the caller
+2. CLI analyzes implementation, generates JSON output, and saves the JSON consensus report in `.fidelity-reviews/`
+3. Skill parses the JSON, presents the summarized findings, and surfaces the stored report path to the caller
 
 ## Fidelity Assessment
 
@@ -276,7 +276,7 @@ Specified features not implemented:
 ✅ Highlight recommendations for remediation
 ✅ Note AI consensus from multiple tool perspectives
 ✅ Provide context from the fidelity assessment
-✅ Surface the saved JSON and Markdown report paths so the caller can inspect the full consensus artifacts
+✅ Surface the saved JSON report path so the caller can inspect the full consensus artifacts
 
 ### DON'T
 ❌ Attempt to manually implement review logic (CLI handles it)
@@ -285,7 +285,7 @@ Specified features not implemented:
 ❌ Ignore the CLI tool's consensus analysis
 ❌ Make up review findings not from CLI output
 ❌ Perform additional analysis beyond the CLI’s consensus results
-❌ Open the persisted Markdown report; reference its filepath instead
+❌ Open the persisted JSON report; reference its filepath instead
 
 ## Example Invocations
 

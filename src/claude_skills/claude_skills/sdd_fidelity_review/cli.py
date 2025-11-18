@@ -285,10 +285,10 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             (resp.tool, resp.model)
             for resp in response_list
         )
-            models_metadata = {
-                "count": len(models_ordered),
-                "tools": models_ordered,
-            }
+        models_metadata = {
+            "count": len(models_ordered),
+            "tools": models_ordered,
+        }
 
         report = _create_fidelity_report(
             reviewer,

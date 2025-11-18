@@ -1,0 +1,1214 @@
+{
+  "spec_id": "opencode-provider-2025-11-18-001",
+  "generated": "2025-11-18T21:52:00Z",
+  "last_updated": "2025-11-18T21:59:23.840264Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Add OpenCode as Provider",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 35,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
+        "objectives": [
+          "Create Node.js wrapper using OpenCode SDK for session and prompt management",
+          "Implement Python provider following existing patterns (Gemini/Codex)",
+          "Integrate with provider registry and detection system",
+          "Support model selection, tool restrictions, and token tracking",
+          "Add comprehensive testing and verification"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Node.js SDK Wrapper Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create Node.js wrapper script that uses OpenCode SDK to handle server management, sessions, and prompts",
+        "risk_level": "medium"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/opencode_wrapper.js",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-1-1",
+        "task-1-1-2",
+        "task-1-1-3",
+        "task-1-1-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/opencode_wrapper.js",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Node.js wrapper script using OpenCode SDK for provider integration"
+      }
+    },
+    "task-1-1-1": {
+      "type": "subtask",
+      "title": "Import OpenCode SDK and setup argument parsing",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Import @opencode-ai/sdk, setup CLI argument parsing (prompt, model, tools, system prompt, working directory)"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-1-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1-2": {
+      "type": "subtask",
+      "title": "Implement server management and session creation",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1-1"
+        ],
+        "blocks": [
+          "task-1-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Use createOpencode() to start/connect to server, create session with title and working directory"
+      }
+    },
+    "task-1-1-3": {
+      "type": "subtask",
+      "title": "Implement prompt execution with model and tool restrictions",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1-2"
+        ],
+        "blocks": [
+          "task-1-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Call session.prompt() with model selection, system prompt, tool restrictions via --allowedTools CLI arg"
+      }
+    },
+    "task-1-1-4": {
+      "type": "subtask",
+      "title": "Format and output JSON response",
+      "status": "pending",
+      "parent": "task-1-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1-3"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Extract response text from parts array, token usage from info, format as JSON output for Python provider"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/package.json",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "blocks": [
+          "task-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/package.json",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add package.json for Node.js dependencies"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Create package.json with OpenCode SDK dependency",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add @opencode-ai/sdk dependency, set type: module for ES6 imports"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/.gitignore",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1"
+      ],
+      "dependencies": {
+        "blocked_by": [],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/.gitignore",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "description": "Add .gitignore for Node.js artifacts"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Add Node.js gitignore entries",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Ignore node_modules/, package-lock.json if present"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "Install OpenCode SDK dependencies",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Run npm install in providers directory to install @opencode-ai/sdk",
+        "file_path": "task-1-4.md"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3",
+        "verify-1-4"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Wrapper script syntax is valid",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "node --check src/claude_skills/claude_skills/common/providers/opencode_wrapper.js",
+        "expected": "No syntax errors"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-1-3",
+          "verify-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "SDK dependencies installed",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "npm list @opencode-ai/sdk --prefix src/claude_skills/claude_skills/common/providers",
+        "expected": "@opencode-ai/sdk present in node_modules"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-1-3",
+          "verify-1-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Wrapper executes and returns valid JSON",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "verify-1-1",
+          "verify-1-2"
+        ],
+        "blocks": [
+          "verify-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "node src/claude_skills/claude_skills/common/providers/opencode_wrapper.js --prompt 'test' | python3 -m json.tool",
+        "expected": "Valid JSON response with text, tokens, and model fields"
+      }
+    },
+    "verify-1-4": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "verify-1-1",
+          "verify-1-2",
+          "verify-1-3"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Python Provider Implementation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1"
+        ],
+        "blocks": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
+        "risk_level": "medium"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/opencode.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3",
+        "task-2-1-4",
+        "task-2-1-5",
+        "task-2-1-6"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/opencode.py",
+        "task_category": "implementation",
+        "estimated_hours": 5,
+        "description": "Main Python provider following Gemini/Codex patterns"
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "Add constants and imports",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add DEFAULT_BINARY=node, DEFAULT_WRAPPER_SCRIPT path, DEFAULT_TIMEOUT_SECONDS=360, AVAILABILITY_OVERRIDE_ENV, CUSTOM_BINARY_ENV, import base classes and types"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-2-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "Define model descriptors and metadata",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-1"
+        ],
+        "blocks": [
+          "task-2-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Create OPENCODE_MODELS list with ModelDescriptor entries (user-configurable via ai_config.yaml), OPENCODE_METADATA with provider_name, security_flags (writes_allowed: False)"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "Implement OpenCodeProvider class",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-2"
+        ],
+        "blocks": [
+          "task-2-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Create class extending ProviderContext with __init__ storing binary, wrapper_script, runner, env, timeout"
+      }
+    },
+    "task-2-1-4": {
+      "type": "subtask",
+      "title": "Implement _execute method",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-3"
+        ],
+        "blocks": [
+          "task-2-1-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Build command calling wrapper script, run subprocess, parse JSON response, extract token usage, emit streaming chunks, return GenerationResult"
+      }
+    },
+    "task-2-1-5": {
+      "type": "subtask",
+      "title": "Add factory function and availability check",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-4"
+        ],
+        "blocks": [
+          "task-2-1-6"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Create create_provider() factory, is_opencode_available() checking for node and opencode binaries"
+      }
+    },
+    "task-2-1-6": {
+      "type": "subtask",
+      "title": "Register provider",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-5"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Call register_provider() with opencode id, factory, metadata, availability_check, description, tags=(sdk, text, vision), replace=True"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "System Integration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2"
+        ],
+        "blocks": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Integrate OpenCode provider with existing registry, detection, and configuration systems",
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4",
+        "task-3-5"
+      ],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/__init__.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add OpenCode imports and exports"
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "Import and export OpenCode provider",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add from .opencode import OpenCodeProvider, create_provider as create_opencode_provider, is_opencode_available as opencode_is_available, OPENCODE_METADATA to imports and __all__"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/providers/detectors.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/providers/detectors.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add OpenCode detector to registry"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add OpenCode ProviderDetector",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add ProviderDetector(provider_id=opencode, default_binary=opencode, override_env=OPENCODE_CLI_AVAILABLE_OVERRIDE, binary_env=OPENCODE_CLI_BINARY, probe_args=(--version,)) to _DEFAULT_DETECTORS"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/ai_config.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/ai_config.py",
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "description": "Add OpenCode to default tools and models configuration"
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Update DEFAULT_TOOLS and DEFAULT_MODELS",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add opencode to DEFAULT_TOOLS with description, command, enabled=True. Add opencode to DEFAULT_MODELS with priority list (user-configurable). Add opencode to DEFAULT_CONSENSUS_AGENTS list"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/ai_tools.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-4-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/ai_tools.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add OpenCode command building to build_tool_command()"
+      }
+    },
+    "task-3-4-1": {
+      "type": "subtask",
+      "title": "Add opencode case to build_tool_command",
+      "status": "pending",
+      "parent": "task-3-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add elif tool == 'opencode' case building command with wrapper script path, --prompt, --model (if specified)"
+      }
+    },
+    "task-3-5": {
+      "type": "task",
+      "title": ".claude/ai_config.yaml",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-5-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": ".claude/ai_config.yaml",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "description": "Add OpenCode to user configuration template"
+      }
+    },
+    "task-3-5-1": {
+      "type": "subtask",
+      "title": "Update ai_config.yaml template",
+      "status": "pending",
+      "parent": "task-3-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Add opencode to tools section with enabled, command. Add opencode model priorities. Add to tool_priority lists. Add to consensus agents"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Provider registry includes OpenCode",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python3 -c \"from claude_skills.common.providers.registry import available_providers; print('opencode' in available_providers())\"",
+        "expected": "True"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "OpenCode detector registered",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python3 -c \"from claude_skills.common.providers.detectors import _DEFAULT_DETECTORS; print(any(d.provider_id == 'opencode' for d in _DEFAULT_DETECTORS))\"",
+        "expected": "True"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-3-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "verify-3-1",
+          "verify-3-2"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Testing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3"
+        ],
+        "blocks": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Create comprehensive unit and integration tests for OpenCode provider",
+        "risk_level": "low"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3",
+        "task-4-1-4"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "description": "Comprehensive unit tests following test_gemini_provider.py pattern"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Test command construction",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Test _build_command with various options (prompt, model, tools, system prompt, working directory)"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Test JSON parsing and token extraction",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Mock subprocess responses, verify JSON parsing, token usage extraction, response text extraction from parts array"
+      }
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "Test error handling",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Test ProviderUnavailableError (binary not found), ProviderTimeoutError (timeout), ProviderExecutionError (non-zero exit, invalid JSON)"
+      }
+    },
+    "task-4-1-4": {
+      "type": "subtask",
+      "title": "Test provider hooks and model validation",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Test before_execute, after_result, on_stream_chunk hooks. Test model descriptor validation"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Unit tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py -v",
+        "expected": "All tests pass"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-4-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "verify-4-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Integration Testing & Documentation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "End-to-end integration testing and documentation updates",
+        "risk_level": "low"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "End-to-end provider functionality test",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "python3 -c \"from claude_skills.common.providers import resolve_provider; from claude_skills.common.providers.base import GenerationRequest; p = resolve_provider('opencode'); r = p._execute(GenerationRequest(prompt='What is 2+2?')); print(r.content)\"",
+        "expected": "Provider instantiates, executes request, returns valid response with text content and token usage"
+      },
+      "dependencies": {
+        "blocks": [
+          "verify-5-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Complete spec implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "verify-5-1"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        },
+        "agent": "sdd-fidelity-review"
+      }
+    }
+  }
+}

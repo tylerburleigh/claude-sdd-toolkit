@@ -389,7 +389,7 @@ Higher thresholds increase confidence but may be overly strict.
 - Useful for retrospectives and audits
 
 ```bash
-sdd fidelity-review spec-001 --task task-2-3 --output reviews/task-2-3-review.md --format markdown
+sdd fidelity-review spec-001 --task task-2-3 --output reviews/task-2-3-review.json --format json
 ```
 
 ---

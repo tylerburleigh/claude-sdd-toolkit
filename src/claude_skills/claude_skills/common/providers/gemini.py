@@ -79,6 +79,16 @@ GEMINI_MODELS: List[ModelDescriptor] = [
         routing_hints={"tier": "pro", "context_window": "1M"},
     ),
     ModelDescriptor(
+        id="gemini-2.5-pro",
+        display_name="Gemini 2.5 Pro",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+            ProviderCapability.VISION,
+        },
+        routing_hints={"tier": "pro", "context_window": "1M"},
+    ),
+    ModelDescriptor(
         id="gemini-2.5-flash",
         display_name="Gemini 2.5 Flash",
         capabilities={

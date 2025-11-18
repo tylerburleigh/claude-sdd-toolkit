@@ -42,7 +42,7 @@ DEFAULT_TOOLS = {
 
 DEFAULT_MODELS = {
     "gemini": {
-        "priority": ["gemini-2.5-flash", "gemini-2.5-pro"]
+        "priority": ["gemini-2.5-flash", "gemini-2.5-pro", "pro"]
     },
     "cursor-agent": {
         "priority": ["composer-1", "gpt-5-codex"]
@@ -53,7 +53,7 @@ DEFAULT_MODELS = {
     "claude": {
         "priority": ["sonnet", "haiku"]
     }
-pro}
+}
 
 
 DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude"]
