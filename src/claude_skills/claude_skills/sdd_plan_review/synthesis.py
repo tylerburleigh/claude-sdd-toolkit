@@ -237,18 +237,7 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
     """
     data = {}
 
-    # Simple fields
-    score_match = re.search(r"Consensus Score\*\*:\s*(\d+\.?\d*)\s*/\s*10", synthesis_text, re.IGNORECASE)
-    if score_match:
-        try:
-            data["overall_score"] = float(score_match.group(1))
-        except (ValueError, IndexError):
-            pass
-
-    rec_match = re.search(r"Final Recommendation\*\*:\s*(APPROVE|REVISE|REJECT)", synthesis_text, re.IGNORECASE)
-    if rec_match:
-        data["final_recommendation"] = rec_match.group(1).upper()
-
+    # Consensus level
     level_match = re.search(r"Consensus Level\*\*:\s*(Strong|Moderate|Weak|Conflicted)", synthesis_text, re.IGNORECASE)
     if level_match:
         data["consensus_level"] = level_match.group(1)
@@ -268,13 +257,14 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
         items = re.findall(r"^\s*[-*]\s*(.*)", content, re.MULTILINE)
         return [item.strip() for item in items]
 
-    data["all_issues"] = _extract_section_list("Critical Issues") + \
-                         _extract_section_list("High Priority Issues") + \
-                         _extract_section_list("Medium/Low Priority")
+    # Extract feedback by category
+    data["critical_blockers"] = _extract_section_list("Critical Blockers")
+    data["major_suggestions"] = _extract_section_list("Major Suggestions")
+    data["questions"] = _extract_section_list("Questions for Author")
+    data["design_strengths"] = _extract_section_list("Design Strengths")
     data["agreements"] = _extract_section_list("Points of Agreement")
     data["disagreements"] = _extract_section_list("Points of Disagreement")
-    data["all_strengths"] = _extract_section_list("Strengths Identified")
-    data["all_recommendations"] = _extract_section_list("Recommendations")
+    data["synthesis_notes"] = _extract_section_list("Synthesis Notes")
 
     return data
 
@@ -369,13 +359,12 @@ def build_consensus(
         "num_models": synthesis_result.get("num_models", 0),
         "models": synthesis_result.get("models", []),
         "synthesis_text": synthesis_text,
-        "overall_score": parsed_data.get("overall_score"),
-        "final_recommendation": parsed_data.get("final_recommendation"),
         "consensus_level": parsed_data.get("consensus_level"),
-        "dimension_scores": dimension_scores,
-        "all_issues": parsed_data.get("all_issues", []),
-        "all_strengths": parsed_data.get("all_strengths", []),
-        "all_recommendations": parsed_data.get("all_recommendations", []),
+        "critical_blockers": parsed_data.get("critical_blockers", []),
+        "major_suggestions": parsed_data.get("major_suggestions", []),
+        "questions": parsed_data.get("questions", []),
+        "design_strengths": parsed_data.get("design_strengths", []),
         "agreements": parsed_data.get("agreements", []),
         "disagreements": parsed_data.get("disagreements", []),
+        "synthesis_notes": parsed_data.get("synthesis_notes", []),
     }
