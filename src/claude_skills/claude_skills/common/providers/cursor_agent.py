@@ -94,7 +94,7 @@ CURSOR_METADATA = ProviderMetadata(
     models=tuple(CURSOR_MODELS),
     default_model="composer-1",
     security_flags={"writes_allowed": False},
-    extra={"cli": "cursor-agent", "command": "cursor-agent chat"},
+    extra={"cli": "cursor-agent", "command": "cursor-agent --print --output-format json"},
 )
 
 
@@ -140,6 +140,7 @@ class CursorAgentProvider(ProviderContext):
 
     def _build_command(self, request: GenerationRequest, model: str) -> List[str]:
         """Assemble the cursor-agent CLI invocation."""
+        # cursor-agent requires "chat" subcommand and --json flag
         command = [self._binary, "chat", "--json"]
 
         working_dir = (request.metadata or {}).get("working_directory")
@@ -164,6 +165,7 @@ class CursorAgentProvider(ProviderContext):
                 if isinstance(flag, str) and flag.strip():
                     command.append(flag.strip())
 
+        # Prompt is passed as --prompt flag
         command.extend(["--prompt", request.prompt])
         return command
 
@@ -198,10 +200,14 @@ class CursorAgentProvider(ProviderContext):
             return completed, True
 
         stderr_text = (completed.stderr or "").lower()
-        if "--json" in command and any(
+        # Check if --json flag is in command
+        has_json_flag = "--json" in command
+        if has_json_flag and any(
             phrase in stderr_text for phrase in ("unknown option", "unrecognized option")
         ):
+            # Remove --json from command for retry
             retry_command = [part for part in command if part != "--json"]
+
             retry_process = self._run(retry_command, timeout=timeout)
             if retry_process.returncode == 0:
                 return retry_process, False

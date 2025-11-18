@@ -77,10 +77,10 @@ Open your project in Claude Code and run:
 /sdd-setup
 ```
 
-This will:
-- Create `.claude/settings.json` in your project
-- Add all required permissions for SDD skills and tools
-- Prepare your project for spec-driven development
+This will create in your project:
+- `.claude/settings.local.json` - Required permissions for SDD skills and tools
+- `.claude/sdd_config.json` - CLI output preferences
+- `.claude/ai_config.yaml` - AI model defaults
 
 You should see a success message confirming the setup is complete.
 
@@ -93,17 +93,16 @@ Verify the installation was successful:
 ### Check CLI Tools
 
 ```bash
-# Check CLI commands are available
+# Check unified CLI is available
 sdd --help
+
+# Check subcommands
 sdd doc --help
 sdd test --help
-
-# Check specific commands
 sdd validate --help
-sdd doc generate --help
 ```
 
-You should see help text for each command.ß
+You should see help text for each command.
 
 ### Test in Claude Code
 
@@ -143,7 +142,7 @@ If skills aren't detected:
 
 ### CLI Commands Not Found
 
-If `sdd`, `doc`, or `test` commands aren't found:
+If `sdd` commands aren't found:
 
 1. **Reinstall Python package**:
    ```bash
@@ -171,13 +170,12 @@ If `sdd`, `doc`, or `test` commands aren't found:
 
 If you get permission errors when using SDD tools:
 
-1. **Set up project permissions**:
-   ```bash
-   cd /path/to/your/project
-   sdd skills-dev setup-permissions -- update .
+1. **Run setup command** in Claude Code:
+   ```
+   /sdd-setup
    ```
 
-2. **Or tell Claude**:
+2. **Or ask Claude**:
    ```
    Set up SDD permissions for this project
    ```
@@ -186,15 +184,43 @@ If you get permission errors when using SDD tools:
 
 To update to the latest version:
 
+### Step 1: Update the Plugin Marketplace
+
 In Claude Code, type:
 
 ```
 /plugins
 ```
 
-When the menu appears, choose "4. Manage marketplaces. Then choose "claude-sdd-toolkit" and then "Update marketplace.
+1. Select **"Manage marketplaces"**
+2. Select **`claude-sdd-toolkit`**
+3. Select **"Update marketplace"**
+4. Wait for the update to complete
 
-Close and reopen Claude Code.
+### Step 2: Update the Installed Plugin
+
+Type `/plugins` again:
+
+1. Select **"Manage and uninstall plugins"**
+2. Select **`claude-sdd-toolkit`**
+3. Select **`sdd-toolkit`**
+4. Select **"Update now"**
+5. Wait for the update to complete
+
+### Step 3: Restart Claude Code
+
+Exit Claude Code completely and restart it.
+
+### Step 4: Reinstall Python Package
+
+The plugin files are now updated, but you must reinstall the Python CLI tools:
+
+```bash
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+pip install -e .
+```
+
+**Why?** The marketplace update gets the latest code, the plugin update installs it to Claude Code, the restart loads the new skills, and the reinstall updates the CLI commands.
 
 ## Getting Help
 
@@ -204,4 +230,4 @@ Close and reopen Claude Code.
 
 ---
 
-**Version**: 0.1.0 | **Installation Guide** | Last updated: 2025-10-24
+**Version**: 0.5.1 | **Installation Guide** | Last updated: 2024-11-18

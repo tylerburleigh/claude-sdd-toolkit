@@ -108,6 +108,7 @@ def run_cli(
     check: bool = False,
     env: Optional[Mapping[str, str]] = None,
     reorder: bool = True,
+    ensure_verbose: bool = True,
     **subprocess_kwargs,
 ):
     """
@@ -124,7 +125,16 @@ def run_cli(
         subprocess.CompletedProcess: Result of the CLI execution.
     """
 
-    args = _normalise_cli_args(cli_args) if reorder else [str(arg) for arg in cli_args]
+    arg_strings = [str(arg) for arg in cli_args]
+
+    if ensure_verbose:
+        has_verbosity_flag = any(
+            flag in arg_strings for flag in ("--verbose", "-v", "--quiet", "-q")
+        )
+        if not has_verbosity_flag:
+            arg_strings.insert(0, "--verbose")
+
+    args = _normalise_cli_args(arg_strings) if reorder else arg_strings
 
     if "capture_output" not in subprocess_kwargs and not any(
         key in subprocess_kwargs for key in ("stdout", "stderr")
@@ -143,4 +153,3 @@ def run_cli(
 
 
 __all__ = ["PROJECT_ROOT", "SRC_PACKAGE_DIR", "run_cli"]
-

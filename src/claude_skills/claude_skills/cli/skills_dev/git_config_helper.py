@@ -9,7 +9,7 @@ import json
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 
 from claude_skills.common import PrettyPrinter
 from claude_skills.common.setup_templates import load_json_template_clean
@@ -296,8 +296,12 @@ def _setup_non_interactive(args, printer: PrettyPrinter, git_config_file: Path) 
 
     config = _load_default_git_config()
 
-    # Use CLI args if provided, otherwise use defaults
-    config["enabled"] = getattr(args, "enabled", True)
+    # Use CLI args if provided, otherwise keep template defaults
+    enabled_arg = getattr(args, "enabled", None)
+    if enabled_arg is not None:
+        config["enabled"] = enabled_arg
+    elif "enabled" not in config:
+        config["enabled"] = True
 
     if not config["enabled"]:
         # Git disabled - write minimal config
@@ -311,25 +315,43 @@ def _setup_non_interactive(args, printer: PrettyPrinter, git_config_file: Path) 
             printer.error(f"Failed to write config file: {e}")
             return 1
 
-    # Build full config from args or defaults
-    config["auto_branch"] = getattr(args, "auto_branch", True)
-    config["auto_commit"] = getattr(args, "auto_commit", True)
-    config["auto_push"] = getattr(args, "auto_push", False)
-    config["commit_cadence"] = getattr(args, "commit_cadence", "task")
+    def _apply_optional_bool(attr: str, key: str, *, default: Optional[bool] = None) -> None:
+        value = getattr(args, attr, None)
+        if value is not None:
+            config[key] = value
+        elif default is not None and key not in config:
+            config[key] = default
+
+    _apply_optional_bool("auto_branch", "auto_branch", default=True)
+    _apply_optional_bool("auto_commit", "auto_commit", default=True)
+    _apply_optional_bool("auto_push", "auto_push", default=False)
+
+    commit_cadence_arg = getattr(args, "commit_cadence", None)
+    if commit_cadence_arg is not None:
+        config["commit_cadence"] = commit_cadence_arg
+    elif "commit_cadence" not in config:
+        config["commit_cadence"] = "task"
 
     file_staging = config.get("file_staging")
     if not isinstance(file_staging, dict):
         file_staging = {}
-    file_staging["show_before_commit"] = getattr(args, "show_files", True)
+    show_files_arg = getattr(args, "show_files", None)
+    if show_files_arg is not None:
+        file_staging["show_before_commit"] = show_files_arg
+    elif "show_before_commit" not in file_staging:
+        file_staging["show_before_commit"] = True
     config["file_staging"] = file_staging
 
-    ai_pr_enabled = getattr(args, "ai_pr", True)
     ai_pr_config = config.get("ai_pr")
     if not isinstance(ai_pr_config, dict):
         ai_pr_config = {}
+    ai_pr_enabled = getattr(args, "ai_pr", None)
+    if ai_pr_enabled is not None:
+        ai_pr_config["enabled"] = ai_pr_enabled
+    elif "enabled" not in ai_pr_config:
+        ai_pr_config["enabled"] = True
     ai_pr_config.update(
         {
-            "enabled": ai_pr_enabled,
             "model": ai_pr_config.get("model", "sonnet"),
             "include_journals": True,
             "include_diffs": True,

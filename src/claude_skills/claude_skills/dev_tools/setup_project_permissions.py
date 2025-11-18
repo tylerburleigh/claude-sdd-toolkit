@@ -94,10 +94,13 @@ GIT_WRITE_PERMISSIONS = [
     "Bash(git checkout:*)",
     "Bash(git add:*)",
     "Bash(git commit:*)",
-    "Bash(git push:*)",
-    "Bash(git rm:*)",
-    "Bash(gh pr create:*)",
     "Bash(git mv:*)",
+]
+
+GIT_APPROVAL_PERMISSIONS = [
+    "Bash(git push:*)",
+    "Bash(gh pr create:*)",
+    "Bash(git rm:*)",
 ]
 
 # Git dangerous permissions (destructive operations requiring approval)
@@ -172,8 +175,10 @@ def _prompt_for_git_permissions() -> dict[str, list[str]]:
         response = input("Enable git write operations? (y/n): ").strip().lower()
         if response in {"y", "yes"}:
             print("", file=sys.stderr)
-            print("✓ Adding git write permissions", file=sys.stderr)
+            print("✓ Adding git write permissions (local operations)", file=sys.stderr)
             permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
+            print("✓ Adding approval-only git operations to ASK list (requires approval)", file=sys.stderr)
+            permissions["ask"].extend(GIT_APPROVAL_PERMISSIONS)
             print("✓ Adding dangerous git operations to ASK list (requires approval)", file=sys.stderr)
             permissions["ask"].extend(GIT_DANGEROUS_PERMISSIONS)
             break

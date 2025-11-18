@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-17 12:32:22
+**Generated:** 2025-11-18 08:20:03
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 325
-- **Total Lines:** 113246
+- **Total Lines:** 113474
 - **Total Classes:** 447
-- **Total Functions:** 1458
-- **Avg Complexity:** 4.75
+- **Total Functions:** 1467
+- **Avg Complexity:** 4.73
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -5170,7 +5170,7 @@ Attributes:
 ### `TestGitPermissionConstants`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:27`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:28`
 
 **Description:**
 > Tests for git permission constant definitions.
@@ -6001,7 +6001,7 @@ Attributes:
 ### `TestPermissionApplication`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:169`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:178`
 
 **Description:**
 > Integration tests for permission application logic.
@@ -6550,7 +6550,7 @@ Attributes:
 ### `TestPromptForGitPermissions`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:105`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_cli_skills_dev/test_setup_permissions.py:113`
 
 **Description:**
 > Tests for _prompt_for_git_permissions function.
@@ -9242,6 +9242,17 @@ Args:
 
 ---
 
+### `_collect_specs_info(project_root) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:107`
+**Complexity:** 8
+
+**Parameters:**
+- `project_root`: Path
+
+---
+
 ### `_compare_dicts(node_id, dict_name, before, after) -> List[FieldChange]`
 
 **Language:** python
@@ -9289,7 +9300,7 @@ Args:
 ### `_create_config_file(project_path, config, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:202`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:222`
 **Complexity:** 6
 
 **Description:**
@@ -10274,6 +10285,17 @@ binaries without leaking to the developer's real tools.
 
 ---
 
+### `_get_git_status(project_root) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:77`
+**Complexity:** 4
+
+**Parameters:**
+- `project_root`: Path
+
+---
+
 ### `_get_latest_journal_excerpt(journal_entries, task_id, limit) -> Optional[Dict[str, Any]]`
 
 **Language:** python
@@ -10287,6 +10309,17 @@ binaries without leaking to the developer's real tools.
 - `journal_entries`: List[Dict[str, Any]]
 - `task_id`: str
 - `limit`: int
+
+---
+
+### `_get_permissions_status(project_root) -> dict`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:35`
+**Complexity:** 3
+
+**Parameters:**
+- `project_root`: Path
 
 ---
 
@@ -11811,7 +11844,7 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_prompt_for_config(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:138`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:158`
 **Complexity:** 9
 
 **Description:**
@@ -11828,7 +11861,7 @@ Returns:
 ### `_prompt_for_git_permissions(printer) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:247`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:267`
 **Complexity:** 7
 
 **Description:**
@@ -11842,7 +11875,7 @@ Returns:
 ### `_prompt_for_git_permissions() -> dict[str, list[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:129`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:132`
 **Complexity:** 7
 
 **Description:**
@@ -12069,6 +12102,18 @@ Returns a tuple of (new_list, removed_flag).
 
 **Parameters:**
 - `renderable`: Any
+
+---
+
+### `_render_active_work(specs, session_state) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:183`
+**Complexity:** 5
+
+**Parameters:**
+- `specs`: list[dict]
+- `session_state`: dict
 
 ---
 
@@ -12335,7 +12380,7 @@ Returns:
 ### `_setup_interactive(args, printer, git_config_file) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:365`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:387`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -12352,7 +12397,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:293`
-**Complexity:** 6
+⚠️ **Complexity:** 17 (High)
 
 **Description:**
 > Set up git config in non-interactive mode using CLI flags or defaults.
@@ -12546,6 +12591,20 @@ Returns:
 
 **Parameters:**
 - `text`: str
+
+---
+
+### `_strip_git_permissions(settings) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:142`
+**Complexity:** 3
+
+**Description:**
+> Remove bundled git permissions from template-derived settings.
+
+**Parameters:**
+- `settings`: dict
 
 ---
 
@@ -12829,6 +12888,18 @@ Returns:
 
 **Parameters:**
 - `tmp_path`: Path
+
+---
+
+### `_write_sdd_config(config_path, printer) -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:394`
+**Complexity:** 2
+
+**Parameters:**
+- `config_path`: Path
+- `printer`: PrettyPrinter
 
 ---
 
@@ -14293,7 +14364,7 @@ Example:
 ### `categorize_missing_permissions(missing) -> dict[str, list[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:428`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:454`
 **Complexity:** 6
 
 **Description:**
@@ -14609,7 +14680,7 @@ Returns:
 ### `check_permissions(project_root) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:326`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:331`
 **Complexity:** 2
 
 **Description:**
@@ -15036,7 +15107,7 @@ Returns:
 ### `cmd_check(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:450`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:476`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -15142,8 +15213,8 @@ Returns:
 ### `cmd_check_permissions(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:23`
-**Complexity:** 7
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:212`
+**Complexity:** 3
 
 **Description:**
 > Check if SDD permissions are configured for the project.
@@ -15366,6 +15437,21 @@ Returns:
 
 ---
 
+### `cmd_ensure_sdd_config(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:408`
+**Complexity:** 4
+
+**Description:**
+> Ensure .claude/sdd_config.json exists, creating it from the template if missing.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_execute_verify(args, printer) -> None`
 
 **Language:** python
@@ -15384,8 +15470,8 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:74`
-**Complexity:** 8
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:241`
+**Complexity:** 1
 
 **Description:**
 > Find all active SDD specifications with resumable work.
@@ -15525,8 +15611,8 @@ Returns:
 ### `cmd_format_output(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:156`
-⚠️ **Complexity:** 17 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:253`
+**Complexity:** 2
 
 **Description:**
 > Format active work as human-readable text with last-accessed task info.
@@ -15612,7 +15698,7 @@ Returns:
 ### `cmd_get_session_info(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:276`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:265`
 **Complexity:** 5
 
 **Description:**
@@ -15687,6 +15773,21 @@ Args:
 **Parameters:**
 - `args`: None
 - `printer`: None
+
+---
+
+### `cmd_inspect_config(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:314`
+**Complexity:** 4
+
+**Description:**
+> Report the current state of .claude config files.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
 
 ---
 
@@ -16133,6 +16234,21 @@ Args:
 
 ---
 
+### `cmd_session_summary(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:358`
+**Complexity:** 3
+
+**Description:**
+> Return consolidated permissions, git status, and active work summary.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
 ### `cmd_setup_git_config(args, printer) -> int`
 
 **Language:** python
@@ -16315,7 +16431,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_update(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:323`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:346`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -17323,7 +17439,7 @@ dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 ### `create_provider() -> CursorAgentProvider`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:323`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:338`
 **Complexity:** 4
 
 **Description:**
@@ -18261,7 +18377,7 @@ Example:
 ### `ensure_gitignore_pattern(project_root, pattern) -> tuple[bool, str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:191`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:196`
 **Complexity:** 6
 
 **Description:**
@@ -23898,7 +24014,7 @@ Returns:
 ### `is_cursor_agent_available() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:318`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/cursor_agent.py:333`
 **Complexity:** 1
 
 **Description:**
@@ -24617,7 +24733,7 @@ Returns:
 ### `main() -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:365`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:370`
 **Complexity:** 3
 
 ---
@@ -26130,7 +26246,7 @@ Args:
 ### `register_git_config_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:530`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/git_config_helper.py:552`
 **Complexity:** 1
 
 **Description:**
@@ -26330,7 +26446,7 @@ Args:
 ### `register_setup_permissions(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:559`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/setup_permissions.py:585`
 **Complexity:** 1
 
 **Description:**
@@ -26364,7 +26480,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:325`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:440`
 **Complexity:** 1
 
 **Description:**
@@ -26818,7 +26934,7 @@ Example:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/integration/cli_runner.py:106`
-**Complexity:** 5
+**Complexity:** 7
 
 **Description:**
 > Execute the SDD CLI with consistent defaults across integration tests.
@@ -33722,7 +33838,7 @@ Returns:
 ### `update_permissions(project_root) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:220`
+**Defined in:** `src/claude_skills/claude_skills/dev_tools/setup_project_permissions.py:225`
 ⚠️ **Complexity:** 15 (High)
 
 **Description:**
@@ -34441,6 +34557,7 @@ Returns:
 - `sys`
 - `typing.Any`
 - `typing.Dict`
+- `typing.Optional`
 - `typing.Tuple`
 
 ### `src/claude_skills/claude_skills/cli/skills_dev/migrate.py`
@@ -34468,14 +34585,15 @@ Returns:
 
 - `claude_skills.cli.skills_dev.git_config_helper.cmd_check_git_config`
 - `claude_skills.cli.skills_dev.git_config_helper.cmd_setup_git_config`
+- `claude_skills.cli.skills_dev.git_config_helper.detect_git_config_state`
+- `claude_skills.cli.skills_dev.git_config_helper.format_git_config_summary`
 - `claude_skills.common.PrettyPrinter`
 - `claude_skills.common.integrations.get_session_state`
-- `datetime.datetime`
+- `claude_skills.common.setup_templates.load_json_template_clean`
 - `json`
 - `os`
 - `pathlib.Path`
 - `sys`
-- `time`
 - `typing.Optional`
 
 ### `src/claude_skills/claude_skills/code_doc/__init__.py`
@@ -37373,6 +37491,7 @@ Returns:
 - `json`
 - `pathlib.Path`
 - `pytest`
+- `setup_permissions.GIT_APPROVAL_PERMISSIONS`
 - `setup_permissions.GIT_DANGEROUS_PERMISSIONS`
 - `setup_permissions.GIT_READ_PERMISSIONS`
 - `setup_permissions.GIT_WRITE_PERMISSIONS`

@@ -20,6 +20,7 @@ from setup_permissions import (
     GIT_READ_PERMISSIONS,
     GIT_WRITE_PERMISSIONS,
     GIT_DANGEROUS_PERMISSIONS,
+    GIT_APPROVAL_PERMISSIONS,
     _prompt_for_git_permissions
 )
 
@@ -88,13 +89,20 @@ class TestGitPermissionConstants:
             "Bash(git checkout:*)",
             "Bash(git add:*)",
             "Bash(git commit:*)",
-            "Bash(git push:*)",  # Note: without --force flags
-            "Bash(git rm:*)",
             "Bash(git mv:*)",
-            "Bash(gh pr create:*)"
         ]
         for op in safe_ops:
             assert op in GIT_WRITE_PERMISSIONS, f"Missing safe operation: {op}"
+
+        # Approval-required operations should live in separate list
+        approval_ops = [
+            "Bash(git push:*)",
+            "Bash(git rm:*)",
+            "Bash(gh pr create:*)",
+        ]
+        for op in approval_ops:
+            assert op in GIT_APPROVAL_PERMISSIONS, f"Missing approval operation: {op}"
+            assert op not in GIT_WRITE_PERMISSIONS
 
         # Dangerous operations should NOT be in write permissions
         assert "Bash(git push --force:*)" not in GIT_WRITE_PERMISSIONS
@@ -149,8 +157,9 @@ class TestPromptForGitPermissions:
         for perm in GIT_WRITE_PERMISSIONS:
             assert perm in result["allow"]
 
-        # Should have dangerous permissions in ask list
-        assert len(result["ask"]) > 0
+        # Approval-required and dangerous permissions should be in ASK list
+        for perm in GIT_APPROVAL_PERMISSIONS:
+            assert perm in result["ask"]
         for perm in GIT_DANGEROUS_PERMISSIONS:
             assert perm in result["ask"]
 

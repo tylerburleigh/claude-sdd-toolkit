@@ -221,7 +221,8 @@ class TestListAssumptionsCLI:
             "simple-spec-2025-01-01-001",
             "--json",
             capture_output=True,
-            text=True
+            text=True,
+            ensure_verbose=False
         )
 
         assert result.returncode == 0
@@ -864,7 +865,8 @@ class TestSpecModificationWorkflow:
             spec_id,
             "--json",
             capture_output=True,
-            text=True
+            text=True,
+            ensure_verbose=False
         )
         assert result_all.returncode == 0
         all_assumptions = json.loads(result_all.stdout)
@@ -878,7 +880,8 @@ class TestSpecModificationWorkflow:
             "--type", "requirement",
             "--json",
             capture_output=True,
-            text=True
+            text=True,
+            ensure_verbose=False
         )
         assert result_req.returncode == 0
         req_assumptions = json.loads(result_req.stdout)

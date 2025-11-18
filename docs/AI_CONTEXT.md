@@ -1,495 +1,1022 @@
 # AI Context - Quick Reference Guide
 
-**Project:** Claude SDD Toolkit
-**Version:** 0.5.0
-**Generated:** 2025-11-09
+**Project**: claude-sdd-toolkit
+**Version**: 1.0.0
+**Generated**: 2025-11-18
 
-> This AI context guide was generated using AI-enhanced analysis with gemini.
-> **Note**: codex was attempted but failed due to requiring an interactive terminal (TTY).
+> This AI context guide was generated for AI assistants working with the SDD Toolkit codebase.
+> Generated using `sdd doc analyze-with-ai` with cursor-agent AI consultation.
 
-This document provides a concise reference for AI assistants working with the SDD Toolkit codebase.
+This document provides a concise, actionable reference for AI assistants (like Claude Code, Cursor, GitHub Copilot) working with the claude-sdd-toolkit codebase.
 
 ---
 
 ## 1. Project Overview
 
-The **SDD Toolkit** is a Python-based command-line toolset designed to integrate with the Claude AI assistant. It facilitates a **"spec-driven development"** (SDD) workflow, where development tasks are defined and managed through machine-readable JSON files called "specs."
+### What is the SDD Toolkit?
 
-### Purpose
+A **Python-based CLI toolkit** implementing Spec-Driven Development (SDD) - a systematic "plan-first" approach that keeps AI models "on guardrails" through machine-readable JSON specifications.
 
-The toolkit provides a suite of commands (skills) that allow developers and AI assistants to create, plan, execute, and track development work in a structured and systematic way.
+### Core Purpose
+
+Enable structured, trackable, AI-assisted development by:
+- Creating development specifications before coding
+- Tracking progress through defined phases and tasks
+- Reviewing implementation fidelity against specs
+- Generating comprehensive documentation
+- Integrating with multiple AI tools for enhanced assistance
 
 ### Target Users
 
-Developers who want to leverage AI for coding tasks while maintaining rigorous organization and clear, version-controlled plans.
+Software developers and teams who want to:
+- Leverage AI assistance systematically
+- Maintain clear development plans and audit trails
+- Ensure implementation matches specifications
+- Track progress transparently
+
+### Key Value Proposition
+
+Puts AI "on guardrails" - provides structure and boundaries for AI-assisted development while maintaining flexibility and power.
 
 ---
 
-## 2. Domain Concepts
+## 2. Essential Domain Concepts
 
-### 1. SDD (Spec-Driven Development)
+### 1. Spec (Specification) - The Heart of SDD
 
-**Definition**: The core methodology of the toolkit - a plan-first approach where all development work is guided by a formal specification document.
+**Definition**: A machine-readable JSON file defining a development task end-to-end.
 
-**Usage**: Used throughout the project as the central workflow philosophy.
-
-**Key Principle**: Every task, dependency, and requirement is explicitly defined in a JSON spec before implementation begins.
-
----
-
-### 2. Spec (Specification)
-
-**Definition**: A JSON file that defines a development task, including purpose, requirements, dependencies, and current status.
-
-**Location**: Managed in the `/specs` directory with subdirectories:
-- `pending/` - Newly created specs
-- `active/` - Currently being worked on
-- `completed/` - Finished specs
-- `archived/` - Old/deprecated specs
+**Location**: `specs/{pending,active,completed,archived}/*.json`
 
 **Structure**:
-- Metadata (name, description, complexity)
-- Phases (logical groupings)
-- Tasks (atomic work units)
-- Dependencies (task relationships)
-- Journal (decision log)
-- Verification steps
+- **Metadata**: Name, description, version, complexity rating
+- **Phases**: Logical groupings of related tasks
+- **Tasks**: Atomic work units with IDs, descriptions, dependencies, verification steps
+- **Dependencies**: Task relationships (which tasks must complete first)
+- **Journal**: Decision log and notes during development
+- **Status tracking**: Per-task and overall progress
 
-**Central Artifact**: Specs are the single source of truth for all development work.
+**Lifecycle**:
+```
+pending/ → active/ → completed/ → archived/
+```
 
----
+**Why Critical**: Single source of truth for all development work; all CLI tools operate on specs.
 
-### 3. Skill
-
-**Definition**: A command or set of capabilities exposed to the user or AI assistant.
-
-**Examples**: `sdd-plan`, `sdd-next`, `code-doc`, `run-tests`
-
-**Location**: Each skill is defined in the `/skills` directory and implemented as CLI commands in `src/claude_skills/claude_skills/`
-
-**Purpose**: Skills provide modular functionality for different parts of the SDD workflow.
+**Schema**: Validated against `src/claude_skills/schemas/specification-schema.json`
 
 ---
 
-### 4. Agent
+### 2. Skills - Modular Capabilities
 
-**Definition**: An AI persona or automated system that performs tasks based on the SDD workflow.
+**Definition**: A command or set of related commands providing specific functionality.
 
-**Location**: Files in `/agents` directory define prompts and instructions for different AI agents.
+**Core Skills**:
 
-**Purpose**: Agents carry out specific parts of the development process:
-- Planning
-- Modifying specs
-- Reviewing work
-- Generating documentation
+**Documentation**:
+- `code_doc` - Generate codebase documentation (Markdown + JSON)
+- `doc_query` - Query generated documentation, analyze dependencies
+
+**SDD Workflow**:
+- `sdd_plan` - Create new specifications
+- `sdd_next` - Get next actionable task (core orchestration)
+- `sdd_update` - Update task status and journal
+- `sdd_validate` - Validate spec structure and dependencies
+- `sdd_render` - Render specs to human-readable markdown
+
+**Quality Assurance**:
+- `sdd_fidelity_review` - Review implementation vs spec
+- `sdd_plan_review` - Review specs before implementation
+- `run_tests` - Test execution with AI debugging
+
+**Workflow Support**:
+- `sdd_pr` - Generate pull requests with AI
+- `sdd_spec_mod` - Systematically modify specs
+- `context_tracker` - Monitor Claude Code token usage
+
+**Architecture**: Each skill is a Python package in `src/claude_skills/` with:
+- `cli.py` - Command-line interface
+- Business logic modules
+- Integration with `common` utilities
+
+**Independence**: Skills are modular and can be used standalone or in workflows.
 
 ---
 
-### 5. Fidelity Review
+### 3. Tasks - Atomic Work Units
 
-**Definition**: A process of comparing implemented code against the original spec to ensure all requirements have been met.
-
-**Skill**: `sdd-fidelity-review` is dedicated to this purpose.
-
-**Purpose**: Quality assurance - ensures implementation matches the plan.
-
----
-
-### 6. Task
-
-**Definition**: An individual unit of work defined within a spec.
+**Definition**: Individual units of work within a spec.
 
 **Structure**:
-- ID (unique identifier)
-- Title and description
-- Status (pending, in_progress, completed, blocked)
-- Dependencies (list of prerequisite task IDs)
-- Verification steps
+```json
+{
+  "id": "task-1-1",
+  "title": "Implement user authentication",
+  "description": "Add JWT-based authentication...",
+  "phase_id": "phase-1",
+  "dependencies": ["task-1-0"],
+  "verification": ["Verify login works", "Test token expiration"],
+  "status": "pending" | "in-progress" | "completed" | "verified"
+}
+```
 
-**Relationship**: A spec can contain multiple tasks, often with dependencies on each other.
+**Key Fields**:
+- `id` - Unique identifier (e.g., `task-1-1`, `task-2-3`)
+- `dependencies` - Array of task IDs that must complete first
+- `verification` - Steps to verify task completion
+- `status` - Current task state
 
----
-
-### 7. Context Tracker
-
-**Definition**: A mechanism to maintain state and history across different skill executions.
-
-**Implementation**: Referenced in `src/claude_skills/claude_skills/context_tracker/cli.py`
-
-**Purpose**: Provides continuity for the AI assistant as it works through multi-step tasks.
-
----
-
-## 3. Critical Files Analysis
-
-### Must-Know Files for Development
-
-#### 1. `src/claude_skills/claude_skills/sdd_plan/cli.py`
-
-**Why Critical**: Entry point for the `sdd-plan` skill - the starting point of the entire SDD workflow.
-
-**Responsibility**: Takes an initial idea and generates a structured JSON spec.
-
-**Key Operations**:
-- Template-based spec generation
-- Initial task definition
-- Dependency setup
+**Task States**:
+- `pending` - Not yet started
+- `in-progress` - Currently being worked on
+- `completed` - Implementation done, awaiting verification
+- `verified` - Verification steps completed
 
 ---
 
-#### 2. `src/claude_skills/claude_skills/sdd_next/cli.py`
+### 4. Dependencies - Task Relationships
 
-**Why Critical**: The engine of the workflow.
+**Definition**: Directed edges between tasks defining execution order.
 
-**Responsibility**:
-- Reads the active spec
-- Identifies the next incomplete task
-- Provides AI with context needed to work on it
+**Format**: Task ID references in `dependencies` array
 
-**Central Role**: This is essential for progressing through a development plan.
+**Example**:
+```json
+{
+  "id": "task-2-1",
+  "dependencies": ["task-1-1", "task-1-2"]
+}
+```
+*Task 2-1 can only start after tasks 1-1 AND 1-2 are completed.*
 
-**Dependencies**: Closely integrated with `doc-query` for context enrichment.
+**Validation**: `sdd_validate` detects circular dependencies
 
----
-
-#### 3. `src/claude_skills/claude_skills/sdd_update/cli.py`
-
-**Why Critical**: State management - all spec modifications flow through here.
-
-**Key Functions**:
-- Mark tasks as complete
-- Record results and decisions
-- Update spec status
-- Manage spec lifecycle (activate, complete, archive)
-
-**Relationship**: Closely tied to `sdd-next` for workflow progression.
+**Impact**: `sdd_next` uses dependencies to determine which tasks are ready vs blocked
 
 ---
 
-#### 4. `src/claude_skills/claude_skills/sdd_spec_mod/cli.py`
+### 5. Phases - Logical Grouping
 
-**Why Critical**: Allows modifying an existing spec.
+**Definition**: High-level organizational units grouping related tasks.
 
-**Purpose**: Adapt to changing requirements or incorporate feedback without starting from scratch.
+**Structure**:
+```json
+{
+  "id": "phase-1",
+  "title": "Foundation Setup",
+  "description": "Core infrastructure and setup",
+  "dependencies": []
+}
+```
 
-**Use Cases**:
-- Adding new tasks
-- Updating estimates
-- Modifying dependencies
-- Incorporating review feedback
+**Purpose**:
+- Organize large projects into manageable chunks
+- Enable phase-level reviews and reporting
+- Support incremental delivery
 
----
-
-#### 5. `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py`
-
-**Why Critical**: Implements the quality assurance step of the workflow.
-
-**Purpose**: Ensures work done aligns with the plan - a key principle of spec-driven development.
-
-**Dependencies**:
-- Reads spec files for requirements
-- Analyzes actual source code changes
-- Uses AI tools for comparison
+**Dependencies**: Phases can depend on other phases completing first
 
 ---
 
-#### 6. `docs/ARCHITECTURE.md`
+### 6. Provider - AI Tool Abstraction
 
-**Why Critical**: Provides high-level overview of system design and component interactions.
+**Definition**: Standardized interface for external AI CLI tools.
 
-**Purpose**: Best starting point for understanding the entire system.
+**Supported Providers**:
+- **Gemini** - Google Gemini CLI (`gemini`)
+- **Codex** - Anthropic Codex CLI (`codex`)
+- **Cursor Agent** - Cursor IDE AI agent (`cursor-agent`)
+- **Claude** - Claude CLI (`claude`, read-only restrictions)
 
-**Content**: Architecture decisions, component relationships, design patterns, technology stack.
+**Provider Context**: Base class `ProviderContext` in `src/claude_skills/common/providers/base.py`
 
----
+**Why Important**: Enables "bring your own AI" model - users choose their preferred tools
 
-#### 7. `specs/` Directory
-
-**Why Critical**: Not a single file, but contains the source of truth for all development work.
-
-**Structure**: JSON spec files organized by status (pending, active, completed, archived).
-
-**Usage**: All workflow commands operate on these files.
+**Configuration**: Managed via `ai_config.json` and environment
 
 ---
 
-## 4. Common Workflow Patterns
+### 7. Documentation JSON - Machine-Readable Codebase
 
-### 1. Creating a New Development Plan
+**Location**: `docs/documentation.json`
+
+**Generated By**: `sdd doc generate` or `sdd doc analyze-with-ai`
+
+**Content**:
+- All modules, classes, functions with full details
+- Complexity metrics (cyclomatic complexity)
+- Dependency graphs (imports, relationships)
+- Code statistics (lines, files, averages)
+- Framework and pattern detection
+
+**Consumed By**:
+- `doc_query` - For all query operations
+- `sdd_next` - For task context preparation
+- Analysis tools - For code insights
+
+**Schema**: Defined in `src/claude_skills/schemas/documentation-schema.json`
+
+---
+
+### 8. Cache - AI Consultation Results
+
+**Location**: Project-local cache directory (`.sdd_cache/` or similar)
+
+**Purpose**: Store AI consultation results to reduce cost and latency
+
+**Features**:
+- TTL-based expiration (configurable, default varies by use case)
+- Deterministic key generation (prompt + model + version)
+- Automatic cleanup of expired entries
+
+**Management**: `sdd cache clear`, `sdd cache inspect`
+
+**Why Important**: Multi-model consultation can be expensive; caching prevents redundant calls
+
+---
+
+## 3. Critical Files for AI Assistants
+
+### Must-Know Files (Read These First)
+
+#### 1. **Specification Schema**
+- **Path**: `src/claude_skills/schemas/specification-schema.json`
+- **Why**: Defines valid spec structure, all required/optional fields
+- **When**: Creating/modifying specs, validating structure
+
+#### 2. **Documentation Schema**
+- **Path**: `src/claude_skills/schemas/documentation-schema.json`
+- **Why**: Defines structure of generated documentation
+- **When**: Parsing documentation.json, generating docs
+
+#### 3. **Common Utilities**
+- **Path**: `src/claude_skills/common/`
+- **Why**: Shared utilities ALL skills depend on
+- **Key Modules**:
+  - `printer.py` - Output formatting (PrettyPrinter)
+  - `spec.py` - Spec loading/saving
+  - `validation.py` - Spec validation
+  - `paths.py` - Path resolution
+  - `providers/` - AI tool integration
+
+#### 4. **CLI Registry**
+- **Path**: `src/claude_skills/cli/registry.py`
+- **Why**: Central command registration - how CLI routes to skills
+- **When**: Understanding command flow, adding new commands
+
+#### 5. **README and Documentation**
+- **Paths**: `README.md`, `docs/ARCHITECTURE.md`, `docs/DOCUMENTATION.md`
+- **Why**: High-level understanding, usage examples
+- **When**: First-time orientation, understanding workflows
+
+### File Naming Conventions
+
+#### Spec Files
+- **Format**: `<descriptive-name>-<YYYY-MM-DD>-<NNN>.json`
+- **Example**: `user-auth-feature-2025-11-18-001.json`
+- **Location**: `specs/{pending,active,completed,archived}/`
+
+#### Skill Structure
+- **Pattern**: `src/claude_skills/<skill_name>/`
+  - `cli.py` - CLI interface (required)
+  - `<feature>.py` - Business logic modules
+  - `__init__.py` - Package initialization
+
+#### Schema Files
+- **Location**: `src/claude_skills/schemas/`
+- **Pattern**: `<name>-schema.json`
+
+#### Generated Documentation
+- **Location**: `docs/`
+- **Files**:
+  - `DOCUMENTATION.md` - Human-readable structural docs
+  - `documentation.json` - Machine-readable structural data
+  - `ARCHITECTURE.md` - AI-enhanced architecture overview
+  - `AI_CONTEXT.md` - This file - AI assistant quick reference
+
+---
+
+## 4. Common Workflows
+
+### Workflow 1: Create and Execute a Spec
+
+**Goal**: Plan a feature, execute tasks systematically
 
 **Steps**:
-1. User invokes `sdd-begin` or `sdd-plan` with high-level description
-2. Tool (with AI assistance) generates new JSON spec in `specs/pending/` or `specs/active/`
-3. Spec outlines required tasks, dependencies, and estimates
+```bash
+# 1. Create new spec
+sdd plan create --name "Add Authentication" --output specs/active/
 
-**AI Assistant Role**:
-- Help define tasks based on user requirements
-- Suggest appropriate dependencies
-- Estimate complexity and time
+# 2. Edit spec JSON to define phases, tasks, dependencies
+
+# 3. Validate spec
+sdd validate specs/active/auth-feature-2025-11-18-001.json
+
+# 4. Get next actionable task
+sdd next-task auth-feature-2025-11-18-001
+
+# 5. Implement the task
+
+# 6. Update task status
+sdd update auth-feature-2025-11-18-001 --task task-1-1 --status completed
+
+# 7. Add journal entry
+sdd journal auth-feature-2025-11-18-001 "Implemented JWT auth with bcrypt"
+
+# 8. Repeat steps 4-7 until all tasks done
+
+# 9. Review implementation fidelity
+sdd fidelity-review auth-feature-2025-11-18-001
+
+# 10. Create pull request
+sdd pr create auth-feature-2025-11-18-001
+```
 
 ---
 
-### 2. Working on the Next Task
+### Workflow 2: Generate and Query Documentation
+
+**Goal**: Document codebase, analyze code structure
 
 **Steps**:
-1. Developer/AI runs `sdd-next` command
-2. Tool inspects active spec, finds next available task, presents details
-3. Developer/AI performs the coding task
-4. Run `sdd-update` to mark task completed, provide paths to changed files
+```bash
+# 1. Generate comprehensive docs with AI enhancement
+sdd doc analyze-with-ai . --name "MyProject" --version "1.0.0"
 
-**AI Assistant Role**:
-- Execute `sdd-next` to identify task
-- Summarize task requirements
-- Suggest implementation approach
-- Mark task complete when done
+# 2. Query documentation
+sdd doc stats                          # Show statistics
+sdd doc complexity --threshold 10      # High-complexity functions
+sdd doc search "authentication"        # Find auth-related code
+sdd doc dependencies src/auth.py       # Show dependencies
+
+# 3. Analyze call graphs
+sdd doc callers authenticate_user      # Who calls this?
+sdd doc callees authenticate_user      # What does this call?
+
+# 4. Impact analysis
+sdd doc impact authenticate_user       # Impact of changing this function
+```
 
 ---
 
-### 3. Modifying an Existing Spec
+### Workflow 3: Review Spec Before Implementation
 
-**Scenario**: Requirements change or feedback needs incorporation.
+**Goal**: Validate spec quality before starting work
 
 **Steps**:
-1. Run `sdd-modify` command
-2. Provide instructions (e.g., "add task for unit tests", "update estimate for task-3")
-3. Tool updates JSON spec file
+```bash
+# 1. Create spec (manually or via sdd plan create)
 
-**AI Assistant Role**:
-- Interpret user's change request
-- Execute modification command
-- Validate updated spec
+# 2. Run multi-model spec review
+sdd plan-review specs/active/new-feature-2025-11-18-001.json
+
+# 3. Review generated report (identifies ambiguities, missing details)
+
+# 4. Modify spec based on feedback
+sdd spec-mod specs/active/new-feature-2025-11-18-001.json --apply-review
+
+# 5. Re-validate
+sdd validate specs/active/new-feature-2025-11-18-001.json
+
+# 6. Proceed with implementation (Workflow 1)
+```
+
+---
+
+### Workflow 4: Debug Test Failures with AI
+
+**Goal**: Use AI to help debug failing tests
+
+**Steps**:
+```bash
+# 1. Run tests
+sdd test run --preset all
+
+# 2. If failures, consult AI for debugging help
+sdd test debug --test test_authentication --ai gemini
+
+# 3. Review AI suggestions
+
+# 4. Fix code based on suggestions
+
+# 5. Re-run tests
+sdd test run --preset all
+```
+
+---
+
+### Workflow 5: Monitor Context Usage (Claude Code)
+
+**Goal**: Track token/context consumption in Claude Code
+
+**Steps**:
+```bash
+# 1. Find Claude Code transcript file
+# Usually in ~/.claude_code/transcripts/ or similar
+
+# 2. Monitor usage
+sdd context-tracker <transcript-file>
+
+# 3. View real-time metrics
+# - Tokens used
+# - Context window percentage
+# - Tool usage breakdown
+```
 
 ---
 
 ## 5. Potential Gotchas
 
-### 1. Spec File Management
+### 1. Spec Validation is Strict
 
-**Issue**: State is stored in JSON files in `specs/` directory.
+**Issue**: Specs must pass JSON schema validation
 
-**Risks**:
-- File corruption
-- Modifying wrong spec
-- Forgetting to move specs between directories (pending → active → completed)
-- Manual edits breaking JSON structure
+**Gotcha**: Missing required fields, incorrect field types, circular dependencies will cause failures
 
-**AI Assistant Guidance**:
-- Always validate after manual edits
-- Use CLI commands instead of direct file editing when possible
-- Double-check spec ID before modifications
+**Fix**:
+- Always run `sdd validate <spec>` before using a spec
+- Use `sdd validate --fix` for auto-fixable issues
+- Check schema at `src/claude_skills/schemas/specification-schema.json`
 
----
-
-### 2. Strict JSON Schema
-
-**Issue**: Spec files adhere to a strict (sometimes undocumented) JSON schema.
-
-**Risks**:
-- Adding/removing/modifying fields incorrectly causes CLI tools to fail
-- Breaking changes between versions
-
-**AI Assistant Guidance**:
-- Learn and respect the schema
-- Use `sdd validate` liberally
-- Use `--auto-fix` for common schema issues
+**Example Error**:
+```
+ValidationError: 'phase_id' is required for task task-1-1
+```
 
 ---
 
-### 3. State Synchronization
+### 2. Documentation Staleness
 
-**Issue**: The `sdd-update` step is critical for keeping specs in sync with code.
+**Issue**: Code changes after documentation generation make docs stale
 
-**Risks**:
-- Complete coding task but forget `sdd-update`
-- Spec becomes out of sync with codebase
-- Confusion and potential rework
+**Gotcha**: `doc_query` may prompt to regenerate if docs are stale
 
-**AI Assistant Guidance**:
-- Always run `sdd-update` after completing tasks
-- Remind user if they complete work without updating spec
+**Fix**:
+- Regenerate docs when code changes significantly: `sdd doc generate .`
+- Use `--skip-refresh` flag to bypass staleness check (not recommended)
+- Set up pre-commit hooks to auto-regenerate
 
----
-
-### 4. Tool Inter-dependencies
-
-**Issue**: Commands designed to be used in specific sequence.
-
-**Required Sequence**: `plan` → `next` → `update` (repeat) → `complete`
-
-**Risks**:
-- Using commands out of order leads to unpredictable results
-- Running `sdd-next` with no active spec fails
-
-**AI Assistant Guidance**:
-- Follow the workflow sequence
-- Check for active spec before running next-task
-- Validate before activating specs
+**Staleness Detection**: Compares doc generation timestamp vs file modification times
 
 ---
 
-### 5. AI Tool Compatibility
+### 3. AI Tool Availability
 
-**Issue**: Some AI CLI tools may not work in non-interactive mode.
+**Issue**: Skills requiring AI tools fail if tools not installed
 
-**Known Issues**:
-- **codex**: Requires TTY, fails with "stdout is not a terminal" error
-- Cannot be used in subprocess/piped mode
+**Gotcha**: Multi-agent consultation needs at least 2 AI tools installed
 
-**Workarounds**:
-- Use gemini or cursor-agent instead
-- For codex users: Request non-interactive mode support from maintainers
+**Fix**:
+- Check available tools: `sdd test check-tools`
+- Install missing tools (gemini, cursor-agent, codex)
+- Use `--single-agent` flag for single-tool consultation
+- Fall back to non-AI commands (e.g., `sdd doc generate` instead of `analyze-with-ai`)
 
-**AI Assistant Guidance**:
-- Check tool availability before AI-enhanced commands
-- Suggest alternative tools if preferred tool unavailable
-- Gracefully fall back to structural-only output
+**Detection**: Provider registry auto-detects installed tools
+
+---
+
+### 4. Dependency Resolution
+
+**Issue**: Complex dependency graphs can block progress
+
+**Gotcha**: `sdd next-task` may report "no ready tasks" if all tasks are blocked
+
+**Fix**:
+- Visualize dependencies: `sdd validate <spec> --show-graph`
+- Check for circular dependencies: `sdd validate <spec>`
+- Review dependency logic - ensure at least one task has no dependencies
+- Consider breaking large specs into smaller ones
+
+**Common Pattern**: Start with one "setup" task with no dependencies
+
+---
+
+### 5. Provider-Specific Restrictions
+
+**Issue**: Claude provider has read-only restrictions
+
+**Gotcha**: Some operations fail with Claude provider due to security restrictions
+
+**Fix**:
+- Use gemini, cursor-agent, or codex for write operations
+- Check provider capabilities in `common/providers/<provider>.py`
+- Provider selection order: cursor-agent → gemini → codex → claude
+
+**Read-Only Operations**: Claude provider can read but not write/modify code
+
+---
+
+### 6. JSON vs Rich Output Modes
+
+**Issue**: CLI output format varies by flags
+
+**Gotcha**: Mixing `--json` with Rich formatting flags causes issues
+
+**Fix**:
+- Use `--json` for programmatic consumption (scripts, agents)
+- Use Rich output (default) for human readability
+- Use `--no-json` to explicitly disable JSON output
+- Check config: `sdd_config.json` may set defaults
+
+**Example**:
+```bash
+# For scripts/agents
+sdd next-task <spec> --json
+
+# For humans
+sdd next-task <spec> --verbose
+```
+
+---
+
+### 7. Work Mode Confusion
+
+**Issue**: `sdd-next` behavior changes based on work mode
+
+**Gotcha**: Auto mode doesn't prompt, interactive mode does
+
+**Fix**:
+- Understand modes:
+  - `auto` - No prompts, fail fast (for AI agents)
+  - `manual` - Explicit task selection required
+  - `interactive` - Prompts for user decisions
+- Set via: `--work-mode <mode>` flag or `work_mode` in config
+- Check current mode: `sdd config show`
+
+**Default**: Usually `interactive` for humans, `auto` for agents
+
+---
+
+### 8. Cache Invalidation
+
+**Issue**: Cached AI results may be stale
+
+**Gotcha**: Code changes don't auto-invalidate cache
+
+**Fix**:
+- Clear cache: `sdd cache clear`
+- Inspect cache: `sdd cache inspect`
+- TTL handles most cases automatically
+- Force refresh: bypass cache in consultation calls (varies by skill)
+
+**When to Clear**: After significant code changes, before important reviews
 
 ---
 
 ## 6. Extension Patterns
 
-The codebase follows a clear, modular pattern for adding new functionality.
-
 ### Adding a New Skill
+
+**Goal**: Extend toolkit with custom functionality
 
 **Steps**:
 
-1. **Create skill directory**: `src/claude_skills/claude_skills/sdd_new_feature/`
+1. **Create Skill Package**:
+   ```bash
+   mkdir -p src/claude_skills/<skill_name>
+   touch src/claude_skills/<skill_name>/__init__.py
+   touch src/claude_skills/<skill_name>/cli.py
+   ```
 
-2. **Implement CLI**: Create `cli.py` using CLI library (typer or click inferred from structure)
-   - Define command-line interface
-   - Add argument parsing
-   - Implement command handlers
+2. **Implement CLI Interface** (`cli.py`):
+   ```python
+   import argparse
+   from claude_skills.common.printer import PrettyPrinter
 
-3. **Add supporting logic**: Place business logic, helpers, classes in additional Python files
-   - `core.py` - Core functionality
-   - `helpers.py` - Utility functions
-   - Other domain-specific modules
+   def register_commands(subparsers):
+       parser = subparsers.add_parser('my-command')
+       parser.add_argument('--option', help='...')
+       parser.set_defaults(func=cmd_my_command)
 
-4. **Document the skill**: Create `SKILL.md` in `skills/sdd-new-feature/`
-   - Explain functionality
-   - Document parameters
-   - Provide usage examples
-   - Serves as documentation for humans and AI
+   def cmd_my_command(args, printer: PrettyPrinter):
+       # Implementation
+       printer.success("Done!")
+   ```
 
-5. **Define agent behavior** (optional): Add `agents/sdd-new-feature.md`
-   - Provide prompts for AI agent
-   - Define automated behavior instructions
+3. **Register in Main CLI**:
+   - Add to `src/claude_skills/cli/registry.py`
+   - Import and call `register_commands()`
 
----
+4. **Use Common Utilities**:
+   ```python
+   from claude_skills.common.printer import PrettyPrinter
+   from claude_skills.common.spec import load_json_spec
+   from claude_skills.common.validation import validate_spec
+   ```
 
-### Integration Best Practices
+5. **Add Tests**:
+   - Create `tests/<skill_name>/` directory
+   - Write unit and integration tests
 
-**Use Common Utilities**:
-- `common/spec.py` - Spec file I/O
-- `common/printer.py` - Consistent output formatting
-- `common/validation.py` - Shared validation logic
-- `common/ai_config.py` - AI tool configuration
-
-**Follow Patterns**:
-- Command pattern for CLI structure
-- Factory pattern for language-specific parsers
-- Strategy pattern for AI tool selection
-- Facade pattern for complex operations
-
-**Maintain Modularity**:
-- Keep skills independent
-- Use clear interfaces
-- Document dependencies
-- Enable graceful degradation
+6. **Document**:
+   - Update README.md
+   - Add skill documentation
 
 ---
 
-## Quick Command Reference
+### Adding a New Language Parser (code_doc)
 
-### Spec Lifecycle
+**Goal**: Support additional programming languages
+
+**Steps**:
+
+1. **Install Tree-Sitter Grammar**:
+   ```bash
+   pip install tree-sitter-<language>
+   ```
+
+2. **Create Parser Module**:
+   ```python
+   # src/claude_skills/code_doc/parsers/<language>.py
+   from .base import BaseParser
+
+   class LanguageParser(BaseParser):
+       def __init__(self):
+           super().__init__(language='<language>')
+
+       def parse_file(self, file_path):
+           # Implementation
+           return parsed_data
+   ```
+
+3. **Update Parser Factory**:
+   ```python
+   # src/claude_skills/code_doc/parsers/factory.py
+   from .<language> import LanguageParser
+
+   def create_parser_factory():
+       return {
+           '<language>': LanguageParser,
+           # ...
+       }
+   ```
+
+4. **Add Language Detection**:
+   ```python
+   # src/claude_skills/code_doc/detectors.py
+   LANGUAGE_EXTENSIONS = {
+       '<language>': ['.ext1', '.ext2'],
+       # ...
+   }
+   ```
+
+5. **Test**:
+   - Create test files in new language
+   - Verify parsing and documentation generation
+
+---
+
+### Adding a New AI Provider
+
+**Goal**: Integrate a new AI CLI tool
+
+**Steps**:
+
+1. **Create Provider Class**:
+   ```python
+   # src/claude_skills/common/providers/<provider>.py
+   from .base import ProviderContext
+
+   class NewProvider(ProviderContext):
+       def __init__(self, model=None):
+           super().__init__(name='<provider>', model=model)
+
+       def _run_prompt_impl(self, prompt, **kwargs):
+           # Call external CLI tool
+           result = subprocess.run(['<cli>', 'prompt', prompt], ...)
+           return result.stdout
+
+       def supports_write_operations(self):
+           return True  # or False if read-only
+   ```
+
+2. **Register Provider**:
+   ```python
+   # src/claude_skills/common/providers/registry.py
+   from .<provider> import NewProvider
+
+   def get_all_providers():
+       return {
+           '<provider>': NewProvider,
+           # ...
+       }
+   ```
+
+3. **Add Detection Logic**:
+   ```python
+   # src/claude_skills/common/providers/detectors.py
+   def detect_<provider>():
+       try:
+           subprocess.run(['<cli>', '--version'], ...)
+           return True
+       except FileNotFoundError:
+           return False
+   ```
+
+4. **Update Configuration**:
+   - Add to `ai_config.json` template
+   - Document provider-specific settings
+
+5. **Test**:
+   - Test with mock provider
+   - Test with actual CLI tool
+   - Verify read/write restrictions
+
+---
+
+## 7. Performance Tips
+
+### 1. Use JSON Output for Programmatic Access
+
+**Why**: JSON parsing is faster than Rich terminal output parsing
+
+**How**:
 ```bash
-sdd create <name>                    # Create new spec
-sdd validate <spec-id>               # Validate integrity
-sdd activate-spec <spec-id>          # Move to active
-sdd complete-spec <spec-id>          # Archive as completed
+sdd next-task <spec> --json | jq '.next_task.id'
 ```
 
-### Task Management
+**Benefit**: Enables scripting, automation, integration with other tools
+
+---
+
+### 2. Skip Staleness Checks When Appropriate
+
+**Why**: Documentation regeneration can be slow on large codebases
+
+**How**:
 ```bash
-sdd next-task <spec-id>              # Find next task
-sdd prepare-task <spec-id> <task-id> # Get context
-sdd update-status <spec-id> <task-id> --status <status>
-sdd complete-task <spec-id> <task-id>
-sdd add-journal <spec-id> --title "..." --body "..."
+sdd doc search "pattern" --skip-refresh
+```
+
+**Caution**: Results may be based on stale data
+
+**Best Practice**: Use during iterative queries, regenerate when code changes
+
+---
+
+### 3. Use Single-Agent Mode for Faster Consultation
+
+**Why**: Multi-agent consultation consults 2+ AI models (slower but higher quality)
+
+**How**:
+```bash
+sdd plan-review <spec> --single-agent --ai gemini
+```
+
+**Trade-off**: Faster but less comprehensive review
+
+**When**: Quick iterations, low-stakes reviews
+
+---
+
+### 4. Leverage Caching
+
+**Why**: AI consultation is slow and expensive
+
+**How**: Let the toolkit handle it automatically (caching is default)
+
+**Manual Control**:
+```bash
+sdd cache inspect   # View cache contents
+sdd cache clear     # Clear all cache (forces fresh consultation)
+```
+
+**Best Practice**: Clear cache only when necessary (significant code changes)
+
+---
+
+### 5. Use Verbosity Levels Wisely
+
+**Why**: Verbose output can be overwhelming, quiet output saves tokens
+
+**How**:
+```bash
+sdd next-task <spec> --quiet      # Minimal output, essential only
+sdd next-task <spec>              # Standard output
+sdd next-task <spec> --verbose    # Detailed debugging output
+```
+
+**For AI Agents**: Use `--quiet --json` for minimal token usage
+
+**For Humans**: Use `--verbose` for debugging
+
+---
+
+### 6. Batch Operations When Possible
+
+**Why**: Reduces overhead of loading specs/docs multiple times
+
+**How**: Use commands that operate on multiple entities
+
+**Example**:
+```bash
+# Good - batch validation
+sdd validate specs/active/*.json
+
+# Less efficient - one at a time
+for spec in specs/active/*.json; do sdd validate $spec; done
+```
+
+---
+
+## 8. Common Error Messages & Solutions
+
+### Error: "Spec validation failed: Circular dependency detected"
+
+**Cause**: Task dependencies form a cycle (A → B → C → A)
+
+**Solution**:
+1. Run `sdd validate <spec> --show-graph` to visualize
+2. Identify the cycle
+3. Remove one dependency to break the cycle
+4. Re-validate
+
+---
+
+### Error: "No ready tasks found"
+
+**Cause**: All tasks are blocked by dependencies
+
+**Solution**:
+1. Check dependency graph: `sdd validate <spec> --show-graph`
+2. Ensure at least one task has no dependencies (entry point)
+3. Mark blocking tasks as completed if they're done
+4. Consider if some dependencies are unnecessary
+
+---
+
+### Error: "Documentation is stale or missing"
+
+**Cause**: `docs/documentation.json` doesn't exist or is older than code
+
+**Solution**:
+1. Regenerate documentation: `sdd doc generate .`
+2. Or with AI enhancement: `sdd doc analyze-with-ai .`
+3. Or skip staleness check: `sdd doc <command> --skip-refresh`
+
+---
+
+### Error: "AI tool 'gemini' not found"
+
+**Cause**: Required AI CLI tool is not installed or not in PATH
+
+**Solution**:
+1. Check available tools: `sdd test check-tools`
+2. Install missing tool (e.g., `pip install gemini-cli`)
+3. Or use different provider: `--ai cursor-agent`
+4. Or use single-agent mode: `--single-agent`
+5. Or fall back to non-AI command
+
+---
+
+### Error: "Provider 'claude' does not support write operations"
+
+**Cause**: Attempting write operation with read-only Claude provider
+
+**Solution**:
+1. Use different provider: `--ai gemini` or `--ai cursor-agent`
+2. Check provider capabilities in docs
+3. Understand which operations require write access
+
+---
+
+### Error: "Task 'task-1-1' not found in spec"
+
+**Cause**: Referenced task ID doesn't exist in spec
+
+**Solution**:
+1. Check task IDs in spec: `sdd list-tasks <spec>`
+2. Fix typo in task ID
+3. Ensure task exists before referencing in dependencies or commands
+
+---
+
+## 9. Key Takeaways for AI Assistants
+
+### 1. Specs Are Central
+- Everything in SDD revolves around JSON specification files
+- Always validate specs before and after modifications
+- Specs live in `specs/{pending,active,completed,archived}/`
+
+### 2. Use Common Utilities
+- Don't reinvent utilities - use `common/` package
+- `PrettyPrinter` for all output
+- `load_json_spec()` / `save_json_spec()` for spec operations
+- `validate_spec()` before saving specs
+
+### 3. Follow Naming Conventions
+- Spec files: `<name>-<YYYY-MM-DD>-<NNN>.json`
+- Task IDs: `task-<phase>-<number>` (e.g., `task-1-1`)
+- Phase IDs: `phase-<number>` (e.g., `phase-1`)
+
+### 4. Respect Dependencies
+- Always check task dependencies before marking as ready
+- Circular dependencies are invalid and will fail validation
+- Use `sdd next-task` to find ready tasks (respects dependencies)
+
+### 5. Provider Awareness
+- Different AI providers have different capabilities
+- Claude provider is read-only
+- Multi-agent mode requires 2+ providers installed
+- Check availability with `sdd test check-tools`
+
+### 6. Documentation is Queryable
+- Generate docs with `sdd doc generate` or `analyze-with-ai`
+- Query with `doc_query` commands (search, complexity, dependencies, etc.)
+- `documentation.json` is machine-readable - use it for code analysis
+
+### 7. Verbosity Matters
+- `--json` for programmatic access (agents, scripts)
+- `--verbose` for debugging
+- `--quiet` for minimal output (token efficiency)
+
+### 8. Caching Improves Performance
+- AI consultation results are cached with TTL
+- Clear cache after significant changes: `sdd cache clear`
+- Cache is transparent - no manual management needed usually
+
+### 9. Work Modes Affect Behavior
+- `auto` - No prompts, fail fast (for AI agents)
+- `manual` - Explicit task selection
+- `interactive` - Prompts for decisions
+- Set appropriately based on context
+
+### 10. Validation is Your Friend
+- Always validate specs: `sdd validate <spec>`
+- Use `--fix` for auto-fixable issues
+- Validation catches circular dependencies, missing fields, schema violations
+
+---
+
+## 10. Quick Reference Commands
+
+### Spec Operations
+```bash
+sdd plan create --name "Feature"           # Create new spec
+sdd validate <spec>                        # Validate spec
+sdd validate <spec> --fix                  # Auto-fix issues
+sdd next-task <spec>                       # Get next ready task
+sdd update <spec> --task <id> --status <s> # Update task status
+sdd journal <spec> "Decision note"         # Add journal entry
+sdd progress <spec>                        # Show progress
 ```
 
 ### Documentation
 ```bash
-sdd doc analyze-with-ai .            # Generate with AI
-sdd doc generate .                   # Generate (structural only)
-sdd doc search "keyword"             # Search documentation
-sdd doc complexity --threshold 10    # Find complex code
-sdd doc find-class "ClassName"       # Locate class
-sdd doc find-function "func_name"    # Locate function
+sdd doc generate .                         # Generate structural docs
+sdd doc analyze-with-ai .                  # Generate AI-enhanced docs
+sdd doc stats                              # Show statistics
+sdd doc search "pattern"                   # Search entities
+sdd doc complexity --threshold 10          # High-complexity functions
+sdd doc dependencies <module>              # Show dependencies
+sdd doc callers <function>                 # Show callers
+sdd doc impact <function>                  # Impact analysis
+```
+
+### Reviews
+```bash
+sdd plan-review <spec>                     # Review spec before implementation
+sdd fidelity-review <spec>                 # Review implementation vs spec
 ```
 
 ### Testing
 ```bash
-sdd test run --preset unit           # Run tests
-sdd test consult --preset unit       # AI debugging
-sdd test discover                    # Find test patterns
+sdd test run --preset all                  # Run tests
+sdd test debug --test <name> --ai gemini   # Debug with AI
+sdd test check-tools                       # Check AI tool availability
 ```
 
-### Review & Quality
+### PR Creation
 ```bash
-sdd plan-review <spec-id>            # Multi-model spec review
-sdd fidelity-review <spec-id>        # Compare code to spec
+sdd pr create <spec>                       # Create PR from spec
+```
+
+### Cache Management
+```bash
+sdd cache clear                            # Clear all cache
+sdd cache inspect                          # View cache contents
 ```
 
 ---
 
-## AI Tool Recommendations
+## Summary
 
-### For Documentation Generation
+The claude-sdd-toolkit enables **systematic, trackable, AI-assisted development** through:
 
-**Recommended**:
-- **gemini**: Fast, reliable, works in subprocess mode ✅
-- **cursor-agent**: Excellent for large codebases (1M context) ✅
+1. **Machine-readable JSON specifications** that define work upfront
+2. **Modular skills** for documentation, planning, execution, review, and PR creation
+3. **Multi-AI integration** via provider abstraction (gemini, cursor-agent, codex, claude)
+4. **Comprehensive documentation** generation and querying
+5. **Quality assurance** through fidelity reviews and plan reviews
+6. **Progress tracking** with status updates and journaling
 
-**Not Recommended**:
-- **codex**: Requires TTY, incompatible with subprocess capture ❌
+**For AI assistants working with this codebase**:
+- Start with specs - they're the source of truth
+- Use `common` utilities for consistency
+- Validate early and often
+- Leverage documentation for code understanding
+- Respect dependencies and provider capabilities
+- Choose appropriate verbosity and work modes
 
-### For Plan Reviews
-
-**Multi-Agent Mode** (default):
-- Uses 2 AI models in parallel
-- Priority order: cursor-agent → gemini → codex
-- Best for production documentation
-
-**Single-Agent Mode** (`--single-agent`):
-- Faster, lower cost
-- Good for quick iterations
-
----
-
-## Key Insights for AI Assistants
-
-1. **Specs are the source of truth** - Never bypass the JSON spec file
-2. **Dependency graphs are critical** - Bad dependencies break the workflow
-3. **Documentation bridges high-level and low-level** - Use doc-query to connect specs to code
-4. **AI is optional** - Core functionality works without AI tools
-5. **Filesystem is the database** - Embrace file-based state management
-6. **Modular by design** - Skills are independent, can be used separately
-7. **Graceful degradation** - Always provide fallback when AI tools fail
-8. **Validation is cheap** - Run `sdd validate` liberally
-
----
-
-## Conclusion
-
-The SDD Toolkit enables structured, systematic development with AI assistance. As an AI assistant working with this codebase:
-
-- **Follow the workflow** - plan → validate → execute → track → complete
-- **Use CLI commands** - Don't manually edit JSON when commands exist
-- **Validate frequently** - Before activating, after modifications
-- **Provide context** - Use doc-query to inform implementation decisions
-- **Log decisions** - Update journals to preserve reasoning
-- **Handle failures gracefully** - Fall back when AI tools unavailable
-
-By understanding these concepts and patterns, you can effectively assist developers in leveraging the full power of spec-driven development.
+This structured approach keeps AI assistance systematic and on-track while maintaining developer control and visibility.

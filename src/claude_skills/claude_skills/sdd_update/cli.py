@@ -596,7 +596,12 @@ def cmd_list_assumptions(args, printer):
     # Check if JSON output is enabled (set by options.py from config)
     use_json = getattr(args, 'json', False)
     verbosity_level = getattr(args, 'verbosity_level', VerbosityLevel.NORMAL)
-    show_metadata = verbosity_level == VerbosityLevel.VERBOSE
+    verbose_flag = getattr(args, 'verbose', False)
+
+    # Only show metadata when BOTH --verbose flag is explicitly set AND verbosity_level is VERBOSE AND using JSON output
+    # When --json is used without --verbose, always output a plain list
+    # This ensures we never show metadata unless explicitly requested
+    show_metadata = verbose_flag and use_json and verbosity_level == VerbosityLevel.VERBOSE
 
     def _emit_json_output(items):
         """Emit JSON either as a bare list (quiet/normal) or detailed dict (verbose)."""

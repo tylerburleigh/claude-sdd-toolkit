@@ -96,10 +96,14 @@ GIT_WRITE_PERMISSIONS = [
     "Bash(git checkout:*)",
     "Bash(git add:*)",
     "Bash(git commit:*)",
-    "Bash(git push:*)",  # Note: Does not include --force variants
-    "Bash(git rm:*)",
-    "Bash(gh pr create:*)",
     "Bash(git mv:*)",
+]
+
+# Git operations allowed only with explicit approval, even when write access is enabled
+GIT_APPROVAL_PERMISSIONS = [
+    "Bash(git push:*)",
+    "Bash(gh pr create:*)",
+    "Bash(git rm:*)",
 ]
 
 # Git dangerous permissions (destructive operations requiring user approval)
@@ -133,6 +137,22 @@ GIT_DANGEROUS_PERMISSIONS = [
     # Aggressive garbage collection
     "Bash(git gc --prune=now:*)",
 ]
+
+
+def _strip_git_permissions(settings: dict) -> None:
+    """Remove bundled git permissions from template-derived settings."""
+
+    permissions = settings.get("permissions", {})
+    allow_list = permissions.get("allow", [])
+    ask_list = permissions.get("ask", [])
+
+    git_allow = set(GIT_READ_PERMISSIONS + GIT_WRITE_PERMISSIONS)
+    git_ask = set(GIT_DANGEROUS_PERMISSIONS + GIT_APPROVAL_PERMISSIONS)
+
+    if isinstance(allow_list, list):
+        permissions["allow"] = [perm for perm in allow_list if perm not in git_allow]
+    if isinstance(ask_list, list):
+        permissions["ask"] = [perm for perm in ask_list if perm not in git_ask]
 
 
 def _prompt_for_config(printer: PrettyPrinter) -> dict:
@@ -294,10 +314,13 @@ def _prompt_for_git_permissions(printer: PrettyPrinter) -> dict:
         response = input("Enable git write operations? (y/n): ").strip().lower()
         if response in ["y", "yes"]:
             printer.info("")
-            printer.info("✓ Adding git write permissions")
+            printer.info("✓ Adding git write permissions (local operations)")
             permissions["allow"].extend(GIT_WRITE_PERMISSIONS)
 
-            # Automatically add dangerous operations to ASK list
+            # Automatically add approval-required operations to ASK list
+            printer.info("✓ Adding approval-only git operations to ASK list (requires approval)")
+            permissions["ask"].extend(GIT_APPROVAL_PERMISSIONS)
+
             printer.info("✓ Adding dangerous git operations to ASK list (requires approval)")
             printer.info("")
             printer.info("  Dangerous operations requiring approval:")
@@ -341,11 +364,14 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
         copy_template_to("sdd_config.json", config_file)
 
     # Load existing settings or start from the packaged template
-    if settings_file.exists():
+    settings_existed = settings_file.exists()
+    if settings_existed:
         with settings_file.open(encoding="utf-8") as f:
             settings = json.load(f)
     else:
         settings = deepcopy(load_json_template_clean("settings.local.json"))
+        # Respect the upcoming git prompt by removing bundled git permissions.
+        _strip_git_permissions(settings)
 
     # Ensure permissions structure exists
     permissions = settings.setdefault("permissions", {})
@@ -386,7 +412,7 @@ def cmd_update(args, printer: PrettyPrinter) -> int:
                 permissions["allow"].append(perm)
                 existing_allow.add(perm)
 
-        # Add dangerous git permissions to ask list (avoid duplicates)
+        # Add git permissions that require approval (avoid duplicates)
         for perm in git_permissions["ask"]:
             if perm not in existing_ask:
                 new_ask_permissions.append(perm)

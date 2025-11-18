@@ -17,146 +17,50 @@ This command helps you resume spec-driven development (SDD) work at the start of
 
 **You are assisting the user with resuming their spec-driven development work.**
 
-### Phase 1: Check Project Permissions
+### Phase 1: Run the Session Summary Once
 
-**FIRST**, check if SDD permissions are configured for this project:
+Start every `/sdd-begin` invocation with a single command that gathers permissions, git status, and active work in one shot:
 
 ```bash
-sdd skills-dev start-helper check-permissions
+sdd skills-dev start-helper session-summary . --json
 ```
 
-**If check returns `status: "fully_configured"`:**
-- Proceed directly to Phase 2 (Git Configuration)
+The JSON response contains:
+- `permissions.status` (e.g., `fully_configured`, `partially_configured`, `not_configured`)
+- `git.needs_setup` plus current `git.settings` when configured
+- `active_work.text` (pre-formatted summary) and `active_work.pending_specs`
+- `session_state.last_task`, `session_state.in_progress_count`, etc.
 
-**If check returns `status: "partially_configured"`:**
+Use this single payload to decide what to do next:
 
-Present this message to the user:
-```
-⚠️  Some SDD permissions are missing (35/41 configured)
+1. **Permissions not fully configured** (`permissions.status != "fully_configured"`):
+   - Explain what’s missing and offer to run `sdd skills-dev setup-permissions update .`.
+   - After the helper finishes, rerun the session-summary command to refresh the status before proceeding.
+2. **Git integration needs setup** (`git.needs_setup: true`):
+   - Offer to run `sdd skills-dev setup-git-config .` (interactive wizard).
+   - If the user declines, continue with read-only mode.
+3. **Git already configured**:
+   - Optionally display a short summary, e.g., `Git integration: ✅ Enabled (auto-branch, auto-commit per task, AI PRs)`.
 
-Missing permissions:
-  • 2 skill permissions
-  • 4 bash/git permissions
-```
-
-Ask the user if they would like to add the missing permissions now, with options to add them or continue anyway.
-
-**If user chooses "Yes, add missing permissions":**
-```bash
-# Run the setup helper to add missing permissions
-sdd skills-dev setup-permissions update .
-
-# Inform the user
-echo "✅ SDD permissions updated! Added missing permissions."
-
-# Then proceed to Phase 2 to configure git
-```
-
-**If user chooses "No, continue anyway":**
-```
-⚠️  Continuing with partial permissions. Some features may not work.
-```
-- Proceed to Phase 2 (Git Configuration)
-
-**If check returns `status: "not_configured"`:**
-
-Present this message to the user:
-```
-Hi! I noticed this project needs SDD permission setup.
-
-Before we can work with specifications, I need to configure project-level permissions for SDD tools.
-```
-
-Ask the user if they would like to set up SDD permissions now, with options to set up permissions (auto-runs setup) or skip for now.
-
-**If user chooses "Yes, set up permissions":**
-```bash
-# Run the setup helper to configure .claude/settings.local.json
-sdd skills-dev setup-permissions update .
-
-# Inform the user
-echo "✅ SDD permissions configured! You can now use SDD skills in this project."
-
-# Then proceed to Phase 2 to configure git
-```
-
-**If user chooses "No, skip for now":**
-- Proceed directly to Phase 2 (Git Configuration)
+This single command replaces the older sequence of `check-permissions`, `setup-permissions`, `check-git-config`, and `get-session-info` calls.
 
 ---
 
-### Phase 2: Check Git Configuration
+### Phase 2: Review Active Work (No Extra Commands)
 
-**AFTER permissions are configured**, check if git integration is configured:
+Use the `active_work.text` field from the session summary output. Display it exactly as returned—no manual formatting—and remind the user:
+- **Never read specs directly.** Always rely on the helper output and SDD skills.
+- The text already includes spec IDs, titles, progress, folder status, last accessed task, and in-progress counts.
 
-```bash
-sdd skills-dev start-helper check-git-config .
-```
-
-**If `needs_setup: true`** (git config not configured):
-
-Present this message to the user:
-```
-I noticed git integration hasn't been configured yet.
-
-Git integration enables automatic branch creation, commits, and AI-powered PR generation. Would you like to set it up now?
-```
-
-Ask the user if they would like to configure git integration, with options to configure now (runs interactive wizard) or skip for now.
-
-**If user chooses "Yes, configure now":**
-```bash
-# Run the interactive setup wizard
-sdd skills-dev setup-git-config .
-
-# The wizard will ask questions like:
-# - Enable git integration? (yes/no)
-# - Auto-create branches? (yes/no)
-# - Auto-commit on task completion? (yes/no)
-# - Show files before commit? (yes/no)
-# - Enable AI-powered PRs? (yes/no)
-# etc.
-
-# Configuration will be saved to .claude/git_config.json
-```
-
-**If user chooses "No, skip for now"**:
-- Proceed directly to Phase 3
-
-**If git already configured**:
-
-Optionally display current git config status (brief, non-intrusive):
-```
-Git integration: ✅ Enabled (auto-branch, auto-commit per task, AI PRs)
-```
-
-Then proceed directly to Phase 3.
+Since `session-summary` also returns structured data, you can avoid additional helper invocations when presenting options later.
 
 ---
 
-### Phase 3: Discover Active Work
-
-**⚠️ USE HELPER SCRIPT ONLY - DO NOT READ SPEC FILES DIRECTLY**
-
-Use the helper script to find and format active specifications:
-
-```bash
-sdd skills-dev start-helper format-output
-```
-
-The script will return properly formatted text with active specs, their progress, and status. It also discovers pending specs in the backlog (from `specs/pending/` folder).
-
-**IMPORTANT**:
-- The `format-output` command returns pre-formatted text with proper newlines and indentation
-- Display this output EXACTLY as returned - do not reformat or modify it
-- **NEVER use Read() on .json spec files** - the helper script handles all spec parsing efficiently
-- JSON specs can be 50KB+ and waste context tokens when read directly
-
-### Phase 4: Present Options Based on Findings
+### Phase 3: Present Options Based on Findings
 
 **If active work found:**
 
-The formatted output from `format-output` already includes:
+The formatted summary already includes:
 - Number of specifications found (active and pending combined)
 - For each spec: ID, title, progress, and folder status
   - Active specs: ⚡ (in_progress) or 📝 (pending status)
@@ -164,18 +68,11 @@ The formatted output from `format-output` already includes:
 - 🕐 Last-accessed task information (if available)
 - 💡 Count of in-progress tasks
 
-Simply display the formatted output directly.
-
-**Then check for last-accessed task:**
-
-Run `get-session-info` to get structured session data:
-```bash
-sdd skills-dev start-helper get-session-info
-```
+Simply display the `active_work.text` block directly—no extra commands required.
 
 **If last-accessed task exists:**
 
-First check if there are pending specs using the get-session-info output (check `pending_specs` array).
+Use `session_state.last_task` and `active_work.pending_specs` from the session summary (no additional CLI calls needed).
 
 Ask the user what they would like to do, with options:
 1. Resume last task (auto-runs sdd-next with specific task)
@@ -186,7 +83,7 @@ Ask the user what they would like to do, with options:
 
 **If NO last-accessed task:**
 
-First check if there are pending specs using the get-session-info output (check `pending_specs` array).
+Use the pending backlog array from the session summary (`active_work.pending_specs`).
 
 Ask the user what they would like to do, with options:
 1. Continue with next task (auto-runs sdd-next)
@@ -196,7 +93,7 @@ Ask the user what they would like to do, with options:
 
 **If NO active work found:**
 
-The formatted output from `format-output` will show:
+The session summary's `active_work.text` will show:
 ```
 📋 No active SDD work found.
 
@@ -252,10 +149,7 @@ Skill(sdd-toolkit:sdd-plan)
 
 Show the user the list of pending specs with their titles:
 
-```bash
-# Get the list of pending specs from get-session-info
-# Display formatted list to user
-```
+Use `active_work.pending_specs` from the session-summary output to display the backlog (no additional commands required).
 
 Example display:
 ```

@@ -16,6 +16,16 @@ This command performs first-time setup for the SDD (Spec-Driven Development) too
 
 ## Workflow
 
+### Before You Begin
+
+Run a quick inspection to document current state (saves user surprises later):
+
+```bash
+sdd skills-dev start-helper inspect-config .
+```
+
+Use the JSON (or human-readable output) to capture whether `.claude/` exists and which of the three config files are already present. Mention in your notes if any files will be created.
+
 ### Step 1: Check Permissions Configuration
 
 First, check if SDD permissions are already configured:
@@ -99,8 +109,9 @@ During permission setup, you'll be prompted about git integration:
 **Prompt 2: Enable git write operations?** (only if Prompt 1 = Yes)
 - Shows risk warning about repository modifications
 - If **Yes**: Adds write permissions using **three-tier model**:
-  - **ALLOW list** (safe writes): `git checkout`, `git add`, `git commit`, `git push`, `git rm`, `git mv`, `gh pr create`
-  - **ASK list** (dangerous ops): force push, hard reset, rebase, history rewriting, force deletions
+  - **ALLOW list** (local writes): `git checkout`, `git add`, `git commit`, `git mv`
+  - **ASK list (approval-only)**: `git push`, `git rm`, `gh pr create`
+  - **ASK list (dangerous ops)**: force push, hard reset, rebase, history rewriting, force deletions
 - If **No**: Keeps read-only git access only
 
 **Risk Warning Displayed:**
@@ -179,16 +190,19 @@ Use AskUserQuestion tool:
 
 **If user chooses "Yes, configure now":**
 
-Gather all git configuration preferences using AskUserQuestion (you can ask up to 4 questions at once):
+Gather all git configuration preferences using AskUserQuestion (you can ask up to 4 questions at once). Use the following map to translate answers directly into CLI flags:
 
-**Question Set 1 (Required):**
-- **Header**: "Git Features"
-- **Question**: "Enable git integration?"
-- **Options**:
-  1. Yes, enable (recommended)
-  2. No, disable
+| Feature          | AskUserQuestion prompt                                                                 | Flag when user selects "Yes"        | Flag when user selects "No" | Notes |
+|------------------|----------------------------------------------------------------------------------------|-------------------------------------|-----------------------------|-------|
+| Git integration  | **Header**: "Git Features" — "Enable git integration?"                                 | `--enabled`                         | `--no-enabled`              | If the user selects **No**, run the minimal command below and skip the rest. |
+| Auto branch      | **Header**: "Auto Branch" — "Auto-create feature branches when starting specs?"        | `--auto-branch`                     | `--no-auto-branch`          | Only ask if git integration stays enabled. |
+| Auto commit      | **Header**: "Auto Commit" — "Auto-commit changes when completing tasks?"               | `--auto-commit`                     | `--no-auto-commit`          | Controls whether to ask the commit cadence question. |
+| Commit cadence   | **Header**: "Commit When" — "When should commits be created?" (task/phase/manual)      | `--commit-cadence task/phase/manual`| _N/A_ (omit flag)           | Only ask if auto-commit = Yes. |
+| Show files       | **Header**: "File Review" — "Show files for review before committing?"                 | `--show-files`                      | `--no-show-files`           | Applies to staging UI. |
+| Auto push        | **Header**: "Auto Push" — "⚠️ Auto-push commits to remote? (Use with caution)"         | `--auto-push`                       | `--no-auto-push`            | Highlight the risk banner before asking. |
+| AI PRs           | **Header**: "AI PRs" — "Enable AI-powered pull request creation?"                      | `--ai-pr`                           | `--no-ai-pr`                | The model is always Sonnet; no extra flag required. |
 
-**If user chooses "No, disable":**
+**If user chooses "No, disable"** on the Git Features prompt:
 
 Write minimal config and skip to Step 5:
 ```bash
@@ -204,54 +218,7 @@ Then proceed to Step 5.
 
 **If user chooses "Yes, enable":**
 
-Ask the remaining configuration questions (you can ask all 4 in one AskUserQuestion call):
-
-**Question 2:**
-- **Header**: "Auto Branch"
-- **Question**: "Auto-create feature branches when starting specs?"
-- **Options**:
-  1. Yes (recommended)
-  2. No
-
-**Question 3:**
-- **Header**: "Auto Commit"
-- **Question**: "Auto-commit changes when completing tasks?"
-- **Options**:
-  1. Yes (recommended)
-  2. No
-
-**Question 4 (only if auto-commit is Yes):**
-- **Header**: "Commit When"
-- **Question**: "When should commits be created?"
-- **Options**:
-  1. Per task (recommended)
-  2. Per phase
-  3. Manually
-
-**Additional Questions (if needed, ask in next batch):**
-
-**Question 5:**
-- **Header**: "File Review"
-- **Question**: "Show files for review before committing?"
-- **Options**:
-  1. Yes (recommended)
-  2. No
-
-**Question 6:**
-- **Header**: "Auto Push"
-- **Question**: "⚠️ Auto-push commits to remote? (Use with caution)"
-- **Options**:
-  1. No (recommended)
-  2. Yes
-
-**Question 7:**
-- **Header**: "AI PRs"
-- **Question**: "Enable AI-powered pull request creation?"
-- **Options**:
-  1. Yes (recommended)
-  2. No
-
-After gathering all answers, build the CLI command with flags (always use sonnet model for AI PRs):
+Ask the remaining questions using the table above, collect all answers, and then build the CLI command with the corresponding flags (always use sonnet model for AI PRs):
 
 ```bash
 sdd skills-dev start-helper setup-git-config . --non-interactive \
@@ -266,14 +233,7 @@ sdd skills-dev start-helper setup-git-config . --non-interactive \
 
 **Example command:**
 ```bash
-sdd skills-dev start-helper setup-git-config . --non-interactive \
-  --enabled \
-  --auto-branch \
-  --auto-commit \
-  --commit-cadence task \
-  --show-files \
-  --no-auto-push \
-  --ai-pr
+sdd skills-dev start-helper setup-git-config . --non-interactive --enabled --auto-branch --auto-commit --commit-cadence task --show-files --no-auto-push --ai-pr
 ```
 
 Note: AI PRs always use the Sonnet model for optimal balance of quality and speed.
@@ -312,7 +272,13 @@ test -f .claude/sdd_config.json && echo "exists" || echo "missing"
 
 **If file is missing:**
 
-Create `.claude/sdd_config.json` with recommended defaults:
+Create `.claude/sdd_config.json` with recommended defaults by running:
+
+```bash
+sdd skills-dev start-helper ensure-sdd-config .
+```
+
+If Python fallback fails for some reason, fall back to `Write` tool with the default payload:
 
 ```json
 {
@@ -322,13 +288,6 @@ Create `.claude/sdd_config.json` with recommended defaults:
   }
 }
 ```
-
-This can be done by copying the template:
-```bash
-cp ~/.claude/plugins/cache/sdd-toolkit/docs/sdd_config.json.template .claude/sdd_config.json
-```
-
-Or creating it directly with Write tool.
 
 Display:
 ```
@@ -358,6 +317,11 @@ After successful configuration, display a summary:
 ✅ Git Integration: [Status]
 
 ✅ SDD CLI Config: [Status]
+
+Files updated:
+  • `.claude/settings.local.json` (permissions)
+  • `.claude/git_config.json` (only list if created/updated in this run)
+  • `.claude/sdd_config.json` (only list if created in this run)
 ```
 
 **If git was configured in this session**, show settings:
@@ -436,7 +400,6 @@ The setup adds these permissions:
 - Bash(codex:*)
 
 **File Access:**
-- Read(//Users/tylerburleigh/.claude/skills/**)
 - Read(//**/specs/**)
 - Write(//**/specs/pending/**)
 - Write(//**/specs/active/**)
@@ -451,7 +414,8 @@ During the interactive setup, you'll be prompted to enable git integration permi
 
 **If you enable git integration + write operations:**
 - **ALLOW list** (read operations): `git status`, `git log`, `git branch`, `git diff`, `git show`, `git describe`, `git rev-parse`, `gh pr view`
-- **ALLOW list** (safe write operations): `git checkout`, `git add`, `git commit`, `git push`, `git rm`, `git mv`, `gh pr create`
+- **ALLOW list** (local write operations): `git checkout`, `git add`, `git commit`, `git mv`
+- **ASK list** (approval-required operations): `git push`, `git rm`, `gh pr create`
 - **ASK list** (dangerous operations requiring approval):
   - Force operations: `git push --force`, `git push -f`, `git push --force-with-lease`, `git clean -f*`
   - History rewriting: `git reset --hard`, `git reset --mixed`, `git reset`, `git rebase`, `git commit --amend`, `git filter-branch`, `git filter-repo`

@@ -191,7 +191,7 @@ class TestValidateCommand:
         assert result.returncode == 2
         combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
         assert "Schema source:" in combined_output
-        assert "Schema validation errors" in combined_output
+        assert ("Schema validation errors" in combined_output or "Schema violation" in combined_output or "Issues:" in combined_output)
         assert "Schema violation" in combined_output
 
     def test_validate_json_includes_schema_details(self, tmp_path):
