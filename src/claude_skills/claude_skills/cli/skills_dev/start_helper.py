@@ -184,13 +184,34 @@ def _render_active_work(specs: list[dict], session_state: dict) -> str:
     if not specs:
         return "📋 No active SDD work found.\n\nNo specs/active directory or no pending/in-progress tasks detected."
 
-    lines = ["📋 Active SDD Specifications:", ""]
+    # Determine if we have active specs, pending specs, or both
+    active_specs = [s for s in specs if s.get("folder_status") == "active"]
+    pending_specs = [s for s in specs if s.get("folder_status") == "pending"]
+
+    # Choose header based on what we have
+    if active_specs and pending_specs:
+        header = "📋 SDD Specifications (Active & Pending):"
+    elif active_specs:
+        header = "📋 Active SDD Specifications:"
+    else:
+        header = "📋 Pending SDD Specifications:"
+
+    lines = [header, ""]
 
     last_accessed = session_state.get("last_task") if session_state else None
 
     for spec in specs:
-        status_icon = "⚡" if spec.get("folder_status") == "active" else "📝"
-        lines.append(f"{status_icon} {spec.get('spec_id', 'unknown')} - {spec.get('title', 'Untitled')}")
+        folder_status = spec.get("folder_status")
+
+        # Use correct emoji and label based on folder status
+        if folder_status == "active":
+            status_icon = "⚡"
+            title_line = f"{status_icon} {spec.get('spec_id', 'unknown')} - {spec.get('title', 'Untitled')}"
+        else:  # pending
+            status_icon = "⏸️"
+            title_line = f"{status_icon} [PENDING] {spec.get('spec_id', 'unknown')} - {spec.get('title', 'Untitled')}"
+
+        lines.append(title_line)
         lines.append(
             f"   Progress: {spec.get('completed', 0)}/{spec.get('total', 0)} tasks ({spec.get('percentage', 0)}%)"
         )
