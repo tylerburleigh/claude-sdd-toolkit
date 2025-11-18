@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://example.com/code-documentation.schema.json",
   "title": "Codebase Documentation Schema",
   "description": "Schema for machine-readable codebase documentation",
   "type": "object",

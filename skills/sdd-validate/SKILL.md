@@ -18,6 +18,17 @@ The **Skill(sdd-toolkit:sdd-validate)** skill provides comprehensive validation 
 - Differentiated exit codes for warnings vs errors
 - Draft 07 JSON Schema validation (installs automatically when `jsonschema` is available; run `pip install claude-skills[validation]` to enable)
 
+## Understanding Exit Codes
+
+Exit codes indicate the **state of your spec**, not command success/failure:
+
+- **Exit 0**: ✅ Spec is valid (no errors)
+- **Exit 1**: ⚠️  Spec has warnings (usable but improvable)
+- **Exit 2**: 🔧 Spec has errors (needs fixing) - **THIS IS EXPECTED FOR NEW SPECS**
+- **Exit 3**: ❌ File not found or access error (actual command failure)
+
+**Important:** Exit code 2 means "I found errors in your spec" not "I failed to validate". The validate command succeeded at detecting issues - your spec just needs work. This is the normal starting point for most specs.
+
 ## When to Use This Skill
 
 Use `Skill(sdd-toolkit:sdd-validate)` to:
@@ -39,12 +50,6 @@ Use `Skill(sdd-toolkit:sdd-validate)` to:
 
 ## Key Concepts
 
-### Exit Codes
-- `0` - Validation passed (no errors)
-- `1` - Warnings only (usable but has issues)
-- `2` - Errors detected in spec content (requires fixes) - **This is expected when spec has issues, not a command failure**
-- `3` - File not found or cannot be accessed (system/file access error)
-
 ### Always Re-validate After Fixing
 Fixing issues often reveals new problems that were previously hidden. Always run `sdd validate` after `sdd fix` to see the current state.
 
@@ -58,6 +63,29 @@ Switch to manual intervention when:
 - Error count unchanged for 2+ passes
 - `sdd fix` reports "skipped issues requiring manual intervention"
 - All remaining issues need context or human judgment
+
+### Input Format: Spec Names vs Paths
+
+All sdd-validate commands accept **both** spec names and paths for maximum flexibility:
+
+**Spec name (recommended):**
+```bash
+sdd validate pomodoro-timer-2025-11-18-001
+```
+Automatically searches in `specs/pending/`, `specs/active/`, `specs/completed/`, and `specs/archived/`.
+
+**Relative path:**
+```bash
+sdd validate specs/pending/pomodoro-timer-2025-11-18-001.json
+sdd validate ../other-project/specs/active/my-spec.json
+```
+
+**Absolute path:**
+```bash
+sdd validate /full/path/to/my-spec.json
+```
+
+**Smart fallback:** If you provide a path that doesn't exist (e.g., `specs/pending/my-spec.json`), the command extracts the spec name (`my-spec`) and searches for it automatically.
 
 ## Command Reference
 
@@ -181,12 +209,14 @@ sdd stats {spec-id}
 - Verification coverage percentage
 - Overall progress percentage
 
-### check-deps
+### analyze-deps
 
 Analyze dependencies for cycles, orphans, deadlocks, and bottlenecks.
 
+**Note:** This command analyzes spec-wide dependency issues. For checking individual task dependencies, use `sdd check-deps` from sdd-next (e.g., `sdd check-deps {spec-id} {task-id}`).
+
 ```bash
-sdd check-deps {spec-id} [--bottleneck-threshold N]
+sdd analyze-deps {spec-id} [--bottleneck-threshold N]
 ```
 
 **Analyzes:**
@@ -197,7 +227,7 @@ sdd check-deps {spec-id} [--bottleneck-threshold N]
 
 **Example:**
 ```bash
-$ sdd check-deps my-spec
+$ sdd analyze-deps my-spec
 ⚠️  Dependency Analysis: 3 issues found
 
 Cycles (2):

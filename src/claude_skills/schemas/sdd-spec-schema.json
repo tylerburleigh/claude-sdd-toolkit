@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://claude-skills.dev/schemas/sdd-spec-v1.json",
   "title": "SDD Spec File Schema",
   "description": "Schema for SDD (Spec-Driven Development) JSON specification files",
   "type": "object",

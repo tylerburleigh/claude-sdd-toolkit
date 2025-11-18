@@ -51,14 +51,12 @@ def test_setup_permissions_bootstraps_ai_config(tmp_path: Path) -> None:
     assert result.returncode == 0
 
     claude_dir = project_root / ".claude"
-    config_path = claude_dir / "sdd_config.json"
     settings_path = claude_dir / "settings.local.json"
 
-    assert config_path.exists()
-    assert settings_path.exists()
+    # Note: sdd_config.json creation was moved to 'sdd skills-dev start-helper ensure-sdd-config'
+    # This test only checks that settings.local.json is created with correct permissions
 
-    config_data = json.loads(config_path.read_text())
-    assert config_data == load_json_template("sdd_config.json")
+    assert settings_path.exists()
 
     settings_data = json.loads(settings_path.read_text())
     permissions = settings_data.get("permissions", {})

@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
 
-from .paths import find_spec_file, ensure_backups_directory
+from .paths import find_spec_file, resolve_spec_file, ensure_backups_directory
 
 
 def extract_frontmatter(spec_file: Union[str, Path]) -> Dict[str, Any]:
@@ -153,24 +153,28 @@ def _coerce_scalar(value: str) -> Any:
     return value
 
 
-def load_json_spec(spec_id: str, specs_dir: Path) -> Optional[Dict]:
+def load_json_spec(spec_id: str, specs_dir: Optional[Path] = None) -> Optional[Dict]:
     """
-    Load the JSON spec file for a given spec ID.
+    Load the JSON spec file for a given spec ID or path.
 
-    Searches for the spec file in active/, completed/, and archived/ directories.
+    Accepts both spec names and paths for maximum flexibility:
+    - Spec names (e.g., 'my-spec')
+    - Relative paths (e.g., 'specs/pending/my-spec.json')
+    - Absolute paths (e.g., '/full/path/to/my-spec.json')
 
     Args:
-        spec_id: Specification ID
-        specs_dir: Path to specs directory
+        spec_id: Specification ID or path to spec file
+        specs_dir: Path to specs directory (optional, auto-detected if not provided)
 
     Returns:
         Spec data dictionary, or None if not found
     """
-    spec_file = find_spec_file(spec_id, specs_dir)
+    spec_file = resolve_spec_file(spec_id, specs_dir)
 
     if not spec_file:
-        print(f"Error: Spec file not found for spec_id: {spec_id}", file=sys.stderr)
-        print(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived", file=sys.stderr)
+        print(f"Error: Spec file not found for: {spec_id}", file=sys.stderr)
+        if specs_dir:
+            print(f"Searched in: {specs_dir}/pending, {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived", file=sys.stderr)
         return None
 
     try:
@@ -186,19 +190,20 @@ def load_json_spec(spec_id: str, specs_dir: Path) -> Optional[Dict]:
 
 def save_json_spec(
     spec_id: str,
-    specs_dir: Path,
-    spec_data: Dict,
+    specs_dir: Optional[Path] = None,
+    spec_data: Dict = None,
     backup: bool = True,
     validate: bool = True
 ) -> bool:
     """
     Save JSON spec file with atomic write and optional backup.
 
-    Updates the existing spec file in its current location (active/completed/archived).
+    Accepts both spec names and paths for maximum flexibility.
+    Updates the existing spec file in its current location (pending/active/completed/archived).
 
     Args:
-        spec_id: Specification ID
-        specs_dir: Path to specs directory
+        spec_id: Specification ID or path to spec file
+        specs_dir: Path to specs directory (optional, auto-detected if not provided)
         spec_data: Spec data to write
         backup: Create backup before writing (default: True)
         validate: Validate JSON before writing (default: True)
@@ -206,7 +211,7 @@ def save_json_spec(
     Returns:
         True if successful, False otherwise
     """
-    spec_file = find_spec_file(spec_id, specs_dir)
+    spec_file = resolve_spec_file(spec_id, specs_dir)
 
     if not spec_file:
         print(f"Error: Spec file not found for spec_id: {spec_id}", file=sys.stderr)
@@ -244,19 +249,21 @@ def save_json_spec(
         return False
 
 
-def backup_json_spec(spec_id: str, specs_dir: Path, suffix: str = ".backup") -> Optional[Path]:
+def backup_json_spec(spec_id: str, specs_dir: Optional[Path] = None, suffix: str = ".backup") -> Optional[Path]:
     """
     Create a backup copy of the JSON spec file in the .backups/ directory.
 
+    Accepts both spec names and paths for maximum flexibility.
+
     Args:
-        spec_id: Specification ID
-        specs_dir: Path to specs directory
+        spec_id: Specification ID or path to spec file
+        specs_dir: Path to specs directory (optional, auto-detected if not provided)
         suffix: Backup file suffix (default: .backup)
 
     Returns:
         Path to backup file if created, None otherwise
     """
-    spec_file = find_spec_file(spec_id, specs_dir)
+    spec_file = resolve_spec_file(spec_id, specs_dir)
 
     if not spec_file:
         return None

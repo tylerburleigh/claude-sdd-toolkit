@@ -320,11 +320,14 @@ def cmd_validate(args, printer):
             print()
 
         if normalized.status == "errors":
-            printer.error("❌ Validation FAILED")
+            printer.error(f"❌ Validation found {normalized.error_count} errors (exit code 2: errors detected)")
+            if not args.verbose:
+                print("\n💡 This is expected for specs with issues. The validate command succeeded at detecting problems.")
+                print("   Run 'sdd fix' to auto-resolve common issues, or use '--verbose' for detailed information.")
         elif normalized.status == "warnings":
-            printer.warning("⚠️  Validation PASSED with warnings")
+            printer.warning(f"⚠️  Validation passed with {normalized.warning_count} warnings (exit code 1)")
         else:
-            printer.success("✅ Validation PASSED")
+            printer.success("✅ Validation PASSED (exit code 0)")
 
         if not args.quiet and getattr(result, "schema_source", None):
             printer.result("Schema source", result.schema_source)

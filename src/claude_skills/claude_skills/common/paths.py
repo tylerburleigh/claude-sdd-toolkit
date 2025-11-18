@@ -134,6 +134,62 @@ def find_spec_file(spec_id: str, specs_dir: Path) -> Optional[Path]:
     return None
 
 
+def resolve_spec_file(spec_name_or_path: str, specs_dir: Optional[Path] = None) -> Optional[Path]:
+    """
+    Resolve spec file from either a spec name or full path.
+
+    This function provides flexible input handling, accepting:
+    - Spec names (e.g., 'my-spec')
+    - Relative paths (e.g., 'specs/pending/my-spec.json')
+    - Absolute paths (e.g., '/full/path/to/my-spec.json')
+
+    Args:
+        spec_name_or_path: Either a spec name or full path
+        specs_dir: Optional specs directory for name-based lookups (auto-detected if not provided)
+
+    Returns:
+        Resolved Path object if found, None otherwise
+    """
+    path = Path(spec_name_or_path)
+
+    # If it's an absolute path, treat it as a full path
+    if path.is_absolute():
+        spec_file = path.resolve()
+
+        if not spec_file.exists():
+            return None
+
+        if spec_file.suffix != '.json':
+            return None
+
+        return spec_file
+
+    # If it ends with .json, try to resolve it as a relative path first
+    # But fall back to spec name lookup if the file doesn't exist
+    search_name = spec_name_or_path
+    if spec_name_or_path.endswith('.json'):
+        spec_file = path.resolve()
+
+        if spec_file.exists():
+            if spec_file.suffix != '.json':
+                return None
+            return spec_file
+
+        # File doesn't exist at resolved path - extract spec name for fallback lookup
+        # Extract spec name from path (e.g., "specs/pending/my-spec.json" -> "my-spec")
+        search_name = path.stem  # Gets filename without extension
+
+    # Treat it as a spec name and search for it
+    if specs_dir is None:
+        specs_dir = find_specs_directory()
+
+    if not specs_dir:
+        return None
+
+    spec_file = find_spec_file(search_name, specs_dir)
+    return spec_file
+
+
 
 
 def validate_path(path: str) -> Optional[Path]:

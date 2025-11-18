@@ -52,3 +52,19 @@ tools:
     enabled: true    # This tool will be used
     description: Extended reasoning and analysis with read-only access
 ```
+
+---
+
+# Potential Command Naming Improvements
+
+## analyze-deps vs check-deps Clarity
+
+Currently we have:
+- `sdd analyze-deps` (from sdd-validate) - Spec-wide dependency analysis
+- `sdd check-deps` (from sdd-next) - Task-specific dependency checking
+
+**Potential improvement:**
+- `sdd analyze-spec-deps` - Makes it clear this is spec-level
+- `sdd check-task-deps` or `sdd check-task` - Makes it clear this is task-level
+
+This would reduce confusion about which command to use and make the scope more obvious at a glance.

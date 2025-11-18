@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/anthropics/claude-sdd-toolkit/schemas/modifications.json",
   "title": "SDD Spec Modifications File",
   "description": "Schema for batch modification operations on SDD specification files",
   "type": "object",

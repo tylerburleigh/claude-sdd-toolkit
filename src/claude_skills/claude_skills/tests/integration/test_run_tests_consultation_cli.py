@@ -27,8 +27,13 @@ def sample_hypothesis() -> str:
 
 
 @pytest.fixture
-def mock_tool_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
-    """Provide mock CLI binaries so consultation commands always have a tool."""
+def mock_tool_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[dict[str, str], Path]:
+    """Provide mock CLI binaries and isolated AI config for consultation commands.
+
+    Returns:
+        Tuple of (env_dict, working_directory) where working_directory should be
+        passed as cwd to run_cli() to ensure tests use the isolated config.
+    """
 
     scripts_dir = tmp_path / "mock_tools"
     scripts_dir.mkdir()
@@ -49,13 +54,34 @@ def mock_tool_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, 
     for binary in ("gemini", "codex", "cursor-agent"):
         write_script(binary, shared_body.format(name=binary))
 
+    # Create isolated AI config with all tools enabled
+    claude_dir = tmp_path / ".claude"
+    claude_dir.mkdir()
+    ai_config_path = claude_dir / "ai_config.yaml"
+    ai_config_content = textwrap.dedent("""
+        tools:
+          gemini:
+            enabled: true
+            command: gemini
+          cursor-agent:
+            enabled: true
+            command: cursor-agent
+          codex:
+            enabled: true
+            command: codex
+    """).lstrip()
+    ai_config_path.write_text(ai_config_content)
+
     injected_path = f"{scripts_dir}{os.pathsep}{os.environ.get('PATH', '')}"
     monkeypatch.setenv("PATH", injected_path)
     monkeypatch.setenv("CLAUDE_SKILLS_TOOL_PATH", str(scripts_dir))
-    return {
-        "PATH": injected_path,
-        "CLAUDE_SKILLS_TOOL_PATH": str(scripts_dir),
-    }
+    return (
+        {
+            "PATH": injected_path,
+            "CLAUDE_SKILLS_TOOL_PATH": str(scripts_dir),
+        },
+        tmp_path,  # Return working directory for subprocess
+    )
 
 
 def test_check_tools_help_command() -> None:
@@ -64,8 +90,9 @@ def test_check_tools_help_command() -> None:
     assert "Usage" in result.stdout or "usage" in result.stdout.lower()
 
 
-def test_check_tools_json_reports_available(mock_tool_env: dict[str, str]) -> None:
-    result = run_cli("test", "check-tools", "--json", env=mock_tool_env)
+def test_check_tools_json_reports_available(mock_tool_env: tuple[dict[str, str], Path]) -> None:
+    env, cwd = mock_tool_env
+    result = run_cli("test", "check-tools", "--json", env=env, cwd=cwd)
     assert result.returncode in (0, 1)
     payload = json.loads(result.stdout)
     tools_list = payload.get("tools") or payload.get("available") or []
@@ -102,10 +129,11 @@ def test_consult_requires_failure_type(sample_test_error: str, sample_hypothesis
 )
 def test_consult_accepts_failure_matrix(
     failure_type: str,
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     result = run_cli(
         "test",
         "consult",
@@ -117,7 +145,8 @@ def test_consult_accepts_failure_matrix(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode in (0, 1)
 
@@ -129,10 +158,11 @@ def test_consult_list_routing_table() -> None:
 
 
 def test_consult_auto_selects_tool_in_dry_run(
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     result = run_cli(
         "test",
         "consult",
@@ -144,7 +174,8 @@ def test_consult_auto_selects_tool_in_dry_run(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
     assert "• cursor-agent" in result.stdout
@@ -152,7 +183,8 @@ def test_consult_auto_selects_tool_in_dry_run(
     assert "Prompt length:" in result.stdout
 
 
-def test_consult_prompt_mode_respects_dry_run(mock_tool_env: dict[str, str]) -> None:
+def test_consult_prompt_mode_respects_dry_run(mock_tool_env: tuple[dict[str, str], Path]) -> None:
+    env, cwd = mock_tool_env
     result = run_cli(
         "test",
         "consult",
@@ -163,7 +195,8 @@ def test_consult_prompt_mode_respects_dry_run(mock_tool_env: dict[str, str]) -> 
         "gemini",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
     expected_model = ai_config.resolve_tool_model("run-tests", "gemini")
@@ -176,10 +209,11 @@ def test_consult_prompt_mode_respects_dry_run(mock_tool_env: dict[str, str]) -> 
 
 
 def test_consult_multi_agent_dry_run(
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     result = run_cli(
         "test",
         "consult",
@@ -192,7 +226,8 @@ def test_consult_multi_agent_dry_run(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
     assert "• cursor-agent" in result.stdout
@@ -241,10 +276,11 @@ def test_consult_skips_when_no_tools_available(sample_test_error: str, sample_hy
 
 def test_consult_with_test_code(
     tmp_path: Path,
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     test_file = tmp_path / "test_sample.py"
     test_file.write_text(
         """
@@ -272,10 +308,11 @@ def test_consult_with_test_code(
 
 def test_consult_with_impl_code(
     tmp_path: Path,
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     impl_file = tmp_path / "calculator.py"
     impl_file.write_text(
         """
@@ -296,17 +333,19 @@ def test_consult_with_impl_code(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
 
 
 def test_consult_with_both_code_inputs(
     tmp_path: Path,
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     test_file = tmp_path / "test_sample.py"
     impl_file = tmp_path / "calculator.py"
     test_file.write_text("def test_add(): assert add(1, 1) == 2")
@@ -327,17 +366,19 @@ def test_consult_with_both_code_inputs(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
 
 
 def test_consult_handles_missing_code_path(
     tmp_path: Path,
-    mock_tool_env: dict[str, str],
+    mock_tool_env: tuple[dict[str, str], Path],
     sample_test_error: str,
     sample_hypothesis: str,
 ) -> None:
+    env, cwd = mock_tool_env
     missing_path = tmp_path / "missing.py"
     result = run_cli(
         "test",
@@ -352,7 +393,8 @@ def test_consult_handles_missing_code_path(
         "--dry-run",
         capture_output=True,
         text=True,
-        env=mock_tool_env,
+        env=env,
+        cwd=cwd,
     )
     assert result.returncode == 0
     assert "Prompt length:" in result.stdout

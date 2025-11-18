@@ -1118,3 +1118,35 @@ def sample_spec_invalid_phases(create_temp_spec_file):
         }
     )
     return create_temp_spec_file(spec_data, "invalid-phases-spec.json")
+
+
+# =============================================================================
+# AI Config Isolation Fixtures
+# =============================================================================
+
+@pytest.fixture(autouse=True)
+def mock_ai_config_enabled_tools(monkeypatch):
+    """
+    Mock AI config to return all available tools as enabled.
+
+    This prevents tests from being affected by the user's .claude/ai_config.yaml
+    settings, ensuring tests are isolated and reproducible.
+    """
+    def mock_get_enabled_tools(skill_name: str):
+        """Return all available tools as enabled, ignoring user config."""
+        try:
+            # Try code-doc's get_available_tools first
+            from claude_skills.code_doc.ai_consultation import get_available_tools
+            available = get_available_tools()
+        except ImportError:
+            # Fallback to detecting available tools directly
+            from claude_skills.common.ai_tools import detect_available_tools
+            # Return a reasonable set of common tools
+            available = detect_available_tools(["gemini", "cursor-agent", "codex", "claude"])
+        # Return a dict mapping tool names to minimal config dicts
+        return {tool: {"enabled": True, "command": tool} for tool in available}
+
+    monkeypatch.setattr(
+        "claude_skills.common.ai_config.get_enabled_tools",
+        mock_get_enabled_tools
+    )
