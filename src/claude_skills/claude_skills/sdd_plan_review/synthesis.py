@@ -269,45 +269,6 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
     return data
 
 
-def _extract_dimension_scores_from_reviews(responses: List[Dict[str, Any]]) -> Dict[str, float]:
-    """
-    Extract and average dimension scores from individual model reviews.
-
-    Args:
-        responses: List of response dicts with raw_review text
-
-    Returns:
-        Dictionary mapping dimension names to average scores
-    """
-    dimensions = ["completeness", "clarity", "feasibility", "architecture", "risk_management", "verification"]
-    all_scores = {dim: [] for dim in dimensions}
-
-    for response in responses:
-        raw_review = response.get("raw_review", "")
-        if not raw_review:
-            continue
-
-        # Extract dimension scores from markdown (e.g., "- **Completeness**: 3/10")
-        for dim in dimensions:
-            dim_display = dim.replace("_", " ").title()
-            pattern = rf"\*\*{re.escape(dim_display)}\*\*:\s*(\d+)\s*/\s*10"
-            match = re.search(pattern, raw_review, re.IGNORECASE)
-            if match:
-                try:
-                    score = int(match.group(1))
-                    all_scores[dim].append(score)
-                except (ValueError, IndexError):
-                    pass
-
-    # Calculate averages
-    dimension_scores = {}
-    for dim, scores in all_scores.items():
-        if scores:
-            dimension_scores[dim] = round(sum(scores) / len(scores), 1)
-
-    return dimension_scores
-
-
 def build_consensus(
     responses: List[Dict[str, Any]],
     spec_id: str = "unknown",
@@ -348,9 +309,6 @@ def build_consensus(
 
     synthesis_text = synthesis_result.get("synthesis_text", "")
     parsed_data = _parse_synthesis_text(synthesis_text)
-
-    # Extract and average dimension scores from individual reviews
-    dimension_scores = _extract_dimension_scores_from_reviews(responses)
 
     # Return synthesis in format expected by downstream code
     # The synthesis_text contains the full markdown synthesis

@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 18:00:49
+**Generated:** 2025-11-18 18:02:08
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113992
+- **Total Lines:** 113981
 - **Total Classes:** 448
 - **Total Functions:** 1468
 - **Avg Complexity:** 4.75
@@ -9839,7 +9839,7 @@ Returns:
 ### `_extract_dimension_scores_from_reviews(responses) -> Dict[str, float]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:282`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:272`
 **Complexity:** 8
 
 **Description:**
@@ -11517,7 +11517,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:226`
-**Complexity:** 6
+**Complexity:** 3
 
 **Description:**
 > Parse structured data from AI-generated synthesis markdown.
@@ -13909,7 +13909,7 @@ Yields:
 ### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:321`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:311`
 **Complexity:** 3
 
 **Description:**
