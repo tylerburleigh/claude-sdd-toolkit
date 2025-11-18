@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 18:03:08
+**Generated:** 2025-11-18 18:05:59
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113939
+- **Total Lines:** 113880
 - **Total Classes:** 448
-- **Total Functions:** 1467
+- **Total Functions:** 1465
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -10089,7 +10089,7 @@ Returns:
 ### `_format_issue(number, issue, brief) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:119`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:86`
 **Complexity:** 5
 
 **Description:**
@@ -10105,8 +10105,8 @@ Returns:
 ### `_format_model_summary(model_data) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:145`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:112`
+**Complexity:** 8
 
 **Description:**
 > Format individual model response for display.
@@ -10348,35 +10348,6 @@ Returns:
 
 **Parameters:**
 - `config`: Mapping[str, Any]
-
----
-
-### `_get_recommendation_summary(consensus, recommendation) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:84`
-**Complexity:** 3
-
-**Description:**
-> Get summary text for recommendation.
-
-**Parameters:**
-- `consensus`: Dict[str, Any]
-- `recommendation`: str
-
----
-
-### `_get_score_assessment(score) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:105`
-**Complexity:** 5
-
-**Description:**
-> Get qualitative assessment for a score.
-
-**Parameters:**
-- `score`: float
 
 ---
 
@@ -21192,7 +21163,7 @@ Returns:
 ### `generate_json_report(consensus, spec_id, spec_title, review_type) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:221`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:163`
 **Complexity:** 1
 
 **Description:**
