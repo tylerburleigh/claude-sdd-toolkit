@@ -929,10 +929,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ### For Users
 - [INSTALLATION.md](INSTALLATION.md) - Setup guide
-- [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) - Development guidance
 - [docs/examples/](docs/examples/) - Workflow examples
-- [docs/spec-modification.md](docs/spec-modification.md) - Validation
-- [docs/review-workflow.md](docs/review-workflow.md) - Fidelity review
 
 ### For Developers
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
@@ -985,7 +982,7 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 6. Review with multi-model consultation
 7. Create PR with AI
 
-See [INSTALLATION.md](INSTALLATION.md) for setup or [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md) for development guidance.
+See [INSTALLATION.md](INSTALLATION.md) for setup.
 
 ---
 
