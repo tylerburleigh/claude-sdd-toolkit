@@ -31,7 +31,8 @@ class TestValidateCommand:
         """Clean spec should exit with code 0."""
         result = run_cli_no_json("validate", str(CLEAN_SPEC))
         assert result.returncode == 0
-        assert "Validation PASSED" in result.stdout or "✅" in result.stdout
+        combined_output = "".join(part or "" for part in (result.stdout, result.stderr))
+        assert "Validation PASSED" in combined_output or "✅" in combined_output
 
     def test_validate_warnings_spec_exit_1(self):
         """Warnings-only spec should exit with code 1."""

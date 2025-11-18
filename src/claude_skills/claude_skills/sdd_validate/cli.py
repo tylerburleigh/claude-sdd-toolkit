@@ -69,8 +69,8 @@ def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
     """
     path = Path(spec_name_or_path)
 
-    # If it's an absolute path or has a .json extension, treat it as a full path
-    if path.is_absolute() or spec_name_or_path.endswith('.json'):
+    # If it's an absolute path, treat it as a full path
+    if path.is_absolute():
         spec_file = path.resolve()
 
         if not spec_file.exists():
@@ -84,17 +84,33 @@ def _resolve_spec_file(spec_name_or_path: str, printer) -> Path:
 
         return spec_file
 
-    # Otherwise, treat it as a spec name and search for it
+    # If it ends with .json, try to resolve it as a relative path first
+    # But fall back to spec name lookup if the file doesn't exist
+    search_name = spec_name_or_path
+    if spec_name_or_path.endswith('.json'):
+        spec_file = path.resolve()
+
+        if spec_file.exists():
+            if spec_file.suffix != '.json':
+                printer.error(f"Expected JSON file, got: {spec_file.suffix}")
+                printer.info("JSON specs are now the single source of truth")
+                sys.exit(2)
+            return spec_file
+        # File doesn't exist at resolved path - extract spec name for fallback lookup
+        # Extract spec name from path (e.g., "specs/pending/my-spec.json" -> "my-spec")
+        search_name = path.stem  # Gets filename without extension
+
+    # Treat it as a spec name and search for it
     specs_dir = find_specs_directory()
     if not specs_dir:
         printer.error("Specs directory not found")
         printer.info("Run from a project with a specs/ directory or provide a full path")
         sys.exit(2)
 
-    spec_file = find_spec_file(spec_name_or_path, specs_dir)
+    spec_file = find_spec_file(search_name, specs_dir)
     if not spec_file:
-        printer.error(f"Spec file not found for spec name: {spec_name_or_path}")
-        printer.info(f"Searched in: {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
+        printer.error(f"Spec file not found for spec name: {search_name}")
+        printer.info(f"Searched in: {specs_dir}/pending, {specs_dir}/active, {specs_dir}/completed, {specs_dir}/archived")
         sys.exit(2)
 
     return spec_file

@@ -682,16 +682,51 @@ def _build_bidirectional_deps_action(error: EnhancedError, spec_data: Dict[str, 
         if not blocker or not blocked:
             return
 
-        # Ensure dependencies dicts exist
-        blocker_deps = blocker.setdefault("dependencies", {})
-        blocked_deps = blocked.setdefault("dependencies", {})
+        # Validate nodes are dicts before modifying structure
+        if not isinstance(blocker, dict) or not isinstance(blocked, dict):
+            return
 
-        # Sync blocks/blocked_by
-        blocks_list = blocker_deps.setdefault("blocks", [])
+        # Robustly handle dependencies structure - four edge cases:
+        # 1. Missing dependencies key: Create complete structure
+        # 2. Null/malformed dependencies (non-dict): Replace with complete structure
+        # 3. Partial dependencies (missing blocks/blocked_by/depends): setdefault adds them below
+        # 4. Complete dependencies: Preserve existing structure
+        blocker_deps = blocker.get("dependencies")
+        if not isinstance(blocker_deps, dict):
+            # Cases 1 & 2: Create complete dependencies structure
+            blocker["dependencies"] = {
+                "blocks": [],
+                "blocked_by": [],
+                "depends": [],
+            }
+            blocker_deps = blocker["dependencies"]
+
+        blocked_deps = blocked.get("dependencies")
+        if not isinstance(blocked_deps, dict):
+            # Cases 1 & 2: Create complete dependencies structure
+            blocked["dependencies"] = {
+                "blocks": [],
+                "blocked_by": [],
+                "depends": [],
+            }
+            blocked_deps = blocked["dependencies"]
+
+        # Ensure all three dependency fields exist on both nodes (Cases 3 & 4)
+        # This handles partial dependencies - setdefault adds missing fields
+        blocker_deps.setdefault("blocks", [])
+        blocker_deps.setdefault("blocked_by", [])
+        blocker_deps.setdefault("depends", [])
+
+        blocked_deps.setdefault("blocks", [])
+        blocked_deps.setdefault("blocked_by", [])
+        blocked_deps.setdefault("depends", [])
+
+        # Sync the relationship between the two nodes
+        blocks_list = blocker_deps["blocks"]
         if blocked_id not in blocks_list:
             blocks_list.append(blocked_id)
 
-        blocked_by_list = blocked_deps.setdefault("blocked_by", [])
+        blocked_by_list = blocked_deps["blocked_by"]
         if blocker_id not in blocked_by_list:
             blocked_by_list.append(blocker_id)
 

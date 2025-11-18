@@ -35,7 +35,6 @@ from claude_skills.cli.sdd.output_utils import (
     CONTEXT_STANDARD,
 )
 
-
 def generate_session_marker() -> str:
     """
     Generate a unique random session marker.
@@ -49,8 +48,7 @@ def generate_session_marker() -> str:
     marker = f"SESSION_MARKER_{secrets.token_hex(4)}"
     return marker
 
-
-def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int = 10) -> str | None:
+def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int = 10, verbosity_level=None) -> str | None:
     """
     Search transcripts for a specific SESSION_MARKER to identify current session.
 
@@ -73,7 +71,7 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
         cwd: Current working directory (used to find project-specific transcripts)
         marker: Specific marker to search for (e.g., "SESSION_MARKER_abc12345")
         max_retries: Maximum number of retry attempts (default: 10)
-
+        verbosity_level: Verbosity level to control output (optional)
     Returns:
         Path to transcript containing the marker, or None if not found
     """
@@ -86,7 +84,6 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
     while True:
         project_dir_name = str(current_path).replace("/", "-").replace("_", "-")
         transcript_dir = Path.home() / ".claude" / "projects" / project_dir_name
-
         if transcript_dir.exists():
             candidate_dirs.append(transcript_dir)
 
@@ -94,14 +91,12 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
         if current_path.parent == current_path or len(candidate_dirs) >= 5:
             break
         current_path = current_path.parent
-
     if not candidate_dirs:
         return None
 
     # Extended retry with exponential backoff, capped at 30 seconds total
     # Delays: 100ms, 200ms, 400ms, 800ms, 1.6s, 3.2s, 6.4s, 12.8s, ...
     delays = [min(0.1 * (2 ** i), 10.0) for i in range(max_retries)]
-
     for attempt in range(max_retries):
         current_time = time.time()
 
@@ -140,16 +135,15 @@ def find_transcript_by_specific_marker(cwd: Path, marker: str, max_retries: int 
         # If not found and we have retries left, wait before next attempt
         if attempt < max_retries - 1:
             # Show progress on stderr so it doesn't interfere with JSON output
-            if attempt > 0:  # Don't show on first attempt
+            # Only show if not in quiet mode
+            if attempt > 0 and verbosity_level != VerbosityLevel.QUIET:  # Don't show on first attempt or in quiet mode
                 print(
                     f"Waiting for marker to be written to transcript... "
                     f"(attempt {attempt + 1}/{max_retries})",
                     file=sys.stderr
                 )
             time.sleep(delays[attempt])
-
     return None
-
 
 def get_transcript_path_from_stdin() -> str | None:
     """
@@ -179,8 +173,7 @@ def get_transcript_path_from_stdin() -> str | None:
     except (json.JSONDecodeError, KeyError, ValueError):
         return None
 
-
-def get_transcript_path(args) -> str | None:
+def get_transcript_path(args, verbosity_level=None) -> str | None:
     """
     Get transcript path from multiple sources (priority order).
 
@@ -192,7 +185,7 @@ def get_transcript_path(args) -> str | None:
 
     Args:
         args: Parsed CLI arguments
-
+        verbosity_level: Verbosity level to control output (optional)
     Returns:
         Transcript path string, or None if not found
     """
@@ -200,7 +193,7 @@ def get_transcript_path(args) -> str | None:
     # Search for transcripts containing the specific session marker
     if hasattr(args, 'session_marker') and args.session_marker:
         cwd = Path.cwd()
-        marker_path = find_transcript_by_specific_marker(cwd, args.session_marker)
+        marker_path = find_transcript_by_specific_marker(cwd, args.session_marker, verbosity_level=verbosity_level)
         if marker_path:
             return marker_path
 
@@ -220,11 +213,9 @@ def get_transcript_path(args) -> str | None:
 
     return None
 
-
 def format_number(n: int) -> str:
     """Format a number with thousands separators."""
     return f"{n:,}"
-
 
 def format_metrics_human(metrics, max_context: int = 160000, transcript_path: str = None):
     """
@@ -236,7 +227,6 @@ def format_metrics_human(metrics, max_context: int = 160000, transcript_path: st
         transcript_path: Optional path to transcript file (for display)
     """
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
-
     output = []
     output.append("=" * 60)
     output.append("Claude Code Context Usage")
@@ -246,7 +236,6 @@ def format_metrics_human(metrics, max_context: int = 160000, transcript_path: st
     if transcript_path:
         transcript_name = Path(transcript_path).name
         output.append(f"\nTranscript: {transcript_name}")
-
     output.append("")
     output.append(f"Context Used:    {format_number(metrics.context_length)} / {format_number(max_context)} tokens ({context_pct:.1f}%)")
     output.append("")
@@ -256,9 +245,7 @@ def format_metrics_human(metrics, max_context: int = 160000, transcript_path: st
     output.append(f"  Cached Tokens:   {format_number(metrics.cached_tokens)}")
     output.append(f"  Total Tokens:    {format_number(metrics.total_tokens)}")
     output.append("=" * 60)
-
     return "\n".join(output)
-
 
 def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str = None, compact: bool = False):
     """
@@ -271,7 +258,6 @@ def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str
         compact: Whether to use compact JSON formatting (default: False)
     """
     context_pct = (metrics.context_length / max_context * 100) if max_context > 0 else 0
-
     result = {
         "context_length": metrics.context_length,
         "context_percentage": round(context_pct, 2),
@@ -286,7 +272,6 @@ def format_metrics_json(metrics, max_context: int = 160000, transcript_path: str
         result["transcript_path"] = transcript_path
 
     output_json(result, compact=compact)
-
 
 def cmd_session_marker(args, printer):
     """
@@ -303,6 +288,9 @@ def cmd_session_marker(args, printer):
     # Output marker to stdout (not stderr) so it can be captured
     print(marker)
 
+from claude_skills.common.sdd_config import load_sdd_config
+
+from claude_skills.cli.sdd.verbosity import VerbosityLevel
 
 def cmd_context(args, printer):
     """
@@ -312,8 +300,11 @@ def cmd_context(args, printer):
         args: Parsed arguments from ArgumentParser
         printer: PrettyPrinter instance for output
     """
-    transcript_path = get_transcript_path(args)
+    sdd_config = load_sdd_config()
 
+    # Determine verbosity level early so we can use it in get_transcript_path
+    args.verbosity_level = VerbosityLevel.from_args(args, sdd_config)
+    transcript_path = get_transcript_path(args, args.verbosity_level)
     if not transcript_path:
         # Provide context-specific error message
         if hasattr(args, 'session_marker') and args.session_marker:
@@ -330,7 +321,6 @@ def cmd_context(args, printer):
                 if current_path.parent == current_path or len(searched_dirs) >= 5:
                     break
                 current_path = current_path.parent
-
             printer.error(f"Could not find transcript containing marker: {args.session_marker}")
             printer.error("")
             printer.error("This usually means the marker hasn't been written to the transcript yet.")
@@ -343,6 +333,7 @@ def cmd_context(args, printer):
             printer.error("not just separate bash commands. The marker must be logged to the")
             printer.error("transcript file before it can be found.")
             printer.error("")
+
             if searched_dirs:
                 printer.error(f"Searched in {len(searched_dirs)} transcript director{'y' if len(searched_dirs) == 1 else 'ies'}:")
                 for dir_path in searched_dirs:
@@ -375,7 +366,6 @@ def cmd_context(args, printer):
 
     # Parse the transcript
     metrics = parse_transcript(transcript_path)
-
     if metrics is None:
         printer.error(f"Could not parse transcript file: {transcript_path}")
         sys.exit(1)
@@ -400,10 +390,15 @@ def cmd_context(args, printer):
 
         # Apply verbosity filtering
         filtered_output = prepare_output(payload, args, CONTEXT_ESSENTIAL, CONTEXT_STANDARD)
-        output_json(filtered_output, compact=args.compact)
+
+        # Determine compact setting
+        use_compact = sdd_config.get("output", {}).get("json_compact", True)
+        if hasattr(args, 'compact') and args.compact is not None:
+            use_compact = args.compact
+
+        output_json(filtered_output, compact=use_compact)
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
-
 
 def register_session_marker(subparsers, parent_parser):
     """
@@ -421,7 +416,6 @@ def register_session_marker(subparsers, parent_parser):
     )
 
     parser.set_defaults(func=cmd_session_marker)
-
 
 def register_context(subparsers, parent_parser):
     """
@@ -463,7 +457,6 @@ def register_context(subparsers, parent_parser):
     #   - With --verbose: Full JSON output (all metrics)
 
     parser.set_defaults(func=cmd_context)
-
 
 def main():
     """Main CLI entry point."""
@@ -511,7 +504,6 @@ when running multiple concurrent Claude Code sessions.
 
     # Get transcript path from args, env var, or stdin
     transcript_path = get_transcript_path(args)
-
     if not transcript_path:
         parser.print_help()
         print("\nError: No session marker provided.", file=sys.stderr)
@@ -532,7 +524,6 @@ when running multiple concurrent Claude Code sessions.
 
     # Parse the transcript
     metrics = parse_transcript(transcript_path)
-
     if metrics is None:
         print(f"Error: Could not parse transcript file: {transcript_path}", file=sys.stderr)
         sys.exit(1)
@@ -545,7 +536,6 @@ when running multiple concurrent Claude Code sessions.
         output_json(payload, compact=getattr(args, 'compact', True))
     else:
         print(format_metrics_human(metrics, args.max_context, transcript_path))
-
 
 if __name__ == "__main__":
     main()
