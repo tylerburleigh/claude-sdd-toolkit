@@ -148,17 +148,19 @@ def cmd_review(args, printer):
             dry_payload = {
                 'spec_id': spec_id,
                 'review_type': args.type,
-                'recommendation': None,
-                'overall_score': None,
+                'recommendation': None,  # Deprecated
+                'overall_score': None,  # Deprecated
                 'artifacts': [],
-                'issue_count': 0,
+                'blocker_count': 0,
+                'suggestion_count': 0,
+                'question_count': 0,
                 'models_responded': 0,
                 'models_requested': len(tools_to_use),
                 'models_consulted': {},
                 'failures': 0,
                 'execution_time': 0,
                 'consensus_level': None,
-                'dimension_scores': None,
+                'dimension_scores': {},  # Deprecated
                 'dry_run': True,
             }
             return _plan_review_output_json(dry_payload, args)
@@ -309,17 +311,19 @@ def cmd_review(args, printer):
     summary_payload = {
         'spec_id': spec_id,
         'review_type': args.type,
-        'recommendation': consensus.get('final_recommendation'),
-        'overall_score': consensus.get('overall_score'),
+        'recommendation': None,  # Deprecated
+        'overall_score': None,  # Deprecated
         'artifacts': artifact_paths,
-        'issue_count': len(consensus.get('all_issues') or []),
+        'blocker_count': len(consensus.get('critical_blockers') or []),
+        'suggestion_count': len(consensus.get('major_suggestions') or []),
+        'question_count': len(consensus.get('questions') or []),
         'models_responded': len(results['parsed_responses']),
         'models_requested': len(tools_to_use),
         'models_consulted': results.get('models', {}),
         'failures': len(results['failures']),
         'execution_time': results.get('execution_time'),
         'consensus_level': consensus.get('consensus_level'),
-        'dimension_scores': consensus.get('dimension_scores'),
+        'dimension_scores': {},  # Deprecated
         'dry_run': False,
     }
     if failed_artifacts:
