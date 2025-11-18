@@ -841,9 +841,41 @@ def cmd_prepare_task(args, printer):
             if reason:
                 printer.detail(f"Reason: {reason}")
 
-            # Show blocked task count if available
+            # Show blocked task details if available
             blocked_count = completion_info.get('blocked_count', 0)
-            if blocked_count > 0:
+            blocked_task_ids = completion_info.get('blocked_tasks', [])
+            if blocked_count > 0 and blocked_task_ids:
+                printer.detail(f"Blocked tasks: {blocked_count}")
+
+                # Load spec to get task details
+                try:
+                    spec_data = load_json_spec(args.spec_id, specs_dir)
+                    hierarchy = spec_data.get("hierarchy", {})
+
+                    print("\n✗ Blocked Task Details:")
+                    for task_id in blocked_task_ids:
+                        task = hierarchy.get(task_id, {})
+                        title = task.get("title", "")
+                        metadata = task.get("metadata", {})
+
+                        printer.detail(f"  • {task_id}: {title}")
+
+                        blocker_desc = metadata.get("blocker_description", "")
+                        if blocker_desc:
+                            printer.detail(f"    Reason: {blocker_desc}")
+
+                        blocker_ticket = metadata.get("blocker_ticket", "")
+                        if blocker_ticket:
+                            printer.detail(f"    Ticket: {blocker_ticket}")
+
+                        blocker_type = metadata.get("blocker_type", "")
+                        if blocker_type:
+                            printer.detail(f"    Type: {blocker_type}")
+                except Exception as e:
+                    # Fallback to just showing count if we can't load details
+                    printer.detail(f"  (Run 'sdd list-blockers {args.spec_id}' for full details)")
+            elif blocked_count > 0:
+                # Has count but no task IDs - show fallback message
                 printer.detail(f"Blocked tasks: {blocked_count}")
                 print(f"\n💡 Run 'sdd list-blockers {args.spec_id}' for details")
         else:
