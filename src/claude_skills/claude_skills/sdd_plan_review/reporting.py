@@ -185,6 +185,11 @@ def generate_json_report(
         "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "models_consulted": consensus["models"],
         "num_models": consensus["num_models"],
+        # Backward compatibility (deprecated fields)
+        "overall_score": None,
+        "dimension_scores": {},
+        "recommendation": None,
+        # New category-based fields
         "consensus_level": consensus.get("consensus_level"),
         "critical_blockers": consensus.get("critical_blockers", []),
         "major_suggestions": consensus.get("major_suggestions", []),
