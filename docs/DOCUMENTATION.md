@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 17:53:18
+**Generated:** 2025-11-18 17:55:09
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114021
+- **Total Lines:** 114025
 - **Total Classes:** 448
 - **Total Functions:** 1469
 - **Avg Complexity:** 4.75
@@ -10203,7 +10203,7 @@ Returns:
 **Complexity:** 1
 
 **Description:**
-> Generate feasibility-focused review prompt.
+> Generate technical complexity review prompt.
 
 **Parameters:**
 - `spec_content`: str
@@ -10235,7 +10235,7 @@ Returns:
 **Complexity:** 1
 
 **Description:**
-> Generate quick review prompt focusing on completeness and clarity.
+> Generate quick review prompt focusing on blockers and questions.
 
 **Parameters:**
 - `spec_content`: str
@@ -10247,7 +10247,7 @@ Returns:
 ### `_generate_security_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:179`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:184`
 **Complexity:** 1
 
 **Description:**
@@ -23019,7 +23019,7 @@ Example:
 ### `get_stance_instruction(stance) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:287`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:291`
 **Complexity:** 3
 
 **Description:**
