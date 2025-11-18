@@ -13,47 +13,49 @@ from typing import Dict, Any
 RESPONSE_SCHEMA = """
 # Review Summary
 
-## Critical Issues
+## Critical Blockers
+Issues that must be fixed before implementation can begin.
 
-- **[CRITICAL]** <Issue title>
-  - Description: <What's wrong>
-  - Impact: <Consequences if not fixed>
-  - Fix: <Specific actionable recommendation>
+- **[Category]** <Issue title>
+  - **Description:** <What's wrong>
+  - **Impact:** <Consequences if not fixed>
+  - **Fix:** <Specific actionable recommendation>
 
-## High Priority Issues
+## Major Suggestions
+Significant improvements that enhance quality, maintainability, or design.
 
-- **[HIGH]** <Issue title>
-  - Description: <What's wrong>
-  - Impact: <Consequences if not fixed>
-  - Fix: <Specific actionable recommendation>
+- **[Category]** <Issue title>
+  - **Description:** <What's wrong>
+  - **Impact:** <Consequences if not addressed>
+  - **Fix:** <Specific actionable recommendation>
 
-## Medium Priority Issues
+## Minor Suggestions
+Smaller improvements and optimizations.
 
-- **[MEDIUM]** <Issue title>
-  - Description: <What's wrong>
-  - Fix: <Specific actionable recommendation>
+- **[Category]** <Issue title>
+  - **Description:** <What could be better>
+  - **Fix:** <Specific actionable recommendation>
 
-## Low Priority Issues
+## Questions
+Clarifications needed or ambiguities to resolve.
 
-- **[LOW]** <Issue title>
-  - Fix: <Specific actionable recommendation>
+- **[Category]** <Question>
+  - **Context:** <Why this matters>
+  - **Needed:** <What information would help>
 
-## Strengths
+## Praise
+What the spec does well.
 
-- <What the spec does well>
-- <Another strength>
-
-## Recommendations
-
-- <Actionable improvement suggestion>
-- <Another recommendation>
+- **[Category]** <What works well>
+  - **Why:** <What makes this effective>
 
 ---
 
 **Important**:
-- Use exact severity tags: [CRITICAL], [HIGH], [MEDIUM], [LOW]
+- Use category tags: [Completeness], [Clarity], [Feasibility], [Architecture], [Risk Management], [Verification]
 - Include all sections even if empty (write "None identified" for empty sections)
 - Be specific and actionable in all feedback
+- Attribution: In multi-model reviews, prefix items with "Flagged by [model-name]:" when applicable
 """
 
 
