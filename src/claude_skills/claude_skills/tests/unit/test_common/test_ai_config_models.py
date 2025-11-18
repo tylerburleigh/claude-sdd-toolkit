@@ -263,12 +263,12 @@ def test_resolve_tool_model_skill_default_overrides_global(
     set_skill_config(
         {
             "models": {
-                "gemini": "gemini-2.5-pro",  # Override global default
+                "gemini": "pro",  # Override global default
             }
         }
     )
     result = ai_config.resolve_tool_model("run-tests", "gemini")
-    assert result == "gemini-2.5-pro"
+    assert result == "pro"
     assert result != ai_config.DEFAULT_MODELS["gemini"]["priority"][0]
 
 

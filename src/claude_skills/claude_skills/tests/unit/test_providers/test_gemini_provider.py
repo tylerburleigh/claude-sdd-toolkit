@@ -58,7 +58,7 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
     provider = GeminiProvider(
         GEMINI_METADATA,
         ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
-        model="gemini-2.5-pro",
+        model="pro",
         runner=runner,
         binary="gemini",
     )
@@ -76,7 +76,7 @@ def test_gemini_provider_executes_command_and_streams(monkeypatch: pytest.Monkey
     assert captured["command"] == [
         "gemini",
         "-m",
-        "gemini-2.5-pro",
+        "pro",
         "--output-format",
         "json",
         "-p",
@@ -135,7 +135,7 @@ def test_create_provider_injects_custom_runner_and_model(monkeypatch: pytest.Mon
     provider = create_provider(
         hooks=ProviderHooks(),
         dependencies={"runner": runner},
-        overrides={"model": "gemini-2.5-pro", "binary": "gemini"},
+        overrides={"model": "pro", "binary": "gemini"},
     )
 
     result = provider.generate(GenerationRequest(prompt="test"))

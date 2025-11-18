@@ -382,7 +382,7 @@ class TestComplexScenarios:
         key = generate_cache_key(
             spec_id="phase5-agent-optimization",
             file_paths=[str(file1)],
-            model="gemini-2.5-pro",
+            model="pro",
             prompt_version="v2",
             extra_params={
                 "scope": "incremental",
@@ -396,7 +396,7 @@ class TestComplexScenarios:
         key2 = generate_cache_key(
             spec_id="phase5-agent-optimization",
             file_paths=[str(file1)],
-            model="gemini-2.5-pro",
+            model="pro",
             prompt_version="v2",
             extra_params={
                 "review_type": "fidelity",

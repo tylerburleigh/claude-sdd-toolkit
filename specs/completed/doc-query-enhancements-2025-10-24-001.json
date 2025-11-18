@@ -33,7 +33,7 @@
       "status": "approved",
       "score": 8.8,
       "date": "2025-10-24",
-      "reviewer": "gemini-2.5-pro",
+      "reviewer": "pro",
       "recommendation": "APPROVE with timeline revision",
       "key_revisions": [
         "Phase 2 estimate increased from 80 to 110 hours",

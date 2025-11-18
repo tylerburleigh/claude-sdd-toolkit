@@ -53,7 +53,7 @@ DEFAULT_MODELS = {
     "claude": {
         "priority": ["sonnet", "haiku"]
     }
-}
+pro}
 
 
 DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude"]

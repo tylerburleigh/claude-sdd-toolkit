@@ -30,7 +30,7 @@ class TestNoOpProgressCallback:
     def test_on_start_no_crash(self) -> None:
         """on_start accepts arguments without error."""
         callback = NoOpProgressCallback()
-        callback.on_start("gemini", 90, model="gemini-2.5-pro")
+        callback.on_start("gemini", 90, model="pro")
 
     def test_on_update_no_crash(self) -> None:
         """on_update accepts arguments without error."""
@@ -163,13 +163,13 @@ class TestSingleConsultationContextManager:
             "gemini",
             timeout=90,
             callback=callback,
-            model="gemini-2.5-pro",
+            model="pro",
             prompt_length=1024,
         ):
             pass
 
         _, kwargs = callback.on_start.call_args
-        assert kwargs["model"] == "gemini-2.5-pro"
+        assert kwargs["model"] == "pro"
         assert kwargs["prompt_length"] == 1024
 
     def test_uses_no_op_callback_by_default(self) -> None:
@@ -843,7 +843,7 @@ class TestQueuedProgressCallback:
         queued = QueuedProgressCallback(wrapped)
 
         queued.start()
-        queued.on_start("gemini", 90, model="gemini-2.5-pro")
+        queued.on_start("gemini", 90, model="pro")
 
         time.sleep(0.2)
         queued.stop()
@@ -852,7 +852,7 @@ class TestQueuedProgressCallback:
         _, kwargs = wrapped.on_start.call_args
         assert kwargs["tool"] == "gemini"
         assert kwargs["timeout"] == 90
-        assert kwargs["model"] == "gemini-2.5-pro"
+        assert kwargs["model"] == "pro"
 
     def test_handles_large_queue_bursts(self) -> None:
         """QueuedProgressCallback handles large bursts of progress updates."""

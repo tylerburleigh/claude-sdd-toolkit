@@ -47,7 +47,7 @@ def test_load_yaml_template_reads_models_section() -> None:
 
     assert isinstance(data, dict)
     assert "models" in data
-    assert data["models"]["gemini"]["priority"][0] == "gemini-2.5-pro"
+    assert data["models"]["gemini"]["priority"][0] == "pro"
 
 
 def test_copy_template_to_supports_directory_and_file_paths(tmp_path: Path) -> None:

@@ -69,8 +69,8 @@ def _default_runner(
 
 GEMINI_MODELS: List[ModelDescriptor] = [
     ModelDescriptor(
-        id="gemini-2.5-pro",
-        display_name="Gemini 2.5 Pro",
+        id="pro",
+        display_name="Gemini 3.0 Pro",
         capabilities={
             ProviderCapability.TEXT,
             ProviderCapability.STREAMING,

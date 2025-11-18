@@ -102,7 +102,7 @@ class ModelDescriptor:
     Describes a model supported by a provider.
 
     Attributes:
-        id: Provider-specific identifier (e.g., "gemini-2.5-pro").
+        id: Provider-specific identifier (e.g., "pro").
         display_name: Friendly name for UIs/logs.
         capabilities: Capability flags supported by the model.
         routing_hints: Optional metadata used by registries (cost, latency, etc.).

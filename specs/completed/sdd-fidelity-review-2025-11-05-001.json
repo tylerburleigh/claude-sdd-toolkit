@@ -2261,7 +2261,7 @@
       "entry_type": "status_change",
       "title": "Task Completed: Add model priorities and flags per tool",
       "author": "claude-code",
-      "content": "Added model priorities and flags in config.yaml models section. Configured gemini (priority: gemini-2.5-pro), codex (priority: cheetah with --skip-git-repo-check flag), and cursor-agent (priority: cheetah). Flags array specifies command-line arguments for each tool. Format matches run-tests pattern and is compatible with common/ai_config.py model loading functions.",
+      "content": "Added model priorities and flags in config.yaml models section. Configured gemini (priority: pro), codex (priority: cheetah with --skip-git-repo-check flag), and cursor-agent (priority: cheetah). Flags array specifies command-line arguments for each tool. Format matches run-tests pattern and is compatible with common/ai_config.py model loading functions.",
       "metadata": {},
       "task_id": "task-2-1-2"
     },

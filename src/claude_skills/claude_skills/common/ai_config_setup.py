@@ -45,7 +45,7 @@ tools:
 models:
   gemini:
     priority:
-      - gemini-2.5-pro
+      - pro
   cursor-agent:
     priority:
       - composer-1
@@ -58,7 +58,7 @@ run-tests:
     overrides:
       failure_type:
         assertion:
-          gemini: gemini-2.5-pro
+          gemini: pro
         timeout:
           cursor-agent: composer-1
 
@@ -69,14 +69,14 @@ code-doc:
         architecture:
           cursor-agent: composer-1
         ai_context:
-          gemini: gemini-2.5-pro
+          gemini: pro
 
 sdd-plan-review:
   models:
     overrides:
       review_type:
         full:
-          gemini: gemini-2.5-pro
+          gemini: pro
         quick:
           cursor-agent: composer-1
 
@@ -85,7 +85,7 @@ sdd-render:
     overrides:
       feature:
         executive_summary:
-          gemini: gemini-2.5-pro
+          gemini: pro
         narrative:
           cursor-agent: composer-1
 

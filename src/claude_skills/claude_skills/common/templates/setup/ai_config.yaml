@@ -24,7 +24,7 @@ tools:
 models:
   gemini:
     priority:
-      - gemini-2.5-pro
+      - pro
       - gemini-2.5-flash
   cursor-agent:
     priority:
@@ -71,7 +71,7 @@ run-tests:
     - codex
     - claude
   models:
-    gemini: gemini-2.5-pro
+    gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
@@ -79,7 +79,7 @@ run-tests:
     #overrides:
     #  failure_type:
     #    assertion:
-    #      gemini: gemini-2.5-pro
+    #      gemini: pro
     #      codex: gpt-5-codex
     #      cursor-agent: composer-1
     #      claude: haiku
@@ -108,7 +108,7 @@ code-doc:
     #      codex: gpt-5-codex
     #      cursor-agent: composer-1
     #    ai_context:
-    #      gemini: gemini-2.5-pro
+    #      gemini: pro
     #      codex: gpt-5-codex
     #      cursor-agent: composer-1
 
@@ -119,7 +119,7 @@ sdd-plan-review:
     - codex
     - claude
   models:
-    gemini: gemini-2.5-pro
+    gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
@@ -127,7 +127,7 @@ sdd-plan-review:
     #overrides:
     #  review_type:
     #    full:
-    #      gemini: gemini-2.5-pro
+    #      gemini: pro
     #      codex: gpt-5-codex
     #      cursor-agent: composer-1
     #      claude: sonnet
@@ -152,7 +152,7 @@ sdd-render:
     #overrides:
     #  feature:
     #    executive_summary:
-    #      gemini: gemini-2.5-pro
+    #      gemini: pro
     #      codex: gpt-5-codex
     #      cursor-agent: composer-1
     #      claude: haiku
@@ -169,7 +169,7 @@ sdd-fidelity-review:
     - codex
     - claude
   models:
-    gemini: gemini-2.5-pro
+    gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
@@ -181,7 +181,7 @@ consensus:
     - codex
     - claude
   models:
-    gemini: gemini-2.5-pro
+    gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet

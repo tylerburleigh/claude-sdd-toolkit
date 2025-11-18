@@ -170,7 +170,7 @@ results = consult_multi_agent(
 ```
 
 **Supported Providers:**
-- **Gemini** - Google's Gemini 2.5 Pro/Flash models
+- **Gemini** - Google's Gemini 3.0 Pro/Flash models
 - **Cursor Agent** - Cursor IDE's AI with 1M context (Composer)
 - **Codex** - Anthropic Codex CLI
 - **Claude** - Anthropic Claude with read-only restrictions (Sonnet 4.5/Haiku 4.5)

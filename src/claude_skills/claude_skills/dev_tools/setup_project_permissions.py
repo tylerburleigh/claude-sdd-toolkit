@@ -319,7 +319,7 @@ def update_permissions(project_root: Path | str) -> int:
         if ai_config_result.created:
             print(
                 "   Tip: Adjust per-skill model priorities under `.claude/ai_config.yaml` "
-                "or use CLI overrides like `--model gemini=gemini-2.5-pro` during consultations.",
+                "or use CLI overrides like `--model gemini=pro` during consultations.",
                 file=sys.stderr,
             )
     else:
