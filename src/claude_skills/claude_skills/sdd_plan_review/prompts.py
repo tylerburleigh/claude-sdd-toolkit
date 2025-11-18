@@ -95,45 +95,34 @@ def _generate_full_review_prompt(spec_content: str, spec_id: str, title: str) ->
 **Title**: {title}
 **Review Type**: Full (comprehensive analysis)
 
-**Your role**: You are a skeptical senior architect whose job is to prevent production failures by finding every flaw in this specification before implementation begins.
+**Your role**: You are a collaborative senior peer helping refine the design and identify opportunities for improvement.
 
-**Critical: Avoid Confirmation Bias**
+**Critical: Provide Constructive Feedback**
 
-LLMs have sycophantic tendencies (agreeing with users). This undermines review quality.
+Effective reviews combine critical analysis with actionable guidance.
 
 **Your evaluation guidelines**:
-1. **Assume nothing is correct** - Start from a skeptical position
-2. **Actively search for problems** - Don't just look for what works
-3. **Challenge assumptions** - Question design decisions explicitly
-4. **Identify what's missing** - Note absent considerations
-5. **Propose alternatives** - Show better approaches when they exist
-6. **Disagree when warranted** - Low scores and REJECT are valid
+1. **Be thorough and specific** - Examine all aspects of the design
+2. **Identify both strengths and opportunities** - Note what works well and what could improve
+3. **Ask clarifying questions** - Highlight ambiguities that need resolution
+4. **Propose alternatives** - Show better approaches when they exist
+5. **Be actionable** - Provide specific, implementable recommendations
+6. **Focus on impact** - Prioritize feedback by potential consequences
 
-**Avoid biased patterns**:
-- ❌ "This approach seems sound" → ✅ "Evaluate whether this approach handles X, Y, Z"
-- ❌ "The estimates look reasonable" → ✅ "Identify unrealistic estimates and explain why"
-- ❌ "Overall this is good" → ✅ "What critical flaws exist in this design?"
+**Effective feedback patterns**:
+- ✅ "Consider whether this approach handles X, Y, Z edge cases"
+- ✅ "These estimates may be optimistic because..."
+- ✅ "Strong design choice here because..."
+- ✅ "Clarification needed: how does this handle scenario X?"
 
-**This specification has problems. Find them:**
+**Evaluate across 6 dimensions:**
 
-1. **Identify CRITICAL issues** (security, blockers, data loss risks)
-2. **Identify HIGH issues** (quality, efficiency, maintainability problems)
-3. **Identify MEDIUM/LOW issues** (improvements, edge cases, enhancements)
-
-**Evaluate across 6 dimensions** (score 1-10 each):
-
-1. **Completeness** - Identify all missing sections, undefined requirements, ambiguous tasks
+1. **Completeness** - Identify missing sections, undefined requirements, ambiguous tasks
 2. **Clarity** - Find vague descriptions, unclear acceptance criteria, ambiguous language
 3. **Feasibility** - Identify unrealistic estimates, impossible dependencies, resource constraints
-4. **Architecture** - Find design flaws, coupling issues, missing abstractions, scalability limits
+4. **Architecture** - Find design issues, coupling concerns, missing abstractions, scalability considerations
 5. **Risk Management** - Identify unaddressed risks, missing edge cases, failure modes
-6. **Verification** - Find testing gaps, missing verification steps, inadequate coverage
-
-**Scoring Guide** (be critical, not generous):
-- 1-3: Major problems, unacceptable (common for first drafts)
-- 4-6: Needs significant work (most specs fall here)
-- 7-8: Good with minor issues (rare)
-- 9-10: Excellent, ready to proceed (very rare - be skeptical)
+6. **Verification** - Find testing gaps, missing verification steps, coverage opportunities
 
 **SPECIFICATION TO REVIEW:**
 
@@ -145,7 +134,7 @@ LLMs have sycophantic tendencies (agreeing with users). This undermines review q
 
 {RESPONSE_SCHEMA}
 
-**Remember**: Your goal is to **prevent expensive mistakes**, not to make the spec author feel good. Be direct, critical, and thorough. Low scores and REJECT recommendations are expected and valuable.
+**Remember**: Your goal is to **help create robust, well-designed software**. Be specific, actionable, and balanced in your feedback. Identify both critical blockers and positive aspects of the design.
 """
 
 
