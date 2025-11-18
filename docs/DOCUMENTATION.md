@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 17:55:57
+**Generated:** 2025-11-18 17:59:48
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113988
+- **Total Lines:** 113985
 - **Total Classes:** 448
 - **Total Functions:** 1468
 - **Avg Complexity:** 4.75
@@ -9839,7 +9839,7 @@ Returns:
 ### `_extract_dimension_scores_from_reviews(responses) -> Dict[str, float]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:278`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:275`
 **Complexity:** 8
 
 **Description:**
@@ -11516,7 +11516,7 @@ Returns:
 ### `_parse_synthesis_text(synthesis_text) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:222`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:219`
 **Complexity:** 6
 
 **Description:**
@@ -13909,7 +13909,7 @@ Yields:
 ### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:317`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:314`
 **Complexity:** 3
 
 **Description:**
