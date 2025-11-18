@@ -436,27 +436,47 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
         Exit code (0 for success, non-zero for error)
     """
     try:
-        # Detect all available tools
-        available_tools = get_enabled_and_available_tools("sdd-fidelity-review")
+        # Detect tools that are both enabled and available
+        ready_tools = get_enabled_and_available_tools("sdd-fidelity-review")
         all_tools = ["gemini", "codex", "cursor-agent"]
 
-        # Build tool status information
+        # Categorize tools based on configuration and availability
         tool_status = []
-        for tool in all_tools:
-            is_available = tool in available_tools
-            status = "available" if is_available else "not found"
-            tool_status.append({
-                "tool": tool,
-                "available": is_available,
-                "status": status
-            })
+        disabled_tools = []
+        not_installed_tools = []
 
-        available_list = [entry for entry in tool_status if entry["available"]]
-        unavailable_list = [entry for entry in tool_status if not entry["available"]]
+        for tool in all_tools:
+            is_enabled = ai_config.is_tool_enabled("sdd-fidelity-review", tool)
+            is_installed = check_tool_available(tool)
+            is_ready = tool in ready_tools
+
+            if not is_enabled:
+                status = "disabled"
+                disabled_tools.append({
+                    "tool": tool,
+                    "available": False,
+                    "status": status
+                })
+            elif is_ready and is_installed:
+                status = "available"
+                tool_status.append({
+                    "tool": tool,
+                    "available": True,
+                    "status": status
+                })
+            else:
+                status = "not found"
+                not_installed_tools.append({
+                    "tool": tool,
+                    "available": False,
+                    "status": status
+                })
+
         result = {
-            "available": available_list,
-            "unavailable": unavailable_list,
-            "available_count": len(available_list),
+            "available": tool_status,
+            "disabled": disabled_tools,
+            "not_installed": not_installed_tools,
+            "available_count": len(tool_status),
             "total": len(all_tools),
         }
 
@@ -474,21 +494,37 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
             print("=" * 60)
             print()
 
-            for status_info in tool_status:
-                tool_name = status_info["tool"]
-                available = status_info["available"]
-                status_symbol = "✓" if available else "✗"
-                status_text = "Available" if available else "Not Found"
+            # Show ready to use tools
+            if tool_status:
+                print("  ✓ Ready to Use:")
+                for status_info in tool_status:
+                    print(f"    • {status_info['tool']}")
+                print()
 
-                print(f"  {status_symbol} {tool_name:<15} {status_text}")
+            # Show disabled tools
+            if disabled_tools:
+                print("  ⊘ Disabled in Config:")
+                for status_info in disabled_tools:
+                    print(f"    • {status_info['tool']}")
+                print("    → Enable in .claude/ai_config.yaml")
+                print()
 
+            # Show not installed tools
+            if not_installed_tools:
+                print("  ✗ Not Installed:")
+                for status_info in not_installed_tools:
+                    print(f"    • {status_info['tool']}")
+                print()
+
+            print(f"Summary: {len(tool_status)}/{len(all_tools)} tools ready to use")
             print()
-            print(f"Available: {len(available_tools)}/{len(all_tools)}")
-            print()
 
-            if len(available_tools) == 0:
-                print("No AI consultation tools found.")
-                print("Install at least one: gemini, codex, or cursor-agent")
+            if len(tool_status) == 0:
+                if disabled_tools:
+                    print("Hint: Some tools are disabled - enable them in .claude/ai_config.yaml")
+                else:
+                    print("No AI consultation tools found.")
+                    print("Install at least one: gemini, codex, or cursor-agent")
             elif hasattr(args, 'verbose') and args.verbose:
                 print("\nUsage:")
                 print("  Use --ai-tools to specify which tools to consult")

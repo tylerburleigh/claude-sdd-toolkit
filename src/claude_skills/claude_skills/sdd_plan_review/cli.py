@@ -23,6 +23,7 @@ from claude_skills.sdd_plan_review import (
     review_with_tools,
 )
 from claude_skills.common.ai_tools import get_enabled_and_available_tools
+from claude_skills.common import ai_config
 from claude_skills.sdd_plan_review.reporting import (
     generate_markdown_report,
     generate_json_report,
@@ -342,32 +343,39 @@ def cmd_review(args, printer):
 
 
 def cmd_list_tools(args, printer):
-    """List available AI CLI tools."""
+    """List available AI CLI tools, respecting enabled configuration."""
     tools_to_check = ["gemini", "codex", "cursor-agent"]
 
-    available = []
-    unavailable = []
+    # Categorize tools based on configuration and availability
+    ready = []          # Enabled and executable exists
+    disabled = []       # Explicitly disabled in config
+    not_installed = []  # Enabled but executable not found
 
     for tool in tools_to_check:
-        is_available = check_tool_available(tool)
-        if is_available:
-            available.append(tool)
+        is_enabled = ai_config.is_tool_enabled("sdd-plan-review", tool)
+        is_installed = check_tool_available(tool)
+
+        if not is_enabled:
+            disabled.append(tool)
+        elif is_installed:
+            ready.append(tool)
         else:
-            unavailable.append(tool)
+            not_installed.append(tool)
 
     # JSON output mode
     if args.json:
         payload = {
-            "available": available,
-            "unavailable": unavailable,
+            "available": ready,
+            "disabled": disabled,
+            "not_installed": not_installed,
             "total": len(tools_to_check),
-            "available_count": len(available)
+            "available_count": len(ready)
         }
 
         # Apply verbosity filtering
         filtered_output = prepare_output(payload, args, LIST_TOOLS_ESSENTIAL, LIST_TOOLS_STANDARD)
         output_json(filtered_output, args.compact)
-        if len(available) == 0:
+        if len(ready) == 0:
             return 1
         else:
             return 0
@@ -375,21 +383,27 @@ def cmd_list_tools(args, printer):
     # Rich UI mode
     printer.header("AI CLI Tools for Reviews")
 
-    if available:
-        printer.success(f"\n✓ Available ({len(available)}):")
-        for tool in available:
+    if ready:
+        printer.success(f"\n✓ Ready to Use ({len(ready)}):")
+        for tool in ready:
             printer.detail(f"  {tool}")
 
-    if unavailable:
-        printer.warning(f"\n✗ Not Available ({len(unavailable)}):")
-        for tool in unavailable:
+    if disabled:
+        printer.warning(f"\n⊘ Disabled in Config ({len(disabled)}):")
+        for tool in disabled:
+            printer.detail(f"  {tool}")
+            printer.detail(f"     To enable: set 'enabled: true' in .claude/ai_config.yaml")
+
+    if not_installed:
+        printer.warning(f"\n✗ Not Installed ({len(not_installed)}):")
+        for tool in not_installed:
             printer.detail(f"  {tool}")
 
     # Installation instructions
-    if unavailable:
+    if not_installed:
         printer.info("\nInstallation Instructions:")
 
-        for tool in unavailable:
+        for tool in not_installed:
             if tool == "gemini":
                 printer.detail("\nGemini CLI:")
                 printer.detail("  npm install -g @google/generative-ai-cli")
@@ -404,12 +418,15 @@ def cmd_list_tools(args, printer):
                 printer.detail("  Cursor agent comes bundled with the IDE")
 
     # Summary
-    printer.info(f"\nSummary: {len(available)}/{len(tools_to_check)} tools available")
+    total_usable = len(ready)
+    printer.info(f"\nSummary: {total_usable}/{len(tools_to_check)} tools ready to use")
 
-    if len(available) == 0:
-        printer.warning("No tools available - cannot run reviews")
+    if len(ready) == 0:
+        printer.warning("No tools ready - cannot run reviews")
+        if disabled:
+            printer.info("Hint: Some tools are disabled in config - enable them in .claude/ai_config.yaml")
         return 1
-    elif len(available) == 1:
+    elif len(ready) == 1:
         printer.info("Single-model reviews available (limited confidence)")
         return 0
     else:

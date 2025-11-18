@@ -229,7 +229,7 @@ CACHE_STATS_STANDARD = {
 
 # list-plan-review-tools command (sdd_plan_review)
 LIST_TOOLS_ESSENTIAL = {'available_count', 'total'}
-LIST_TOOLS_STANDARD = {'available', 'unavailable', 'total', 'available_count'}
+LIST_TOOLS_STANDARD = {'available', 'disabled', 'not_installed', 'total', 'available_count'}
 
 # check-deps command
 CHECK_DEPS_ESSENTIAL = {'can_start', 'blocked_by'}
