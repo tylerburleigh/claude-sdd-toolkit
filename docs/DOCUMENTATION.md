@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 17:55:09
+**Generated:** 2025-11-18 17:55:57
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114025
+- **Total Lines:** 113988
 - **Total Classes:** 448
-- **Total Functions:** 1469
+- **Total Functions:** 1468
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -23013,26 +23013,6 @@ Example:
 
 **Parameters:**
 - `repo_root`: Path
-
----
-
-### `get_stance_instruction(stance) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:291`
-**Complexity:** 3
-
-**Description:**
-> Get stance-specific instruction for a model.
-
-Args:
-    stance: for, against, or neutral
-
-Returns:
-    Stance instruction string
-
-**Parameters:**
-- `stance`: str
 
 ---
 
