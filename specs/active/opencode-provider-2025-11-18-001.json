@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T12:54:04.247254Z",
+  "last_updated": "2025-11-19T12:55:29.114829Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -40,7 +40,7 @@
         "task-1-5"
       ],
       "total_tasks": 13,
-      "completed_tasks": 8,
+      "completed_tasks": 9,
       "metadata": {
         "purpose": "Create Node.js wrapper script that uses OpenCode SDK to handle server management, sessions, and prompts",
         "risk_level": "medium"
@@ -1331,16 +1331,22 @@
       "type": "task",
       "title": "Environment variable handling in wrapper",
       "description": "Add support for passing configuration via environment variables to the Node.js wrapper. The wrapper must read: OPENCODE_API_KEY (optional, if required for OpenCode server access), OPENCODE_SERVER_URL (optional, with default), and any other SDK configuration from environment. Document expected environment variables in wrapper code comments.",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "estimated_hours": 1,
         "file_path": "task-1-5.md",
         "task_category": "implementation",
-        "description": "Enable configuration passing from Python to Node.js via environment"
+        "description": "Enable configuration passing from Python to Node.js via environment",
+        "started_at": "2025-11-19T12:55:07.617509Z",
+        "status_note": "Environment variable handling already implemented in task-1-1-2",
+        "completed_at": "2025-11-19T12:55:29.096833Z",
+        "needs_journaling": false,
+        "actual_hours": 0.006,
+        "journaled_at": "2025-11-19T12:55:29.109632Z"
       },
       "dependencies": {
         "blocks": [
@@ -1658,12 +1664,21 @@
       "content": "All child tasks in group phase-1-files have been completed.",
       "metadata": {},
       "task_id": "phase-1-files"
+    },
+    {
+      "timestamp": "2025-11-19T12:55:29.109607Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Environment variable handling in wrapper",
+      "author": "claude-code",
+      "content": "Environment variable handling was already implemented during task-1-1-2. The wrapper script reads OPENCODE_API_KEY (required) and OPENCODE_SERVER_URL (optional, defaults to https://api.opencode.ai) from environment variables and passes them to createOpencode() client initialization. No additional work required - this task was created during plan review to ensure environment variables were handled, which has been confirmed complete.\n\nFile location: /home/tyler/Documents/GitHub/claude-sdd-toolkit/src/claude_skills/claude_skills/common/providers/opencode_wrapper.js lines 164-176.",
+      "metadata": {},
+      "task_id": "task-1-5"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 19,
+    "progress_percentage": 21,
     "current_phase": "phase-1"
   }
 }
