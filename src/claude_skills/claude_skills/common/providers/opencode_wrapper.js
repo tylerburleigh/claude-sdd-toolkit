@@ -64,7 +64,7 @@ Options:
  */
 function showVersion() {
   // Read version from package.json
-  import('./package.json', { assert: { type: 'json' } })
+  import('./package.json', { with: { type: 'json' } })
     .then(pkg => {
       console.log(`OpenCode Wrapper v${pkg.default.version}`);
       console.log(`@opencode-ai/sdk v${pkg.default.dependencies['@opencode-ai/sdk']}`);
@@ -111,7 +111,6 @@ async function readStdin() {
     let data = '';
     const rl = createInterface({
       input: process.stdin,
-      output: process.stdout,
       terminal: false
     });
 
@@ -198,6 +197,11 @@ async function main() {
 
   if (!apiKey) {
     throw new Error('OPENCODE_API_KEY environment variable is required');
+  }
+
+  // Validate configuration object
+  if (payload.config && typeof payload.config !== 'object') {
+    throw new Error('config must be an object');
   }
 
   // Create OpenCode client connection

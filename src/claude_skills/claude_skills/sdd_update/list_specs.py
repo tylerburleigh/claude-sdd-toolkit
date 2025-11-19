@@ -131,6 +131,9 @@ def list_specs(
 
             specs_info.append(info)
 
+    # Sort specs: active folder first, then by completion % (highest first)
+    specs_info.sort(key=lambda s: (0 if s.get("status") == "active" else 1, -s.get("progress_percentage", 0)))
+
     # Output results
     if output_format == "json":
         # Apply verbosity filtering for JSON output

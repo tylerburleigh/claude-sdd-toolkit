@@ -172,6 +172,9 @@ def _collect_specs_info(project_root: Path) -> dict:
             except Exception:
                 continue
 
+    # Sort specs: active folder first, then by completion % (highest first)
+    specs.sort(key=lambda s: (0 if s.get("folder_status") == "active" else 1, -s.get("percentage", 0)))
+
     pending_specs = [
         {"spec_id": spec["spec_id"], "title": spec["title"]}
         for spec in specs
