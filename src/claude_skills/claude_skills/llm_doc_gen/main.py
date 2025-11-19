@@ -51,7 +51,8 @@ class DocumentationWorkflow:
         index_data: IndexData,
         llm_consultation_fn: Callable[[str], tuple[bool, str]],
         use_batching: bool = False,
-        batch_size: int = 3
+        batch_size: int = 3,
+        resume: bool = False
     ) -> Dict[str, Any]:
         """
         Generate complete documentation suite.
@@ -62,6 +63,7 @@ class DocumentationWorkflow:
             llm_consultation_fn: Function to call LLM (signature: (prompt: str) -> tuple[bool, str])
             use_batching: Whether to use batched generation
             batch_size: Batch size if using batching
+            resume: Whether to resume from previous interrupted generation
 
         Returns:
             Dict with generation results
@@ -78,12 +80,14 @@ class DocumentationWorkflow:
             results = self.orchestrator.generate_documentation_batched(
                 project_data=self._project_data_to_dict(project_data),
                 shard_generators=shard_generators,
-                batch_size=batch_size
+                batch_size=batch_size,
+                resume=resume
             )
         else:
             results = self.orchestrator.generate_documentation(
                 project_data=self._project_data_to_dict(project_data),
-                shard_generators=shard_generators
+                shard_generators=shard_generators,
+                resume=resume
             )
 
         return results

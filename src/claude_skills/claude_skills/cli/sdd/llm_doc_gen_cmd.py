@@ -16,6 +16,7 @@ Options for generate:
     --description DESC   Project description
     --batch-size N       Number of shards to process per batch (default: 3)
     --no-batching        Disable batched generation
+    --resume             Resume from previous interrupted generation
     --verbose, -v        Verbose output
 
 Examples:
@@ -73,6 +74,8 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
         printer.info(f"Generating LLM-based documentation for: {project_name}")
         printer.info(f"Project root: {project_root}")
         printer.info(f"Output directory: {output_dir}")
+        if args.resume:
+            printer.info("Resume mode: Will continue from previous state if available")
 
         # Create project data from scan
         printer.info("Scanning project...")
@@ -110,7 +113,8 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
             index_data=index_data,
             llm_consultation_fn=llm_consultation_wrapper,
             use_batching=use_batching,
-            batch_size=batch_size
+            batch_size=batch_size,
+            resume=args.resume
         )
 
         # Report results
@@ -199,5 +203,10 @@ def register_llm_doc_gen(subparsers: argparse._SubParsersAction, parent_parser: 
         '--no-batching',
         action='store_true',
         help='Disable batched generation'
+    )
+    generate_parser.add_argument(
+        '--resume',
+        action='store_true',
+        help='Resume from previous interrupted generation (uses saved state)'
     )
     generate_parser.set_defaults(func=handle_generate)
