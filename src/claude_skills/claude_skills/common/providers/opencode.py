@@ -67,3 +67,80 @@ OPENCODE_METADATA = ProviderMetadata(
         "configurable": True,
     },
 )
+
+
+class RunnerProtocol(Protocol):
+    """Callable signature used for executing Node.js wrapper commands."""
+
+    def __call__(
+        self,
+        command: Sequence[str],
+        *,
+        timeout: Optional[int] = None,
+        env: Optional[Dict[str, str]] = None,
+        input_data: Optional[str] = None,
+    ) -> subprocess.CompletedProcess[str]:
+        raise NotImplementedError
+
+
+def _default_runner(
+    command: Sequence[str],
+    *,
+    timeout: Optional[int] = None,
+    env: Optional[Dict[str, str]] = None,
+    input_data: Optional[str] = None,
+) -> subprocess.CompletedProcess[str]:
+    """Invoke the OpenCode wrapper via subprocess."""
+    return subprocess.run(  # noqa: S603,S607 - intentional wrapper invocation
+        list(command),
+        capture_output=True,
+        text=True,
+        input=input_data,
+        timeout=timeout,
+        env=env,
+        check=False,
+    )
+
+
+class OpenCodeProvider(ProviderContext):
+    """ProviderContext implementation backed by the OpenCode AI wrapper."""
+
+    def __init__(
+        self,
+        metadata: ProviderMetadata,
+        hooks: ProviderHooks,
+        *,
+        model: Optional[str] = None,
+        binary: Optional[str] = None,
+        wrapper_path: Optional[Path] = None,
+        runner: Optional[RunnerProtocol] = None,
+        env: Optional[Dict[str, str]] = None,
+        timeout: Optional[int] = None,
+    ):
+        super().__init__(metadata, hooks)
+        self._runner = runner or _default_runner
+        self._binary = binary or os.environ.get(CUSTOM_BINARY_ENV, DEFAULT_BINARY)
+        self._wrapper_path = wrapper_path or Path(
+            os.environ.get(CUSTOM_WRAPPER_ENV, str(DEFAULT_WRAPPER_SCRIPT))
+        )
+        self._env = env
+        self._timeout = timeout or DEFAULT_TIMEOUT_SECONDS
+        self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
+        self._server_process: Optional[subprocess.Popen] = None
+
+    def _first_model_id(self) -> str:
+        if not self.metadata.models:
+            raise ProviderUnavailableError(
+                "OpenCode provider metadata is missing model descriptors.",
+                provider=self.metadata.provider_name,
+            )
+        return self.metadata.models[0].id
+
+    def _ensure_model(self, candidate: str) -> str:
+        available = {descriptor.id for descriptor in self.metadata.models}
+        if candidate not in available:
+            raise ProviderExecutionError(
+                f"Unsupported OpenCode model '{candidate}'. Available: {', '.join(sorted(available))}",
+                provider=self.metadata.provider_name,
+            )
+        return candidate
