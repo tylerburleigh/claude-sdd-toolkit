@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:26:46
+**Generated:** 2025-11-19 17:47:27
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 340
-- **Total Lines:** 119510
+- **Total Lines:** 119533
 - **Total Classes:** 475
 - **Total Functions:** 1527
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 339
-- **Lines:** 119213
+- **Lines:** 119236
 - **Classes:** 475
 - **Functions:** 1520
 - **Avg Complexity:** 4.69
@@ -17913,7 +17913,7 @@ Returns:
 ### `create_index_data_from_project(project_data, project_description) -> IndexData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:298`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:321`
 **Complexity:** 1
 
 **Description:**
@@ -18114,7 +18114,7 @@ Returns:
 ### `create_project_data_from_scan(project_root, project_name) -> ProjectData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:266`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:289`
 **Complexity:** 1
 
 **Description:**
@@ -18738,7 +18738,7 @@ Returns:
 ### `detect_project_structure(project_root) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:173`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:196`
 **Complexity:** 5
 
 **Description:**
@@ -28494,7 +28494,7 @@ Returns:
 ### `scan_project_files(project_root, max_files) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:210`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:233`
 **Complexity:** 8
 
 **Description:**
