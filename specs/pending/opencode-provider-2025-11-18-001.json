@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-18T21:59:23.840264Z",
+  "last_updated": "2025-11-19T00:44:53.695184Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -15,7 +15,7 @@
         "phase-4",
         "phase-5"
       ],
-      "total_tasks": 35,
+      "total_tasks": 40,
       "completed_tasks": 0,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
@@ -35,9 +35,10 @@
       "parent": "spec-root",
       "children": [
         "phase-1-files",
-        "phase-1-verify"
+        "phase-1-verify",
+        "task-1-5"
       ],
-      "total_tasks": 11,
+      "total_tasks": 13,
       "completed_tasks": 0,
       "metadata": {
         "purpose": "Create Node.js wrapper script that uses OpenCode SDK to handle server management, sessions, and prompts",
@@ -62,7 +63,7 @@
         "task-1-3",
         "task-1-4"
       ],
-      "total_tasks": 7,
+      "total_tasks": 8,
       "completed_tasks": 0,
       "metadata": {},
       "dependencies": {
@@ -86,12 +87,13 @@
       ],
       "dependencies": {
         "blocks": [
-          "task-1-2"
+          "task-1-2",
+          "task-1-5"
         ],
         "blocked_by": [],
         "depends": []
       },
-      "total_tasks": 4,
+      "total_tasks": 5,
       "completed_tasks": 0,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/providers/opencode_wrapper.js",
@@ -105,12 +107,14 @@
       "title": "Import OpenCode SDK and setup argument parsing",
       "status": "pending",
       "parent": "task-1-1",
-      "children": [],
+      "children": [
+        "verify-1-1-1-2"
+      ],
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Import @opencode-ai/sdk, setup CLI argument parsing (prompt, model, tools, system prompt, working directory)"
+        "description": "Import @opencode-ai/sdk, setup CLI argument parsing (prompt, model, tools, system prompt, working directory) CRITICAL DESIGN: Use stdin for data transmission to avoid CLI argument length limits. Only use CLI args for simple flags like --version."
       },
       "dependencies": {
         "blocks": [
@@ -118,11 +122,12 @@
         ],
         "blocked_by": [],
         "depends": []
-      }
+      },
+      "description": "Define CLI interface for the wrapper script. The wrapper accepts minimal CLI flags (e.g., --version, --help) but receives all prompt data via stdin. On execution, the wrapper reads a JSON payload from stdin containing: {\"prompt\": \"...\", \"system_prompt\": \"...\", \"config\": {...}, \"allowedTools\": [...]}. This avoids OS argument length limits (~128KB) that would cause failures on large prompts or complex tool definitions."
     },
     "task-1-1-2": {
       "type": "subtask",
-      "title": "Implement server management and session creation",
+      "title": "Implement client connection",
       "status": "pending",
       "parent": "task-1-1",
       "children": [],
@@ -139,12 +144,13 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Use createOpencode() to start/connect to server, create session with title and working directory"
-      }
+        "description": "Use createOpencodeClient() to connect to the server URL provided in config/env. Do NOT start a server instance here. Add SIGINT/SIGTERM handlers."
+      },
+      "description": "Implement OpenCode Client initialization. Use 'createOpencodeClient()' to connect to the existing OpenCode server (managed by the Python provider). Read OPENCODE_SERVER_URL from environment (defaulting to localhost:4096). Implement signal handlers to cleanly disconnect."
     },
     "task-1-1-3": {
       "type": "subtask",
-      "title": "Implement prompt execution with model and tool restrictions",
+      "title": "Create session and execute prompt with model and tool restrictions",
       "status": "pending",
       "parent": "task-1-1",
       "children": [],
@@ -161,15 +167,19 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Call session.prompt() with model selection, system prompt, tool restrictions via --allowedTools CLI arg"
-      }
+        "description": "Create a new session using client.session.create(). Use the session ID to call session.prompt() with model selection. Construct model object { providerID, modelID } by parsing input."
+      },
+      "description": "Parse configuration from stdin JSON payload. Create a new ephemeral session via 'client.session.create()'. Construct the model object required by SDK: {providerID: '...', modelID: '...'} by parsing the 'model' string. Call 'client.session.prompt()' using the new session ID. Investigate SDK support for tool restrictions; if unsupported, document limitation or attempt to enforce via system prompt instructions."
     },
     "task-1-1-4": {
       "type": "subtask",
       "title": "Format and output JSON response",
       "status": "pending",
       "parent": "task-1-1",
-      "children": [],
+      "children": [
+        "verify-1-1-4-1",
+        "verify-1-1-4-2"
+      ],
       "dependencies": {
         "blocked_by": [
           "task-1-1-3"
@@ -177,12 +187,13 @@
         "blocks": [],
         "depends": []
       },
-      "total_tasks": 1,
+      "total_tasks": 2,
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Extract response text from parts array, token usage from info, format as JSON output for Python provider"
-      }
+        "description": "Implement streaming using client.event.subscribe(). Listen for events (e.g. message.delta) to emit chunks {type: 'chunk', content: '...'} to stdout. Handle final response from prompt() result for usage stats. CRITICAL: Top-level try/catch."
+      },
+      "description": "Implement streaming response handling using 'client.event.subscribe()' to capture real-time token events. Emit line-delimited JSON chunks: {\"type\": \"chunk\", \"content\": \"token\"} as events arrive. On completion (from prompt() return value), output {\"type\": \"done\", \"response\": {...}}. Wrap ALL execution in a top-level try/catch block to output structured JSON errors on failure."
     },
     "task-1-2": {
       "type": "task",
@@ -220,8 +231,9 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Add @opencode-ai/sdk dependency, set type: module for ES6 imports"
-      }
+        "description": "Add @opencode-ai/sdk dependency, set type: module for ES6 imports IMPORTANT: Pin SDK to specific version (e.g., ^1.0.0) to prevent future breakage. Don't use 'latest'."
+      },
+      "description": "Create package.json with pinned SDK version. Initialize package.json with @opencode-ai/sdk pinned to a specific version (e.g., \"^1.0.0\" or specific beta tag like \"1.0.0-beta.5\"). Pinning prevents breakage from future SDK updates. Include other necessary fields: name, version, description, main entry point."
     },
     "task-1-3": {
       "type": "task",
@@ -407,7 +419,8 @@
       "parent": "spec-root",
       "children": [
         "phase-2-files",
-        "phase-2-verify"
+        "phase-2-verify",
+        "task-2-3"
       ],
       "dependencies": {
         "blocked_by": [
@@ -418,7 +431,7 @@
         ],
         "depends": []
       },
-      "total_tasks": 7,
+      "total_tasks": 8,
       "completed_tasks": 0,
       "metadata": {
         "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
@@ -464,6 +477,15 @@
         "task_category": "implementation",
         "estimated_hours": 5,
         "description": "Main Python provider following Gemini/Codex patterns"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ],
+        "blocked_by": [
+          "task-1-5"
+        ],
+        "depends": []
       }
     },
     "task-2-1-1": {
@@ -476,7 +498,7 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Add DEFAULT_BINARY=node, DEFAULT_WRAPPER_SCRIPT path, DEFAULT_TIMEOUT_SECONDS=360, AVAILABILITY_OVERRIDE_ENV, CUSTOM_BINARY_ENV, import base classes and types"
+        "description": "Add DEFAULT_BINARY=node, DEFAULT_WRAPPER_SCRIPT path, DEFAULT_TIMEOUT_SECONDS=360, DEFAULT_SERVER_URL='http://localhost:4096', SERVER_STARTUP_TIMEOUT=30. Import subprocess, time, socket, etc."
       },
       "dependencies": {
         "blocks": [
@@ -527,7 +549,7 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Create class extending ProviderContext with __init__ storing binary, wrapper_script, runner, env, timeout"
+        "description": "Create class extending ProviderContext. Add `_server_process` attribute. Initialize with binary, wrapper path, runner, env, timeout."
       }
     },
     "task-2-1-4": {
@@ -535,7 +557,9 @@
       "title": "Implement _execute method",
       "status": "pending",
       "parent": "task-2-1",
-      "children": [],
+      "children": [
+        "verify-2-1-4-1"
+      ],
       "dependencies": {
         "blocked_by": [
           "task-2-1-3"
@@ -549,15 +573,18 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Build command calling wrapper script, run subprocess, parse JSON response, extract token usage, emit streaming chunks, return GenerationResult"
-      }
+        "description": "Call _ensure_server_running(). Build command calling wrapper script, run subprocess, parse JSON response, extract token usage, emit streaming chunks, return GenerationResult."
+      },
+      "description": "Implement the _execute method. 1. Call `self._ensure_server_running()` to verify server availability. 2. Build subprocess command. 3. Write JSON payload to stdin. 4. Stream JSON chunks from stdout. 5. Handle done/error messages. 6. Return GenerationResult."
     },
     "task-2-1-5": {
       "type": "subtask",
       "title": "Add factory function and availability check",
       "status": "pending",
       "parent": "task-2-1",
-      "children": [],
+      "children": [
+        "verify-2-1-5-1"
+      ],
       "dependencies": {
         "blocked_by": [
           "task-2-1-4"
@@ -571,8 +598,32 @@
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Create create_provider() factory, is_opencode_available() checking for node and opencode binaries"
-      }
+        "description": "Create create_provider() factory. Implement is_opencode_available() checking for node runtime AND opencode binary (in node_modules or PATH). Check for node_modules presence."
+      },
+      "description": "Implement is_opencode_available() with comprehensive dependency checks. Check: (1) Node.js runtime available. (2) Wrapper script exists. (3) node_modules exists with @opencode-ai/sdk. (4) `opencode` binary exists (in node_modules/.bin/opencode or global PATH) for server management. If missing, raise ProviderUnavailableError with setup instructions."
+    },
+    "task-2-1-7": {
+      "type": "subtask",
+      "title": "Implement server lifecycle management",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1-3"
+        ],
+        "blocks": [
+          "task-2-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "description": "Implement _ensure_server_running() to check if opencode server is active on port. If not, spawn 'opencode serve' (via node_modules/.bin/opencode) in background. Wait for health check."
+      },
+      "description": "Implement helper method `_ensure_server_running()`. 1. Check if TCP port 4096 (or configured port) is open using socket connection. 2. If closed, locate `opencode` binary (prefer local node_modules/.bin/opencode, fall back to global). 3. Spawn `opencode serve` as a detached background process. 4. Loop/wait (up to SERVER_STARTUP_TIMEOUT) for port to become active. 5. Store process handle (if possible) or rely on persistent OS process."
     },
     "task-2-1-6": {
       "type": "subtask",
@@ -739,12 +790,20 @@
       "title": "Add OpenCode ProviderDetector",
       "status": "pending",
       "parent": "task-3-2",
-      "children": [],
+      "children": [
+        "verify-3-2-1-1"
+      ],
       "total_tasks": 1,
       "completed_tasks": 0,
       "metadata": {
         "task_category": "implementation",
-        "description": "Add ProviderDetector(provider_id=opencode, default_binary=opencode, override_env=OPENCODE_CLI_AVAILABLE_OVERRIDE, binary_env=OPENCODE_CLI_BINARY, probe_args=(--version,)) to _DEFAULT_DETECTORS"
+        "description": "Add ProviderDetector to _DEFAULT_DETECTORS. Check for 'node' runtime AND 'opencode' command capability (via npm exec or local bin)."
+      },
+      "description": "Update ProviderDetector. It should verify Node.js runtime is available. Additionally, since we manage the server process, it should hint if 'opencode' command is likely available (e.g. by checking if node_modules is hydrated or global 'opencode' exists).",
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
       }
     },
     "task-3-3": {
@@ -991,6 +1050,13 @@
         "task_category": "implementation",
         "estimated_hours": 4,
         "description": "Comprehensive unit tests following test_gemini_provider.py pattern"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-5-1"
+        ],
+        "blocked_by": [],
+        "depends": []
       }
     },
     "task-4-1-1": {
@@ -1122,7 +1188,9 @@
       "parent": "spec-root",
       "children": [
         "phase-5-files",
-        "phase-5-verify"
+        "phase-5-verify",
+        "task-5-1",
+        "task-5-2"
       ],
       "dependencies": {
         "blocked_by": [
@@ -1131,7 +1199,7 @@
         "blocks": [],
         "depends": []
       },
-      "total_tasks": 3,
+      "total_tasks": 5,
       "completed_tasks": 0,
       "metadata": {
         "purpose": "End-to-end integration testing and documentation updates",
@@ -1209,6 +1277,258 @@
         },
         "agent": "sdd-fidelity-review"
       }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "Environment variable handling in wrapper",
+      "description": "Add support for passing configuration via environment variables to the Node.js wrapper. The wrapper must read: OPENCODE_API_KEY (optional, if required for OpenCode server access), OPENCODE_SERVER_URL (optional, with default), and any other SDK configuration from environment. Document expected environment variables in wrapper code comments.",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1,
+        "file_path": "task-1-5.md",
+        "task_category": "implementation",
+        "description": "Enable configuration passing from Python to Node.js via environment"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-2-1",
+          "task-2-3"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Pass environment variables to subprocess",
+      "description": "Update OpenCodeProvider to pass required environment variables to the Node.js subprocess. Use subprocess env parameter to pass: OPENCODE_API_KEY from config/environment, OPENCODE_SERVER_URL if configured, and inherit other necessary env vars. Ensure sensitive data (API keys) are handled securely.",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 1,
+        "file_path": "task-2-3.md",
+        "task_category": "implementation",
+        "description": "Security: Secure handling of API keys in subprocess environment"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1",
+          "task-1-5"
+        ],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "Create OpenCode provider documentation",
+      "description": "Create comprehensive documentation for the OpenCode provider. Document: (1) Prerequisites - Node.js >= 16.x required, (2) Configuration - OPENCODE_API_KEY and OPENCODE_SERVER_URL environment variables, (3) Installation - how to enable in ai_config.yaml, (4) Usage examples, (5) Troubleshooting common issues. Add to docs/providers/OPENCODE.md or update existing AI_CONTEXT.md.",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2,
+        "file_path": "task-5-1.md",
+        "task_category": "implementation",
+        "description": "Must document Node.js prerequisite and environment configuration"
+      },
+      "dependencies": {
+        "blocks": [
+          "task-5-2"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      }
+    },
+    "verify-1-1-4-1": {
+      "type": "verify",
+      "title": "Verify wrapper outputs line-delimited JSON chunks, not single blob",
+      "description": "Verify wrapper outputs line-delimited JSON chunks, not single blob",
+      "status": "pending",
+      "parent": "task-1-1-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-2-1-4-1": {
+      "type": "verify",
+      "title": "Verify subprocess uses list-format arguments (no shell injection vulnerability)",
+      "description": "Verify subprocess uses list-format arguments (no shell injection vulnerability)",
+      "status": "pending",
+      "parent": "task-2-1-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-2-1-1": {
+      "type": "verify",
+      "title": "Verify detector checks for 'node' runtime, not 'opencode' binary",
+      "description": "Verify detector checks for 'node' runtime, not 'opencode' binary",
+      "status": "pending",
+      "parent": "task-3-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "Create provider setup command/documentation",
+      "description": "Add user-facing setup instructions for OpenCode provider. Update documentation to explain that after installing the Python package, users must run 'cd [install_path]/providers/opencode && npm install' to hydrate Node.js dependencies. Consider adding a convenience command 'sdd setup-provider opencode' that automates this step. Document this requirement prominently in installation instructions and troubleshooting guide.",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "estimated_hours": 2,
+        "file_path": "docs/providers/OPENCODE.md",
+        "task_category": "implementation",
+        "description": "Critical for end-user experience. Must explain node_modules setup clearly."
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      }
+    },
+    "verify-1-1-1-2": {
+      "type": "verify",
+      "title": "Verify wrapper reads from stdin, not argv (no prompt in args)",
+      "description": "Verify wrapper reads from stdin, not argv (no prompt in args)",
+      "status": "pending",
+      "parent": "task-1-1-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-1-1-4-2": {
+      "type": "verify",
+      "title": "Verify errors output structured JSON {type: 'error', ...}, not stack traces",
+      "description": "Verify errors output structured JSON {type: 'error', ...}, not stack traces",
+      "status": "pending",
+      "parent": "task-1-1-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-2-1-5-1": {
+      "type": "verify",
+      "title": "Verify availability check detects missing node_modules and provides setup instructions",
+      "description": "Verify availability check detects missing node_modules and provides setup instructions",
+      "status": "pending",
+      "parent": "task-2-1-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
     }
-  }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-19T00:36:43.265023Z",
+      "entry_type": "note",
+      "title": "Applied Plan Review Feedback",
+      "author": "claude-code",
+      "content": "Applied 9 modifications based on full plan review findings:\n\nCRITICAL FIXES:\n1. Updated task-1-1-4: Node.js wrapper now implements line-delimited JSON streaming instead of single blob output\n2. Updated task-2-1-4: Python provider now handles streaming chunks + uses list-format subprocess args to prevent shell injection\n3. Updated task-3-2-1: Detector now checks for 'node' runtime instead of non-existent 'opencode' binary\n\nNEW TASKS ADDED:\n4. task-1-5: Environment variable handling in wrapper (API keys, server URL)\n5. task-2-3: Pass environment variables from Python to Node.js subprocess\n6. task-5-1: Create comprehensive OpenCode provider documentation\n\nVERIFICATION STEPS:\n- Added 3 new verification steps to validate streaming, security, and detection fixes\n\nAll critical blockers from review have been addressed. Spec ready for implementation.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-11-19T00:44:53.695101Z",
+      "entry_type": "note",
+      "title": "Applied Second Review Improvements",
+      "author": "claude-code",
+      "content": "Applied 11 modifications based on second review feedback:\n\nMAJOR IMPROVEMENTS:\n1. Stdin-based communication (task-1-1-1, task-1-1-3, task-2-1-4):\n   - Refactored to pass JSON payload via stdin instead of CLI args\n   - Avoids OS argument length limits (~128KB)\n   - Supports arbitrarily large prompts and complex tool schemas\n\n2. Structured error propagation (task-1-1-4):\n   - Added top-level try/catch wrapper in Node.js\n   - All errors output structured JSON: {type: 'error', code: '...', message: '...'}\n   - Prevents stack traces from breaking Python JSON parsing\n   - Enables meaningful error messages to users\n\n3. User-facing dependency management (task-2-1-5, task-5-2):\n   - Updated availability check to detect missing node_modules\n   - Provides specific setup instructions when dependencies missing\n   - Added task-5-2 for setup command/documentation\n\nADDITIONAL ENHANCEMENTS:\n4. Pinned SDK version (task-1-2-1): Prevents breakage from future updates\n5. Graceful shutdown (task-1-1-2): SIGINT/SIGTERM handlers for clean termination\n6. Added 3 new verification steps for stdin, error handling, and dependency checks\n\nValidation: \u2705 0 errors, 0 warnings\nSpec is production-ready with robust error handling and user experience improvements.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-11-19T01:25:00.000000Z",
+      "entry_type": "note",
+      "title": "Added Server Lifecycle Management",
+      "author": "claude-code",
+      "content": "Updated spec to address server process management:\n\n1. Server Management (Task 2-1-7): Added explicit task for Python provider to manage 'opencode serve' process. This ensures a server is running without per-request startup overhead.\n2. Client Connection (Task 1-1-2): Updated wrapper to use 'createOpencodeClient()' to connect to the managed server instead of starting its own.\n3. Availability Checks (Task 2-1-5, 3-2-1): Updated checks to verify 'opencode' binary availability for server spawning.\n\nArchitecture: Python Provider manages Server Process -> Node.js Wrapper connects as Client.",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-11-19T01:45:00.000000Z",
+      "entry_type": "note",
+      "title": "Added Session Creation Step",
+      "author": "gemini-cli",
+      "content": "Updated Task 1-1-3 to explicitly include creating a session via `client.session.create()` before executing a prompt. This aligns with the OpenCode SDK requirements where `prompt` requires a valid `session.id`.",
+      "metadata": {}
+    }
+  ]
 }
