@@ -229,6 +229,45 @@ def test_build_tool_command_handles_whitespace() -> None:
     assert command == ["gemini", "--output-format", "json", "-p", "  spaced prompt  "]
 
 
+def test_build_tool_command_opencode_basic() -> None:
+    """Test OpenCode command construction with basic prompt."""
+    command = build_tool_command(
+        tool="opencode",
+        prompt="Hello world",
+    )
+    assert command == ["node", "opencode_wrapper.js", "--prompt", "Hello world"]
+
+
+def test_build_tool_command_opencode_with_model() -> None:
+    """Test OpenCode command construction with model specified."""
+    command = build_tool_command(
+        tool="opencode",
+        prompt="Test prompt",
+        model="gpt-5.1-codex-mini",
+    )
+    assert command == ["node", "opencode_wrapper.js", "--model", "gpt-5.1-codex-mini", "--prompt", "Test prompt"]
+
+
+def test_build_tool_command_opencode_preserves_whitespace() -> None:
+    """Test OpenCode command preserves prompt whitespace."""
+    command = build_tool_command(
+        tool="opencode",
+        prompt="  spaced prompt  ",
+    )
+    assert command == ["node", "opencode_wrapper.js", "--prompt", "  spaced prompt  "]
+
+
+def test_build_tool_command_opencode_multiline_prompt() -> None:
+    """Test OpenCode command handles multiline prompts."""
+    multiline_prompt = "Line 1\nLine 2\nLine 3"
+    command = build_tool_command(
+        tool="opencode",
+        prompt=multiline_prompt,
+        model="default",
+    )
+    assert command == ["node", "opencode_wrapper.js", "--model", "default", "--prompt", multiline_prompt]
+
+
 # =============================================================================
 # Tool Execution Tests
 # =============================================================================

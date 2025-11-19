@@ -51,25 +51,74 @@ Once cloning is complete, click **"Install"** when prompted.
 
 **Important**: Before installing Python dependencies, you must exit out of Claude Code.
 
-### 8. Install Python Dependencies
+### 8. Install Dependencies (Unified Approach - Recommended)
 
-The plugin requires Python dependencies. Open a terminal and run:
+The plugin requires both Python and Node.js dependencies. Open a terminal and run:
 
 ```bash
 # Navigate to the plugin directory
 cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 
-# Install the package
+# Install Python package first
+pip install -e .
+
+# Run unified installer for all dependencies (pip + npm)
+sdd skills-dev install
+```
+
+**What this does**:
+- Reinstalls/updates Python package
+- Installs Node.js dependencies for OpenCode provider
+- Verifies all installations
+- Reports status
+
+**Prerequisites**:
+- Python 3.9+ (required)
+- Node.js >= 18.x (required for OpenCode provider)
+
+**Note**: The unified installer always installs OpenCode provider dependencies. If you don't have Node.js, see the Manual Installation method below.
+
+### 9. Manual Installation (Alternative)
+
+If you prefer manual control or don't have Node.js installed:
+
+**Python package only**:
+```bash
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
 pip install -e .
 ```
 
-This installs the python CLI tools that the skills use.
+**OpenCode provider** (optional, requires Node.js >= 18.x):
+```bash
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills/claude_skills/common/providers
+npm install
+```
 
-### 9. Restart Claude Code
+See [docs/providers/OPENCODE.md](docs/providers/OPENCODE.md) for complete OpenCode setup instructions.
+
+### 10. Verify Installation
+
+Check that everything is installed correctly:
+
+```bash
+# Check installation status
+sdd skills-dev verify-install
+
+# Or get JSON output
+sdd skills-dev verify-install --json
+```
+
+This will verify:
+- Python package installation
+- sdd command availability
+- OpenCode provider availability
+- Node.js dependencies
+
+### 11. Restart Claude Code
 
 Now restart Claude Code. The plugin and all its components will be active.
 
-### 10. Configure Project Permissions
+### 12. Configure Project Permissions
 
 Open your project in Claude Code and run:
 

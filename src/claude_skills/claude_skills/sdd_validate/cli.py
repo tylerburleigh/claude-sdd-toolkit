@@ -245,6 +245,16 @@ def _interactive_select_fixes(actions, printer):
 
 def cmd_validate(args, printer):
     """Validate JSON spec file."""
+    # Handle --auto-fix deprecation/redirection
+    if getattr(args, 'auto_fix', False):
+        msg = "The --auto-fix flag is not supported for 'validate'. Please use 'sdd fix' command instead."
+        if args.json:
+            output_json({"error": msg, "command": f"sdd fix {args.spec_file}"}, compact=getattr(args, "compact", False))
+        else:
+            printer.error(msg)
+            printer.info(f"Run: sdd fix {args.spec_file}")
+        return 2
+
     spec_file = _resolve_spec_file(args.spec_file, printer)
 
     # Check if we should show progress
@@ -481,6 +491,10 @@ def cmd_fix(args, printer):
         if migration_actions:
             payload["migrated_tasks"] = [a.id.replace("file_path.remove_placeholder:", "") for a in migration_actions]
 
+        # Include remaining issues if present (crucial for debugging failed fixes)
+        if report.post_validation and "issues" in report.post_validation:
+             payload["remaining_issues"] = report.post_validation["issues"]
+
         # Apply verbosity filtering for JSON output
         filtered_output = prepare_output(payload, args, FIX_SPEC_ESSENTIAL, FIX_SPEC_STANDARD)
         output_json(filtered_output, compact=getattr(args, "compact", False))
@@ -704,6 +718,10 @@ def register_validate(subparsers, parent_parser):
     parser_validate.add_argument('--report-format', dest='report_format',
                                  choices=['markdown', 'json'], default='markdown',
                                  help='Report format (default: markdown)')
+    # Add --auto-fix as a supported argument (even though it errors) so argparse doesn't reject it
+    # This allows us to give a helpful "use sdd fix" message in the command handler
+    parser_validate.add_argument('--auto-fix', action='store_true',
+                                help='(Deprecated) Use "sdd fix" command instead')
     parser_validate.set_defaults(func=cmd_validate)
 
     # Fix command

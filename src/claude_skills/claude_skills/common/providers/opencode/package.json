@@ -1,0 +1,19 @@
+{
+  "name": "opencode-provider-wrapper",
+  "version": "1.0.0",
+  "description": "Node.js wrapper for OpenCode AI SDK used by Claude SDD Toolkit",
+  "type": "module",
+  "main": "opencode_wrapper.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["opencode", "ai", "wrapper", "sdd"],
+  "author": "Claude SDD Toolkit",
+  "license": "MIT"
+}

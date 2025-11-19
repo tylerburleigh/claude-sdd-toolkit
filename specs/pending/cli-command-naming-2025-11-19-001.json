@@ -1,0 +1,396 @@
+{
+  "spec_id": "cli-command-naming-2025-11-19-001",
+  "title": "Improve CLI Command Naming Clarity",
+  "generated": "2025-11-19T12:00:00Z",
+  "last_updated": "2025-11-19T13:02:02.177920Z",
+  "metadata": {
+    "description": "Rename analyze-deps and check-deps commands to make their scope more obvious",
+    "objectives": [
+      "Rename analyze-deps to analyze-spec-deps for clarity",
+      "Rename check-deps to check-task-deps for clarity"
+    ],
+    "complexity": "low",
+    "estimated_hours": 3
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Improve CLI Command Naming Clarity",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Command Registration Updates",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update command registrations with new names and backward-compatible aliases"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_validate/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": "Change .add_parser('analyze-deps') to .add_parser('analyze-spec-deps')"
+      },
+      "metadata.details": "Change .add_parser('analyze-deps') to .add_parser('analyze-spec-deps')"
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_next/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_next/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": "Change .add_parser('check-deps') to .add_parser('check-task-deps')"
+      },
+      "metadata.details": "Change .add_parser('check-deps') to .add_parser('check-task-deps')"
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Command names work correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd analyze-spec-deps <spec-id> && sdd check-task-deps <spec-id> <task-id>",
+        "expected": "Both commands execute successfully with new names"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Documentation Updates",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1"
+        ],
+        "blocks": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Update all documentation to reference new command names"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3"
+      ],
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Update skill documentation",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/sdd-validate/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "details": [
+          "Update skills/sdd-validate/SKILL.md: change 'analyze-deps' to 'analyze-spec-deps'",
+          "Update skills/sdd-next/SKILL.md: change 'check-deps' to 'check-task-deps'",
+          "Add notes about backward compatibility aliases"
+        ]
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Update reference documentation",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "BIKE_LANE.md",
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "details": [
+          "Update BIKE_LANE.md with new command names",
+          "Update .agents/sdd-next.md references",
+          "Update src/claude_skills/claude_skills/common/contracts.py comment"
+        ]
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "Regenerate documentation.json",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1",
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 0.25,
+        "details": "Run documentation generation to update docs/documentation.json and docs/DOCUMENTATION.md with new command names",
+        "file_path": "task-2-3.md"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Documentation references updated",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "grep -r 'sdd analyze-deps' --include='*.md' . && grep -r 'sdd check-deps' --include='*.md' .",
+        "expected": "Only find references in migration notes or backward compatibility sections, not in examples"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Help text shows new names",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd --help",
+        "expected": "Lists 'analyze-spec-deps' and 'check-task-deps' as primary command names"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Testing and Final Verification",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure tests pass and overall implementation quality"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Integration tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "python -m pytest tests/integration/test_sdd_validate_cli.py tests/integration/test_sdd_next_cli.py tests/integration/test_list_commands.py -v",
+        "expected": "All CLI integration tests pass"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    }
+  }
+}

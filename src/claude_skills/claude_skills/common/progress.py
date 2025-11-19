@@ -80,15 +80,22 @@ def update_node_status(node: Dict, hierarchy: Dict = None) -> None:
 
     # Handle manually-completed tasks with children
     if node.get("metadata", {}).get("completed_at") and node.get("children"):
-        node["status"] = "completed"
-        # Update children's completion counts if needed
-        if node.get("children"):
-            # Mark all children as completed to maintain consistency
-            # This happens when a parent is manually marked complete
-            # but children weren't individually marked
-            total = node.get("total_tasks", 0)
-            node["completed_tasks"] = total
-        # Don't return early - allow parent chain to update
+        # Check if actual children progress matches the "completed" state
+        # Note: node["completed_tasks"] has already been summed from children in recalculate_progress
+        actual_completed = node.get("completed_tasks", 0)
+        total = node.get("total_tasks", 0)
+
+        if actual_completed < total:
+            # Inconsistent state: parent marked complete but children aren't.
+            # This happens if new subtasks were added after completion, or children weren't marked.
+            # We must respect the children's state to avoid validation errors.
+            # Remove completed_at to allow normal status calculation to take over below.
+            if "metadata" in node and "completed_at" in node["metadata"]:
+                del node["metadata"]["completed_at"]
+        else:
+            # Consistent state, enforce completion
+            node["status"] = "completed"
+            # Don't return early - allow parent chain to update
 
     # If blocked, don't change status but continue to allow count updates
     if is_blocked:

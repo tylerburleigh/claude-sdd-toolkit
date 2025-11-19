@@ -187,11 +187,11 @@ VALIDATE_STANDARD = {
 }
 
 # fix command (sdd_validate)
-FIX_SPEC_ESSENTIAL = {'spec_id', 'applied_action_count', 'post_status'}
+FIX_SPEC_ESSENTIAL = {'spec_id', 'applied_action_count', 'post_status', 'remaining_issues'}
 FIX_SPEC_STANDARD = {
     'spec_id', 'applied_action_count', 'skipped_action_count',
     'migration_action_count', 'backup_path', 'remaining_errors',
-    'remaining_warnings', 'post_status', 'migrated_tasks'
+    'remaining_warnings', 'remaining_issues', 'post_status', 'migrated_tasks'
 }
 
 # stats command (sdd_validate)

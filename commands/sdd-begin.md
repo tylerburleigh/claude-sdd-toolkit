@@ -68,7 +68,18 @@ The formatted summary already includes:
 
 Simply display the `active_work.text` block directly—no extra commands required.
 
-**If last-accessed task exists:**
+**Determine what actionable work exists:**
+
+Before presenting options, check the session summary data to understand what work is available:
+- `session_state.active_specs`: Array of active specs with their status
+- `session_state.in_progress_count`: Number of tasks currently in progress
+- `active_work.specs`: All specs (with completed ones now filtered out by the helper)
+
+**Has actionable incomplete tasks** if:
+- Any spec in `active_work.specs` has `status == "in_progress"` AND `percentage < 100`, OR
+- `session_state.in_progress_count > 0`
+
+**If last-accessed task exists AND actionable tasks available:**
 
 Use `session_state.last_task` and `active_work.pending_specs` from the session summary (no additional CLI calls needed).
 
@@ -79,7 +90,7 @@ Ask the user what they would like to do, with options:
 4. View pending backlog (M specs) - **Only show if pending_specs array has items**
 5. Something else (exit)
 
-**If NO last-accessed task:**
+**If NO last-accessed task AND actionable tasks available:**
 
 Use the pending backlog array from the session summary (`active_work.pending_specs`).
 
@@ -88,6 +99,17 @@ Ask the user what they would like to do, with options:
 2. Write new spec (auto-runs sdd-plan)
 3. View pending backlog (M specs) - **Only show if pending_specs array has items**
 4. Something else (exit)
+
+**If NO actionable tasks (only pending specs OR no work):**
+
+When there are no in-progress tasks, only pending specs with 0% progress:
+
+Ask the user what they would like to do, with options:
+1. View pending backlog (M specs) - **Show this as the PRIMARY option if pending_specs array has items**
+2. Write new spec (auto-runs sdd-plan)
+3. Something else (exit)
+
+Do NOT show "Continue with next task" option when there are no actionable incomplete tasks.
 
 **If NO active work found:**
 

@@ -1,0 +1,25 @@
+{
+  "name": "@claude-sdd-toolkit/opencode-provider",
+  "version": "0.1.0",
+  "description": "OpenCode AI provider integration for Claude SDD Toolkit",
+  "type": "module",
+  "main": "opencode_wrapper.js",
+  "scripts": {
+    "test": "node opencode_wrapper.js --test < test_input.json"
+  },
+  "keywords": [
+    "opencode",
+    "ai",
+    "provider",
+    "claude",
+    "sdd"
+  ],
+  "author": "Claude SDD Toolkit",
+  "license": "MIT",
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

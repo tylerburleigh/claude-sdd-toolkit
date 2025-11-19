@@ -37,6 +37,11 @@ DEFAULT_TOOLS = {
         "description": "Extended reasoning and analysis with read-only access",
         "command": "claude",
         "enabled": True
+    },
+    "opencode": {
+        "description": "User-configurable AI model routing and execution",
+        "command": "opencode",
+        "enabled": True
     }
 }
 
@@ -52,11 +57,14 @@ DEFAULT_MODELS = {
     },
     "claude": {
         "priority": ["sonnet", "haiku"]
+    },
+    "opencode": {
+        "priority": ["gpt-5.1-codex-mini"]
     }
 }
 
 
-DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude"]
+DEFAULT_CONSENSUS_AGENTS: List[str] = ["cursor-agent", "gemini", "codex", "claude", "opencode"]
 
 DEFAULT_AUTO_TRIGGER_RULES: Dict[str, bool] = {
     "default": False,

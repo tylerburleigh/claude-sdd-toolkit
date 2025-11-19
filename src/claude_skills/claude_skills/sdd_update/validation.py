@@ -300,6 +300,28 @@ def reconcile_state(
             if not dry_run:
                 node_data["status"] = "in_progress"
 
+    import json
+
+    # Recalculate progress and detect changes (count mismatches, etc.)
+    # We do this BEFORE reporting findings so we can report count fixes too
+    if printer:
+        printer.action("Recalculating progress...")
+
+    # Capture state before recalculation to detect changes
+    # (recalculate_progress modifies in-place)
+    before_state = json.dumps(spec_data.get("hierarchy", {}), sort_keys=True)
+    recalculate_progress(spec_data)
+    after_state = json.dumps(spec_data.get("hierarchy", {}), sort_keys=True)
+    
+    if before_state != after_state:
+        fixes_made.append({
+            "node_id": "hierarchy",
+            "title": "Global Progress",
+            "old_status": "N/A",
+            "new_status": "Recalculated",
+            "reason": "Count mismatch or inconsistency detected and resolved"
+        })
+
     # Prepare result data
     result_data = {
         "spec_id": spec_id,
@@ -326,11 +348,6 @@ def reconcile_state(
         if printer:
             printer.warning("DRY RUN - No changes saved")
         return result_data if not printer else True
-
-    # Recalculate progress to ensure counts are correct
-    if printer:
-        printer.action("Recalculating progress...")
-    recalculate_progress(spec_data)
 
     # Save JSON spec with backup
     if printer:

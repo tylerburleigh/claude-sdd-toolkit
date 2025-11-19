@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.6.0-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.6.5-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -21,7 +21,7 @@ The SDD Toolkit is a Python library and CLI toolkit for Spec-Driven Development 
 
 **For CLI:**
 - Unified `sdd` command for SDD, documentation, testing, and validation operations
-- Multi-provider support for Gemini, Codex, Cursor Agent, and Claude
+- Multi-provider support for Gemini, Codex, Cursor Agent, Claude, and OpenCode
 - Output modes: Rich (terminal-enhanced), plain text, or JSON
 
 **Integration**:
@@ -50,16 +50,19 @@ SDD Toolkit provides:
    /plugin → Add from marketplace → tylerburleigh/claude-sdd-toolkit
    ```
 
-2. **Install Python Package**:
+2. **Install Dependencies**:
    ```bash
    cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
    pip install -e .
+   sdd skills-dev install  # Installs both pip and npm dependencies
    ```
 
-3. **Configure Project** (in Claude Code):
+3. **Restart Claude Code**, then **Configure Project**:
    ```
    /sdd-setup
    ```
+
+**Note**: Requires Python 3.9+ and Node.js >= 18.x. See [INSTALLATION.md](INSTALLATION.md) for detailed instructions.
 
 ### First Workflow
 
@@ -159,7 +162,7 @@ Unified interface for multiple AI tools:
 
 ```python
 # All providers implement ProviderContext
-providers = ["gemini", "cursor-agent", "codex", "claude"]
+providers = ["gemini", "cursor-agent", "codex", "claude", "opencode"]
 
 # Parallel consultation
 results = consult_multi_agent(
@@ -174,8 +177,11 @@ results = consult_multi_agent(
 - **Cursor Agent** - Cursor IDE's AI with 1M context (Composer)
 - **Codex** - Anthropic Codex CLI
 - **Claude** - Anthropic Claude with read-only restrictions (Sonnet 4.5/Haiku 4.5)
+- **OpenCode** - OpenCode AI models with Node.js SDK integration (requires Node.js >= 18.x)
 
-**Security**: Claude provider enforces read-only tool access (allows Read, Grep, Glob, WebSearch; blocks Write, Edit, Bash).
+**Security**: Claude and OpenCode providers enforce read-only tool access (allows Read, Grep, Glob, WebSearch; blocks Write, Edit, Bash).
+
+**Provider Documentation**: See `docs/providers/OPENCODE.md` for detailed OpenCode setup instructions.
 
 ### Data Flow
 

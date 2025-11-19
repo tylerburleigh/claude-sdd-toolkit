@@ -145,6 +145,13 @@ def _collect_specs_info(project_root: Path) -> dict:
                 total = spec_root.get('total_tasks', 0)
                 percentage = int((completed / total) * 100) if total > 0 else 0
 
+                spec_status = spec_root.get('status', 'unknown')
+
+                # Filter out completed specs - only include pending or in_progress
+                # This matches the filtering logic in get_session_state()
+                if spec_status not in ["pending", "in_progress"]:
+                    continue
+
                 spec_info = {
                     "spec_id": spec_data.get('spec_id'),
                     "spec_file": str(spec_file),
@@ -152,7 +159,7 @@ def _collect_specs_info(project_root: Path) -> dict:
                     "completed": completed,
                     "total": total,
                     "percentage": percentage,
-                    "status": spec_root.get('status', 'unknown'),
+                    "status": spec_status,
                     "folder_status": folder_status,
                     "last_updated": spec_data.get('last_updated', ''),
                 }
@@ -164,6 +171,9 @@ def _collect_specs_info(project_root: Path) -> dict:
                 specs.append(spec_info)
             except Exception:
                 continue
+
+    # Sort specs: active folder first, then by completion % (highest first)
+    specs.sort(key=lambda s: (0 if s.get("folder_status") == "active" else 1, -s.get("percentage", 0)))
 
     pending_specs = [
         {"spec_id": spec["spec_id"], "title": spec["title"]}

@@ -1,0 +1,9 @@
+{
+  "modifications": [
+    {
+      "operation": "remove_node",
+      "node_id": "verify-1-2",
+      "cascade": false
+    }
+  ]
+}

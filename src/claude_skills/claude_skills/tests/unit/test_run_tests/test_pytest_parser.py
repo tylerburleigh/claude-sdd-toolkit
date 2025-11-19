@@ -14,7 +14,6 @@ from claude_skills.run_tests.pytest_parser import (
     format_progress_summary,
 )
 
-
 pytestmark = pytest.mark.unit
 
 # Prevent pytest from treating imported helper classes as tests.
@@ -670,7 +669,9 @@ class TestPytestProgressDisplay:
         display = PytestProgressDisplay(mock_progress, total_tests=10)
 
         progress_info = ProgressInfo(1, 0, 0, 0, 0, 0, 1, 10)
-        display.update(progress_info, current_file="tests/integration/auth/test_oauth_flow.py")
+        display.update(
+            progress_info, current_file="tests/integration/auth/test_oauth_flow.py"
+        )
 
         call_args = mock_progress.update.call_args
         description = call_args[1]["description"]

@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 # Unreleased
 
+## [0.6.5] - 2025-11-19
+
+### Added
+
+**OpenCode AI Provider:**
+- New AI provider for OpenCode AI models with Node.js wrapper integration
+  - Full provider implementation supporting OpenCode AI's latest models
+  - Node.js wrapper (`opencode_wrapper.js`) for SDK communication
+  - Read-only security mode (blocks Write, Edit, Bash tools)
+  - Allows Read, Grep, Glob, WebSearch, WebFetch, Task, Explore tools only
+  - 360-second default timeout for extended reasoning tasks
+  - Comprehensive unit test coverage (696 lines across all test scenarios)
+  - Provider detection with Node.js runtime checks
+  - Automatic npm dependency installation verification
+- **Provider Documentation** - Complete guide at `docs/providers/OPENCODE.md`
+  - Installation instructions with Node.js setup requirements
+  - Configuration examples with API key management
+  - Troubleshooting guide for common issues
+  - Architecture overview and design patterns
+- **Integration Features**:
+  - Provider registry integration with lazy-loading
+  - Availability checks with helpful error messages
+  - Updated AI config templates with OpenCode defaults
+  - CLI runner support: `python -m claude_skills.cli.provider_runner --provider opencode`
+
+### Changed
+- **AI Configuration Templates** - Updated default templates to include OpenCode provider configuration
+- **Provider System** - Enhanced provider detection to support Node.js-based providers
+
+### Notes
+- Requires Node.js >= 18.x for OpenCode provider
+- npm dependencies must be installed separately in the providers directory
+- OpenCode CLI binary (`@opencode-ai/sdk`) should be installed globally
+- Provider follows same security model as Claude provider (read-only tools only)
+
 ## [0.6.0] - 2025-11-18
 
 ### Added
