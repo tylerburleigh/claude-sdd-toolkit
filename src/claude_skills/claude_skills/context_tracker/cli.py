@@ -328,6 +328,12 @@ def cmd_context(args, printer):
 
     # Determine verbosity level early so we can use it in get_transcript_path
     args.verbosity_level = VerbosityLevel.from_args(args, sdd_config)
+
+    # Apply config default for JSON output if not explicitly set
+    # This ensures config settings are observed even if main CLI didn't apply them
+    if not hasattr(args, 'json') or args.json is None:
+        args.json = sdd_config.get('output', {}).get('default_mode') == 'json'
+
     transcript_path = get_transcript_path(args, args.verbosity_level)
     if not transcript_path:
         # Provide context-specific error message
