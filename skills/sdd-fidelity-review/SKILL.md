@@ -101,8 +101,13 @@ sdd fidelity-review <spec-id> --task <task-id>
 - Read spec files with Read tool
 - Parse specs with Python or jq
 - Use cat/head/tail/grep on spec files
+- Create temporary bash scripts (e.g., `/tmp/*.sh`)
+- Use bash loops to iterate through tasks (e.g., `for i in 1 2 3; do sdd get-task...`)
+- Call `sdd get-task` repeatedly - the CLI handles batch task retrieval
+- Use grep/sed/awk to parse JSON outputs - the CLI returns structured JSON
+- Call any `sdd` commands other than `sdd fidelity-review`
 
-This skill must only run `sdd fidelity-review` commands (with `--task` or `--phase` parameter). No other shell commands are required for fidelity review, and the agent should not execute additional tooling alongside the CLI.
+This skill must ONLY run `sdd fidelity-review` commands (with `--task` or `--phase` parameter). The CLI internally uses efficient query functions to retrieve all task data in batch. No other shell commands, loops, or manual task iteration are required for fidelity review.
 
 Your job is to execute the CLI command and parse its JSON output.
 
