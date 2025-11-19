@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 15:09:13
+**Generated:** 2025-11-19 15:14:29
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 332
-- **Total Lines:** 116902
+- **Total Lines:** 116908
 - **Total Classes:** 459
 - **Total Functions:** 1518
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 331
-- **Lines:** 116605
+- **Lines:** 116611
 - **Classes:** 459
 - **Functions:** 1511
 - **Avg Complexity:** 4.69
@@ -883,7 +883,7 @@ Supports multiple programming languages.
 ### `DocumentationWorkflow`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:473`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:479`
 
 **Description:**
 > Specialized workflow engine for documentation generation.
