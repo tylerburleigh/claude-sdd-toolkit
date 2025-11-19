@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:23:16
+**Generated:** 2025-11-19 17:25:18
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 338
-- **Total Lines:** 118856
-- **Total Classes:** 471
+- **Total Files:** 339
+- **Total Lines:** 119187
+- **Total Classes:** 474
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
@@ -32,9 +32,9 @@
 
 ### PYTHON
 
-- **Files:** 337
-- **Lines:** 118559
-- **Classes:** 471
+- **Files:** 338
+- **Lines:** 118890
+- **Classes:** 474
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
 
@@ -921,6 +921,34 @@ Supports multiple programming languages.
 - `save_markdown()`
 - `save_json()`
 - `generate_all()`
+
+---
+
+### `DocumentationOrchestrator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/orchestrator.py:43`
+
+**Description:**
+> Orchestrates documentation generation with write-as-you-go pattern.
+
+Key principles from BMAD:
+1. Write shards immediately to disk
+2. Purge detailed findings from context after writing
+3. Keep only 1-2 sentence summaries in memory
+4. Batch processing to manage memory
+5. State tracking for resumability
+
+**Methods:**
+- `__init__()`
+- `generate_documentation()`
+- `generate_documentation_batched()`
+- `_load_or_init_state()`
+- `_save_state()`
+- `_get_shard_filename()`
+- `_create_summary()`
+- `get_completed_shards()`
+- `cleanup_state()`
 
 ---
 
@@ -2178,6 +2206,16 @@ Example:
 
 ---
 
+### `OrchestrationState`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/orchestrator.py:30`
+
+**Description:**
+> Tracks orchestration progress for resumability.
+
+---
+
 ### `OverviewGenerator`
 
 **Language:** python
@@ -3213,6 +3251,16 @@ Attributes:
 - `get_impact_analysis()`
 - `_extract_keywords()`
 - `_deduplicate_results()`
+
+---
+
+### `ShardResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/orchestrator.py:19`
+
+**Description:**
+> Result of generating a single documentation shard.
 
 ---
 
@@ -37196,6 +37244,18 @@ Returns:
 - `dataclasses.dataclass`
 - `pathlib.Path`
 - `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/orchestrator.py`
+
+- `dataclasses.dataclass`
+- `datetime.datetime`
+- `json`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Callable`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
