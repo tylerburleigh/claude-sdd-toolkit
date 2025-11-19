@@ -227,3 +227,118 @@ class OpenCodeProvider(ProviderContext):
             f"OpenCode server failed to start within {SERVER_STARTUP_TIMEOUT} seconds",
             provider=self.metadata.provider_name,
         )
+
+    def _execute(self, request: GenerationRequest) -> GenerationResult:
+        """Execute generation request via OpenCode wrapper."""
+        # Ensure server is running before making request
+        self._ensure_server_running()
+
+        # Build JSON payload for wrapper stdin
+        payload = {
+            "prompt": request.prompt,
+            "system_prompt": request.system_prompt if hasattr(request, "system_prompt") else None,
+            "config": {
+                "model": self._model,
+                "temperature": request.temperature if hasattr(request, "temperature") else None,
+                "max_tokens": request.max_tokens if hasattr(request, "max_tokens") else None,
+            },
+        }
+
+        # Build command to invoke wrapper
+        command = [self._binary, str(self._wrapper_path)]
+        if request.stream:
+            command.append("--stream")
+
+        # Execute wrapper with JSON payload via stdin
+        timeout = request.timeout or self._timeout
+        try:
+            completed = self._runner(
+                command,
+                timeout=timeout,
+                env=self._env,
+                input_data=json.dumps(payload),
+            )
+        except FileNotFoundError as exc:
+            raise ProviderUnavailableError(
+                f"Node.js binary '{self._binary}' not found",
+                provider=self.metadata.provider_name,
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            raise ProviderTimeoutError(
+                f"OpenCode wrapper timed out after {timeout}s",
+                provider=self.metadata.provider_name,
+            ) from exc
+
+        if completed.returncode != 0:
+            stderr = (completed.stderr or "").strip()
+            raise ProviderExecutionError(
+                f"OpenCode wrapper exited with code {completed.returncode}: {stderr or 'no stderr'}",
+                provider=self.metadata.provider_name,
+            )
+
+        # Parse line-delimited JSON output
+        content_parts = []
+        final_usage: Optional[TokenUsage] = None
+        raw_payload: Dict[str, Any] = {}
+
+        for line in completed.stdout.strip().split("\n"):
+            if not line.strip():
+                continue
+
+            try:
+                msg = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ProviderExecutionError(
+                    f"Invalid JSON from wrapper: {line[:100]}",
+                    provider=self.metadata.provider_name,
+                ) from exc
+
+            msg_type = msg.get("type")
+
+            if msg_type == "chunk":
+                # Streaming chunk
+                chunk_content = msg.get("content", "")
+                content_parts.append(chunk_content)
+                if request.stream:
+                    self._emit_stream_chunk(StreamChunk(content=chunk_content, index=len(content_parts) - 1))
+
+            elif msg_type == "done":
+                # Final response with metadata
+                response_data = msg.get("response", {})
+                final_text = response_data.get("text", "")
+                if final_text and not content_parts:
+                    content_parts.append(final_text)
+
+                # Extract token usage
+                usage_data = response_data.get("usage", {})
+                final_usage = TokenUsage(
+                    input_tokens=usage_data.get("prompt_tokens", 0),
+                    output_tokens=usage_data.get("completion_tokens", 0),
+                    total_tokens=usage_data.get("total_tokens", 0),
+                    metadata={"model": response_data.get("model")},
+                )
+                raw_payload = response_data
+
+            elif msg_type == "error":
+                # Error from wrapper
+                error_msg = msg.get("message", "Unknown error")
+                raise ProviderExecutionError(
+                    f"OpenCode wrapper error: {error_msg}",
+                    provider=self.metadata.provider_name,
+                )
+
+        # Combine all content parts
+        final_content = "".join(content_parts)
+
+        # Use default usage if not provided
+        if final_usage is None:
+            final_usage = TokenUsage(input_tokens=0, output_tokens=0, total_tokens=0)
+
+        return GenerationResult(
+            content=final_content,
+            model_fqn=f"{self.metadata.provider_name}:{self._model}",
+            status=ProviderStatus.SUCCESS,
+            usage=final_usage,
+            stderr=(completed.stderr or "").strip() or None,
+            raw_payload=raw_payload,
+        )
