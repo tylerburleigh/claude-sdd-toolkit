@@ -20,6 +20,9 @@ tools:
   claude:
     command: claude
     enabled: false
+  opencode:
+    command: opencode
+    enabled: false
 
 models:
   gemini:
@@ -37,6 +40,9 @@ models:
     priority:
       - sonnet
       - haiku
+  opencode:
+    priority:
+      - default
 
 # Tool/provider fallback priority (consulted in order if earlier tools fail)
 tool_priority:
@@ -45,6 +51,7 @@ tool_priority:
     - cursor-agent
     - codex
     - claude
+    - opencode
 
 # Fallback and retry configuration
 fallback:
@@ -70,11 +77,13 @@ run-tests:
     - cursor-agent
     - codex
     - claude
+    - opencode
   models:
     gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
+    opencode: default
     # Contextual overrides: use specific models based on failure type
     #overrides:
     #  failure_type:
@@ -95,11 +104,13 @@ code-doc:
     - cursor-agent
     - codex
     - claude
+    - opencode
   models:
     gemini: gemini-2.5-flash
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: haiku
+    opencode: default
     # Contextual overrides: use specific models based on documentation type
     #overrides:
     #  doc_type:
@@ -118,11 +129,13 @@ sdd-plan-review:
     - cursor-agent
     - codex
     - claude
+    - opencode
   models:
     gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
+    opencode: default
     # Contextual overrides: use specific models based on review type
     #overrides:
     #  review_type:
@@ -143,11 +156,13 @@ sdd-render:
     - cursor-agent
     - codex
     - claude
+    - opencode
   models:
     gemini: gemini-2.5-flash
     cursor-agent: composer-1
     codex: gpt-5-codex-mini
     claude: haiku
+    opencode: default
     # Contextual overrides: use specific models based on feature
     #overrides:
     #  feature:
@@ -168,11 +183,13 @@ sdd-fidelity-review:
     - cursor-agent
     - codex
     - claude
+    - opencode
   models:
     gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
+    opencode: default
 
 consensus:
   agents:
@@ -180,11 +197,13 @@ consensus:
     - gemini
     - codex
     - claude
+    - opencode
   models:
     gemini: pro
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
+    opencode: default
   auto_trigger:
     default: false
     assertion: true
