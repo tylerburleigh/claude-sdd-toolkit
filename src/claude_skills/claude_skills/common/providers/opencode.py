@@ -342,3 +342,96 @@ class OpenCodeProvider(ProviderContext):
             stderr=(completed.stderr or "").strip() or None,
             raw_payload=raw_payload,
         )
+
+
+def is_opencode_available() -> bool:
+    """
+    Check if OpenCode provider dependencies are available.
+
+    Verifies:
+    1. Node.js runtime is available
+    2. Wrapper script exists
+    3. node_modules exists with @opencode-ai/sdk
+    4. opencode binary exists (for server management)
+    """
+    # Check Node.js runtime
+    try:
+        result = subprocess.run(
+            ["node", "--version"],
+            capture_output=True,
+            timeout=5,
+            check=False,
+        )
+        if result.returncode != 0:
+            return False
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+    # Check wrapper script exists
+    if not DEFAULT_WRAPPER_SCRIPT.exists():
+        return False
+
+    # Check node_modules with @opencode-ai/sdk
+    sdk_path = DEFAULT_WRAPPER_SCRIPT.parent / "node_modules" / "@opencode-ai" / "sdk"
+    if not sdk_path.exists():
+        return False
+
+    # Check opencode binary (in node_modules/.bin or global PATH)
+    node_modules_bin = Path("node_modules/.bin/opencode")
+    if node_modules_bin.exists():
+        return True
+
+    # Check global PATH
+    try:
+        result = subprocess.run(
+            ["which", "opencode"],
+            capture_output=True,
+            timeout=5,
+            check=False,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return True
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+
+    return False
+
+
+def create_provider(
+    *,
+    hooks: ProviderHooks,
+    model: Optional[str] = None,
+    dependencies: Optional[Dict[str, object]] = None,
+    overrides: Optional[Dict[str, object]] = None,
+) -> OpenCodeProvider:
+    """
+    Factory function for creating OpenCodeProvider instances.
+
+    Args:
+        hooks: Provider hooks for callbacks
+        model: Optional model ID override
+        dependencies: Optional dependencies (runner, env, binary)
+        overrides: Optional parameter overrides
+
+    Returns:
+        Configured OpenCodeProvider instance
+    """
+    dependencies = dependencies or {}
+    overrides = overrides or {}
+
+    runner = dependencies.get("runner")
+    env = dependencies.get("env")
+    binary = overrides.get("binary") or dependencies.get("binary")
+    wrapper_path = overrides.get("wrapper_path") or dependencies.get("wrapper_path")
+    timeout = overrides.get("timeout") or dependencies.get("timeout")
+
+    return OpenCodeProvider(
+        metadata=OPENCODE_METADATA,
+        hooks=hooks,
+        model=model,
+        binary=binary,
+        wrapper_path=wrapper_path,
+        runner=runner,
+        env=env,
+        timeout=timeout,
+    )

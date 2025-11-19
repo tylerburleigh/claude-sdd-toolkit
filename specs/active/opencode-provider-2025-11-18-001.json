@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T15:03:09.813997Z",
+  "last_updated": "2025-11-19T15:04:17.227769Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 18,
+      "completed_tasks": 19,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -522,7 +522,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
         "risk_level": "medium"
@@ -537,7 +537,7 @@
         "task-2-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -561,7 +561,7 @@
         "task-2-1-6"
       ],
       "total_tasks": 6,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/providers/opencode.py",
         "task_category": "implementation",
@@ -696,7 +696,7 @@
     "task-2-1-5": {
       "type": "subtask",
       "title": "Add factory function and availability check",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [
         "verify-2-1-5-1"
@@ -711,10 +711,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
-        "description": "Create create_provider() factory. Implement is_opencode_available() checking for node runtime AND opencode binary (in node_modules or PATH). Check for node_modules presence."
+        "description": "Create create_provider() factory. Implement is_opencode_available() checking for node runtime AND opencode binary (in node_modules or PATH). Check for node_modules presence.",
+        "started_at": "2025-11-19T15:03:40.075264Z",
+        "status_note": "Adding factory function and comprehensive availability checks",
+        "completed_at": "2025-11-19T15:04:17.221028Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-19T15:04:17.225737Z"
       },
       "description": "Implement is_opencode_available() with comprehensive dependency checks. Check: (1) Node.js runtime available. (2) Wrapper script exists. (3) node_modules exists with @opencode-ai/sdk. (4) `opencode` binary exists (in node_modules/.bin/opencode or global PATH) for server management. If missing, raise ProviderUnavailableError with setup instructions."
     },
@@ -1956,12 +1962,21 @@
       "content": "Verified subprocess security - _execute method uses list-format command arguments (command = [self._binary, str(self._wrapper_path)]) preventing shell injection. _default_runner also uses list(command) format. No shell=True parameter used. All subprocess calls are secure against command injection vulnerabilities.",
       "metadata": {},
       "task_id": "verify-2-1-4-1"
+    },
+    {
+      "timestamp": "2025-11-19T15:04:17.225727Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Add factory function and availability check",
+      "author": "claude-code",
+      "content": "Implemented is_opencode_available() with comprehensive dependency checks: (1) Node.js runtime availability via 'node --version', (2) wrapper script existence at DEFAULT_WRAPPER_SCRIPT path, (3) node_modules with @opencode-ai/sdk package, (4) opencode binary in node_modules/.bin or global PATH for server management. Created create_provider() factory function accepting hooks, model, dependencies, and overrides parameters, returning configured OpenCodeProvider instance with proper dependency injection support. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 347-437, 91 new lines).",
+      "metadata": {},
+      "task_id": "task-2-1-5"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 43,
+    "progress_percentage": 46,
     "current_phase": "phase-2",
     "task-1-1-1.completed_tasks": "0",
     "task-1-1-4.completed_tasks": "0"
