@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:57:51
+**Generated:** 2025-11-19 18:07:08
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 341
-- **Total Lines:** 119728
+- **Total Lines:** 119738
 - **Total Classes:** 475
 - **Total Functions:** 1529
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 340
-- **Lines:** 119431
+- **Lines:** 119441
 - **Classes:** 475
 - **Functions:** 1522
 - **Avg Complexity:** 4.69
@@ -24426,7 +24426,7 @@ Args:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:40`
-⚠️ **Complexity:** 13 (High)
+⚠️ **Complexity:** 15 (High)
 
 **Decorators:** `@track_metrics('llm_doc_gen_generate')`
 
@@ -27200,7 +27200,7 @@ Args:
 ### `register_llm_doc_gen(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:144`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:154`
 **Complexity:** 1
 
 **Description:**
