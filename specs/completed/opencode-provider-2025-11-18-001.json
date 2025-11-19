@@ -1,12 +1,12 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T16:48:34.565384Z",
+  "last_updated": "2025-11-19T16:49:19.760549Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
       "title": "Add OpenCode as Provider",
-      "status": "in_progress",
+      "status": "completed",
       "parent": null,
       "children": [
         "phase-1",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 40,
+      "completed_tasks": 41,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -1439,7 +1439,7 @@
     "phase-5": {
       "type": "phase",
       "title": "Integration Testing & Documentation",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "spec-root",
       "children": [
         "phase-5-files",
@@ -1455,21 +1455,27 @@
         "depends": []
       },
       "total_tasks": 5,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "End-to-end integration testing and documentation updates",
-        "risk_level": "low"
+        "risk_level": "low",
+        "needs_journaling": true,
+        "completed_at": "2025-11-19T16:49:19.760500Z"
       }
     },
     "phase-5-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {}
+      "completed_tasks": 1,
+      "metadata": {
+        "completed_at": "2025-11-19T16:49:19.760062Z",
+        "needs_journaling": true,
+        "status_note": "All file modifications completed in child tasks (task-5-1 and task-5-2)"
+      }
     },
     "phase-5-verify": {
       "type": "group",

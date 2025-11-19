@@ -8,7 +8,7 @@
  * and outputs streaming responses as line-delimited JSON to stdout.
  */
 
-import { createOpencode } from '@opencode-ai/sdk';
+import { createOpencodeClient } from '@opencode-ai/sdk/client';
 import { createInterface } from 'readline';
 
 // Global client instance for graceful shutdown
@@ -78,14 +78,9 @@ function showVersion() {
  * Cleanup function for graceful shutdown
  */
 async function cleanup() {
-  if (opcodeClient) {
-    try {
-      await opcodeClient.close();
-      opcodeClient = null;
-    } catch (error) {
-      console.error('Error closing client:', error.message);
-    }
-  }
+  // OpenCode client doesn't need explicit cleanup
+  // Just null out the reference
+  opcodeClient = null;
 }
 
 /**
@@ -195,29 +190,27 @@ async function main() {
   const serverUrl = process.env.OPENCODE_SERVER_URL || 'https://api.opencode.ai';
   const apiKey = process.env.OPENCODE_API_KEY;
 
-  if (!apiKey) {
-    throw new Error('OPENCODE_API_KEY environment variable is required');
-  }
+  // Note: OPENCODE_API_KEY is only required for Zen models
+  // For non-Zen models (openai/*, anthropic/*, etc.), the SDK uses ~/.local/share/opencode/auth.json
 
   // Validate configuration object
   if (payload.config && typeof payload.config !== 'object') {
     throw new Error('config must be an object');
   }
 
-  // Create OpenCode client connection
-  opcodeClient = createOpencode({
-    apiKey: apiKey,
-    baseURL: serverUrl,
-    ...payload.config
+  // Create OpenCode client that connects to server
+  // Python provider ensures server is running via _ensure_server_running()
+  opcodeClient = createOpencodeClient({
+    baseUrl: 'http://localhost:4096'
   });
 
   // Parse model specification
   const modelConfig = payload.config?.model || 'default-model';
   let providerID, modelID;
 
-  // Parse model format: "provider:model" or just "model"
-  if (typeof modelConfig === 'string' && modelConfig.includes(':')) {
-    [providerID, modelID] = modelConfig.split(':', 2);
+  // Parse model format: "provider/model" or just "model"
+  if (typeof modelConfig === 'string' && modelConfig.includes('/')) {
+    [providerID, modelID] = modelConfig.split('/', 2);
   } else if (typeof modelConfig === 'object') {
     providerID = modelConfig.providerID;
     modelID = modelConfig.modelID;
@@ -229,56 +222,55 @@ async function main() {
   // Create session
   const session = await opcodeClient.session.create();
 
-  // Execute prompt with model and tool restrictions
-  const promptOptions = {
-    model: {
-      providerID: providerID,
-      modelID: modelID
-    },
-    systemPrompt: payload.system_prompt,
-    temperature: payload.config?.temperature,
-    maxTokens: payload.config?.max_tokens
-  };
-
-  // Add tool restrictions if provided
-  if (payload.allowedTools && payload.allowedTools.length > 0) {
-    promptOptions.tools = payload.allowedTools;
-  }
-
-  // Subscribe to streaming events
-  let responseText = '';
-  const eventUnsubscribe = opcodeClient.event.subscribe((event) => {
-    if (event.type === 'message.delta') {
-      // Emit streaming chunk as line-delimited JSON
-      const chunk = {
-        type: 'chunk',
-        content: event.delta.text || event.delta.content || ''
-      };
-      console.log(JSON.stringify(chunk));
-      responseText += chunk.content;
-    }
-  });
-
   try {
-    // Execute the prompt with streaming
-    const response = await session.prompt(payload.prompt, promptOptions);
+    // Build request body, filtering out null/undefined values
+    const requestBody = {
+      model: {
+        providerID: providerID,
+        modelID: modelID
+      },
+      parts: [
+        {
+          type: 'text',
+          text: payload.prompt
+        }
+      ]
+    };
 
-    // Emit final response with metadata
+    // Only add system prompt if it's not null/undefined
+    if (payload.system_prompt != null) {
+      requestBody.system = payload.system_prompt;
+    }
+
+    // Execute prompt using the session API with correct structure
+    const response = await opcodeClient.session.prompt({
+      path: {
+        id: session.data.id
+      },
+      body: requestBody
+    });
+
+    // Extract response text from parts
+    const responseParts = response.data?.parts || [];
+    const textParts = responseParts
+      .filter(part => part.type === 'text')
+      .map(part => part.text)
+      .join('');
+
+    // Emit response as line-delimited JSON
     const finalResponse = {
       type: 'done',
       response: {
-        text: responseText || response.text,
-        usage: response.usage,
-        sessionId: session.id
+        text: textParts,
+        usage: response.data?.usage || {},
+        model: `${providerID}/${modelID}`,
+        sessionId: session.data.id
       }
     };
     console.log(JSON.stringify(finalResponse));
 
-  } finally {
-    // Unsubscribe from events
-    if (eventUnsubscribe) {
-      eventUnsubscribe();
-    }
+  } catch (error) {
+    throw new Error(`Prompt execution failed: ${error.message}`);
   }
 
   // Cleanup before exit

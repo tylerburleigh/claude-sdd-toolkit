@@ -133,7 +133,7 @@ class OpenCodeProvider(ProviderContext):
 
     def __del__(self) -> None:
         """Clean up server process on provider destruction."""
-        if self._server_process is not None:
+        if hasattr(self, '_server_process') and self._server_process is not None:
             try:
                 self._server_process.terminate()
                 # Give it a moment to terminate gracefully
@@ -180,10 +180,11 @@ class OpenCodeProvider(ProviderContext):
         return self.metadata.models[0].id
 
     def _ensure_model(self, candidate: str) -> str:
-        available = {descriptor.id for descriptor in self.metadata.models}
-        if candidate not in available:
+        # OpenCode supports arbitrary provider/model combinations (e.g., openai/gpt-4o-mini)
+        # so we don't validate against a fixed list. Just ensure it's not empty.
+        if not candidate or not candidate.strip():
             raise ProviderExecutionError(
-                f"Unsupported OpenCode model '{candidate}'. Available: {', '.join(sorted(available))}",
+                "Model identifier cannot be empty",
                 provider=self.metadata.provider_name,
             )
         return candidate
@@ -245,7 +246,7 @@ class OpenCodeProvider(ProviderContext):
         server_env = self._prepare_subprocess_env(self._env)
         try:
             self._server_process = subprocess.Popen(
-                [opencode_binary, "serve"],
+                [opencode_binary, "serve", f"--hostname=127.0.0.1", f"--port={port}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 env=server_env,  # Pass environment variables to server
