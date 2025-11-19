@@ -49,6 +49,16 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
         )
         from claude_skills.llm_doc_gen.ai_consultation import consult_llm
 
+        # Create wrapper to adapt ConsultationResult to tuple format expected by generators
+        def llm_consultation_wrapper(prompt: str) -> tuple[bool, str]:
+            """Wrapper to convert ConsultationResult to (bool, str) tuple."""
+            result = consult_llm(prompt, verbose=args.verbose)
+            if result.success:
+                return (True, result.output)
+            else:
+                error_msg = result.error or "LLM consultation failed"
+                return (False, error_msg)
+
         project_root = Path(args.directory).resolve()
         if not project_root.exists():
             printer.error(f"Project directory not found: {project_root}")
@@ -98,7 +108,7 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
         results = workflow.generate_full_documentation(
             project_data=project_data,
             index_data=index_data,
-            llm_consultation_fn=consult_llm,
+            llm_consultation_fn=llm_consultation_wrapper,
             use_batching=use_batching,
             batch_size=batch_size
         )
