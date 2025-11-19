@@ -567,6 +567,72 @@ sdd update-frontmatter {spec-id} priority "high"
 sdd sync-metadata {spec-id}
 ```
 
+### Update Task Metadata
+
+Update metadata fields for individual tasks using `update-task-metadata`:
+
+```bash
+# Update predefined metadata fields using individual flags
+sdd update-task-metadata {spec-id} {task-id} --file-path "src/auth.py"
+sdd update-task-metadata {spec-id} {task-id} --description "Updated task description"
+sdd update-task-metadata {spec-id} {task-id} --task-category "implementation"
+sdd update-task-metadata {spec-id} {task-id} --actual-hours 2.5
+
+# Update custom metadata fields using JSON
+sdd update-task-metadata {spec-id} {task-id} \
+  --metadata '{"focus_areas": ["performance", "security"], "priority": "high"}'
+
+# Combine individual flags with custom JSON (flags take precedence)
+sdd update-task-metadata {spec-id} {task-id} \
+  --file-path "src/middleware.py" \
+  --metadata '{"focus_areas": ["authentication"], "complexity": "medium"}'
+
+# Complex nested metadata structures
+sdd update-task-metadata {spec-id} {task-id} \
+  --metadata '{
+    "focus_areas": ["error handling", "edge cases"],
+    "blockers": ["clarification needed", "dependency X"],
+    "implementation_notes": {
+      "approach": "incremental",
+      "testing_strategy": "unit + integration"
+    }
+  }'
+```
+
+**Available individual flags:**
+- `--file-path` - File path associated with this task
+- `--description` - Task description
+- `--task-category` - Category (e.g., implementation, testing, documentation)
+- `--actual-hours` - Actual hours spent on task
+- `--status-note` - Status note or completion note
+- `--verification-type` - Verification type (auto, manual, none)
+- `--command` - Command executed
+
+**Custom metadata with --metadata:**
+- Accepts JSON object with any custom fields
+- Useful for tracking focus areas, priorities, blockers, complexity, etc.
+- Merges with individual flags (individual flags take precedence)
+- Supports nested structures and arrays
+
+**Common use cases:**
+```bash
+# Track focus areas for investigation tasks
+sdd update-task-metadata {spec-id} task-1-1 \
+  --metadata '{"focus_areas": ["code-doc structure", "skill patterns"]}'
+
+# Document blockers and complexity
+sdd update-task-metadata {spec-id} task-2-3 \
+  --metadata '{"blockers": ["API design unclear"], "complexity": "high"}'
+
+# Track implementation approach
+sdd update-task-metadata {spec-id} task-3-2 \
+  --metadata '{
+    "approach": "refactor existing code",
+    "estimated_subtasks": 4,
+    "dependencies": ["task-3-1"]
+  }'
+```
+
 ### Validation
 
 For comprehensive spec validation, use the sdd-validate subagent:
@@ -771,6 +837,7 @@ sdd query-tasks {spec-id} --status pending
 - `check-complete` - Verify if spec/phase is ready to complete
 
 ### Metadata
+- `update-task-metadata` - Update task metadata fields (individual flags or JSON)
 - `update-frontmatter` - Update spec metadata fields
 - `sync-metadata` - Synchronize metadata with hierarchy
 

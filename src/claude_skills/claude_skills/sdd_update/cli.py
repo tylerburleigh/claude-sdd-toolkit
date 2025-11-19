@@ -1734,10 +1734,38 @@ def cmd_update_task_metadata(args, printer):
             printer.detail("3. Or specify path: --specs-dir /path/to/specs")
         return 1
 
-    # Collect metadata updates from args (8 fields)
+    # Collect metadata updates from args
     metadata_updates = {}
 
-    # Collect each field if provided
+    # First, parse --metadata JSON if provided
+    if hasattr(args, 'metadata_json') and args.metadata_json:
+        try:
+            parsed_metadata = json.loads(args.metadata_json)
+
+            # Validate it's a dictionary
+            if not isinstance(parsed_metadata, dict):
+                printer.error("--metadata must be a JSON object (dictionary), not a list, string, or other type")
+                printer.info("\nExample usage:")
+                printer.detail('  --metadata \'{"focus_areas": ["performance", "security"], "priority": "high"}\'')
+                return 1
+
+            # Merge parsed metadata
+            metadata_updates.update(parsed_metadata)
+
+        except json.JSONDecodeError as e:
+            printer.error(f"Invalid JSON in --metadata argument: {str(e)}")
+            printer.info("\nExpected format:")
+            printer.detail('  --metadata \'{"field_name": "value", "array_field": ["item1", "item2"]}\'')
+            printer.info("\nCommon issues:")
+            printer.detail("  - Use single quotes around the JSON string")
+            printer.detail("  - Use double quotes for JSON keys and string values")
+            printer.detail("  - Ensure all brackets/braces are balanced")
+            return 1
+        except Exception as e:
+            printer.error(f"Error parsing --metadata argument: {str(e)}")
+            return 1
+
+    # Collect individual field flags (these take precedence over --metadata)
     if hasattr(args, 'file_path') and args.file_path:
         metadata_updates['file_path'] = args.file_path
     if hasattr(args, 'description') and args.description:
@@ -1756,6 +1784,10 @@ def cmd_update_task_metadata(args, printer):
     # Validate that at least one metadata field was provided
     if not metadata_updates:
         printer.error("No metadata fields provided. Use --help to see available options.")
+        printer.info("\nYou can use either:")
+        printer.detail("  - Individual flags: --file-path, --description, --task-category, etc.")
+        printer.detail('  - JSON metadata: --metadata \'{"custom_field": "value"}\'')
+        printer.detail("  - Or both together (individual flags take precedence)")
         return 1
 
     # Load JSON spec file
@@ -2143,6 +2175,14 @@ def register_update(subparsers, parent_parser):
     p_update_meta.add_argument("--status-note", dest="status_note", help="Status note or completion note")
     p_update_meta.add_argument("--verification-type", dest="verification_type", help="Verification type (auto, manual, none)")
     p_update_meta.add_argument("--command", help="Command executed")
+
+    # JSON metadata flag for arbitrary custom fields
+    p_update_meta.add_argument(
+        "--metadata",
+        dest="metadata_json",
+        help="JSON string with custom metadata fields (e.g., '{\"focus_areas\": [\"performance\"], \"priority\": \"high\"}'). "
+             "Merges with individual flags; individual flags take precedence on conflict."
+    )
 
     # Standard flags
     p_update_meta.add_argument("--dry-run", action="store_true", help="Preview changes without saving")

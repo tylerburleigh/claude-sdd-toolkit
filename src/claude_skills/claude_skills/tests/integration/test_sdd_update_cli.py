@@ -793,3 +793,148 @@ class TestCompletionDetection:
         # Note: The spec file should still be in the active directory since user declined
         spec_file = specs_structure / "active" / f"{spec_id}.json"
         assert spec_file.exists() or (specs_structure / f"{spec_id}.json").exists()
+
+
+@pytest.mark.integration
+class TestUpdateTaskMetadataCLI:
+    """Tests for update-task-metadata command with --metadata flag."""
+
+    def test_update_metadata_individual_flags(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with individual flags."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--file-path", "src/test.py",
+            "--description", "Updated description",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        # Verify metadata was updated
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        assert data["task_id"] == "task-1-1"
+
+    def test_update_metadata_json_flag(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with --metadata JSON flag."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--metadata", '{"focus_areas": ["performance", "security"], "priority": "high"}',
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+
+        # Verify the metadata was actually saved
+        from claude_skills.common.spec import load_json_spec
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+        task_metadata = spec_data["hierarchy"]["task-1-1"]["metadata"]
+        assert "focus_areas" in task_metadata
+        assert task_metadata["focus_areas"] == ["performance", "security"]
+        assert task_metadata["priority"] == "high"
+
+    def test_update_metadata_merge_json_and_flags(self, sample_json_spec_simple, specs_structure):
+        """Test that individual flags take precedence over JSON metadata."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--metadata", '{"description": "from JSON", "custom_field": "test"}',
+            "--description", "from flag",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # Verify flag took precedence and JSON was merged
+        from claude_skills.common.spec import load_json_spec
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+        task_metadata = spec_data["hierarchy"]["task-1-1"]["metadata"]
+        assert task_metadata["description"] == "from flag"  # Flag won
+        assert task_metadata["custom_field"] == "test"  # JSON was merged
+
+    def test_update_metadata_invalid_json(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with invalid JSON."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--metadata", '{invalid json}',
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 1
+        assert "Invalid JSON" in result.stdout or "Invalid JSON" in result.stderr
+
+    def test_update_metadata_non_dict_json(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with non-dictionary JSON."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--metadata", '["array", "not", "dict"]',
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 1
+        assert "must be a JSON object" in result.stdout or "must be a JSON object" in result.stderr
+
+    def test_update_metadata_no_fields_provided(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with no metadata fields."""
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 1
+        assert "No metadata fields provided" in result.stdout or "No metadata fields provided" in result.stderr
+
+    def test_update_metadata_complex_nested_json(self, sample_json_spec_simple, specs_structure):
+        """Test update-task-metadata with complex nested JSON structures."""
+        complex_metadata = {
+            "focus_areas": ["error handling", "edge cases"],
+            "details": {
+                "complexity": "high",
+                "blockers": ["dependency X", "clarification needed"]
+            },
+            "estimated_subtasks": 5
+        }
+
+        result = run_cli(
+            "update-task-metadata",
+            "--path", str(specs_structure),
+            "simple-spec-2025-01-01-001",
+            "task-1-1",
+            "--metadata", json.dumps(complex_metadata),
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+
+        # Verify the complex structure was saved correctly
+        from claude_skills.common.spec import load_json_spec
+        spec_data = load_json_spec("simple-spec-2025-01-01-001", specs_structure)
+        task_metadata = spec_data["hierarchy"]["task-1-1"]["metadata"]
+        assert task_metadata["focus_areas"] == ["error handling", "edge cases"]
+        assert task_metadata["details"]["complexity"] == "high"
+        assert task_metadata["estimated_subtasks"] == 5

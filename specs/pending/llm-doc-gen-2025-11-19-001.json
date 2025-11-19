@@ -1,0 +1,1624 @@
+{
+  "spec_id": "llm-doc-gen-2025-11-19-001",
+  "generated": "2025-11-19T18:00:00Z",
+  "last_updated": "2025-11-19T19:36:03.106511Z",
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "LLM-Based Documentation Generation",
+      "status": "pending",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5"
+      ],
+      "total_tasks": 53,
+      "completed_tasks": 0,
+      "metadata": {
+        "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
+        "objectives": [
+          "Generate AI-written multi-file documentation for codebases",
+          "Enable INDEX_GUIDED loading pattern for efficient LLM consumption",
+          "Leverage existing code-doc parsers for data collection"
+        ],
+        "bmad_reference": "/Users/tylerburleigh/Downloads/BMAD-METHOD-main",
+        "bmad_patterns_used": [
+          "7-section index.md structure from index-template.md",
+          "Write-as-you-go architecture to prevent context exhaustion",
+          "Multi-part project detection (monorepo vs monolith)",
+          "State tracking for resumability",
+          "Template-based documentation generation",
+          "INDEX_GUIDED loading pattern for efficient LLM consumption"
+        ]
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Core Infrastructure & Workflow Foundation",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-investigation",
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Set up basic skill structure, workflow engine foundation",
+        "risk_level": "low"
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-investigation": {
+      "type": "group",
+      "title": "Investigation & Planning",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Analyze existing skill structure patterns",
+      "status": "pending",
+      "parent": "phase-1-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-3"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 1,
+        "focus_areas": [
+          "code-doc structure",
+          "skill patterns"
+        ],
+        "priority": "high",
+        "description": "from flag",
+        "custom_field": "test"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "Analyze AI provider integration patterns",
+      "status": "pending",
+      "parent": "phase-1-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 2,
+        "focus_areas": [
+          "Review existing AI consultation code (ai_consultation.py)",
+          "Understand provider abstraction patterns",
+          "Identify how to invoke LLM for content generation",
+          "Study BMAD document-project's LLM usage for content generation",
+          "Review how BMAD templates balance AI-generated vs static content",
+          "Reference LLM patterns in: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/workflow.yaml",
+          "Reference Master Agent definition: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/core/agents/bmad-master.agent.yaml",
+          "Reference Agent Activation Protocol: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/utility/models/agent-activation-ide.xml"
+        ]
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "task-1-3",
+        "task-1-4",
+        "task-1-5"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-investigation"
+        ],
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/SKILL.md",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "blocks": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/SKILL.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": "Create skill documentation with workflow overview"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Define skill purpose and core workflow",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Document LLM-based doc generation approach, differentiate from programmatic code-doc"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Document workflow steps and user interaction",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Step-by-step workflow, expected outputs, resumability notes"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/workflow_engine.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-1-2",
+          "task-1-3"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/workflow_engine.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": "Basic workflow orchestration engine, step execution framework",
+        "focus_areas": [
+          "Reference workflow engine logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/core/tasks/workflow.xml",
+          "Study <conditional-execution-patterns> and <protocols> in workflow.xml",
+          "Reference Advanced Elicitation logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/core/tasks/advanced-elicitation.xml",
+          "Reference Advanced Methods data: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/core/tasks/adv-elicit-methods.csv"
+        ]
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/__init__.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-1-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": "Skill initialization and exports"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Skill structure validation",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "SKILL.md is complete and clear",
+          "Directory structure follows skill conventions",
+          "Imports work correctly"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Workflow engine basic functionality",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_workflow_engine.py -v",
+        "expected": "Basic workflow orchestration tests pass"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Phase 1 fidelity review",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Project Analysis & State Management",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-investigation",
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-1"
+        ],
+        "blocks": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Detect project structure, integrate with code-doc parsers, implement resumability",
+        "risk_level": "medium"
+      }
+    },
+    "phase-2-investigation": {
+      "type": "group",
+      "title": "Investigation & Analysis",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Analyze code-doc parser integration points",
+      "status": "pending",
+      "parent": "phase-2-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 2,
+        "focus_areas": [
+          "Review DocumentationGenerator API in generator.py",
+          "Understand ParserFactory usage",
+          "Identify data structures returned by parsers",
+          "Study BMAD's use of code scanners in document-project workflow",
+          "Review BMAD's documentation-requirements.csv for scanning patterns",
+          "Reference scanning patterns: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/documentation-requirements.csv"
+        ]
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "Research project structure detection patterns",
+      "status": "pending",
+      "parent": "phase-2-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-2-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research",
+        "estimated_hours": 1,
+        "focus_areas": [
+          "Monorepo vs monolith detection heuristics",
+          "Package.json, go.mod, requirements.txt patterns",
+          "Multi-part project indicators",
+          "Study BMAD's multi-part detection (monorepo vs monolith)",
+          "Review BMAD's project classification approach",
+          "Reference project root logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/tools/flattener/projectRoot.js"
+        ]
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-3",
+        "task-2-4",
+        "task-2-5",
+        "task-2-6"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-investigation"
+        ],
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "depends": []
+      },
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/parsers.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "blocks": [
+          "task-2-5"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/parsers.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": "Wrapper around existing code-doc parsers, deep scan mode implementation"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/project_classifier.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-4-1",
+        "task-2-4-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-2"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/project_classifier.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "details": "Project structure detection and type classification",
+        "focus_areas": [
+          "Reference project root logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/tools/flattener/projectRoot.js",
+          "Reference doc requirements: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/documentation-requirements.csv",
+          "Reference project types: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/2-plan-workflows/prd/project-types.csv"
+        ]
+      }
+    },
+    "task-2-4-1": {
+      "type": "subtask",
+      "title": "Implement monorepo vs monolith detection",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Detect multiple parts, workspace patterns, client/server structure"
+      }
+    },
+    "task-2-4-2": {
+      "type": "subtask",
+      "title": "Implement project type classification",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Classify as web, backend, CLI, library based on patterns"
+      }
+    },
+    "task-2-5": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/state_manager.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-5-1",
+        "task-2-5-2",
+        "task-2-5-3"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-2-3"
+        ]
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/state_manager.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": "State file management for resumability"
+      }
+    },
+    "task-2-5-1": {
+      "type": "subtask",
+      "title": "Implement state file read/write",
+      "status": "pending",
+      "parent": "task-2-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "JSON state file at {output_folder}/doc-gen-state.json"
+      }
+    },
+    "task-2-5-2": {
+      "type": "subtask",
+      "title": "Track workflow progress and completed steps",
+      "status": "pending",
+      "parent": "task-2-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Record timestamps, current_step, completed_steps, findings"
+      }
+    },
+    "task-2-5-3": {
+      "type": "subtask",
+      "title": "Implement resume detection and user prompts",
+      "status": "pending",
+      "parent": "task-2-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Check for existing state, prompt user to resume or start fresh"
+      }
+    },
+    "task-2-6": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/data_collector.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-2-3",
+          "task-2-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/data_collector.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": "Orchestrate parsing, collect statistics, aggregate data for LLM",
+        "focus_areas": [
+          "Reference discovery logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/tools/flattener/discovery.js",
+          "Reference ignore rules: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/tools/flattener/ignoreRules.js",
+          "Reference scan schema: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/project-scan-report-schema.json"
+        ]
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3",
+        "verify-2-4"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Parser integration tests",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_parsers.py -v",
+        "expected": "Parser wrapper correctly integrates with code-doc"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Project classifier accuracy",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_project_classifier.py -v",
+        "expected": "Correctly detects monorepo/monolith and project types"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "State management resumability",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_state_manager.py -v",
+        "expected": "State persists correctly, resume works as expected"
+      }
+    },
+    "verify-2-4": {
+      "type": "verify",
+      "title": "Phase 2 fidelity review",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Core LLM Documentation Generators",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-investigation",
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-2"
+        ],
+        "blocks": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 13,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Implement LLM-powered generators for core documentation shards",
+        "risk_level": "medium",
+        "note": "Core shards only: project-overview, architecture, component-inventory"
+      }
+    },
+    "phase-3-investigation": {
+      "type": "group",
+      "title": "Investigation & Research",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1"
+      ],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-files"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Research effective LLM prompting for documentation",
+      "status": "pending",
+      "parent": "phase-3-investigation",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-3",
+          "task-3-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "research",
+        "estimated_hours": 2,
+        "focus_areas": [
+          "Review ai_consultation.py prompt patterns",
+          "Study effective documentation prompts",
+          "Identify token budget constraints",
+          "Study BMAD document-project prompt patterns for each shard type",
+          "Review BMAD templates (project-overview-template.md, index-template.md)",
+          "Analyze token budget management in BMAD workflows",
+          "Reference Overview Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/project-overview-template.md",
+          "Reference Index Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/index-template.md",
+          "Reference Deep Dive Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/deep-dive-template.md"
+        ]
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-2",
+        "task-3-3",
+        "task-3-4",
+        "task-3-5"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3-investigation"
+        ],
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/generators/overview_generator.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1",
+        "task-3-2-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-3-1"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/generators/overview_generator.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "details": "LLM-powered project overview generator"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Implement LLM prompt for project overview",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Generate 2-3 paragraph overview from codebase data"
+      }
+    },
+    "task-3-2-2": {
+      "type": "subtask",
+      "title": "Integrate with existing AI provider",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Use existing provider abstraction, handle errors gracefully"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/generators/architecture_generator.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1",
+        "task-3-3-2"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "task-3-1"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/generators/architecture_generator.py",
+        "task_category": "implementation",
+        "estimated_hours": 5,
+        "details": "LLM-powered architecture analysis generator",
+        "focus_areas": [
+          "Reference Architecture Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/3-solutioning/architecture/architecture-template.md",
+          "Reference Architecture Patterns: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/3-solutioning/architecture/architecture-patterns.yaml"
+        ]
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Implement architecture analysis prompt",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Identify patterns, design decisions, architecture type"
+      }
+    },
+    "task-3-3-2": {
+      "type": "subtask",
+      "title": "Use model-chorus for multi-model insights",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Optional: Consult multiple models for richer architecture analysis"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/generators/component_generator.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "blocked_by": [
+          "task-3-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/generators/component_generator.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "details": "LLM-enhanced component inventory with narrative descriptions",
+        "focus_areas": [
+          "Reference Source Tree Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/source-tree-template.md"
+        ]
+      }
+    },
+    "task-3-5": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/generators/__init__.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-3-2",
+          "task-3-3",
+          "task-3-4"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/generators/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": "Generator module exports"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3",
+        "verify-3-4",
+        "verify-3-5",
+        "verify-3-6"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Overview generator quality check",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Generates coherent 2-3 paragraph overview",
+          "Accurately reflects codebase purpose",
+          "Token count within budget (800-1200 tokens)"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Architecture generator quality check",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Identifies architecture patterns correctly",
+          "Provides actionable insights",
+          "Describes design decisions accurately"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Component generator quality check",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "All components listed with descriptions",
+          "Categorization makes sense",
+          "Reusable components identified"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-3-4": {
+      "type": "verify",
+      "title": "Generator integration tests",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/generators/ -v",
+        "expected": "All generator unit tests pass"
+      }
+    },
+    "verify-3-5": {
+      "type": "verify",
+      "title": "End-to-end generator workflow test",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_e2e_generators.py -v",
+        "expected": "Can generate all 3 core shards successfully"
+      }
+    },
+    "verify-3-6": {
+      "type": "verify",
+      "title": "Phase 3 fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Index Generation & Multi-File Orchestration",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-3"
+        ],
+        "blocks": [
+          "phase-5"
+        ],
+        "depends": []
+      },
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Generate master index.md and orchestrate shard writing",
+        "risk_level": "low"
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/generators/index_generator.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2"
+      ],
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/generators/index_generator.py",
+        "task_category": "implementation",
+        "estimated_hours": 4,
+        "details": "7-section index.md generator following BMAD index-template.md structure exactly (See: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/index-template.md)"
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "Implement 7-section structure",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "BMAD's 7 sections: Header (project metadata), Overview (description + multi-part structure), Quick Reference (stack/entry/patterns at-a-glance), Generated Documentation (links to all shards), Existing Documentation (pre-existing docs), Getting Started (prerequisites/setup/run/test), For AI-Assisted Development (guidance on which docs for different features)"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "Auto-detect and link generated shards",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Check which shards exist, add '_(To be generated)_' markers for missing"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/orchestrator.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-4-1"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/orchestrator.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": "Write-as-you-go orchestration following BMAD patterns: write shards immediately to disk, purge detailed findings from context after writing, batch processing for memory management, shard file management",
+        "focus_areas": [
+          "Study BMAD's write-as-you-go pattern to prevent context exhaustion",
+          "Review BMAD's batching strategy and state management",
+          "Implement immediate shard writing after generation",
+          "Context purging after each shard write",
+          "Reference write-as-you-go logic in: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/workflow.yaml",
+          "Reference full-scan logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/workflows/full-scan-instructions.md",
+          "Reference deep-dive logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/workflows/deep-dive-instructions.md",
+          "Reference doc requirements logic: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/documentation-requirements.csv"
+        ]
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "skills/llm-doc-gen/main.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-4-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "skills/llm-doc-gen/main.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": "Main entry point, workflow coordination"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3",
+        "verify-4-4"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Index structure validation",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "All 7 sections present in index.md",
+          "Links to generated shards work",
+          "Missing shards have '_(To be generated)_' markers",
+          "Token count 3-7k as expected"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Write-as-you-go pattern verification",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Shards written immediately after generation",
+          "Memory not accumulating large content",
+          "Files validated after writing"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Orchestration end-to-end test",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_e2e_orchestration.py -v",
+        "expected": "Full workflow generates all core shards + index.md"
+      }
+    },
+    "verify-4-4": {
+      "type": "verify",
+      "title": "Phase 4 fidelity review",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "CLI Integration & Testing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-4"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Wire up skill to sdd command, comprehensive testing",
+        "risk_level": "low"
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3"
+      ],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": "Add llm-doc-gen subcommand to sdd CLI"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1",
+        "task-5-2-2"
+      ],
+      "dependencies": {
+        "depends": [
+          "task-5-1"
+        ]
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
+        "task_category": "implementation",
+        "estimated_hours": 3,
+        "details": "CLI command handler for llm-doc-gen",
+        "focus_areas": [
+          "Reference CLI structure: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/tools/cli/bmad-cli.js",
+          "Reference validation checklist: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/checklist.md"
+        ]
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Implement argument parsing",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Args: project_root, output_dir, optional resume flag"
+      }
+    },
+    "task-5-2-2": {
+      "type": "subtask",
+      "title": "Wire to skill main entry point",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Call skills/llm-doc-gen/main.py, handle errors, display progress"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "README.md and docs/llm-doc-gen.md",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [],
+      "dependencies": {
+        "depends": [
+          "task-5-2"
+        ]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "docs/llm-doc-gen.md",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "details": "User documentation with examples"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3",
+        "verify-5-4",
+        "verify-5-5",
+        "verify-5-6"
+      ],
+      "dependencies": {
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "blocks": [],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "CLI command execution",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "sdd llm-doc-gen <project> works correctly",
+          "Progress displayed during generation",
+          "Errors handled gracefully",
+          "Output written to correct location"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Resume functionality test",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Interrupted workflow can be resumed",
+          "State persists correctly",
+          "User prompted appropriately"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Integration test suite",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "command": "python -m pytest tests/skills/llm_doc_gen/test_integration.py -v",
+        "expected": "All integration tests pass"
+      }
+    },
+    "verify-5-4": {
+      "type": "verify",
+      "title": "Real codebase smoke test",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "Run on small real codebase (this repo)",
+          "Documentation quality is acceptable",
+          "All 3 core shards generated + index.md",
+          "No crashes or errors"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-5": {
+      "type": "verify",
+      "title": "Documentation review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "checklist": [
+          "User docs are clear and complete",
+          "Examples work correctly",
+          "SKILL.md is accurate"
+        ],
+        "command": "",
+        "expected": ""
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "verify-5-6": {
+      "type": "verify",
+      "title": "Phase 5 and full spec fidelity review",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "skill": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "agent": "sdd-fidelity-review"
+      },
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    }
+  }
+}
