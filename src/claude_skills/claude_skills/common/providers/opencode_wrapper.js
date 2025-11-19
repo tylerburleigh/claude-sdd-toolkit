@@ -11,6 +11,9 @@
 import { createOpencode } from '@opencode-ai/sdk';
 import { createInterface } from 'readline';
 
+// Global client instance for graceful shutdown
+let opcodeClient = null;
+
 /**
  * Parse command line arguments for simple flags
  */
@@ -70,6 +73,35 @@ function showVersion() {
 }
 
 /**
+ * Cleanup function for graceful shutdown
+ */
+async function cleanup() {
+  if (opcodeClient) {
+    try {
+      await opcodeClient.close();
+      opcodeClient = null;
+    } catch (error) {
+      console.error('Error closing client:', error.message);
+    }
+  }
+}
+
+/**
+ * Setup signal handlers for graceful shutdown
+ */
+function setupSignalHandlers() {
+  process.on('SIGINT', async () => {
+    await cleanup();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    await cleanup();
+    process.exit(0);
+  });
+}
+
+/**
  * Read JSON payload from stdin
  */
 async function readStdin() {
@@ -104,6 +136,9 @@ async function readStdin() {
  * Main execution function
  */
 async function main() {
+  // Setup signal handlers for graceful shutdown
+  setupSignalHandlers();
+
   // Parse CLI arguments
   const flags = parseArgs(process.argv.slice(2));
 
@@ -126,13 +161,29 @@ async function main() {
     throw new Error('Missing required field: prompt');
   }
 
-  // Store payload for use in subsequent tasks
-  // (Client connection and execution will be implemented in next tasks)
+  // Get server configuration from environment variables
+  const serverUrl = process.env.OPENCODE_SERVER_URL || 'https://api.opencode.ai';
+  const apiKey = process.env.OPENCODE_API_KEY;
 
-  // For now, just validate the structure
+  if (!apiKey) {
+    throw new Error('OPENCODE_API_KEY environment variable is required');
+  }
+
+  // Create OpenCode client connection
+  opcodeClient = createOpencode({
+    apiKey: apiKey,
+    baseURL: serverUrl,
+    ...payload.config
+  });
+
+  // For now, just validate the connection was created
+  console.error('DEBUG: Client connected successfully');
   console.error('DEBUG: Received payload:', JSON.stringify(payload, null, 2));
 
-  // Success - payload parsed correctly
+  // Cleanup before exit
+  await cleanup();
+
+  // Success - client connected and payload parsed
   process.exit(0);
 }
 
