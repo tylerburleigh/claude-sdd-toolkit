@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T20:29:08.867250Z",
+  "last_updated": "2025-11-19T20:32:08.947923Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 13,
+      "completed_tasks": 14,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -421,7 +421,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Detect project structure, integrate with code-doc parsers, implement resumability",
         "risk_level": "medium"
@@ -536,7 +536,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "task-2-3": {
@@ -571,7 +571,7 @@
     "task-2-4": {
       "type": "task",
       "title": "skills/llm-doc-gen/project_classifier.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-4-1",
@@ -583,7 +583,7 @@
         ]
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "skills/llm-doc-gen/project_classifier.py",
         "task_category": "implementation",
@@ -617,13 +617,19 @@
     "task-2-4-2": {
       "type": "subtask",
       "title": "Implement project type classification",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-4",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Classify as web, backend, CLI, library based on patterns"
+        "details": "Classify as web, backend, CLI, library based on patterns",
+        "started_at": "2025-11-19T20:29:37.413445Z",
+        "status_note": "Starting project type classification implementation",
+        "completed_at": "2025-11-19T20:32:08.937158Z",
+        "needs_journaling": false,
+        "actual_hours": 0.042,
+        "journaled_at": "2025-11-19T20:32:08.944247Z"
       }
     },
     "task-2-5": {
@@ -1906,10 +1912,19 @@
       "content": "Implemented monorepo vs monolith detection (skills/llm-doc-gen/detectors.py). Created ProjectStructureDetector class that identifies:\n- Monorepo structures (multiple packages/services in workspaces)\n- Monolithic applications (single cohesive codebase)  \n- Client/server architectures (separate frontend/backend)\n- Workspace patterns (npm/yarn/pnpm workspaces, Lerna, Nx)\n\nFeatures include:\n- Automatic workspace configuration detection (package.json workspaces, lerna.json, nx.json, pnpm-workspace.yaml)\n- Multi-part project scanning (packages/, apps/, services/, libs/, modules/, src/, client/, server/)\n- Language detection per part (JavaScript/TypeScript, Python, Go)\n- Confidence scoring (0.0-1.0) with human-readable indicators\n- Structured output (ProjectStructureInfo with parts, workspace config, confidence)\n- CLI interface for standalone testing\n- Comprehensive test suite (13 tests, all passing)\n\nFiles created:\n- skills/llm-doc-gen/detectors.py (407 lines) - Main detector implementation\n- skills/llm-doc-gen/test_detectors.py (250 lines) - Unit tests\n\nManual verification performed:\n- Tested CLI: python detectors.py . --json\n- Detected claude-sdd-toolkit as monolith with claude_skills package\n- All 13 unit tests passing including monorepo, client/server, and workspace detection\n- Correctly identifies npm workspaces, Lerna, and Nx configurations\n- Proper confidence scoring and indicator generation",
       "metadata": {},
       "task_id": "task-2-4-1"
+    },
+    {
+      "timestamp": "2025-11-19T20:32:08.944230Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement project type classification",
+      "author": "claude-code",
+      "content": "Implemented project type classification in skills/llm-doc-gen/detectors.py. Extended ProjectStructureDetector to classify projects as:\n- Web Application (React, Vue, Angular, Flask, Django frameworks)\n- Backend API (Express, FastAPI, Flask APIs)\n- CLI Tool (bin entries, CLI libraries like commander/click)\n- Library (packages with main entry but no executables)\n- Desktop/Mobile App (future extensibility)\n- Unknown (fallback for unclear patterns)\n\nClassification based on pattern matching:\n- package.json dependencies and bin entries (web/API/CLI frameworks)\n- Python requirements.txt and setup.py (web/API/CLI frameworks)\n- Directory structure (api/, routes/, bin/, cli/, templates/, public/)\n- File patterns (src/pages/, views/, static/)\n- Scoring system with highest score wins\n\nFeatures:\n- Automatic project type detection alongside structure detection\n- Integrated into existing ProjectStructureInfo dataclass\n- JSON serialization support\n- Verbose output shows detected project type\n- Comprehensive test suite (7 new tests, all passing)\n\nFiles modified:\n- skills/llm-doc-gen/detectors.py - Added ProjectType enum, _classify_project_type() method (144 lines added)\n- skills/llm-doc-gen/test_detectors.py - Added 7 new project type classification tests\n\nManual verification:\n- Tested on claude-sdd-toolkit: correctly identified as 'library'\n- All 20 unit tests passing (13 structure + 7 type classification)\n- Covers web apps, APIs, CLI tools, libraries for both JS/TS and Python\n- JSON output includes project_type field",
+      "metadata": {},
+      "task_id": "task-2-4-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 24,
+    "progress_percentage": 26,
     "status": "active",
     "current_phase": "phase-2"
   }

@@ -23,6 +23,17 @@ class ProjectStructure(Enum):
     UNKNOWN = "unknown"
 
 
+class ProjectType(Enum):
+    """Types of projects based on functionality."""
+    WEB_APP = "web_app"
+    BACKEND_API = "backend_api"
+    CLI_TOOL = "cli_tool"
+    LIBRARY = "library"
+    DESKTOP_APP = "desktop_app"
+    MOBILE_APP = "mobile_app"
+    UNKNOWN = "unknown"
+
+
 @dataclass
 class ProjectPart:
     """Represents a distinct part of a project (e.g., package, service)."""
@@ -42,6 +53,7 @@ class ProjectStructureInfo:
     structure_type: ProjectStructure
     parts: List[ProjectPart]
     root_path: Path
+    project_type: Optional[ProjectType] = None
     workspace_config: Optional[Dict] = None
     confidence: float = 0.0  # 0.0 to 1.0
     indicators: List[str] = None  # Human-readable detection reasoning
@@ -54,6 +66,7 @@ class ProjectStructureInfo:
         """Convert to dictionary for JSON serialization."""
         return {
             'structure_type': self.structure_type.value,
+            'project_type': self.project_type.value if self.project_type else None,
             'parts': [
                 {
                     'name': p.name,
@@ -117,8 +130,12 @@ class ProjectStructureDetector:
             parts, workspace_config
         )
 
+        # Classify project type
+        project_type = self._classify_project_type(parts)
+
         result = ProjectStructureInfo(
             structure_type=structure_type,
+            project_type=project_type,
             parts=parts,
             root_path=self.project_root,
             workspace_config=workspace_config,
@@ -346,9 +363,156 @@ class ProjectStructureDetector:
         # Multiple parts but unclear structure
         return ProjectStructure.UNKNOWN, confidence, indicators
 
+    def _classify_project_type(self, parts: List[ProjectPart]) -> ProjectType:
+        """
+        Classify the project type based on patterns and files.
+
+        Args:
+            parts: List of detected project parts
+
+        Returns:
+            ProjectType classification
+        """
+        # Collect all files for pattern matching
+        web_indicators = 0
+        api_indicators = 0
+        cli_indicators = 0
+        library_indicators = 0
+
+        # Check package.json for clues
+        package_json = self.project_root / "package.json"
+        if package_json.exists():
+            try:
+                with open(package_json) as f:
+                    pkg_data = json.load(f)
+                    dependencies = pkg_data.get("dependencies", {})
+                    dev_dependencies = pkg_data.get("devDependencies", {})
+                    all_deps = {**dependencies, **dev_dependencies}
+
+                    # Web framework indicators
+                    web_frameworks = ["react", "vue", "angular", "svelte", "next", "nuxt", "gatsby"]
+                    if any(fw in all_deps for fw in web_frameworks):
+                        web_indicators += 2
+
+                    # Build tools for web
+                    if any(tool in all_deps for tool in ["webpack", "vite", "parcel"]):
+                        web_indicators += 1
+
+                    # Backend/API indicators
+                    api_frameworks = ["express", "fastify", "koa", "hapi", "nest"]
+                    if any(fw in all_deps for fw in api_frameworks):
+                        api_indicators += 2
+
+                    # CLI indicators
+                    if "bin" in pkg_data:
+                        cli_indicators += 2
+                    cli_libs = ["commander", "yargs", "inquirer", "chalk", "ora"]
+                    if any(lib in all_deps for lib in cli_libs):
+                        cli_indicators += 1
+
+                    # Library indicators
+                    if pkg_data.get("main") and not pkg_data.get("bin"):
+                        library_indicators += 1
+            except (json.JSONDecodeError, IOError):
+                pass
+
+        # Check Python files
+        setup_py = self.project_root / "setup.py"
+        pyproject_toml = self.project_root / "pyproject.toml"
+
+        if setup_py.exists() or pyproject_toml.exists():
+            # Check for common Python patterns
+            if (self.project_root / "setup.py").exists():
+                try:
+                    content = (self.project_root / "setup.py").read_text()
+                    if "entry_points" in content and "console_scripts" in content:
+                        cli_indicators += 2
+                except IOError:
+                    pass
+
+            # Check for web frameworks
+            requirements_files = list(self.project_root.glob("*requirements*.txt"))
+            requirements_files.extend(self.project_root.glob("requirements/*.txt"))
+
+            for req_file in requirements_files:
+                try:
+                    content = req_file.read_text().lower()
+                    if any(fw in content for fw in ["django", "flask", "fastapi", "starlette"]):
+                        if "fastapi" in content or "starlette" in content:
+                            api_indicators += 2
+                        else:
+                            web_indicators += 2
+
+                    if any(lib in content for fw in ["click", "typer", "argparse"]):
+                        cli_indicators += 1
+                except IOError:
+                    pass
+
+        # Check for common file patterns
+        has_public_or_static = (
+            (self.project_root / "public").exists() or
+            (self.project_root / "static").exists()
+        )
+        has_src_pages = (self.project_root / "src" / "pages").exists()
+        has_views_or_templates = (
+            (self.project_root / "views").exists() or
+            (self.project_root / "templates").exists()
+        )
+
+        if has_public_or_static or has_src_pages or has_views_or_templates:
+            web_indicators += 1
+
+        # Check for API-specific patterns
+        has_api_dir = (
+            (self.project_root / "api").exists() or
+            (self.project_root / "routes").exists() or
+            (self.project_root / "endpoints").exists()
+        )
+        if has_api_dir:
+            api_indicators += 1
+
+        # Check for CLI-specific patterns
+        has_cli_dir = (self.project_root / "cli").exists()
+        has_bin_dir = (self.project_root / "bin").exists()
+        if has_cli_dir or has_bin_dir:
+            cli_indicators += 1
+
+        # Library patterns
+        has_lib_structure = (
+            (self.project_root / "lib").exists() or
+            (self.project_root / "src").exists() and not has_src_pages
+        )
+        no_executables = not (has_bin_dir or has_cli_dir)
+        if has_lib_structure and no_executables and library_indicators == 0:
+            # Only increment if no other strong indicators
+            if web_indicators == 0 and api_indicators == 0 and cli_indicators == 0:
+                library_indicators += 1
+
+        # Determine project type based on scores
+        scores = {
+            ProjectType.WEB_APP: web_indicators,
+            ProjectType.BACKEND_API: api_indicators,
+            ProjectType.CLI_TOOL: cli_indicators,
+            ProjectType.LIBRARY: library_indicators,
+        }
+
+        # Get highest score
+        max_score = max(scores.values())
+        if max_score == 0:
+            return ProjectType.UNKNOWN
+
+        # Return type with highest score
+        for proj_type, score in scores.items():
+            if score == max_score:
+                return proj_type
+
+        return ProjectType.UNKNOWN
+
     def _print_detection_summary(self, result: ProjectStructureInfo):
         """Print summary of detection results."""
         print(f"\n✅ Structure detected: {result.structure_type.value}")
+        if result.project_type:
+            print(f"   Project type: {result.project_type.value}")
         print(f"   Confidence: {result.confidence:.0%}")
 
         if result.indicators:

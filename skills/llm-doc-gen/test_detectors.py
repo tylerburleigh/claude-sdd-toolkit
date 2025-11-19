@@ -11,6 +11,7 @@ import json
 from detectors import (
     ProjectStructureDetector,
     ProjectStructure,
+    ProjectType,
     detect_project_structure
 )
 
@@ -238,6 +239,124 @@ def test_detect_nx_workspace():
         result = detect_project_structure(temp_dir, verbose=False)
         assert result.workspace_config is not None
         assert "nx" in result.workspace_config
+
+
+def test_classify_web_app():
+    """Test classification of web application."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create package.json with React
+        (temp_path / "package.json").write_text(json.dumps({
+            "name": "my-web-app",
+            "dependencies": {"react": "^18.0.0", "react-dom": "^18.0.0"}
+        }))
+
+        (temp_path / "src").mkdir()
+        (temp_path / "src" / "App.js").write_text("// React app")
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.WEB_APP
+
+
+def test_classify_backend_api():
+    """Test classification of backend API."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create package.json with Express
+        (temp_path / "package.json").write_text(json.dumps({
+            "name": "my-api",
+            "dependencies": {"express": "^4.18.0"}
+        }))
+
+        (temp_path / "api").mkdir()
+        (temp_path / "api" / "server.js").write_text("// Express server")
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.BACKEND_API
+
+
+def test_classify_cli_tool():
+    """Test classification of CLI tool."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create package.json with bin entry
+        (temp_path / "package.json").write_text(json.dumps({
+            "name": "my-cli",
+            "bin": {"mycli": "./bin/cli.js"},
+            "dependencies": {"commander": "^9.0.0"}
+        }))
+
+        (temp_path / "bin").mkdir()
+        (temp_path / "bin" / "cli.js").write_text("#!/usr/bin/env node\n// CLI tool")
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.CLI_TOOL
+
+
+def test_classify_library():
+    """Test classification of library."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create package.json with main entry (no bin)
+        (temp_path / "package.json").write_text(json.dumps({
+            "name": "my-library",
+            "main": "index.js",
+            "version": "1.0.0"
+        }))
+
+        (temp_path / "index.js").write_text("module.exports = {}")
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.LIBRARY
+
+
+def test_classify_python_web():
+    """Test classification of Python web application."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create Python web app with Flask
+        (temp_path / "requirements.txt").write_text("flask==2.3.0\ngunicorn==20.1.0")
+        (temp_path / "app.py").write_text("from flask import Flask\napp = Flask(__name__)")
+        (temp_path / "templates").mkdir()
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.WEB_APP
+
+
+def test_classify_python_api():
+    """Test classification of Python API."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        # Create Python API with FastAPI
+        (temp_path / "requirements.txt").write_text("fastapi==0.100.0\nuvicorn==0.23.0")
+        (temp_path / "main.py").write_text("from fastapi import FastAPI\napp = FastAPI()")
+        (temp_path / "api").mkdir()
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        assert result.project_type == ProjectType.BACKEND_API
+
+
+def test_project_type_in_dict():
+    """Test that project_type is included in to_dict output."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+
+        (temp_path / "package.json").write_text(json.dumps({
+            "name": "test",
+            "dependencies": {"react": "^18.0.0"}
+        }))
+
+        result = detect_project_structure(temp_dir, verbose=False)
+        result_dict = result.to_dict()
+
+        assert "project_type" in result_dict
+        assert result_dict["project_type"] is not None
 
 
 if __name__ == "__main__":
