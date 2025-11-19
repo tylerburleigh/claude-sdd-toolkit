@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 07:31:14
+**Generated:** 2025-11-19 09:22:59
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 326
-- **Total Lines:** 113916
+- **Total Files:** 327
+- **Total Lines:** 114186
 - **Total Classes:** 448
-- **Total Functions:** 1463
-- **Avg Complexity:** 4.75
+- **Total Functions:** 1470
+- **Avg Complexity:** 4.74
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -20,6 +20,23 @@
   - cmd_review (46)
   - complete_task_workflow (45)
 
+## 🌐 Language Breakdown
+
+### JAVASCRIPT
+
+- **Files:** 1
+- **Lines:** 270
+- **Classes:** 0
+- **Functions:** 7
+- **Avg Complexity:** 2.71
+
+### PYTHON
+
+- **Files:** 326
+- **Lines:** 113916
+- **Classes:** 448
+- **Functions:** 1463
+- **Avg Complexity:** 4.75
 
 
 ## 🏛️ Classes
@@ -14775,6 +14792,14 @@ Example:
 
 ---
 
+### `async cleanup() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:78`
+**Complexity:** 3
+
+---
+
 ### `clear_cache() -> None`
 
 **Language:** python
@@ -24630,6 +24655,14 @@ Returns:
 
 ---
 
+### `async main() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:138`
+**Complexity:** 10
+
+---
+
 ### `main() -> None`
 
 **Language:** python
@@ -25204,6 +25237,17 @@ Notes:
 **Parameters:**
 - `data`: Any
 - `compact`: bool
+
+---
+
+### `parseArgs(args) -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:20`
+**Complexity:** 1
+
+**Parameters:**
+- `args`: None
 
 ---
 
@@ -25904,6 +25948,14 @@ Returns:
 - `format_type`: str
 - `printer`: Optional[PrettyPrinter]
 - `limit`: Optional[int]
+
+---
+
+### `async readStdin() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:107`
+**Complexity:** 2
 
 ---
 
@@ -27598,6 +27650,14 @@ that will be passed to the provider factory via the `dependencies` keyword.
 
 ---
 
+### `setupSignalHandlers() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:92`
+**Complexity:** 1
+
+---
+
 ### `should_auto_trigger_consensus(failure_type) -> bool`
 
 **Language:** python
@@ -27837,6 +27897,22 @@ Example:
 
 **Parameters:**
 - `force_plain`: bool
+
+---
+
+### `showHelp() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:31`
+**Complexity:** 1
+
+---
+
+### `showVersion() -> None`
+
+**Language:** javascript
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:63`
+**Complexity:** 1
 
 ---
 
@@ -35475,6 +35551,11 @@ Returns:
 - `typing.Optional`
 - `typing.Protocol`
 - `typing.Sequence`
+
+### `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js`
+
+- `@opencode-ai/sdk`
+- `readline`
 
 ### `src/claude_skills/claude_skills/common/providers/registry.py`
 

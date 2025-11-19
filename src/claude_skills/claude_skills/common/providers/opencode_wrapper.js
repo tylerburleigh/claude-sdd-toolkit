@@ -21,6 +21,7 @@ function parseArgs(args) {
   const flags = {
     help: args.includes('--help') || args.includes('-h'),
     version: args.includes('--version') || args.includes('-v'),
+    test: args.includes('--test'),
   };
   return flags;
 }
@@ -54,6 +55,7 @@ Output Format (line-delimited JSON to stdout):
 Options:
   -h, --help     Show this help message
   -v, --version  Show version information
+  --test         Run in test mode (returns mock responses without API key)
 `);
 }
 
@@ -159,6 +161,35 @@ async function main() {
   // Validate required fields
   if (!payload.prompt) {
     throw new Error('Missing required field: prompt');
+  }
+
+  // Test mode - return mock response without requiring API key
+  if (flags.test) {
+    // Simulate streaming chunks
+    const mockChunks = ['Mock ', 'response ', 'from ', 'OpenCode ', 'test ', 'mode'];
+    for (const chunk of mockChunks) {
+      console.log(JSON.stringify({
+        type: 'chunk',
+        content: chunk
+      }));
+    }
+
+    // Return mock successful response
+    const mockResponse = {
+      type: 'done',
+      response: {
+        text: 'Mock response from OpenCode test mode',
+        usage: {
+          prompt_tokens: 10,
+          completion_tokens: 6,
+          total_tokens: 16
+        },
+        model: 'mock-model',
+        sessionId: 'test-session-123'
+      }
+    };
+    console.log(JSON.stringify(mockResponse));
+    process.exit(0);
   }
 
   // Get server configuration from environment variables
