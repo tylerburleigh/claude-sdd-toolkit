@@ -120,6 +120,13 @@ _DEFAULT_DETECTORS: tuple[ProviderDetector, ...] = (
         binary_env="CLAUDE_CLI_BINARY",
         probe_args=("--version",),
     ),
+    ProviderDetector(
+        provider_id="opencode",
+        default_binary="node",
+        override_env="OPENCODE_AVAILABLE_OVERRIDE",
+        binary_env="OPENCODE_BINARY",
+        probe_args=("--version",),
+    ),
 )
 
 _DETECTORS: Dict[str, ProviderDetector] = {}

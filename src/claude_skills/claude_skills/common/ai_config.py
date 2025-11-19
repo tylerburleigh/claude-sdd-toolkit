@@ -59,7 +59,7 @@ DEFAULT_MODELS = {
         "priority": ["sonnet", "haiku"]
     },
     "opencode": {
-        "priority": ["default"]
+        "priority": ["gpt-5.1-codex-mini"]
     }
 }
 

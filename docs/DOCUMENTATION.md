@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 10:12:07
+**Generated:** 2025-11-19 10:52:42
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 328
-- **Total Lines:** 114708
-- **Total Classes:** 450
-- **Total Functions:** 1473
-- **Avg Complexity:** 4.75
+- **Total Files:** 329
+- **Total Lines:** 115230
+- **Total Classes:** 451
+- **Total Functions:** 1492
+- **Avg Complexity:** 4.71
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -32,11 +32,11 @@
 
 ### PYTHON
 
-- **Files:** 327
-- **Lines:** 114403
-- **Classes:** 450
-- **Functions:** 1466
-- **Avg Complexity:** 4.76
+- **Files:** 328
+- **Lines:** 114925
+- **Classes:** 451
+- **Functions:** 1485
+- **Avg Complexity:** 4.72
 
 
 ## 🏛️ Classes
@@ -1096,6 +1096,16 @@ Example:
 
 ---
 
+### `FakeProcess`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:31`
+
+**Methods:**
+- `__init__()`
+
+---
+
 ### `FidelityReport`
 
 **Language:** python
@@ -1984,6 +1994,7 @@ Example:
 
 **Methods:**
 - `__init__()`
+- `__del__()`
 - `_prepare_subprocess_env()`
 - `_first_model_id()`
 - `_ensure_model()`
@@ -2407,7 +2418,7 @@ Attributes:
 ### `ProgressEmitter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:296`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:303`
 
 **Description:**
 > Emits structured JSON progress events for AI agents and automation tools.
@@ -9220,7 +9231,7 @@ Args:
 ### `_coerce_override_map(override) -> Tuple[Optional[str], Dict[str, str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:300`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:308`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -9496,7 +9507,7 @@ Returns:
 ### `_cursor_agent_json_flag_error(result) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:491`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:505`
 **Complexity:** 5
 
 **Description:**
@@ -9516,7 +9527,7 @@ Returns:
 ### `_dedupe_preserve_order(items) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:120`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:128`
 **Complexity:** 6
 
 **Description:**
@@ -9986,7 +9997,7 @@ Preserves multi-line items by joining continuation lines with spaces.
 ### `_extract_model_priority(models_config, tool, context) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:236`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:244`
 ⚠️ **Complexity:** 22 (High)
 
 **Description:**
@@ -10007,7 +10018,7 @@ Resolution order:
 ### `_extract_override_priority(overrides_config, tool, context) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:183`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:191`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -10023,7 +10034,7 @@ Resolution order:
 ### `_extract_priority_from_value(value, tool) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:166`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:174`
 **Complexity:** 6
 
 **Description:**
@@ -10369,7 +10380,7 @@ Returns:
 ### `_get_provider_map(config) -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:90`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:98`
 **Complexity:** 3
 
 **Description:**
@@ -11176,7 +11187,7 @@ Returns:
 ### `_normalize_auto_trigger_value(value) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:820`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:828`
 **Complexity:** 6
 
 **Description:**
@@ -11190,7 +11201,7 @@ Returns:
 ### `_normalize_context_values(value) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:135`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:143`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -11247,7 +11258,7 @@ Returns:
 ### `_normalize_priority_entry(entry) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:101`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:109`
 **Complexity:** 7
 
 **Description:**
@@ -11261,7 +11272,7 @@ Returns:
 ### `_normalize_provider_settings(config) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:73`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:81`
 **Complexity:** 3
 
 **Description:**
@@ -11549,6 +11560,21 @@ Returns:
 
 **Parameters:**
 - `content`: str
+
+---
+
+### `_payload(content, model) -> str`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:38`
+**Complexity:** 1
+
+**Description:**
+> Create a line-delimited JSON response matching OpenCode wrapper format.
+
+**Parameters:**
+- `content`: str
+- `model`: str
 
 ---
 
@@ -12075,7 +12101,7 @@ Returns:
 ### `_remove_first_occurrence(items, token) -> tuple[list[str], bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:525`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:539`
 **Complexity:** 4
 
 **Description:**
@@ -12206,7 +12232,7 @@ Returns:
 ### `_resolve_context_for_tool(context, tool) -> Optional[Mapping[str, Any]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:350`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:358`
 **Complexity:** 10
 
 **Description:**
@@ -13985,7 +14011,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:420`
-**Complexity:** 7
+**Complexity:** 9
 
 **Description:**
 > Build command list for tool execution.
@@ -13994,9 +14020,10 @@ Handles tool-specific command patterns:
 - gemini: uses -m for model, -p for prompt
 - codex: uses -m for model, positional arg for prompt
 - cursor-agent: uses --print flag, positional arg for prompt
+- opencode: uses Node.js wrapper with --model and --prompt flags
 
 Args:
-    tool: Tool name ("gemini", "codex", "cursor-agent")
+    tool: Tool name ("gemini", "codex", "cursor-agent", "opencode")
     prompt: The prompt to include in command
     model: Optional model override
 
@@ -14013,6 +14040,8 @@ Example:
     ['codex', 'exec', '--sandbox', 'read-only', '--json', '-m', 'o1', 'Fix bug']
     >>> build_tool_command("cursor-agent", "Review code", model="composer-1")
     ['cursor-agent', '--print', '--json', '--model', 'composer-1', 'Review code']
+    >>> build_tool_command("opencode", "Generate code", model="default")
+    ['node', 'opencode_wrapper.js', '--model', 'default', '--prompt', 'Generate code']
 
 **Parameters:**
 - `tool`: str
@@ -15161,7 +15190,7 @@ Returns:
 ### `cmd_check_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:627`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:641`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -15589,8 +15618,8 @@ Returns:
 ### `cmd_fix(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:381`
-⚠️ **Complexity:** 34 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:391`
+⚠️ **Complexity:** 36 (High)
 
 **Description:**
 > Auto-fix validation issues in spec file.
@@ -16147,7 +16176,7 @@ Returns:
 ### `cmd_report(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:517`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:531`
 **Complexity:** 10
 
 **Description:**
@@ -16282,7 +16311,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:584`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:598`
 **Complexity:** 4
 
 **Description:**
@@ -16505,7 +16534,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:246`
-⚠️ **Complexity:** 25 (High)
+⚠️ **Complexity:** 27 (High)
 
 **Description:**
 > Validate JSON spec file.
@@ -17449,7 +17478,7 @@ dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 ### `create_provider() -> OpenCodeProvider`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:426`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:446`
 **Complexity:** 6
 
 **Description:**
@@ -18019,7 +18048,7 @@ Args:
 ### `detect_unjournaled_tasks(spec_id, specs_dir, printer) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:349`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:366`
 **Complexity:** 7
 
 **Description:**
@@ -18514,7 +18543,7 @@ Example:
 ### `execute_tool(tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:672`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:686`
 **Complexity:** 10
 
 **Description:**
@@ -18548,7 +18577,7 @@ Example:
 ### `execute_tool_with_fallback(skill_name, tool, prompt) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:546`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:560`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -18596,7 +18625,7 @@ Example:
 ### `execute_tools_parallel(tools, prompt) -> MultiToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:768`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_tools.py:782`
 **Complexity:** 5
 
 **Description:**
@@ -21556,7 +21585,7 @@ Returns:
 ### `get_agent_command(skill_name, agent_name, prompt) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:727`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:735`
 **Complexity:** 2
 
 **Description:**
@@ -21582,7 +21611,7 @@ Returns:
 ### `get_agent_priority(skill_name, default_order) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:699`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:707`
 **Complexity:** 6
 
 **Description:**
@@ -21803,7 +21832,7 @@ Returns:
 ### `get_config_path(skill_name) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:586`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:594`
 **Complexity:** 3
 
 **Description:**
@@ -21901,7 +21930,7 @@ Returns:
 ### `get_consensus_agents(skill_name) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:837`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:845`
 **Complexity:** 7
 
 **Description:**
@@ -21919,7 +21948,7 @@ when the configuration is missing or malformed.
 ### `get_consultation_limit(skill_name) -> Optional[int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:982`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:990`
 **Complexity:** 9
 
 **Description:**
@@ -22118,7 +22147,7 @@ Returns dictionary of tools where enabled: true in config.
 ### `get_enabled_tools(skill_name) -> Dict[str, Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:680`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:688`
 **Complexity:** 1
 
 **Description:**
@@ -22138,7 +22167,7 @@ Returns:
 ### `get_fallback_config(skill_name) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:941`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:949`
 **Complexity:** 3
 
 **Description:**
@@ -22223,7 +22252,7 @@ Returns:
 ### `get_global_config_path() -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:492`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:500`
 **Complexity:** 6
 
 **Description:**
@@ -22592,7 +22621,7 @@ Returns:
 ### `get_preferred_model(skill_name, tool_name) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:487`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:495`
 **Complexity:** 1
 
 **Description:**
@@ -22687,7 +22716,7 @@ Returns:
 ### `get_progress_summary(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:164`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:171`
 **Complexity:** 8
 
 **Description:**
@@ -22800,7 +22829,7 @@ Example:
 ### `get_routing_config(skill_name) -> Dict[str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:867`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:875`
 **Complexity:** 3
 
 **Description:**
@@ -23183,7 +23212,7 @@ Example:
 ### `get_task_counts_by_status(spec_data) -> Dict[str, int]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:265`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:272`
 **Complexity:** 5
 
 **Description:**
@@ -23390,7 +23419,7 @@ Returns:
 ### `get_timeout(skill_name, timeout_type) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:761`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:769`
 **Complexity:** 4
 
 **Description:**
@@ -23412,7 +23441,7 @@ Returns:
 ### `get_tool_config(skill_name, tool_name) -> Optional[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:789`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:797`
 **Complexity:** 1
 
 **Description:**
@@ -23434,7 +23463,7 @@ Returns:
 ### `get_tool_priority(skill_name, context) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:888`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:896`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -24140,7 +24169,7 @@ Returns:
 ### `is_opencode_available() -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:373`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:393`
 **Complexity:** 9
 
 **Description:**
@@ -24220,7 +24249,7 @@ Returns:
 ### `is_tool_enabled(skill_name, tool_name) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:804`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:812`
 **Complexity:** 2
 
 **Description:**
@@ -24389,7 +24418,7 @@ Returns:
 ### `list_phases(spec_data) -> List[Dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:228`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:235`
 **Complexity:** 4
 
 **Description:**
@@ -24559,7 +24588,7 @@ Returns:
 ### `load_global_config() -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:535`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:543`
 **Complexity:** 4
 
 **Description:**
@@ -24701,7 +24730,7 @@ Returns:
 ### `load_skill_config(skill_name) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:618`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:626`
 **Complexity:** 4
 
 **Description:**
@@ -24945,7 +24974,7 @@ Returns:
 ### `merge_configs(base, override) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:560`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:568`
 **Complexity:** 5
 
 **Description:**
@@ -26093,7 +26122,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_update/validation.py:237`
-⚠️ **Complexity:** 22 (High)
+⚠️ **Complexity:** 23 (High)
 
 **Description:**
 > Reconcile JSON spec by fixing inconsistent task statuses.
@@ -26636,7 +26665,7 @@ Args:
 ### `register_validate(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:686`
+**Defined in:** `src/claude_skills/claude_skills/sdd_validate/cli.py:700`
 **Complexity:** 2
 
 **Description:**
@@ -26883,7 +26912,7 @@ Returns:
 ### `resolve_models_for_tools(skill_name, tools, override, context) -> 'OrderedDict[str, Optional[str]]'`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:437`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:445`
 **Complexity:** 8
 
 **Description:**
@@ -26950,7 +26979,7 @@ Returns:
 ### `resolve_tool_model(skill_name, tool, override, context) -> Optional[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:383`
+**Defined in:** `src/claude_skills/claude_skills/common/ai_config.py:391`
 **Complexity:** 8
 
 **Description:**
@@ -30511,6 +30540,17 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_create_provider_injects_custom_runner_and_env() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:345`
+**Complexity:** 1
+
+**Description:**
+> Test that factory function properly injects dependencies.
+
+---
+
 ### `test_create_provider_injects_custom_runner_and_model() -> None`
 
 **Language:** python
@@ -30910,6 +30950,62 @@ a decision needs to be made about what to implement.
 
 **Description:**
 > Test handling of empty/null task_category (should use default inference).
+
+---
+
+### `test_ensure_server_running_passes_environment_to_server(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:211`
+**Complexity:** 1
+
+**Description:**
+> Test that _ensure_server_running passes environment variables to server process.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_ensure_server_running_raises_if_binary_not_found(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:250`
+**Complexity:** 1
+
+**Description:**
+> Test that _ensure_server_running raises error if opencode binary not found.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_ensure_server_running_raises_timeout_if_server_fails_to_start(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:269`
+**Complexity:** 1
+
+**Description:**
+> Test that _ensure_server_running raises timeout if server doesn't start.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_ensure_server_running_skips_if_port_open(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:195`
+**Complexity:** 1
+
+**Description:**
+> Test that _ensure_server_running skips startup if server already running.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
 
 ---
 
@@ -32176,6 +32272,95 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_is_opencode_available_checks_global_binary(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:405`
+**Complexity:** 6
+
+**Description:**
+> Test that availability check falls back to global opencode binary.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_is_opencode_available_checks_node_runtime(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:371`
+**Complexity:** 1
+
+**Description:**
+> Test that availability check verifies Node.js runtime.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_is_opencode_available_checks_sdk_and_binary(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:386`
+**Complexity:** 4
+
+**Description:**
+> Test that availability check verifies SDK and opencode binary.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_is_opencode_available_checks_wrapper_script(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:378`
+**Complexity:** 1
+
+**Description:**
+> Test that availability check verifies wrapper script exists.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
+
+---
+
+### `test_is_port_open_detects_closed_port() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:163`
+**Complexity:** 1
+
+**Description:**
+> Test that _is_port_open correctly detects a closed port.
+
+---
+
+### `test_is_port_open_detects_open_port() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:146`
+**Complexity:** 1
+
+**Description:**
+> Test that _is_port_open correctly detects an open port.
+
+---
+
+### `test_is_port_open_handles_socket_error() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:180`
+**Complexity:** 1
+
+**Description:**
+> Test that _is_port_open handles socket errors gracefully.
+
+---
+
 ### `test_key_sanitization_round_trip(tmp_path) -> None`
 
 **Language:** python
@@ -32546,6 +32731,20 @@ a decision needs to be made about what to implement.
 
 **Parameters:**
 - `doc_query_samples`: None
+
+---
+
+### `test_opencode_provider_executes_command_with_json_stdin(monkeypatch) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:65`
+**Complexity:** 1
+
+**Description:**
+> Test that OpenCode provider executes wrapper with JSON payload via stdin.
+
+**Parameters:**
+- `monkeypatch`: pytest.MonkeyPatch
 
 ---
 
@@ -32934,6 +33133,28 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_prepare_subprocess_env_merges_environments() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:118`
+**Complexity:** 1
+
+**Description:**
+> Test that _prepare_subprocess_env properly merges environments.
+
+---
+
+### `test_prepare_subprocess_env_preserves_server_url() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:133`
+**Complexity:** 1
+
+**Description:**
+> Test that custom OPENCODE_SERVER_URL is preserved.
+
+---
+
 ### `test_print_json_output_modes(capsys) -> None`
 
 **Language:** python
@@ -32966,6 +33187,39 @@ a decision needs to be made about what to implement.
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_base_provider.py:135`
 **Complexity:** 1
+
+---
+
+### `test_provider_handles_error_messages_from_wrapper() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:294`
+**Complexity:** 1
+
+**Description:**
+> Test that provider raises error when wrapper returns error type.
+
+---
+
+### `test_provider_handles_non_zero_exit_code() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:328`
+**Complexity:** 1
+
+**Description:**
+> Test that provider raises error when wrapper exits with non-zero code.
+
+---
+
+### `test_provider_validates_json_output() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:312`
+**Complexity:** 1
+
+**Description:**
+> Test that provider raises error on invalid JSON from wrapper.
 
 ---
 
@@ -33967,7 +34221,7 @@ Raises:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/common/progress.py:63`
-⚠️ **Complexity:** 17 (High)
+⚠️ **Complexity:** 19 (High)
 
 **Description:**
 > Update a node's status based on its children's progress.
@@ -33988,7 +34242,7 @@ Args:
 ### `update_parent_status(spec_data, node_id) -> Dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/progress.py:128`
+**Defined in:** `src/claude_skills/claude_skills/common/progress.py:135`
 **Complexity:** 5
 
 **Description:**
@@ -35483,6 +35737,10 @@ Returns:
 - `gemini.GeminiProvider`
 - `gemini.create_provider`
 - `gemini.is_gemini_available`
+- `opencode.OPENCODE_METADATA`
+- `opencode.OpenCodeProvider`
+- `opencode.create_provider`
+- `opencode.is_opencode_available`
 - `registry.ProviderFactory`
 - `registry.ProviderRegistration`
 - `registry.available_providers`
@@ -38066,6 +38324,30 @@ Returns:
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
+
+### `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py`
+
+- `__future__.annotations`
+- `claude_skills.common.providers.GenerationRequest`
+- `claude_skills.common.providers.ProviderExecutionError`
+- `claude_skills.common.providers.ProviderHooks`
+- `claude_skills.common.providers.ProviderTimeoutError`
+- `claude_skills.common.providers.ProviderUnavailableError`
+- `claude_skills.common.providers.opencode.DEFAULT_SERVER_URL`
+- `claude_skills.common.providers.opencode.OPENCODE_METADATA`
+- `claude_skills.common.providers.opencode.OpenCodeProvider`
+- `claude_skills.common.providers.opencode.create_provider`
+- `claude_skills.common.providers.opencode.is_opencode_available`
+- `json`
+- `pathlib.Path`
+- `pytest`
+- `socket`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `unittest.mock.MagicMock`
+- `unittest.mock.Mock`
+- `unittest.mock.patch`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_providers/test_provider_detectors.py`
 
