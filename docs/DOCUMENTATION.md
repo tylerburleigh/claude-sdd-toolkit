@@ -1,24 +1,24 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 16:46:17
+**Generated:** 2025-11-18 18:34:39
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 114120
+- **Total Lines:** 113927
 - **Total Classes:** 448
-- **Total Functions:** 1469
+- **Total Functions:** 1465
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
-  - _handle_fidelity_review (53)
+  - _handle_fidelity_review (51)
   - parse_review_response (50)
+  - cmd_review (46)
   - complete_task_workflow (45)
-  - cmd_review (42)
 
 
 
@@ -1095,7 +1095,6 @@ This class will be implemented in Phase 4 (Report Generation).
 - `_format_models_display()`
 - `_get_report_metadata()`
 - `_convert_to_dict()`
-- `generate_markdown()`
 - `generate_json()`
 - `print_console()`
 - `print_console_rich()`
@@ -8860,7 +8859,7 @@ Example output:
 ### `_build_output_basename(spec_id, task_id, phase_id, file_paths) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:61`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:66`
 **Complexity:** 7
 
 **Parameters:**
@@ -9335,7 +9334,7 @@ Args:
 ### `_create_fidelity_report(reviewer, parsed_responses, consensus, categorized_issues, models_metadata) -> FidelityReport`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:92`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:97`
 **Complexity:** 1
 
 **Parameters:**
@@ -9837,26 +9836,6 @@ Returns:
 
 ---
 
-### `_extract_dimension_scores_from_reviews(responses) -> Dict[str, float]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:278`
-**Complexity:** 8
-
-**Description:**
-> Extract and average dimension scores from individual model reviews.
-
-Args:
-    responses: List of response dicts with raw_review text
-
-Returns:
-    Dictionary mapping dimension names to average scores
-
-**Parameters:**
-- `responses`: List[Dict[str, Any]]
-
----
-
 ### `_extract_issues_from_markdown(content) -> Dict[str, List[Dict[str, Any]]]`
 
 **Language:** python
@@ -10030,7 +10009,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:46`
-**Complexity:** 1
+**Complexity:** 2
 
 **Description:**
 > Emit fidelity summary respecting verbosity settings.
@@ -10110,7 +10089,7 @@ Returns:
 ### `_format_issue(number, issue, brief) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:119`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:86`
 **Complexity:** 5
 
 **Description:**
@@ -10126,8 +10105,8 @@ Returns:
 ### `_format_model_summary(model_data) -> List[str]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:145`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:112`
+**Complexity:** 8
 
 **Description:**
 > Format individual model response for display.
@@ -10200,11 +10179,11 @@ Returns:
 ### `_generate_feasibility_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:257`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:237`
 **Complexity:** 1
 
 **Description:**
-> Generate feasibility-focused review prompt.
+> Generate technical complexity review prompt.
 
 **Parameters:**
 - `spec_content`: str
@@ -10216,7 +10195,7 @@ Returns:
 ### `_generate_full_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:100`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:91`
 **Complexity:** 1
 
 **Description:**
@@ -10232,11 +10211,11 @@ Returns:
 ### `_generate_quick_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:162`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:142`
 **Complexity:** 1
 
 **Description:**
-> Generate quick review prompt focusing on completeness and clarity.
+> Generate quick review prompt focusing on blockers and questions.
 
 **Parameters:**
 - `spec_content`: str
@@ -10248,7 +10227,7 @@ Returns:
 ### `_generate_security_review_prompt(spec_content, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:199`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:184`
 **Complexity:** 1
 
 **Description:**
@@ -10369,35 +10348,6 @@ Returns:
 
 **Parameters:**
 - `config`: Mapping[str, Any]
-
----
-
-### `_get_recommendation_summary(consensus, recommendation) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:84`
-**Complexity:** 3
-
-**Description:**
-> Get summary text for recommendation.
-
-**Parameters:**
-- `consensus`: Dict[str, Any]
-- `recommendation`: str
-
----
-
-### `_get_score_assessment(score) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:105`
-**Complexity:** 5
-
-**Description:**
-> Get qualitative assessment for a score.
-
-**Parameters:**
-- `score`: float
 
 ---
 
@@ -10559,8 +10509,8 @@ Example:
 ### `_handle_fidelity_review(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:127`
-⚠️ **Complexity:** 53 (High)
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:132`
+⚠️ **Complexity:** 51 (High)
 
 **Description:**
 > Handle fidelity-review command execution.
@@ -11517,8 +11467,8 @@ Returns:
 ### `_parse_synthesis_text(synthesis_text) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:222`
-**Complexity:** 6
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:226`
+**Complexity:** 3
 
 **Description:**
 > Parse structured data from AI-generated synthesis markdown.
@@ -12128,7 +12078,7 @@ Returns a tuple of (new_list, removed_flag).
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:183`
-**Complexity:** 5
+**Complexity:** 9
 
 **Parameters:**
 - `specs`: list[dict]
@@ -12498,7 +12448,7 @@ Returns:
 ### `_slugify_component(value) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:53`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:58`
 **Complexity:** 3
 
 **Parameters:**
@@ -12885,7 +12835,7 @@ Returns:
 ### `_write_report_artifact(path, format, get_markdown, get_json_text) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:109`
+**Defined in:** `src/claude_skills/claude_skills/sdd_fidelity_review/cli.py:114`
 **Complexity:** 3
 
 **Parameters:**
@@ -12913,7 +12863,7 @@ Returns:
 ### `_write_sdd_config(config_path, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:306`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:327`
 **Complexity:** 2
 
 **Parameters:**
@@ -13910,7 +13860,7 @@ Yields:
 ### `build_consensus(responses, spec_id, spec_title) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:317`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/synthesis.py:272`
 **Complexity:** 3
 
 **Description:**
@@ -15189,7 +15139,7 @@ Returns:
 ### `cmd_check_environment(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1137`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1169`
 ⚠️ **Complexity:** 13 (High)
 
 **Description:**
@@ -15419,7 +15369,7 @@ Returns:
 ### `cmd_detect_project(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1064`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1096`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -15446,7 +15396,7 @@ Returns:
 ### `cmd_ensure_sdd_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:320`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:341`
 **Complexity:** 4
 
 **Description:**
@@ -15476,7 +15426,7 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:212`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:233`
 **Complexity:** 1
 
 **Description:**
@@ -15491,7 +15441,7 @@ Returns:
 ### `cmd_find_circular_deps(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1181`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1213`
 ⚠️ **Complexity:** 12 (High)
 
 **Description:**
@@ -15542,7 +15492,7 @@ Returns:
 ### `cmd_find_pattern(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1041`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1073`
 **Complexity:** 5
 
 **Description:**
@@ -15557,7 +15507,7 @@ Returns:
 ### `cmd_find_related_files(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1222`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1254`
 ⚠️ **Complexity:** 11 (High)
 
 **Description:**
@@ -15587,7 +15537,7 @@ Returns:
 ### `cmd_find_tests(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1104`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1136`
 **Complexity:** 9
 
 **Description:**
@@ -15617,7 +15567,7 @@ Returns:
 ### `cmd_format_plan(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:984`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1016`
 **Complexity:** 4
 
 **Description:**
@@ -15778,7 +15728,7 @@ Args:
 ### `cmd_inspect_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:224`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:245`
 **Complexity:** 4
 
 **Description:**
@@ -15889,7 +15839,7 @@ Args:
 ### `cmd_list_tools(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:345`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:355`
 ⚠️ **Complexity:** 20 (High)
 
 **Description:**
@@ -16008,7 +15958,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:739`
-⚠️ **Complexity:** 36 (High)
+⚠️ **Complexity:** 43 (High)
 
 **Description:**
 > Prepare task for implementation.
@@ -16176,7 +16126,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:87`
-⚠️ **Complexity:** 42 (High)
+⚠️ **Complexity:** 46 (High)
 
 **Description:**
 > Review a specification file using multiple AI models.
@@ -16236,7 +16186,7 @@ Args:
 ### `cmd_session_summary(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:268`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:289`
 **Complexity:** 4
 
 **Description:**
@@ -16268,7 +16218,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_spec_stats(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1287`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1319`
 **Complexity:** 10
 
 **Description:**
@@ -16532,7 +16482,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_paths(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1259`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1291`
 **Complexity:** 7
 
 **Description:**
@@ -16547,7 +16497,7 @@ Supports both interactive (terminal) and non-interactive (CLI flags) modes.
 ### `cmd_validate_spec(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1003`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1035`
 **Complexity:** 10
 
 **Description:**
@@ -21213,7 +21163,7 @@ Returns:
 ### `generate_json_report(consensus, spec_id, spec_title, review_type) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:221`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:163`
 **Complexity:** 1
 
 **Description:**
@@ -21403,7 +21353,7 @@ Returns:
 ### `generate_review_prompt(spec_content, review_type, spec_id, title) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:72`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:63`
 **Complexity:** 4
 
 **Description:**
@@ -23014,26 +22964,6 @@ Example:
 
 **Parameters:**
 - `repo_root`: Path
-
----
-
-### `get_stance_instruction(stance) -> str`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/prompts.py:307`
-**Complexity:** 3
-
-**Description:**
-> Get stance-specific instruction for a model.
-
-Args:
-    stance: for, against, or neutral
-
-Returns:
-    Stance instruction string
-
-**Parameters:**
-- `stance`: str
 
 ---
 
@@ -26378,7 +26308,7 @@ Args:
 ### `register_next(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1335`
+**Defined in:** `src/claude_skills/claude_skills/sdd_next/cli.py:1367`
 **Complexity:** 1
 
 **Description:**
@@ -26408,7 +26338,7 @@ Args:
 ### `register_plan_review(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:437`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/cli.py:447`
 **Complexity:** 1
 
 **Description:**
@@ -26571,7 +26501,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:352`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:373`
 **Complexity:** 1
 
 **Description:**
@@ -36075,6 +36005,7 @@ Returns:
 - `claude_skills.common.paths.find_specs_directory`
 - `claude_skills.common.progress.ProgressEmitter`
 - `claude_skills.common.sdd_config.get_default_format`
+- `claude_skills.common.sdd_config.get_json_compact`
 - `collections.OrderedDict`
 - `consultation.ConsultationError`
 - `consultation.ConsultationTimeoutError`

@@ -106,42 +106,46 @@ def synthesize_with_ai(
         "# Synthesis",
         "",
         "## Overall Assessment",
-        "- **Consensus Score**: X.X/10 (explain how you calculated from individual scores)",
-        "- **Final Recommendation**: APPROVE/REVISE/REJECT",
-        "- **Consensus Level**: Strong/Moderate/Weak/Conflicted (based on score variance)",
+        "- **Consensus Level**: Strong/Moderate/Weak/Conflicted (based on agreement across models)",
         "",
-        "## Key Findings",
-        "",
-        "### Critical Issues (Must Fix)",
-        "- Issue title - flagged by: [model names]",
+        "## Critical Blockers",
+        "Issues that must be fixed before implementation (identified by multiple models):",
+        "- **[Category]** Issue title - flagged by: [model names]",
         "  - Impact: ...",
         "  - Recommended fix: ...",
         "",
-        "### High Priority Issues",
-        "- Issue title - flagged by: [model names]",
+        "## Major Suggestions",
+        "Significant improvements that enhance quality, maintainability, or design:",
+        "- **[Category]** Issue title - flagged by: [model names]",
+        "  - Description: ...",
+        "  - Recommended fix: ...",
         "",
-        "### Medium/Low Priority",
-        "- (Summarize briefly)",
+        "## Questions for Author",
+        "Clarifications needed (common questions across models):",
+        "- **[Category]** Question - flagged by: [model names]",
+        "  - Context: Why this matters",
+        "",
+        "## Design Strengths",
+        "What the spec does well (areas of agreement):",
+        "- **[Category]** Strength - noted by: [model names]",
+        "  - Why this is effective",
         "",
         "## Points of Agreement",
         "- What all/most models agree on",
         "",
-        "## Points of Disagreement  ",
+        "## Points of Disagreement",
         "- Where models conflict",
         "- Your assessment of the disagreement",
         "",
-        "## Strengths Identified",
-        "- Common strengths across reviews",
-        "",
-        "## Recommendations",
+        "## Synthesis Notes",
+        "- Overall themes across reviews",
         "- Actionable next steps",
         "```",
         "",
         "**Important**:",
-        "- Extract ALL scores mentioned and calculate consensus",
         "- Attribute issues to specific models (e.g., \"flagged by: gemini, codex\")",
         "- Note where models agree vs. disagree",
-        "- Make a clear APPROVE/REVISE/REJECT recommendation with reasoning",
+        "- Focus on synthesizing actionable feedback across all reviews",
         "",
         "---",
         ""
@@ -233,18 +237,7 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
     """
     data = {}
 
-    # Simple fields
-    score_match = re.search(r"Consensus Score\*\*:\s*(\d+\.?\d*)\s*/\s*10", synthesis_text, re.IGNORECASE)
-    if score_match:
-        try:
-            data["overall_score"] = float(score_match.group(1))
-        except (ValueError, IndexError):
-            pass
-
-    rec_match = re.search(r"Final Recommendation\*\*:\s*(APPROVE|REVISE|REJECT)", synthesis_text, re.IGNORECASE)
-    if rec_match:
-        data["final_recommendation"] = rec_match.group(1).upper()
-
+    # Consensus level
     level_match = re.search(r"Consensus Level\*\*:\s*(Strong|Moderate|Weak|Conflicted)", synthesis_text, re.IGNORECASE)
     if level_match:
         data["consensus_level"] = level_match.group(1)
@@ -264,54 +257,16 @@ def _parse_synthesis_text(synthesis_text: str) -> Dict[str, Any]:
         items = re.findall(r"^\s*[-*]\s*(.*)", content, re.MULTILINE)
         return [item.strip() for item in items]
 
-    data["all_issues"] = _extract_section_list("Critical Issues") + \
-                         _extract_section_list("High Priority Issues") + \
-                         _extract_section_list("Medium/Low Priority")
+    # Extract feedback by category
+    data["critical_blockers"] = _extract_section_list("Critical Blockers")
+    data["major_suggestions"] = _extract_section_list("Major Suggestions")
+    data["questions"] = _extract_section_list("Questions for Author")
+    data["design_strengths"] = _extract_section_list("Design Strengths")
     data["agreements"] = _extract_section_list("Points of Agreement")
     data["disagreements"] = _extract_section_list("Points of Disagreement")
-    data["all_strengths"] = _extract_section_list("Strengths Identified")
-    data["all_recommendations"] = _extract_section_list("Recommendations")
+    data["synthesis_notes"] = _extract_section_list("Synthesis Notes")
 
     return data
-
-
-def _extract_dimension_scores_from_reviews(responses: List[Dict[str, Any]]) -> Dict[str, float]:
-    """
-    Extract and average dimension scores from individual model reviews.
-
-    Args:
-        responses: List of response dicts with raw_review text
-
-    Returns:
-        Dictionary mapping dimension names to average scores
-    """
-    dimensions = ["completeness", "clarity", "feasibility", "architecture", "risk_management", "verification"]
-    all_scores = {dim: [] for dim in dimensions}
-
-    for response in responses:
-        raw_review = response.get("raw_review", "")
-        if not raw_review:
-            continue
-
-        # Extract dimension scores from markdown (e.g., "- **Completeness**: 3/10")
-        for dim in dimensions:
-            dim_display = dim.replace("_", " ").title()
-            pattern = rf"\*\*{re.escape(dim_display)}\*\*:\s*(\d+)\s*/\s*10"
-            match = re.search(pattern, raw_review, re.IGNORECASE)
-            if match:
-                try:
-                    score = int(match.group(1))
-                    all_scores[dim].append(score)
-                except (ValueError, IndexError):
-                    pass
-
-    # Calculate averages
-    dimension_scores = {}
-    for dim, scores in all_scores.items():
-        if scores:
-            dimension_scores[dim] = round(sum(scores) / len(scores), 1)
-
-    return dimension_scores
 
 
 def build_consensus(
@@ -355,9 +310,6 @@ def build_consensus(
     synthesis_text = synthesis_result.get("synthesis_text", "")
     parsed_data = _parse_synthesis_text(synthesis_text)
 
-    # Extract and average dimension scores from individual reviews
-    dimension_scores = _extract_dimension_scores_from_reviews(responses)
-
     # Return synthesis in format expected by downstream code
     # The synthesis_text contains the full markdown synthesis
     return {
@@ -365,13 +317,12 @@ def build_consensus(
         "num_models": synthesis_result.get("num_models", 0),
         "models": synthesis_result.get("models", []),
         "synthesis_text": synthesis_text,
-        "overall_score": parsed_data.get("overall_score"),
-        "final_recommendation": parsed_data.get("final_recommendation"),
         "consensus_level": parsed_data.get("consensus_level"),
-        "dimension_scores": dimension_scores,
-        "all_issues": parsed_data.get("all_issues", []),
-        "all_strengths": parsed_data.get("all_strengths", []),
-        "all_recommendations": parsed_data.get("all_recommendations", []),
+        "critical_blockers": parsed_data.get("critical_blockers", []),
+        "major_suggestions": parsed_data.get("major_suggestions", []),
+        "questions": parsed_data.get("questions", []),
+        "design_strengths": parsed_data.get("design_strengths", []),
         "agreements": parsed_data.get("agreements", []),
         "disagreements": parsed_data.get("disagreements", []),
+        "synthesis_notes": parsed_data.get("synthesis_notes", []),
     }

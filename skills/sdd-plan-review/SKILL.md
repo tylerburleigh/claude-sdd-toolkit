@@ -1,32 +1,34 @@
 ---
 name: sdd-plan-review
-description: Multi-model consultation and synthesis stage for SDD specifications. Coordinates parallel AI reviewers, consolidates consensus findings, and prepares advisory reports and handoffs without modifying specs or executing fixes.
+description: Multi-model consultation for SDD specifications providing structured feedback. Coordinates parallel AI reviewers, synthesizes actionable insights, and categorizes findings by feedback type without modifying specs or executing fixes.
 ---
 
 # Spec-Driven Development: Plan Review Skill
 
 ## Overview
 
-`Skill(sdd-toolkit:sdd-plan-review)` is the consultative review gate for Spec-Driven Development. It convenes multiple AI reviewers, challenges assumptions with anti-sycophancy prompts, and synthesizes a consensus readiness assessment before any implementation or remediation occurs.
+`Skill(sdd-toolkit:sdd-plan-review)` is the multi-perspective feedback stage for Spec-Driven Development. It convenes multiple AI reviewers to provide structured, actionable feedback across key dimensions before any implementation begins.
 
-- Builds shared understanding of spec strengths, risks, and open questions
-- Produces an advisory report that captures agreements, disagreements, and severity tags
+- Builds shared understanding of spec strengths, risks, and improvement opportunities
+- Produces categorized feedback organized by type (Missing Information, Design Concerns, Risk Flags, etc.)
+- Synthesizes reviewer perspectives into clear, prioritized insights
 - Recommends handoffs to the correct downstream skills instead of applying changes directly
 
-This stage is advisory-only. The output is a synthesized report and clear guidance on where follow-up work belongs.
+This stage is advisory-only. The output is a structured feedback report and clear guidance on where follow-up work belongs.
 
 ## Scope & Responsibilities
 
 **This skill delivers:**
-- Multi-model critique of draft specs across architecture, feasibility, risk, and verification
-- Consolidated findings that highlight consensus, dissent, and severity of concerns
-- Advisory recommendations on which downstream skill should address each issue
+- Multi-model feedback on draft specs across architecture, feasibility, risk, and verification
+- Categorized feedback organized by type (Missing Information, Design Concerns, Risk Flags, Enhancement Suggestions, etc.)
+- Consolidated findings that highlight reviewer consensus and diverse perspectives
+- Advisory recommendations on which downstream skill should address each finding
 - Structured reports (Markdown and JSON) that capture review context for the broader workflow
 
 **This skill does not:**
 - Edit specifications or apply fixes
 - Update spec metadata, journals, or approval status
-- Green-light implementation without stakeholder review
+- Make approval/rejection decisions (provides feedback only)
 
 ## Position in the SDD Workflow
 
@@ -34,41 +36,41 @@ This stage is advisory-only. The output is a synthesized report and clear guidan
 PLAN → PLAN-REVIEW (consult) → UPDATE/NEXT/VALIDATE
 ```
 
-- **Entry point:** A draft spec exists and needs a critical second opinion.
-- **Core activity:** `sdd-plan-review` convenes multiple AI reviewers, scores the spec across shared dimensions, and synthesizes an advisory consensus.
+- **Entry point:** A draft spec exists and needs multi-perspective feedback.
+- **Core activity:** `sdd-plan-review` convenes multiple AI reviewers and synthesizes structured, actionable feedback.
 
-**Role of this skill:** Provide a rigorous, multi-perspective critique and consensus summary before any remediation starts. It informs, but never performs, follow-up edits.
+**Role of this skill:** Provide diverse perspectives and categorized feedback before implementation starts. It informs, but never performs, follow-up edits.
 
 ## Scope Boundaries
 
-- ✅ **Do:** Convene multi-model reviews, interrogate assumptions, aggregate perspectives, surface consensus/disagreements, and articulate advisory recommendations with severity tagging.
-- ✅ **Do:** Capture review metadata, scores, and rationale in the generated report so downstream skills have clear guidance.
+- ✅ **Do:** Convene multi-model reviews, interrogate assumptions, aggregate perspectives, and categorize feedback by type (Missing Information, Design Concerns, Risk Flags, etc.).
+- ✅ **Do:** Capture review metadata, feedback categories, and rationale in the generated report so downstream skills have clear guidance.
 - ❌ **Don't:** Edit specs, adjust estimates, rewrite acceptance criteria, or change task hierarchies.
 - ❌ **Don't:** Update journals, statuses, or frontmatter.
 - ❌ **Don't:** Author execution plans or task breakdowns.
 
 ## Core Philosophy
 
-**Diverse Perspectives Improve Quality**: Multiple AI models reviewing a specification catch more issues than a single review. By consulting different AI CLIs (gemini, codex, cursor-agent) in parallel, we validate design decisions, identify risks, and build confidence before costly implementation.
+**Diverse Perspectives Improve Quality**: Multiple AI models reviewing a specification catch more issues and provide richer insights than a single review. By consulting different AI CLIs (gemini, codex, cursor-agent) in parallel, we validate design decisions, identify risks, and surface improvement opportunities before costly implementation.
 
-**Anti-Sycophancy by Design**: LLMs naturally want to agree and validate. This skill enforces critical framing and dissent-seeking defaults so reviewers actively hunt for issues instead of rubber-stamping drafts.
+**Feedback, Not Gatekeeping**: This skill provides structured, actionable feedback to inform decision-making, not approval/rejection gatekeeping. The output helps spec authors understand strengths, risks, and opportunities from multiple perspectives.
 
 **Key Benefits:**
-- Catches specification gaps before coding begins
+- Surfaces specification gaps and improvement opportunities before coding begins
 - Validates architecture from multiple expert angles
 - Identifies hidden risks and edge cases
 - Evaluates implementation feasibility realistically
 - Provides diverse perspectives on complex decisions
-- Builds confidence through consensus
+- Generates categorized, actionable feedback
 - Reduces expensive rework and technical debt
 
 ## When to Use This Skill
 
-Request `Skill(sdd-toolkit:sdd-plan-review)` when you need an advisory consensus on a draft specification:
-- New or revised specs that require stakeholder confidence before approval
+Request `Skill(sdd-toolkit:sdd-plan-review)` when you need multi-perspective feedback on a draft specification:
+- New or revised specs that benefit from diverse expert perspectives
 - High-risk, high-effort, or multi-team initiatives where blind spots are expensive
 - Novel architectures, emerging technologies, or unfamiliar integrations
-- Security-sensitive surfaces (auth, PII, critical data flows) that demand scrutiny
+- Security-sensitive surfaces (auth, PII, critical data flows) that need scrutiny
 - Aggressive timelines or estimates that need feasibility validation
 
 **Do NOT request this skill when:**
@@ -77,7 +79,7 @@ Request `Skill(sdd-toolkit:sdd-plan-review)` when you need an advisory consensus
 - You need someone to make direct specification edits
 - The work is exploratory, disposable, or prototype-only
 
-**Reminder:** This skill surfaces findings and next-step recommendations—actual remediation flows through the calling agent.
+**Reminder:** This skill provides structured feedback—decisions about addressing findings flow through the calling agent.
 
 ## Decision Guide: Should We Convene a Review?
 
@@ -164,18 +166,83 @@ sdd review user-auth-001 --type feasibility
    ```
    - Confirm the correct review type and tools, run once per major draft.
 
-2. **Interpret the synthesized report**
-   - Read the aggregated scores, model consensus summary, and severity-tagged findings.
-   - Capture key agreements/disagreements and any open questions that need follow-up.
+2. **Interpret the feedback report**
+   - Review categorized findings organized by feedback type
+   - Note reviewer consensus and diverse perspectives
+   - Identify priority findings that need addressing
 
 3. **Prepare the advisory handoff**
-   - Summarize the readiness recommendation (approve / revise / reject) with rationale.
+   - Summarize key findings and improvement opportunities
+   - Prioritize feedback by category and severity
+   - Recommend downstream actions based on findings
 
 ## Outputs
 
-- **Consensus report (Markdown):** Automatically saved to `specs/.reviews/<spec-id>-review-<type>.md` and printed to stdout; captures findings, severity tags, dissent notes, and recommended handoffs.
-- **JSON summary:** Automatically saved alongside the Markdown as `specs/.reviews/<spec-id>-review-<type>.json`; includes scores, recommendation, participating tools, and issue catalog for orchestration.
-- **Readiness recommendation:** APPROVE / REVISE / REJECT judgement with supporting rationale embedded in both default artifacts.
+- **Feedback report (Markdown):** Automatically saved to `specs/.reviews/<spec-id>-review-<type>.md` and printed to stdout; captures categorized findings, reviewer perspectives, and recommended handoffs.
+- **JSON summary:** Automatically saved alongside the Markdown as `specs/.reviews/<spec-id>-review-<type>.json`; includes feedback categories, participating tools, and issue catalog for orchestration.
+- **Exit codes for automation:**
+  - `0`: Review completed successfully with feedback
+  - `1`: Review failed (configuration, tool errors)
+  - `2`: Critical feedback items found (for CI/CD integration)
+
+## Feedback Categories
+
+Review findings are organized into structured categories to make feedback actionable:
+
+### Missing Information
+Identifies gaps where the spec needs more detail for successful implementation.
+
+**Examples:**
+- "Task 2.3 lacks acceptance criteria - unclear when task is complete"
+- "Authentication flow missing error handling details"
+- "Database migration steps not specified in Phase 3"
+- "No rollback strategy defined for deployment tasks"
+
+### Design Concerns
+Highlights architectural or design choices that may need reconsideration.
+
+**Examples:**
+- "Tight coupling between auth module and user service may hinder testing"
+- "Synchronous API calls in task 1.4 could create bottlenecks under load"
+- "Consider event-driven pattern instead of polling for real-time updates"
+- "Circular dependency between modules A and B needs resolution"
+
+### Risk Flags
+Surfaces potential security, performance, or reliability risks.
+
+**Examples:**
+- "Admin endpoints lack authentication checks (security risk)"
+- "No rate limiting on public API (DoS vulnerability)"
+- "Storing passwords in plaintext violates security best practices"
+- "Missing input validation could allow SQL injection"
+- "No monitoring for critical payment processing flow"
+
+### Feasibility Questions
+Raises concerns about estimates, dependencies, or implementation approach.
+
+**Examples:**
+- "Task 3.2 estimated at 2 hours but involves complex OAuth integration (likely 6-8 hours)"
+- "Phase 2 assumes legacy API has endpoint X - need to verify availability"
+- "Database migration in task 4.1 requires DBA access - confirm permissions"
+- "Timeline assumes 3 developers but team currently has 2"
+
+### Enhancement Suggestions
+Proposes improvements that aren't critical but would strengthen the spec.
+
+**Examples:**
+- "Consider adding health check endpoints for monitoring"
+- "Could benefit from batch processing for large datasets"
+- "Adding retry logic would improve resilience"
+- "Documentation task for API endpoints would help future maintenance"
+
+### Clarification Requests
+Identifies ambiguous language or unclear requirements.
+
+**Examples:**
+- "What does 'performant' mean in acceptance criteria? Need specific metrics"
+- "Task 2.1 says 'update user profile' - which fields are in scope?"
+- "'Handle errors gracefully' is vague - specify retry strategy, logging, user messaging"
+- "Does 'mobile support' include tablets or just phones?"
 
 ## Review Types
 
@@ -261,58 +328,47 @@ sdd review user-auth-001 --type feasibility
 
 **Identifies underestimated tasks** and impossible requirements.
 
-## Scoring Dimensions
+## Review Dimensions
 
-Every review evaluates specs across **6 dimensions** (1-10 scale):
+Every review examines specs across **6 dimensions** to structure feedback:
 
-1. **Completeness** (1-10)
+1. **Completeness**
    - All sections present
    - Sufficient detail for implementation
    - No missing requirements or undefined dependencies
    - Acceptance criteria for all tasks
 
-2. **Clarity** (1-10)
+2. **Clarity**
    - Clear, unambiguous descriptions
    - Specific acceptance criteria
    - Well-defined task boundaries
    - No vague or confusing language
 
-3. **Feasibility** (1-10)
+3. **Feasibility**
    - Realistic time estimates
    - Achievable dependencies
    - Required skills available
    - No impossible requirements
 
-4. **Architecture** (1-10)
+4. **Architecture**
    - Sound design decisions
    - Proper abstractions
    - Scalability considerations
    - Low coupling, high cohesion
 
-5. **Risk Management** (1-10)
+5. **Risk Management**
    - Risks identified
    - Edge cases covered
    - Failure modes addressed
    - Mitigation strategies present
 
-6. **Verification** (1-10)
+6. **Verification**
    - Comprehensive test plan
    - Verification steps defined
    - Quality gates established
    - Testing gaps identified
 
-**Overall Score**: Average of all 6 dimensions
-
-**Scoring Guide** (models use critical standards):
-- **1-3**: Major problems, unacceptable (common for first drafts)
-- **4-6**: Needs significant work (most specs fall here)
-- **7-8**: Good with minor issues (rare - models are skeptical)
-- **9-10**: Excellent, ready to proceed (very rare - be critical)
-
-**Final Recommendation**:
-- **APPROVE**: Overall score ≥ 8, few/no critical issues
-- **REVISE**: Overall score 4-7, fixable issues exist (most common)
-- **REJECT**: Overall score ≤ 3, fundamental flaws require redesign
+These dimensions help organize feedback into actionable categories. Reviewers provide specific findings and suggestions within each dimension rather than numerical scores.
 
 ## The Review Workflow
 
@@ -384,68 +440,60 @@ Models responded: 2/3
 
 **Understanding the report:**
 
-**Overall Recommendation:**
-- **✅ APPROVE**: Score ≥ 8, ready for implementation
-- **⚠️ REVISE**: Score 4-7, needs fixes before proceeding
-- **❌ REJECT**: Score ≤ 3, fundamental redesign required
+**Feedback Organization:**
+The report groups findings by category (Missing Information, Design Concerns, Risk Flags, Feasibility Questions, Enhancement Suggestions, Clarification Requests) to make them actionable.
 
-**Consensus Level:**
-- **Strong**: Models closely agree (score variance < 1.0)
-- **Moderate**: Some disagreement (variance 1.0-2.0)
-- **Weak**: Significant disagreement (variance 2.0-3.0)
-- **Conflicted**: Major disagreement (variance > 3.0)
+**Reviewer Consensus:**
+- **Strong consensus**: Multiple reviewers identified the same issue
+- **Diverse perspectives**: Different reviewers raised different concerns
+- **Conflicting views**: Reviewers disagree (both perspectives documented)
 
-**Issue Severity:**
-- **CRITICAL**: Security vulnerabilities, blockers, data loss risks → **Must fix**
-- **HIGH**: Design flaws, quality issues, maintainability → **Should fix**
-- **MEDIUM**: Improvements, unclear requirements → **Consider fixing**
+**Priority Levels:**
+- **CRITICAL**: Security vulnerabilities, blockers, data loss risks → **Address immediately**
+- **HIGH**: Design flaws, missing information, quality issues → **Address before implementation**
+- **MEDIUM**: Improvements, unclear requirements → **Consider addressing**
 - **LOW**: Nice-to-have enhancements → **Note for future**
-
-**Score Interpretation:**
-```
-Dimension Scores:
-  Completeness:     8/10  (Good)
-  Clarity:          7/10  (Good)
-  Feasibility:      6/10  (Needs Work)
-  Architecture:     8/10  (Good)
-  Risk Management:  5/10  (Needs Work)
-  Verification:     7/10  (Good)
-  ────────────────────────
-  Overall:          6.8/10 (REVISE)
-```
 
 **Example findings:**
 ```
-🚨 Issues Found:
+📋 Feedback Summary:
 
-### Critical Issues (Must Fix)
+### Risk Flags (CRITICAL)
 1. Missing authentication on admin endpoints
-   Severity: CRITICAL | Flagged by: gemini, codex
+   Priority: CRITICAL | Flagged by: gemini, codex
    Impact: Unauthorized access to sensitive operations
-    Recommended follow-up: Add JWT validation middleware to routes
+   Recommendation: Add JWT validation middleware to routes
 
-### High Priority Issues (Should Fix)
-2. Time estimates unrealistic for Phase 2
-   Severity: HIGH | Flagged by: codex
-   Impact: Timeline will slip, stakeholders disappointed
-    Recommended follow-up: Revisit estimates for tasks 2.3-2.5 (suggest +50%)
+### Feasibility Questions (HIGH)
+2. Time estimates may be unrealistic for Phase 2
+   Priority: HIGH | Flagged by: codex
+   Impact: Timeline risk - complex OAuth integration underestimated
+   Recommendation: Revisit estimates for tasks 2.3-2.5 (suggest +50%)
+
+### Missing Information (MEDIUM)
+3. Error handling strategy not defined
+   Priority: MEDIUM | Flagged by: gemini
+   Impact: Unclear how failures should be handled
+   Recommendation: Add error handling details to affected tasks
 ```
 
 ### Phase 4: Synthesize Findings & Recommend Handoffs
 
-1. **Prioritize by consensus severity**
-   - Group findings by CRITICAL / HIGH / MEDIUM / LOW using the report metadata.
-   - Note which models agreed and where dissent exists so downstream skills know when to investigate further.
+1. **Organize feedback by category and priority**
+   - Group findings by category (Missing Information, Design Concerns, Risk Flags, etc.)
+   - Prioritize within each category by CRITICAL / HIGH / MEDIUM / LOW
+   - Note reviewer consensus and diverse perspectives
 
 2. **Identify the type of downstream work**
    - Structural or architectural redesign
-   - Documentation, metadata, or journal updates
-   - Implementation sequencing once APPROVE is accepted
-   - Additional audits (tests, validation)
+   - Documentation, metadata, or acceptance criteria updates
+   - Additional planning or investigation needed
+   - Additional audits (security review, validation)
 
-3. **Capture the advisory summary**
-   - Record readiness recommendation, key blocking issues, and open questions.
-   - Return the path to the JSON report for full context.
+3. **Capture the feedback summary**
+   - Highlight key findings and improvement opportunities
+   - Note areas of consensus and areas where reviewers disagree
+   - Return the path to the JSON report for full context
 
 ## Advanced Topics
 
@@ -522,34 +570,34 @@ Dimension Scores:
 
 ### Coordinating Follow-Up Work
 
-**Prioritization guide for downstream teams:**
+**Prioritization guide for addressing feedback:**
 
 ```
-CRITICAL issues:
+CRITICAL findings:
   - Security vulnerabilities
   - Blocking dependencies
   - Data loss risks
   - Compliance violations
-  → Escalate immediately
+  → Address immediately before implementation
 
-HIGH issues:
+HIGH findings:
   - Design flaws
+  - Missing information
   - Unrealistic estimates
-  - Missing error handling
   - Quality concerns
-  → Identify remediation work required before granting APPROVE
+  → Address before implementation begins
 
-MEDIUM issues:
+MEDIUM findings:
   - Unclear requirements
   - Missing optimizations
   - Incomplete documentation
-  → Recommend whether to defer; provide rationale
+  → Consider addressing; may defer with rationale
 
-LOW issues:
+LOW findings:
   - Nice-to-have improvements
   - Edge case enhancements
   - Future considerations
-  → Identify as possible future work items
+  → Note for future work; safe to defer
 ```
 
 **Balance perspectives:**

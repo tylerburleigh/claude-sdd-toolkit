@@ -65,10 +65,10 @@ def review_with_tools(
 
     # Show what we're asking the external AI models to evaluate
     review_dimensions = {
-        "quick": "Completeness, Clarity",
-        "full": "Completeness, Clarity, Feasibility, Architecture, Risk Management, Verification",
-        "security": "Security vulnerabilities, Authentication, Authorization, Data handling, Risk Management",
-        "feasibility": "Time estimates, Dependencies, Complexity, Resource requirements, Feasibility"
+        "quick": "Critical blockers, Questions for clarification",
+        "full": "Completeness, Architecture, Data Model, Interface Design, Security, Verification",
+        "security": "Security vulnerabilities, Authentication, Authorization, Data protection",
+        "feasibility": "Technical complexity, Dependencies, Integration challenges, Implementation risks"
     }
 
     dimensions = review_dimensions.get(review_type, "All standard dimensions")

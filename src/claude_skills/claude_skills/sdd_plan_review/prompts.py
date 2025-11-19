@@ -13,59 +13,50 @@ from typing import Dict, Any
 RESPONSE_SCHEMA = """
 # Review Summary
 
-Overall Score: <1-10>/10
-Recommendation: <APPROVE|REVISE|REJECT>
+## Critical Blockers
+Issues that must be fixed before implementation can begin.
 
-## Dimension Scores
+- **[Category]** <Issue title>
+  - **Description:** <What's wrong>
+  - **Impact:** <Consequences if not fixed>
+  - **Fix:** <Specific actionable recommendation>
 
-- **Completeness**: <1-10>/10 - <brief notes on what's missing or well-defined>
-- **Clarity**: <1-10>/10 - <brief notes on clarity issues or strengths>
-- **Feasibility**: <1-10>/10 - <brief notes on realistic estimates>
-- **Architecture**: <1-10>/10 - <brief notes on design quality>
-- **Risk Management**: <1-10>/10 - <brief notes on risk handling>
-- **Verification**: <1-10>/10 - <brief notes on testing approach>
+## Major Suggestions
+Significant improvements that enhance quality, maintainability, or design.
 
-## Critical Issues
+- **[Category]** <Issue title>
+  - **Description:** <What's wrong>
+  - **Impact:** <Consequences if not addressed>
+  - **Fix:** <Specific actionable recommendation>
 
-- **[CRITICAL]** <Issue title>
-  - Description: <What's wrong>
-  - Impact: <Consequences if not fixed>
-  - Fix: <Specific actionable recommendation>
+## Minor Suggestions
+Smaller improvements and optimizations.
 
-## High Priority Issues
+- **[Category]** <Issue title>
+  - **Description:** <What could be better>
+  - **Fix:** <Specific actionable recommendation>
 
-- **[HIGH]** <Issue title>
-  - Description: <What's wrong>
-  - Impact: <Consequences if not fixed>
-  - Fix: <Specific actionable recommendation>
+## Questions
+Clarifications needed or ambiguities to resolve.
 
-## Medium Priority Issues
+- **[Category]** <Question>
+  - **Context:** <Why this matters>
+  - **Needed:** <What information would help>
 
-- **[MEDIUM]** <Issue title>
-  - Description: <What's wrong>
-  - Fix: <Specific actionable recommendation>
+## Praise
+What the spec does well.
 
-## Low Priority Issues
-
-- **[LOW]** <Issue title>
-  - Fix: <Specific actionable recommendation>
-
-## Strengths
-
-- <What the spec does well>
-- <Another strength>
-
-## Recommendations
-
-- <Actionable improvement suggestion>
-- <Another recommendation>
+- **[Category]** <What works well>
+  - **Why:** <What makes this effective>
 
 ---
 
 **Important**:
-- Use exact severity tags: [CRITICAL], [HIGH], [MEDIUM], [LOW]
+- Use category tags: [Completeness], [Architecture], [Data Model], [Interface Design], [Security], [Verification]
 - Include all sections even if empty (write "None identified" for empty sections)
 - Be specific and actionable in all feedback
+- For clarity issues, use Questions section rather than creating a separate category
+- Attribution: In multi-model reviews, prefix items with "Flagged by [model-name]:" when applicable
 """
 
 
@@ -105,45 +96,34 @@ def _generate_full_review_prompt(spec_content: str, spec_id: str, title: str) ->
 **Title**: {title}
 **Review Type**: Full (comprehensive analysis)
 
-**Your role**: You are a skeptical senior architect whose job is to prevent production failures by finding every flaw in this specification before implementation begins.
+**Your role**: You are a collaborative senior peer helping refine the design and identify opportunities for improvement.
 
-**Critical: Avoid Confirmation Bias**
+**Critical: Provide Constructive Feedback**
 
-LLMs have sycophantic tendencies (agreeing with users). This undermines review quality.
+Effective reviews combine critical analysis with actionable guidance.
 
 **Your evaluation guidelines**:
-1. **Assume nothing is correct** - Start from a skeptical position
-2. **Actively search for problems** - Don't just look for what works
-3. **Challenge assumptions** - Question design decisions explicitly
-4. **Identify what's missing** - Note absent considerations
-5. **Propose alternatives** - Show better approaches when they exist
-6. **Disagree when warranted** - Low scores and REJECT are valid
+1. **Be thorough and specific** - Examine all aspects of the design
+2. **Identify both strengths and opportunities** - Note what works well and what could improve
+3. **Ask clarifying questions** - Highlight ambiguities that need resolution
+4. **Propose alternatives** - Show better approaches when they exist
+5. **Be actionable** - Provide specific, implementable recommendations
+6. **Focus on impact** - Prioritize feedback by potential consequences
 
-**Avoid biased patterns**:
-- ❌ "This approach seems sound" → ✅ "Evaluate whether this approach handles X, Y, Z"
-- ❌ "The estimates look reasonable" → ✅ "Identify unrealistic estimates and explain why"
-- ❌ "Overall this is good" → ✅ "What critical flaws exist in this design?"
+**Effective feedback patterns**:
+- ✅ "Consider whether this approach handles X, Y, Z edge cases"
+- ✅ "These estimates may be optimistic because..."
+- ✅ "Strong design choice here because..."
+- ✅ "Clarification needed: how does this handle scenario X?"
 
-**This specification has problems. Find them:**
+**Evaluate across 6 technical dimensions:**
 
-1. **Identify CRITICAL issues** (security, blockers, data loss risks)
-2. **Identify HIGH issues** (quality, efficiency, maintainability problems)
-3. **Identify MEDIUM/LOW issues** (improvements, edge cases, enhancements)
-
-**Evaluate across 6 dimensions** (score 1-10 each):
-
-1. **Completeness** - Identify all missing sections, undefined requirements, ambiguous tasks
-2. **Clarity** - Find vague descriptions, unclear acceptance criteria, ambiguous language
-3. **Feasibility** - Identify unrealistic estimates, impossible dependencies, resource constraints
-4. **Architecture** - Find design flaws, coupling issues, missing abstractions, scalability limits
-5. **Risk Management** - Identify unaddressed risks, missing edge cases, failure modes
-6. **Verification** - Find testing gaps, missing verification steps, inadequate coverage
-
-**Scoring Guide** (be critical, not generous):
-- 1-3: Major problems, unacceptable (common for first drafts)
-- 4-6: Needs significant work (most specs fall here)
-- 7-8: Good with minor issues (rare)
-- 9-10: Excellent, ready to proceed (very rare - be skeptical)
+1. **Completeness** - Identify missing sections, undefined requirements, ambiguous tasks
+2. **Architecture** - Find design issues, coupling concerns, missing abstractions, scalability considerations
+3. **Data Model** - Evaluate data structures, relationships, consistency, migration strategies
+4. **Interface Design** - Review API contracts, component boundaries, integration patterns
+5. **Security** - Identify authentication, authorization, data protection, and vulnerability concerns
+6. **Verification** - Find testing gaps, missing verification steps, coverage opportunities
 
 **SPECIFICATION TO REVIEW:**
 
@@ -155,32 +135,37 @@ LLMs have sycophantic tendencies (agreeing with users). This undermines review q
 
 {RESPONSE_SCHEMA}
 
-**Remember**: Your goal is to **prevent expensive mistakes**, not to make the spec author feel good. Be direct, critical, and thorough. Low scores and REJECT recommendations are expected and valuable.
+**Remember**: Your goal is to **help create robust, well-designed software**. Be specific, actionable, and balanced in your feedback. Identify both critical blockers and positive aspects of the design.
 """
 
 
 def _generate_quick_review_prompt(spec_content: str, spec_id: str, title: str) -> str:
-    """Generate quick review prompt focusing on completeness and clarity."""
+    """Generate quick review prompt focusing on blockers and questions."""
     return f"""You are conducting a quick technical review of a software specification.
 
 **Spec**: {spec_id}
 **Title**: {title}
-**Review Type**: Quick (focus on completeness and clarity)
+**Review Type**: Quick (focus on blockers and questions)
 
-**Your role**: Identify critical gaps and ambiguities that would block implementation.
+**Your role**: Identify critical blockers and key questions that need resolution before implementation.
 
-**This specification likely has problems. Find them:**
+**Focus on finding:**
 
-1. **Completeness**: List all missing sections, undefined requirements, gaps
-2. **Clarity**: Identify vague descriptions, unclear acceptance criteria
-3. **Critical Issues**: Find blockers that prevent implementation
+1. **Critical Blockers**: What would prevent implementation from starting?
+   - Missing required sections or requirements
+   - Undefined dependencies or integrations
+   - Unresolved technical decisions
+   - Incomplete acceptance criteria
 
-**Focus on these questions**:
-- What information is missing?
-- What is ambiguous or unclear?
-- What would block a developer from implementing this?
-- Are acceptance criteria defined?
-- Are dependencies stated?
+2. **Key Questions**: What needs clarification?
+   - Ambiguous requirements or acceptance criteria
+   - Unclear technical approaches
+   - Missing context or rationale
+   - Edge cases not addressed
+
+**Evaluation areas**:
+- **Completeness**: Are all necessary sections and requirements present?
+- **Questions**: What clarifications are needed?
 
 **SPECIFICATION TO REVIEW:**
 
@@ -192,7 +177,7 @@ def _generate_quick_review_prompt(spec_content: str, spec_id: str, title: str) -
 
 {RESPONSE_SCHEMA}
 
-**Note**: Focus primarily on completeness and clarity dimensions. Other dimensions can have brief notes.
+**Note**: Focus primarily on Critical Blockers and Questions sections. Brief notes for other sections are sufficient.
 """
 
 
@@ -204,41 +189,36 @@ def _generate_security_review_prompt(spec_content: str, spec_id: str, title: str
 **Title**: {title}
 **Review Type**: Security (focus on vulnerabilities and risks)
 
-**Your role**: You are a security auditor who assumes malicious users and identifies vulnerabilities.
+**Your role**: Security specialist helping identify and mitigate potential vulnerabilities.
 
-**This specification has security vulnerabilities. Find them:**
+**Focus on security considerations:**
 
-1. **Identify CRITICAL security issues**:
-   - Authentication/authorization flaws
-   - Data validation gaps
-   - Secrets management problems
-   - Access control weaknesses
-   - Injection vulnerabilities
+1. **Authentication & Authorization**:
+   - Are authentication mechanisms properly designed?
+   - Is authorization enforced at appropriate boundaries?
+   - Does access control follow principle of least privilege?
 
-2. **Identify HIGH security issues**:
-   - Missing audit logging
-   - Insufficient error handling
-   - Insecure defaults
-   - Privacy concerns
-   - Compliance gaps
+2. **Data Protection**:
+   - Is input validation comprehensive?
+   - Are secrets managed securely?
+   - Is data encrypted at rest and in transit?
+   - Do error messages avoid leaking sensitive information?
 
-3. **Identify MEDIUM/LOW security issues**:
-   - Rate limiting needs
-   - Input sanitization improvements
-   - Security headers
-   - Encryption opportunities
+3. **Common Vulnerabilities**:
+   - Are injection attacks (SQL, command, XSS, CSRF) prevented?
+   - Are security headers and protections in place?
+   - Is rate limiting and DoS protection addressed?
+   - Are insecure defaults avoided?
 
-**Security evaluation checklist**:
-- [ ] Authentication/authorization properly designed?
-- [ ] Input validation comprehensive?
-- [ ] Secrets management secure?
-- [ ] Access control principle of least privilege?
-- [ ] Audit logging sufficient?
-- [ ] Error messages don't leak information?
-- [ ] Data encryption at rest and in transit?
-- [ ] SQL/command injection prevented?
-- [ ] CSRF/XSS protections in place?
-- [ ] Rate limiting and DoS protection?
+4. **Audit & Compliance**:
+   - Is audit logging sufficient for security events?
+   - Are privacy concerns addressed?
+   - Are relevant compliance requirements considered?
+
+**Evaluation areas**:
+- **Security**: Authentication, authorization, data protection, vulnerability prevention
+- **Architecture**: Security-relevant design decisions
+- **Data Model**: Data sensitivity, encryption, access patterns
 
 **SPECIFICATION TO REVIEW:**
 
@@ -250,45 +230,49 @@ def _generate_security_review_prompt(spec_content: str, spec_id: str, title: str
 
 {RESPONSE_SCHEMA}
 
-**Emphasize the risk_management dimension in your scoring.**
+**Note**: Focus primarily on Security category feedback. Include Critical Blockers for any security issues that must be addressed before implementation.
 """
 
 
 def _generate_feasibility_review_prompt(spec_content: str, spec_id: str, title: str) -> str:
-    """Generate feasibility-focused review prompt."""
-    return f"""You are conducting a feasibility review of a software specification.
+    """Generate technical complexity review prompt."""
+    return f"""You are conducting a technical complexity review of a software specification.
 
 **Spec**: {spec_id}
 **Title**: {title}
-**Review Type**: Feasibility (focus on realistic implementation)
+**Review Type**: Technical Complexity (focus on implementation challenges)
 
-**Your role**: You are a pragmatic engineer who identifies unrealistic estimates and impossible dependencies.
+**Your role**: Pragmatic engineer helping identify technical challenges and implementation risks.
 
-**These estimates are likely wrong. Find the problems:**
+**Focus on technical considerations:**
 
-1. **Identify underestimated tasks**:
-   - Which tasks will take longer than estimated?
-   - What hidden complexity exists?
-   - What dependencies are missing?
+1. **Hidden Complexity**:
+   - What technical challenges might not be obvious?
+   - Where does complexity concentrate?
+   - What edge cases increase difficulty?
 
-2. **Identify overestimated tasks**:
-   - Which tasks are simpler than stated?
-   - Where can work be parallelized?
+2. **Dependencies & Integration**:
+   - Are all required dependencies identified?
+   - Are external services/APIs available and documented?
+   - Are integration points well-defined?
+   - What dependency risks exist?
 
-3. **Identify impossible requirements**:
-   - What dependencies don't exist?
-   - What technical constraints block this?
-   - What skills are required but not available?
+3. **Technical Constraints**:
+   - What technical limitations could impact the design?
+   - Are performance requirements achievable?
+   - Are there scalability considerations?
+   - What infrastructure requirements exist?
 
-**Feasibility evaluation checklist**:
-- [ ] Time estimates realistic for each task?
-- [ ] Dependencies available and accessible?
-- [ ] Required skills present in team?
-- [ ] External services/APIs exist and documented?
-- [ ] Performance requirements achievable?
-- [ ] Complexity accurately assessed?
-- [ ] Blockers identified and mitigated?
-- [ ] Resource requirements feasible?
+4. **Implementation Risks**:
+   - What could go wrong during implementation?
+   - Where are the highest-risk technical areas?
+   - What mitigation strategies are needed?
+
+**Evaluation areas**:
+- **Completeness**: Are technical requirements fully specified?
+- **Architecture**: Is the technical approach sound?
+- **Data Model**: Are data complexity factors addressed?
+- **Interface Design**: Are integration points well-defined?
 
 **SPECIFICATION TO REVIEW:**
 
@@ -300,42 +284,5 @@ def _generate_feasibility_review_prompt(spec_content: str, spec_id: str, title: 
 
 {RESPONSE_SCHEMA}
 
-**Emphasize the feasibility dimension in your scoring. Identify specific tasks with unrealistic estimates.**
-"""
-
-
-def get_stance_instruction(stance: str) -> str:
-    """
-    Get stance-specific instruction for a model.
-
-    Args:
-        stance: for, against, or neutral
-
-    Returns:
-        Stance instruction string
-    """
-    if stance == "for":
-        return """
-**Your stance**: You are generally supportive but identify genuine problems.
-- Look for strengths and good decisions
-- Identify issues that genuinely need fixing
-- Don't inflate problems artificially
-- Acknowledge what works well
-"""
-    elif stance == "against":
-        return """
-**Your stance**: You are skeptical and search for flaws.
-- Assume the spec has problems
-- Challenge every design decision
-- Identify what could go wrong
-- Propose alternative approaches
-- Don't give benefit of the doubt
-"""
-    else:  # neutral
-        return """
-**Your stance**: You are balanced and objective.
-- Evaluate based on evidence
-- Identify both strengths and weaknesses
-- Be neither generous nor harsh
-- Focus on technical merit
+**Note**: Focus on technical challenges and risks. Identify Major Suggestions for areas of hidden complexity and Critical Blockers for missing technical requirements.
 """

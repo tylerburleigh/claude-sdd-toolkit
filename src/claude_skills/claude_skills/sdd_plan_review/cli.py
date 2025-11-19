@@ -146,19 +146,18 @@ def cmd_review(args, printer):
         printer.detail(f"Cache: {'Yes' if args.cache else 'No'}")
         if json_requested:
             dry_payload = {
-                'spec_id': spec_id,
+                'spec_id': args.spec_id,
                 'review_type': args.type,
-                'recommendation': None,
-                'overall_score': None,
                 'artifacts': [],
-                'issue_count': 0,
+                'blocker_count': 0,
+                'suggestion_count': 0,
+                'question_count': 0,
                 'models_responded': 0,
                 'models_requested': len(tools_to_use),
                 'models_consulted': {},
                 'failures': 0,
                 'execution_time': 0,
                 'consensus_level': None,
-                'dimension_scores': None,
                 'dry_run': True,
             }
             return _plan_review_output_json(dry_payload, args)
@@ -309,17 +308,16 @@ def cmd_review(args, printer):
     summary_payload = {
         'spec_id': spec_id,
         'review_type': args.type,
-        'recommendation': consensus.get('final_recommendation'),
-        'overall_score': consensus.get('overall_score'),
         'artifacts': artifact_paths,
-        'issue_count': len(consensus.get('all_issues') or []),
+        'blocker_count': len(consensus.get('critical_blockers') or []),
+        'suggestion_count': len(consensus.get('major_suggestions') or []),
+        'question_count': len(consensus.get('questions') or []),
         'models_responded': len(results['parsed_responses']),
         'models_requested': len(tools_to_use),
         'models_consulted': results.get('models', {}),
         'failures': len(results['failures']),
         'execution_time': results.get('execution_time'),
         'consensus_level': consensus.get('consensus_level'),
-        'dimension_scores': consensus.get('dimension_scores'),
         'dry_run': False,
     }
     if failed_artifacts:
@@ -339,7 +337,19 @@ def cmd_review(args, printer):
         for label, path, error in failed_artifacts:
             printer.warning(f"Artifact write skipped for {label} ({path}): {error}")
 
-    return 0
+    # Exit code mapping for automation (replaces APPROVE/REVISE/REJECT verdicts)
+    # Exit 1: Critical blockers found (equivalent to REJECT)
+    # Exit 2: Multiple major suggestions (equivalent to REVISE)
+    # Exit 0: No significant issues (equivalent to APPROVE)
+    blocker_count = summary_payload.get('blocker_count', 0)
+    suggestion_count = summary_payload.get('suggestion_count', 0)
+
+    if blocker_count > 0:
+        return 1  # Critical blockers must be fixed
+    elif suggestion_count > 3:
+        return 2  # Significant revisions recommended
+    else:
+        return 0  # Ready to proceed
 
 
 def cmd_list_tools(args, printer):
