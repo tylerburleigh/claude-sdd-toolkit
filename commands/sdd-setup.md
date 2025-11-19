@@ -16,6 +16,83 @@ This command performs first-time setup for the SDD (Spec-Driven Development) too
 
 ## Workflow
 
+### Pre-Check: Verify Installation
+
+**Before starting setup, verify that the SDD Toolkit is fully installed:**
+
+```bash
+sdd skills-dev verify-install --json
+```
+
+The command will return JSON with an `overall` status field.
+
+**If `overall: "not_installed"` or `overall: "partially_installed"`:**
+
+Display message:
+```
+⚠️  SDD Toolkit installation is incomplete
+
+The toolkit needs to install dependencies before setup can continue.
+```
+
+Use AskUserQuestion tool:
+- **Header**: "Installation"
+- **Question**: "Run installation now? This will install pip and npm dependencies."
+- **Options**:
+  1. Yes, install now
+  2. No, I'll install manually
+
+**If user chooses "Yes, install now":**
+
+Run the unified installer:
+```bash
+sdd skills-dev install
+```
+
+This command will:
+- Install Python package with pip
+- Install Node.js dependencies for OpenCode provider
+- Verify all installations
+- Report status
+
+If the install command fails, display error and exit:
+```
+❌ Installation failed. Please check the error messages above.
+
+Manual installation:
+1. cd to your plugin directory
+2. Run: pip install -e .
+3. Run: cd claude_skills/common/providers && npm install
+```
+
+**If user chooses "No, I'll install manually":**
+
+Display instructions and exit:
+```
+⏭️  Skipping installation. Please install manually:
+
+1. Navigate to plugin directory:
+   cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+
+2. Install Python package:
+   pip install -e .
+
+3. Install Node.js dependencies:
+   cd claude_skills/common/providers
+   npm install
+
+4. Then run /sdd-setup again
+```
+
+Return without continuing to setup steps.
+
+**If `overall: "fully_installed"`:**
+
+Display success message and proceed to Step 1:
+```
+✅ SDD Toolkit installation verified!
+```
+
 ### Before You Begin
 
 Run a quick inspection to document current state (saves user surprises later):

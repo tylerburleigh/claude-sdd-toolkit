@@ -23,9 +23,11 @@ def register_all_subcommands(subparsers: Any, parent_parser: argparse.ArgumentPa
     from .setup_permissions import register_setup_permissions
     from .gendocs import register_gendocs
     from .migrate import register_migrate
+    from .install_helper import register_install_helper
 
     # Register commands
     register_start_helper(subparsers, parent_parser)
     register_setup_permissions(subparsers, parent_parser)
     register_gendocs(subparsers, parent_parser)
     register_migrate(subparsers, parent_parser)
+    register_install_helper(subparsers, parent_parser)

@@ -50,6 +50,33 @@ You'll need an OpenCode API key. Obtain one from your OpenCode AI account dashbo
 
 > **IMPORTANT**: After installing the SDD Toolkit Python package, you must install Node.js dependencies for the OpenCode provider to function.
 
+### Quick Installation (Recommended)
+
+If you installed the SDD Toolkit via plugin, use the unified installer:
+
+```bash
+# Navigate to plugin directory
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills
+
+# Install Python package
+pip install -e .
+
+# Run unified installer (installs both pip and npm dependencies)
+sdd skills-dev install
+```
+
+**What this does**:
+- Reinstalls/updates Python package
+- Automatically installs Node.js dependencies for OpenCode provider
+- Verifies all installations
+- Reports status
+
+Then skip to [Step 3: Install OpenCode CLI Binary](#3-install-opencode-cli-binary).
+
+### Manual Installation (Alternative)
+
+If you prefer manual control or are installing from PyPI:
+
 ### 1. Install SDD Toolkit
 
 First, install the SDD Toolkit Python package:
@@ -95,31 +122,35 @@ This provides the `opencode` binary needed to run the OpenCode server.
 
 ### 4. Verify Installation
 
-Check that the OpenCode provider is available:
+Use the unified verification command to check all components:
 
 ```bash
-sdd provider-status
+sdd skills-dev verify-install
 ```
 
-You should see `opencode` listed among available providers with status "Available".
+This will verify:
+- Python package installation
+- sdd command availability
+- OpenCode provider availability
+- Node.js dependencies
+
+**For JSON output** (useful for scripts):
+```bash
+sdd skills-dev verify-install --json
+```
 
 Alternatively, verify each component manually:
 
 ```bash
 # Verify Node.js
-node --version
+node --version  # Should be >= 18.x
 
 # Verify OpenCode binary
 which opencode
 opencode --version
 
-# Verify provider dependencies
-python -c "from claude_skills.common.providers.opencode import is_opencode_available; print('OpenCode Available:', is_opencode_available())"
-```
-
-Expected output:
-```
-OpenCode Available: True
+# Verify provider import
+python -c "from claude_skills.common.providers.opencode import create_opencode_provider; print('OpenCode provider available')"
 ```
 
 ## Configuration
