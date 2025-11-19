@@ -70,6 +70,12 @@ from .claude import (
     is_claude_available as claude_is_available,
     CLAUDE_METADATA,
 )
+from .opencode import (
+    OpenCodeProvider,
+    create_provider as create_opencode_provider,
+    is_opencode_available as opencode_is_available,
+    OPENCODE_METADATA,
+)
 
 __all__ = [
     "ProviderCapability",
@@ -122,4 +128,8 @@ __all__ = [
     "create_claude_provider",
     "claude_is_available",
     "CLAUDE_METADATA",
+    "OpenCodeProvider",
+    "create_opencode_provider",
+    "opencode_is_available",
+    "OPENCODE_METADATA",
 ]
