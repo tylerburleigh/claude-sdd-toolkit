@@ -210,17 +210,46 @@ async function main() {
     promptOptions.tools = payload.allowedTools;
   }
 
-  // Execute the prompt (streaming will be implemented in next task)
-  const response = await session.prompt(payload.prompt, promptOptions);
+  // Subscribe to streaming events
+  let responseText = '';
+  const eventUnsubscribe = opcodeClient.event.subscribe((event) => {
+    if (event.type === 'message.delta') {
+      // Emit streaming chunk as line-delimited JSON
+      const chunk = {
+        type: 'chunk',
+        content: event.delta.text || event.delta.content || ''
+      };
+      console.log(JSON.stringify(chunk));
+      responseText += chunk.content;
+    }
+  });
 
-  // For now, store response for next task (streaming output implementation)
-  console.error('DEBUG: Prompt executed successfully');
-  console.error('DEBUG: Session ID:', session.id);
+  try {
+    // Execute the prompt with streaming
+    const response = await session.prompt(payload.prompt, promptOptions);
+
+    // Emit final response with metadata
+    const finalResponse = {
+      type: 'done',
+      response: {
+        text: responseText || response.text,
+        usage: response.usage,
+        sessionId: session.id
+      }
+    };
+    console.log(JSON.stringify(finalResponse));
+
+  } finally {
+    // Unsubscribe from events
+    if (eventUnsubscribe) {
+      eventUnsubscribe();
+    }
+  }
 
   // Cleanup before exit
   await cleanup();
 
-  // Success - prompt executed
+  // Success - prompt executed and streamed
   process.exit(0);
 }
 
