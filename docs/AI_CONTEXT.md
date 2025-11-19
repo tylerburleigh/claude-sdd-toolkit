@@ -187,6 +187,7 @@ pending/ → active/ → completed/ → archived/
 - **Codex** - Anthropic Codex CLI (`codex`)
 - **Cursor Agent** - Cursor IDE AI agent (`cursor-agent`)
 - **Claude** - Claude CLI (`claude`, read-only restrictions)
+- **OpenCode** - OpenCode AI SDK via Node.js wrapper (`opencode`)
 
 **Provider Context**: Base class `ProviderContext` in `src/claude_skills/common/providers/base.py`
 
