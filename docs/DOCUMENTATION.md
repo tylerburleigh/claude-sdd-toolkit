@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 16:51:57
+**Generated:** 2025-11-19 16:54:16
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 337
-- **Total Lines:** 118398
+- **Total Lines:** 118409
 - **Total Classes:** 467
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 336
-- **Lines:** 118101
+- **Lines:** 118112
 - **Classes:** 467
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
@@ -37093,7 +37093,12 @@ Returns:
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/__init__.py`
 
+- `architecture_generator.ArchitectureData`
+- `architecture_generator.ArchitectureGenerator`
+- `component_generator.ComponentData`
+- `component_generator.ComponentGenerator`
 - `overview_generator.OverviewGenerator`
+- `overview_generator.ProjectData`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py`
 

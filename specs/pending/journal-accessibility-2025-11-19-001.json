@@ -1,0 +1,456 @@
+{
+  "spec_id": "journal-accessibility-2025-11-19-001",
+  "title": "Improve Journal Entry Accessibility",
+  "generated": "2025-11-19T22:00:00Z",
+  "last_updated": "2025-11-19T22:00:00Z",
+  "metadata": {
+    "description": "Enhance journal entry accessibility by making get-journal support flexible invocations and ensuring prepare-task always includes journal data",
+    "objectives": [
+      "Support both positional and flag-based task-id in get-journal command",
+      "Maintain backwards compatibility with existing --task-id flag",
+      "Ensure prepare-task output always includes task journal entries",
+      "Improve documentation for both commands"
+    ],
+    "complexity": "medium",
+    "estimated_hours": 8
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Improve Journal Entry Accessibility",
+      "status": "pending",
+      "parent": null,
+      "children": ["phase-1", "phase-2", "phase-3"],
+      "total_tasks": 17,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "CLI Enhancement for get-journal",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-1-files", "phase-1-verify"],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Make get-journal accept flexible invocation patterns while maintaining backwards compatibility",
+        "risk_level": "low"
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["task-1-1", "task-1-2", "task-1-3"],
+      "total_tasks": 5,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "Analyze current get-journal argument parsing",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-1-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Review current argument parser implementation in sdd_update/cli.py",
+          "Understand how task_id is currently handled",
+          "Identify any edge cases or validation logic"
+        ]
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/sdd_update/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": ["task-1-2-1", "task-1-2-2", "task-1-2-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-1-1"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/sdd_update/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Update get-journal argument parser to accept optional positional task_id while maintaining --task-id flag",
+        "reasoning": "Provides more intuitive CLI UX while preserving backwards compatibility"
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "Add optional positional task_id argument",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Modify p_get_journal parser to accept task_id as nargs='?' positional argument after spec_id"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "Add fallback logic for --task-id flag",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "In cmd_get_journal, check positional task_id first, then fall back to --task-id flag if not provided"
+      }
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "Update help text with both usage patterns",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Update p_get_journal help text to show: 'sdd get-journal SPEC_ID [TASK_ID]' and mention --task-id as alternative"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/query_operations.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": ["task-1-2"]
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/query_operations.py",
+        "task_category": "refactoring",
+        "estimated_hours": 0.5,
+        "changes": "Ensure get_journal_entries() handles None task_id gracefully",
+        "reasoning": "Verify the underlying function properly handles both filtered and unfiltered journal queries"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": ["verify-1-1", "verify-1-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Test positional task-id invocation",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd get-journal version-aware-unsaved-changes-2025-11-19-001 task-5-2-2 --json",
+        "expected": "Returns journal entries for task-5-2-2 without error"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "Test --task-id flag still works",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd get-journal version-aware-unsaved-changes-2025-11-19-001 --task-id task-5-2-2 --json",
+        "expected": "Returns same journal entries, confirming backwards compatibility"
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Prepare-Task Output Enhancement",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-2-files", "phase-2-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-1"],
+        "depends": []
+      },
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Ensure task_journal is always included in prepare-task output regardless of verbosity",
+        "risk_level": "low"
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["task-2-1", "task-2-2"],
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "Analyze current output filtering logic",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [],
+      "dependencies": {
+        "blocks": ["task-2-2"],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "investigation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Review output_utils.py filtering logic",
+          "Check PREPARE_TASK_ESSENTIAL and PREPARE_TASK_STANDARD field lists",
+          "Understand how context field is currently handled",
+          "Verify where task_journal appears in the output hierarchy"
+        ]
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/common/output_utils.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": ["task-2-2-1", "task-2-2-2", "task-2-2-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["task-2-1"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/common/output_utils.py",
+        "task_category": "implementation",
+        "estimated_hours": 1.5,
+        "changes": "Add task_journal to essential and standard output field lists",
+        "reasoning": "Ensures journal data is always available in prepare-task output at all verbosity levels"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add context to PREPARE_TASK_ESSENTIAL",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add 'context' field to PREPARE_TASK_ESSENTIAL set so task_journal is included at minimum verbosity"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Add context to PREPARE_TASK_STANDARD",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add 'context' field to PREPARE_TASK_STANDARD set if not already present"
+      }
+    },
+    "task-2-2-3": {
+      "type": "subtask",
+      "title": "Verify context filtering preserves task_journal",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Review context object filtering logic to ensure task_journal field is preserved when context is included"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": ["verify-2-1", "verify-2-2"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-2-files"],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Test prepare-task includes task_journal",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd prepare-task version-aware-unsaved-changes-2025-11-19-001 task-5-2-2 --json --compact",
+        "expected": "Output includes context.task_journal field with journal entries"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Test prepare-task with different verbosity levels",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd prepare-task version-aware-unsaved-changes-2025-11-19-001 task-5-2-2 --json (without --compact)",
+        "expected": "Context and task_journal are present at all verbosity levels"
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Documentation & Integration Testing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": ["phase-3-files", "phase-3-verify"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-2"],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Document changes and verify end-to-end integration",
+        "risk_level": "low"
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "Documentation",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["task-3-1"],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "Update CLI documentation",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "task_category": "implementation",
+        "estimated_hours": 1,
+        "details": [
+          "Update get-journal usage examples in documentation",
+          "Add note about prepare-task including journal entries",
+          "Document both invocation patterns (positional and flag-based)",
+          "Add examples showing when to use get-journal vs prepare-task"
+        ]
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Integration Testing",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": ["verify-3-1", "verify-3-2", "verify-3-3"],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": ["phase-3-files"],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "End-to-end workflow test",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Both get-journal patterns work and prepare-task includes journal data in realistic workflow"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Backwards compatibility verification",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "expected": "Existing scripts and workflows using --task-id flag continue to work without modification"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity review",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "spec",
+        "target": "spec-root",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    }
+  }
+}
