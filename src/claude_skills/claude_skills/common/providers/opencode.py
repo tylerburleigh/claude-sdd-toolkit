@@ -123,10 +123,36 @@ class OpenCodeProvider(ProviderContext):
         self._wrapper_path = wrapper_path or Path(
             os.environ.get(CUSTOM_WRAPPER_ENV, str(DEFAULT_WRAPPER_SCRIPT))
         )
-        self._env = env
+
+        # Prepare environment for subprocess with secure API key handling
+        self._env = self._prepare_subprocess_env(env)
+
         self._timeout = timeout or DEFAULT_TIMEOUT_SECONDS
         self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
         self._server_process: Optional[subprocess.Popen] = None
+
+    def _prepare_subprocess_env(self, custom_env: Optional[Dict[str, str]]) -> Dict[str, str]:
+        """
+        Prepare environment variables for subprocess execution.
+
+        Merges current process environment with custom overrides and ensures
+        required OpenCode variables are present.
+        """
+        # Start with a copy of the current environment
+        subprocess_env = os.environ.copy()
+
+        # Merge custom environment if provided
+        if custom_env:
+            subprocess_env.update(custom_env)
+
+        # Ensure OPENCODE_SERVER_URL is set (use default if not provided)
+        if "OPENCODE_SERVER_URL" not in subprocess_env:
+            subprocess_env["OPENCODE_SERVER_URL"] = DEFAULT_SERVER_URL
+
+        # Note: OPENCODE_API_KEY should be provided via environment or custom_env
+        # We don't set a default value for security reasons
+
+        return subprocess_env
 
     def _first_model_id(self) -> str:
         if not self.metadata.models:

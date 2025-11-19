@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T15:06:05.842652Z",
+  "last_updated": "2025-11-19T15:07:30.292439Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 20,
+      "completed_tasks": 21,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -522,7 +522,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
         "risk_level": "medium"
@@ -1452,16 +1452,22 @@
       "type": "task",
       "title": "Pass environment variables to subprocess",
       "description": "Update OpenCodeProvider to pass required environment variables to the Node.js subprocess. Use subprocess env parameter to pass: OPENCODE_API_KEY from config/environment, OPENCODE_SERVER_URL if configured, and inherit other necessary env vars. Ensure sensitive data (API keys) are handled securely.",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "estimated_hours": 1,
         "file_path": "task-2-3.md",
         "task_category": "implementation",
-        "description": "Security: Secure handling of API keys in subprocess environment"
+        "description": "Security: Secure handling of API keys in subprocess environment",
+        "started_at": "2025-11-19T15:06:42.105958Z",
+        "status_note": "Enhancing environment variable handling for secure API key passing",
+        "completed_at": "2025-11-19T15:07:30.285785Z",
+        "needs_journaling": false,
+        "actual_hours": 0.013,
+        "journaled_at": "2025-11-19T15:07:30.290127Z"
       },
       "dependencies": {
         "blocks": [],
@@ -2011,12 +2017,21 @@
       "content": "All child tasks in group phase-2-files have been completed.",
       "metadata": {},
       "task_id": "phase-2-files"
+    },
+    {
+      "timestamp": "2025-11-19T15:07:30.290122Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Pass environment variables to subprocess",
+      "author": "claude-code",
+      "content": "Implemented secure environment variable handling for subprocess. Added _prepare_subprocess_env() method in __init__ that: (1) Copies current process environment using os.environ.copy() to inherit all necessary variables, (2) Merges custom environment overrides if provided, (3) Ensures OPENCODE_SERVER_URL is set (defaults to DEFAULT_SERVER_URL if not provided), (4) Securely handles OPENCODE_API_KEY by requiring it from environment/config without setting insecure defaults. Environment dictionary passed to all subprocess calls via self._env includes API keys and other config. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 127-155, 24 new lines).",
+      "metadata": {},
+      "task_id": "task-2-3"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 48,
+    "progress_percentage": 51,
     "current_phase": "phase-2",
     "task-1-1-1.completed_tasks": "0",
     "task-1-1-4.completed_tasks": "0"
