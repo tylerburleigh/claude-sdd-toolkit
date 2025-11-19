@@ -621,7 +621,3 @@ This skill is currently under development. The sections above define the core pu
 - Synthesis logic implementation
 - Integration with code-doc and SDD
 - Comprehensive examples and use cases
-
----
-
-*This skill documentation follows the standard pattern established by code-doc and doc-query skills.*
