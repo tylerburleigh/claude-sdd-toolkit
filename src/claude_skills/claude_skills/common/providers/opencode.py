@@ -435,3 +435,15 @@ def create_provider(
         env=env,
         timeout=timeout,
     )
+
+
+# Register the provider immediately so consumers can resolve it by id.
+register_provider(
+    "opencode",
+    factory=create_provider,
+    metadata=OPENCODE_METADATA,
+    availability_check=is_opencode_available,
+    description="OpenCode AI SDK adapter with Node.js wrapper",
+    tags=("sdk", "text", "streaming"),
+    replace=True,
+)

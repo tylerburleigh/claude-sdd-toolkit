@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T15:05:11.756263Z",
+  "last_updated": "2025-11-19T15:06:05.842652Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 19,
+      "completed_tasks": 20,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -522,7 +522,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
         "risk_level": "medium"
@@ -531,14 +531,18 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2",
       "children": [
         "task-2-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 5,
-      "metadata": {},
+      "completed_tasks": 6,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-19T15:06:05.834470Z",
+        "journaled_at": "2025-11-19T15:06:05.842628Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-2-verify"
@@ -550,7 +554,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/common/providers/opencode.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -561,7 +565,7 @@
         "task-2-1-6"
       ],
       "total_tasks": 6,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/providers/opencode.py",
         "task_category": "implementation",
@@ -756,7 +760,7 @@
     "task-2-1-6": {
       "type": "subtask",
       "title": "Register provider",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -767,10 +771,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
-        "description": "Call register_provider() with opencode id, factory, metadata, availability_check, description, tags=(sdk, text, vision), replace=True"
+        "description": "Call register_provider() with opencode id, factory, metadata, availability_check, description, tags=(sdk, text, vision), replace=True",
+        "started_at": "2025-11-19T15:05:31.430062Z",
+        "status_note": "Registering OpenCode provider with registry",
+        "completed_at": "2025-11-19T15:06:05.834326Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-19T15:06:05.838888Z"
       }
     },
     "phase-2-verify": {
@@ -1983,12 +1993,30 @@
       "content": "Verified is_opencode_available() detects missing dependencies. Function checks: (1) Node.js runtime via 'node --version', (2) wrapper script at DEFAULT_WRAPPER_SCRIPT path, (3) node_modules/@opencode-ai/sdk package directory existence, (4) opencode binary in node_modules/.bin or PATH. Returns False if any dependency missing. Setup instructions provided via ProviderUnavailableError in _ensure_server_running() method when dependencies not found (line 195-198).",
       "metadata": {},
       "task_id": "verify-2-1-5-1"
+    },
+    {
+      "timestamp": "2025-11-19T15:06:05.838883Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Register provider",
+      "author": "claude-code",
+      "content": "Registered OpenCode provider with registry using register_provider() at module level. Registration includes provider ID 'opencode', factory function create_provider, OPENCODE_METADATA, availability check is_opencode_available, description 'OpenCode AI SDK adapter with Node.js wrapper', tags ('sdk', 'text', 'streaming'), and replace=True. Provider now discoverable by consumers via registry lookup. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 440-449, 10 new lines).",
+      "metadata": {},
+      "task_id": "task-2-1-6"
+    },
+    {
+      "timestamp": "2025-11-19T15:06:05.842623Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: File Modifications",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-2-files have been completed.",
+      "metadata": {},
+      "task_id": "phase-2-files"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 46,
+    "progress_percentage": 48,
     "current_phase": "phase-2",
     "task-1-1-1.completed_tasks": "0",
     "task-1-1-4.completed_tasks": "0"
