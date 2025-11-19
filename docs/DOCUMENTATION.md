@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:47:27
+**Generated:** 2025-11-19 17:53:19
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 340
-- **Total Lines:** 119533
+- **Total Files:** 341
+- **Total Lines:** 119728
 - **Total Classes:** 475
-- **Total Functions:** 1527
+- **Total Functions:** 1529
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -32,10 +32,10 @@
 
 ### PYTHON
 
-- **Files:** 339
-- **Lines:** 119236
+- **Files:** 340
+- **Lines:** 119431
 - **Classes:** 475
-- **Functions:** 1520
+- **Functions:** 1522
 - **Avg Complexity:** 4.69
 
 
@@ -12503,7 +12503,7 @@ Returns:
 ### `_register_doc_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:196`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:198`
 **Complexity:** 1
 
 **Description:**
@@ -12518,7 +12518,7 @@ Returns:
 ### `_register_optional_modules(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:252`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:254`
 **Complexity:** 6
 
 **Description:**
@@ -12533,7 +12533,7 @@ Returns:
 ### `_register_skills_dev_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:234`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:236`
 **Complexity:** 1
 
 **Description:**
@@ -12548,7 +12548,7 @@ Returns:
 ### `_register_test_cli(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:216`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/registry.py:218`
 **Complexity:** 1
 
 **Description:**
@@ -24422,6 +24422,23 @@ Args:
 
 ---
 
+### `handle_generate(args, printer) -> int`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/cli.py:40`
+⚠️ **Complexity:** 13 (High)
+
+**Decorators:** `@track_metrics('llm_doc_gen_generate')`
+
+**Description:**
+> Handle the generate command.
+
+**Parameters:**
+- `args`: None
+- `printer`: PrettyPrinter
+
+---
+
 ### `has_dependency_cycle(graph, node) -> Tuple[bool, Optional[List[str]]]`
 
 **Language:** python
@@ -27177,6 +27194,21 @@ Args:
 **Parameters:**
 - `subparsers`: argparse._SubParsersAction
 - `parent_parser`: Optional[argparse.ArgumentParser]
+
+---
+
+### `register_llm_doc_gen(subparsers, parent_parser) -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/cli.py:144`
+**Complexity:** 1
+
+**Description:**
+> Register llm-doc-gen commands for the unified CLI.
+
+**Parameters:**
+- `subparsers`: argparse._SubParsersAction
+- `parent_parser`: argparse.ArgumentParser
 
 ---
 
@@ -37308,6 +37340,17 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/cli.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.metrics.track_metrics`
+- `pathlib.Path`
+- `sys`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/__init__.py`
 
