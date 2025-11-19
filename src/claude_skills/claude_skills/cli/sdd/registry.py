@@ -161,6 +161,7 @@ def register_all_subcommands(subparsers, parent_parser):
     from claude_skills.common.cache.cli import register_cache
     from claude_skills.cli.sdd.work_mode import register_get_work_mode
     from claude_skills.cli.sdd.schema import register_schema
+    from claude_skills.llm_doc_gen.cli import register_llm_doc_gen
 
     # Register core SDD subcommands
     register_next(subparsers, parent_parser)
@@ -175,6 +176,7 @@ def register_all_subcommands(subparsers, parent_parser):
     register_cache(subparsers, parent_parser)
     register_get_work_mode(subparsers, parent_parser)
     register_schema(subparsers, parent_parser)
+    register_llm_doc_gen(subparsers, parent_parser)
 
     # Register unified CLIs as SDD subcommands
     _register_doc_cli(subparsers, parent_parser)
