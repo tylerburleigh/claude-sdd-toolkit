@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 16:48:58
+**Generated:** 2025-11-19 16:51:57
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 336
-- **Total Lines:** 118040
-- **Total Classes:** 465
+- **Total Files:** 337
+- **Total Lines:** 118398
+- **Total Classes:** 467
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
@@ -32,9 +32,9 @@
 
 ### PYTHON
 
-- **Files:** 335
-- **Lines:** 117743
-- **Classes:** 465
+- **Files:** 336
+- **Lines:** 118101
+- **Classes:** 467
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
 
@@ -546,6 +546,38 @@ Example:
 - `score_all_tasks()`
 - `get_high_complexity_tasks()`
 - `get_complexity_stats()`
+
+---
+
+### `ComponentData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/component_generator.py:14`
+
+**Description:**
+> Structured component data for documentation generation.
+
+---
+
+### `ComponentGenerator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/component_generator.py:42`
+
+**Description:**
+> Generates component inventory documentation using structured LLM prompts.
+
+Based on BMAD source tree template:
+- Analyzes directory structure and organization patterns
+- Identifies critical folders and their purposes
+- Describes entry points and file organization
+- Documents component relationships and integration points
+
+**Methods:**
+- `__init__()`
+- `format_component_prompt()`
+- `compose_component_doc()`
+- `generate_component_doc()`
 
 ---
 
@@ -37066,6 +37098,16 @@ Returns:
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py`
 
 - `dataclasses.dataclass`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/generators/component_generator.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
 - `pathlib.Path`
 - `typing.Any`
 - `typing.Dict`

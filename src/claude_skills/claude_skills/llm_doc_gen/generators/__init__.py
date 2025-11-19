@@ -7,6 +7,17 @@ This package contains specialized generators for different documentation types:
 - component_generator: Component and module documentation
 """
 
-from .overview_generator import OverviewGenerator
+from .overview_generator import OverviewGenerator, ProjectData
+from .architecture_generator import ArchitectureGenerator, ArchitectureData
+from .component_generator import ComponentGenerator, ComponentData
 
-__all__ = ["OverviewGenerator"]
+__all__ = [
+    # Generators
+    "OverviewGenerator",
+    "ArchitectureGenerator",
+    "ComponentGenerator",
+    # Data classes
+    "ProjectData",
+    "ArchitectureData",
+    "ComponentData",
+]
