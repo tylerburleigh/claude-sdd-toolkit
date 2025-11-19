@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:21:34
+**Generated:** 2025-11-19 17:23:16
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 338
-- **Total Lines:** 118813
+- **Total Lines:** 118856
 - **Total Classes:** 471
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 337
-- **Lines:** 118516
+- **Lines:** 118559
 - **Classes:** 471
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
@@ -1538,6 +1538,8 @@ The 7 sections:
 **Methods:**
 - `__init__()`
 - `generate_index()`
+- `_check_shard_exists()`
+- `_format_doc_link()`
 - `_generate_header()`
 - `_generate_overview()`
 - `_generate_quick_reference()`
