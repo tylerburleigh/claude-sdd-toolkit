@@ -16,9 +16,9 @@ The OpenCode provider integrates OpenCode AI into the SDD Toolkit's multi-provid
 
 ### Required Software
 
-1. **Node.js >= 16.x**
+1. **Node.js >= 18.x**
 
-   OpenCode runs on Node.js. Verify your installation:
+   OpenCode runs on Node.js 18 or higher. Verify your installation:
    ```bash
    node --version
    ```
@@ -26,11 +26,11 @@ The OpenCode provider integrates OpenCode AI into the SDD Toolkit's multi-provid
    If not installed, download from [nodejs.org](https://nodejs.org/) or use a version manager:
    ```bash
    # Using nvm
-   nvm install 16
-   nvm use 16
+   nvm install 18
+   nvm use 18
 
    # Using brew (macOS)
-   brew install node@16
+   brew install node@18
    ```
 
 2. **OpenCode AI SDK**
@@ -48,19 +48,52 @@ You'll need an OpenCode API key. Obtain one from your OpenCode AI account dashbo
 
 ## Installation
 
-### 1. Install OpenCode Dependencies
+> **IMPORTANT**: After installing the SDD Toolkit Python package, you must install Node.js dependencies for the OpenCode provider to function.
 
-From your project root (where the SDD Toolkit is installed):
+### 1. Install SDD Toolkit
+
+First, install the SDD Toolkit Python package:
 
 ```bash
-# Install OpenCode SDK globally or in your project
-npm install -g @opencode-ai/sdk
-
-# Or install locally in your project
-npm install @opencode-ai/sdk
+pip install claude-sdd-toolkit
 ```
 
-### 2. Verify Installation
+### 2. Install Node.js Dependencies (REQUIRED)
+
+**This step is critical** - the OpenCode provider requires Node.js dependencies to be installed separately:
+
+```bash
+# Find your Python installation path
+python -c "import claude_skills; print(claude_skills.__file__)"
+# Example output: /usr/local/lib/python3.11/site-packages/claude_skills/__init__.py
+
+# Navigate to the providers directory
+# Replace the path below with your actual installation path
+cd /usr/local/lib/python3.11/site-packages/claude_skills/common/providers
+
+# Install Node.js dependencies
+npm install
+```
+
+**Quick Setup Script**:
+
+You can use this one-liner to automate the process:
+
+```bash
+cd "$(python -c 'import claude_skills.common.providers as p; from pathlib import Path; print(Path(p.__file__).parent)')" && npm install
+```
+
+### 3. Install OpenCode CLI Binary
+
+Install the OpenCode CLI globally for server management:
+
+```bash
+npm install -g @opencode-ai/sdk
+```
+
+This provides the `opencode` binary needed to run the OpenCode server.
+
+### 4. Verify Installation
 
 Check that the OpenCode provider is available:
 
@@ -68,9 +101,9 @@ Check that the OpenCode provider is available:
 sdd provider-status
 ```
 
-You should see `opencode` listed among available providers.
+You should see `opencode` listed among available providers with status "Available".
 
-Alternatively, check manually:
+Alternatively, verify each component manually:
 
 ```bash
 # Verify Node.js
@@ -79,6 +112,14 @@ node --version
 # Verify OpenCode binary
 which opencode
 opencode --version
+
+# Verify provider dependencies
+python -c "from claude_skills.common.providers.opencode import is_opencode_available; print('OpenCode Available:', is_opencode_available())"
+```
+
+Expected output:
+```
+OpenCode Available: True
 ```
 
 ## Configuration
@@ -249,21 +290,49 @@ print(f"Tokens used: {result.usage.total_tokens}")
 
 **Causes**:
 - Node.js not installed or not in PATH
-- OpenCode SDK not installed
+- **Node.js dependencies not installed in provider directory** (most common)
+- OpenCode SDK not installed globally
 - Wrapper script missing
 
 **Solutions**:
 ```bash
-# Check Node.js
+# 1. Check Node.js (must be >= 18.x)
 node --version
-# If missing: brew install node (macOS) or download from nodejs.org
+# If missing or too old:
+#   macOS: brew install node@18
+#   Other: download from nodejs.org
 
-# Check OpenCode SDK
+# 2. Install Node.js dependencies in provider directory (MOST COMMON FIX)
+cd "$(python -c 'import claude_skills.common.providers as p; from pathlib import Path; print(Path(p.__file__).parent)')"
+npm install
+
+# 3. Verify node_modules exists
+ls -la node_modules/@opencode-ai/sdk
+# Should show the SDK package
+
+# 4. Check OpenCode SDK globally
 npm list -g @opencode-ai/sdk
 # If missing: npm install -g @opencode-ai/sdk
 
-# Verify installation
+# 5. Verify installation
 sdd provider-status
+```
+
+**If provider still unavailable after npm install**:
+```bash
+# Check what's missing
+python -c "from claude_skills.common.providers.opencode import is_opencode_available; print('Available:', is_opencode_available())"
+
+# Debug availability check
+python << 'EOF'
+from claude_skills.common.providers.opencode import DEFAULT_WRAPPER_SCRIPT
+from pathlib import Path
+print(f"Wrapper script exists: {DEFAULT_WRAPPER_SCRIPT.exists()}")
+print(f"Wrapper path: {DEFAULT_WRAPPER_SCRIPT}")
+sdk_path = DEFAULT_WRAPPER_SCRIPT.parent / "node_modules" / "@opencode-ai" / "sdk"
+print(f"SDK exists: {sdk_path.exists()}")
+print(f"SDK path: {sdk_path}")
+EOF
 ```
 
 #### 2. Server Won't Start

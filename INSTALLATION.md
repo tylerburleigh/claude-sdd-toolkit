@@ -65,11 +65,29 @@ pip install -e .
 
 This installs the python CLI tools that the skills use.
 
-### 9. Restart Claude Code
+### 9. (Optional) Install OpenCode Provider Dependencies
+
+If you plan to use the OpenCode AI provider, install Node.js dependencies:
+
+```bash
+# Navigate to the providers directory
+cd ~/.claude/plugins/marketplaces/claude-sdd-toolkit/src/claude_skills/claude_skills/common/providers
+
+# Install Node.js dependencies
+npm install
+```
+
+**Prerequisites for OpenCode**:
+- Node.js >= 18.x
+- OpenCode API key
+
+See [docs/providers/OPENCODE.md](docs/providers/OPENCODE.md) for complete setup instructions.
+
+### 10. Restart Claude Code
 
 Now restart Claude Code. The plugin and all its components will be active.
 
-### 10. Configure Project Permissions
+### 11. Configure Project Permissions
 
 Open your project in Claude Code and run:
 
