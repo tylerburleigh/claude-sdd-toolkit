@@ -42,3 +42,28 @@ SERVER_STARTUP_TIMEOUT = 30
 AVAILABILITY_OVERRIDE_ENV = "OPENCODE_AVAILABLE_OVERRIDE"
 CUSTOM_BINARY_ENV = "OPENCODE_BINARY"
 CUSTOM_WRAPPER_ENV = "OPENCODE_WRAPPER_SCRIPT"
+
+
+OPENCODE_MODELS: List[ModelDescriptor] = [
+    ModelDescriptor(
+        id="default",
+        display_name="OpenCode AI Default",
+        capabilities={
+            ProviderCapability.TEXT,
+            ProviderCapability.STREAMING,
+        },
+        routing_hints={"configurable": True, "source": "ai_config.yaml"},
+    ),
+]
+
+OPENCODE_METADATA = ProviderMetadata(
+    provider_name="opencode",
+    models=tuple(OPENCODE_MODELS),
+    default_model="default",
+    security_flags={"writes_allowed": False},
+    extra={
+        "wrapper": "opencode_wrapper.js",
+        "server_url": DEFAULT_SERVER_URL,
+        "configurable": True,
+    },
+)

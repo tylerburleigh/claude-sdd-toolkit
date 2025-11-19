@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T14:52:07.593349Z",
+  "last_updated": "2025-11-19T14:53:10.082437Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -522,7 +522,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Create Python provider that manages Node.js wrapper subprocess and handles responses",
         "risk_level": "medium"
@@ -537,7 +537,7 @@
         "task-2-1"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -561,7 +561,7 @@
         "task-2-1-6"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/common/providers/opencode.py",
         "task_category": "implementation",
@@ -607,7 +607,7 @@
     "task-2-1-2": {
       "type": "subtask",
       "title": "Define model descriptors and metadata",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "dependencies": {
@@ -620,10 +620,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
-        "description": "Create OPENCODE_MODELS list with ModelDescriptor entries (user-configurable via ai_config.yaml), OPENCODE_METADATA with provider_name, security_flags (writes_allowed: False)"
+        "description": "Create OPENCODE_MODELS list with ModelDescriptor entries (user-configurable via ai_config.yaml), OPENCODE_METADATA with provider_name, security_flags (writes_allowed: False)",
+        "started_at": "2025-11-19T14:52:33.590794Z",
+        "status_note": "Defining model descriptors and provider metadata",
+        "completed_at": "2025-11-19T14:53:10.076338Z",
+        "needs_journaling": false,
+        "actual_hours": 0.01,
+        "journaled_at": "2025-11-19T14:53:10.080661Z"
       }
     },
     "task-2-1-3": {
@@ -1866,12 +1872,21 @@
       "content": "Created opencode.py with all required constants and imports. Added DEFAULT_BINARY='node', DEFAULT_WRAPPER_SCRIPT path (using Path(__file__).parent), DEFAULT_TIMEOUT_SECONDS=360, DEFAULT_SERVER_URL='http://localhost:4096', SERVER_STARTUP_TIMEOUT=30. Imported subprocess, time, socket, Path from pathlib, and all base provider classes (GenerationRequest, GenerationResult, ModelDescriptor, ProviderCapability, ProviderContext, errors, hooks, metadata, status, streaming, TokenUsage). File location: src/claude_skills/claude_skills/common/providers/opencode.py (45 lines).",
       "metadata": {},
       "task_id": "task-2-1-1"
+    },
+    {
+      "timestamp": "2025-11-19T14:53:10.080650Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define model descriptors and metadata",
+      "author": "claude-code",
+      "content": "Defined OPENCODE_MODELS list with ModelDescriptor for configurable model (id='default', display_name='OpenCode AI Default', capabilities include TEXT and STREAMING, routing_hints note configurability via ai_config.yaml). Created OPENCODE_METADATA with provider_name='opencode', models tuple, default_model='default', security_flags with writes_allowed=False, and extra metadata including wrapper script, server URL, and configurability flag. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 47-69).",
+      "metadata": {},
+      "task_id": "task-2-1-2"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 34,
+    "progress_percentage": 36,
     "current_phase": "phase-2",
     "task-1-1-1.completed_tasks": "0",
     "task-1-1-4.completed_tasks": "0"
