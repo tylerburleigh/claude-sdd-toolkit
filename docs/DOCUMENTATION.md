@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 10:52:42
+**Generated:** 2025-11-19 11:21:21
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 329
-- **Total Lines:** 115230
+- **Total Lines:** 115544
 - **Total Classes:** 451
-- **Total Functions:** 1492
-- **Avg Complexity:** 4.71
+- **Total Functions:** 1506
+- **Avg Complexity:** 4.68
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -33,10 +33,10 @@
 ### PYTHON
 
 - **Files:** 328
-- **Lines:** 114925
+- **Lines:** 115239
 - **Classes:** 451
-- **Functions:** 1485
-- **Avg Complexity:** 4.72
+- **Functions:** 1499
+- **Avg Complexity:** 4.68
 
 
 ## 🏛️ Classes
@@ -12204,7 +12204,7 @@ Returns a tuple of (new_list, removed_flag).
 ### `_reset_default_detectors() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:128`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:135`
 **Complexity:** 2
 
 ---
@@ -18030,7 +18030,7 @@ Returns:
 ### `detect_provider_availability(provider_id) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:148`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:155`
 **Complexity:** 2
 
 **Description:**
@@ -22078,7 +22078,7 @@ Example:
 ### `get_detector(provider_id) -> Optional[ProviderDetector]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:143`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:150`
 **Complexity:** 1
 
 **Description:**
@@ -24348,7 +24348,7 @@ Example:
 ### `iter_detector_statuses() -> Dict[str, bool]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:162`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:169`
 **Complexity:** 1
 
 **Description:**
@@ -24407,7 +24407,7 @@ Returns:
 ### `list_detectors() -> Iterable[ProviderDetector]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:175`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:182`
 **Complexity:** 1
 
 **Description:**
@@ -26300,7 +26300,7 @@ Args:
 ### `register_detector(detector) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:134`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:141`
 **Complexity:** 3
 
 **Description:**
@@ -26824,7 +26824,7 @@ Returns:
 ### `reset_detectors() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:170`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/detectors.py:177`
 **Complexity:** 1
 
 **Description:**
@@ -29484,7 +29484,7 @@ a decision needs to be made about what to implement.
 ### `test_build_tool_command_handles_model_only() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:338`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:377`
 **Complexity:** 1
 
 ---
@@ -29505,6 +29505,50 @@ a decision needs to be made about what to implement.
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:224`
 **Complexity:** 1
+
+---
+
+### `test_build_tool_command_opencode_basic() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:232`
+**Complexity:** 1
+
+**Description:**
+> Test OpenCode command construction with basic prompt.
+
+---
+
+### `test_build_tool_command_opencode_multiline_prompt() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:260`
+**Complexity:** 1
+
+**Description:**
+> Test OpenCode command handles multiline prompts.
+
+---
+
+### `test_build_tool_command_opencode_preserves_whitespace() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:251`
+**Complexity:** 1
+
+**Description:**
+> Test OpenCode command preserves prompt whitespace.
+
+---
+
+### `test_build_tool_command_opencode_with_model() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:241`
+**Complexity:** 1
+
+**Description:**
+> Test OpenCode command construction with model specified.
 
 ---
 
@@ -30660,7 +30704,7 @@ a decision needs to be made about what to implement.
 ### `test_detect_available_tools_parallel_invocation(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:331`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:370`
 **Complexity:** 1
 
 **Parameters:**
@@ -31090,7 +31134,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_captures_duration(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:319`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:358`
 **Complexity:** 1
 
 **Parameters:**
@@ -31112,7 +31156,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_error_status(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:273`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:312`
 **Complexity:** 1
 
 **Parameters:**
@@ -31201,7 +31245,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_not_found(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:263`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:302`
 **Complexity:** 1
 
 **Parameters:**
@@ -31223,7 +31267,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:237`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:276`
 **Complexity:** 1
 
 **Parameters:**
@@ -31234,7 +31278,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tool_timeout(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:253`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:292`
 **Complexity:** 1
 
 **Parameters:**
@@ -31286,7 +31330,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_handles_failures(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:303`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:342`
 **Complexity:** 1
 
 **Parameters:**
@@ -31308,7 +31352,7 @@ a decision needs to be made about what to implement.
 ### `test_execute_tools_parallel_success(mocker) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:287`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_tools.py:326`
 **Complexity:** 1
 
 **Parameters:**
@@ -33166,6 +33210,50 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_provider_calls_after_result_hook() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:607`
+**Complexity:** 1
+
+**Description:**
+> Test that after_result hook is called after generation.
+
+---
+
+### `test_provider_calls_before_execute_hook() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:588`
+**Complexity:** 1
+
+**Description:**
+> Test that before_execute hook is called before generation.
+
+---
+
+### `test_provider_calls_hooks_in_correct_order() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:658`
+**Complexity:** 1
+
+**Description:**
+> Test that hooks are called in the correct order: before, stream, after.
+
+---
+
+### `test_provider_calls_on_stream_chunk_hook() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:626`
+**Complexity:** 1
+
+**Description:**
+> Test that on_stream_chunk hook is called for each chunk.
+
+---
+
 ### `test_provider_context_invokes_hooks_and_streams() -> None`
 
 **Language:** python
@@ -33190,6 +33278,39 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_provider_extracts_model_from_response_metadata() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:545`
+**Complexity:** 1
+
+**Description:**
+> Test that provider extracts model information from response metadata.
+
+---
+
+### `test_provider_extracts_text_from_done_message_only() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:490`
+**Complexity:** 1
+
+**Description:**
+> Test that provider extracts text when only done message is present (no chunks).
+
+---
+
+### `test_provider_handles_empty_chunks_gracefully() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:515`
+**Complexity:** 1
+
+**Description:**
+> Test that provider handles empty chunk content without errors.
+
+---
+
 ### `test_provider_handles_error_messages_from_wrapper() -> None`
 
 **Language:** python
@@ -33198,6 +33319,17 @@ a decision needs to be made about what to implement.
 
 **Description:**
 > Test that provider raises error when wrapper returns error type.
+
+---
+
+### `test_provider_handles_missing_token_usage() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:464`
+**Complexity:** 1
+
+**Description:**
+> Test that provider handles responses without token usage gracefully.
 
 ---
 
@@ -33212,6 +33344,17 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_provider_parses_multiple_chunks() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:431`
+**Complexity:** 1
+
+**Description:**
+> Test that provider correctly aggregates multiple streaming chunks.
+
+---
+
 ### `test_provider_validates_json_output() -> None`
 
 **Language:** python
@@ -33220,6 +33363,17 @@ a decision needs to be made about what to implement.
 
 **Description:**
 > Test that provider raises error on invalid JSON from wrapper.
+
+---
+
+### `test_provider_validates_unsupported_model() -> None`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_providers/test_opencode_provider.py:574`
+**Complexity:** 1
+
+**Description:**
+> Test that provider raises error for unsupported model.
 
 ---
 
