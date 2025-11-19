@@ -569,3 +569,128 @@ def test_provider_extracts_model_from_response_metadata() -> None:
     assert result.usage.metadata == {"model": "gpt-5.1-codex"}
     assert result.usage.input_tokens == 10
     assert result.usage.output_tokens == 20
+
+
+def test_provider_validates_unsupported_model() -> None:
+    """Test that provider raises error for unsupported model."""
+    with pytest.raises(ProviderExecutionError) as excinfo:
+        OpenCodeProvider(
+            OPENCODE_METADATA,
+            ProviderHooks(),
+            model="unsupported-model",
+            runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+        )
+
+    assert "unsupported-model" in str(excinfo.value).lower()
+    assert "available" in str(excinfo.value).lower()
+
+
+def test_provider_calls_before_execute_hook() -> None:
+    """Test that before_execute hook is called before generation."""
+    hook_calls: List[str] = []
+
+    def before_hook(request, metadata):
+        hook_calls.append(f"before:{request.prompt}")
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(before_execute=before_hook),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload()),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        provider.generate(GenerationRequest(prompt="test prompt"))
+
+    assert hook_calls == ["before:test prompt"]
+
+
+def test_provider_calls_after_result_hook() -> None:
+    """Test that after_result hook is called after generation."""
+    hook_calls: List[str] = []
+
+    def after_hook(result):
+        hook_calls.append(f"after:{result.content}")
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(after_result=after_hook),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=_payload(content="Generated content")),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        provider.generate(GenerationRequest(prompt="test"))
+
+    assert hook_calls == ["after:Generated content"]
+
+
+def test_provider_calls_on_stream_chunk_hook() -> None:
+    """Test that on_stream_chunk hook is called for each chunk."""
+    hook_calls: List[str] = []
+
+    def stream_hook(chunk):
+        hook_calls.append(chunk.content)
+
+    chunks = [
+        json.dumps({"type": "chunk", "content": "First"}),
+        json.dumps({"type": "chunk", "content": "Second"}),
+        json.dumps({
+            "type": "done",
+            "response": {
+                "text": "FirstSecond",
+                "model": "default",
+                "usage": {"prompt_tokens": 5, "completion_tokens": 10, "total_tokens": 15}
+            }
+        }),
+    ]
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(on_stream_chunk=stream_hook),
+        runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        provider.generate(GenerationRequest(prompt="test", stream=True))
+
+    assert hook_calls == ["First", "Second"]
+
+
+def test_provider_calls_hooks_in_correct_order() -> None:
+    """Test that hooks are called in the correct order: before, stream, after."""
+    hook_sequence: List[str] = []
+
+    def before_hook(request, metadata):
+        hook_sequence.append("before")
+
+    def stream_hook(chunk):
+        hook_sequence.append(f"stream:{chunk.content}")
+
+    def after_hook(result):
+        hook_sequence.append("after")
+
+    chunks = [
+        json.dumps({"type": "chunk", "content": "chunk1"}),
+        json.dumps({
+            "type": "done",
+            "response": {
+                "text": "chunk1",
+                "model": "default",
+                "usage": {"prompt_tokens": 5, "completion_tokens": 5, "total_tokens": 10}
+            }
+        }),
+    ]
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(
+            before_execute=before_hook,
+            on_stream_chunk=stream_hook,
+            after_result=after_hook
+        ),
+        runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        provider.generate(GenerationRequest(prompt="test", stream=True))
+
+    assert hook_sequence == ["before", "stream:chunk1", "after"]
