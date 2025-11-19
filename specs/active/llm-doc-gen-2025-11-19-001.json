@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T21:06:26.039361Z",
+  "last_updated": "2025-11-19T21:08:32.212840Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 15,
+      "completed_tasks": 16,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -421,7 +421,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Detect project structure, integrate with code-doc parsers, implement resumability",
         "risk_level": "medium"
@@ -536,7 +536,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {}
     },
     "task-2-3": {
@@ -648,7 +648,7 @@
         ]
       },
       "total_tasks": 3,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "skills/llm-doc-gen/state_manager.py",
         "task_category": "implementation",
@@ -677,13 +677,19 @@
     "task-2-5-2": {
       "type": "subtask",
       "title": "Track workflow progress and completed steps",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Record timestamps, current_step, completed_steps, findings"
+        "details": "Record timestamps, current_step, completed_steps, findings",
+        "started_at": "2025-11-19T21:06:51.206164Z",
+        "status_note": "Extending state manager to track workflow progress with timestamps, steps, and findings",
+        "completed_at": "2025-11-19T21:08:32.200250Z",
+        "needs_journaling": false,
+        "actual_hours": 0.028,
+        "journaled_at": "2025-11-19T21:08:32.210325Z"
       }
     },
     "task-2-5-3": {
@@ -1936,10 +1942,19 @@
       "content": "Implemented state file read/write for documentation generation resumability. Created state_manager.py with comprehensive state persistence features including:\n- DocumentationState and FileProcessingState dataclasses for tracking progress\n- StateManager class with atomic writes, backup/restore functionality\n- JSON state file at {output_folder}/doc-gen-state.json\n- Support for file status tracking (pending/in_progress/completed/failed/skipped)\n- Progress metrics and resumable file detection\n- Error recovery with automatic backup restoration\n\nCreated comprehensive test suite (test_state_manager.py) with 19 tests covering all functionality. All tests pass successfully.\n\nFiles created:\n- skills/llm-doc-gen/state_manager.py (445 lines)\n- skills/llm-doc-gen/test_state_manager.py (459 lines)\n\nVerification: All 19 unit tests passing, covering state creation, save/load, backup/restore, file status updates, progress tracking, and full integration workflow.",
       "metadata": {},
       "task_id": "task-2-5-1"
+    },
+    {
+      "timestamp": "2025-11-19T21:08:32.210308Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Track workflow progress and completed steps",
+      "author": "claude-code",
+      "content": "Extended state manager to track workflow progress with timestamps, steps, and findings. Added the following capabilities to DocumentationState:\n- current_step: tracks the current workflow step being executed\n- completed_steps: list of all completed workflow steps\n- step_timestamps: dictionary mapping step names to completion timestamps\n- findings: list of accumulated findings/insights with type, description, step, timestamp, and details\n\nAdded StateManager methods:\n- start_workflow_step(): marks a workflow step as started\n- complete_workflow_step(): marks step as completed, records timestamp\n- add_finding(): records findings/insights with type (insight/warning/error/metric)\n- get_workflow_progress(): retrieves workflow progress metrics\n- _group_findings_by_type(): helper to aggregate findings by type\n\nUpdated state serialization (to_dict/from_dict) to persist workflow data across save/load cycles.\n\nAdded 8 comprehensive tests covering:\n- Starting and completing workflow steps\n- Recording timestamps for completed steps\n- Adding findings with automatic and explicit step association\n- Workflow progress reporting\n- State persistence across save/load\n\nAll 27 tests passing (19 original + 8 new workflow tests).\n\nFiles modified:\n- skills/llm-doc-gen/state_manager.py (added 117 lines of workflow tracking code)\n- skills/llm-doc-gen/test_state_manager.py (added 8 new test methods)\n\nVerification: All tests pass, workflow state persists correctly across save/load operations.",
+      "metadata": {},
+      "task_id": "task-2-5-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 28,
+    "progress_percentage": 30,
     "status": "active",
     "current_phase": "phase-2"
   }

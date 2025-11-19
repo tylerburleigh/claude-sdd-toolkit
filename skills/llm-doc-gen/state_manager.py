@@ -91,6 +91,12 @@ class DocumentationState:
     current_phase: Optional[str] = None
     phases_completed: List[str] = field(default_factory=list)
 
+    # Workflow progress tracking
+    current_step: Optional[str] = None
+    completed_steps: List[str] = field(default_factory=list)
+    step_timestamps: Dict[str, str] = field(default_factory=dict)  # step_name -> completion_timestamp
+    findings: List[Dict[str, Any]] = field(default_factory=list)  # Accumulated findings/insights
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
@@ -108,7 +114,11 @@ class DocumentationState:
             'skipped_files': self.skipped_files,
             'exclude_patterns': self.exclude_patterns,
             'current_phase': self.current_phase,
-            'phases_completed': self.phases_completed
+            'phases_completed': self.phases_completed,
+            'current_step': self.current_step,
+            'completed_steps': self.completed_steps,
+            'step_timestamps': self.step_timestamps,
+            'findings': self.findings
         }
 
     @staticmethod
@@ -134,7 +144,11 @@ class DocumentationState:
             skipped_files=data.get('skipped_files', 0),
             exclude_patterns=data.get('exclude_patterns', []),
             current_phase=data.get('current_phase'),
-            phases_completed=data.get('phases_completed', [])
+            phases_completed=data.get('phases_completed', []),
+            current_step=data.get('current_step'),
+            completed_steps=data.get('completed_steps', []),
+            step_timestamps=data.get('step_timestamps', {}),
+            findings=data.get('findings', [])
         )
 
 
@@ -431,6 +445,117 @@ class StateManager:
             'current_phase': state.current_phase,
             'phases_completed': state.phases_completed
         }
+
+    def start_workflow_step(
+        self,
+        state: DocumentationState,
+        step_name: str
+    ) -> None:
+        """
+        Mark a workflow step as started.
+
+        Args:
+            state: Current state
+            step_name: Name of the step being started
+        """
+        state.current_step = step_name
+
+        if self.verbose:
+            print(f"▶️  Started step: {step_name}")
+
+    def complete_workflow_step(
+        self,
+        state: DocumentationState,
+        step_name: Optional[str] = None
+    ) -> None:
+        """
+        Mark a workflow step as completed.
+
+        Args:
+            state: Current state
+            step_name: Name of the step to complete (uses current_step if not provided)
+        """
+        if step_name is None:
+            step_name = state.current_step
+
+        if step_name is None:
+            raise ValueError("No step name provided and no current step set")
+
+        # Record completion timestamp
+        now = datetime.utcnow().isoformat()
+        state.step_timestamps[step_name] = now
+
+        # Add to completed steps if not already there
+        if step_name not in state.completed_steps:
+            state.completed_steps.append(step_name)
+
+        # Clear current step if it matches
+        if state.current_step == step_name:
+            state.current_step = None
+
+        if self.verbose:
+            print(f"✅ Completed step: {step_name}")
+
+    def add_finding(
+        self,
+        state: DocumentationState,
+        finding_type: str,
+        description: str,
+        details: Optional[Dict[str, Any]] = None,
+        step_name: Optional[str] = None
+    ) -> None:
+        """
+        Add a finding or insight to the state.
+
+        Args:
+            state: Current state
+            finding_type: Type of finding (e.g., 'insight', 'warning', 'error', 'metric')
+            description: Human-readable description
+            details: Optional additional structured data
+            step_name: Step where finding was discovered (uses current_step if not provided)
+        """
+        if step_name is None:
+            step_name = state.current_step
+
+        finding = {
+            'type': finding_type,
+            'description': description,
+            'step': step_name,
+            'timestamp': datetime.utcnow().isoformat(),
+            'details': details or {}
+        }
+
+        state.findings.append(finding)
+
+        if self.verbose:
+            print(f"📝 Finding ({finding_type}): {description}")
+
+    def get_workflow_progress(self, state: DocumentationState) -> Dict[str, Any]:
+        """
+        Get workflow progress information.
+
+        Args:
+            state: Current state
+
+        Returns:
+            Dictionary with workflow progress metrics
+        """
+        return {
+            'current_step': state.current_step,
+            'completed_steps': state.completed_steps,
+            'total_steps_completed': len(state.completed_steps),
+            'step_timestamps': state.step_timestamps,
+            'findings_count': len(state.findings),
+            'findings_by_type': self._group_findings_by_type(state.findings)
+        }
+
+    def _group_findings_by_type(self, findings: List[Dict[str, Any]]) -> Dict[str, int]:
+        """Group findings by type and count them."""
+        counts: Dict[str, int] = {}
+        for finding in findings:
+            finding_type = finding.get('type', 'unknown')
+            counts[finding_type] = counts.get(finding_type, 0) + 1
+        return counts
 
 
 def create_state_manager(

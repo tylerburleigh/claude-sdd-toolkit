@@ -374,6 +374,125 @@ class TestConvenienceFunctions:
         assert manager.verbose is True
 
 
+class TestWorkflowTracking:
+    """Tests for workflow progress tracking."""
+
+    def test_start_workflow_step(self, state_manager, temp_project_dir):
+        """Test starting a workflow step."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        state_manager.start_workflow_step(state, "discovery")
+
+        assert state.current_step == "discovery"
+        assert "discovery" not in state.completed_steps
+
+    def test_complete_workflow_step(self, state_manager, temp_project_dir):
+        """Test completing a workflow step."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        state_manager.start_workflow_step(state, "discovery")
+        state_manager.complete_workflow_step(state)
+
+        assert state.current_step is None
+        assert "discovery" in state.completed_steps
+        assert "discovery" in state.step_timestamps
+
+    def test_complete_specific_step(self, state_manager, temp_project_dir):
+        """Test completing a specific step by name."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        state_manager.start_workflow_step(state, "step1")
+        state_manager.start_workflow_step(state, "step2")
+        state_manager.complete_workflow_step(state, "step1")
+
+        assert state.current_step == "step2"
+        assert "step1" in state.completed_steps
+        assert "step2" not in state.completed_steps
+
+    def test_complete_without_current_step_raises(self, state_manager, temp_project_dir):
+        """Test that completing without a step raises error."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        with pytest.raises(ValueError, match="No step name provided"):
+            state_manager.complete_workflow_step(state)
+
+    def test_add_finding(self, state_manager, temp_project_dir):
+        """Test adding a finding."""
+        state = state_manager.create_new_state(temp_project_dir)
+        state_manager.start_workflow_step(state, "analysis")
+
+        state_manager.add_finding(
+            state,
+            finding_type="insight",
+            description="Found 50 Python files",
+            details={"file_count": 50}
+        )
+
+        assert len(state.findings) == 1
+        finding = state.findings[0]
+        assert finding['type'] == "insight"
+        assert finding['description'] == "Found 50 Python files"
+        assert finding['step'] == "analysis"
+        assert finding['details']['file_count'] == 50
+        assert 'timestamp' in finding
+
+    def test_add_finding_with_explicit_step(self, state_manager, temp_project_dir):
+        """Test adding a finding with explicit step name."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        state_manager.add_finding(
+            state,
+            finding_type="warning",
+            description="Skipped binary files",
+            step_name="scanning"
+        )
+
+        assert len(state.findings) == 1
+        assert state.findings[0]['step'] == "scanning"
+
+    def test_get_workflow_progress(self, state_manager, temp_project_dir):
+        """Test getting workflow progress."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        # Simulate workflow
+        state_manager.start_workflow_step(state, "step1")
+        state_manager.complete_workflow_step(state)
+
+        state_manager.start_workflow_step(state, "step2")
+        state_manager.add_finding(state, "insight", "Found patterns")
+        state_manager.add_finding(state, "warning", "Large file detected")
+        state_manager.complete_workflow_step(state)
+
+        progress = state_manager.get_workflow_progress(state)
+
+        assert progress['current_step'] is None
+        assert progress['completed_steps'] == ["step1", "step2"]
+        assert progress['total_steps_completed'] == 2
+        assert len(progress['step_timestamps']) == 2
+        assert progress['findings_count'] == 2
+        assert progress['findings_by_type'] == {"insight": 1, "warning": 1}
+
+    def test_workflow_state_persistence(self, state_manager, temp_project_dir):
+        """Test that workflow state persists across save/load."""
+        state = state_manager.create_new_state(temp_project_dir)
+
+        # Set up workflow state
+        state_manager.start_workflow_step(state, "parsing")
+        state_manager.complete_workflow_step(state, "discovery")
+        state_manager.add_finding(state, "metric", "100 files found", {"count": 100})
+
+        state_manager.save_state(state)
+
+        # Load and verify
+        loaded_state = state_manager.load_state()
+
+        assert loaded_state.current_step == "parsing"
+        assert "discovery" in loaded_state.completed_steps
+        assert "discovery" in loaded_state.step_timestamps
+        assert len(loaded_state.findings) == 1
+        assert loaded_state.findings[0]['type'] == "metric"
+
+
 class TestIntegration:
     """Integration tests for full workflows."""
 
