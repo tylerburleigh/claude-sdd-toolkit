@@ -19719,7 +19719,7 @@ Examples:
 Token Savings:
     Typical savings compared to pretty-printed full output:
     - prepare-task: 85-90%
-    - task-info: 70-75%
+    - task-info: 70-85%
     - check-deps: 80-85%
     - progress: 85-90%
     - next-task: 60-70%

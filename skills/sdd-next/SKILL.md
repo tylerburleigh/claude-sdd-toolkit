@@ -62,7 +62,7 @@ or
 - If `"autonomous"`: Follow **Autonomous Mode Workflow** (Section starting at line 438)
   - Complete all tasks in current phase automatically within context limits
   - Check context after EVERY task completion
-  - Stop only for blockers, plan deviations, or when context ≥75%
+  - Stop only for blockers, plan deviations, or when context ≥85%
 
 ---
 
@@ -172,8 +172,8 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 
 ### Context Thresholds
 
-- **< 75%**: Safe to continue
-- **≥ 75%**: Stop and recommend to the user that they `/clear` and then `/sdd-begin` for the next task
+- **< 85%**: Safe to continue
+- **≥ 85%**: Stop and recommend to the user that they `/clear` and then `/sdd-begin` for the next task
 
 ### CRITICAL: Never Anticipate Context Usage
 
@@ -182,14 +182,14 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 ❌ DO NOT stop early because:
   - "Phase 2 implementation will consume context"
   - "File reading tasks are coming"
-  - "I predict I'll hit 75% during the next phase"
+  - "I predict I'll hit 85% during the next phase"
   - "I should have buffer space for future work"
 
 ✅ DO ONLY stop when:
-  - Context is CURRENTLY at or above 75%
+  - Context is CURRENTLY at or above 85%
   - You have JUST checked context and confirmed actual usage
 
-**Rationale:** Predicting context usage is unreliable and defeats the purpose of checking. The threshold (75%) is designed to give adequate headroom; stopping earlier wastes that safety margin.
+**Rationale:** Predicting context usage is unreliable and defeats the purpose of checking. The threshold (85%) is designed to give adequate headroom; stopping earlier wastes that safety margin.
 
 ### When to Check Context
 
@@ -213,7 +213,7 @@ When sdd-next is invoked, it automatically reads the `work_mode` setting from `.
 - Follows dedicated Autonomous Mode section (later in this document)
 - Complete all tasks in current phase automatically within context limits
 - Check context after EVERY task completion (required)
-- Stop only for blockers, plan deviations, or when context ≥75%
+- Stop only for blockers, plan deviations, or when context ≥85%
 - Continues until phase is complete or manual intervention needed
 
 ---
@@ -498,7 +498,7 @@ Use this workflow when the configured work mode is **Autonomous Mode** (`"work_m
 ### Key Characteristics
 
 - **Phase-scoped**: Completes all tasks within current phase only (does not cross phase boundaries)
-- **Context-aware**: Checks context after EVERY task, stops if ≥75%
+- **Context-aware**: Checks context after EVERY task, stops if ≥85%
 - **Defensive stops**: Stops for blocked tasks and plan deviations (requires user approval)
 - **No plan approval**: Creates execution plans internally without showing user
 
@@ -562,10 +562,10 @@ For each task in current phase:
    ```
 
    **Check ACTUAL context percentage reported, do NOT speculate:**
-   - If context ACTUALLY ≥75% (as reported by command): **STOP**, exit loop, go to Summary
-   - If context <75%: Continue to next iteration
+   - If context ACTUALLY ≥85% (as reported by command): **STOP**, exit loop, go to Summary
+   - If context <85%: Continue to next iteration
 
-   **CRITICAL:** Do not stop based on predictions like "upcoming work will use context" or "I should have buffer space for the next phase." Only stop when actual usage reaches the threshold. The 75% threshold already provides safety margin.
+   **CRITICAL:** Do not stop based on predictions like "upcoming work will use context" or "I should have buffer space for the next phase." Only stop when actual usage reaches the threshold. The 85% threshold already provides safety margin.
 
 10. **Check phase completion:**
     - If current phase complete: Exit loop, go to Summary
@@ -596,7 +596,7 @@ Current context: {context_percentage}%
 ### Exit Reason
 {One of:}
 - ✅ Phase Complete
-- ⏸️ Context Limit: ≥75% threshold
+- ⏸️ Context Limit: ≥85% threshold
 - 🚧 Blocked Task
 - ⚠️ Plan Deviation
 - ❌ No Actionable Tasks
@@ -609,9 +609,9 @@ Current context: {context_percentage}%
 
 **DO:**
 - ✅ Check context after EVERY task completion
-- ✅ Stop immediately when context ≥75%
+- ✅ Stop immediately when context ≥85%
 - ✅ Base stopping decisions on ACTUAL context percentage, never predictions
-- ✅ Use the full safety margin (continue until ≥75% reported)
+- ✅ Use the full safety margin (continue until ≥85% reported)
 - ✅ Stop for blocked tasks (don't auto-pivot)
 - ✅ Stop for plan deviations (don't auto-revise)
 - ✅ Create detailed internal plans
@@ -620,7 +620,7 @@ Current context: {context_percentage}%
 **DON'T:**
 - ❌ Cross phase boundaries
 - ❌ Skip plan creation (always plan, just don't show)
-- ❌ Continue past 75% context
+- ❌ Continue past 85% context
 - ❌ Stop early based on predictions of future context usage
 - ❌ Auto-resolve blockers
 - ❌ Auto-revise plans on deviations
@@ -728,6 +728,6 @@ sdd check-complete {spec-id} --phase {phase-id}
 | **Spec reading** | Always use `sdd` commands, NEVER `Read()` or `cat` on JSON |
 | **Context checking** | Two-step sequential (marker → context), never combined |
 | **Task completion** | Never mark complete if tests failing/partial/errors |
-| **Autonomous mode** | Check context after EVERY task, stop at ≥75% |
+| **Autonomous mode** | Check context after EVERY task, stop at ≥85% |
 | **Verification** | Dispatch to appropriate subagent by `verification_type` |
 | **User decisions** | Always use `AskUserQuestion`, never text lists |
