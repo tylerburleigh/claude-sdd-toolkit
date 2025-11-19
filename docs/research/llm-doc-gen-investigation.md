@@ -393,6 +393,150 @@ sdd llm-doc from-spec <spec-id> --task <task-id> --output implementation-guide.m
 
 ---
 
+## ARCHITECTURAL PIVOT (2025-11-19)
+
+### Decision: BMAD-Style Standalone Architecture
+
+**Pivot from:** code-doc integration approach with AST parsing
+**Pivot to:** BMAD-style standalone workflow-based approach
+
+### Rationale
+
+1. **BMAD Proves Pure-LLM Works**
+   - No AST parsing in BMAD workflows
+   - LLMs read source files directly
+   - Proven successful pattern
+   - Simpler, more maintainable
+
+2. **AST Parsing Unnecessary**
+   - Modern LLMs understand code structure natively
+   - Tree-sitter adds complexity and maintenance
+   - Language-specific parsers need constant updates
+   - Parsing doesn't improve LLM output quality
+
+3. **Sharded Output Superior**
+   - BMAD uses index.md + topic-specific files
+   - More navigable than monolithic DOCUMENTATION.md
+   - Better for large projects
+   - Easier to update individual sections
+
+4. **Workflow-Based > Parsing-Based**
+   - State file enables resumability
+   - Workflow guides LLM analysis systematically
+   - Proven orchestration patterns from BMAD
+   - Focus on prompting, not parsing
+
+### What Changes
+
+**Removed:**
+- ❌ AST parsing / tree-sitter dependencies
+- ❌ code-doc integration
+- ❌ documentation.json input/output
+- ❌ Programmatic structure extraction
+- ❌ "Use both approaches" guidance
+
+**Added:**
+- ✅ BMAD-style workflow orchestration
+- ✅ State-based resumability (project-doc-state.json)
+- ✅ Sharded documentation output
+- ✅ Direct source file reading by LLMs
+- ✅ Workflow-driven analysis steps
+
+### BMAD Sharded Documentation Pattern
+
+**Output Structure:**
+```
+docs/
+├── index.md                    # Main navigation/overview
+├── architecture/
+│   ├── overview.md             # System architecture
+│   ├── components.md           # Component descriptions
+│   └── data-flow.md            # Data flow diagrams
+├── guides/
+│   ├── getting-started.md      # Onboarding
+│   ├── development.md          # Dev workflows
+│   └── deployment.md           # Deployment guide
+└── reference/
+    ├── api.md                  # API reference
+    ├── configuration.md        # Config options
+    └── troubleshooting.md      # Common issues
+```
+
+**State File (project-doc-state.json):**
+```json
+{
+  "version": "1.0",
+  "project_name": "MyProject",
+  "last_updated": "2025-11-19T19:58:00Z",
+  "current_step": "analyze-architecture",
+  "completed_steps": ["scan-structure", "identify-components"],
+  "files_analyzed": ["src/main.py", "src/auth.py"],
+  "sections_generated": ["docs/index.md", "docs/architecture/overview.md"],
+  "workflow_mode": "full_scan",
+  "resume_token": "abc123..."
+}
+```
+
+**Workflow Steps (BMAD-inspired):**
+1. **Initialize** - Create state file, scan project structure
+2. **Analyze** - LLM reads source files, identifies patterns
+3. **Plan Sections** - Determine sharded doc structure
+4. **Generate** - Create each section with LLM consultation
+5. **Review** - Validate completeness, update state
+6. **Finalize** - Generate index.md, save state
+
+### Revised Architecture
+
+**Module Structure:**
+```
+skills/llm-doc-gen/
+├── SKILL.md                  # User-facing documentation
+├── cli.py                    # CLI entry point
+├── workflow/                 # Workflow orchestration
+│   ├── engine.py            # Main workflow engine
+│   ├── state.py             # State file management
+│   └── steps.py             # Individual workflow steps
+├── prompts/                  # Prompt templates
+│   ├── architecture.py
+│   ├── guide.py
+│   └── reference.py
+├── synthesis.py              # Multi-agent response synthesis
+└── output/                   # Output generators
+    ├── markdown.py          # Markdown formatting
+    └── sharding.py          # Document sharding logic
+```
+
+**CLI Commands (Revised):**
+```bash
+# Full documentation scan (creates sharded docs)
+sdd llm-doc scan ./src --project-name MyProject
+
+# Resume interrupted scan
+sdd llm-doc resume ./docs
+
+# Generate specific section only
+sdd llm-doc section architecture --output ./docs/architecture/
+
+# Multi-agent mode (default)
+sdd llm-doc scan ./src --multi-agent
+
+# Single-agent mode (faster)
+sdd llm-doc scan ./src --single-agent --tool cursor-agent
+```
+
+**No code-doc Integration** - Standalone solution.
+
+### Impact on Remaining Tasks
+
+Tasks assuming code-doc integration need revision:
+- Remove references to documentation.json as input
+- Remove AST parsing implementation tasks
+- Add state file management tasks
+- Add sharded output generation tasks
+- Add workflow orchestration tasks
+
+---
+
 ## Next Steps
 
 ### Phase 2: Implementation Planning

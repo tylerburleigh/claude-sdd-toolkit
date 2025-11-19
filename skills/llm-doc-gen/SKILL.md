@@ -7,9 +7,9 @@ description: LLM-powered documentation generation for narrative architecture doc
 
 ## Overview
 
-The `Skill(sdd-toolkit:llm-doc-gen)` skill generates narrative, contextual documentation using Large Language Model (LLM) consultation. Unlike programmatic documentation generators that extract structural information from code, this skill uses AI to create human-readable explanations, architectural insights, and developer-friendly guides.
+The `Skill(sdd-toolkit:llm-doc-gen)` skill generates comprehensive, navigable documentation using Large Language Model (LLM) consultation. It creates sharded documentation (organized topic files) by having LLMs read and analyze source code directly, then synthesizing their insights into structured, human-readable guides.
 
-**Core Capability:** Transform code structure and context into narrative documentation by consulting one or more LLMs in parallel, synthesizing their responses, and composing publication-ready documents.
+**Core Capability:** Transform codebases into sharded documentation by orchestrating LLM analysis through workflow-driven steps, managing state for resumability, and producing organized topic files instead of monolithic documents.
 
 **Use this skill when:**
 - Creating architecture documentation that explains *why*, not just *what*
@@ -19,172 +19,183 @@ The `Skill(sdd-toolkit:llm-doc-gen)` skill generates narrative, contextual docum
 - Creating narrative content that requires interpretation and synthesis
 
 **Key features:**
+- **Sharded documentation** - Organized topic files (architecture/, guides/, reference/) instead of monolithic docs
+- **State-based resumability** - Resume interrupted scans from last checkpoint
 - **Multi-agent consultation** - Parallel LLM queries for comprehensive insights
-- **Context-aware prompting** - Uses code-doc output + spec data + source code
-- **Research-then-synthesis** - LLMs provide research, main agent composes docs
-- **Multiple output formats** - Architecture docs, tutorials, developer guides
-- **Integration with SDD** - Generate docs from specs and task contexts
+- **Workflow orchestration** - BMAD-style step-by-step analysis guided by workflow engine
+- **Direct source reading** - LLMs read code directly (no AST parsing required)
+- **Research-then-synthesis** - LLMs provide research, main agent composes organized docs
 
 **Do NOT use for:**
-- API reference documentation (use `Skill(sdd-toolkit:code-doc)` instead)
-- Function/class catalogs (use code-doc for structural docs)
-- Dependency graphs or metrics (use code-doc for programmatic analysis)
-- Simple docstring extraction (code-doc handles this)
+- Quick prototyping or throwaway code
+- Projects under 100 lines
+- Code that changes daily (docs become stale quickly)
+- When simple README.md is sufficient
 
 ---
 
-## LLM vs Programmatic Documentation
+## Sharded Documentation Output
 
-Understanding when to use LLM-based vs programmatic documentation generation is critical:
+Unlike monolithic documentation files, llm-doc-gen produces organized, navigable documentation sharded by topic:
 
-### When to Use LLM Documentation (llm-doc-gen)
-
-**✅ Use llm-doc-gen when you need:**
-
-1. **Narrative Explanations**
-   - "Why does this architecture use microservices?"
-   - "What problem does this design pattern solve here?"
-   - Contextual interpretation, not just structure extraction
-
-2. **Synthesis Across Sources**
-   - Combining insights from code + specs + comments + tests
-   - Identifying patterns and relationships
-   - Creating coherent narratives from disparate information
-
-3. **Human-Readable Guides**
-   - Onboarding documentation for new developers
-   - Architecture decision records with rationale
-   - Tutorial content with explanations and examples
-
-4. **Contextual Understanding**
-   - Domain-specific terminology explained
-   - Design trade-offs articulated
-   - Implementation choices justified
-
-### When to Use Programmatic Documentation (code-doc)
-
-**✅ Use code-doc when you need:**
-
-1. **Structural Information**
-   - Complete list of all functions and classes
-   - Accurate parameter types and return values
-   - Inheritance hierarchies and class relationships
-
-2. **Metrics and Analysis**
-   - Cyclomatic complexity scores
-   - Dependency graphs
-   - Code coverage statistics
-
-3. **API Reference**
-   - Machine-readable function signatures
-   - Exhaustive method documentation
-   - Interface definitions
-
-4. **Guaranteed Accuracy**
-   - Programmatic extraction eliminates hallucination
-   - AST parsing provides ground truth
-   - No interpretation, just facts
-
-### Best Practice: Combine Both
-
-The most powerful documentation strategy uses both approaches:
-
-```bash
-# Step 1: Generate structural documentation with code-doc
-sdd doc generate ./src --name MyProject --output-dir ./docs
-
-# Step 2: Use that structural data as input for LLM narrative
-sdd llm-doc architecture ./src \
-    --use-code-doc ./docs/documentation.json \
-    --output ./docs/ARCHITECTURE.md
+**Example Output Structure:**
+```
+docs/
+├── index.md                    # Main navigation and project overview
+├── architecture/
+│   ├── overview.md             # System architecture and design
+│   ├── components.md           # Component descriptions
+│   └── data-flow.md            # Data flow and interactions
+├── guides/
+│   ├── getting-started.md      # Developer onboarding
+│   ├── development.md          # Development workflows
+│   └── deployment.md           # Deployment procedures
+└── reference/
+    ├── api.md                  # API reference
+    ├── configuration.md        # Configuration options
+    └── troubleshooting.md      # Common issues and solutions
 ```
 
-**Why this works:**
-- code-doc provides accurate structural data (functions, classes, dependencies)
-- llm-doc-gen reads that data + source code to create narrative
-- LLM has factual grounding from code-doc, reducing hallucination
-- Result: Accurate structure + insightful narrative
+**Benefits:**
+- **Navigable** - Find specific topics easily
+- **Maintainable** - Update individual sections without touching others
+- **Scalable** - Grows organically with project complexity
+- **Readable** - Focused docs instead of overwhelming single file
+
+**State File for Resumability:**
+
+The skill maintains a `project-doc-state.json` file to enable resuming interrupted scans:
+
+```json
+{
+  "version": "1.0",
+  "project_name": "MyProject",
+  "last_updated": "2025-11-19T20:00:00Z",
+  "current_step": "generate-guides",
+  "completed_steps": ["scan-structure", "analyze-architecture", "generate-architecture-docs"],
+  "files_analyzed": ["src/main.py", "src/auth.py", "src/db.py"],
+  "sections_generated": [
+    "docs/index.md",
+    "docs/architecture/overview.md",
+    "docs/architecture/components.md"
+  ],
+  "workflow_mode": "full_scan"
+}
+```
+
+If the scan is interrupted, simply run `sdd llm-doc resume ./docs` to continue from the last checkpoint.
 
 ---
 
 ## Core Workflow
 
-### Research-Then-Synthesis Pattern
+### Workflow-Driven Documentation Generation
 
-The llm-doc-gen skill uses a two-phase approach that separates AI research from document composition:
+The llm-doc-gen skill uses a workflow engine that orchestrates LLM analysis through systematic steps:
 
 ```
 ┌─────────────────────────────────────────┐
-│ Phase 1: Research Gathering             │
+│ Step 1: Initialize                      │
 │ ─────────────────────────────────────── │
 │                                         │
-│  1. Gather Context                      │
-│     ├─ Code-doc structural data         │
-│     ├─ SDD spec context (if available)  │
-│     ├─ Source code files                │
-│     └─ Existing documentation           │
-│                                         │
-│  2. Format LLM Prompts                  │
-│     ├─ Include gathered context         │
-│     ├─ Specify output requirements      │
-│     └─ Add constraints and examples     │
-│                                         │
-│  3. Execute LLM Consultation            │
-│     ├─ Multi-agent (parallel, default)  │
-│     │  • cursor-agent                   │
-│     │  • gemini                         │
-│     │  • codex (if available)           │
-│     └─ Single-agent (faster, optional)  │
-│                                         │
-│  4. Return Research Findings            │
-│     └─ Separate responses per LLM       │
+│  • Scan project structure               │
+│  • Create state file (project-doc-state.json) │
+│  • Detect project type                  │
+│  • Plan documentation sections          │
+│  • Check for existing docs/resume       │
 └─────────────────────────────────────────┘
-                 │
-                 │ Research findings (text)
                  │
                  ▼
 ┌─────────────────────────────────────────┐
-│ Phase 2: Synthesis & Composition        │
+│ Step 2: Analyze Architecture            │
 │ ─────────────────────────────────────── │
 │                                         │
-│  5. Synthesize Responses                │
-│     ├─ Merge complementary insights     │
-│     ├─ Resolve contradictions           │
-│     ├─ Remove redundancy                │
-│     └─ Identify consensus points        │
+│  • LLMs read source files directly      │
+│  • Identify components and patterns     │
+│  • Analyze data flow and interactions   │
+│  • Multi-agent consultation (parallel)  │
+│  • Update state: architecture analyzed  │
+└─────────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│ Step 3: Generate Architecture Docs      │
+│ ─────────────────────────────────────── │
 │                                         │
-│  6. Compose Final Document              │
-│     ├─ Apply document template          │
-│     ├─ Format sections                  │
-│     ├─ Add metadata                     │
-│     └─ Validate output                  │
+│  • Synthesize LLM research findings     │
+│  • Create docs/architecture/overview.md │
+│  • Create docs/architecture/components.md │
+│  • Create docs/architecture/data-flow.md │
+│  • Update state: architecture docs done │
+└─────────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│ Step 4: Generate Guides                 │
+│ ─────────────────────────────────────── │
 │                                         │
-│  7. Write Output File                   │
-│     └─ Save to specified location       │
+│  • Analyze developer workflows          │
+│  • Create docs/guides/getting-started.md │
+│  • Create docs/guides/development.md    │
+│  • Create docs/guides/deployment.md     │
+│  • Update state: guides done            │
+└─────────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│ Step 5: Generate Reference              │
+│ ─────────────────────────────────────── │
+│                                         │
+│  • Extract API patterns                 │
+│  • Create docs/reference/api.md         │
+│  • Create docs/reference/configuration.md │
+│  • Create docs/reference/troubleshooting.md │
+│  • Update state: reference done         │
+└─────────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────┐
+│ Step 6: Finalize                        │
+│ ─────────────────────────────────────── │
+│                                         │
+│  • Generate docs/index.md with navigation │
+│  • Validate all sections created        │
+│  • Update state: complete                │
+│  • Archive state file                   │
 └─────────────────────────────────────────┘
 ```
 
-**Why This Pattern:**
+**Resumability:**
 
-1. **Separation of Concerns**
-   - LLMs focus on analysis and research
-   - Main agent controls file writing and composition
-   - Clean boundary between AI analysis and output generation
+If interrupted at any step, the workflow can resume from the last completed step using the state file:
 
-2. **Safety**
-   - LLMs never write files directly
-   - Main agent validates and controls all file operations
-   - No risk of AI accidentally modifying code
+```bash
+# Workflow interrupted after Step 3
+sdd llm-doc resume ./docs
+# Resumes from Step 4: Generate Guides
+```
 
-3. **Multi-Perspective Synthesis**
-   - Consult multiple LLMs in parallel for diverse insights
-   - Main agent intelligently merges perspectives
-   - Richer, more comprehensive documentation
+**Key Workflow Principles:**
 
-4. **Consistency**
-   - Main agent ensures consistent formatting
-   - Template-based output structure
-   - Predictable document organization
+1. **Stateful Execution**
+   - Each step updates project-doc-state.json
+   - Resume from any checkpoint
+   - No duplicate work
+
+2. **LLMs Read Code Directly**
+   - No AST parsing or pre-processing
+   - LLMs analyze source files natively
+   - Simpler, more maintainable
+
+3. **Sharded Output**
+   - Each step produces focused docs
+   - Organized by topic (architecture/, guides/, reference/)
+   - Easy to navigate and maintain
+
+4. **Multi-Agent Research**
+   - Parallel LLM consultation at each step
+   - Synthesis of multiple perspectives
+   - Richer, more comprehensive insights
 
 ---
 
@@ -222,34 +233,38 @@ If no LLM tools are installed, this skill cannot function. Install at least one 
 ### Basic Usage
 
 ```bash
-# Generate architecture documentation (multi-agent default)
-sdd llm-doc architecture ./src --output ./docs/ARCHITECTURE.md
+# Generate complete sharded documentation
+sdd llm-doc scan ./src --project-name MyProject --output-dir ./docs
 
-# Generate developer guide
-sdd llm-doc guide ./src/auth --output ./docs/auth-guide.md
+# Resume interrupted scan
+sdd llm-doc resume ./docs
 
-# Generate tutorial from feature implementation
-sdd llm-doc tutorial ./src/scoring --output ./docs/scoring-tutorial.md
+# Generate specific section only
+sdd llm-doc section architecture --source ./src --output ./docs/architecture/
+
+# Single-agent mode (faster, less comprehensive)
+sdd llm-doc scan ./src --single-agent --tool cursor-agent
 ```
 
-### With Code-Doc Integration
+### Output
 
-```bash
-# Step 1: Generate structural docs first
-sdd doc generate ./src --name MyProject
+After running `sdd llm-doc scan`, you'll get organized documentation:
 
-# Step 2: Generate narrative docs using structural data
-sdd llm-doc architecture ./src \
-    --use-code-doc ./docs/documentation.json \
-    --output ./docs/ARCHITECTURE.md
 ```
-
-### From SDD Spec
-
-```bash
-# Generate implementation guide from completed spec
-sdd llm-doc from-spec my-spec-001 \
-    --output ./docs/implementation-guide.md
+docs/
+├── index.md                    # Navigation and overview
+├── architecture/               # System design docs
+│   ├── overview.md
+│   ├── components.md
+│   └── data-flow.md
+├── guides/                     # Developer guides
+│   ├── getting-started.md
+│   ├── development.md
+│   └── deployment.md
+└── reference/                  # Reference docs
+    ├── api.md
+    ├── configuration.md
+    └── troubleshooting.md
 ```
 
 ---
@@ -311,25 +326,25 @@ sdd llm-doc from-spec my-spec-001 \
 
 ### MUST DO:
 
-1. **Always gather context first**
-   - Run code-doc if structural data is needed
-   - Read relevant spec files with `sdd` commands
-   - Identify key source files to include
+1. **Always use the workflow engine**
+   - Don't skip initialization step
+   - Let the workflow manage state and checkpoints
+   - Enable resumability by maintaining state file
 
 2. **Use multi-agent by default**
    - Parallel consultation provides richer insights
    - Synthesis of multiple perspectives improves quality
-   - Only use single-agent for quick iterations
+   - Only use single-agent for quick iterations or cost constraints
 
-3. **Validate LLM outputs**
-   - Check for hallucinated function names or features
-   - Cross-reference with code-doc structural data
-   - Don't blindly trust LLM responses
+3. **Let LLMs read code directly**
+   - Provide source file paths to LLMs
+   - No pre-processing or parsing required
+   - Trust LLMs to understand code structure
 
-4. **Specify output format clearly**
-   - Define document structure in prompt
-   - Provide examples of desired format
-   - Set length and tone constraints
+4. **Maintain state file integrity**
+   - Don't manually edit project-doc-state.json
+   - Use `sdd llm-doc resume` to continue interrupted scans
+   - State file enables checkpointing and progress tracking
 
 5. **Report LLM failures transparently**
    - If an LLM tool fails, inform the user
@@ -340,28 +355,257 @@ sdd llm-doc from-spec my-spec-001 \
 
 1. **Never let LLMs write files directly**
    - Always use research-then-synthesis pattern
-   - Main agent controls all file operations
-   - LLMs return text only, never write
+   - Workflow engine controls all file operations
+   - LLMs return analysis text only
 
-2. **Never skip context gathering**
-   - LLMs need grounding in actual code structure
-   - Without context, outputs are generic and unhelpful
-   - Always provide code-doc data when available
+2. **Never skip the initialization step**
+   - State file setup is critical for resumability
+   - Project structure scan informs documentation organization
+   - Skipping initialization breaks checkpoint recovery
 
-3. **Never use for mission-critical accuracy**
-   - LLMs can hallucinate details
-   - Use code-doc for anything requiring 100% accuracy
-   - Reserve llm-doc-gen for narrative and explanation
+3. **Never mix monolithic and sharded output**
+   - Stick to sharded documentation structure
+   - Don't create single DOCUMENTATION.md files
+   - Organized topics are more maintainable
 
 4. **Never ignore timeout/failure**
    - LLM calls can hang or fail
    - Always implement timeout handling
    - Provide graceful fallback to single-agent or manual
 
-5. **Never batch without user awareness**
+5. **Never batch without state tracking**
    - LLM consultation is expensive (time and API cost)
-   - Always confirm before generating multiple docs
-   - Show progress during multi-doc generation
+   - State file tracks progress through sections
+   - Always show progress during generation
+
+---
+
+## Detailed Workflow Steps
+
+### Step-by-Step Execution
+
+When you run `sdd llm-doc scan ./src --project-name MyProject`, the workflow engine executes these steps:
+
+#### Step 1: Initialize (5-10 seconds)
+
+**Actions:**
+- Scan project directory structure
+- Detect project type (web app, library, CLI tool, etc.)
+- Create `docs/project-doc-state.json` file
+- Plan documentation sections based on project type
+- Check for existing documentation to resume
+
+**Output:**
+```
+🔍 Scanning project structure...
+✅ Detected: Python web application (Flask)
+📋 Planned sections: architecture, guides, reference
+💾 State file created: docs/project-doc-state.json
+```
+
+**Resume Check:**
+If state file exists, you'll be prompted:
+```
+Found existing documentation state (last updated 2 hours ago).
+
+Resume from where you left off? [Y/n]
+```
+
+---
+
+#### Step 2: Analyze Architecture (30-60 seconds)
+
+**Actions:**
+- LLMs read main source files (entry points, core modules)
+- Identify system components and their relationships
+- Analyze data flow and interaction patterns
+- Multi-agent consultation (2+ LLMs in parallel)
+- Synthesize findings from multiple perspectives
+
+**Expected Output:**
+```
+🤖 Consulting 2 AI models for architecture analysis...
+   Tools: cursor-agent, gemini
+
+✅ cursor-agent completed (28.3s)
+✅ gemini completed (24.1s)
+
+📊 Analysis complete:
+   - 5 core components identified
+   - 3 data flow patterns documented
+   - 12 source files analyzed
+```
+
+**State Update:**
+`current_step: "generate-architecture-docs"`, `completed_steps: ["initialize", "analyze-architecture"]`
+
+---
+
+#### Step 3: Generate Architecture Docs (20-40 seconds)
+
+**Actions:**
+- Synthesize LLM research findings
+- Create `docs/architecture/overview.md`
+- Create `docs/architecture/components.md`
+- Create `docs/architecture/data-flow.md`
+- Update state file
+
+**Expected Output:**
+```
+📝 Generating architecture documentation...
+
+✅ Created: docs/architecture/overview.md (2.1 KB)
+✅ Created: docs/architecture/components.md (3.4 KB)
+✅ Created: docs/architecture/data-flow.md (1.8 KB)
+
+💾 State updated: 3 architecture docs complete
+```
+
+---
+
+#### Step 4: Generate Guides (40-80 seconds)
+
+**Actions:**
+- Analyze developer workflows and setup procedures
+- Create `docs/guides/getting-started.md`
+- Create `docs/guides/development.md`
+- Create `docs/guides/deployment.md`
+- Update state file
+
+**Expected Output:**
+```
+📝 Generating developer guides...
+
+🤖 Analyzing: Setup procedures, development workflows, deployment...
+
+✅ Created: docs/guides/getting-started.md (4.2 KB)
+✅ Created: docs/guides/development.md (3.1 KB)
+✅ Created: docs/guides/deployment.md (2.5 KB)
+
+💾 State updated: 3 guide docs complete
+```
+
+---
+
+#### Step 5: Generate Reference (30-50 seconds)
+
+**Actions:**
+- Extract API patterns and endpoints
+- Document configuration options
+- Identify common issues and solutions
+- Create reference documentation
+- Update state file
+
+**Expected Output:**
+```
+📝 Generating reference documentation...
+
+✅ Created: docs/reference/api.md (5.3 KB)
+✅ Created: docs/reference/configuration.md (2.8 KB)
+✅ Created: docs/reference/troubleshooting.md (1.9 KB)
+
+💾 State updated: 3 reference docs complete
+```
+
+---
+
+#### Step 6: Finalize (10-15 seconds)
+
+**Actions:**
+- Generate `docs/index.md` with navigation
+- Validate all sections created
+- Mark state as complete
+- Archive state file
+
+**Expected Output:**
+```
+✨ Finalizing documentation...
+
+✅ Created: docs/index.md (navigation index)
+✅ Validated: All 9 documentation files present
+
+📊 Documentation Complete:
+   Total sections: 9 files
+   Total size: 27.1 KB
+   Time elapsed: 2m 45s
+
+📁 Output directory: ./docs
+```
+
+---
+
+### Resumability
+
+If the workflow is interrupted at any step, the state file preserves progress:
+
+```json
+{
+  "current_step": "generate-guides",
+  "completed_steps": ["initialize", "analyze-architecture", "generate-architecture-docs"],
+  "sections_generated": [
+    "docs/architecture/overview.md",
+    "docs/architecture/components.md",
+    "docs/architecture/data-flow.md"
+  ]
+}
+```
+
+**To resume:**
+```bash
+sdd llm-doc resume ./docs
+```
+
+**Resume output:**
+```
+🔄 Resuming documentation generation...
+✅ Found state file (last updated 1 hour ago)
+📋 Progress: 3/9 sections complete (33%)
+▶️  Resuming from: Step 4 (Generate Guides)
+```
+
+The workflow continues from Step 4, skipping already-completed sections.
+
+---
+
+### User Interaction Points
+
+The workflow prompts for user input at key decision points:
+
+**1. Resume Check** (if state file exists)
+```
+Found existing documentation state.
+
+Resume from where you left off? [Y/n]
+```
+
+**2. Project Type Confirmation** (if auto-detection uncertain)
+```
+Detected project type: Web Application
+
+Is this correct? [Y/n]
+> If no: What type of project is this? [library/cli/api/other]
+```
+
+**3. Section Selection** (optional)
+```
+Generate all sections or specific sections only?
+
+1. All sections (recommended)
+2. Architecture only
+3. Guides only
+4. Reference only
+5. Custom selection
+
+Choice [1]:
+```
+
+**4. LLM Tool Failure**
+```
+⚠️  Warning: cursor-agent failed (timeout)
+
+Continue with remaining tools? [Y/n]
+Available: gemini
+```
 
 ---
 
