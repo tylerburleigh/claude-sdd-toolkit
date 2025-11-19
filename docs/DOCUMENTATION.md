@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 09:22:59
+**Generated:** 2025-11-19 09:27:11
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 327
-- **Total Lines:** 114186
+- **Total Lines:** 114217
 - **Total Classes:** 448
 - **Total Functions:** 1470
 - **Avg Complexity:** 4.74
@@ -25,10 +25,10 @@
 ### JAVASCRIPT
 
 - **Files:** 1
-- **Lines:** 270
+- **Lines:** 301
 - **Classes:** 0
 - **Functions:** 7
-- **Avg Complexity:** 2.71
+- **Avg Complexity:** 2.86
 
 ### PYTHON
 
@@ -14795,7 +14795,7 @@ Example:
 ### `async cleanup() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:78`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:80`
 **Complexity:** 3
 
 ---
@@ -24658,8 +24658,8 @@ Returns:
 ### `async main() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:138`
-**Complexity:** 10
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:140`
+⚠️ **Complexity:** 11 (High)
 
 ---
 
@@ -25954,7 +25954,7 @@ Returns:
 ### `async readStdin() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:107`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:109`
 **Complexity:** 2
 
 ---
@@ -27653,7 +27653,7 @@ that will be passed to the provider factory via the `dependencies` keyword.
 ### `setupSignalHandlers() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:92`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:94`
 **Complexity:** 1
 
 ---
@@ -27903,7 +27903,7 @@ Example:
 ### `showHelp() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:31`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:32`
 **Complexity:** 1
 
 ---
@@ -27911,7 +27911,7 @@ Example:
 ### `showVersion() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:63`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:65`
 **Complexity:** 1
 
 ---
