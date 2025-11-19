@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:25:18
+**Generated:** 2025-11-19 17:26:46
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 339
-- **Total Lines:** 119187
-- **Total Classes:** 474
-- **Total Functions:** 1523
+- **Total Files:** 340
+- **Total Lines:** 119510
+- **Total Classes:** 475
+- **Total Functions:** 1527
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -32,10 +32,10 @@
 
 ### PYTHON
 
-- **Files:** 338
-- **Lines:** 118890
-- **Classes:** 474
-- **Functions:** 1516
+- **Files:** 339
+- **Lines:** 119213
+- **Classes:** 475
+- **Functions:** 1520
 - **Avg Complexity:** 4.69
 
 
@@ -992,6 +992,27 @@ Key principles from BMAD:
 - `get_call_count()`
 - `_create_graph_node()`
 - `build_call_graph()`
+
+---
+
+### `DocumentationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:18`
+
+**Description:**
+> Main workflow coordinator for documentation generation.
+
+Ties together:
+- Project structure detection
+- Generator coordination (overview, architecture, component, index)
+- Orchestration with write-as-you-go pattern
+
+**Methods:**
+- `__init__()`
+- `generate_full_documentation()`
+- `_create_shard_generators()`
+- `_project_data_to_dict()`
 
 ---
 
@@ -17889,6 +17910,28 @@ Returns:
 
 ---
 
+### `create_index_data_from_project(project_data, project_description) -> IndexData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:298`
+**Complexity:** 1
+
+**Description:**
+> Create IndexData from ProjectData.
+
+Args:
+    project_data: Project data from scan
+    project_description: Description of the project
+
+Returns:
+    IndexData instance
+
+**Parameters:**
+- `project_data`: ProjectData
+- `project_description`: str
+
+---
+
 ### `create_minimal_spec() -> dict`
 
 **Language:** python
@@ -18065,6 +18108,28 @@ Returns:
 
 **Parameters:**
 - `spec_data`: Dict[str, Any]
+
+---
+
+### `create_project_data_from_scan(project_root, project_name) -> ProjectData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:266`
+**Complexity:** 1
+
+**Description:**
+> Create ProjectData from project scan.
+
+Args:
+    project_root: Root directory of project
+    project_name: Name of the project
+
+Returns:
+    ProjectData instance
+
+**Parameters:**
+- `project_root`: Path
+- `project_name`: str
 
 ---
 
@@ -18667,6 +18732,26 @@ Returns:
 
 **Parameters:**
 - `directory`: Optional[Path]
+
+---
+
+### `detect_project_structure(project_root) -> Dict[str, Any]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:173`
+**Complexity:** 5
+
+**Description:**
+> Detect project structure (monolith, monorepo, multi-part).
+
+Args:
+    project_root: Root directory of project
+
+Returns:
+    Dict with structure information
+
+**Parameters:**
+- `project_root`: Path
 
 ---
 
@@ -28406,6 +28491,28 @@ Returns:
 
 ---
 
+### `scan_project_files(project_root, max_files) -> Dict[str, List[str]]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:210`
+**Complexity:** 8
+
+**Description:**
+> Scan project for key files and source files.
+
+Args:
+    project_root: Root directory of project
+    max_files: Maximum files to return
+
+Returns:
+    Dict with 'key_files' and 'source_files' lists
+
+**Parameters:**
+- `project_root`: Path
+- `max_files`: int
+
+---
+
 ### `set_dependency_resolver(resolver) -> None`
 
 **Language:** python
@@ -37244,6 +37351,25 @@ Returns:
 - `dataclasses.dataclass`
 - `pathlib.Path`
 - `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/main.py`
+
+- `datetime.datetime`
+- `generators.architecture_generator.ArchitectureGenerator`
+- `generators.component_generator.ComponentGenerator`
+- `generators.index_generator.ExistingDoc`
+- `generators.index_generator.IndexData`
+- `generators.index_generator.IndexGenerator`
+- `generators.index_generator.ProjectPart`
+- `generators.overview_generator.OverviewGenerator`
+- `generators.overview_generator.ProjectData`
+- `orchestrator.DocumentationOrchestrator`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Callable`
 - `typing.Dict`
 - `typing.List`
 - `typing.Optional`
