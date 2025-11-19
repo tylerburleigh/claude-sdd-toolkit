@@ -81,85 +81,6 @@ def generate_markdown_report(
     return "\n".join(lines)
 
 
-
-
-def _format_issue(number: int, issue: Dict[str, Any], brief: bool = False) -> List[str]:
-    """Format an issue for display."""
-    lines = []
-
-    flagged_by = ", ".join(issue.get("flagged_by", []))
-
-    lines.append(f"#### {number}. {issue['title']}")
-    lines.append(f"**Severity**: {issue['severity']} | **Flagged by**: {flagged_by}")
-    lines.append("")
-
-    if not brief:
-        if issue.get("description"):
-            lines.append(f"**Description**: {issue['description']}")
-            lines.append("")
-
-        if issue.get("impact"):
-            lines.append(f"**Impact**: {issue['impact']}")
-            lines.append("")
-
-        if issue.get("recommendation"):
-            lines.append(f"**Recommendation**: {issue['recommendation']}")
-            lines.append("")
-
-    return lines
-
-
-def _format_model_summary(model_data: Dict[str, Any]) -> List[str]:
-    """
-    Format individual model response for display.
-
-    Args:
-        model_data: Normalized model response data
-
-    Returns:
-        List of formatted lines
-    """
-    lines = []
-
-    # Check if response is completely empty
-    has_content = (
-        model_data.get("issues") or
-        model_data.get("strengths") or
-        model_data.get("recommendations")
-    )
-
-    if not has_content:
-        lines.append("**Response could not be parsed**")
-        lines.append("")
-        lines.append("The model's response did not contain structured feedback in the expected format.")
-        lines.append("")
-        return lines
-
-    # Key issues
-    if model_data.get("issues"):
-        lines.append("**Key Issues Identified**:")
-        # Show all issues sorted by severity
-        sorted_issues = sorted(
-            model_data["issues"],
-            key=lambda x: {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}.get(x.get("severity", "MEDIUM"), 4)
-        )
-        for issue in sorted_issues:
-            severity = issue.get("severity", "MEDIUM")
-            title = issue.get("title", "Untitled")
-            lines.append(f"- [{severity}] {title}")
-        lines.append("")
-
-    # Key strengths
-    if model_data.get("strengths"):
-        lines.append("**Strengths Noted**:")
-        # Show all strengths
-        for strength in model_data["strengths"]:
-            lines.append(f"- {strength}")
-        lines.append("")
-
-    return lines
-
-
 def generate_json_report(
     consensus: Dict[str, Any],
     spec_id: str,
@@ -185,11 +106,7 @@ def generate_json_report(
         "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "models_consulted": consensus["models"],
         "num_models": consensus["num_models"],
-        # Backward compatibility (deprecated fields)
-        "overall_score": None,
-        "dimension_scores": {},
-        "recommendation": None,
-        # New category-based fields
+        # Category-based feedback fields
         "consensus_level": consensus.get("consensus_level"),
         "critical_blockers": consensus.get("critical_blockers", []),
         "major_suggestions": consensus.get("major_suggestions", []),
