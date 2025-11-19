@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T17:33:03.702565Z",
+  "last_updated": "2025-11-19T17:34:10.846723Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -2455,6 +2455,8 @@
     "task-1-1-4.completed_tasks": "0",
     "completed_date": "2025-11-19T17:32:44.111180Z",
     "actual_hours": 0.162,
-    "git.branch_name": "opencode-provider"
+    "git.branch_name": "opencode-provider",
+    "git.pr_url": "https://github.com/tylerburleigh/claude-sdd-toolkit/pull/29",
+    "git.pr_number": "29"
   }
 }
