@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-18 18:34:39
+**Generated:** 2025-11-19 07:28:15
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113927
+- **Total Lines:** 113844
 - **Total Classes:** 448
-- **Total Functions:** 1465
+- **Total Functions:** 1463
 - **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -10083,42 +10083,6 @@ Returns:
 
 **Parameters:**
 - `seconds`: int
-
----
-
-### `_format_issue(number, issue, brief) -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:86`
-**Complexity:** 5
-
-**Description:**
-> Format an issue for display.
-
-**Parameters:**
-- `number`: int
-- `issue`: Dict[str, Any]
-- `brief`: bool
-
----
-
-### `_format_model_summary(model_data) -> List[str]`
-
-**Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:112`
-**Complexity:** 8
-
-**Description:**
-> Format individual model response for display.
-
-Args:
-    model_data: Normalized model response data
-
-Returns:
-    List of formatted lines
-
-**Parameters:**
-- `model_data`: Dict[str, Any]
 
 ---
 
@@ -21163,7 +21127,7 @@ Returns:
 ### `generate_json_report(consensus, spec_id, spec_title, review_type) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:163`
+**Defined in:** `src/claude_skills/claude_skills/sdd_plan_review/reporting.py:84`
 **Complexity:** 1
 
 **Description:**

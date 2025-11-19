@@ -17,7 +17,7 @@ class TokenMetrics:
     context_length: int
 
     @property
-    def context_percentage(self, max_context: int = 160000) -> float:
+    def context_percentage(self, max_context: int = 155000) -> float:
         """Calculate context usage percentage."""
         return (self.context_length / max_context) * 100 if max_context > 0 else 0.0
 
@@ -35,19 +35,19 @@ def is_clear_command(entry: dict) -> bool:
     Returns:
         True if this entry represents a /clear command
     """
-    if entry.get('type') != 'user':
+    if entry.get("type") != "user":
         return False
 
-    message = entry.get('message', {})
-    content = message.get('content', [])
+    message = entry.get("message", {})
+    content = message.get("content", [])
 
     if not content or not isinstance(content, list):
         return False
 
     for item in content:
         if isinstance(item, dict):
-            text = item.get('text', '')
-            if '<command-name>/clear</command-name>' in text:
+            text = item.get("text", "")
+            if "<command-name>/clear</command-name>" in text:
                 return True
 
     return False
