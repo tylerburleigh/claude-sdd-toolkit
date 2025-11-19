@@ -426,3 +426,146 @@ def test_is_opencode_available_checks_global_binary(monkeypatch: pytest.MonkeyPa
 
         with patch("pathlib.Path.exists", mock_exists):
             assert is_opencode_available() is True
+
+
+def test_provider_parses_multiple_chunks() -> None:
+    """Test that provider correctly aggregates multiple streaming chunks."""
+    chunks = [
+        json.dumps({"type": "chunk", "content": "Part 1 "}),
+        json.dumps({"type": "chunk", "content": "Part 2 "}),
+        json.dumps({"type": "chunk", "content": "Part 3"}),
+        json.dumps({
+            "type": "done",
+            "response": {
+                "text": "Part 1 Part 2 Part 3",
+                "model": "default",
+                "usage": {"prompt_tokens": 10, "completion_tokens": 15, "total_tokens": 25}
+            }
+        }),
+    ]
+
+    stream_chunks: List[str] = []
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
+        runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test", stream=True))
+
+    assert result.content == "Part 1 Part 2 Part 3"
+    assert stream_chunks == ["Part 1 ", "Part 2 ", "Part 3"]
+    assert result.usage.input_tokens == 10
+    assert result.usage.output_tokens == 15
+    assert result.usage.total_tokens == 25
+
+
+def test_provider_handles_missing_token_usage() -> None:
+    """Test that provider handles responses without token usage gracefully."""
+    response = json.dumps({
+        "type": "done",
+        "response": {
+            "text": "Response without usage",
+            "model": "default"
+            # No usage field
+        }
+    })
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=response),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test"))
+
+    assert result.content == "Response without usage"
+    assert result.usage.input_tokens == 0
+    assert result.usage.output_tokens == 0
+    assert result.usage.total_tokens == 0
+
+
+def test_provider_extracts_text_from_done_message_only() -> None:
+    """Test that provider extracts text when only done message is present (no chunks)."""
+    response = json.dumps({
+        "type": "done",
+        "response": {
+            "text": "Complete response",
+            "model": "gpt-5.1-codex-mini",
+            "usage": {"prompt_tokens": 5, "completion_tokens": 10, "total_tokens": 15}
+        }
+    })
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=response),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test"))
+
+    assert result.content == "Complete response"
+    assert result.model_fqn == "opencode:default"
+    assert result.usage.total_tokens == 15
+
+
+def test_provider_handles_empty_chunks_gracefully() -> None:
+    """Test that provider handles empty chunk content without errors."""
+    chunks = [
+        json.dumps({"type": "chunk", "content": ""}),
+        json.dumps({"type": "chunk", "content": "Actual content"}),
+        json.dumps({"type": "chunk", "content": ""}),
+        json.dumps({
+            "type": "done",
+            "response": {
+                "text": "Actual content",
+                "model": "default",
+                "usage": {"prompt_tokens": 5, "completion_tokens": 5, "total_tokens": 10}
+            }
+        }),
+    ]
+
+    stream_chunks: List[str] = []
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(on_stream_chunk=lambda chunk: stream_chunks.append(chunk.content)),
+        runner=lambda *args, **kwargs: FakeProcess(stdout="\n".join(chunks)),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test", stream=True))
+
+    assert result.content == "Actual content"
+    assert stream_chunks == ["", "Actual content", ""]
+
+
+def test_provider_extracts_model_from_response_metadata() -> None:
+    """Test that provider extracts model information from response metadata."""
+    response = json.dumps({
+        "type": "done",
+        "response": {
+            "text": "Response",
+            "model": "gpt-5.1-codex",
+            "usage": {
+                "prompt_tokens": 10,
+                "completion_tokens": 20,
+                "total_tokens": 30,
+            }
+        }
+    })
+
+    provider = OpenCodeProvider(
+        OPENCODE_METADATA,
+        ProviderHooks(),
+        runner=lambda *args, **kwargs: FakeProcess(stdout=response),
+    )
+
+    with patch.object(provider, "_ensure_server_running"):
+        result = provider.generate(GenerationRequest(prompt="test"))
+
+    assert result.usage.metadata == {"model": "gpt-5.1-codex"}
+    assert result.usage.input_tokens == 10
+    assert result.usage.output_tokens == 20
