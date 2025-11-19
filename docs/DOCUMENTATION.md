@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 16:46:26
+**Generated:** 2025-11-19 16:48:58
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 336
-- **Total Lines:** 117900
+- **Total Lines:** 118040
 - **Total Classes:** 465
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 335
-- **Lines:** 117603
+- **Lines:** 117743
 - **Classes:** 465
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
@@ -186,6 +186,8 @@ Based on BMAD architecture template and patterns:
 - `format_architecture_prompt()`
 - `compose_architecture_doc()`
 - `generate_architecture_doc()`
+- `generate_architecture_doc_multi_model()`
+- `_synthesize_multi_model_findings()`
 
 ---
 
