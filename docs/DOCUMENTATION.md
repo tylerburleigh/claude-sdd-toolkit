@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 18:07:08
+**Generated:** 2025-11-19 18:12:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 341
-- **Total Lines:** 119738
+- **Total Lines:** 119751
 - **Total Classes:** 475
 - **Total Functions:** 1529
 - **Avg Complexity:** 4.68
@@ -33,7 +33,7 @@
 ### PYTHON
 
 - **Files:** 340
-- **Lines:** 119441
+- **Lines:** 119454
 - **Classes:** 475
 - **Functions:** 1522
 - **Avg Complexity:** 4.69
@@ -17913,7 +17913,7 @@ Returns:
 ### `create_index_data_from_project(project_data, project_description) -> IndexData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:321`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:325`
 **Complexity:** 1
 
 **Description:**
@@ -18114,7 +18114,7 @@ Returns:
 ### `create_project_data_from_scan(project_root, project_name) -> ProjectData`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:289`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:293`
 **Complexity:** 1
 
 **Description:**
@@ -18738,7 +18738,7 @@ Returns:
 ### `detect_project_structure(project_root) -> Dict[str, Any]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:196`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:200`
 **Complexity:** 5
 
 **Description:**
@@ -24425,8 +24425,8 @@ Args:
 ### `handle_generate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:40`
-⚠️ **Complexity:** 15 (High)
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:41`
+⚠️ **Complexity:** 16 (High)
 
 **Decorators:** `@track_metrics('llm_doc_gen_generate')`
 
@@ -27200,7 +27200,7 @@ Args:
 ### `register_llm_doc_gen(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:154`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:158`
 **Complexity:** 1
 
 **Description:**
@@ -28526,7 +28526,7 @@ Returns:
 ### `scan_project_files(project_root, max_files) -> Dict[str, List[str]]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:233`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/main.py:237`
 **Complexity:** 8
 
 **Description:**
