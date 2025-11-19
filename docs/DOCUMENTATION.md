@@ -1,16 +1,16 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 16:30:58
+**Generated:** 2025-11-19 16:42:39
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 332
-- **Total Lines:** 116908
-- **Total Classes:** 459
-- **Total Functions:** 1518
+- **Total Files:** 335
+- **Total Lines:** 117520
+- **Total Classes:** 463
+- **Total Functions:** 1523
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
 - **High Complexity Functions:**
@@ -32,10 +32,10 @@
 
 ### PYTHON
 
-- **Files:** 331
-- **Lines:** 116611
-- **Classes:** 459
-- **Functions:** 1511
+- **Files:** 334
+- **Lines:** 117223
+- **Classes:** 463
+- **Functions:** 1516
 - **Avg Complexity:** 4.69
 
 
@@ -51,6 +51,17 @@
 
 **Methods:**
 - `to_dict()`
+
+---
+
+### `AIConsultationError`
+
+**Language:** python
+**Inherits from:** `Exception`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:25`
+
+**Description:**
+> Raised when AI consultation fails.
 
 ---
 
@@ -549,6 +560,16 @@ Attributes:
 
 **Description:**
 > Represents a response from a tool consultation.
+
+---
+
+### `ConsultationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:15`
+
+**Description:**
+> Result from AI consultation.
 
 ---
 
@@ -2038,6 +2059,27 @@ Example:
 
 ---
 
+### `OverviewGenerator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py:28`
+
+**Description:**
+> Generates project overview documentation using structured LLM prompts.
+
+Based on research findings from ai_consultation.py and BMAD templates:
+- Structured prompt sections for clarity
+- Limited file lists to manage token budget
+- Separation of research (LLM) from composition (Python)
+
+**Methods:**
+- `__init__()`
+- `format_overview_prompt()`
+- `compose_overview_doc()`
+- `generate_overview()`
+
+---
+
 ### `ParseResult`
 
 **Language:** python
@@ -2521,6 +2563,16 @@ Provides a simple update() method for advancing progress.
 
 **Methods:**
 - `complete()`
+
+---
+
+### `ProjectData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py:14`
+
+**Description:**
+> Structured project data for overview generation.
 
 ---
 
@@ -9531,6 +9583,36 @@ Args:
 - `node_id`: str
 - `before`: Dict[str, Any]
 - `after`: Dict[str, Any]
+
+---
+
+### `_consult_llm_direct(prompt, provider, model, timeout, verbose, start_time) -> ConsultationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:138`
+**Complexity:** 9
+
+**Description:**
+> Direct CLI consultation fallback when provider abstraction unavailable.
+
+Args:
+    prompt: Formatted prompt
+    provider: Provider name
+    model: Model name
+    timeout: Timeout in seconds
+    verbose: Verbose output
+    start_time: Start time for duration tracking
+
+Returns:
+    ConsultationResult
+
+**Parameters:**
+- `prompt`: str
+- `provider`: Optional[str]
+- `model`: Optional[str]
+- `timeout`: int
+- `verbose`: bool
+- `start_time`: float
 
 ---
 
@@ -17178,6 +17260,39 @@ Example:
 
 ---
 
+### `consult_llm(prompt, provider, model, timeout, verbose) -> ConsultationResult`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:60`
+**Complexity:** 7
+
+**Description:**
+> Consult an LLM with the given prompt.
+
+Integrates with existing AI provider abstraction with graceful error handling.
+
+Args:
+    prompt: Formatted prompt for LLM
+    provider: Specific provider to use (auto-selected if None)
+    model: Specific model to use (uses provider default if None)
+    timeout: Timeout in seconds
+    verbose: Enable verbose output
+
+Returns:
+    ConsultationResult with success status and output/error
+
+Raises:
+    AIConsultationError: If consultation fails critically
+
+**Parameters:**
+- `prompt`: str
+- `provider`: Optional[str]
+- `model`: Optional[str]
+- `timeout`: int
+- `verbose`: bool
+
+---
+
 ### `consult_multi_agent(doc_type, prompt, agents, dry_run, verbose, printer, model_override) -> Dict[str, any]`
 
 **Language:** python
@@ -17207,6 +17322,32 @@ Returns:
 - `verbose`: bool
 - `printer`: Optional['PrettyPrinter']
 - `model_override`: Any
+
+---
+
+### `consult_multi_agent(prompt, providers, timeout, verbose) -> Dict[str, ConsultationResult]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:236`
+**Complexity:** 9
+
+**Description:**
+> Consult multiple AI providers in parallel.
+
+Args:
+    prompt: Formatted prompt for LLMs
+    providers: List of providers to use (auto-selected if None)
+    timeout: Timeout in seconds per provider
+    verbose: Enable verbose output
+
+Returns:
+    Dictionary mapping provider names to ConsultationResults
+
+**Parameters:**
+- `prompt`: str
+- `providers`: Optional[list[str]]
+- `timeout`: int
+- `verbose`: bool
 
 ---
 
@@ -21978,6 +22119,23 @@ Returns:
 **Parameters:**
 - `hierarchy`: Dict
 - `node_id`: str
+
+---
+
+### `get_available_providers() -> list[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:31`
+**Complexity:** 4
+
+**Description:**
+> Get list of available AI providers.
+
+Checks for external AI CLI tools that can be used for consultation.
+Falls back to empty list if no providers available.
+
+Returns:
+    List of available provider names
 
 ---
 
@@ -30857,6 +31015,20 @@ a decision needs to be made about what to implement.
 
 ---
 
+### `test_consultation() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py:302`
+**Complexity:** 1
+
+**Description:**
+> Test AI consultation with a simple prompt.
+
+Returns:
+    True if consultation works, False otherwise
+
+---
+
 ### `test_context_compact_and_pretty(tmp_path, monkeypatch) -> None`
 
 **Language:** python
@@ -36842,6 +37014,29 @@ Returns:
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowState`
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowStep`
 - `claude_skills.llm_doc_gen.workflow_engine.WorkflowVariable`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/ai_consultation.py`
+
+- `dataclasses.dataclass`
+- `pathlib.Path`
+- `sys`
+- `typing.Any`
+- `typing.Dict`
+- `typing.Optional`
+- `typing.Tuple`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/generators/__init__.py`
+
+- `overview_generator.OverviewGenerator`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py`
+
+- `dataclasses.dataclass`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py`
 
