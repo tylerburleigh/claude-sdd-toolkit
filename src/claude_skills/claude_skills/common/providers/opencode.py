@@ -131,6 +131,23 @@ class OpenCodeProvider(ProviderContext):
         self._model = self._ensure_model(model or metadata.default_model or self._first_model_id())
         self._server_process: Optional[subprocess.Popen] = None
 
+    def __del__(self) -> None:
+        """Clean up server process on provider destruction."""
+        if self._server_process is not None:
+            try:
+                self._server_process.terminate()
+                # Give it a moment to terminate gracefully
+                try:
+                    self._server_process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    # Force kill if it doesn't terminate
+                    self._server_process.kill()
+            except (OSError, ProcessLookupError):
+                # Process already terminated, ignore
+                pass
+            finally:
+                self._server_process = None
+
     def _prepare_subprocess_env(self, custom_env: Optional[Dict[str, str]]) -> Dict[str, str]:
         """
         Prepare environment variables for subprocess execution.
@@ -224,11 +241,14 @@ class OpenCodeProvider(ProviderContext):
             )
 
         # Start server in background
+        # Prepare environment with API keys and configuration
+        server_env = self._prepare_subprocess_env(self._env)
         try:
             self._server_process = subprocess.Popen(
                 [opencode_binary, "serve"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                env=server_env,  # Pass environment variables to server
                 start_new_session=True,  # Detach from parent
             )
         except (OSError, subprocess.SubprocessError) as e:

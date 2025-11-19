@@ -1,17 +1,17 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 09:27:11
+**Generated:** 2025-11-19 10:12:07
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 327
-- **Total Lines:** 114217
-- **Total Classes:** 448
-- **Total Functions:** 1470
-- **Avg Complexity:** 4.74
+- **Total Files:** 328
+- **Total Lines:** 114708
+- **Total Classes:** 450
+- **Total Functions:** 1473
+- **Avg Complexity:** 4.75
 - **Max Complexity:** 55
 - **High Complexity Functions:**
   - generate_report (55)
@@ -25,18 +25,18 @@
 ### JAVASCRIPT
 
 - **Files:** 1
-- **Lines:** 301
+- **Lines:** 305
 - **Classes:** 0
 - **Functions:** 7
-- **Avg Complexity:** 2.86
+- **Avg Complexity:** 3.0
 
 ### PYTHON
 
-- **Files:** 326
-- **Lines:** 113916
-- **Classes:** 448
-- **Functions:** 1463
-- **Avg Complexity:** 4.75
+- **Files:** 327
+- **Lines:** 114403
+- **Classes:** 450
+- **Functions:** 1466
+- **Avg Complexity:** 4.76
 
 
 ## 🏛️ Classes
@@ -1973,6 +1973,26 @@ Example:
 
 ---
 
+### `OpenCodeProvider`
+
+**Language:** python
+**Inherits from:** `ProviderContext`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:105`
+
+**Description:**
+> ProviderContext implementation backed by the OpenCode AI wrapper.
+
+**Methods:**
+- `__init__()`
+- `_prepare_subprocess_env()`
+- `_first_model_id()`
+- `_ensure_model()`
+- `_is_port_open()`
+- `_ensure_server_running()`
+- `_execute()`
+
+---
+
 ### `ParseResult`
 
 **Language:** python
@@ -2919,6 +2939,20 @@ Attributes:
 
 **Description:**
 > Callable signature used for executing Gemini CLI commands.
+
+**Methods:**
+- `__call__()`
+
+---
+
+### `RunnerProtocol`
+
+**Language:** python
+**Inherits from:** `Protocol`
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:72`
+
+**Description:**
+> Callable signature used for executing Node.js wrapper commands.
 
 **Methods:**
 - `__call__()`
@@ -9591,6 +9625,20 @@ callers understand that provider execution is not yet wired up.
 
 ---
 
+### `_default_runner(command) -> subprocess.CompletedProcess[str]`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:86`
+**Complexity:** 1
+
+**Description:**
+> Invoke the OpenCode wrapper via subprocess.
+
+**Parameters:**
+- `command`: Sequence[str]
+
+---
+
 ### `_dependencies_to_dict(analysis) -> Dict[str, Any]`
 
 **Language:** python
@@ -11728,7 +11776,7 @@ the appropriate backend (Rich Table for RichUi, ASCII table for PlainUi).
 ### `_print_specs_text(specs_info, verbose, printer, ui) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:151`
+**Defined in:** `src/claude_skills/claude_skills/sdd_update/list_specs.py:154`
 ⚠️ **Complexity:** 17 (High)
 
 **Description:**
@@ -12058,7 +12106,7 @@ Returns a tuple of (new_list, removed_flag).
 ### `_render_active_work(specs, session_state) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:190`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:193`
 **Complexity:** 9
 
 **Parameters:**
@@ -12844,7 +12892,7 @@ Returns:
 ### `_write_sdd_config(config_path, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:334`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:337`
 **Complexity:** 2
 
 **Parameters:**
@@ -15243,7 +15291,7 @@ Returns:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:319`
-⚠️ **Complexity:** 16 (High)
+⚠️ **Complexity:** 18 (High)
 
 **Description:**
 > Handler for 'sdd context' command.
@@ -15385,7 +15433,7 @@ Returns:
 ### `cmd_ensure_sdd_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:348`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:351`
 **Complexity:** 4
 
 **Description:**
@@ -15415,7 +15463,7 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:240`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:243`
 **Complexity:** 1
 
 **Description:**
@@ -15717,7 +15765,7 @@ Args:
 ### `cmd_inspect_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:252`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:255`
 **Complexity:** 4
 
 **Description:**
@@ -16175,7 +16223,7 @@ Args:
 ### `cmd_session_summary(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:296`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:299`
 **Complexity:** 4
 
 **Description:**
@@ -17395,6 +17443,26 @@ dependencies/overrides allow callers (or tests) to inject runner/env/binary.
 > Factory used by the provider registry.
 
 dependencies/overrides allow callers (or tests) to inject runner/env/binary.
+
+---
+
+### `create_provider() -> OpenCodeProvider`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:426`
+**Complexity:** 6
+
+**Description:**
+> Factory function for creating OpenCodeProvider instances.
+
+Args:
+    hooks: Provider hooks for callbacks
+    model: Optional model ID override
+    dependencies: Optional dependencies (runner, env, binary)
+    overrides: Optional parameter overrides
+
+Returns:
+    Configured OpenCodeProvider instance
 
 ---
 
@@ -24069,6 +24137,23 @@ Returns:
 
 ---
 
+### `is_opencode_available() -> bool`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode.py:373`
+**Complexity:** 9
+
+**Description:**
+> Check if OpenCode provider dependencies are available.
+
+Verifies:
+1. Node.js runtime is available
+2. Wrapper script exists
+3. node_modules exists with @opencode-ai/sdk
+4. opencode binary exists (for server management)
+
+---
+
 ### `is_quiet_mode(args) -> bool`
 
 **Language:** python
@@ -24658,8 +24743,8 @@ Returns:
 ### `async main() -> None`
 
 **Language:** javascript
-**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:140`
-⚠️ **Complexity:** 11 (High)
+**Defined in:** `src/claude_skills/claude_skills/common/providers/opencode_wrapper.js:139`
+⚠️ **Complexity:** 12 (High)
 
 ---
 
@@ -24679,7 +24764,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:514`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:520`
 **Complexity:** 5
 
 **Description:**
@@ -26167,7 +26252,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:472`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:478`
 **Complexity:** 1
 
 **Description:**
@@ -26464,7 +26549,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:454`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:460`
 **Complexity:** 1
 
 **Description:**
@@ -26517,7 +26602,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:380`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:383`
 **Complexity:** 1
 
 **Description:**
@@ -35545,6 +35630,37 @@ Returns:
 - `os`
 - `registry.register_provider`
 - `subprocess`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Protocol`
+- `typing.Sequence`
+
+### `src/claude_skills/claude_skills/common/providers/opencode.py`
+
+- `__future__.annotations`
+- `base.GenerationRequest`
+- `base.GenerationResult`
+- `base.ModelDescriptor`
+- `base.ProviderCapability`
+- `base.ProviderContext`
+- `base.ProviderExecutionError`
+- `base.ProviderHooks`
+- `base.ProviderMetadata`
+- `base.ProviderStatus`
+- `base.ProviderTimeoutError`
+- `base.ProviderUnavailableError`
+- `base.StreamChunk`
+- `base.TokenUsage`
+- `detectors.detect_provider_availability`
+- `json`
+- `os`
+- `pathlib.Path`
+- `registry.register_provider`
+- `socket`
+- `subprocess`
+- `time`
 - `typing.Any`
 - `typing.Dict`
 - `typing.List`
