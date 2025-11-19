@@ -43,6 +43,7 @@ class TestFixCommandVerbosity:
             'post_status': 'clean',
             'skipped_action_count': 1,
             'backup_path': '/tmp/spec.backup',
+            'remaining_issues': ['issue'],
         }
         result = prepare_output(data, _args(VerbosityLevel.QUIET), FIX_SPEC_ESSENTIAL, FIX_SPEC_STANDARD)
         assert set(result.keys()) == FIX_SPEC_ESSENTIAL

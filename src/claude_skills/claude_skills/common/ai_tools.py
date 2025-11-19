@@ -430,9 +430,10 @@ def build_tool_command(
     - gemini: uses -m for model, -p for prompt
     - codex: uses -m for model, positional arg for prompt
     - cursor-agent: uses --print flag, positional arg for prompt
+    - opencode: uses Node.js wrapper with --model and --prompt flags
 
     Args:
-        tool: Tool name ("gemini", "codex", "cursor-agent")
+        tool: Tool name ("gemini", "codex", "cursor-agent", "opencode")
         prompt: The prompt to include in command
         model: Optional model override
 
@@ -449,6 +450,8 @@ def build_tool_command(
         ['codex', 'exec', '--sandbox', 'read-only', '--json', '-m', 'o1', 'Fix bug']
         >>> build_tool_command("cursor-agent", "Review code", model="composer-1")
         ['cursor-agent', '--print', '--json', '--model', 'composer-1', 'Review code']
+        >>> build_tool_command("opencode", "Generate code", model="default")
+        ['node', 'opencode_wrapper.js', '--model', 'default', '--prompt', 'Generate code']
     """
     if tool == "gemini":
         cmd = ["gemini"]
@@ -484,8 +487,19 @@ def build_tool_command(
         cmd.append(prompt)
         return cmd
 
+    elif tool == "opencode":
+        # NOTE: OpenCode uses Node.js wrapper script, not direct CLI
+        # This command is primarily for compatibility; actual execution uses provider system
+        cmd = ["node"]
+        # Wrapper script path is resolved from provider metadata
+        cmd.append("opencode_wrapper.js")
+        if model:
+            cmd.extend(["--model", model])
+        cmd.extend(["--prompt", prompt])
+        return cmd
+
     else:
-        raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent")
+        raise ValueError(f"Unknown tool: {tool}. Supported: gemini, codex, cursor-agent, opencode")
 
 
 def _cursor_agent_json_flag_error(result: subprocess.CompletedProcess) -> bool:
