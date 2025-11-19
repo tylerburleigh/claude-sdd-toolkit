@@ -176,14 +176,51 @@ async function main() {
     ...payload.config
   });
 
-  // For now, just validate the connection was created
-  console.error('DEBUG: Client connected successfully');
-  console.error('DEBUG: Received payload:', JSON.stringify(payload, null, 2));
+  // Parse model specification
+  const modelConfig = payload.config?.model || 'default-model';
+  let providerID, modelID;
+
+  // Parse model format: "provider:model" or just "model"
+  if (typeof modelConfig === 'string' && modelConfig.includes(':')) {
+    [providerID, modelID] = modelConfig.split(':', 2);
+  } else if (typeof modelConfig === 'object') {
+    providerID = modelConfig.providerID;
+    modelID = modelConfig.modelID;
+  } else {
+    providerID = 'opencode';
+    modelID = modelConfig;
+  }
+
+  // Create session
+  const session = await opcodeClient.session.create();
+
+  // Execute prompt with model and tool restrictions
+  const promptOptions = {
+    model: {
+      providerID: providerID,
+      modelID: modelID
+    },
+    systemPrompt: payload.system_prompt,
+    temperature: payload.config?.temperature,
+    maxTokens: payload.config?.max_tokens
+  };
+
+  // Add tool restrictions if provided
+  if (payload.allowedTools && payload.allowedTools.length > 0) {
+    promptOptions.tools = payload.allowedTools;
+  }
+
+  // Execute the prompt (streaming will be implemented in next task)
+  const response = await session.prompt(payload.prompt, promptOptions);
+
+  // For now, store response for next task (streaming output implementation)
+  console.error('DEBUG: Prompt executed successfully');
+  console.error('DEBUG: Session ID:', session.id);
 
   // Cleanup before exit
   await cleanup();
 
-  // Success - client connected and payload parsed
+  // Success - prompt executed
   process.exit(0);
 }
 
