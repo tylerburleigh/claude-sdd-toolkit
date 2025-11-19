@@ -116,8 +116,19 @@ class DocumentationWorkflow:
 
         # Architecture shard
         def generate_architecture(data: Dict[str, Any]) -> str:
-            success, content = self.architecture_gen.generate_architecture(
-                project_data,
+            # Convert ProjectData to ArchitectureData
+            from .generators.architecture_generator import ArchitectureData
+            arch_data = ArchitectureData(
+                project_name=project_data.project_name,
+                project_type=project_data.project_type,
+                primary_languages=project_data.primary_languages,
+                tech_stack=project_data.tech_stack,
+                file_count=project_data.file_count,
+                total_loc=project_data.total_loc,
+                directory_structure=project_data.directory_structure
+            )
+            success, content = self.architecture_gen.generate_architecture_doc(
+                arch_data,
                 key_files=data.get("key_files", []),
                 llm_consultation_fn=llm_consultation_fn
             )
@@ -129,9 +140,21 @@ class DocumentationWorkflow:
 
         # Component inventory shard
         def generate_components(data: Dict[str, Any]) -> str:
-            success, content = self.component_gen.generate_component_inventory(
-                project_data,
-                source_files=data.get("source_files", []),
+            # Convert ProjectData to ComponentData
+            from .generators.component_generator import ComponentData
+            component_data = ComponentData(
+                project_name=project_data.project_name,
+                project_root=str(self.project_root),
+                is_multi_part=project_data.repository_type in ["monorepo", "multi-part"],
+                complete_source_tree=str(project_data.directory_structure),
+                critical_folders=[],
+                main_entry_point="",
+                file_type_patterns=[],
+                config_files=[]
+            )
+            success, content = self.component_gen.generate_component_doc(
+                component_data,
+                directories_to_analyze=data.get("source_files", []),
                 llm_consultation_fn=llm_consultation_fn
             )
             if not success:
