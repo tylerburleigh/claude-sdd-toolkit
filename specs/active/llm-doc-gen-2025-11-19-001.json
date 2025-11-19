@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T22:21:18.183350Z",
+  "last_updated": "2025-11-19T22:22:57.474129Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 36,
+      "completed_tasks": 37,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -1363,7 +1363,7 @@
         "depends": []
       },
       "total_tasks": 8,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "Generate master index.md and orchestrate shard writing",
         "risk_level": "low"
@@ -1380,7 +1380,7 @@
         "task-4-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1393,14 +1393,14 @@
     "task-4-1": {
       "type": "task",
       "title": "skills/llm-doc-gen/generators/index_generator.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-4-files",
       "children": [
         "task-4-1-1",
         "task-4-1-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "skills/llm-doc-gen/generators/index_generator.py",
         "task_category": "implementation",
@@ -1429,13 +1429,19 @@
     "task-4-1-2": {
       "type": "subtask",
       "title": "Auto-detect and link generated shards",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-4-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Check which shards exist, add '_(To be generated)_' markers for missing"
+        "details": "Check which shards exist, add '_(To be generated)_' markers for missing",
+        "started_at": "2025-11-19T22:21:41.781009Z",
+        "status_note": "Adding auto-detection of generated shards with missing markers",
+        "completed_at": "2025-11-19T22:22:57.463349Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-19T22:22:57.470365Z"
       }
     },
     "task-4-2": {
@@ -2340,10 +2346,19 @@
       "content": "Implemented 7-section BMAD index structure in index_generator.py (461 lines). All sections implemented: 1) Header with project metadata, 2) Project Overview with multi-part structure support, 3) Quick Reference for stack/entry/patterns, 4) Generated Documentation links to all shards, 5) Existing Documentation listing, 6) Getting Started with setup commands, 7) For AI-Assisted Development with navigation guidance. Follows BMAD index-template.md structure exactly.",
       "metadata": {},
       "task_id": "task-4-1-1"
+    },
+    {
+      "timestamp": "2025-11-19T22:22:57.470354Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Auto-detect and link generated shards",
+      "author": "claude-code",
+      "content": "Implemented auto-detection of generated shards with missing markers. Added output_dir parameter to generate_index(), _check_shard_exists() method to check file existence, and _format_doc_link() helper to add \"_(To be generated)_\" markers. Updated _generate_documentation_links() to use auto-detection for all shard links (project-overview, source-tree-analysis, architecture, component-inventory, development-guide, api-contracts, data-models, integration-architecture, deployment-guide, contribution-guide).",
+      "metadata": {},
+      "task_id": "task-4-1-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 67,
+    "progress_percentage": 69,
     "status": "active",
     "current_phase": "phase-4"
   }

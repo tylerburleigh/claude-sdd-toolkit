@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:04:12
+**Generated:** 2025-11-19 17:21:34
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 337
-- **Total Lines:** 118409
-- **Total Classes:** 467
+- **Total Files:** 338
+- **Total Lines:** 118813
+- **Total Classes:** 471
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
@@ -32,9 +32,9 @@
 
 ### PYTHON
 
-- **Files:** 336
-- **Lines:** 118112
-- **Classes:** 467
+- **Files:** 337
+- **Lines:** 118516
+- **Classes:** 471
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
 
@@ -1177,6 +1177,16 @@ Example:
 
 ---
 
+### `ExistingDoc`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:32`
+
+**Description:**
+> Represents existing documentation in the project.
+
+---
+
 ### `FakeProcess`
 
 **Language:** python
@@ -1495,6 +1505,47 @@ Example:
 
 **Methods:**
 - `to_dict()`
+
+---
+
+### `IndexData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:41`
+
+**Description:**
+> Structured data for index.md generation.
+
+---
+
+### `IndexGenerator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:72`
+
+**Description:**
+> Generates index.md following BMAD 7-section structure.
+
+The 7 sections:
+1. Header (project metadata)
+2. Project Overview (description + multi-part structure)
+3. Quick Reference (stack/entry/patterns)
+4. Generated Documentation (links to shards)
+5. Existing Documentation (pre-existing docs)
+6. Getting Started (setup/run/test)
+7. For AI-Assisted Development (navigation guidance)
+
+**Methods:**
+- `__init__()`
+- `generate_index()`
+- `_generate_header()`
+- `_generate_overview()`
+- `_generate_quick_reference()`
+- `_generate_documentation_links()`
+- `_generate_existing_docs()`
+- `_generate_getting_started()`
+- `_generate_ai_guidance()`
+- `_generate_footer()`
 
 ---
 
@@ -2639,6 +2690,16 @@ Provides a simple update() method for advancing progress.
 
 **Description:**
 > Structured project data for overview generation.
+
+---
+
+### `ProjectPart`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:13`
+
+**Description:**
+> Represents a single part in a multi-part project.
 
 ---
 
@@ -37113,6 +37174,15 @@ Returns:
 
 - `dataclasses.dataclass`
 - `dataclasses.field`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py`
+
+- `dataclasses.dataclass`
 - `pathlib.Path`
 - `typing.Any`
 - `typing.Dict`

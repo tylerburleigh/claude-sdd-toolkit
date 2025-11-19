@@ -91,11 +91,13 @@ class IndexGenerator:
             project_root: Root directory of the project
         """
         self.project_root = project_root
+        self.output_dir: Optional[Path] = None
 
     def generate_index(
         self,
         index_data: IndexData,
-        generated_date: str
+        generated_date: str,
+        output_dir: Optional[Path] = None
     ) -> str:
         """
         Generate complete index.md from structured data.
@@ -103,10 +105,15 @@ class IndexGenerator:
         Args:
             index_data: Structured index data
             generated_date: Document generation date
+            output_dir: Optional directory where documentation will be written
+                       (used to check which shards already exist)
 
         Returns:
             Complete index.md content as markdown string
         """
+        # Store output_dir for shard existence checking
+        self.output_dir = output_dir
+
         sections = []
 
         # Section 1: Header
@@ -134,6 +141,42 @@ class IndexGenerator:
         sections.append(self._generate_footer())
 
         return "\n".join(sections)
+
+    def _check_shard_exists(self, filename: str) -> bool:
+        """
+        Check if a documentation shard exists in output directory.
+
+        Args:
+            filename: Name of the documentation file (e.g., 'architecture.md')
+
+        Returns:
+            True if file exists, False otherwise
+        """
+        if self.output_dir is None:
+            return True  # Assume exists if we can't check
+
+        file_path = self.output_dir / filename
+        return file_path.exists()
+
+    def _format_doc_link(self, filename: str, title: str, description: str) -> str:
+        """
+        Format a documentation link with existence marker.
+
+        Args:
+            filename: Name of the documentation file
+            title: Display title for the link
+            description: Description text after the link
+
+        Returns:
+            Formatted markdown link with optional "To be generated" marker
+        """
+        exists = self._check_shard_exists(filename)
+        link = f"[{title}](./{filename})"
+
+        if not exists:
+            link += " _(To be generated)_"
+
+        return f"- {link} - {description}"
 
     def _generate_header(self, data: IndexData, date: str) -> str:
         """Generate Section 1: Header with project metadata."""
@@ -220,25 +263,25 @@ class IndexGenerator:
         lines.append("")
         lines.append("### Core Documentation")
         lines.append("")
-        lines.append("- [Project Overview](./project-overview.md) - Executive summary and high-level architecture")
-        lines.append("- [Source Tree Analysis](./source-tree-analysis.md) - Annotated directory structure")
+        lines.append(self._format_doc_link("project-overview.md", "Project Overview", "Executive summary and high-level architecture"))
+        lines.append(self._format_doc_link("source-tree-analysis.md", "Source Tree Analysis", "Annotated directory structure"))
         lines.append("")
 
         if not data.is_multi_part:
             # Single-part documentation links
-            lines.append("- [Architecture](./architecture.md) - Detailed technical architecture")
+            lines.append(self._format_doc_link("architecture.md", "Architecture", "Detailed technical architecture"))
 
             comp_desc = "Catalog of major components"
             if data.has_ui_components:
                 comp_desc += " and UI elements"
-            lines.append(f"- [Component Inventory](./component-inventory.md) - {comp_desc}")
+            lines.append(self._format_doc_link("component-inventory.md", "Component Inventory", comp_desc))
 
-            lines.append("- [Development Guide](./development-guide.md) - Local setup and development workflow")
+            lines.append(self._format_doc_link("development-guide.md", "Development Guide", "Local setup and development workflow"))
 
             if data.has_api_docs:
-                lines.append("- [API Contracts](./api-contracts.md) - API endpoints and schemas")
+                lines.append(self._format_doc_link("api-contracts.md", "API Contracts", "API endpoints and schemas"))
             if data.has_data_models:
-                lines.append("- [Data Models](./data-models.md) - Database schema and models")
+                lines.append(self._format_doc_link("data-models.md", "Data Models", "Database schema and models"))
         else:
             # Multi-part documentation links
             lines.append("### Part-Specific Documentation")
@@ -248,29 +291,29 @@ class IndexGenerator:
                 for part in data.project_parts:
                     lines.append(f"#### {part.part_name} ({part.part_id})")
                     lines.append("")
-                    lines.append(f"- [Architecture](./architecture-{part.part_id}.md) - Technical architecture for {part.part_name}")
+                    lines.append(self._format_doc_link(f"architecture-{part.part_id}.md", "Architecture", f"Technical architecture for {part.part_name}"))
                     if part.has_components:
-                        lines.append(f"- [Components](./component-inventory-{part.part_id}.md) - Component catalog")
-                    lines.append(f"- [Development Guide](./development-guide-{part.part_id}.md) - Setup and dev workflow")
+                        lines.append(self._format_doc_link(f"component-inventory-{part.part_id}.md", "Components", "Component catalog"))
+                    lines.append(self._format_doc_link(f"development-guide-{part.part_id}.md", "Development Guide", "Setup and dev workflow"))
                     if part.has_api:
-                        lines.append(f"- [API Contracts](./api-contracts-{part.part_id}.md) - API documentation")
+                        lines.append(self._format_doc_link(f"api-contracts-{part.part_id}.md", "API Contracts", "API documentation"))
                     if part.has_data:
-                        lines.append(f"- [Data Models](./data-models-{part.part_id}.md) - Data architecture")
+                        lines.append(self._format_doc_link(f"data-models-{part.part_id}.md", "Data Models", "Data architecture"))
                     lines.append("")
 
             lines.append("### Integration")
             lines.append("")
-            lines.append("- [Integration Architecture](./integration-architecture.md) - How parts communicate")
-            lines.append("- [Project Parts Metadata](./project-parts.json) - Machine-readable structure")
+            lines.append(self._format_doc_link("integration-architecture.md", "Integration Architecture", "How parts communicate"))
+            lines.append(self._format_doc_link("project-parts.json", "Project Parts Metadata", "Machine-readable structure"))
             lines.append("")
 
         # Optional documentation
         lines.append("### Optional Documentation")
         lines.append("")
         if data.has_deployment_guide:
-            lines.append("- [Deployment Guide](./deployment-guide.md) - Deployment process and infrastructure")
+            lines.append(self._format_doc_link("deployment-guide.md", "Deployment Guide", "Deployment process and infrastructure"))
         if data.has_contribution_guide:
-            lines.append("- [Contribution Guide](./contribution-guide.md) - Contributing guidelines and standards")
+            lines.append(self._format_doc_link("contribution-guide.md", "Contribution Guide", "Contributing guidelines and standards"))
         lines.append("")
 
         return "\n".join(lines)
