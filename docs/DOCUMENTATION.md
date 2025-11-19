@@ -1,14 +1,14 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 07:28:15
+**Generated:** 2025-11-19 07:31:14
 
 ---
 
 ## 📊 Project Statistics
 
 - **Total Files:** 326
-- **Total Lines:** 113844
+- **Total Lines:** 113916
 - **Total Classes:** 448
 - **Total Functions:** 1463
 - **Avg Complexity:** 4.75
@@ -4837,7 +4837,7 @@ Attributes:
 ### `TestFormatProgressSummary`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:265`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:264`
 
 **Description:**
 > Test suite for format_progress_summary.
@@ -6598,7 +6598,7 @@ Attributes:
 ### `TestPytestOutputParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:24`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:23`
 
 **Description:**
 > Test suite for PytestOutputParser.
@@ -6628,7 +6628,7 @@ Attributes:
 ### `TestPytestProgressDisplay`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:380`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_run_tests/test_pytest_parser.py:379`
 
 **Description:**
 > Test suite for PytestProgressDisplay.
@@ -9264,7 +9264,7 @@ Args:
 
 **Language:** python
 **Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:107`
-**Complexity:** 8
+**Complexity:** 9
 
 **Parameters:**
 - `project_root`: Path
@@ -12041,7 +12041,7 @@ Returns a tuple of (new_list, removed_flag).
 ### `_render_active_work(specs, session_state) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:183`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:190`
 **Complexity:** 9
 
 **Parameters:**
@@ -12827,7 +12827,7 @@ Returns:
 ### `_write_sdd_config(config_path, printer) -> bool`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:327`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:334`
 **Complexity:** 2
 
 **Parameters:**
@@ -15217,7 +15217,7 @@ Returns:
 ### `cmd_context(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:295`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:319`
 ⚠️ **Complexity:** 16 (High)
 
 **Description:**
@@ -15360,7 +15360,7 @@ Returns:
 ### `cmd_ensure_sdd_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:341`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:348`
 **Complexity:** 4
 
 **Description:**
@@ -15390,7 +15390,7 @@ Returns:
 ### `cmd_find_active_work(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:233`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:240`
 **Complexity:** 1
 
 **Description:**
@@ -15692,7 +15692,7 @@ Args:
 ### `cmd_inspect_config(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:245`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:252`
 **Complexity:** 4
 
 **Description:**
@@ -16128,7 +16128,7 @@ Returns:
 ### `cmd_session_marker(args, printer) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:276`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:299`
 **Complexity:** 1
 
 **Description:**
@@ -16150,7 +16150,7 @@ Args:
 ### `cmd_session_summary(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:289`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:296`
 **Complexity:** 4
 
 **Description:**
@@ -19452,7 +19452,7 @@ Returns:
 ### `find_transcript_by_specific_marker(cwd, marker, max_retries, verbosity_level) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:51`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:53`
 ⚠️ **Complexity:** 19 (High)
 
 **Description:**
@@ -19719,7 +19719,7 @@ Examples:
 Token Savings:
     Typical savings compared to pretty-printed full output:
     - prepare-task: 85-90%
-    - task-info: 70-85%
+    - task-info: 70-75%
     - check-deps: 80-85%
     - progress: 85-90%
     - next-task: 60-70%
@@ -20158,7 +20158,7 @@ Returns:
 ### `format_metrics_human(metrics, max_context, transcript_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:220`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:232`
 **Complexity:** 2
 
 **Description:**
@@ -20179,7 +20179,7 @@ Args:
 ### `format_metrics_json(metrics, max_context, transcript_path, compact) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:250`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:267`
 **Complexity:** 2
 
 **Description:**
@@ -20202,7 +20202,7 @@ Args:
 ### `format_number(n) -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:216`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:227`
 **Complexity:** 1
 
 **Description:**
@@ -21359,7 +21359,7 @@ Returns:
 ### `generate_session_marker() -> str`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:38`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:39`
 **Complexity:** 1
 
 **Description:**
@@ -23366,7 +23366,7 @@ Returns:
 ### `get_transcript_path(args, verbosity_level) -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:176`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:184`
 **Complexity:** 8
 
 **Description:**
@@ -23393,7 +23393,7 @@ Returns:
 ### `get_transcript_path_from_stdin() -> str | None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:148`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:155`
 **Complexity:** 4
 
 **Description:**
@@ -24646,7 +24646,7 @@ Returns:
 ### `main() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:461`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:514`
 **Complexity:** 5
 
 **Description:**
@@ -26115,7 +26115,7 @@ Note:
 ### `register_context(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:420`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:472`
 **Complexity:** 1
 
 **Description:**
@@ -26412,7 +26412,7 @@ Args:
 ### `register_session_marker(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:403`
+**Defined in:** `src/claude_skills/claude_skills/context_tracker/cli.py:454`
 **Complexity:** 1
 
 **Description:**
@@ -26465,7 +26465,7 @@ Args:
 ### `register_start_helper(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:373`
+**Defined in:** `src/claude_skills/claude_skills/cli/skills_dev/start_helper.py:380`
 **Complexity:** 1
 
 **Description:**
