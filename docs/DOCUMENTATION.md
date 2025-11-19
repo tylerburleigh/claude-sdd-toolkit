@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 17:53:19
+**Generated:** 2025-11-19 17:57:51
 
 ---
 
@@ -24425,7 +24425,7 @@ Args:
 ### `handle_generate(args, printer) -> int`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/cli.py:40`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:40`
 ⚠️ **Complexity:** 13 (High)
 
 **Decorators:** `@track_metrics('llm_doc_gen_generate')`
@@ -27200,7 +27200,7 @@ Args:
 ### `register_llm_doc_gen(subparsers, parent_parser) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/cli.py:144`
+**Defined in:** `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py:144`
 **Complexity:** 1
 
 **Description:**
@@ -35915,6 +35915,17 @@ Returns:
 - `pathlib.Path`
 - `sys`
 
+### `src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py`
+
+- `__future__.annotations`
+- `argparse`
+- `claude_skills.cli.sdd.output_utils.prepare_output`
+- `claude_skills.common.PrettyPrinter`
+- `claude_skills.common.metrics.track_metrics`
+- `pathlib.Path`
+- `sys`
+- `typing.Optional`
+
 ### `src/claude_skills/claude_skills/cli/sdd/options.py`
 
 - `argparse`
@@ -37340,17 +37351,6 @@ Returns:
 - `typing.Dict`
 - `typing.Optional`
 - `typing.Tuple`
-
-### `src/claude_skills/claude_skills/llm_doc_gen/cli.py`
-
-- `__future__.annotations`
-- `argparse`
-- `claude_skills.cli.sdd.output_utils.prepare_output`
-- `claude_skills.common.PrettyPrinter`
-- `claude_skills.common.metrics.track_metrics`
-- `pathlib.Path`
-- `sys`
-- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/__init__.py`
 

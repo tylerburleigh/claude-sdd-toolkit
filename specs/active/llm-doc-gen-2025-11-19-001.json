@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T22:55:12.915509Z",
+  "last_updated": "2025-11-19T23:02:15.977405Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 45,
+      "completed_tasks": 46,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -1664,7 +1664,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Wire up skill to sdd command, comprehensive testing",
         "risk_level": "low"
@@ -1681,7 +1681,7 @@
         "task-5-3"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -1715,7 +1715,7 @@
     "task-5-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-5-files",
       "children": [
         "task-5-2-1",
@@ -1727,7 +1727,7 @@
         ]
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py",
         "task_category": "implementation",
@@ -1760,13 +1760,19 @@
     "task-5-2-2": {
       "type": "subtask",
       "title": "Wire to skill main entry point",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Call skills/llm-doc-gen/main.py, handle errors, display progress"
+        "details": "Call skills/llm-doc-gen/main.py, handle errors, display progress",
+        "started_at": "2025-11-19T22:58:00.880521Z",
+        "status_note": "Wiring CLI command to main.py entry point",
+        "completed_at": "2025-11-19T23:02:15.965684Z",
+        "needs_journaling": false,
+        "actual_hours": 0.071,
+        "journaled_at": "2025-11-19T23:02:15.974453Z"
       }
     },
     "task-5-3": {
@@ -2513,10 +2519,19 @@
       "content": "Argument parsing implementation complete in llm_doc_gen_cmd.py.\n\nThe CLI handler includes comprehensive argument parsing:\n- Required: directory (project directory to document)\n- Optional: --output-dir (default: ./docs/llm-generated)\n- Optional: --name (project name, defaults to directory name)\n- Optional: --description (project description)\n- Optional: --batch-size (number of shards per batch, default: 3)\n- Optional: --no-batching (disable batched generation)\n\nAll arguments are properly parsed and passed to DocumentationWorkflow in handle_generate().\n\nLocation: src/claude_skills/claude_skills/cli/sdd/llm_doc_gen_cmd.py (lines 167-194)",
       "metadata": {},
       "task_id": "task-5-2-1"
+    },
+    {
+      "timestamp": "2025-11-19T23:02:15.974445Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Wire to skill main entry point",
+      "author": "claude-code",
+      "content": "Successfully wired the CLI command to the main.py entry point. The implementation was already complete in llm_doc_gen_cmd.py:\n\n- Lines 44-50: Imports DocumentationWorkflow, helper functions, and consult_llm from claude_skills.llm_doc_gen.main\n- Lines 42-141: handle_generate function with comprehensive error handling using try/except\n- Lines 63-125: Progress display using printer.info, printer.success, and printer.error throughout execution\n- Lines 98-104: Calls workflow.generate_full_documentation() which invokes the main entry point\n- Lines 107-134: Detailed result reporting with shard status and file listings\n\nVerification performed:\n1. Import test: All imports from main.py successful\n2. CLI help test: sdd llm-doc-gen --help and sdd llm-doc-gen generate --help both work correctly\n3. End-to-end test: Command successfully executes, calls main.py, and displays error messages properly\n4. Component integration test: All components (handle_generate, DocumentationWorkflow, consult_llm) properly wired\n\nThe wiring is complete and functional.",
+      "metadata": {},
+      "task_id": "task-5-2-2"
     }
   ],
   "metadata": {
-    "progress_percentage": 84,
+    "progress_percentage": 86,
     "status": "active",
     "current_phase": "phase-5"
   }
