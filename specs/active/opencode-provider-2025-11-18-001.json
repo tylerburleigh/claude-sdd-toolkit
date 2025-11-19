@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T14:54:40.686659Z",
+  "last_updated": "2025-11-19T14:56:38.182660Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -17,7 +17,7 @@
         "task-2-1-7"
       ],
       "total_tasks": 41,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "description": "Integrate OpenCode as a new AI provider using Node.js SDK wrapper approach with Python subprocess management",
         "objectives": [
@@ -715,7 +715,7 @@
     "task-2-1-7": {
       "type": "subtask",
       "title": "Implement server lifecycle management",
-      "status": "pending",
+      "status": "completed",
       "parent": "spec-root",
       "children": [],
       "dependencies": {
@@ -728,10 +728,16 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "implementation",
-        "description": "Implement _ensure_server_running() to check if opencode server is active on port. If not, spawn 'opencode serve' (via node_modules/.bin/opencode) in background. Wait for health check."
+        "description": "Implement _ensure_server_running() to check if opencode server is active on port. If not, spawn 'opencode serve' (via node_modules/.bin/opencode) in background. Wait for health check.",
+        "started_at": "2025-11-19T14:55:40.187157Z",
+        "status_note": "Implementing server lifecycle management with port checking and background process spawning",
+        "completed_at": "2025-11-19T14:56:38.175869Z",
+        "needs_journaling": false,
+        "actual_hours": 0.016,
+        "journaled_at": "2025-11-19T14:56:38.181062Z"
       },
       "description": "Implement helper method `_ensure_server_running()`. 1. Check if TCP port 4096 (or configured port) is open using socket connection. 2. If closed, locate `opencode` binary (prefer local node_modules/.bin/opencode, fall back to global). 3. Spawn `opencode serve` as a detached background process. 4. Loop/wait (up to SERVER_STARTUP_TIMEOUT) for port to become active. 5. Store process handle (if possible) or rely on persistent OS process."
     },
@@ -1905,12 +1911,21 @@
       "content": "Implemented OpenCodeProvider class extending ProviderContext. Added RunnerProtocol definition and _default_runner function for subprocess execution with stdin input support. Class __init__ takes metadata, hooks, and optional parameters (model, binary, wrapper_path, runner, env, timeout). Initializes _server_process attribute as Optional[subprocess.Popen] for server lifecycle management. Includes _first_model_id() and _ensure_model() helper methods for model validation. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 72-146, 75 new lines).",
       "metadata": {},
       "task_id": "task-2-1-3"
+    },
+    {
+      "timestamp": "2025-11-19T14:56:38.181057Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement server lifecycle management",
+      "author": "claude-code",
+      "content": "Implemented server lifecycle management with two methods: _is_port_open() checks TCP port availability using socket connection with 1-second timeout. _ensure_server_running() parses port from server URL (default 4096), checks if server is running, searches for opencode binary (node_modules/.bin/opencode first, then global PATH), spawns 'opencode serve' as detached background process, waits up to SERVER_STARTUP_TIMEOUT (30s) for port to open with 0.5s polling interval, handles errors and timeouts with proper cleanup. File: src/claude_skills/claude_skills/common/providers/opencode.py (lines 148-229, 82 new lines).",
+      "metadata": {},
+      "task_id": "task-2-1-7"
     }
   ],
   "metadata": {
     "status": "active",
     "activated_date": "2025-11-19T12:27:21.771722Z",
-    "progress_percentage": 39,
+    "progress_percentage": 41,
     "current_phase": "phase-2",
     "task-1-1-1.completed_tasks": "0",
     "task-1-1-4.completed_tasks": "0"

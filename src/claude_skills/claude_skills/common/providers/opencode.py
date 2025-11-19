@@ -144,3 +144,86 @@ class OpenCodeProvider(ProviderContext):
                 provider=self.metadata.provider_name,
             )
         return candidate
+
+    def _is_port_open(self, port: int, host: str = "localhost") -> bool:
+        """Check if a TCP port is open and accepting connections."""
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(1)
+                result = sock.connect_ex((host, port))
+                return result == 0
+        except (socket.error, OSError):
+            return False
+
+    def _ensure_server_running(self) -> None:
+        """Ensure OpenCode server is running, start if necessary."""
+        # Extract port from server URL (default: 4096)
+        server_url = self._env.get("OPENCODE_SERVER_URL", DEFAULT_SERVER_URL) if self._env else DEFAULT_SERVER_URL
+        try:
+            # Parse port from URL (e.g., "http://localhost:4096" -> 4096)
+            port = int(server_url.split(":")[-1].rstrip("/"))
+        except (ValueError, IndexError):
+            port = 4096
+
+        # Check if server is already running
+        if self._is_port_open(port):
+            return
+
+        # Server not running - need to start it
+        # Look for opencode binary in node_modules/.bin first
+        opencode_binary = None
+        node_modules_bin = Path("node_modules/.bin/opencode")
+
+        if node_modules_bin.exists():
+            opencode_binary = str(node_modules_bin)
+        else:
+            # Fall back to global opencode if available
+            try:
+                result = subprocess.run(
+                    ["which", "opencode"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                    check=False,
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    opencode_binary = result.stdout.strip()
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+        if not opencode_binary:
+            raise ProviderUnavailableError(
+                "OpenCode server not running and 'opencode' binary not found in node_modules/.bin or PATH",
+                provider=self.metadata.provider_name,
+            )
+
+        # Start server in background
+        try:
+            self._server_process = subprocess.Popen(
+                [opencode_binary, "serve"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                start_new_session=True,  # Detach from parent
+            )
+        except (OSError, subprocess.SubprocessError) as e:
+            raise ProviderExecutionError(
+                f"Failed to start OpenCode server: {e}",
+                provider=self.metadata.provider_name,
+            ) from e
+
+        # Wait for server to become available
+        start_time = time.time()
+        while time.time() - start_time < SERVER_STARTUP_TIMEOUT:
+            if self._is_port_open(port):
+                return
+            time.sleep(0.5)
+
+        # Timeout - server didn't start
+        if self._server_process:
+            self._server_process.terminate()
+            self._server_process = None
+
+        raise ProviderTimeoutError(
+            f"OpenCode server failed to start within {SERVER_STARTUP_TIMEOUT} seconds",
+            provider=self.metadata.provider_name,
+        )
