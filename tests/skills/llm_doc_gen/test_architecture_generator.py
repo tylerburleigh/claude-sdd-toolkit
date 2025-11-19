@@ -345,3 +345,157 @@ def test_architecture_data_with_optional_fields():
 
     assert data.detected_patterns == ["api_service"]
     assert data.quality_attributes == ["performance"]
+
+
+def test_generate_architecture_doc_multi_model_success(tmp_path, sample_arch_data):
+    """Test multi-model architecture generation with successful consultations."""
+    from unittest.mock import Mock, patch
+    from claude_skills.llm_doc_gen.ai_consultation import ConsultationResult
+
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["main.py"]
+
+    # Mock consultation results from multiple providers
+    mock_results = {
+        "provider1": ConsultationResult(
+            success=True,
+            output="## Architecture\n\nLayered architecture detected.",
+            tool_used="provider1",
+            duration=1.5
+        ),
+        "provider2": ConsultationResult(
+            success=True,
+            output="## Architecture\n\nMicroservices pattern identified.",
+            tool_used="provider2",
+            duration=2.0
+        )
+    }
+
+    with patch('claude_skills.llm_doc_gen.ai_consultation.consult_multi_agent', return_value=mock_results):
+        success, doc = generator.generate_architecture_doc_multi_model(
+            sample_arch_data,
+            key_files,
+            providers=["provider1", "provider2"],
+            max_files=15
+        )
+
+    assert success is True
+    assert "# TestProject - Architecture Documentation" in doc
+    assert "Multi-Model Architecture Analysis" in doc
+    assert "provider1" in doc
+    assert "provider2" in doc
+    assert "Layered architecture detected" in doc
+    assert "Microservices pattern identified" in doc
+
+
+def test_generate_architecture_doc_multi_model_partial_failure(tmp_path, sample_arch_data):
+    """Test multi-model generation with some providers failing."""
+    from unittest.mock import patch
+    from claude_skills.llm_doc_gen.ai_consultation import ConsultationResult
+
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["main.py"]
+
+    # Mix of successful and failed results
+    mock_results = {
+        "provider1": ConsultationResult(
+            success=True,
+            output="## Architecture Analysis\n\nDetailed findings here.",
+            tool_used="provider1",
+            duration=1.5
+        ),
+        "provider2": ConsultationResult(
+            success=False,
+            output="",
+            error="Connection timeout",
+            tool_used="provider2",
+            duration=120.0
+        )
+    }
+
+    with patch('claude_skills.llm_doc_gen.ai_consultation.consult_multi_agent', return_value=mock_results):
+        success, doc = generator.generate_architecture_doc_multi_model(
+            sample_arch_data,
+            key_files,
+            providers=["provider1", "provider2"]
+        )
+
+    # Should succeed with partial results
+    assert success is True
+    assert "provider1" in doc
+    assert "Detailed findings here" in doc
+
+
+def test_generate_architecture_doc_multi_model_all_fail(tmp_path, sample_arch_data):
+    """Test multi-model generation when all providers fail."""
+    from unittest.mock import patch
+    from claude_skills.llm_doc_gen.ai_consultation import ConsultationResult
+
+    generator = ArchitectureGenerator(tmp_path)
+    key_files = ["main.py"]
+
+    # All failed results
+    mock_results = {
+        "provider1": ConsultationResult(
+            success=False,
+            output="",
+            error="Connection timeout",
+            tool_used="provider1",
+            duration=120.0
+        ),
+        "provider2": ConsultationResult(
+            success=False,
+            output="",
+            error="Service unavailable",
+            tool_used="provider2",
+            duration=120.0
+        )
+    }
+
+    with patch('claude_skills.llm_doc_gen.ai_consultation.consult_multi_agent', return_value=mock_results):
+        success, result = generator.generate_architecture_doc_multi_model(
+            sample_arch_data,
+            key_files
+        )
+
+    # Should fail when all providers fail
+    assert success is False
+    assert "All model consultations failed" in result
+    assert "Connection timeout" in result
+    assert "Service unavailable" in result
+
+
+def test_synthesize_multi_model_findings(tmp_path, sample_arch_data):
+    """Test synthesis of findings from multiple models."""
+    from claude_skills.llm_doc_gen.ai_consultation import ConsultationResult
+
+    generator = ArchitectureGenerator(tmp_path)
+
+    results = {
+        "claude": ConsultationResult(
+            success=True,
+            output="Finding from Claude",
+            tool_used="claude",
+            duration=1.0
+        ),
+        "gemini": ConsultationResult(
+            success=True,
+            output="Finding from Gemini",
+            tool_used="gemini",
+            duration=1.2
+        )
+    }
+
+    synthesis = generator._synthesize_multi_model_findings(results, sample_arch_data)
+
+    # Verify synthesis structure
+    assert "Multi-Model Architecture Analysis" in synthesis
+    assert "2 AI models" in synthesis
+    assert "claude" in synthesis
+    assert "gemini" in synthesis
+    assert "Finding from Claude" in synthesis
+    assert "Finding from Gemini" in synthesis
+    assert "Synthesis Summary" in synthesis
+    assert "Consensus Patterns" in synthesis
+    assert "Unique Insights" in synthesis
+    assert "Recommended Next Steps" in synthesis

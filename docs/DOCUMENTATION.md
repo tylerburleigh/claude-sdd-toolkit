@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 16:42:39
+**Generated:** 2025-11-19 16:46:26
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 335
-- **Total Lines:** 117520
-- **Total Classes:** 463
+- **Total Files:** 336
+- **Total Lines:** 117900
+- **Total Classes:** 465
 - **Total Functions:** 1523
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
@@ -32,9 +32,9 @@
 
 ### PYTHON
 
-- **Files:** 334
-- **Lines:** 117223
-- **Classes:** 463
+- **Files:** 335
+- **Lines:** 117603
+- **Classes:** 465
 - **Functions:** 1516
 - **Avg Complexity:** 4.69
 
@@ -154,6 +154,38 @@ Usage:
 - `fill_prompt()`
 - `list_prompts()`
 - `get_categories()`
+
+---
+
+### `ArchitectureData`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py:15`
+
+**Description:**
+> Structured architecture data for documentation generation.
+
+---
+
+### `ArchitectureGenerator`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py:29`
+
+**Description:**
+> Generates architecture documentation using structured LLM prompts.
+
+Based on BMAD architecture template and patterns:
+- Identifies requirement patterns (e.g., realtime collaboration, ecommerce, SaaS)
+- Detects quality attributes (e.g., high availability, performance, security)
+- Maps architecture decisions to patterns
+- Structured prompts for clarity and token efficiency
+
+**Methods:**
+- `__init__()`
+- `format_architecture_prompt()`
+- `compose_architecture_doc()`
+- `generate_architecture_doc()`
 
 ---
 
@@ -37028,6 +37060,15 @@ Returns:
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/__init__.py`
 
 - `overview_generator.OverviewGenerator`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/generators/architecture_generator.py`
+
+- `dataclasses.dataclass`
+- `pathlib.Path`
+- `typing.Any`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
 
 ### `src/claude_skills/claude_skills/llm_doc_gen/generators/overview_generator.py`
 

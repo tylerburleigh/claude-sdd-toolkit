@@ -378,3 +378,143 @@ class ArchitectureGenerator:
         documentation = self.compose_architecture_doc(findings, arch_data, generated_date)
 
         return True, documentation
+
+    def generate_architecture_doc_multi_model(
+        self,
+        arch_data: ArchitectureData,
+        key_files: List[str],
+        providers: Optional[List[str]] = None,
+        max_files: int = 15,
+        timeout: int = 120,
+        verbose: bool = False
+    ) -> tuple[bool, str]:
+        """
+        Generate architecture documentation using multiple AI models for richer insights.
+
+        Consults multiple models in parallel, synthesizes their findings, and produces
+        a comprehensive architecture document enriched with diverse perspectives.
+
+        Args:
+            arch_data: Structured architecture data
+            key_files: List of key files to analyze
+            providers: List of AI providers to consult (auto-selected if None)
+            max_files: Maximum files to include in prompt
+            timeout: Timeout in seconds per provider
+            verbose: Enable verbose output
+
+        Returns:
+            Tuple of (success: bool, documentation: str)
+        """
+        from datetime import datetime
+
+        # Import multi-agent consultation
+        try:
+            from ..ai_consultation import consult_multi_agent
+        except ImportError:
+            return False, "Multi-agent consultation not available. Install required dependencies."
+
+        # Format prompt
+        prompt = self.format_architecture_prompt(arch_data, key_files, max_files)
+
+        # Consult multiple models
+        results = consult_multi_agent(
+            prompt=prompt,
+            providers=providers,
+            timeout=timeout,
+            verbose=verbose
+        )
+
+        # Check if any consultation succeeded
+        successful_results = {
+            provider: result
+            for provider, result in results.items()
+            if result.success
+        }
+
+        if not successful_results:
+            errors = [f"{p}: {r.error}" for p, r in results.items()]
+            return False, f"All model consultations failed:\n" + "\n".join(errors)
+
+        # Synthesize findings from multiple models
+        synthesized_findings = self._synthesize_multi_model_findings(
+            successful_results,
+            arch_data
+        )
+
+        # Compose final document
+        generated_date = datetime.now().strftime("%Y-%m-%d")
+        documentation = self.compose_architecture_doc(
+            synthesized_findings,
+            arch_data,
+            generated_date
+        )
+
+        return True, documentation
+
+    def _synthesize_multi_model_findings(
+        self,
+        results: Dict[str, Any],
+        arch_data: ArchitectureData
+    ) -> str:
+        """
+        Synthesize findings from multiple AI models into a cohesive analysis.
+
+        Combines insights from different models, highlighting consensus and
+        unique perspectives.
+
+        Args:
+            results: Dictionary mapping provider names to ConsultationResults
+            arch_data: Architecture data for context
+
+        Returns:
+            Synthesized findings as markdown text
+        """
+        synthesis_parts = []
+
+        # Header
+        synthesis_parts.append("## Multi-Model Architecture Analysis")
+        synthesis_parts.append("")
+        synthesis_parts.append(f"This analysis synthesizes insights from {len(results)} AI models:")
+        synthesis_parts.append("")
+        for provider in results.keys():
+            synthesis_parts.append(f"- {provider}")
+        synthesis_parts.append("")
+        synthesis_parts.append("---")
+        synthesis_parts.append("")
+
+        # Individual model findings
+        for provider, result in results.items():
+            synthesis_parts.append(f"### Findings from {provider}")
+            synthesis_parts.append("")
+            synthesis_parts.append(result.output)
+            synthesis_parts.append("")
+            synthesis_parts.append("---")
+            synthesis_parts.append("")
+
+        # Synthesis summary
+        synthesis_parts.append("## Synthesis Summary")
+        synthesis_parts.append("")
+        synthesis_parts.append("### Consensus Patterns")
+        synthesis_parts.append("")
+        synthesis_parts.append("Patterns identified by multiple models:")
+        synthesis_parts.append("")
+        synthesis_parts.append("*(Analyze the findings above to identify common themes)*")
+        synthesis_parts.append("")
+
+        synthesis_parts.append("### Unique Insights")
+        synthesis_parts.append("")
+        synthesis_parts.append("Perspectives unique to specific models:")
+        synthesis_parts.append("")
+        synthesis_parts.append("*(Highlight insights mentioned by only one model)*")
+        synthesis_parts.append("")
+
+        synthesis_parts.append("### Recommended Next Steps")
+        synthesis_parts.append("")
+        synthesis_parts.append("Based on the multi-model analysis:")
+        synthesis_parts.append("")
+        synthesis_parts.append("1. Review consensus patterns for architectural foundation")
+        synthesis_parts.append("2. Investigate unique insights for potential blind spots")
+        synthesis_parts.append("3. Validate findings against actual codebase")
+        synthesis_parts.append("")
+
+        return "\n".join(synthesis_parts)
