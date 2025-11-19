@@ -557,6 +557,112 @@ class StateManager:
             counts[finding_type] = counts.get(finding_type, 0) + 1
         return counts
 
+    def check_resume_available(self) -> bool:
+        """
+        Check if a previous session can be resumed.
+
+        Returns:
+            True if a valid state file exists, False otherwise
+        """
+        if not self.state_exists():
+            return False
+
+        # Try to load the state to verify it's valid
+        state = self.load_state()
+        return state is not None
+
+    def get_resume_info(self) -> Optional[Dict[str, Any]]:
+        """
+        Get information about a resumable session.
+
+        Returns:
+            Dictionary with resume information or None if no valid state exists
+        """
+        if not self.check_resume_available():
+            return None
+
+        state = self.load_state()
+        if state is None:
+            return None
+
+        progress = self.get_progress_summary(state)
+        workflow = self.get_workflow_progress(state)
+
+        # Calculate time since last update
+        from datetime import datetime
+        try:
+            updated = datetime.fromisoformat(state.updated_at)
+            now = datetime.utcnow()
+            time_since_update = (now - updated).total_seconds()
+            hours_ago = time_since_update / 3600
+
+            if hours_ago < 1:
+                time_ago = f"{int(time_since_update / 60)} minutes ago"
+            elif hours_ago < 24:
+                time_ago = f"{int(hours_ago)} hours ago"
+            else:
+                time_ago = f"{int(hours_ago / 24)} days ago"
+        except (ValueError, TypeError):
+            time_ago = "unknown"
+
+        return {
+            'session_id': state.session_id,
+            'project_root': state.project_root,
+            'created_at': state.created_at,
+            'updated_at': state.updated_at,
+            'time_ago': time_ago,
+            'progress': progress,
+            'workflow': workflow,
+            'can_resume': len(self.get_resumable_files(state)) > 0
+        }
+
+    def format_resume_prompt(self) -> str:
+        """
+        Format a user-friendly prompt about resuming a session.
+
+        Returns:
+            Formatted string describing the resumable session, or empty if none exists
+        """
+        info = self.get_resume_info()
+        if info is None:
+            return ""
+
+        progress = info['progress']
+        workflow = info['workflow']
+
+        lines = [
+            "📋 Previous documentation session found:",
+            f"   Session ID: {info['session_id']}",
+            f"   Last updated: {info['time_ago']}",
+            "",
+            "📊 Progress:",
+            f"   Files: {progress['completed']}/{progress['total_files']} completed ({progress['percentage']}%)",
+            f"   Failed: {progress['failed']}, Skipped: {progress['skipped']}, Pending: {progress['pending']}",
+        ]
+
+        if progress['languages']:
+            lines.append(f"   Languages: {', '.join(progress['languages'])}")
+
+        if workflow['current_step']:
+            lines.append(f"   Current step: {workflow['current_step']}")
+
+        if workflow['completed_steps']:
+            lines.append(f"   Completed steps: {', '.join(workflow['completed_steps'])}")
+
+        if workflow['findings_count'] > 0:
+            findings_summary = ', '.join(
+                f"{count} {ftype}" for ftype, count in workflow['findings_by_type'].items()
+            )
+            lines.append(f"   Findings: {findings_summary}")
+
+        lines.append("")
+        if info['can_resume']:
+            lines.append("✅ Session can be resumed")
+        else:
+            lines.append("⚠️  All files processed - session appears complete")
+
+        return "\n".join(lines)
+
 
 def create_state_manager(
     output_folder: str,

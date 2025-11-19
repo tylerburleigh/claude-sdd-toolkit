@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T21:08:32.212840Z",
+  "last_updated": "2025-11-19T21:10:20.736892Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 16,
+      "completed_tasks": 17,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -421,7 +421,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 7,
+      "completed_tasks": 8,
       "metadata": {
         "purpose": "Detect project structure, integrate with code-doc parsers, implement resumability",
         "risk_level": "medium"
@@ -536,7 +536,7 @@
         "depends": []
       },
       "total_tasks": 7,
-      "completed_tasks": 5,
+      "completed_tasks": 6,
       "metadata": {}
     },
     "task-2-3": {
@@ -635,7 +635,7 @@
     "task-2-5": {
       "type": "task",
       "title": "skills/llm-doc-gen/state_manager.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-2-files",
       "children": [
         "task-2-5-1",
@@ -648,7 +648,7 @@
         ]
       },
       "total_tasks": 3,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "file_path": "skills/llm-doc-gen/state_manager.py",
         "task_category": "implementation",
@@ -695,13 +695,19 @@
     "task-2-5-3": {
       "type": "subtask",
       "title": "Implement resume detection and user prompts",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Check for existing state, prompt user to resume or start fresh"
+        "details": "Check for existing state, prompt user to resume or start fresh",
+        "started_at": "2025-11-19T21:08:58.296765Z",
+        "status_note": "Implementing resume detection logic and user prompt helper functions",
+        "completed_at": "2025-11-19T21:10:20.727076Z",
+        "needs_journaling": false,
+        "actual_hours": 0.023,
+        "journaled_at": "2025-11-19T21:10:20.733974Z"
       }
     },
     "task-2-6": {
@@ -1951,10 +1957,19 @@
       "content": "Extended state manager to track workflow progress with timestamps, steps, and findings. Added the following capabilities to DocumentationState:\n- current_step: tracks the current workflow step being executed\n- completed_steps: list of all completed workflow steps\n- step_timestamps: dictionary mapping step names to completion timestamps\n- findings: list of accumulated findings/insights with type, description, step, timestamp, and details\n\nAdded StateManager methods:\n- start_workflow_step(): marks a workflow step as started\n- complete_workflow_step(): marks step as completed, records timestamp\n- add_finding(): records findings/insights with type (insight/warning/error/metric)\n- get_workflow_progress(): retrieves workflow progress metrics\n- _group_findings_by_type(): helper to aggregate findings by type\n\nUpdated state serialization (to_dict/from_dict) to persist workflow data across save/load cycles.\n\nAdded 8 comprehensive tests covering:\n- Starting and completing workflow steps\n- Recording timestamps for completed steps\n- Adding findings with automatic and explicit step association\n- Workflow progress reporting\n- State persistence across save/load\n\nAll 27 tests passing (19 original + 8 new workflow tests).\n\nFiles modified:\n- skills/llm-doc-gen/state_manager.py (added 117 lines of workflow tracking code)\n- skills/llm-doc-gen/test_state_manager.py (added 8 new test methods)\n\nVerification: All tests pass, workflow state persists correctly across save/load operations.",
       "metadata": {},
       "task_id": "task-2-5-2"
+    },
+    {
+      "timestamp": "2025-11-19T21:10:20.733959Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Implement resume detection and user prompts",
+      "author": "claude-code",
+      "content": "Implemented resume detection logic and user prompt helpers for documentation generation resumability. Added three key methods to StateManager:\n\n1. check_resume_available(): Validates if a previous session can be resumed by checking for valid state file\n2. get_resume_info(): Retrieves comprehensive information about resumable session including:\n   - Session metadata (ID, timestamps, time since last update)\n   - Progress summary (files completed/failed/pending, percentage)\n   - Workflow progress (current/completed steps, findings)\n   - Resume capability status (whether resumable files exist)\n3. format_resume_prompt(): Generates user-friendly formatted text prompt displaying session details, progress metrics, workflow state, and resumability status\n\nKey features:\n- Time-aware display (shows 'X minutes/hours/days ago')\n- Handles corrupted state files gracefully (returns False/None)\n- Distinguishes between resumable and completed sessions\n- Rich information display including languages, steps, findings\n\nAdded 9 comprehensive tests covering:\n- Resume availability detection (no state, valid state, corrupted state)\n- Resume info extraction and validation\n- Completed session detection (can_resume=False when no pending files)\n- Prompt formatting for various scenarios\n- Edge cases (no state, all completed)\n\nAll 36 tests passing (27 previous + 9 new resume detection tests).\n\nFiles modified:\n- skills/llm-doc-gen/state_manager.py (added 107 lines for resume detection)\n- skills/llm-doc-gen/test_state_manager.py (added 9 comprehensive test methods)\n\nVerification: All tests pass, resume detection works correctly for empty/valid/corrupted/completed sessions, formatted prompts display all relevant information.",
+      "metadata": {},
+      "task_id": "task-2-5-3"
     }
   ],
   "metadata": {
-    "progress_percentage": 30,
+    "progress_percentage": 32,
     "status": "active",
     "current_phase": "phase-2"
   }

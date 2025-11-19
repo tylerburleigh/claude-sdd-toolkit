@@ -493,6 +493,146 @@ class TestWorkflowTracking:
         assert loaded_state.findings[0]['type'] == "metric"
 
 
+class TestResumeDetection:
+    """Tests for resume detection and user prompts."""
+
+    def test_check_resume_available_no_state(self, state_manager):
+        """Test resume check when no state exists."""
+        assert not state_manager.check_resume_available()
+
+    def test_check_resume_available_with_state(self, state_manager, temp_project_dir):
+        """Test resume check when valid state exists."""
+        state = state_manager.create_new_state(temp_project_dir)
+        state_manager.save_state(state)
+
+        assert state_manager.check_resume_available()
+
+    def test_check_resume_available_corrupted_state(self, state_manager, temp_project_dir):
+        """Test resume check with corrupted state file."""
+        # Create corrupted state file
+        with open(state_manager.state_file, 'w') as f:
+            f.write("{ corrupted json")
+
+        assert not state_manager.check_resume_available()
+
+    def test_get_resume_info_no_state(self, state_manager):
+        """Test getting resume info when no state exists."""
+        info = state_manager.get_resume_info()
+        assert info is None
+
+    def test_get_resume_info_with_state(self, state_manager, temp_project_dir):
+        """Test getting resume info with existing state."""
+        state = state_manager.create_new_state(temp_project_dir, session_id="test_resume")
+        state.total_files = 10
+        state.completed_files = 6
+        state.failed_files = 1
+        state.languages_detected = ["python", "javascript"]
+
+        # Add some workflow data
+        state_manager.start_workflow_step(state, "parsing")
+        state_manager.complete_workflow_step(state, "discovery")
+        state_manager.add_finding(state, "insight", "Found patterns")
+
+        # Add resumable files
+        state.files["pending.py"] = FileProcessingState(
+            file_path="pending.py",
+            status=ProcessingStatus.PENDING
+        )
+
+        state_manager.save_state(state)
+
+        info = state_manager.get_resume_info()
+
+        assert info is not None
+        assert info['session_id'] == "test_resume"
+        assert info['can_resume'] is True
+        assert info['progress']['total_files'] == 10
+        assert info['progress']['completed'] == 6
+        assert info['workflow']['current_step'] == "parsing"
+        assert "discovery" in info['workflow']['completed_steps']
+        assert 'time_ago' in info
+
+    def test_get_resume_info_completed_session(self, state_manager, temp_project_dir):
+        """Test resume info for a completed session."""
+        state = state_manager.create_new_state(temp_project_dir)
+        state.total_files = 2
+        state.completed_files = 2
+
+        # All files completed
+        state.files["file1.py"] = FileProcessingState(
+            file_path="file1.py",
+            status=ProcessingStatus.COMPLETED
+        )
+        state.files["file2.py"] = FileProcessingState(
+            file_path="file2.py",
+            status=ProcessingStatus.COMPLETED
+        )
+
+        state_manager.save_state(state)
+
+        info = state_manager.get_resume_info()
+
+        assert info is not None
+        assert info['can_resume'] is False  # No pending or failed files
+
+    def test_format_resume_prompt_no_state(self, state_manager):
+        """Test formatting resume prompt when no state exists."""
+        prompt = state_manager.format_resume_prompt()
+        assert prompt == ""
+
+    def test_format_resume_prompt_with_state(self, state_manager, temp_project_dir):
+        """Test formatting resume prompt with existing state."""
+        state = state_manager.create_new_state(temp_project_dir, session_id="test_123")
+        state.total_files = 20
+        state.completed_files = 15
+        state.failed_files = 2
+        state.skipped_files = 1
+        state.languages_detected = ["python", "javascript"]
+
+        state_manager.start_workflow_step(state, "generation")
+        state_manager.complete_workflow_step(state, "parsing")
+        state_manager.add_finding(state, "insight", "Pattern detected")
+        state_manager.add_finding(state, "warning", "Large file")
+
+        # Add resumable file
+        state.files["pending.py"] = FileProcessingState(
+            file_path="pending.py",
+            status=ProcessingStatus.PENDING
+        )
+
+        state_manager.save_state(state)
+
+        prompt = state_manager.format_resume_prompt()
+
+        assert prompt != ""
+        assert "test_123" in prompt
+        assert "15/20 completed" in prompt
+        assert "python, javascript" in prompt
+        assert "generation" in prompt  # current step
+        assert "parsing" in prompt  # completed step
+        assert "1 insight, 1 warning" in prompt or "1 warning, 1 insight" in prompt
+        assert "Session can be resumed" in prompt
+
+    def test_format_resume_prompt_completed_session(self, state_manager, temp_project_dir):
+        """Test formatting prompt for completed session."""
+        state = state_manager.create_new_state(temp_project_dir)
+        state.total_files = 5
+        state.completed_files = 5
+
+        # All completed
+        for i in range(5):
+            state.files[f"file{i}.py"] = FileProcessingState(
+                file_path=f"file{i}.py",
+                status=ProcessingStatus.COMPLETED
+            )
+
+        state_manager.save_state(state)
+
+        prompt = state_manager.format_resume_prompt()
+
+        assert "All files processed - session appears complete" in prompt
+
+
 class TestIntegration:
     """Integration tests for full workflows."""
 
