@@ -1,7 +1,7 @@
 {
   "spec_id": "opencode-provider-2025-11-18-001",
   "generated": "2025-11-18T21:52:00Z",
-  "last_updated": "2025-11-19T16:49:19.760549Z",
+  "last_updated": "2025-11-19T17:33:03.702565Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -2447,11 +2447,14 @@
     }
   ],
   "metadata": {
-    "status": "active",
+    "status": "completed",
     "activated_date": "2025-11-19T12:27:21.771722Z",
     "progress_percentage": 97,
     "current_phase": "phase-5",
     "task-1-1-1.completed_tasks": "0",
-    "task-1-1-4.completed_tasks": "0"
+    "task-1-1-4.completed_tasks": "0",
+    "completed_date": "2025-11-19T17:32:44.111180Z",
+    "actual_hours": 0.162,
+    "git.branch_name": "opencode-provider"
   }
 }
