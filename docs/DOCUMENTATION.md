@@ -1,15 +1,15 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 15:06:46
+**Generated:** 2025-11-19 15:09:13
 
 ---
 
 ## 📊 Project Statistics
 
-- **Total Files:** 330
-- **Total Lines:** 116225
-- **Total Classes:** 452
+- **Total Files:** 332
+- **Total Lines:** 116902
+- **Total Classes:** 459
 - **Total Functions:** 1518
 - **Avg Complexity:** 4.68
 - **Max Complexity:** 55
@@ -32,9 +32,9 @@
 
 ### PYTHON
 
-- **Files:** 329
-- **Lines:** 115928
-- **Classes:** 452
+- **Files:** 331
+- **Lines:** 116605
+- **Classes:** 459
 - **Functions:** 1511
 - **Avg Complexity:** 4.69
 
@@ -880,6 +880,29 @@ Supports multiple programming languages.
 
 ---
 
+### `DocumentationWorkflow`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:473`
+
+**Description:**
+> Specialized workflow engine for documentation generation.
+
+Extends WorkflowEngine with documentation-specific protocols and handlers.
+
+**Methods:**
+- `__init__()`
+- `load_workflow()`
+- `_user_handler()`
+- `_discover_inputs_protocol()`
+- `_load_all_matching()`
+- `_load_selective()`
+- `_load_index_guided()`
+- `_advanced_elicitation_protocol()`
+- `execute()`
+
+---
+
 ### `DummyPrinter`
 
 **Language:** python
@@ -983,6 +1006,17 @@ Attributes:
     executive_summary_agent: AI agent to use for summary (None = auto)
     max_insights: Maximum number of insights to include (0 = all)
     insight_severity_threshold: Minimum severity level to include
+
+---
+
+### `ExecutionMode`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:24`
+
+**Description:**
+> Workflow execution modes.
 
 ---
 
@@ -3082,6 +3116,17 @@ Example:
 - `count_all_issues()`
 - `is_valid()`
 - `calculate_completion()`
+
+---
+
+### `StepStatus`
+
+**Language:** python
+**Inherits from:** `Enum`
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:30`
+
+**Description:**
+> Step execution status.
 
 ---
 
@@ -8583,6 +8628,74 @@ Example:
 - `build_category_distribution()`
 - `build_risk_heatmap()`
 - `build_all_visualizations()`
+
+---
+
+### `WorkflowEngine`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:99`
+
+**Description:**
+> Core workflow orchestration engine.
+
+Executes workflows step-by-step with state management, conditional logic,
+and user interaction checkpoints.
+
+**Methods:**
+- `__init__()`
+- `_load_or_create_state()`
+- `_save_state()`
+- `_default_user_handler()`
+- `resolve_variables()`
+- `_resolve_config_refs()`
+- `_resolve_system_variables()`
+- `_resolve_path()`
+- `evaluate_condition()`
+- `execute_step()`
+- `_execute_action()`
+- `_invoke_protocol()`
+- `_invoke_workflow()`
+- `_handle_ask()`
+- `_handle_response_branches()`
+- `_handle_template_output()`
+- `register_protocol()`
+- `execute()`
+- `_load_instructions()`
+
+---
+
+### `WorkflowState`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:63`
+
+**Description:**
+> Maintains workflow execution state for resumability.
+
+**Methods:**
+- `to_dict()`
+- `from_dict()`
+
+---
+
+### `WorkflowStep`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:49`
+
+**Description:**
+> Represents a single workflow step.
+
+---
+
+### `WorkflowVariable`
+
+**Language:** python
+**Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py:40`
+
+**Description:**
+> Represents a workflow variable with value and metadata.
 
 ---
 
@@ -36719,6 +36832,31 @@ Returns:
 - `typing.Optional`
 - `typing.Set`
 - `typing.Tuple`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/__init__.py`
+
+- `claude_skills.llm_doc_gen.workflow_engine.DocumentationWorkflow`
+- `claude_skills.llm_doc_gen.workflow_engine.ExecutionMode`
+- `claude_skills.llm_doc_gen.workflow_engine.StepStatus`
+- `claude_skills.llm_doc_gen.workflow_engine.WorkflowEngine`
+- `claude_skills.llm_doc_gen.workflow_engine.WorkflowState`
+- `claude_skills.llm_doc_gen.workflow_engine.WorkflowStep`
+- `claude_skills.llm_doc_gen.workflow_engine.WorkflowVariable`
+
+### `src/claude_skills/claude_skills/llm_doc_gen/workflow_engine.py`
+
+- `dataclasses.dataclass`
+- `dataclasses.field`
+- `enum.Enum`
+- `json`
+- `pathlib.Path`
+- `re`
+- `typing.Any`
+- `typing.Callable`
+- `typing.Dict`
+- `typing.List`
+- `typing.Optional`
+- `typing.Union`
 
 ### `src/claude_skills/claude_skills/run_tests/cli.py`
 
