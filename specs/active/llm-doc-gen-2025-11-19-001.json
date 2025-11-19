@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T21:26:21.867261Z",
+  "last_updated": "2025-11-19T21:28:04.552355Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -16,7 +16,7 @@
         "phase-5"
       ],
       "total_tasks": 53,
-      "completed_tasks": 22,
+      "completed_tasks": 23,
       "metadata": {
         "description": "Create LLM-based documentation generation skill following BMAD workflow pattern",
         "objectives": [
@@ -865,7 +865,7 @@
     "phase-3": {
       "type": "phase",
       "title": "Core LLM Documentation Generators",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-3-investigation",
@@ -882,7 +882,7 @@
         "depends": []
       },
       "total_tasks": 13,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Implement LLM-powered generators for core documentation shards",
         "risk_level": "medium",
@@ -892,14 +892,18 @@
     "phase-3-investigation": {
       "type": "group",
       "title": "Investigation & Research",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3",
       "children": [
         "task-3-1"
       ],
       "total_tasks": 1,
-      "completed_tasks": 0,
-      "metadata": {},
+      "completed_tasks": 1,
+      "metadata": {
+        "needs_journaling": false,
+        "completed_at": "2025-11-19T21:28:04.528509Z",
+        "journaled_at": "2025-11-19T21:28:04.552321Z"
+      },
       "dependencies": {
         "blocks": [
           "phase-3-files"
@@ -911,7 +915,7 @@
     "task-3-1": {
       "type": "task",
       "title": "Research effective LLM prompting for documentation",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-3-investigation",
       "children": [],
       "dependencies": {
@@ -922,7 +926,7 @@
         ]
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "research",
         "estimated_hours": 2,
@@ -936,7 +940,13 @@
           "Reference Overview Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/project-overview-template.md",
           "Reference Index Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/index-template.md",
           "Reference Deep Dive Template: /Users/tylerburleigh/Downloads/BMAD-METHOD-main/src/modules/bmm/workflows/document-project/templates/deep-dive-template.md"
-        ]
+        ],
+        "started_at": "2025-11-19T21:26:46.046649Z",
+        "status_note": "Researching LLM prompting patterns for documentation generation",
+        "completed_at": "2025-11-19T21:28:04.528121Z",
+        "needs_journaling": false,
+        "actual_hours": 0.022,
+        "journaled_at": "2025-11-19T21:28:04.543271Z"
       }
     },
     "phase-3-files": {
@@ -2079,11 +2089,29 @@
       "content": "All child tasks in phase phase-2 have been completed.",
       "metadata": {},
       "task_id": "phase-2"
+    },
+    {
+      "timestamp": "2025-11-19T21:28:04.543248Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Research effective LLM prompting for documentation",
+      "author": "claude-code",
+      "content": "Research on effective LLM prompting for documentation completed. Key findings:\n\n**Prompt Patterns from ai_consultation.py (claude-sdd-toolkit):**\n- Structured research prompts with clear sections (System Overview, Component Identification, Data Flow, Design Patterns, Technology Stack, Architectural Decisions)\n- Explicit READ-ONLY instructions to prevent tool from writing files\n- Separation of research (AI tool) vs composition (orchestrator)\n- Numbered research findings format with markdown formatting\n- Context summary provided upfront before file list\n- Limited file lists (top 8-10 files) to manage token budget\n\n**BMAD Template Patterns:**\n- Handlebars templates (project-overview-template.md, index-template.md, deep-dive-template.md) for structured output\n- Multi-part project support with conditional sections\n- Progressive disclosure: quick ref \u2192 overview \u2192 deep dive\n- AI-specific guidance sections ('For AI-Assisted Development')\n- Template variables for project classification, tech stack, parts metadata\n\n**Token Budget Management (BMAD workflows):**\n- Batching strategy: process subfolders one at a time, write findings immediately, purge from context\n- State file persistence: cache project_type_id, classification summaries between steps\n- Scan levels: quick (patterns only), deep (critical dirs), exhaustive (all files)\n- Conditional loading: load only needed CSV rows on resume vs all rows on fresh start\n- Memory purging after each step: keep 1-2 sentence summaries, discard detailed findings\n- Immediate writes: validate + write to disk + update state + purge = prevents context overflow\n\n**Application to llm-doc-gen:**\n- Adopt batching+purge pattern for processing large codebases\n- Use structured prompt sections like ai_consultation.py\n- Implement state file for resume capability\n- Create focused prompts per documentation shard type\n- Limit file lists in prompts to top N most relevant files",
+      "metadata": {},
+      "task_id": "task-3-1"
+    },
+    {
+      "timestamp": "2025-11-19T21:28:04.552305Z",
+      "entry_type": "status_change",
+      "title": "Group Completed: Investigation & Research",
+      "author": "claude-code",
+      "content": "All child tasks in group phase-3-investigation have been completed.",
+      "metadata": {},
+      "task_id": "phase-3-investigation"
     }
   ],
   "metadata": {
-    "progress_percentage": 41,
+    "progress_percentage": 43,
     "status": "active",
-    "current_phase": "phase-2"
+    "current_phase": "phase-3"
   }
 }
