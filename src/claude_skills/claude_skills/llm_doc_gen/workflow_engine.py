@@ -138,9 +138,15 @@ class WorkflowEngine:
     def _load_or_create_state(self, workflow_id: str) -> WorkflowState:
         """Load existing state or create new state."""
         if self.state_file and self.state_file.exists():
-            with open(self.state_file, "r") as f:
-                data = json.load(f)
-                return WorkflowState.from_dict(data)
+            try:
+                with open(self.state_file, "r") as f:
+                    content = f.read().strip()
+                    if content:
+                        data = json.loads(content)
+                        return WorkflowState.from_dict(data)
+            except (json.JSONDecodeError, ValueError):
+                # File is empty or invalid JSON, create new state
+                pass
         return WorkflowState(workflow_id=workflow_id)
 
     def _save_state(self):
