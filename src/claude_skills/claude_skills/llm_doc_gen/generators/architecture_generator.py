@@ -2,7 +2,7 @@
 Architecture Generator for LLM-based Documentation.
 
 Generates architecture documentation using LLM prompts based on codebase analysis.
-Implements patterns from ai_consultation.py and BMAD architecture templates.
+Implements patterns from ai_consultation.py.
 Identifies architecture patterns, design decisions, and architecture types.
 """
 
@@ -30,7 +30,7 @@ class ArchitectureGenerator:
     """
     Generates architecture documentation using structured LLM prompts.
 
-    Based on BMAD architecture template and patterns:
+    Capabilities:
     - Identifies requirement patterns (e.g., realtime collaboration, ecommerce, SaaS)
     - Detects quality attributes (e.g., high availability, performance, security)
     - Maps architecture decisions to patterns
@@ -126,7 +126,7 @@ class ArchitectureGenerator:
             prompt_parts.append(f"- `{file}`")
         prompt_parts.append("")
 
-        # Research objectives - structured sections based on BMAD template
+        # Research objectives - structured sections
         prompt_parts.append("## Research Findings to Provide")
         prompt_parts.append("")
 
@@ -267,7 +267,7 @@ class ArchitectureGenerator:
         Compose final architecture document from LLM research findings.
 
         Implements composition layer (separate from LLM research) following
-        BMAD architecture template structure.
+        structured template format.
 
         Args:
             research_findings: Raw research output from LLM

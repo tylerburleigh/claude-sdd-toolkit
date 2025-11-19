@@ -22,7 +22,7 @@ The `Skill(sdd-toolkit:llm-doc-gen)` skill generates comprehensive, navigable do
 - **Sharded documentation** - Organized topic files (architecture/, guides/, reference/) instead of monolithic docs
 - **State-based resumability** - Resume interrupted scans from last checkpoint
 - **Multi-agent consultation** - Parallel LLM queries for comprehensive insights
-- **Workflow orchestration** - BMAD-style step-by-step analysis guided by workflow engine
+- **Workflow orchestration** - Step-by-step analysis guided by workflow engine
 - **Direct source reading** - LLMs read code directly (no AST parsing required)
 - **Research-then-synthesis** - LLMs provide research, main agent composes organized docs
 

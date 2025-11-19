@@ -1,7 +1,7 @@
-# src Documentation
+# claude_skills Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-19 18:12:14
+**Generated:** 2025-11-19 18:29:45
 
 ---
 
@@ -175,7 +175,7 @@ Usage:
 **Description:**
 > Generates architecture documentation using structured LLM prompts.
 
-Based on BMAD architecture template and patterns:
+Capabilities:
 - Identifies requirement patterns (e.g., realtime collaboration, ecommerce, SaaS)
 - Detects quality attributes (e.g., high availability, performance, security)
 - Maps architecture decisions to patterns
@@ -567,7 +567,7 @@ Example:
 **Description:**
 > Generates component inventory documentation using structured LLM prompts.
 
-Based on BMAD source tree template:
+Capabilities:
 - Analyzes directory structure and organization patterns
 - Identifies critical folders and their purposes
 - Describes entry points and file organization
@@ -932,7 +932,7 @@ Supports multiple programming languages.
 **Description:**
 > Orchestrates documentation generation with write-as-you-go pattern.
 
-Key principles from BMAD:
+Key principles:
 1. Write shards immediately to disk
 2. Purge detailed findings from context after writing
 3. Keep only 1-2 sentence summaries in memory
@@ -1573,7 +1573,7 @@ Example:
 **Defined in:** `src/claude_skills/claude_skills/llm_doc_gen/generators/index_generator.py:72`
 
 **Description:**
-> Generates index.md following BMAD 7-section structure.
+> Generates index.md following 7-section structure.
 
 The 7 sections:
 1. Header (project metadata)
@@ -2245,7 +2245,7 @@ Example:
 **Description:**
 > Generates project overview documentation using structured LLM prompts.
 
-Based on research findings from ai_consultation.py and BMAD templates:
+Based on research findings from ai_consultation.py:
 - Structured prompt sections for clarity
 - Limited file lists to manage token budget
 - Separation of research (LLM) from composition (Python)

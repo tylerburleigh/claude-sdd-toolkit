@@ -1,7 +1,7 @@
 {
   "spec_id": "llm-doc-gen-2025-11-19-001",
   "generated": "2025-11-19T18:00:00Z",
-  "last_updated": "2025-11-19T23:18:33.377286Z",
+  "last_updated": "2025-11-19T23:23:54.045551Z",
   "hierarchy": {
     "spec-root": {
       "type": "spec",
@@ -2676,6 +2676,7 @@
   "metadata": {
     "progress_percentage": 100,
     "status": "completed",
-    "current_phase": "phase-5"
+    "current_phase": "phase-5",
+    "git.branch_name": "new-docs-engine"
   }
 }

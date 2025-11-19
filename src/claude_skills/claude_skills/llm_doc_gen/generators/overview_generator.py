@@ -2,7 +2,7 @@
 Overview Generator for LLM-based Documentation.
 
 Generates project overview documentation using LLM prompts based on codebase analysis.
-Implements patterns from ai_consultation.py and BMAD templates.
+Implements patterns from ai_consultation.py.
 """
 
 from pathlib import Path
@@ -29,7 +29,7 @@ class OverviewGenerator:
     """
     Generates project overview documentation using structured LLM prompts.
 
-    Based on research findings from ai_consultation.py and BMAD templates:
+    Based on research findings from ai_consultation.py:
     - Structured prompt sections for clarity
     - Limited file lists to manage token budget
     - Separation of research (LLM) from composition (Python)

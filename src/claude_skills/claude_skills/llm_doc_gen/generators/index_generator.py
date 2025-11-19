@@ -1,7 +1,7 @@
 """
 Index Generator for LLM-based Documentation.
 
-Generates index.md following BMAD 7-section structure with project navigation.
+Generates index.md following 7-section structure with project navigation.
 """
 
 from pathlib import Path
@@ -71,7 +71,7 @@ class IndexData:
 
 class IndexGenerator:
     """
-    Generates index.md following BMAD 7-section structure.
+    Generates index.md following 7-section structure.
 
     The 7 sections:
     1. Header (project metadata)

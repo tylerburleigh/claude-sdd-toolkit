@@ -43,7 +43,7 @@ class ComponentGenerator:
     """
     Generates component inventory documentation using structured LLM prompts.
 
-    Based on BMAD source tree template:
+    Capabilities:
     - Analyzes directory structure and organization patterns
     - Identifies critical folders and their purposes
     - Describes entry points and file organization
@@ -251,7 +251,7 @@ class ComponentGenerator:
         Compose final component inventory document from LLM research findings.
 
         Implements composition layer (separate from LLM research) following
-        BMAD source tree template structure.
+        structured template format.
 
         Args:
             research_findings: Raw research output from LLM

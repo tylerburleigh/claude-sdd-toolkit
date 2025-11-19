@@ -1,7 +1,7 @@
 """
 Documentation Generation Orchestrator.
 
-Implements BMAD write-as-you-go pattern to prevent context exhaustion:
+Implements write-as-you-go pattern to prevent context exhaustion:
 - Generate shards one at a time
 - Write immediately to disk after generation
 - Purge detailed content from context, keep only summaries
@@ -44,7 +44,7 @@ class DocumentationOrchestrator:
     """
     Orchestrates documentation generation with write-as-you-go pattern.
 
-    Key principles from BMAD:
+    Key principles:
     1. Write shards immediately to disk
     2. Purge detailed findings from context after writing
     3. Keep only 1-2 sentence summaries in memory
@@ -297,7 +297,7 @@ class DocumentationOrchestrator:
         """
         Create brief 1-2 sentence summary of shard (for context purging).
 
-        Following BMAD pattern: keep only summary, purge detailed content.
+        Following write-as-you-go pattern: keep only summary, purge detailed content.
 
         Args:
             shard_name: Name of the shard
