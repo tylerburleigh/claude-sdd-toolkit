@@ -29,6 +29,7 @@ from claude_skills.common.providers import (
     TokenUsage,
     resolve_provider,
     get_provider_detector,
+    check_provider_available,
 )
 from claude_skills.common import ai_config
 from claude_skills.common import consultation_limits
@@ -298,11 +299,12 @@ def check_tool_available(
     """
     Check if a tool is available and optionally working.
 
-    Uses shutil.which() for fast PATH lookup. Optionally verifies tool
-    responds to --version flag.
+    Uses both detector-based PATH lookup and provider registry availability checks
+    to ensure comprehensive validation (especially important for SDK-based providers
+    like opencode that require additional dependencies).
 
     Args:
-        tool: Tool name to check (e.g., "gemini", "codex", "cursor-agent")
+        tool: Tool name to check (e.g., "gemini", "codex", "cursor-agent", "opencode")
         check_version: If True, verify tool responds to --version
         timeout: Timeout in seconds for version check (default 5)
 
@@ -317,10 +319,17 @@ def check_tool_available(
         >>> check_tool_available("gemini", check_version=True)
         True
     """
+    # First check using detector (fast PATH-based check)
     detector = get_provider_detector(tool)
     if detector is not None:
-        return detector.is_available(use_probe=check_version)
+        if not detector.is_available(use_probe=check_version):
+            return False
 
+        # Detector passed, but also check provider registry for comprehensive validation
+        # (e.g., opencode needs SDK + wrapper + server, not just node binary)
+        return check_provider_available(tool)
+
+    # Fallback for tools without detectors
     executable = _resolve_tool_executable(tool)
 
     # Quick PATH check

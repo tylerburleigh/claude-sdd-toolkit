@@ -12,6 +12,7 @@ from claude_skills.common import PrettyPrinter
 from claude_skills.common.metrics import track_metrics
 from claude_skills.common.ai_tools import get_enabled_and_available_tools
 from claude_skills.common import ai_config
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.cli.sdd.output_utils import (
     prepare_output,
     RUN_TESTS_CHECK_TOOLS_ESSENTIAL,
@@ -119,7 +120,7 @@ def cmd_check_tools(args: argparse.Namespace, printer: PrettyPrinter) -> int:
 
     if not available_tools:
         printer.warning("No external tools found")
-        printer.info("Install at least one: gemini, codex, or cursor-agent")
+        printer.info(f"Install at least one: {', '.join(ALL_SUPPORTED_TOOLS)}")
         return 1
 
     printer.success(f"Found {len(available_tools)} tool(s):")
@@ -146,7 +147,7 @@ def cmd_consult(args: argparse.Namespace, printer: PrettyPrinter) -> int:
                 if _maybe_json(args, error_payload):
                     return 1
                 printer.error("No external tools found")
-                printer.info("Install at least one: gemini, codex, or cursor-agent")
+                printer.info(f"Install at least one: {', '.join(ALL_SUPPORTED_TOOLS)}")
                 return 1
             tool = available_tools[0]
         return run_consultation(
@@ -301,7 +302,7 @@ Failure types:
     consult_parser.add_argument("--impl-code", help="Path to file containing implementation code, or inline code")
     consult_parser.add_argument("--context", help="Additional context about the issue")
     consult_parser.add_argument("--question", help="Specific question to ask (overrides defaults)")
-    consult_parser.add_argument("--tool", "-t", choices=["gemini", "codex", "cursor-agent", "auto"], default="auto")
+    consult_parser.add_argument("--tool", "-t", choices=ALL_SUPPORTED_TOOLS + ["auto"], default="auto")
     consult_parser.add_argument(
         "--model",
         action="append",

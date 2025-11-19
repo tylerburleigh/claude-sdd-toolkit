@@ -2,8 +2,8 @@
 """
 SDD Plan Review CLI - Multi-model specification review commands.
 
-Uses external AI CLI tools (gemini, codex, cursor-agent) to review specs
-from multiple perspectives and provide actionable feedback.
+Uses external AI CLI tools to review specs from multiple perspectives
+and provide actionable feedback.
 """
 
 import argparse
@@ -24,6 +24,7 @@ from claude_skills.sdd_plan_review import (
 )
 from claude_skills.common.ai_tools import get_enabled_and_available_tools
 from claude_skills.common import ai_config
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.sdd_plan_review.reporting import (
     generate_markdown_report,
     generate_json_report,
@@ -354,7 +355,7 @@ def cmd_review(args, printer):
 
 def cmd_list_tools(args, printer):
     """List available AI CLI tools, respecting enabled configuration."""
-    tools_to_check = ["gemini", "codex", "cursor-agent"]
+    tools_to_check = ALL_SUPPORTED_TOOLS
 
     # Categorize tools based on configuration and availability
     ready = []          # Enabled and executable exists

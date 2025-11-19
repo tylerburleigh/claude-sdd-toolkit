@@ -13,16 +13,16 @@ tools:
     enabled: true
   cursor-agent:
     command: cursor-agent
-    enabled: false
+    enabled: true
   codex:
     command: codex
-    enabled: true
+    enabled: false
   claude:
     command: claude
-    enabled: false
+    enabled: true
   opencode:
     command: opencode
-    enabled: false
+    enabled: true
 
 models:
   gemini:
@@ -42,7 +42,7 @@ models:
       - haiku
   opencode:
     priority:
-      - gpt-5.1-codex-mini
+      - openai/gpt-5.1-codex-mini
 
 # Tool/provider fallback priority (consulted in order if earlier tools fail)
 tool_priority:
@@ -83,7 +83,7 @@ run-tests:
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on failure type
     #overrides:
     #  failure_type:
@@ -110,7 +110,7 @@ code-doc:
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: haiku
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on documentation type
     #overrides:
     #  doc_type:
@@ -135,7 +135,7 @@ sdd-plan-review:
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on review type
     #overrides:
     #  review_type:
@@ -162,7 +162,7 @@ sdd-render:
     cursor-agent: composer-1
     codex: gpt-5-codex-mini
     claude: haiku
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
     # Contextual overrides: use specific models based on feature
     #overrides:
     #  feature:
@@ -189,7 +189,7 @@ sdd-fidelity-review:
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
 
 consensus:
   agents:
@@ -203,7 +203,7 @@ consensus:
     cursor-agent: composer-1
     codex: gpt-5-codex
     claude: sonnet
-    opencode: gpt-5.1-codex-mini
+    opencode: openai/gpt-5.1-codex-mini
   auto_trigger:
     default: false
     assertion: true

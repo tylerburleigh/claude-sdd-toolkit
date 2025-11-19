@@ -18,6 +18,7 @@ from claude_skills.common.ai_tools import (
     get_enabled_and_available_tools,
 )
 from claude_skills.common import ai_config
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.common import consultation_limits
 
 
@@ -479,10 +480,9 @@ def run_consultation(
         printer = PrettyPrinter()
 
     # Validate tool
-    known_tools = ["gemini", "codex", "cursor-agent"]
-    if tool not in known_tools:
+    if tool not in ALL_SUPPORTED_TOOLS:
         printer.error(f"Unknown tool '{tool}'")
-        printer.info(f"Available tools: {', '.join(known_tools)}")
+        printer.info(f"Available tools: {', '.join(ALL_SUPPORTED_TOOLS)}")
         return 1
 
     # Validate prompt
@@ -615,7 +615,7 @@ def consult_with_auto_routing(
         if routing_plan:
             print(f"Needed: {', '.join(routing_plan)}")
         else:
-            print("Needed: gemini, codex, cursor-agent")
+            print(f"Needed: {', '.join(ALL_SUPPORTED_TOOLS)}")
         print("Available: none")
         return 1
 
@@ -627,7 +627,7 @@ def consult_with_auto_routing(
             if routing_plan:
                 print(f"Needed: {', '.join(routing_plan)}")
             else:
-                print("Needed: gemini, codex, cursor-agent")
+                print(f"Needed: {', '.join(ALL_SUPPORTED_TOOLS)}")
             print(f"Available: {', '.join(available_tools)}" if available_tools else "Available: none")
             return 1
     else:

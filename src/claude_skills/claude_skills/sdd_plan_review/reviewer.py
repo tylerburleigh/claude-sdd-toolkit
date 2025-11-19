@@ -2,9 +2,9 @@
 """
 Multi-model review orchestration for sdd-plan-review.
 
-Orchestrates parallel execution of AI CLI tools (gemini, codex, cursor-agent)
-for specification review. Uses shared implementations from common.ai_tools for
-tool detection and execution, with response synthesis and consensus building.
+Orchestrates parallel execution of AI CLI tools for specification review.
+Uses shared implementations from common.ai_tools for tool detection and
+execution, with response synthesis and consensus building.
 """
 
 import subprocess

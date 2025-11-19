@@ -28,6 +28,7 @@ from claude_skills.common.ai_tools import (
     get_enabled_and_available_tools,
     check_tool_available
 )
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common.sdd_config import get_default_format, get_json_compact
 from claude_skills.common.json_output import output_json
@@ -248,7 +249,7 @@ def _handle_fidelity_review(args: argparse.Namespace, printer=None) -> int:
             )
         except NoToolsAvailableError as e:
             print(f"Error: {e}", file=sys.stderr)
-            print("Tip: Install AI consultation tools (gemini, codex, or cursor-agent)", file=sys.stderr)
+            print(f"Tip: Install AI consultation tools ({', '.join(ALL_SUPPORTED_TOOLS)})", file=sys.stderr)
             return 1
         except ConsultationTimeoutError as e:
             print(f"Error: {e}", file=sys.stderr)
@@ -438,7 +439,7 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
     try:
         # Detect tools that are both enabled and available
         ready_tools = get_enabled_and_available_tools("sdd-fidelity-review")
-        all_tools = ["gemini", "codex", "cursor-agent"]
+        all_tools = ALL_SUPPORTED_TOOLS
 
         # Categorize tools based on configuration and availability
         tool_status = []
@@ -524,7 +525,7 @@ def _handle_list_review_tools(args: argparse.Namespace, printer=None) -> int:
                     print("Hint: Some tools are disabled - enable them in .claude/ai_config.yaml")
                 else:
                     print("No AI consultation tools found.")
-                    print("Install at least one: gemini, codex, or cursor-agent")
+                    print(f"Install at least one: {', '.join(ALL_SUPPORTED_TOOLS)}")
             elif hasattr(args, 'verbose') and args.verbose:
                 print("\nUsage:")
                 print("  Use --ai-tools to specify which tools to consult")
@@ -583,7 +584,7 @@ def register_fidelity_review_command(subparsers: argparse._SubParsersAction, par
     parser.add_argument(
         "--ai-tools",
         nargs="+",
-        choices=["gemini", "codex", "cursor-agent"],
+        choices=ALL_SUPPORTED_TOOLS,
         metavar="TOOL",
         help="AI tools to consult (default: all available)"
     )
@@ -663,7 +664,7 @@ def register_list_review_tools_command(subparsers: argparse._SubParsersAction, p
         "list-review-tools",
         parents=parents,
         help="List available AI consultation tools",
-        description="Show which AI tools (gemini, codex, cursor-agent) are available for fidelity review",
+        description=f"Show which AI tools ({', '.join(ALL_SUPPORTED_TOOLS)}) are available for fidelity review",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 

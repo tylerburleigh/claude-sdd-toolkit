@@ -249,6 +249,26 @@ def available_providers(*, include_unavailable: bool = False) -> List[str]:
     return [reg.provider_id for reg in providers if reg.is_available()]
 
 
+def check_provider_available(provider_id: str) -> bool:
+    """
+    Check if a provider is available using its registered availability check.
+
+    Args:
+        provider_id: Provider identifier (e.g., "opencode", "gemini")
+
+    Returns:
+        True if provider is registered and passes its availability check
+
+    Example:
+        >>> check_provider_available("opencode")
+        True
+    """
+    registration = _REGISTRY.get(provider_id)
+    if registration is None:
+        return False
+    return registration.is_available()
+
+
 def resolve_provider(
     provider_id: str,
     *,
@@ -345,6 +365,7 @@ __all__ = [
     "register_provider",
     "register_lazy_provider",
     "available_providers",
+    "check_provider_available",
     "resolve_provider",
     "get_provider_metadata",
     "describe_providers",

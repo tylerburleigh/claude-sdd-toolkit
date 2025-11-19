@@ -45,6 +45,10 @@ DEFAULT_TOOLS = {
     }
 }
 
+# Canonical list of all supported AI tools/providers
+# This is the single source of truth for tool names across the toolkit
+ALL_SUPPORTED_TOOLS = ["gemini", "cursor-agent", "codex", "claude", "opencode"]
+
 DEFAULT_MODELS = {
     "gemini": {
         "priority": ["gemini-2.5-flash", "gemini-2.5-pro", "pro"]
@@ -729,7 +733,7 @@ def get_agent_priority(skill_name: str, default_order: Optional[List[str]] = Non
             return consultation_config['agent_priority']
 
     # Use provided default or sensible fallback
-    return default_order or ['gemini', 'cursor-agent', 'codex']
+    return default_order or ALL_SUPPORTED_TOOLS
 
 
 def get_agent_command(

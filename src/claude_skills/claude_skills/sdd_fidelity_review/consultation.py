@@ -18,6 +18,7 @@ from claude_skills.common import ai_tools
 from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 from claude_skills.common.progress import ProgressEmitter
 from claude_skills.common import ai_config
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.common import consultation_limits
 
 # Import cache modules with fallback
@@ -674,7 +675,7 @@ def consult_ai_on_fidelity(
             if not available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
-                    "Please install: gemini, codex, or cursor-agent"
+                    f"Please install: {', '.join(ALL_SUPPORTED_TOOLS)}"
                 )
             tool = available_tools[0]
             logger.info(f"Using detected tool: {tool}")
@@ -794,7 +795,7 @@ def consult_multiple_ai_on_fidelity(
             if not all_available_tools:
                 raise NoToolsAvailableError(
                     "No AI consultation tools available. "
-                    "Please install: gemini, codex, or cursor-agent"
+                    f"Please install: {', '.join(ALL_SUPPORTED_TOOLS)}"
                 )
 
             # Filter to only tools that are BOTH available AND enabled

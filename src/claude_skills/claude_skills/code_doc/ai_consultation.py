@@ -1,8 +1,8 @@
 """
 AI Consultation for Documentation Generation
 
-Shells out to external AI CLI tools (gemini, codex, cursor-agent) to generate
-contextual documentation (ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
+Shells out to external AI CLI tools to generate contextual documentation
+(ARCHITECTURE.md, AI_CONTEXT.md) based on structural analysis.
 
 Uses shared AI tool utilities from claude_skills.common.ai_tools and the
 provider abstraction so consultations are routed through a consistent
@@ -27,6 +27,7 @@ from claude_skills.common.ai_tools import (
     ToolStatus,
 )
 from claude_skills.common import ai_config
+from claude_skills.common.ai_config import ALL_SUPPORTED_TOOLS
 from claude_skills.common import consultation_limits
 
 # =============================================================================
@@ -419,12 +420,11 @@ def run_consultation(
     Returns:
         Tuple of (success: bool, output: str)
     """
-    known_tools = {"gemini", "codex", "cursor-agent"}
     resolved_model = get_model_for_tool(tool, doc_type=doc_type, override=model_override)
     timeout = ai_config.get_timeout("code-doc", "consultation")
 
-    if tool not in known_tools:
-        return False, f"Unknown tool '{tool}'. Available tools: gemini, codex, cursor-agent"
+    if tool not in ALL_SUPPORTED_TOOLS:
+        return False, f"Unknown tool '{tool}'. Available tools: {', '.join(ALL_SUPPORTED_TOOLS)}"
 
     if dry_run:
         model_note = f"model={resolved_model}" if resolved_model else "default model"
@@ -480,8 +480,8 @@ def run_consultation(
         message = f"{tool} timed out after {timeout} seconds"
     elif response.status == ToolStatus.NOT_FOUND:
         message = (
-            f"{tool} not found. Install gemini, codex, or cursor-agent "
-            "and ensure they are on PATH."
+            f"{tool} not found. Install one of {', '.join(ALL_SUPPORTED_TOOLS)} "
+            "and ensure it is on PATH."
         )
     else:
         message = response.error or f"{tool} consultation failed (status={response.status.value})"
