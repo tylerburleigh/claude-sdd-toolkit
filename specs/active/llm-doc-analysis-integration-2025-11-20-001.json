@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-analysis-integration-2025-11-20-001",
   "title": "Integrate Codebase Analysis into LLM Documentation Generation",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-20T23:53:00.433375Z",
+  "last_updated": "2025-11-20T23:54:09.268869Z",
   "metadata": {
     "description": "Integrate codebase.json analysis data into AI consultant prompts for llm-doc-gen to improve documentation quality through structural insights, complexity metrics, and cross-reference information.",
     "objectives": [
@@ -21,7 +21,7 @@
       "Token budgets of 250-450 tokens per generator are acceptable overhead"
     ],
     "revision_history": [],
-    "progress_percentage": 4,
+    "progress_percentage": 6,
     "status": "active",
     "current_phase": "phase-1"
   },
@@ -40,7 +40,7 @@
         "phase-6"
       ],
       "total_tasks": 46,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {}
     },
     "phase-1": {
@@ -53,7 +53,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 6,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "Understand existing infrastructure and design integration approach based on multi-model consensus feedback",
         "risk_level": "low"
@@ -78,7 +78,7 @@
         "task-1-4"
       ],
       "total_tasks": 4,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -159,7 +159,7 @@
     "task-1-3": {
       "type": "task",
       "title": "Define metrics to extract based on consensus feedback",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-1-investigation",
       "children": [],
       "dependencies": {
@@ -171,7 +171,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "task_category": "decision",
         "estimated_hours": 1,
@@ -180,7 +180,13 @@
           "Priority 2 metrics: Instantiated classes, module complexity ranking",
           "New metrics from consensus: Fan-out analysis, dependency clusters",
           "Per-generator focus areas (architecture vs component vs overview)"
-        ]
+        ],
+        "started_at": "2025-11-20T23:53:28.553627Z",
+        "status_note": "Defining priority metrics for analysis insights",
+        "completed_at": "2025-11-20T23:54:09.263823Z",
+        "needs_journaling": false,
+        "actual_hours": 0.011,
+        "journaled_at": "2025-11-20T23:54:09.267414Z"
       }
     },
     "task-1-4": {
@@ -1555,6 +1561,15 @@
       "content": "Reviewed existing doc_query capabilities and workflows to identify reusable components for llm-doc-gen integration.\n\nCore Query Capabilities (doc_query_lib.py):\n1. Basic entity queries: find_class, find_function, find_module, list_* methods\n2. Cross-reference queries (Schema v2.0): get_callers, get_callees, get_call_count, build_call_graph\n3. Complexity analysis: get_high_complexity, complexity statistics in module summaries\n4. Dependency tracking: get_dependencies, module-level dependency mapping\n5. Context gathering: get_context_for_area, describe_module, search_entities\n\nAdvanced Workflows:\n1. Impact Analysis (workflows/impact_analysis.py) - Calculate blast radius for code changes\n2. Refactor Candidates (workflows/refactor_candidates.py) - Prioritize tech debt\n3. Data Lifecycle Tracing (workflows/trace_data.py) - Track class usage\n4. Execution Flow Tracing (workflows/trace_entry.py) - Call chain traversal\n\nCapabilities Reusable for llm-doc-gen:\n\u2705 Already compatible (use as-is): All basic query methods, cross-reference queries, dependency tracking, context gathering\n\u2705 Highly reusable (minimal adaptation): Impact analysis, refactor candidate detection, layer detection logic, complexity analysis\n\u2705 Conceptually reusable (needs redesign): Data lifecycle tracing, execution flow tracing, risk assessment algorithms\n\nGaps to Fill:\n1. Missing from doc_query: AI-powered narrative generation, markdown documentation generation, project overview generation, architecture pattern detection, component relationship visualization, tutorial/guide generation\n2. Integration opportunities: llm-doc-gen can leverage doc_query workflows for Insights sections (Impact analysis \u2192 Change Impact insights, Refactor candidates \u2192 Tech Debt insights, Complexity hot spots \u2192 Complexity Warnings, Call graphs \u2192 Dependency Visualizations)\n\nArchitecture insight: doc_query is a pure query engine providing data retrieval without AI/narrative generation. This makes it perfect for integration - llm-doc-gen can use doc_query methods to gather structured data, then feed that data to AI models for narrative generation.\n\nFiles reviewed:\n- src/claude_skills/claude_skills/doc_query/doc_query_lib.py (1724 lines)\n- src/claude_skills/claude_skills/doc_query/workflows/impact_analysis.py (767 lines)\n- src/claude_skills/claude_skills/doc_query/workflows/refactor_candidates.py (521 lines)\n- src/claude_skills/claude_skills/doc_query/workflows/trace_data.py (604 lines)\n- src/claude_skills/claude_skills/doc_query/workflows/trace_entry.py (462 lines)\n\nNo code changes made - this was an investigation task only.",
       "metadata": {},
       "task_id": "task-1-2"
+    },
+    {
+      "timestamp": "2025-11-20T23:54:09.267404Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define metrics to extract based on consensus feedback",
+      "author": "claude-code",
+      "content": "Defined comprehensive metrics to extract for analysis insights, organized by priority and generator focus.\n\n**Priority 1 Metrics** (Implement First):\n1. Most Called Functions (Hotspots) - Sort by call_count from schema v2.0\n2. High Complexity Functions - Filter by complexity >= 10\n3. Entry Points - Functions with zero callers or heuristic-based detection\n4. Cross-Module Dependencies - Count and cycle detection\n\n**Priority 2 Metrics** (Implement After Core):\n5. Instantiated Classes - Sort by instantiation_count\n6. Module Complexity Ranking - Aggregate function complexities per module\n7. Fan-Out Analysis - Flag functions calling >5 others\n8. Dependency Clusters - Detect tightly coupled module groups\n9. Impact Radius - Bidirectional blast radius analysis\n10. Refactor Priority Score - Complexity \u00d7 dependent_count\n\n**Per-Generator Focus**:\n- Architecture Generator: Cross-module dependencies, module complexity, dependency clusters, most called functions\n- Component Generator: High complexity functions, instantiated classes, fan-out analysis, impact radius\n- Overview Generator: Entry points, refactor priority score, top-level statistics\n\n**Implementation Strategy**:\n- All metrics computed from schema v2.0 (no additional parsing)\n- Reuse workflows from doc_query as libraries\n- Compute during documentation generation with caching in analysis_insights.py module\n- Metrics provide data for AI prompts, AI generators create narrative\n\n**Decision rationale**: Priority 1 focuses on most valuable insights (complexity, entry points, dependencies, call frequency). Priority 2 and advanced metrics add depth without overwhelming users. Clear implementation guidance for tasks 2-1 (analysis_cache) and 1-4 (module architecture).",
+      "metadata": {},
+      "task_id": "task-1-3"
     }
   ]
 }
