@@ -77,9 +77,24 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
         if args.resume:
             printer.info("Resume mode: Will continue from previous state if available")
 
+        # Handle cache options
+        cache_dir = None
+        if getattr(args, 'cache', False) or getattr(args, 'cache_dir', None):
+            # Use specified cache_dir or default
+            cache_dir = Path(getattr(args, 'cache_dir', None) or './.doc-cache')
+            printer.info(f"Cache enabled: {cache_dir}")
+
+            # Clear cache if requested
+            if getattr(args, 'clear_cache', False):
+                from claude_skills.llm_doc_gen.analysis.optimization.cache import PersistentCache
+                if cache_dir.exists():
+                    cache = PersistentCache(cache_dir)
+                    cache.clear()
+                    printer.info(f"Cache cleared at {cache_dir}")
+
         # Create project data from scan
         printer.info("Scanning project...")
-        project_data = create_project_data_from_scan(project_root, project_name, output_dir)
+        project_data = create_project_data_from_scan(project_root, project_name, output_dir, cache_dir)
 
         # Create index data
         project_description = args.description or f"{project_name} documentation"
@@ -208,5 +223,20 @@ def register_llm_doc_gen(subparsers: argparse._SubParsersAction, parent_parser: 
         '--resume',
         action='store_true',
         help='Resume from previous interrupted generation (uses saved state)'
+    )
+    generate_parser.add_argument(
+        '--cache',
+        action='store_true',
+        help='Enable persistent caching of parse results (speeds up subsequent runs)'
+    )
+    generate_parser.add_argument(
+        '--cache-dir',
+        type=str,
+        help='Directory for cache storage (default: ./.doc-cache)'
+    )
+    generate_parser.add_argument(
+        '--clear-cache',
+        action='store_true',
+        help='Clear the cache before generating documentation'
     )
     generate_parser.set_defaults(func=handle_generate)

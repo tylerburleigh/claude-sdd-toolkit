@@ -1,0 +1,20 @@
+{
+  "project_root": "/Users/tylerburleigh/Documents/claude-sdd-toolkit",
+  "output_folder": "/Users/tylerburleigh/Documents/claude-sdd-toolkit/docs",
+  "started_at": "2025-11-20T17:28:56.029214",
+  "last_updated": "2025-11-20T17:29:57.834785",
+  "completed_shards": [
+    "project_overview",
+    "architecture",
+    "component_inventory",
+    "index"
+  ],
+  "failed_shards": [],
+  "pending_shards": [],
+  "shard_summaries": {
+    "project_overview": "project_overview generated: 91 lines, ~1653 tokens",
+    "architecture": "architecture generated: 61 lines, ~1534 tokens",
+    "component_inventory": "component_inventory generated: 182 lines, ~1248 tokens",
+    "index": "index generated: 62 lines, ~387 tokens"
+  }
+}

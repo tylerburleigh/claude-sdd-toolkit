@@ -8,8 +8,14 @@ functions, imports, and complexity metrics.
 import ast
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from collections import defaultdict
+
+try:
+    import jedi
+    JEDI_AVAILABLE = True
+except ImportError:
+    JEDI_AVAILABLE = False
 
 from .base import (
     BaseParser,
@@ -294,7 +300,115 @@ class PythonParser(BaseParser):
                 # Fallback for complex decorators
                 return ast.unparse(decorator)
 
-    def parse_file(self, file_path: Path) -> ParseResult:
+    class _JediEnhancer:
+        """
+        Enhances call resolution using Jedi type inference.
+
+        This class runs after AST-based call tracking to improve accuracy
+        by using Jedi's semantic analysis and type inference capabilities.
+        """
+
+        def __init__(self, source: str, file_path: str, graph: CrossReferenceGraph):
+            """
+            Initialize Jedi enhancer.
+
+            Args:
+                source: Python source code
+                file_path: Path to file being analyzed
+                graph: CrossReferenceGraph to enhance
+            """
+            if not JEDI_AVAILABLE:
+                raise ImportError("Jedi is not available")
+
+            self.script = jedi.Script(source, path=file_path)
+            self.source = source
+            self.file_path = file_path
+            self.graph = graph
+            self.source_lines = source.splitlines()
+
+        def enhance_calls(self):
+            """
+            Enhance unresolved calls using Jedi.
+
+            Iterates through all calls in the graph and attempts to resolve
+            unknown or low-confidence targets using Jedi's goto() and infer() APIs.
+            """
+            for call in self.graph.calls:
+                # Skip already resolved calls with high confidence
+                if call.callee_file and call.callee_file not in ("unknown", None):
+                    resolution_method = call.metadata.get('resolution_method')
+                    if resolution_method == 'jedi':
+                        continue  # Already enhanced
+
+                # Attempt Jedi resolution
+                self._resolve_with_jedi(call)
+
+        def _resolve_with_jedi(self, call: CallSite):
+            """
+            Use Jedi to resolve a call target.
+
+            Args:
+                call: CallSite to resolve
+            """
+            try:
+                # Get the source line (Jedi uses 1-indexed lines)
+                line_no = call.caller_line
+                if line_no < 1 or line_no > len(self.source_lines):
+                    return
+
+                line_content = self.source_lines[line_no - 1]
+
+                # Find the call in the line (look for the callee name)
+                # This is a heuristic - we find the column of the callee name
+                column = line_content.find(call.callee)
+                if column == -1:
+                    # Try as method call (look for .callee)
+                    column = line_content.find(f".{call.callee}")
+                    if column != -1:
+                        column += 1  # Skip the dot
+
+                if column == -1:
+                    return  # Can't find the call in the source
+
+                # Use Jedi's goto() to find the definition
+                definitions = self.script.goto(line_no, column)
+
+                if definitions:
+                    # Take the first definition
+                    definition = definitions[0]
+
+                    # Get the module path
+                    if definition.module_path:
+                        resolved_file = str(definition.module_path)
+
+                        # Update call site with Jedi-resolved file
+                        call.callee_file = resolved_file
+                        call.metadata['resolution_method'] = 'jedi'
+                        call.metadata['confidence'] = 'high'
+                        call.metadata['jedi_type'] = definition.type
+
+                        return
+
+                # If goto() didn't work, try infer() for type information
+                inferences = self.script.infer(line_no, column)
+
+                if inferences:
+                    inference = inferences[0]
+
+                    if inference.module_path:
+                        resolved_file = str(inference.module_path)
+
+                        call.callee_file = resolved_file
+                        call.metadata['resolution_method'] = 'jedi'
+                        call.metadata['confidence'] = 'medium'
+                        call.metadata['jedi_type'] = inference.type
+
+            except Exception as e:
+                # Jedi may fail on complex code - silently continue
+                call.metadata['jedi_error'] = str(e)
+                pass
+
+    def _parse_file_impl(self, file_path: Path) -> ParseResult:
         """
         Parse a Python file and extract structure.
 
@@ -352,6 +466,16 @@ class PythonParser(BaseParser):
 
             # Walk the entire AST to track function calls
             tracker.visit(tree)
+
+            # Enhance call resolution with Jedi (if available)
+            if JEDI_AVAILABLE:
+                try:
+                    enhancer = self._JediEnhancer(source, relative_path, graph)
+                    enhancer.enhance_calls()
+                except Exception as e:
+                    # Jedi enhancement is optional - don't fail the parse
+                    # Only print error in verbose mode
+                    pass
 
             # Add cross-reference graph to result
             result.cross_references = graph

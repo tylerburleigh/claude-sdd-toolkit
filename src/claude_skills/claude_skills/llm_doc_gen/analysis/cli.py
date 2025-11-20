@@ -27,7 +27,7 @@ Examples:
     sdd doc generate ./src --name MyProject --version 0.1.0
     sdd doc generate ./src --format json --output-dir ./docs
     sdd doc analyze ./src --verbose
-    sdd doc validate ./docs/documentation.json
+    sdd doc validate ./docs/codebase.json
 """
 
 from __future__ import annotations
@@ -54,6 +54,7 @@ from claude_skills.cli.sdd.output_utils import (
 from claude_skills.llm_doc_gen.analysis.generator import DocumentationGenerator
 from claude_skills.llm_doc_gen.analysis.parsers import Language, create_parser_factory
 from claude_skills.llm_doc_gen.analysis.calculator import calculate_statistics
+from claude_skills.llm_doc_gen.analysis.optimization.filters import FilterProfile, create_filter_chain
 from claude_skills.llm_doc_gen.analysis.detectors import (
     detect_framework,
     identify_key_files,
@@ -204,12 +205,34 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             printer.detail("Continuing with all languages...")
             languages = None
 
+    # Handle filter profile and custom overrides
+    filter_profile = None
+    if getattr(args, 'filter_mode', None):
+        filter_profile = FilterProfile(args.filter_mode)
+
+    # Handle cache options
+    cache_dir = None
+    if getattr(args, 'cache', False) or getattr(args, 'cache_dir', None):
+        # Use specified cache_dir or default
+        cache_dir = Path(getattr(args, 'cache_dir', None) or './.doc-cache')
+
+        # Clear cache if requested
+        if getattr(args, 'clear_cache', False):
+            from claude_skills.llm_doc_gen.analysis.optimization.cache import PersistentCache
+            if cache_dir.exists():
+                cache = PersistentCache(cache_dir)
+                cache.clear()
+                if not _print_if_json(args, {"status": "info", "message": "Cache cleared"}, printer):
+                    printer.detail(f"Cache cleared at {cache_dir}")
+
     generator = DocumentationGenerator(
         project_dir,
         project_name,
         args.version,
         exclude_patterns,
         languages,
+        filter_profile,
+        cache_dir,
     )
 
     try:
@@ -217,6 +240,10 @@ def cmd_generate(args: argparse.Namespace, printer: PrettyPrinter) -> int:
             output_dir,
             format_type=args.format,
             verbose=getattr(args, 'verbose', False),
+            parallel=getattr(args, 'parallel', False),
+            num_workers=getattr(args, 'workers', None),
+            streaming=getattr(args, 'streaming', False),
+            compress=getattr(args, 'compress', False),
         )
         output_data = {
             "status": "ok",
@@ -454,7 +481,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
 
             output_dir.mkdir(parents=True, exist_ok=True)
             md_path = output_dir / 'DOCUMENTATION.md'
-            json_path = output_dir / 'documentation.json'
+            json_path = output_dir / 'codebase.json'
             generator.save_markdown(md_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
             generator.save_json(json_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
             printer.success(f"Structural documentation saved to {output_dir}")
@@ -518,7 +545,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         output_dir.mkdir(parents=True, exist_ok=True)
 
         md_path = output_dir / 'DOCUMENTATION.md'
-        json_path = output_dir / 'documentation.json'
+        json_path = output_dir / 'codebase.json'
         generator.save_markdown(md_path, analysis, statistics, verbose=False)
         generator.save_json(json_path, analysis, statistics, verbose=False)
         printer.success(f"   ✅ {md_path}")
@@ -580,6 +607,30 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     generate_parser.add_argument('--version', default='1.0.0', help='Project version (default: 1.0.0)')
     generate_parser.add_argument('--language', help='Filter by language (python, javascript, typescript, go, html, css)')
     generate_parser.add_argument('--exclude', action='append', default=[], help='Exclude pattern (can be used multiple times)')
+
+    # Filter options for large codebases
+    generate_parser.add_argument(
+        '--filter-mode',
+        choices=['fast', 'balanced', 'complete'],
+        help='Filter profile: fast (aggressive filtering for large codebases), balanced (moderate filtering), complete (minimal filtering)'
+    )
+    generate_parser.add_argument('--max-file-size', type=int, help='Maximum file size in bytes (overrides filter-mode default)')
+    generate_parser.add_argument('--max-files-per-dir', type=int, help='Maximum files per directory (overrides filter-mode default)')
+    generate_parser.add_argument('--sample-rate', type=float, help='Sampling rate 0.0-1.0 for very large projects (overrides filter-mode default)')
+
+    # Parallel processing options
+    generate_parser.add_argument('--parallel', action='store_true', help='Enable parallel parsing using multiprocessing (faster on multi-core systems)')
+    generate_parser.add_argument('--workers', type=int, metavar='N', help='Number of worker processes for parallel parsing (default: auto-detect CPU count - 1)')
+
+    # Streaming and compression options for JSON output
+    generate_parser.add_argument('--streaming', action='store_true', help='Use streaming generation for JSON output (memory efficient for large codebases)')
+    generate_parser.add_argument('--compress', action='store_true', help='Use gzip compression for JSON output')
+
+    # Cache options
+    generate_parser.add_argument('--cache', action='store_true', help='Enable persistent caching of parse results (speeds up subsequent runs)')
+    generate_parser.add_argument('--cache-dir', type=str, help='Directory for cache storage (default: ./.doc-cache)')
+    generate_parser.add_argument('--clear-cache', action='store_true', help='Clear the cache before generating documentation')
+
     generate_parser.set_defaults(func=cmd_generate)
 
     validate_parser = subparsers.add_parser(

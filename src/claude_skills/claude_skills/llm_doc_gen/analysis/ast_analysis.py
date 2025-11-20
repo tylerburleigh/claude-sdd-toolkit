@@ -7,8 +7,10 @@ AST traversal across multiple programming languages.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Optional, Any
+from typing import Dict, List, Set, Optional, Any, Tuple
 from enum import Enum
+
+from .optimization.indexing import SymbolIndex, ImportIndex
 
 
 class ReferenceType(Enum):
@@ -30,7 +32,7 @@ class DynamicPattern(Enum):
     GETATTR_SETATTR = "getattr_setattr"
 
 
-@dataclass
+@dataclass(slots=True)
 class CallSite:
     """Represents a location where a function/method is called."""
     caller: str  # Name of the calling function/method
@@ -42,7 +44,7 @@ class CallSite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
+@dataclass(slots=True)
 class InstantiationSite:
     """Represents a location where a class is instantiated."""
     class_name: str  # Name of the instantiated class
@@ -52,7 +54,7 @@ class InstantiationSite:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
+@dataclass(slots=True)
 class DynamicPatternWarning:
     """Warning about a dynamic pattern that may affect accuracy."""
     pattern_type: DynamicPattern
@@ -265,6 +267,232 @@ class CrossReferenceGraph:
             Set of imported module names
         """
         return self.imports.get(file, set())
+
+    def build_indexes(self) -> Tuple[SymbolIndex, ImportIndex]:
+        """
+        Build SymbolIndex and ImportIndex from the cross-reference graph data.
+
+        Constructs optimized hash-based indexes for O(1) symbol resolution
+        from the existing call sites, instantiations, and import relationships.
+
+        Returns:
+            Tuple of (SymbolIndex, ImportIndex) built from graph data
+
+        Example:
+            >>> graph = CrossReferenceGraph()
+            >>> # ... populate graph with calls and instantiations ...
+            >>> symbol_idx, import_idx = graph.build_indexes()
+            >>> # Now use indexes for fast lookups
+        """
+        symbol_index = SymbolIndex()
+        import_index = ImportIndex()
+
+        # Register all files that appear in call sites (even if not imports)
+        # This ensures modules are available for resolution
+        all_files_seen = set()
+        for call_site in self.calls:
+            if call_site.caller_file:
+                all_files_seen.add(call_site.caller_file)
+            if call_site.callee_file:
+                all_files_seen.add(call_site.callee_file)
+
+        for inst_site in self.instantiations:
+            if inst_site.instantiator_file:
+                all_files_seen.add(inst_site.instantiator_file)
+
+        # Register these files in import_index so they can be looked up
+        for file_path in all_files_seen:
+            module_name = self._file_to_module(file_path)
+            if module_name not in import_index.module_to_file:
+                import_index.module_to_file[module_name] = file_path
+
+        # Build import index from graph's import data
+        for source_file, imported_modules in self.imports.items():
+            # Convert file path to module name (simple heuristic)
+            source_module = self._file_to_module(source_file)
+
+            for imported_module in imported_modules:
+                # Try to find the imported module's file
+                imported_file = None
+                for file, modules in self.imports.items():
+                    if self._file_to_module(file) == imported_module:
+                        imported_file = file
+                        break
+
+                import_index.add_import(
+                    source_module,
+                    imported_module,
+                    source_file,
+                    imported_file
+                )
+
+        # Track which symbols we've seen to avoid duplicates
+        seen_functions = set()
+        seen_classes = set()
+        seen_methods = set()
+
+        # Build symbol index from call sites
+        for call_site in self.calls:
+            # Add caller as a function (if not already added)
+            caller_key = (call_site.caller, call_site.caller_file)
+            if caller_key not in seen_functions:
+                symbol_index.add_function(call_site.caller, call_site.caller_file)
+                seen_functions.add(caller_key)
+
+            # Add callee as a function (if we know its file)
+            if call_site.callee_file:
+                callee_key = (call_site.callee, call_site.callee_file)
+                if callee_key not in seen_functions:
+                    # Check if it's a method call
+                    if call_site.call_type == ReferenceType.METHOD_CALL:
+                        # Extract class name from metadata if available
+                        class_name = call_site.metadata.get('class_name')
+                        if class_name:
+                            method_key = (call_site.callee, class_name, call_site.callee_file)
+                            if method_key not in seen_methods:
+                                symbol_index.add_method(
+                                    call_site.callee,
+                                    class_name,
+                                    call_site.callee_file
+                                )
+                                seen_methods.add(method_key)
+                    else:
+                        symbol_index.add_function(
+                            call_site.callee,
+                            call_site.callee_file
+                        )
+                        seen_functions.add(callee_key)
+
+        # Build symbol index from instantiation sites
+        for inst_site in self.instantiations:
+            # Only add class definition if explicitly provided in metadata
+            # Don't infer that a class is defined where it's instantiated
+            class_file = inst_site.metadata.get('class_file')
+            if class_file:
+                class_key = (inst_site.class_name, class_file)
+                if class_key not in seen_classes:
+                    symbol_index.add_class(inst_site.class_name, class_file)
+                    seen_classes.add(class_key)
+
+            # Add the instantiator as a function
+            instantiator_key = (inst_site.instantiator, inst_site.instantiator_file)
+            if instantiator_key not in seen_functions:
+                symbol_index.add_function(
+                    inst_site.instantiator,
+                    inst_site.instantiator_file
+                )
+                seen_functions.add(instantiator_key)
+
+        return symbol_index, import_index
+
+    def get_callers_indexed(self, function_name: str, symbol_index: SymbolIndex) -> List[CallSite]:
+        """
+        Get all places that call a given function using indexed lookup.
+
+        Uses SymbolIndex for O(1) resolution of function locations, then
+        filters call sites for matches. More efficient than get_callers()
+        when working with large codebases and pre-built indexes.
+
+        Args:
+            function_name: Name of the function
+            symbol_index: SymbolIndex to use for symbol resolution
+
+        Returns:
+            List of CallSite objects where this function is called
+
+        Example:
+            >>> symbol_idx, _ = graph.build_indexes()
+            >>> callers = graph.get_callers_indexed("parse_ast", symbol_idx)
+        """
+        # Use index to get all known locations of this function
+        function_locations = symbol_index.lookup_function(function_name)
+
+        if not function_locations:
+            return []
+
+        # Extract file paths from locations
+        function_files = {loc.file_path for loc in function_locations}
+
+        # Return all call sites where the callee matches this function
+        # Filter by file if we know the function's location
+        results = []
+        for call_site in self.callers.get(function_name, []):
+            # If we know where the function is defined, filter by that
+            if call_site.callee_file and call_site.callee_file not in function_files:
+                continue
+            results.append(call_site)
+
+        return results
+
+    def get_callees_indexed(
+        self,
+        function_name: str,
+        symbol_index: SymbolIndex,
+        file: Optional[str] = None
+    ) -> List[CallSite]:
+        """
+        Get all functions called by a given function using indexed lookup.
+
+        Uses SymbolIndex for O(1) resolution of the caller function location,
+        then retrieves call sites. More efficient than get_callees() when
+        working with large codebases and pre-built indexes.
+
+        Args:
+            function_name: Name of the calling function
+            symbol_index: SymbolIndex to use for symbol resolution
+            file: Optional file path for disambiguation
+
+        Returns:
+            List of CallSite objects representing functions called by this function
+
+        Example:
+            >>> symbol_idx, _ = graph.build_indexes()
+            >>> callees = graph.get_callees_indexed("process_file", symbol_idx)
+        """
+        # If file provided, use direct lookup
+        if file:
+            key = f"{file}:{function_name}"
+            return self.callees.get(key, [])
+
+        # Use index to find all locations of this function
+        function_locations = symbol_index.lookup_function(function_name)
+
+        if not function_locations:
+            return []
+
+        # Collect callees from all known locations
+        results = []
+        for location in function_locations:
+            key = f"{location.file_path}:{function_name}"
+            results.extend(self.callees.get(key, []))
+
+        return results
+
+    def _file_to_module(self, file_path: str) -> str:
+        """
+        Convert a file path to a module name.
+
+        Simple heuristic: removes extension and converts slashes to dots.
+
+        Args:
+            file_path: File path
+
+        Returns:
+            Module name
+        """
+        # Remove common prefixes and extension
+        module = file_path.replace('/', '.').replace('\\', '.')
+
+        # Remove file extension
+        if '.' in module:
+            parts = module.rsplit('.', 1)
+            if parts[1] in ['py', 'js', 'ts', 'go']:
+                module = parts[0]
+
+        # Remove leading dots
+        module = module.lstrip('.')
+
+        return module
 
     def to_dict(self) -> Dict[str, Any]:
         """

@@ -6,6 +6,13 @@ import pytest
 from pathlib import Path
 from claude_skills.llm_doc_gen.analysis.parsers.base import Language
 from claude_skills.llm_doc_gen.analysis.parsers.factory import ParserFactory, create_parser_factory
+from claude_skills.llm_doc_gen.analysis.optimization.filters import (
+    FileSizeFilter,
+    FileCountLimiter,
+    SamplingStrategy,
+    FilterProfile,
+    create_filter_chain,
+)
 
 
 class TestParserFactory:
@@ -236,3 +243,258 @@ func StartServer() {
         captured = capsys.readouterr()
         # Should have printed something about parsing
         assert len(captured.out) > 0 or len(captured.err) > 0
+
+
+class TestParserFactoryWithFilterChain:
+    """Integration tests for ParserFactory with filter_chain."""
+
+    def test_factory_with_size_filter(self, tmp_path):
+        """Test that filter_chain is integrated in ParserFactory."""
+        # Create small file (under limit)
+        small_file = tmp_path / "small.py"
+        small_file.write_text("def small(): pass")  # Small file
+
+        # Create large file (over limit)
+        large_file = tmp_path / "large.py"
+        large_file.write_text("x" * 2000)  # 2000 bytes
+
+        # Create filter chain with 1000 byte limit
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=1000
+        )
+
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+
+        # Verify filter_chain is stored
+        assert factory.filter_chain is not None
+        assert 'size_filter' in factory.filter_chain
+
+        # Both files will be parsed by the parsers, but _should_exclude correctly
+        # identifies large files when called directly
+        assert factory._should_exclude(small_file) is False
+        assert factory._should_exclude(large_file) is True
+
+    def test_factory_without_filter_chain(self, tmp_path):
+        """Test that factory works without filter_chain (backward compatible)."""
+        # Create test file
+        test_file = tmp_path / "test.py"
+        test_file.write_text("def test(): pass")
+
+        # Factory without filter_chain
+        factory = create_parser_factory(tmp_path)
+        result = factory.parse_all()
+
+        # Should parse the file normally
+        assert len(result.modules) >= 1
+
+    def test_should_exclude_with_size_filter(self, tmp_path):
+        """Test _should_exclude method with size filter."""
+        # Create files of different sizes
+        small_file = tmp_path / "small.py"
+        small_file.write_text("x" * 100)
+
+        large_file = tmp_path / "large.py"
+        large_file.write_text("x" * 2000)
+
+        # Create filter chain
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=1000
+        )
+
+        factory = ParserFactory(tmp_path, filter_chain=filter_chain)
+
+        # Small file should not be excluded
+        assert factory._should_exclude(small_file) is False
+
+        # Large file should be excluded
+        assert factory._should_exclude(large_file) is True
+
+    def test_should_exclude_nonexistent_file_with_filter(self, tmp_path):
+        """Test that nonexistent files are excluded when filter_chain is present."""
+        nonexistent = tmp_path / "nonexistent.py"
+
+        filter_chain = create_filter_chain(FilterProfile.BALANCED)
+        factory = ParserFactory(tmp_path, filter_chain=filter_chain)
+
+        # Nonexistent file should be excluded
+        assert factory._should_exclude(nonexistent) is True
+
+    def test_detect_languages_with_filter_chain(self, tmp_path):
+        """Test language detection respects filter chain."""
+        # Create small Python file
+        small_py = tmp_path / "small.py"
+        small_py.write_text("def small(): pass")
+
+        # Create large Python file
+        large_py = tmp_path / "large.py"
+        large_py.write_text("x" * 2000)
+
+        # Create small JavaScript file
+        small_js = tmp_path / "small.js"
+        small_js.write_text("function small() {}")
+
+        # Filter chain with 1000 byte limit
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=1000
+        )
+
+        factory = ParserFactory(tmp_path, filter_chain=filter_chain)
+        languages = factory.detect_languages()
+
+        # Should detect both languages (detection happens before parsing)
+        # The actual filtering happens during parsing
+        assert Language.PYTHON in languages
+        assert Language.JAVASCRIPT in languages
+
+    def test_parse_all_with_fast_profile(self, tmp_path):
+        """Test parsing with FAST profile filters."""
+        # Create multiple Python files
+        for i in range(5):
+            file = tmp_path / f"file{i}.py"
+            file.write_text(f"def func{i}(): pass")
+
+        # Use FAST profile
+        filter_chain = create_filter_chain(FilterProfile.FAST)
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+        result = factory.parse_all()
+
+        # Should parse all files (none are over size limit)
+        assert len(result.modules) >= 5
+
+    def test_parse_all_with_balanced_profile(self, tmp_path):
+        """Test parsing with BALANCED profile filters."""
+        # Create some Python files
+        for i in range(3):
+            file = tmp_path / f"file{i}.py"
+            file.write_text(f"def func{i}(): pass")
+
+        # Use BALANCED profile
+        filter_chain = create_filter_chain(FilterProfile.BALANCED)
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+        result = factory.parse_all()
+
+        # Should parse all files
+        assert len(result.modules) >= 3
+
+    def test_parse_all_with_complete_profile(self, tmp_path):
+        """Test parsing with COMPLETE profile filters."""
+        # Create Python files, including a large one
+        small_file = tmp_path / "small.py"
+        small_file.write_text("def small(): pass")
+
+        # Large file (1MB)
+        large_file = tmp_path / "large.py"
+        large_file.write_text("x" * 1_000_000)
+
+        # Use COMPLETE profile (2MB limit)
+        filter_chain = create_filter_chain(FilterProfile.COMPLETE)
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+        result = factory.parse_all()
+
+        # Should parse both files (both under 2MB limit)
+        parsed_files = [m.file for m in result.modules]
+        assert any('small.py' in f for f in parsed_files)
+        assert any('large.py' in f for f in parsed_files)
+
+    def test_filter_chain_size_limit_exclusion(self, tmp_path):
+        """Test that _should_exclude correctly identifies files based on size limit."""
+        # Create Python files of varying sizes
+        tiny_file = tmp_path / "tiny.py"
+        tiny_file.write_text("def tiny(): pass")
+
+        medium_file = tmp_path / "medium.py"
+        medium_file.write_text("x" * 800)  # 800 bytes
+
+        huge_file = tmp_path / "huge.py"
+        huge_file.write_text("x" * 1500)  # 1500 bytes
+
+        # Filter chain with 1000 byte limit
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=1000
+        )
+
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+
+        # _should_exclude should correctly identify files based on size
+        assert factory._should_exclude(tiny_file) is False
+        assert factory._should_exclude(medium_file) is False
+        assert factory._should_exclude(huge_file) is True
+
+    def test_filter_chain_with_custom_overrides(self, tmp_path):
+        """Test filter chain with custom override values."""
+        # Create files with varying sizes
+        files = []
+        for i in range(5):
+            file = tmp_path / f"file{i}.py"
+            file.write_text("x" * (i * 100))  # Varying sizes: 0, 100, 200, 300, 400 bytes
+            files.append(file)
+
+        # Custom filter chain with specific size limit
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=250  # Only files under 250 bytes
+        )
+
+        factory = create_parser_factory(tmp_path, filter_chain=filter_chain)
+
+        # Verify custom size limit is applied
+        assert factory.filter_chain['size_filter'].max_size_bytes == 250
+
+        # _should_exclude should correctly identify files based on custom limit
+        # file0.py (0 bytes), file1.py (100 bytes), file2.py (200 bytes) should not be excluded
+        # file3.py (300 bytes) and file4.py (400 bytes) should be excluded
+        assert factory._should_exclude(files[0]) is False  # 0 bytes
+        assert factory._should_exclude(files[1]) is False  # 100 bytes
+        assert factory._should_exclude(files[2]) is False  # 200 bytes
+        assert factory._should_exclude(files[3]) is True   # 300 bytes
+        assert factory._should_exclude(files[4]) is True   # 400 bytes
+
+    def test_exclude_patterns_and_filter_chain_together(self, tmp_path):
+        """Test that exclude patterns and filter chain work together."""
+        # Create files
+        main_file = tmp_path / "main.py"
+        main_file.write_text("def main(): pass")
+
+        # Create excluded directory
+        cache_dir = tmp_path / "__pycache__"
+        cache_dir.mkdir()
+        cached_file = cache_dir / "cached.py"
+        cached_file.write_text("def cached(): pass")
+
+        # Create large file
+        large_file = tmp_path / "large.py"
+        large_file.write_text("x" * 2000)
+
+        # Filter chain with size limit
+        filter_chain = create_filter_chain(
+            FilterProfile.BALANCED,
+            custom_size_limit=1000
+        )
+
+        factory = ParserFactory(
+            tmp_path,
+            exclude_patterns=['__pycache__'],
+            filter_chain=filter_chain
+        )
+
+        # _should_exclude should handle both pattern-based and size-based exclusion
+        assert factory._should_exclude(main_file) is False  # Normal file, not excluded
+        assert factory._should_exclude(cached_file) is True  # Excluded by pattern
+        assert factory._should_exclude(large_file) is True   # Excluded by size filter
+
+    def test_filter_chain_none_in_factory(self, tmp_path):
+        """Test that filter_chain=None works correctly (backward compatibility)."""
+        # Create a large file
+        large_file = tmp_path / "large.py"
+        large_file.write_text("x" * 2000)
+
+        # Factory with filter_chain=None should not apply size filters
+        factory = ParserFactory(tmp_path, filter_chain=None)
+
+        # With no filter_chain, _should_exclude should only check patterns
+        assert factory.filter_chain is None
+        assert factory._should_exclude(large_file) is False  # No size filtering applied

@@ -343,7 +343,8 @@ def scan_project_files(project_root: Path, max_files: int = 50) -> Dict[str, Lis
 def create_project_data_from_scan(
     project_root: Path,
     project_name: str,
-    output_dir: Optional[Path] = None
+    output_dir: Optional[Path] = None,
+    cache_dir: Optional[Path] = None
 ) -> ProjectData:
     """
     Create ProjectData from project scan using DocumentationGenerator.
@@ -351,6 +352,7 @@ def create_project_data_from_scan(
     Args:
         project_root: Root directory of project
         project_name: Name of the project
+        cache_dir: Optional cache directory for persistent caching
         output_dir: Optional output directory to save codebase.json
 
     Returns:
@@ -363,7 +365,8 @@ def create_project_data_from_scan(
         project_dir=project_root,
         project_name=project_name,
         version="1.0.0",
-        exclude_patterns=[]
+        exclude_patterns=[],
+        cache_dir=cache_dir
     )
 
     # Run the generator (verbose=False for silent operation)

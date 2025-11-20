@@ -867,7 +867,7 @@ sdd list-specs [--status STATUS]
 
 ### Documentation
 ```bash
-sdd doc generate .
+sdd doc generate . --parallel --filter-mode balanced  # Fast, optimized generation
 sdd doc analyze-with-ai .
 sdd doc stats
 sdd doc search "pattern"

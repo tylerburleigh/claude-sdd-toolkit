@@ -6,10 +6,11 @@ and routes files to appropriate parsers.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Type
+from typing import Dict, List, Optional, Set, Type, Any
 from collections import defaultdict
 
 from .base import BaseParser, Language, ParseResult
+from ..optimization.parallel import ParallelParser
 
 
 class ParserFactory:
@@ -24,7 +25,9 @@ class ParserFactory:
         self,
         project_root: Path,
         exclude_patterns: Optional[List[str]] = None,
-        languages: Optional[List[Language]] = None
+        languages: Optional[List[Language]] = None,
+        filter_chain: Optional[Dict[str, Any]] = None,
+        cache: Optional[Any] = None
     ):
         """
         Initialize the parser factory.
@@ -33,6 +36,10 @@ class ParserFactory:
             project_root: Root directory of the project
             exclude_patterns: Patterns to exclude from analysis
             languages: Specific languages to parse (None = auto-detect all)
+            filter_chain: Optional dictionary of filter instances from create_filter_chain().
+                Contains 'size_filter', 'count_limiter', and 'sampling' keys.
+                If None, no additional filtering is applied (backward compatible).
+            cache: Optional PersistentCache instance for caching parse results
         """
         self.project_root = project_root.resolve()
         self.exclude_patterns = exclude_patterns or [
@@ -40,6 +47,8 @@ class ParserFactory:
             'build', 'dist', '.egg-info'
         ]
         self.requested_languages = languages
+        self.filter_chain = filter_chain
+        self.cache = cache
         self._parsers: Dict[Language, BaseParser] = {}
         self._parser_classes: Dict[Language, Type[BaseParser]] = {}
 
@@ -88,21 +97,38 @@ class ParserFactory:
         # Create new parser if class is registered
         if language in self._parser_classes:
             parser_class = self._parser_classes[language]
-            parser = parser_class(self.project_root, self.exclude_patterns)
+            parser = parser_class(self.project_root, self.exclude_patterns, self.cache)
             self._parsers[language] = parser
             return parser
 
         return None
 
-    def parse_all(self, verbose: bool = False) -> ParseResult:
+    def parse_all(
+        self,
+        verbose: bool = False,
+        parallel: bool = False,
+        num_workers: Optional[int] = None
+    ) -> ParseResult:
         """
         Parse all files in the project across all detected languages.
 
         Args:
             verbose: Enable verbose output
+            parallel: Enable parallel parsing using multiprocessing (default: False)
+            num_workers: Number of worker processes (auto-detected if None, only used when parallel=True)
 
         Returns:
             Merged ParseResult containing all parsed entities
+
+        Example:
+            >>> # Sequential parsing (default)
+            >>> result = factory.parse_all()
+            >>>
+            >>> # Parallel parsing with auto-detected workers
+            >>> result = factory.parse_all(parallel=True)
+            >>>
+            >>> # Parallel parsing with explicit worker count
+            >>> result = factory.parse_all(parallel=True, num_workers=4)
         """
         # Determine which languages to parse
         if self.requested_languages:
@@ -114,8 +140,19 @@ class ParserFactory:
             print(f"📁 Analyzing {self.project_root}...")
             detected_langs = ', '.join(sorted(l.value for l in languages_to_parse))
             print(f"🔍 Detected languages: {detected_langs}")
+            if parallel:
+                workers = num_workers if num_workers else ParallelParser.get_cpu_count() - 1
+                print(f"⚡ Parallel mode enabled with {workers} workers")
 
-        # Parse each language
+        # Delegate to ParallelParser if parallel mode enabled
+        if parallel:
+            return self._parse_all_parallel(
+                languages_to_parse,
+                verbose=verbose,
+                num_workers=num_workers
+            )
+
+        # Sequential parsing (original behavior)
         result = ParseResult()
         for language in sorted(languages_to_parse, key=lambda x: x.value):
             parser = self.get_parser(language)
@@ -136,6 +173,93 @@ class ParserFactory:
             self._print_summary(result, languages_to_parse)
 
         return result
+
+    def _parse_all_parallel(
+        self,
+        languages_to_parse: Set[Language],
+        verbose: bool = False,
+        num_workers: Optional[int] = None
+    ) -> ParseResult:
+        """
+        Parse all files in parallel using ParallelParser.
+
+        Args:
+            languages_to_parse: Set of languages to parse
+            verbose: Enable verbose output
+            num_workers: Number of worker processes
+
+        Returns:
+            Merged ParseResult from all workers
+        """
+        # Collect all files from all languages with their parsers
+        file_tasks: List[tuple[Path, Language]] = []
+        language_file_counts: Dict[Language, int] = {}
+
+        for language in sorted(languages_to_parse, key=lambda x: x.value):
+            parser = self.get_parser(language)
+
+            if parser is None:
+                if verbose:
+                    print(f"  ⚠️  {language.value.upper()}: No parser available (skipping)")
+                continue
+
+            files = parser.find_files()
+            language_file_counts[language] = len(files)
+
+            if verbose and files:
+                print(f"  {language.value.upper()}: Found {len(files)} files")
+
+            # Add tasks as (file_path, language) tuples
+            for file_path in files:
+                file_tasks.append((file_path, language))
+
+        # If no files to parse, return empty result
+        if not file_tasks:
+            result = ParseResult()
+            if verbose:
+                self._print_summary(result, languages_to_parse)
+            return result
+
+        # Create parallel parser
+        parallel_parser = ParallelParser(num_workers=num_workers)
+
+        # Define worker function that parses a single file
+        def parse_single_file(task: tuple[Path, Language]) -> ParseResult:
+            file_path, language = task
+            parser = self.get_parser(language)
+            if parser is None:
+                return ParseResult(
+                    errors=[f"No parser available for {language.value}"]
+                )
+            return parser.parse_file(file_path)
+
+        # Progress callback for verbose mode
+        progress_callback = None
+        if verbose:
+            total_files = len(file_tasks)
+            def progress_callback(completed: int, total: int):
+                print(f"    [{completed}/{total}] files parsed...", end='\r')
+
+        # Parse all files in parallel
+        results = parallel_parser.parse_files(
+            file_tasks,
+            parse_single_file,
+            progress_callback=progress_callback
+        )
+
+        # Clear progress line
+        if verbose:
+            print(" " * 60, end='\r')
+
+        # Merge all results
+        merged_result = ParseResult()
+        for result in results:
+            merged_result.merge(result)
+
+        if verbose:
+            self._print_summary(merged_result, languages_to_parse)
+
+        return merged_result
 
     def parse_file(self, file_path: Path, verbose: bool = False) -> ParseResult:
         """
@@ -191,14 +315,17 @@ class ParserFactory:
 
     def _should_exclude(self, file_path: Path) -> bool:
         """
-        Check if a file should be excluded based on patterns.
+        Check if a file should be excluded based on patterns and filters.
 
         Uses path component matching to avoid false positives.
         For example, '.git' will match '.git/' but not '.github/'.
+
+        Also applies filter_chain if configured (size limits, etc.).
         """
         path_parts = file_path.parts
         path_str = str(file_path)
 
+        # First check pattern-based exclusions
         for pattern in self.exclude_patterns:
             # Check if pattern matches any path component exactly
             if pattern in path_parts:
@@ -217,6 +344,18 @@ class ParserFactory:
             if pattern.count('.') > 1:
                 # For patterns like '.env.local', match as substring
                 if pattern in path_str:
+                    return True
+
+        # Apply filter_chain if configured
+        if self.filter_chain is not None:
+            # Check size filter
+            size_filter = self.filter_chain.get('size_filter')
+            if size_filter is not None:
+                try:
+                    if not size_filter.should_include(file_path):
+                        return True  # Exclude files that are too large
+                except (FileNotFoundError, OSError):
+                    # If we can't access the file, exclude it
                     return True
 
         return False
@@ -288,7 +427,9 @@ def _auto_register_parsers(factory: ParserFactory):
 def create_parser_factory(
     project_root: Path,
     exclude_patterns: Optional[List[str]] = None,
-    languages: Optional[List[Language]] = None
+    languages: Optional[List[Language]] = None,
+    filter_chain: Optional[Dict[str, Any]] = None,
+    cache: Optional[Any] = None
 ) -> ParserFactory:
     """
     Create a ParserFactory with all available parsers registered.
@@ -297,10 +438,12 @@ def create_parser_factory(
         project_root: Root directory of project
         exclude_patterns: Patterns to exclude
         languages: Specific languages to parse
+        filter_chain: Optional dictionary of filter instances from create_filter_chain()
+        cache: Optional PersistentCache instance for caching parse results
 
     Returns:
         Configured ParserFactory instance
     """
-    factory = ParserFactory(project_root, exclude_patterns, languages)
+    factory = ParserFactory(project_root, exclude_patterns, languages, filter_chain, cache)
     _auto_register_parsers(factory)
     return factory
