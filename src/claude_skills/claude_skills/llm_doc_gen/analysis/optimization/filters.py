@@ -6,6 +6,7 @@ during codebase analysis.
 
 import os
 import random
+from enum import Enum
 from pathlib import Path
 from typing import Union, Optional, List, Dict, Callable
 from collections import defaultdict
@@ -468,3 +469,98 @@ def should_process_file(
     size_filter = FileSizeFilter(max_size_bytes) if max_size_bytes else None
     content_filter = ContentFilter(size_filter=size_filter)
     return content_filter.should_process(file_path)
+
+
+class FilterProfile(Enum):
+    """Predefined filter profiles for different use cases.
+
+    Each profile represents a different balance between speed and completeness:
+    - FAST: Aggressive filtering for quick analysis of large codebases
+    - BALANCED: Moderate filtering for typical projects (default)
+    - COMPLETE: Minimal filtering for comprehensive documentation
+
+    Example:
+        >>> filters = create_filter_chain(FilterProfile.FAST)
+        >>> filters = create_filter_chain(FilterProfile.BALANCED)
+        >>> filters = create_filter_chain(FilterProfile.COMPLETE)
+    """
+
+    FAST = "fast"
+    BALANCED = "balanced"
+    COMPLETE = "complete"
+
+
+def create_filter_chain(
+    profile: FilterProfile = FilterProfile.BALANCED,
+    custom_size_limit: Optional[int] = None,
+    custom_file_limit: Optional[int] = None,
+    custom_sample_rate: Optional[float] = None,
+) -> Dict[str, Union[FileSizeFilter, FileCountLimiter, SamplingStrategy, None]]:
+    """Factory function to create a filter chain based on a profile.
+
+    This function creates a consistent set of filters optimized for different
+    use cases. You can override specific parameters while maintaining the
+    overall profile characteristics.
+
+    Args:
+        profile: The filter profile to use (FAST, BALANCED, or COMPLETE)
+        custom_size_limit: Override the profile's file size limit (bytes)
+        custom_file_limit: Override the profile's file count limit per directory
+        custom_sample_rate: Override the profile's sampling rate (0.0 to 1.0)
+
+    Returns:
+        Dictionary containing configured filter instances:
+        - 'size_filter': FileSizeFilter instance or None
+        - 'count_limiter': FileCountLimiter instance or None
+        - 'sampling': SamplingStrategy instance or None
+
+    Example:
+        >>> # Use FAST profile for quick analysis
+        >>> filters = create_filter_chain(FilterProfile.FAST)
+        >>> size_filter = filters['size_filter']
+        >>> count_limiter = filters['count_limiter']
+        >>> sampling = filters['sampling']
+        >>>
+        >>> # Customize BALANCED profile
+        >>> filters = create_filter_chain(
+        ...     FilterProfile.BALANCED,
+        ...     custom_size_limit=1_000_000  # 1MB instead of default
+        ... )
+    """
+    # Define profile configurations
+    profiles = {
+        FilterProfile.FAST: {
+            'size_limit': 200_000,      # 200KB - skip large files aggressively
+            'file_limit': 50,            # 50 files per directory
+            'sample_rate': 0.2,          # Sample 20% of files
+        },
+        FilterProfile.BALANCED: {
+            'size_limit': 500_000,      # 500KB - default reasonable limit
+            'file_limit': 100,           # 100 files per directory
+            'sample_rate': None,         # No sampling for typical projects
+        },
+        FilterProfile.COMPLETE: {
+            'size_limit': 2_000_000,    # 2MB - very permissive
+            'file_limit': 500,           # 500 files per directory
+            'sample_rate': None,         # No sampling
+        },
+    }
+
+    # Get configuration for selected profile
+    config = profiles[profile]
+
+    # Apply custom overrides
+    size_limit = custom_size_limit if custom_size_limit is not None else config['size_limit']
+    file_limit = custom_file_limit if custom_file_limit is not None else config['file_limit']
+    sample_rate = custom_sample_rate if custom_sample_rate is not None else config['sample_rate']
+
+    # Create filter instances
+    size_filter = FileSizeFilter(max_size_bytes=size_limit) if size_limit else None
+    count_limiter = FileCountLimiter(max_files_per_dir=file_limit) if file_limit else None
+    sampling = SamplingStrategy(sample_rate=sample_rate) if sample_rate else None
+
+    return {
+        'size_filter': size_filter,
+        'count_limiter': count_limiter,
+        'sampling': sampling,
+    }

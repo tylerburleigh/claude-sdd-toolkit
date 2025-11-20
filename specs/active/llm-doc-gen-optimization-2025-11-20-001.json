@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T18:50:39.952463Z",
+  "last_updated": "2025-11-20T18:52:19.443076Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 5,
+    "progress_percentage": 7,
     "current_phase": "phase-1"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -57,7 +57,7 @@
         "phase-1-verify"
       ],
       "total_tasks": 14,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {
         "purpose": "Reduce processing scope through intelligent file selection and configurable limits",
         "risk_level": "low",
@@ -85,7 +85,7 @@
         "task-1-6"
       ],
       "total_tasks": 11,
-      "completed_tasks": 4,
+      "completed_tasks": 5,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -129,7 +129,7 @@
     "task-1-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/filters.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-1-files",
       "children": [
         "task-1-2-1",
@@ -148,7 +148,7 @@
         "depends": []
       },
       "total_tasks": 4,
-      "completed_tasks": 3,
+      "completed_tasks": 4,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/filters.py",
         "task_category": "implementation",
@@ -212,13 +212,19 @@
     "task-1-2-4": {
       "type": "subtask",
       "title": "FilterProfile enum and factory",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-1-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Define FilterProfile enum (FAST, BALANCED, COMPLETE) and create_filter_chain() factory for combining filters"
+        "details": "Define FilterProfile enum (FAST, BALANCED, COMPLETE) and create_filter_chain() factory for combining filters",
+        "started_at": "2025-11-20T18:51:06.700987Z",
+        "status_note": "Implementing FilterProfile enum and factory",
+        "completed_at": "2025-11-20T18:52:19.434299Z",
+        "needs_journaling": false,
+        "actual_hours": 0.02,
+        "journaled_at": "2025-11-20T18:52:19.440646Z"
       }
     },
     "task-1-3": {
@@ -2130,6 +2136,15 @@
       "content": "Implemented SamplingStrategy class in filters.py for large projects (10K+ files) with sample_rate parameter (default 0.1 for 10%). Includes intelligent sampling based on recency (modification time, 40% weight), depth (directory depth, 30% weight), and optional custom importance scorer (30% weight). Methods include sample_files() for batch processing, should_sample() for streaming scenarios, estimate_sample_size() for planning, and _calculate_file_score() for composite scoring. Updated __init__.py to export SamplingStrategy. All code includes comprehensive docstrings with examples and type hints.",
       "metadata": {},
       "task_id": "task-1-2-3"
+    },
+    {
+      "timestamp": "2025-11-20T18:52:19.440634Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: FilterProfile enum and factory",
+      "author": "claude-code",
+      "content": "Implemented FilterProfile enum with three profiles (FAST, BALANCED, COMPLETE) representing different balances between speed and completeness. Created create_filter_chain() factory function that instantiates coordinated filter sets based on profile. FAST profile uses 200KB size limit, 50 files/dir, 20% sampling. BALANCED uses 500KB, 100 files/dir, no sampling. COMPLETE uses 2MB, 500 files/dir, no sampling. Factory supports custom overrides for size_limit, file_limit, and sample_rate. Updated __init__.py to export FilterProfile and create_filter_chain. All code includes comprehensive docstrings with examples.",
+      "metadata": {},
+      "task_id": "task-1-2-4"
     }
   ]
 }

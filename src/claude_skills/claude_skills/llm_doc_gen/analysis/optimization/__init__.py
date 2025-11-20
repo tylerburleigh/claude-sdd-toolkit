@@ -15,6 +15,8 @@ from .filters import (
     FileSizeFilter,
     FileCountLimiter,
     SamplingStrategy,
+    FilterProfile,
+    create_filter_chain,
 )
 from .parallel import ParallelProcessor, process_files_parallel
 from .streaming import StreamingProcessor, process_in_chunks
@@ -27,6 +29,8 @@ __all__ = [
     "FileSizeFilter",
     "FileCountLimiter",
     "SamplingStrategy",
+    "FilterProfile",
+    "create_filter_chain",
     # Parallel processing
     "ParallelProcessor",
     "process_files_parallel",
