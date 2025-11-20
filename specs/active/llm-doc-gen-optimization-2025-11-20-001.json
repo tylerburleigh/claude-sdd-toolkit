@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T21:36:14.479633Z",
+  "last_updated": "2025-11-20T21:38:29.875923Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 77,
+    "progress_percentage": 79,
     "current_phase": "phase-5"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 53,
+      "completed_tasks": 54,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -1773,7 +1773,7 @@
         "depends": []
       },
       "total_tasks": 11,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "80-95% faster incremental runs through SQLite-backed caching",
         "risk_level": "medium",
@@ -1793,7 +1793,7 @@
         "task-5-5"
       ],
       "total_tasks": 8,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2015,7 +2015,7 @@
     "task-5-5": {
       "type": "task",
       "title": "tests/test_persistent_cache.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-5-files",
       "children": [
         "task-5-5-1",
@@ -2029,7 +2029,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "tests/test_persistent_cache.py",
         "task_category": "implementation",
@@ -2039,13 +2039,19 @@
     "task-5-5-1": {
       "type": "subtask",
       "title": "Cache hit/miss tests",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-5-5",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Test cache population, hit detection, miss handling, invalidation on file change"
+        "details": "Test cache population, hit detection, miss handling, invalidation on file change",
+        "started_at": "2025-11-20T21:36:41.069368Z",
+        "status_note": "Creating comprehensive cache tests for hit/miss scenarios and invalidation",
+        "completed_at": "2025-11-20T21:38:29.864511Z",
+        "needs_journaling": false,
+        "actual_hours": 0.03,
+        "journaled_at": "2025-11-20T21:38:29.872959Z"
       }
     },
     "task-5-5-2": {
@@ -3017,6 +3023,15 @@
       "content": "Successfully added cache CLI flags to the llm-doc-gen generate subcommand.\n\nImplementation details:\n- Added three new CLI flags to the generate subcommand:\n  * --cache: Boolean flag to enable persistent caching (makes cache_dir default to ./.doc-cache)\n  * --cache-dir CACHE_DIR: Specify custom directory for cache storage\n  * --clear-cache: Clear the cache before generating documentation\n- Updated cmd_generate() to handle cache options:\n  * Check for --cache or --cache-dir flags\n  * Use specified cache_dir or default to ./.doc-cache\n  * If --clear-cache is set, initialize PersistentCache and call clear() method\n  * Pass cache_dir to DocumentationGenerator constructor\n- Added import for PersistentCache in cache clearing logic\n\nTesting performed:\n- Syntax validation passed\n- Help output verification confirmed all three flags appear:\n  * --cache shows in usage line\n  * --cache-dir CACHE_DIR shows in usage line\n  * --clear-cache shows in usage line\n  * All three flags have proper help text descriptions\n  * Flags are properly grouped under 'Cache options' section\n\nUsage examples:\n- sdd doc generate ./src --cache\n- sdd doc generate ./src --cache-dir /tmp/my-cache\n- sdd doc generate ./src --cache --clear-cache\n- sdd doc generate ./src --cache-dir ~/.cache/doc-gen --clear-cache\n\nFiles modified:\n- src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py (added cache argument handling and CLI flags)",
       "metadata": {},
       "task_id": "task-5-4-1"
+    },
+    {
+      "timestamp": "2025-11-20T21:38:29.872947Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Cache hit/miss tests",
+      "author": "claude-code",
+      "content": "Successfully created comprehensive test suite for PersistentCache covering all cache hit/miss scenarios, file change invalidation, dependency tracking, and cascade invalidation.\n\nImplementation details:\nCreated test file with 23 tests organized into 6 test classes:\n1. TestCacheInitialization (3 tests) - Database and schema creation\n2. TestCacheHitMiss (4 tests) - Cache hit/miss scenarios including first access, after store, nonexistent files, multiple hits\n3. TestFileChangeInvalidation (3 tests) - Content change detection, unchanged content handling, manual invalidation\n4. TestDependencyTracking (3 tests) - Store dependencies, get dependencies, get dependents\n5. TestCascadeInvalidation (2 tests) - Cascade enabled/disabled scenarios\n6. TestCacheStatistics (3 tests) - Empty cache stats, stats with data, clear cache\n7. TestEdgeCases (5 tests) - Nonexistent files, uncached files, dependency updates\n\nTest coverage includes:\n- Cache population on first store\n- Cache hit detection on subsequent access\n- Cache miss handling on first access and after file changes\n- Content-addressed storage (hash-based) detects actual content changes\n- Mtime changes without content changes still result in cache hits\n- Manual invalidation via invalidate_file()\n- Dependency tracking stores and retrieves import relationships\n- Cascade invalidation propagates to dependent files\n- Non-cascade invalidation only affects target file\n- Statistics tracking (files_cached, results_cached, total_size_bytes, dependencies_tracked)\n- Clear cache functionality\n- Edge cases (nonexistent files, uncached files, dependency updates)\n\nTesting performed:\n- All 23 tests passed in 0.16s\n- pytest execution successful with no errors or warnings\n- Comprehensive coverage of cache behaviors specified in task requirements\n\nFiles created:\n- src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_persistent_cache.py (comprehensive test suite)",
+      "metadata": {},
+      "task_id": "task-5-5-1"
     }
   ]
 }
