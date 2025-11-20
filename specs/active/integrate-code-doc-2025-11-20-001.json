@@ -1,7 +1,7 @@
 {
   "spec_id": "integrate-code-doc-2025-11-20-001",
   "generated": "2025-11-20T12:00:00Z",
-  "last_updated": "2025-11-20T15:06:22.467453Z",
+  "last_updated": "2025-11-20T15:07:24.470090Z",
   "title": "Integrate Code-Doc into LLM-Doc-Gen",
   "metadata": {
     "title": "Integrate Code-Doc into LLM-Doc-Gen",
@@ -39,8 +39,8 @@
         "modified_by": "sdd-cli"
       }
     ],
-    "progress_percentage": 66,
-    "current_phase": "phase-1"
+    "progress_percentage": 77,
+    "current_phase": "phase-2"
   },
   "hierarchy": {
     "spec-root": {
@@ -55,7 +55,7 @@
         "phase-3"
       ],
       "total_tasks": 9,
-      "completed_tasks": 6,
+      "completed_tasks": 7,
       "metadata": {
         "purpose": "Consolidate documentation tools."
       },
@@ -276,14 +276,14 @@
       "id": "phase-2",
       "type": "phase",
       "title": "Cleanup Standalone Skills",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "task-2-1",
         "task-2-2"
       ],
       "total_tasks": 2,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Remove redundant agent definitions."
       },
@@ -297,16 +297,22 @@
       "id": "task-2-1",
       "type": "task",
       "title": "Remove Code-Doc Agent",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "agents/code-doc.md",
         "changes": "Delete the file.",
         "details": "The agent definition is no longer needed as functionality is merged.",
-        "task_category": "implementation"
+        "task_category": "implementation",
+        "started_at": "2025-11-20T15:06:53.223209Z",
+        "status_note": "Removing standalone code-doc agent file",
+        "completed_at": "2025-11-20T15:07:24.464774Z",
+        "needs_journaling": false,
+        "actual_hours": 0.009,
+        "journaled_at": "2025-11-20T15:07:24.469165Z"
       },
       "dependencies": {
         "blocks": [],
@@ -439,6 +445,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-20T15:07:24.469154Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Remove Standalone Code-Doc Agent",
+      "author": "claude-code",
+      "content": "Successfully removed standalone code-doc agent file as the functionality has been fully integrated into llm-doc-gen as the analysis module. Deleted agents/code-doc.md (6035 bytes). Code-doc functionality is no longer needed as a separate agent definition, making this cleanup operation complete.",
+      "metadata": {},
+      "task_id": "task-2-1"
     }
   ]
 }

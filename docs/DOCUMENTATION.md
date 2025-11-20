@@ -1,7 +1,7 @@
 # src Documentation
 
 **Version:** 1.0.0
-**Generated:** 2025-11-20 10:01:20
+**Generated:** 2025-11-20 10:06:46
 
 ---
 
@@ -3980,7 +3980,7 @@ Attributes:
 ### `TestBaseParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:158`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_base.py:158`
 
 **Description:**
 > Test BaseParser abstract class.
@@ -4189,7 +4189,7 @@ Attributes:
 ### `TestCSSParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py:17`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_css.py:17`
 
 **Description:**
 > Test CSS parser functionality.
@@ -4210,7 +4210,7 @@ Attributes:
 ### `TestCSSParserAdvanced`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py:170`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_css.py:170`
 
 **Description:**
 > Advanced CSS parser tests.
@@ -4583,7 +4583,7 @@ Attributes:
 ### `TestClassSchemaEnhancements`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:1419`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:1419`
 
 **Description:**
 > Test class schema v1.1 enhancements with usage tracking fields.
@@ -4791,7 +4791,7 @@ Attributes:
 ### `TestConsultation`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:124`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:124`
 
 **Description:**
 > Tests for run_consultation().
@@ -4807,7 +4807,7 @@ Attributes:
 ### `TestContextSummary`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:247`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:247`
 
 **Description:**
 > Tests for create_context_summary().
@@ -4852,7 +4852,7 @@ Attributes:
 ### `TestCreateParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:155`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_factory.py:155`
 
 **Description:**
 > Test create_parser_factory helper function.
@@ -5529,7 +5529,7 @@ Attributes:
 ### `TestFrameworkDetection`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:21`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:21`
 
 **Description:**
 > Tests for detect_framework().
@@ -5875,7 +5875,7 @@ Attributes:
 ### `TestGoParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_go.py:17`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_go.py:17`
 
 **Description:**
 > Test Go parser functionality.
@@ -5898,7 +5898,7 @@ Attributes:
 ### `TestHTMLParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py:17`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_html.py:17`
 
 **Description:**
 > Test HTML parser functionality.
@@ -5917,7 +5917,7 @@ Attributes:
 ### `TestHTMLParserAdvanced`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py:141`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_html.py:141`
 
 **Description:**
 > Advanced HTML parser tests.
@@ -6098,7 +6098,7 @@ Attributes:
 ### `TestJavaScriptParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py:17`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_javascript.py:17`
 
 **Description:**
 > Test JavaScript parser functionality.
@@ -6150,7 +6150,7 @@ Attributes:
 ### `TestKeyFileIdentification`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:74`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:74`
 
 **Description:**
 > Tests for identify_key_files().
@@ -6169,7 +6169,7 @@ Attributes:
 ### `TestLanguageEnum`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:18`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_base.py:18`
 
 **Description:**
 > Test Language enum.
@@ -6183,7 +6183,7 @@ Attributes:
 ### `TestLayerDetection`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:134`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:134`
 
 **Description:**
 > Tests for detect_layers().
@@ -6434,7 +6434,7 @@ Attributes:
 ### `TestModelResolution`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:231`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:231`
 
 **Description:**
 > Tests ensuring shared model helpers are used.
@@ -6602,7 +6602,7 @@ Attributes:
 ### `TestParseResult`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:104`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_base.py:104`
 
 **Description:**
 > Test ParseResult aggregation.
@@ -6617,7 +6617,7 @@ Attributes:
 ### `TestParsedDataStructures`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py:37`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_base.py:37`
 
 **Description:**
 > Test parsed data structures.
@@ -6633,7 +6633,7 @@ Attributes:
 ### `TestParserFactory`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:11`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_factory.py:11`
 
 **Description:**
 > Test ParserFactory functionality.
@@ -6658,7 +6658,7 @@ Attributes:
 ### `TestParserFactoryMultiLanguage`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py:174`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_factory.py:174`
 
 **Description:**
 > Integration tests for multi-language parsing.
@@ -7196,7 +7196,7 @@ Attributes:
 ### `TestPromptContentValidation`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:184`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:184`
 
 **Description:**
 > Tests to ensure prompts contain critical information.
@@ -7252,7 +7252,7 @@ Attributes:
 ### `TestPromptFormatting`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:22`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:22`
 
 **Description:**
 > Tests for prompt formatting functions.
@@ -7323,7 +7323,7 @@ Attributes:
 ### `TestPythonParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:11`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:11`
 
 **Description:**
 > Test Python parser functionality.
@@ -7349,7 +7349,7 @@ Attributes:
 ### `TestPythonParserAdvanced`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:252`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:252`
 
 **Description:**
 > Advanced Python parser tests.
@@ -7365,7 +7365,7 @@ Attributes:
 ### `TestPythonParserCrossReferences`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:314`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:314`
 
 **Description:**
 > Test cross-reference tracking in Python parser.
@@ -7399,7 +7399,7 @@ Attributes:
 ### `TestPythonParserDynamicPatterns`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:856`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:856`
 
 **Description:**
 > Test dynamic pattern warning detection.
@@ -7507,7 +7507,7 @@ Attributes:
 ### `TestReadingOrder`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:194`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:194`
 
 **Description:**
 > Tests for suggest_reading_order().
@@ -7522,7 +7522,7 @@ Attributes:
 ### `TestReadmeExtraction`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py:230`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py:230`
 
 **Description:**
 > Tests for extract_readme().
@@ -7847,7 +7847,7 @@ Attributes:
 ### `TestRoutingMatrix`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:164`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:164`
 
 **Description:**
 > Tests for documentation type routing.
@@ -7897,7 +7897,7 @@ Attributes:
 ### `TestSchemaEnhancements`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py:1109`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py:1109`
 
 **Description:**
 > Test schema v1.1 enhancements with cross-reference fields.
@@ -8411,7 +8411,7 @@ Attributes:
 ### `TestToolSelection`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py:88`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py:88`
 
 **Description:**
 > Tests for AI tool selection.
@@ -8457,7 +8457,7 @@ Attributes:
 ### `TestTypeScriptParser`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py:227`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_javascript.py:227`
 
 **Description:**
 > Test TypeScript-specific parsing.
@@ -9330,7 +9330,7 @@ and user interaction checkpoints.
 ### `_StubPrinter`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:12`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:12`
 
 **Methods:**
 - `__init__()`
@@ -10606,7 +10606,7 @@ Returns:
 ### `_doc_payload() -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:35`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:35`
 **Complexity:** 1
 
 ---
@@ -11806,7 +11806,7 @@ Args:
 ### `_make_args(json_path) -> Namespace`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:46`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:46`
 **Complexity:** 1
 
 **Parameters:**
@@ -11988,7 +11988,7 @@ Returns:
 ### `_module(file_path) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:20`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:20`
 **Complexity:** 4
 
 **Description:**
@@ -19368,7 +19368,7 @@ Args:
 ### `django_modules() -> list[dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:125`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:125`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -20947,7 +20947,7 @@ Returns:
 ### `flask_modules() -> list[dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:143`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:143`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -26374,7 +26374,7 @@ settings, ensuring tests are isolated and reproducible.
 ### `mock_execute_tool(monkeypatch) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:198`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:198`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -26390,7 +26390,7 @@ settings, ensuring tests are isolated and reproducible.
 ### `mock_execute_tool_failure(monkeypatch) -> ToolResponse`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:215`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:215`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -26963,7 +26963,7 @@ Returns:
 ### `plain_modules() -> list[dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:162`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:162`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -28727,7 +28727,7 @@ Returns:
 ### `sample_framework_info(sample_modules) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:171`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:171`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -28883,7 +28883,7 @@ Returns:
 ### `sample_layers(sample_modules) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:177`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:177`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -28899,7 +28899,7 @@ Returns:
 ### `sample_modules() -> list[dict]`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:57`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:57`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -29063,7 +29063,7 @@ Returns:
 ### `sample_statistics(sample_modules) -> dict`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:183`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:183`
 **Complexity:** 2
 
 **Decorators:** `@pytest.fixture`
@@ -30247,7 +30247,7 @@ Returns:
 ### `temp_project_dir(tmp_path) -> Path`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py:43`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py:43`
 **Complexity:** 1
 
 **Decorators:** `@pytest.fixture`
@@ -34815,7 +34815,7 @@ Returns:
 ### `test_parse_model_override_accepts_none() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:154`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:154`
 **Complexity:** 1
 
 ---
@@ -34863,7 +34863,7 @@ Returns:
 ### `test_parse_model_override_mixed_with_default() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:168`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:168`
 **Complexity:** 1
 
 ---
@@ -34871,7 +34871,7 @@ Returns:
 ### `test_parse_model_override_per_tool_values() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:163`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:163`
 **Complexity:** 1
 
 ---
@@ -34887,7 +34887,7 @@ Returns:
 ### `test_parse_model_override_single_value() -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:159`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:159`
 **Complexity:** 1
 
 ---
@@ -35854,7 +35854,7 @@ Returns:
 ### `test_validate_handles_missing_schema(monkeypatch, tmp_path, capsys) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:83`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:83`
 **Complexity:** 1
 
 **Parameters:**
@@ -35867,7 +35867,7 @@ Returns:
 ### `test_validate_missing_jsonschema_uses_basic_checks(monkeypatch, tmp_path, capsys) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:125`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:125`
 **Complexity:** 2
 
 **Parameters:**
@@ -35880,7 +35880,7 @@ Returns:
 ### `test_validate_missing_keys_fails(monkeypatch, tmp_path, capsys) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:104`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:104`
 **Complexity:** 1
 
 **Parameters:**
@@ -35946,7 +35946,7 @@ Returns:
 ### `test_validate_uses_schema_loader(monkeypatch, tmp_path, capsys) -> None`
 
 **Language:** python
-**Defined in:** `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py:50`
+**Defined in:** `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py:50`
 **Complexity:** 1
 
 **Parameters:**
@@ -40340,6 +40340,101 @@ Returns:
 - `subprocess`
 - `sys`
 
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/conftest.py`
+
+- `__future__.annotations`
+- `claude_skills.common.ai_tools.ToolResponse`
+- `claude_skills.common.ai_tools.ToolStatus`
+- `claude_skills.llm_doc_gen.analysis.detectors`
+- `pathlib.Path`
+- `pytest`
+- `typing.Iterable`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_ai_consultation.py`
+
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.DOC_TYPE_ROUTING`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.consult_multi_agent`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.format_ai_context_research_prompt`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.format_architecture_research_prompt`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.get_best_tool`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.get_model_for_tool`
+- `claude_skills.llm_doc_gen.analysis.ai_consultation.run_consultation`
+- `pathlib.Path`
+- `pytest`
+- `unittest.mock.MagicMock`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_cli.py`
+
+- `argparse.Namespace`
+- `builtins`
+- `claude_skills.llm_doc_gen.analysis.cli`
+- `json`
+- `pytest`
+- `sys`
+- `types.SimpleNamespace`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_detectors.py`
+
+- `claude_skills.llm_doc_gen.analysis.detectors.create_context_summary`
+- `claude_skills.llm_doc_gen.analysis.detectors.detect_framework`
+- `claude_skills.llm_doc_gen.analysis.detectors.detect_layers`
+- `claude_skills.llm_doc_gen.analysis.detectors.extract_readme`
+- `claude_skills.llm_doc_gen.analysis.detectors.identify_key_files`
+- `claude_skills.llm_doc_gen.analysis.detectors.suggest_reading_order`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_base.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.BaseParser`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.ParseResult`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.ParsedClass`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.ParsedFunction`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.ParsedModule`
+- `claude_skills.llm_doc_gen.analysis.parsers.base.ParsedParameter`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_css.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_factory.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `claude_skills.llm_doc_gen.analysis.parsers.factory.ParserFactory`
+- `claude_skills.llm_doc_gen.analysis.parsers.factory.create_parser_factory`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_go.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_html.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_javascript.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `pathlib.Path`
+- `pytest`
+
+### `src/claude_skills/claude_skills/tests/unit/llm_doc_gen/analysis/test_parsers_python.py`
+
+- `claude_skills.llm_doc_gen.analysis.parsers.base.Language`
+- `claude_skills.llm_doc_gen.analysis.parsers.python.PythonParser`
+- `pathlib.Path`
+- `pytest`
+
 ### `src/claude_skills/claude_skills/tests/unit/test_apply_modifications_cli.py`
 
 - `claude_skills.sdd_spec_mod.cli.cmd_apply_modifications`
@@ -40376,101 +40471,6 @@ Returns:
 - `unittest.mock.MagicMock`
 - `unittest.mock.mock_open`
 - `unittest.mock.patch`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/conftest.py`
-
-- `__future__.annotations`
-- `claude_skills.code_doc.detectors`
-- `claude_skills.common.ai_tools.ToolResponse`
-- `claude_skills.common.ai_tools.ToolStatus`
-- `pathlib.Path`
-- `pytest`
-- `typing.Iterable`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_ai_consultation.py`
-
-- `claude_skills.code_doc.ai_consultation.DOC_TYPE_ROUTING`
-- `claude_skills.code_doc.ai_consultation.consult_multi_agent`
-- `claude_skills.code_doc.ai_consultation.format_ai_context_research_prompt`
-- `claude_skills.code_doc.ai_consultation.format_architecture_research_prompt`
-- `claude_skills.code_doc.ai_consultation.get_best_tool`
-- `claude_skills.code_doc.ai_consultation.get_model_for_tool`
-- `claude_skills.code_doc.ai_consultation.run_consultation`
-- `pathlib.Path`
-- `pytest`
-- `unittest.mock.MagicMock`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_cli.py`
-
-- `argparse.Namespace`
-- `builtins`
-- `claude_skills.code_doc.cli`
-- `json`
-- `pytest`
-- `sys`
-- `types.SimpleNamespace`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_detectors.py`
-
-- `claude_skills.code_doc.detectors.create_context_summary`
-- `claude_skills.code_doc.detectors.detect_framework`
-- `claude_skills.code_doc.detectors.detect_layers`
-- `claude_skills.code_doc.detectors.extract_readme`
-- `claude_skills.code_doc.detectors.identify_key_files`
-- `claude_skills.code_doc.detectors.suggest_reading_order`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_base.py`
-
-- `claude_skills.code_doc.parsers.base.BaseParser`
-- `claude_skills.code_doc.parsers.base.Language`
-- `claude_skills.code_doc.parsers.base.ParseResult`
-- `claude_skills.code_doc.parsers.base.ParsedClass`
-- `claude_skills.code_doc.parsers.base.ParsedFunction`
-- `claude_skills.code_doc.parsers.base.ParsedModule`
-- `claude_skills.code_doc.parsers.base.ParsedParameter`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_css.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_factory.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `claude_skills.code_doc.parsers.factory.ParserFactory`
-- `claude_skills.code_doc.parsers.factory.create_parser_factory`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_go.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_html.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_javascript.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `pathlib.Path`
-- `pytest`
-
-### `src/claude_skills/claude_skills/tests/unit/test_code_doc/test_parsers_python.py`
-
-- `claude_skills.code_doc.parsers.base.Language`
-- `claude_skills.code_doc.parsers.python.PythonParser`
-- `pathlib.Path`
-- `pytest`
 
 ### `src/claude_skills/claude_skills/tests/unit/test_common/test_ai_config_models.py`
 
