@@ -198,6 +198,21 @@ llm-doc-gen:
     #      cursor-agent: composer-1
     #      claude: haiku
 
+# =============================================================================
+# Multi-Agent Consensus Configuration (Shared across skills)
+# =============================================================================
+# Used by: run-tests, llm-doc-gen, sdd-plan-review, sdd-fidelity-review
+#
+# Configures parallel consultation of multiple AI models for complex scenarios.
+# When enabled, the toolkit consults multiple models simultaneously and synthesizes
+# their insights to produce more robust solutions.
+#
+# - agents: Priority-ordered list of AI tools to consult during consensus
+# - models: Specific models to use for each agent during consensus consultation
+# - auto_trigger: Rules for when to automatically trigger consensus (run-tests only)
+#   - Controls which test failure types automatically invoke multi-agent consultation
+#   - true = auto-trigger consensus, false = use single-agent by default
+#
 consensus:
   agents:
     - cursor-agent

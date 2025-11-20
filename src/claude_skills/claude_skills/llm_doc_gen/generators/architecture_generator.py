@@ -341,6 +341,17 @@ class ArchitectureGenerator:
             # Log warnings (in production, you might want to use proper logging)
             for warning in warnings:
                 print(f"[WARN] Markdown validation: {warning}")
+
+            # Check for truncation warnings specifically
+            truncation_warnings = [w for w in warnings if "Section header with no content" in w or "truncation" in w.lower()]
+            if truncation_warnings:
+                print(f"\n[ERROR] LLM response appears truncated. This will result in incomplete documentation.")
+                print("Possible solutions:")
+                print("  - Reduce prompt complexity or split into smaller sections")
+                print("  - Increase model output token limits")
+                print("  - Use a model with larger context window")
+                print("  - Try regenerating with a different AI tool\n")
+                # Continue anyway but flag the issue
         doc_parts.append(sanitized_findings)
         doc_parts.append("")
 

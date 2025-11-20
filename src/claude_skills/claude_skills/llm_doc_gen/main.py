@@ -374,7 +374,7 @@ def create_project_data_from_scan(
         output_path = output_dir / "codebase.json"
         generator.save_json(
             output_path=output_path,
-            analysis=result,
+            analysis=result.get("analysis", {}),
             statistics=result.get("statistics", {}),
             verbose=False
         )
@@ -382,7 +382,7 @@ def create_project_data_from_scan(
     # Extract statistics and full analysis from result
     statistics = result.get("statistics", {})
     analysis = {
-        "modules": result.get("modules", []),
+        "modules": result.get("analysis", {}).get("modules", []),
         "statistics": statistics
     }
 
@@ -393,7 +393,7 @@ def create_project_data_from_scan(
     directory_tree = build_directory_tree(project_root, max_depth=3)
 
     # Extract languages from statistics
-    languages_data = statistics.get("languages", {})
+    languages_data = statistics.get("by_language", {})
     primary_languages = sorted(
         languages_data.keys(),
         key=lambda lang: languages_data[lang].get("lines", 0),

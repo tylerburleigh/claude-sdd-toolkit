@@ -79,7 +79,7 @@ def handle_generate(args, printer: PrettyPrinter) -> int:
 
         # Create project data from scan
         printer.info("Scanning project...")
-        project_data = create_project_data_from_scan(project_root, project_name)
+        project_data = create_project_data_from_scan(project_root, project_name, output_dir)
 
         # Create index data
         project_description = args.description or f"{project_name} documentation"

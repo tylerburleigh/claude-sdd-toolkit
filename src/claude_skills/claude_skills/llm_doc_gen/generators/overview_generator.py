@@ -148,7 +148,7 @@ class OverviewGenerator:
                 prompt_parts.append("")
 
             # Language statistics
-            languages = project_data.analysis.get("statistics", {}).get("languages", {})
+            languages = project_data.analysis.get("statistics", {}).get("by_language", {})
             if languages:
                 prompt_parts.append("### Language Breakdown")
                 prompt_parts.append("")

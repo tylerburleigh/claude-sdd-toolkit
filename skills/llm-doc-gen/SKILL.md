@@ -111,7 +111,7 @@ The skill maintains a `project-doc-state.json` file to enable resuming interrupt
 }
 ```
 
-If the scan is interrupted, simply run `sdd llm-doc resume ./docs` to continue from the last checkpoint.
+If the scan is interrupted, simply run `sdd llm-doc-gen resume ./docs` to continue from the last checkpoint.
 
 ---
 
@@ -199,7 +199,7 @@ If interrupted at any step, the workflow can resume from the last completed step
 
 ```bash
 # Workflow interrupted after Step 3
-sdd llm-doc resume ./docs
+sdd llm-doc-gen resume ./docs
 # Resumes from Step 4: Generate Guides
 ```
 
@@ -259,21 +259,21 @@ If no LLM tools are installed, this skill cannot function. Install at least one 
 
 ```bash
 # Generate complete sharded documentation
-sdd llm-doc scan ./src --project-name MyProject --output-dir ./docs
+sdd llm-doc-gen scan ./src --project-name MyProject --output-dir ./docs
 
 # Resume interrupted scan
-sdd llm-doc resume ./docs
+sdd llm-doc-gen resume ./docs
 
 # Generate specific section only
-sdd llm-doc section architecture --source ./src --output ./docs/architecture/
+sdd llm-doc-gen section architecture --source ./src --output ./docs/architecture/
 
 # Single-agent mode (faster, less comprehensive)
-sdd llm-doc scan ./src --single-agent --tool cursor-agent
+sdd llm-doc-gen scan ./src --single-agent --tool cursor-agent
 ```
 
 ### Output
 
-After running `sdd llm-doc scan`, you'll get organized documentation:
+After running `sdd llm-doc-gen scan`, you'll get organized documentation:
 
 ```
 docs/
@@ -368,7 +368,7 @@ docs/
 
 4. **Maintain state file integrity**
    - Don't manually edit project-doc-state.json
-   - Use `sdd llm-doc resume` to continue interrupted scans
+   - Use `sdd llm-doc-gen resume` to continue interrupted scans
    - State file enables checkpointing and progress tracking
 
 5. **Report LLM failures transparently**
@@ -409,7 +409,7 @@ docs/
 
 ### Step-by-Step Execution
 
-When you run `sdd llm-doc scan ./src --project-name MyProject`, the workflow engine executes these steps:
+When you run `sdd llm-doc-gen scan ./src --project-name MyProject`, the workflow engine executes these steps:
 
 #### Step 1: Initialize (5-10 seconds)
 
@@ -577,7 +577,7 @@ If the workflow is interrupted at any step, the state file preserves progress:
 
 **To resume:**
 ```bash
-sdd llm-doc resume ./docs
+sdd llm-doc-gen resume ./docs
 ```
 
 **Resume output:**
