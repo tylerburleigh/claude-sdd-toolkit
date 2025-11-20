@@ -257,18 +257,20 @@ class BaseParser(ABC):
     the required abstract methods.
     """
 
-    def __init__(self, project_root: Path, exclude_patterns: Optional[List[str]] = None):
+    def __init__(self, project_root: Path, exclude_patterns: Optional[List[str]] = None, cache: Optional[Any] = None):
         """
         Initialize the parser.
 
         Args:
             project_root: Root directory of the project
             exclude_patterns: Patterns to exclude from parsing
+            cache: Optional PersistentCache instance for caching parse results
         """
         self.project_root = project_root.resolve()
         # Store CWD for computing relative paths in output
         self.cwd = Path.cwd()
         self.exclude_patterns = exclude_patterns or []
+        self.cache = cache
 
     @property
     @abstractmethod
@@ -283,9 +285,12 @@ class BaseParser(ABC):
         pass
 
     @abstractmethod
-    def parse_file(self, file_path: Path) -> ParseResult:
+    def _parse_file_impl(self, file_path: Path) -> ParseResult:
         """
-        Parse a single file and return structured results.
+        Parse a single file and return structured results (implementation).
+
+        Subclasses should implement this method. Use parse_file() which wraps
+        this with caching logic.
 
         Args:
             file_path: Path to the file to parse
@@ -294,6 +299,33 @@ class BaseParser(ABC):
             ParseResult containing parsed entities
         """
         pass
+
+    def parse_file(self, file_path: Path) -> ParseResult:
+        """
+        Parse a single file and return structured results.
+
+        Checks cache first if available, otherwise parses and stores in cache.
+
+        Args:
+            file_path: Path to the file to parse
+
+        Returns:
+            ParseResult containing parsed entities
+        """
+        # Check cache if available
+        if self.cache:
+            cached_result = self.cache.get_cached_result(file_path)
+            if cached_result is not None:
+                return cached_result
+
+        # Parse file
+        result = self._parse_file_impl(file_path)
+
+        # Store in cache if available
+        if self.cache:
+            self.cache.store_result(file_path, result)
+
+        return result
 
     def find_files(self) -> List[Path]:
         """

@@ -408,7 +408,7 @@ class PythonParser(BaseParser):
                 call.metadata['jedi_error'] = str(e)
                 pass
 
-    def parse_file(self, file_path: Path) -> ParseResult:
+    def _parse_file_impl(self, file_path: Path) -> ParseResult:
         """
         Parse a Python file and extract structure.
 
