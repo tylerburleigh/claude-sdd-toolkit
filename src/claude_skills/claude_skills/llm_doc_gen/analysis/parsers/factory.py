@@ -196,14 +196,17 @@ class ParserFactory:
 
     def _should_exclude(self, file_path: Path) -> bool:
         """
-        Check if a file should be excluded based on patterns.
+        Check if a file should be excluded based on patterns and filters.
 
         Uses path component matching to avoid false positives.
         For example, '.git' will match '.git/' but not '.github/'.
+
+        Also applies filter_chain if configured (size limits, etc.).
         """
         path_parts = file_path.parts
         path_str = str(file_path)
 
+        # First check pattern-based exclusions
         for pattern in self.exclude_patterns:
             # Check if pattern matches any path component exactly
             if pattern in path_parts:
@@ -222,6 +225,18 @@ class ParserFactory:
             if pattern.count('.') > 1:
                 # For patterns like '.env.local', match as substring
                 if pattern in path_str:
+                    return True
+
+        # Apply filter_chain if configured
+        if self.filter_chain is not None:
+            # Check size filter
+            size_filter = self.filter_chain.get('size_filter')
+            if size_filter is not None:
+                try:
+                    if not size_filter.should_include(file_path):
+                        return True  # Exclude files that are too large
+                except (FileNotFoundError, OSError):
+                    # If we can't access the file, exclude it
                     return True
 
         return False
