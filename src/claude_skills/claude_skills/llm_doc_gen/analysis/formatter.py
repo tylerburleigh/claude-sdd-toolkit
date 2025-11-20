@@ -5,14 +5,17 @@ Supports multi-language projects.
 """
 
 from datetime import datetime, timezone
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from collections import defaultdict
+from pathlib import Path
 
 # Handle both direct execution and module import
 try:
     from .schema import SCHEMA_VERSION
+    from .optimization.streaming import StreamingJSONWriter
 except ImportError:
     from schema import SCHEMA_VERSION
+    from optimization.streaming import StreamingJSONWriter
 
 
 class MarkdownGenerator:
@@ -205,8 +208,31 @@ class JSONGenerator:
         self.project_name = project_name
         self.version = version
 
-    def generate(self, analysis: Dict[str, Any], statistics: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate JSON documentation with multi-language support."""
+    def generate(
+        self,
+        analysis: Dict[str, Any],
+        statistics: Dict[str, Any],
+        streaming: bool = False,
+        output_path: Optional[Path] = None,
+        compress: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Generate JSON documentation with multi-language support.
+
+        Args:
+            analysis: Analyzed codebase data
+            statistics: Code statistics
+            streaming: If True, use StreamingJSONWriter for memory-efficient output
+            output_path: Path for streaming output (required if streaming=True)
+            compress: Enable gzip compression for streaming output
+
+        Returns:
+            Dict containing JSON documentation (if streaming=False)
+            None (if streaming=True, output written to file)
+
+        Raises:
+            ValueError: If streaming=True but output_path not provided
+        """
         # Detect languages present
         languages = set()
         for module in analysis.get('modules', []):
@@ -214,17 +240,50 @@ class JSONGenerator:
             if lang != 'unknown':
                 languages.add(lang)
 
-        return {
-            "metadata": {
-                "project_name": self.project_name,
-                "version": self.version,
-                "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                "languages": sorted(list(languages)) if languages else ["unknown"],
-                "schema_version": SCHEMA_VERSION
-            },
-            "statistics": statistics,
-            "modules": analysis['modules'],
-            "classes": analysis['classes'],
-            "functions": analysis['functions'],
-            "dependencies": analysis['dependencies']
+        # Prepare metadata
+        metadata = {
+            "project_name": self.project_name,
+            "version": self.version,
+            "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "languages": sorted(list(languages)) if languages else ["unknown"],
+            "schema_version": SCHEMA_VERSION
         }
+
+        if streaming:
+            # Streaming mode - write incrementally to file
+            if output_path is None:
+                raise ValueError("output_path required when streaming=True")
+
+            with StreamingJSONWriter(output_path, compress=compress) as writer:
+                # Write metadata
+                writer.write_metadata({**metadata, **statistics})
+
+                # Write modules incrementally
+                for module in analysis.get('modules', []):
+                    writer.write_module(module)
+
+                # Write classes incrementally
+                for class_obj in analysis.get('classes', []):
+                    writer.write_class(class_obj)
+
+                # Write functions incrementally
+                for function in analysis.get('functions', []):
+                    writer.write_function(function)
+
+                # Write dependencies
+                writer.write_dependencies(analysis.get('dependencies', {}))
+
+                # Write errors if any
+                writer.write_errors(analysis.get('errors', []))
+
+            return None  # No in-memory return for streaming
+        else:
+            # Traditional mode - build entire structure in memory
+            return {
+                "metadata": metadata,
+                "statistics": statistics,
+                "modules": analysis['modules'],
+                "classes": analysis['classes'],
+                "functions": analysis['functions'],
+                "dependencies": analysis['dependencies']
+            }
