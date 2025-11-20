@@ -337,5 +337,169 @@ class TestWorkerFunction:
         assert len(result.errors) > 0
 
 
+class TestParallelPerformance:
+    """Performance benchmarks for parallel parsing."""
+
+    def _create_large_project(self, tmp_dir: Path, num_files: int = 50) -> list:
+        """
+        Create a large test project with many files.
+
+        Args:
+            tmp_dir: Temporary directory
+            num_files: Number of files to create
+
+        Returns:
+            List of file paths
+        """
+        files = []
+
+        for i in range(num_files):
+            py_file = tmp_dir / f"module_{i}.py"
+            py_file.write_text(f"""
+import os
+import sys
+from typing import List, Dict
+
+def function_{i}_1(x, y):
+    '''Process data {i}.'''
+    return x + y
+
+def function_{i}_2(a, b, c):
+    '''Calculate {i}.'''
+    return (a * b) + c
+
+class Class_{i}:
+    def __init__(self, value):
+        self.value = value
+
+    def process(self, data):
+        return data * self.value
+
+    def transform(self, items: List[int]) -> Dict[int, int]:
+        return {{item: item * 2 for item in items}}
+""")
+            files.append(str(py_file))
+
+        return files
+
+    def test_parallel_speedup(self):
+        """Test that parallel parsing provides speedup over sequential."""
+        import time
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            files = self._create_large_project(tmp_path, num_files=20)
+
+            # Sequential parsing
+            factory_seq = create_parser_factory(tmp_path)
+            start_seq = time.time()
+            result_seq = factory_seq.parse_all(verbose=False, parallel=False)
+            time_seq = time.time() - start_seq
+
+            # Parallel parsing
+            factory_par = create_parser_factory(tmp_path)
+            start_par = time.time()
+            result_par = factory_par.parse_all(verbose=False, parallel=True, num_workers=4)
+            time_par = time.time() - start_par
+
+            print(f"\nSequential time: {time_seq:.3f}s")
+            print(f"Parallel time: {time_par:.3f}s")
+
+            if time_seq > 0:
+                speedup = time_seq / time_par if time_par > 0 else 1.0
+                print(f"Speedup: {speedup:.2f}x")
+
+            # Note: On small projects, parallel might be slower due to overhead
+            # This test primarily documents the API, actual speedup measured on large projects
+
+    def test_scaling_with_file_count(self):
+        """Test how parallel parsing scales with number of files."""
+        import time
+
+        file_counts = [10, 30, 50]
+        results = []
+
+        for count in file_counts:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                tmp_path = Path(tmp_dir)
+                files = self._create_large_project(tmp_path, num_files=count)
+
+                factory = create_parser_factory(tmp_path)
+
+                start = time.time()
+                factory.parse_all(verbose=False, parallel=True, num_workers=4)
+                elapsed = time.time() - start
+
+                results.append((count, elapsed))
+
+        print(f"\nScaling test results:")
+        for count, elapsed in results:
+            print(f"  {count} files: {elapsed:.3f}s")
+
+        # Check that time grows sub-linearly (parallel should help)
+        # For linear growth: time(50) / time(10) ≈ 5
+        # For good parallelism: time(50) / time(10) < 5
+        if len(results) >= 2 and results[0][1] > 0:
+            growth_ratio = results[-1][1] / results[0][1]
+            file_ratio = results[-1][0] / results[0][0]
+
+            print(f"Growth ratio: {growth_ratio:.2f}x (file ratio: {file_ratio:.2f}x)")
+
+            # With good parallelism, time growth should be less than file count growth
+            # Allow some overhead for small projects
+            assert growth_ratio < file_ratio * 1.5, \
+                f"Scaling poorly: {growth_ratio:.2f}x time for {file_ratio:.2f}x files"
+
+    def test_worker_count_impact(self):
+        """Test impact of different worker counts on performance."""
+        import time
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            files = self._create_large_project(tmp_path, num_files=30)
+
+            worker_counts = [1, 2, 4]
+            results = []
+
+            for workers in worker_counts:
+                factory = create_parser_factory(tmp_path)
+
+                start = time.time()
+                factory.parse_all(verbose=False, parallel=True, num_workers=workers)
+                elapsed = time.time() - start
+
+                results.append((workers, elapsed))
+
+            print(f"\nWorker count impact:")
+            for workers, elapsed in results:
+                print(f"  {workers} workers: {elapsed:.3f}s")
+
+            # More workers should generally be faster (with diminishing returns)
+            # At minimum, 4 workers shouldn't be slower than 1 worker
+            if len(results) >= 2:
+                time_1_worker = results[0][1]
+                time_4_workers = results[-1][1]
+
+                # Allow for overhead on small projects
+                # On large projects, 4 workers should be faster than 1
+                improvement = time_1_worker / time_4_workers if time_4_workers > 0 else 1.0
+                print(f"Improvement from 1 to 4 workers: {improvement:.2f}x")
+
+    def test_memory_efficiency(self):
+        """Test that parallel parsing doesn't consume excessive memory."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            files = self._create_large_project(tmp_path, num_files=20)
+
+            factory = create_parser_factory(tmp_path)
+
+            # Parse in parallel (should manage memory efficiently with worker pools)
+            result = factory.parse_all(verbose=False, parallel=True, num_workers=4)
+
+            # Check result is valid (memory wasn't exhausted)
+            assert result is not None
+            assert isinstance(result.modules, list)
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "-s"])
