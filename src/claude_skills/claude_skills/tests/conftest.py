@@ -1135,8 +1135,8 @@ def mock_ai_config_enabled_tools(monkeypatch):
     def mock_get_enabled_tools(skill_name: str):
         """Return all available tools as enabled, ignoring user config."""
         try:
-            # Try code-doc's get_available_tools first
-            from claude_skills.code_doc.ai_consultation import get_available_tools
+            # Try analysis module's get_available_tools first
+            from claude_skills.llm_doc_gen.analysis.ai_consultation import get_available_tools
             available = get_available_tools()
         except ImportError:
             # Fallback to detecting available tools directly

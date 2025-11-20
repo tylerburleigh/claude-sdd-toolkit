@@ -10,16 +10,16 @@ from typing import List, Optional, Dict, Any, Set
 from dataclasses import dataclass
 import sys
 
-# Import code-doc parser infrastructure
+# Import analysis parser infrastructure
 try:
-    from claude_skills.code_doc.parsers.factory import create_parser_factory
-    from claude_skills.code_doc.parsers.base import Language, ParseResult
+    from claude_skills.llm_doc_gen.analysis.parsers.factory import create_parser_factory
+    from claude_skills.llm_doc_gen.analysis.parsers.base import Language, ParseResult
 except ImportError:
     # Support running from source directory during development
     parent_path = Path(__file__).parent.parent.parent / "src" / "claude_skills"
     sys.path.insert(0, str(parent_path.parent))
-    from claude_skills.code_doc.parsers.factory import create_parser_factory
-    from claude_skills.code_doc.parsers.base import Language, ParseResult
+    from claude_skills.llm_doc_gen.analysis.parsers.factory import create_parser_factory
+    from claude_skills.llm_doc_gen.analysis.parsers.base import Language, ParseResult
 
 
 @dataclass

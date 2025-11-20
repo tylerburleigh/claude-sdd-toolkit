@@ -197,7 +197,7 @@ def register_all_subcommands(subparsers, parent_parser):
 
 def _register_doc_cli(subparsers, parent_parser):
     """Register the doc CLI as an SDD subcommand."""
-    from claude_skills.code_doc.cli import register_code_doc
+    from claude_skills.llm_doc_gen.analysis.cli import register_code_doc
     from claude_skills.doc_query.cli import register_doc_query
 
     doc_parser = subparsers.add_parser(
