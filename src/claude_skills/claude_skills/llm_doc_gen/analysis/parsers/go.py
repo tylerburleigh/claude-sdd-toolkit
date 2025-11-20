@@ -35,6 +35,7 @@ from .base import (
     ParsedFunction,
     ParsedParameter,
 )
+from ..tree_cache import TreeCache
 
 
 class GoParser(BaseParser):
@@ -53,6 +54,9 @@ class GoParser(BaseParser):
         go_lang = Language(tsgo.language())
         self._parser = Parser(go_lang)
 
+        # Initialize tree cache for incremental parsing
+        self._tree_cache = TreeCache(max_cache_size=1000)
+
     @property
     def language(self) -> Lang:
         """Return Go language."""
@@ -62,6 +66,14 @@ class GoParser(BaseParser):
     def file_extensions(self) -> List[str]:
         """Go file extensions."""
         return ['go']
+
+    def get_cache_stats(self):
+        """Get tree cache statistics."""
+        return self._tree_cache.get_stats()
+
+    def clear_cache(self):
+        """Clear the tree cache."""
+        self._tree_cache.clear()
 
     def parse_file(self, file_path: Path) -> ParseResult:
         """
@@ -80,12 +92,23 @@ class GoParser(BaseParser):
             with open(file_path, 'rb') as f:
                 source = f.read()
 
-            # Parse source code
-            tree = self._parser.parse(source)
+            # Check cache for existing tree (incremental parsing)
+            cached = self._tree_cache.get(file_path)
+
+            # Parse source code (incremental if cached tree available)
+            if cached:
+                tree = self._parser.parse(source, old_tree=cached.tree)
+            else:
+                tree = self._parser.parse(source)
             root = tree.root_node
 
-            # Create module info
+            # Decode source for further processing
             source_text = source.decode('utf-8')
+
+            # Store in cache for future incremental parsing
+            self._tree_cache.put(file_path, tree, source_text)
+
+            # Create module info
             module = ParsedModule(
                 name=file_path.stem,
                 file=relative_path,

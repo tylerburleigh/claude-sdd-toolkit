@@ -1,0 +1,2090 @@
+{
+  "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
+  "title": "Codebase.json Generation Improvements for Large Codebases",
+  "generated": "2025-11-20T00:00:00Z",
+  "last_updated": "2025-11-20T18:46:37.544789Z",
+  "metadata": {
+    "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
+    "objectives": [
+      "Handle codebases >100K files without OOM errors",
+      "Achieve sub-minute incremental updates",
+      "Reduce peak memory to <100MB for large projects",
+      "Enable generation for 50K+ file projects"
+    ],
+    "complexity": "high",
+    "estimated_hours": 80,
+    "assumptions": [
+      "Multi-model consensus identified 7 key improvements",
+      "Phases build on each other sequentially",
+      "Phase 6 (Two-Tier) is optional and can be deferred",
+      "Backward compatibility maintained where possible"
+    ],
+    "status": "active",
+    "activated_date": "2025-11-20T18:45:49.944481Z",
+    "progress_percentage": 1,
+    "current_phase": "phase-1"
+  },
+  "hierarchy": {
+    "spec-root": {
+      "type": "spec",
+      "title": "Codebase.json Generation Improvements",
+      "status": "in_progress",
+      "parent": null,
+      "children": [
+        "phase-1",
+        "phase-2",
+        "phase-3",
+        "phase-4",
+        "phase-5",
+        "phase-6"
+      ],
+      "total_tasks": 68,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1": {
+      "type": "phase",
+      "title": "Smart Filtering and Sampling Framework",
+      "status": "in_progress",
+      "parent": "spec-root",
+      "children": [
+        "phase-1-files",
+        "phase-1-verify"
+      ],
+      "total_tasks": 14,
+      "completed_tasks": 1,
+      "metadata": {
+        "purpose": "Reduce processing scope through intelligent file selection and configurable limits",
+        "risk_level": "low",
+        "estimated_hours": 10
+      },
+      "dependencies": {
+        "blocks": [
+          "phase-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "phase-1-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "in_progress",
+      "parent": "phase-1",
+      "children": [
+        "task-1-1",
+        "task-1-2",
+        "task-1-3",
+        "task-1-4",
+        "task-1-5",
+        "task-1-6"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 1,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-1-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-1-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/__init__.py",
+      "status": "completed",
+      "parent": "phase-1-files",
+      "children": [],
+      "dependencies": {
+        "blocks": [
+          "task-1-2"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 1,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/__init__.py",
+        "task_category": "implementation",
+        "estimated_hours": 0.5,
+        "details": [
+          "Create new optimization package directory",
+          "Add __init__.py with module exports for filtering, parallel, streaming, and cache components"
+        ],
+        "started_at": "2025-11-20T18:46:12.326030Z",
+        "status_note": "Starting autonomous execution of optimization package initialization",
+        "completed_at": "2025-11-20T18:46:37.534407Z",
+        "needs_journaling": false,
+        "actual_hours": 0.007,
+        "journaled_at": "2025-11-20T18:46:37.541114Z"
+      }
+    },
+    "task-1-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/filters.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-2-1",
+        "task-1-2-2",
+        "task-1-2-3",
+        "task-1-2-4"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-3",
+          "task-1-6"
+        ],
+        "blocked_by": [
+          "task-1-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 4,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/filters.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-1-2-1": {
+      "type": "subtask",
+      "title": "FileSizeFilter class for skipping large files",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement FileSizeFilter(max_size_bytes=500000) - skip files exceeding threshold (default 500KB for likely generated/minified code)"
+      }
+    },
+    "task-1-2-2": {
+      "type": "subtask",
+      "title": "FileCountLimiter class for capping files per directory",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement FileCountLimiter(max_files_per_dir=100) - limit files processed per directory, prioritize by modification time"
+      }
+    },
+    "task-1-2-3": {
+      "type": "subtask",
+      "title": "SamplingStrategy class for very large projects",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement SamplingStrategy(sample_rate=0.1) - for 10K+ files, sample representative subset by recency, depth, and importance"
+      }
+    },
+    "task-1-2-4": {
+      "type": "subtask",
+      "title": "FilterProfile enum and factory",
+      "status": "pending",
+      "parent": "task-1-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Define FilterProfile enum (FAST, BALANCED, COMPLETE) and create_filter_chain() factory for combining filters"
+      }
+    },
+    "task-1-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-3-1",
+        "task-1-3-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-4"
+        ],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Integrate filtering into ParserFactory"
+      }
+    },
+    "task-1-3-1": {
+      "type": "subtask",
+      "title": "Add filter_chain parameter to ParserFactory.__init__",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Accept optional filter_chain parameter, default to None for backward compatibility"
+      }
+    },
+    "task-1-3-2": {
+      "type": "subtask",
+      "title": "Apply filters in _should_exclude and detect_languages methods",
+      "status": "pending",
+      "parent": "task-1-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Check filter_chain before processing files, integrate with existing exclusion logic at lines 192-222"
+      }
+    },
+    "task-1-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-4-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-1-5"
+        ],
+        "blocked_by": [
+          "task-1-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+        "task_category": "refactoring",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-4-1": {
+      "type": "subtask",
+      "title": "Add filter configuration to DocumentationGenerator",
+      "status": "pending",
+      "parent": "task-1-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add filter_profile parameter to __init__ (lines 46-68), pass to parser_factory creation"
+      }
+    },
+    "task-1-5": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-5-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-1-5-1": {
+      "type": "subtask",
+      "title": "Add CLI flags for filtering options",
+      "status": "pending",
+      "parent": "task-1-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add --filter-mode (fast/balanced/complete), --max-file-size, --max-files-per-dir, --sample-rate flags to generate subcommand"
+      }
+    },
+    "task-1-6": {
+      "type": "task",
+      "title": "tests/test_optimization_filters.py",
+      "status": "pending",
+      "parent": "phase-1-files",
+      "children": [
+        "task-1-6-1",
+        "task-1-6-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-1-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_optimization_filters.py",
+        "task_category": "implementation",
+        "estimated_hours": 2
+      }
+    },
+    "task-1-6-1": {
+      "type": "subtask",
+      "title": "Unit tests for filter classes",
+      "status": "pending",
+      "parent": "task-1-6",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test FileSizeFilter, FileCountLimiter, SamplingStrategy edge cases and threshold behavior"
+      }
+    },
+    "task-1-6-2": {
+      "type": "subtask",
+      "title": "Integration test with ParserFactory",
+      "status": "pending",
+      "parent": "task-1-6",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test filter chain integration, verify file counts match expectations"
+      }
+    },
+    "phase-1-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-1",
+      "children": [
+        "verify-1-1",
+        "verify-1-2",
+        "verify-1-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-1-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-1-1": {
+      "type": "verify",
+      "title": "Filter tests pass",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_optimization_filters.py -v",
+        "expected": "All filter tests pass, coverage >80%"
+      }
+    },
+    "verify-1-2": {
+      "type": "verify",
+      "title": "CLI flags work correctly",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "sdd doc generate /path/to/large/project --filter-mode fast",
+        "expected": "File count significantly reduced, generation faster than baseline"
+      }
+    },
+    "verify-1-3": {
+      "type": "verify",
+      "title": "Phase 1 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-1-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-1",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-2": {
+      "type": "phase",
+      "title": "Indexed Cross-Reference Resolution",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-2-files",
+        "phase-2-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-3"
+        ],
+        "blocked_by": [
+          "phase-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "Replace O(n\u00b2) resolution with O(n log n) indexed lookups",
+        "risk_level": "medium",
+        "estimated_hours": 12
+      }
+    },
+    "phase-2-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "task-2-1",
+        "task-2-2",
+        "task-2-3",
+        "task-2-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-2-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-2-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/indexing.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-1-1",
+        "task-2-1-2",
+        "task-2-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-2",
+          "task-2-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/indexing.py",
+        "task_category": "implementation",
+        "estimated_hours": 4
+      }
+    },
+    "task-2-1-1": {
+      "type": "subtask",
+      "title": "SymbolIndex class with hash-based lookups",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create SymbolIndex with function_map: Dict[str, List[str]], class_map: Dict[str, List[str]], method_map: Dict[str, List[Tuple[str, str]]]"
+      }
+    },
+    "task-2-1-2": {
+      "type": "subtask",
+      "title": "ImportIndex class for module resolution",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create ImportIndex with imports: Dict[str, Set[str]], imported_by: Dict[str, Set[str]], module_to_file: Dict[str, str]"
+      }
+    },
+    "task-2-1-3": {
+      "type": "subtask",
+      "title": "FastResolver class using indexes",
+      "status": "pending",
+      "parent": "task-2-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement FastResolver.resolve_call() and FastResolver.resolve_instantiation() using index lookups instead of nested loops"
+      }
+    },
+    "task-2-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-2-1",
+        "task-2-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-2-3"
+        ],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Add index building support to CrossReferenceGraph"
+      }
+    },
+    "task-2-2-1": {
+      "type": "subtask",
+      "title": "Add build_indexes() method",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add CrossReferenceGraph.build_indexes() to construct SymbolIndex and ImportIndex from existing data"
+      }
+    },
+    "task-2-2-2": {
+      "type": "subtask",
+      "title": "Add indexed resolution methods",
+      "status": "pending",
+      "parent": "task-2-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add get_callers_indexed(), get_callees_indexed() methods using indexes for O(1) lookup"
+      }
+    },
+    "task-2-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Replace _resolve_references with indexed version"
+      }
+    },
+    "task-2-3-1": {
+      "type": "subtask",
+      "title": "Refactor _resolve_references to use FastResolver",
+      "status": "pending",
+      "parent": "task-2-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Replace nested loops at lines 109-248 with FastResolver.resolve_call(), maintain backward compatibility"
+      }
+    },
+    "task-2-4": {
+      "type": "task",
+      "title": "tests/test_indexed_resolution.py",
+      "status": "pending",
+      "parent": "phase-2-files",
+      "children": [
+        "task-2-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-2-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_indexed_resolution.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-2-4-1": {
+      "type": "subtask",
+      "title": "Performance benchmark and correctness tests",
+      "status": "pending",
+      "parent": "task-2-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Benchmark indexed vs non-indexed resolution on large graphs, verify same results, test O(n) vs O(n\u00b2) scaling"
+      }
+    },
+    "phase-2-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-2",
+      "children": [
+        "verify-2-1",
+        "verify-2-2",
+        "verify-2-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-2-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-2-1": {
+      "type": "verify",
+      "title": "Indexed resolution tests pass",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_indexed_resolution.py -v",
+        "expected": "All tests pass, benchmark shows 10-100x speedup"
+      }
+    },
+    "verify-2-2": {
+      "type": "verify",
+      "title": "Cross-reference accuracy maintained",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Compare codebase.json before/after on test project",
+        "expected": "Cross-reference data identical, resolution strategies unchanged"
+      }
+    },
+    "verify-2-3": {
+      "type": "verify",
+      "title": "Phase 2 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-2-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-2",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-3": {
+      "type": "phase",
+      "title": "Parallel File Parsing",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-3-files",
+        "phase-3-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-4"
+        ],
+        "blocked_by": [
+          "phase-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 9,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "3-8x speedup through multi-core processing",
+        "risk_level": "medium",
+        "estimated_hours": 10
+      }
+    },
+    "phase-3-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "task-3-1",
+        "task-3-2",
+        "task-3-3",
+        "task-3-4"
+      ],
+      "total_tasks": 6,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-3-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-3-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/parallel.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-1-1",
+        "task-3-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-2",
+          "task-3-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/parallel.py",
+        "task_category": "implementation",
+        "estimated_hours": 4
+      }
+    },
+    "task-3-1-1": {
+      "type": "subtask",
+      "title": "ParallelParser class with multiprocessing.Pool",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement ParallelParser(num_workers=None) with auto-detection of CPU cores, chunk file list for workers"
+      }
+    },
+    "task-3-1-2": {
+      "type": "subtask",
+      "title": "Worker function with per-worker TreeCache",
+      "status": "pending",
+      "parent": "task-3-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create _parse_worker_func() with isolated TreeCache, return ParseResult for merging"
+      }
+    },
+    "task-3-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-2-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-3-3"
+        ],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/factory.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Add parallel mode to parse_all()"
+      }
+    },
+    "task-3-2-1": {
+      "type": "subtask",
+      "title": "Add parallel parameter to parse_all",
+      "status": "pending",
+      "parent": "task-3-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add parallel=False, num_workers=None parameters to parse_all() at line 97, delegate to ParallelParser when enabled"
+      }
+    },
+    "task-3-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-3-3-1": {
+      "type": "subtask",
+      "title": "Add --parallel and --workers CLI flags",
+      "status": "pending",
+      "parent": "task-3-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add --parallel flag (boolean) and --workers N flag to generate subcommand"
+      }
+    },
+    "task-3-4": {
+      "type": "task",
+      "title": "tests/test_parallel_parsing.py",
+      "status": "pending",
+      "parent": "phase-3-files",
+      "children": [
+        "task-3-4-1",
+        "task-3-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-3-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_parallel_parsing.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-3-4-1": {
+      "type": "subtask",
+      "title": "Correctness tests",
+      "status": "pending",
+      "parent": "task-3-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Verify parallel parsing produces same ParseResult as sequential, test merging correctness"
+      }
+    },
+    "task-3-4-2": {
+      "type": "subtask",
+      "title": "Performance benchmark",
+      "status": "pending",
+      "parent": "task-3-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Measure speedup on multi-core system, verify 3-8x improvement on large projects"
+      }
+    },
+    "phase-3-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-3",
+      "children": [
+        "verify-3-1",
+        "verify-3-2",
+        "verify-3-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-3-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-3-1": {
+      "type": "verify",
+      "title": "Parallel parsing tests pass",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_parallel_parsing.py -v",
+        "expected": "All tests pass, benchmark shows 3-8x speedup"
+      }
+    },
+    "verify-3-2": {
+      "type": "verify",
+      "title": "Thread safety verification",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Run parallel parsing 10 times, compare outputs",
+        "expected": "Results deterministic, no race conditions"
+      }
+    },
+    "verify-3-3": {
+      "type": "verify",
+      "title": "Phase 3 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-3-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-3",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-4": {
+      "type": "phase",
+      "title": "Streaming JSON Output and Memory Optimization",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-4-files",
+        "phase-4-verify"
+      ],
+      "dependencies": {
+        "blocks": [
+          "phase-5",
+          "phase-6"
+        ],
+        "blocked_by": [
+          "phase-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 14,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "60-80% memory reduction, enable 5-10x larger codebases",
+        "risk_level": "high",
+        "estimated_hours": 18
+      }
+    },
+    "phase-4-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "task-4-1",
+        "task-4-2",
+        "task-4-3",
+        "task-4-4",
+        "task-4-5",
+        "task-4-6"
+      ],
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-4-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-4-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/streaming.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-1-1",
+        "task-4-1-2",
+        "task-4-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-2",
+          "task-4-6"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/streaming.py",
+        "task_category": "implementation",
+        "estimated_hours": 5
+      }
+    },
+    "task-4-1-1": {
+      "type": "subtask",
+      "title": "StreamingJSONWriter class",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement StreamingJSONWriter with write_metadata(), write_module(), write_class(), write_function() methods for chunked output"
+      }
+    },
+    "task-4-1-2": {
+      "type": "subtask",
+      "title": "CompressionWrapper for optional gzip",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create CompressionWrapper to wrap file handle with gzip.GzipFile when compression enabled"
+      }
+    },
+    "task-4-1-3": {
+      "type": "subtask",
+      "title": "NDJSON format support",
+      "status": "pending",
+      "parent": "task-4-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add NDJSONWriter class for newline-delimited JSON format (alternative to streaming JSON)"
+      }
+    },
+    "task-4-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-2-1",
+        "task-4-2-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-4"
+        ],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py",
+        "task_category": "refactoring",
+        "estimated_hours": 4,
+        "changes": "Add streaming mode to JSONGenerator"
+      }
+    },
+    "task-4-2-1": {
+      "type": "subtask",
+      "title": "Add streaming parameter to JSONGenerator.generate()",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add streaming=False parameter at line 208, delegate to StreamingJSONWriter when enabled"
+      }
+    },
+    "task-4-2-2": {
+      "type": "subtask",
+      "title": "Implement generate_streaming() method",
+      "status": "pending",
+      "parent": "task-4-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create JSONGenerator.generate_streaming(output_file, analysis, statistics, compress=False)"
+      }
+    },
+    "task-4-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-3-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/ast_analysis.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Add memory-efficient data structures"
+      }
+    },
+    "task-4-3-1": {
+      "type": "subtask",
+      "title": "Add __slots__ to dataclasses for memory efficiency",
+      "status": "pending",
+      "parent": "task-4-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add __slots__ to CallSite, InstantiationSite, DynamicPatternWarning classes at lines 33-64"
+      }
+    },
+    "task-4-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-4-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-4-5"
+        ],
+        "blocked_by": [
+          "task-4-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Add streaming mode to save_json"
+      }
+    },
+    "task-4-4-1": {
+      "type": "subtask",
+      "title": "Add streaming support to save_json()",
+      "status": "pending",
+      "parent": "task-4-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add streaming=False, compress=False parameters at line 379, use generate_streaming() when enabled"
+      }
+    },
+    "task-4-5": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-5-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-4-5-1": {
+      "type": "subtask",
+      "title": "Add --streaming and --compress CLI flags",
+      "status": "pending",
+      "parent": "task-4-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add --streaming and --compress flags to generate subcommand"
+      }
+    },
+    "task-4-6": {
+      "type": "task",
+      "title": "tests/test_streaming_output.py",
+      "status": "pending",
+      "parent": "phase-4-files",
+      "children": [
+        "task-4-6-1",
+        "task-4-6-2",
+        "task-4-6-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-4-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_streaming_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-4-6-1": {
+      "type": "subtask",
+      "title": "Output correctness tests",
+      "status": "pending",
+      "parent": "task-4-6",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Verify streaming output produces equivalent data to non-streaming (when loaded back)"
+      }
+    },
+    "task-4-6-2": {
+      "type": "subtask",
+      "title": "Memory usage tests",
+      "status": "pending",
+      "parent": "task-4-6",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Measure peak memory with streaming vs non-streaming, verify 60-80% reduction"
+      }
+    },
+    "task-4-6-3": {
+      "type": "subtask",
+      "title": "Compression tests",
+      "status": "pending",
+      "parent": "task-4-6",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test gzip compression, verify 5-10x file size reduction"
+      }
+    },
+    "phase-4-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-4",
+      "children": [
+        "verify-4-1",
+        "verify-4-2",
+        "verify-4-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-4-1": {
+      "type": "verify",
+      "title": "Streaming output tests pass",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_streaming_output.py -v",
+        "expected": "All tests pass, memory reduction verified"
+      }
+    },
+    "verify-4-2": {
+      "type": "verify",
+      "title": "Large codebase generation",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Generate docs for 10K+ file project with streaming",
+        "expected": "Completes without OOM, peak memory <100MB"
+      }
+    },
+    "verify-4-3": {
+      "type": "verify",
+      "title": "Phase 4 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-4-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-4",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-5": {
+      "type": "phase",
+      "title": "Persistent Project-Level Cache",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-5-files",
+        "phase-5-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 11,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "80-95% faster incremental runs through SQLite-backed caching",
+        "risk_level": "medium",
+        "estimated_hours": 14
+      }
+    },
+    "phase-5-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "task-5-1",
+        "task-5-2",
+        "task-5-3",
+        "task-5-4",
+        "task-5-5"
+      ],
+      "total_tasks": 8,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-5-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-5-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/cache.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-1-1",
+        "task-5-1-2",
+        "task-5-1-3"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-2",
+          "task-5-5"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/cache.py",
+        "task_category": "implementation",
+        "estimated_hours": 6
+      }
+    },
+    "task-5-1-1": {
+      "type": "subtask",
+      "title": "PersistentCache class with SQLite backend",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement PersistentCache with file_metadata table (path, hash, mtime, size) and cached_results table (file_hash, result_blob)"
+      }
+    },
+    "task-5-1-2": {
+      "type": "subtask",
+      "title": "Content-addressed storage with SHA256",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement get_file_hash(), store ParseResult keyed by content hash, compress with pickle+gzip"
+      }
+    },
+    "task-5-1-3": {
+      "type": "subtask",
+      "title": "Cache invalidation and dependency tracking",
+      "status": "pending",
+      "parent": "task-5-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Implement invalidate_file(), track import dependencies, cascade invalidation to dependents"
+      }
+    },
+    "task-5-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-2-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-3"
+        ],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/parsers/base.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Add cache support to BaseParser"
+      }
+    },
+    "task-5-2-1": {
+      "type": "subtask",
+      "title": "Add cache parameter to BaseParser.__init__",
+      "status": "pending",
+      "parent": "task-5-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add optional cache: PersistentCache parameter, check cache before parsing in parse_file()"
+      }
+    },
+    "task-5-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-3-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-5-4"
+        ],
+        "blocked_by": [
+          "task-5-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/generator.py",
+        "task_category": "refactoring",
+        "estimated_hours": 2,
+        "changes": "Add cache integration to DocumentationGenerator"
+      }
+    },
+    "task-5-3-1": {
+      "type": "subtask",
+      "title": "Add cache_dir parameter and initialization",
+      "status": "pending",
+      "parent": "task-5-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add cache_dir parameter at line 46, initialize PersistentCache, pass to parser_factory"
+      }
+    },
+    "task-5-4": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-4-1"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-3"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/cli.py",
+        "task_category": "implementation",
+        "estimated_hours": 1
+      }
+    },
+    "task-5-4-1": {
+      "type": "subtask",
+      "title": "Add cache CLI flags",
+      "status": "pending",
+      "parent": "task-5-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add --cache, --cache-dir, --clear-cache flags to generate subcommand"
+      }
+    },
+    "task-5-5": {
+      "type": "task",
+      "title": "tests/test_persistent_cache.py",
+      "status": "pending",
+      "parent": "phase-5-files",
+      "children": [
+        "task-5-5-1",
+        "task-5-5-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-5-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_persistent_cache.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-5-5-1": {
+      "type": "subtask",
+      "title": "Cache hit/miss tests",
+      "status": "pending",
+      "parent": "task-5-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Test cache population, hit detection, miss handling, invalidation on file change"
+      }
+    },
+    "task-5-5-2": {
+      "type": "subtask",
+      "title": "Performance benchmark",
+      "status": "pending",
+      "parent": "task-5-5",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Measure first run vs cached run time, verify 80-95% speedup on cached run"
+      }
+    },
+    "phase-5-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-5",
+      "children": [
+        "verify-5-1",
+        "verify-5-2",
+        "verify-5-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-5-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-5-1": {
+      "type": "verify",
+      "title": "Persistent cache tests pass",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_persistent_cache.py -v",
+        "expected": "All tests pass, 80-95% speedup verified"
+      }
+    },
+    "verify-5-2": {
+      "type": "verify",
+      "title": "Incremental update workflow",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Generate docs, modify 1 file, regenerate",
+        "expected": "Second run completes in <10s for 10K file project"
+      }
+    },
+    "verify-5-3": {
+      "type": "verify",
+      "title": "Phase 5 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-5-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-5",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    },
+    "phase-6": {
+      "type": "phase",
+      "title": "Two-Tier Output Structure (Optional)",
+      "status": "pending",
+      "parent": "spec-root",
+      "children": [
+        "phase-6-files",
+        "phase-6-verify"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-4"
+        ],
+        "depends": []
+      },
+      "total_tasks": 10,
+      "completed_tasks": 0,
+      "metadata": {
+        "purpose": "100x smaller primary output through summary/detail separation",
+        "risk_level": "high",
+        "estimated_hours": 16,
+        "status": "optional - can be deferred to future enhancement"
+      }
+    },
+    "phase-6-files": {
+      "type": "group",
+      "title": "File Modifications",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "task-6-1",
+        "task-6-2",
+        "task-6-3",
+        "task-6-4"
+      ],
+      "total_tasks": 7,
+      "completed_tasks": 0,
+      "metadata": {},
+      "dependencies": {
+        "blocks": [
+          "phase-6-verify"
+        ],
+        "blocked_by": [],
+        "depends": []
+      }
+    },
+    "task-6-1": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/two_tier.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-1-1",
+        "task-6-1-2"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-6-2",
+          "task-6-4"
+        ],
+        "blocked_by": [],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/two_tier.py",
+        "task_category": "implementation",
+        "estimated_hours": 5
+      }
+    },
+    "task-6-1-1": {
+      "type": "subtask",
+      "title": "SummaryGenerator class",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create SummaryGenerator to produce lightweight codebase-summary.json with signatures only, no docstrings/bodies"
+      }
+    },
+    "task-6-1-2": {
+      "type": "subtask",
+      "title": "DetailWriter class",
+      "status": "pending",
+      "parent": "task-6-1",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create DetailWriter to generate per-module detail files in docs/details/ directory"
+      }
+    },
+    "task-6-2": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-2-1"
+      ],
+      "dependencies": {
+        "blocks": [
+          "task-6-3"
+        ],
+        "blocked_by": [
+          "task-6-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py",
+        "task_category": "implementation",
+        "estimated_hours": 2,
+        "changes": "Add summary/detail schema definitions"
+      }
+    },
+    "task-6-2-1": {
+      "type": "subtask",
+      "title": "Define summary and detail schemas",
+      "status": "pending",
+      "parent": "task-6-2",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Add SUMMARY_SCHEMA and DETAIL_SCHEMA constants, create to_summary() and to_detail() helper functions"
+      }
+    },
+    "task-6-3": {
+      "type": "task",
+      "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-3-1",
+        "task-6-3-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-2"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/formatter.py",
+        "task_category": "refactoring",
+        "estimated_hours": 3,
+        "changes": "Add two-tier generation to JSONGenerator"
+      }
+    },
+    "task-6-3-1": {
+      "type": "subtask",
+      "title": "Add generate_two_tier() method",
+      "status": "pending",
+      "parent": "task-6-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Create JSONGenerator.generate_two_tier(output_dir, analysis, statistics, detail_dir='details')"
+      }
+    },
+    "task-6-3-2": {
+      "type": "subtask",
+      "title": "Add backward compatibility mode",
+      "status": "pending",
+      "parent": "task-6-3",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Keep generate() unchanged, add two_tier=False parameter to maintain single-file output by default"
+      }
+    },
+    "task-6-4": {
+      "type": "task",
+      "title": "tests/test_two_tier_output.py",
+      "status": "pending",
+      "parent": "phase-6-files",
+      "children": [
+        "task-6-4-1",
+        "task-6-4-2"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "task-6-1"
+        ],
+        "depends": []
+      },
+      "total_tasks": 2,
+      "completed_tasks": 0,
+      "metadata": {
+        "file_path": "tests/test_two_tier_output.py",
+        "task_category": "implementation",
+        "estimated_hours": 3
+      }
+    },
+    "task-6-4-1": {
+      "type": "subtask",
+      "title": "Summary/detail correctness tests",
+      "status": "pending",
+      "parent": "task-6-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Verify summary contains signatures, detail files contain full data, linked references work"
+      }
+    },
+    "task-6-4-2": {
+      "type": "subtask",
+      "title": "File size comparison",
+      "status": "pending",
+      "parent": "task-6-4",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "details": "Measure summary vs full JSON size, verify 100x reduction for summary file"
+      }
+    },
+    "phase-6-verify": {
+      "type": "group",
+      "title": "Verification",
+      "status": "pending",
+      "parent": "phase-6",
+      "children": [
+        "verify-6-1",
+        "verify-6-2",
+        "verify-6-3"
+      ],
+      "dependencies": {
+        "blocks": [],
+        "blocked_by": [
+          "phase-6-files"
+        ],
+        "depends": []
+      },
+      "total_tasks": 3,
+      "completed_tasks": 0,
+      "metadata": {}
+    },
+    "verify-6-1": {
+      "type": "verify",
+      "title": "Two-tier output tests pass",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "auto",
+        "agent": "run-tests",
+        "command": "pytest tests/test_two_tier_output.py -v",
+        "expected": "All tests pass, 100x size reduction verified"
+      }
+    },
+    "verify-6-2": {
+      "type": "verify",
+      "title": "Backward compatibility check",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "manual",
+        "command": "Generate without --two-tier flag",
+        "expected": "Single-file output still works, no breaking changes"
+      }
+    },
+    "verify-6-3": {
+      "type": "verify",
+      "title": "Phase 6 implementation fidelity",
+      "status": "pending",
+      "parent": "phase-6-verify",
+      "children": [],
+      "total_tasks": 1,
+      "completed_tasks": 0,
+      "metadata": {
+        "verification_type": "fidelity",
+        "agent": "sdd-fidelity-review",
+        "scope": "phase",
+        "target": "phase-6",
+        "on_failure": {
+          "consult": true,
+          "revert_status": "in_progress",
+          "continue_on_failure": false
+        }
+      }
+    }
+  },
+  "journal": [
+    {
+      "timestamp": "2025-11-20T18:46:37.541100Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/__init__.py",
+      "author": "claude-code",
+      "content": "Created optimization package directory at src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/. Added __init__.py with module exports for filtering, parallel processing, streaming, and cache components. File includes comprehensive docstring describing the package purpose and exports all planned components (ContentFilter, should_process_file, ParallelProcessor, process_files_parallel, StreamingProcessor, process_in_chunks, CacheManager, get_cached_result, set_cached_result).",
+      "metadata": {},
+      "task_id": "task-1-1"
+    }
+  ]
+}

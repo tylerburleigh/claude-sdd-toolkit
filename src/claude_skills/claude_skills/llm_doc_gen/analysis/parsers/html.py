@@ -33,6 +33,7 @@ from .base import (
     ParsedModule,
     ParsedFunction,
 )
+from ..tree_cache import TreeCache
 
 
 class HTMLParser(BaseParser):
@@ -50,6 +51,9 @@ class HTMLParser(BaseParser):
         # Initialize parser with language grammar
         html_lang = Language(tshtml.language())
         self._parser = Parser(html_lang)
+
+        # Initialize tree cache for incremental parsing
+        self._tree_cache = TreeCache(max_cache_size=1000)
 
         # HTMX attributes to track
         self.htmx_attributes = {
@@ -69,6 +73,14 @@ class HTMLParser(BaseParser):
         """HTML file extensions."""
         return ['html', 'htm']
 
+    def get_cache_stats(self):
+        """Get tree cache statistics."""
+        return self._tree_cache.get_stats()
+
+    def clear_cache(self):
+        """Clear the tree cache."""
+        self._tree_cache.clear()
+
     def parse_file(self, file_path: Path) -> ParseResult:
         """
         Parse an HTML file.
@@ -86,12 +98,23 @@ class HTMLParser(BaseParser):
             with open(file_path, 'rb') as f:
                 source = f.read()
 
-            # Parse source code
-            tree = self._parser.parse(source)
+            # Check cache for existing tree (incremental parsing)
+            cached = self._tree_cache.get(file_path)
+
+            # Parse source code (incremental if cached tree available)
+            if cached:
+                tree = self._parser.parse(source, old_tree=cached.tree)
+            else:
+                tree = self._parser.parse(source)
             root = tree.root_node
 
-            # Create module info
+            # Decode source for further processing
             source_text = source.decode('utf-8')
+
+            # Store in cache for future incremental parsing
+            self._tree_cache.put(file_path, tree, source_text)
+
+            # Create module info
             module = ParsedModule(
                 name=file_path.stem,
                 file=relative_path,

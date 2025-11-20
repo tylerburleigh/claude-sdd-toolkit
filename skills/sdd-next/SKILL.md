@@ -369,12 +369,12 @@ sdd prepare-task {spec-id}
 When a task has been marked as blocked and the blocker is later resolved:
 
 ```bash
-sdd unblock-task {spec-id} {task-id} --note "Brief description of how blocker was resolved"
+sdd unblock-task {spec-id} {task-id} --resolution "Brief description of how blocker was resolved"
 ```
 
 **Example:**
 ```bash
-sdd unblock-task feature-auth-001 task-3-2 --note "API endpoint now available in staging environment"
+sdd unblock-task feature-auth-001 task-3-2 --resolution "API endpoint now available in staging environment"
 ```
 
 This marks the task as unblocked and ready to proceed. The task will then appear in `sdd prepare-task` recommendations.
@@ -717,7 +717,7 @@ sdd context --session-marker "SESSION_MARKER_<hash>"
 # Advanced
 sdd query-tasks {spec-id} --status pending --parent {phase-id}
 sdd list-blockers {spec-id}
-sdd unblock-task {spec-id} {task-id} [--note "reason"]
+sdd unblock-task {spec-id} {task-id} [--resolution "reason"]
 sdd check-complete {spec-id} --phase {phase-id}
 ```
 

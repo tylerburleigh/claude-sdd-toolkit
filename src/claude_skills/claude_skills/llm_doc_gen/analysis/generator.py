@@ -114,6 +114,8 @@ class DocumentationGenerator:
         Args:
             parse_result: The parse result containing functions, modules, and graph
         """
+        import builtins
+        
         if not parse_result.cross_references:
             return
 
@@ -133,10 +135,24 @@ class DocumentationGenerator:
             if cls.name not in class_map:
                 class_map[cls.name] = []
             class_map[cls.name].append(cls.file)
+            
+        # Method name -> list of (file, class_name) defining it
+        method_map = {}
+        for cls in parse_result.classes:
+            for method in cls.methods:
+                if method not in method_map:
+                    method_map[method] = []
+                method_map[method].append((cls.file, cls.name))
 
         # 2. Resolve function calls
         for call in graph.calls:
             if call.callee_file:
+                continue
+
+            # Strategy 0: Built-ins
+            # Check if it's a Python built-in (e.g., len, str, any)
+            if call.callee in dir(builtins):
+                call.callee_file = "built-in"
                 continue
 
             # Get candidates (functions or classes/constructors)
@@ -144,40 +160,91 @@ class DocumentationGenerator:
             if not candidates:
                 candidates = class_map.get(call.callee, [])
 
-            if not candidates:
-                continue
-
-            # Strategy A: Exact match
-            if len(candidates) == 1:
-                call.callee_file = candidates[0]
-                continue
-
-            # Strategy B: Same file (local call)
-            if call.caller_file in candidates:
-                call.callee_file = call.caller_file
-                continue
-
-            # Strategy C: Check imports (simplified)
             # Get imports for the caller file
             imports = graph.imports.get(call.caller_file, set())
 
-            # Check if any candidate file stem matches an imported name
-            # This is a heuristic and may not handle aliasing or full paths correctly
-            found_import = False
-            for candidate_file in candidates:
-                # Extract simple name from file path (e.g., "utils.py" -> "utils")
-                candidate_name = Path(candidate_file).stem
-                
-                # Check if this name appears in imports (either as exact match or suffix)
-                # e.g., import utils -> matches utils
-                # e.g., from common import utils -> matches utils
-                for imp in imports:
-                    if imp == candidate_name or imp.endswith(f".{candidate_name}"):
-                        call.callee_file = candidate_file
-                        found_import = True
+            if candidates:
+                # Strategy A: Exact match
+                if len(candidates) == 1:
+                    call.callee_file = candidates[0]
+                    continue
+
+                # Strategy B: Same file (local call)
+                if call.caller_file in candidates:
+                    call.callee_file = call.caller_file
+                    continue
+
+                # Strategy C: Check imports (enhanced)
+                # Check if any candidate file stem matches an imported name
+                found_import = False
+                for candidate_file in candidates:
+                    # Extract simple name from file path (e.g., "utils.py" -> "utils")
+                    candidate_name = Path(candidate_file).stem
+                    
+                    for imp in imports:
+                        # Check exact match or suffix (e.g., import utils -> matches utils)
+                        if imp == candidate_name or imp.endswith(f".{candidate_name}"):
+                            call.callee_file = candidate_file
+                            found_import = True
+                            break
+                        
+                        # Check if candidate is a module in the import path
+                        # e.g. from utils import func -> imp="utils.func" (matches utils.py)
+                        if f".{candidate_name}." in f".{imp}.":
+                            call.callee_file = candidate_file
+                            found_import = True
+                            break
+                            
+                    if found_import:
                         break
-                if found_import:
-                    break
+            
+            # Strategy D: Method Resolution
+            # If it's a method call, check if the method belongs to an imported class
+            if not call.callee_file and call.call_type.value == "method_call":
+                method_candidates = method_map.get(call.callee, [])
+                for candidate_file, candidate_class in method_candidates:
+                    # Check if the class defining this method is imported in the caller file
+                    for imp in imports:
+                        # Match class name (e.g. "PrettyPrinter") against imports
+                        # import ...PrettyPrinter or from ... import PrettyPrinter
+                        if imp.endswith(f".{candidate_class}") or imp == candidate_class:
+                            call.callee_file = candidate_file
+                            break
+                    if call.callee_file:
+                        break
+            
+            # Strategy E: External Import Resolution
+            # If still unresolved, check if it matches an external import
+            if not call.callee_file:
+                for imp in imports:
+                    # Check if callee matches an imported name (alias or suffix)
+                    if imp.endswith(f".{call.callee}"):
+                        # It's likely an external import (e.g. argparse.ArgumentParser)
+                        module = imp.rsplit(".", 1)[0]
+                        call.callee_file = f"external://{module}"
+                        break
+                    elif imp == call.callee:
+                        call.callee_file = f"external://{imp}"
+                        break
+            
+            # Strategy F: Built-in Method Resolution (Heuristic)
+            # If still unresolved, check if it's a common method of a built-in type
+            # (e.g. str.endswith, list.append, file.write)
+            if not call.callee_file:
+                COMMON_BUILTIN_METHODS = {
+                    # String
+                    'split', 'strip', 'join', 'replace', 'format', 'startswith', 
+                    'endswith', 'lower', 'upper', 'find', 'count', 'encode', 'decode',
+                    # List/Set/Dict
+                    'append', 'extend', 'pop', 'remove', 'add', 'get', 'items', 
+                    'keys', 'values', 'update', 'clear', 'copy', 'sort', 'reverse',
+                    # IO / Context Managers
+                    'read', 'write', 'close', 'flush', 'open', '__enter__', '__exit__',
+                    # Path
+                    'exists', 'is_file', 'is_dir', 'resolve', 'glob', 'rglob'
+                }
+                if call.callee in COMMON_BUILTIN_METHODS:
+                    call.callee_file = "built-in"
 
     def _convert_parse_result(self, result: ParseResult) -> Dict[str, Any]:
         """
