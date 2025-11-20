@@ -287,6 +287,25 @@ class CrossReferenceGraph:
         symbol_index = SymbolIndex()
         import_index = ImportIndex()
 
+        # Register all files that appear in call sites (even if not imports)
+        # This ensures modules are available for resolution
+        all_files_seen = set()
+        for call_site in self.calls:
+            if call_site.caller_file:
+                all_files_seen.add(call_site.caller_file)
+            if call_site.callee_file:
+                all_files_seen.add(call_site.callee_file)
+
+        for inst_site in self.instantiations:
+            if inst_site.instantiator_file:
+                all_files_seen.add(inst_site.instantiator_file)
+
+        # Register these files in import_index so they can be looked up
+        for file_path in all_files_seen:
+            module_name = self._file_to_module(file_path)
+            if module_name not in import_index.module_to_file:
+                import_index.module_to_file[module_name] = file_path
+
         # Build import index from graph's import data
         for source_file, imported_modules in self.imports.items():
             # Convert file path to module name (simple heuristic)
@@ -346,18 +365,14 @@ class CrossReferenceGraph:
 
         # Build symbol index from instantiation sites
         for inst_site in self.instantiations:
-            # Add the instantiated class
-            class_key = (inst_site.class_name, inst_site.instantiator_file)
-
-            # Try to find the class definition file
-            # For now, assume it's in the same file or we don't have that info
-            # In a real implementation, this would use import resolution
-            class_file = inst_site.metadata.get('class_file', inst_site.instantiator_file)
-
-            class_key = (inst_site.class_name, class_file)
-            if class_key not in seen_classes:
-                symbol_index.add_class(inst_site.class_name, class_file)
-                seen_classes.add(class_key)
+            # Only add class definition if explicitly provided in metadata
+            # Don't infer that a class is defined where it's instantiated
+            class_file = inst_site.metadata.get('class_file')
+            if class_file:
+                class_key = (inst_site.class_name, class_file)
+                if class_key not in seen_classes:
+                    symbol_index.add_class(inst_site.class_name, class_file)
+                    seen_classes.add(class_key)
 
             # Add the instantiator as a function
             instantiator_key = (inst_site.instantiator, inst_site.instantiator_file)

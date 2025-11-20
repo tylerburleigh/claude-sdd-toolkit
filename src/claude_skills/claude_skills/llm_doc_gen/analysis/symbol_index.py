@@ -251,6 +251,50 @@ class ImportIndex:
         return f"ImportIndex(modules={len(self)})"
 
 
+class SymbolLocation:
+    """Represents a symbol's location in the codebase.
+
+    Attributes:
+        name: Symbol name (function, class, or method)
+        file_path: Path to file where symbol is defined
+        symbol_type: Type of symbol ('function', 'class', or 'method')
+        class_name: For methods, the class name; None for functions/classes
+    """
+
+    def __init__(self, name: str, file_path: str, symbol_type: str, class_name: Optional[str] = None):
+        """Initialize symbol location.
+
+        Args:
+            name: Symbol name
+            file_path: Path to file where symbol is defined
+            symbol_type: Type of symbol ('function', 'class', or 'method')
+            class_name: For methods, the class name; None for functions/classes
+        """
+        self.name = name
+        self.file_path = file_path
+        self.symbol_type = symbol_type
+        self.class_name = class_name
+
+    def __repr__(self) -> str:
+        """Get string representation."""
+        if self.symbol_type == 'method':
+            return f"SymbolLocation({self.class_name}.{self.name}@{self.file_path})"
+        return f"SymbolLocation({self.name}@{self.file_path})"
+
+    def __eq__(self, other):
+        """Check equality."""
+        if not isinstance(other, SymbolLocation):
+            return False
+        return (self.name == other.name and
+                self.file_path == other.file_path and
+                self.symbol_type == other.symbol_type and
+                self.class_name == other.class_name)
+
+    def __hash__(self):
+        """Get hash."""
+        return hash((self.name, self.file_path, self.symbol_type, self.class_name))
+
+
 class SymbolIndex:
     """Fast hash-based lookup index for code symbols.
 
@@ -261,6 +305,8 @@ class SymbolIndex:
         function_map: Maps function names to list of file paths where they're defined
         class_map: Maps class names to list of file paths where they're defined
         method_map: Maps method names to list of (class_name, file_path) tuples
+        functions: Public read-only access to function symbols
+        classes: Public read-only access to class symbols
 
     Example:
         >>> index = SymbolIndex()
@@ -273,6 +319,9 @@ class SymbolIndex:
         >>>
         >>> locations = index.find_method("parse")
         >>> # Returns [("Parser", "/src/parser.py")]
+        >>>
+        >>> locs = index.lookup_function("parse_file")
+        >>> # Returns [SymbolLocation("parse_file", "/src/parser.py", "function")]
     """
 
     def __init__(self):
@@ -345,6 +394,53 @@ class SymbolIndex:
             List of (class_name, file_path) tuples (empty if not found)
         """
         return self.method_map.get(name, [])
+
+    def lookup_function(self, name: str) -> List['SymbolLocation']:
+        """Find all locations where a function is defined (returns SymbolLocation objects).
+
+        Args:
+            name: Function name to search for
+
+        Returns:
+            List of SymbolLocation objects (empty if not found)
+        """
+        files = self.function_map.get(name, [])
+        return [SymbolLocation(name, file_path, 'function') for file_path in files]
+
+    def lookup_class(self, name: str) -> List['SymbolLocation']:
+        """Find all locations where a class is defined (returns SymbolLocation objects).
+
+        Args:
+            name: Class name to search for
+
+        Returns:
+            List of SymbolLocation objects (empty if not found)
+        """
+        files = self.class_map.get(name, [])
+        return [SymbolLocation(name, file_path, 'class') for file_path in files]
+
+    def lookup_method(self, name: str) -> List['SymbolLocation']:
+        """Find all locations where a method is defined (returns SymbolLocation objects).
+
+        Args:
+            name: Method name to search for
+
+        Returns:
+            List of SymbolLocation objects (empty if not found)
+        """
+        locations = self.method_map.get(name, [])
+        return [SymbolLocation(name, file_path, 'method', class_name)
+                for class_name, file_path in locations]
+
+    @property
+    def functions(self) -> Dict[str, List[str]]:
+        """Public read-only access to function symbol index."""
+        return dict(self.function_map)
+
+    @property
+    def classes(self) -> Dict[str, List[str]]:
+        """Public read-only access to class symbol index."""
+        return dict(self.class_map)
 
     def get_all_functions(self) -> Set[str]:
         """Get set of all indexed function names.
@@ -523,21 +619,27 @@ class FastResolver:
         """
         results = []
 
-        # Check if it's a function in the current module
+        # Get calling module's file
         calling_file = self.import_index.get_file_path(calling_module)
-        if calling_file:
-            functions_in_file = self.symbol_index.find_function(name)
-            if calling_file in functions_in_file:
-                results.append((calling_file, "function"))
 
-        # Check if it's a function in an imported module
+        # Get imported modules
         imported_modules = self.import_index.get_imports(calling_module)
-        for imported_module in imported_modules:
-            imported_file = self.import_index.get_file_path(imported_module)
-            if imported_file:
-                functions_in_file = self.symbol_index.find_function(name)
-                if imported_file in functions_in_file:
-                    results.append((imported_file, "function"))
+
+        # Check if it's a function (can be in current or imported modules)
+        functions_in_any_file = self.symbol_index.find_function(name)
+        for file_path in functions_in_any_file:
+            # Function is available if:
+            # 1. It's in the current module, OR
+            # 2. Its module is imported
+            if file_path == calling_file:
+                # Function in same file
+                results.append((file_path, "function"))
+            else:
+                # Check if this file's module is imported
+                for module, mod_file in self.import_index.module_to_file.items():
+                    if mod_file == file_path and module in imported_modules:
+                        results.append((file_path, "function"))
+                        break
 
         # Check if it's a method
         method_locations = self.symbol_index.find_method(name)
@@ -549,13 +651,10 @@ class FastResolver:
                 results.append((file_path, "method"))
             else:
                 # Check if the class is imported
-                class_files = self.symbol_index.find_class(class_name)
-                if file_path in class_files:
-                    # Check if this file's module is imported
-                    for module, mod_file in self.import_index.module_to_file.items():
-                        if mod_file == file_path and module in imported_modules:
-                            results.append((file_path, "method"))
-                            break
+                for module, mod_file in self.import_index.module_to_file.items():
+                    if mod_file == file_path and module in imported_modules:
+                        results.append((file_path, "method"))
+                        break
 
         return results
 
