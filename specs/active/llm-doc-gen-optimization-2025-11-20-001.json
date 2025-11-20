@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:17:18.662407Z",
+  "last_updated": "2025-11-20T19:19:36.265620Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,8 +21,8 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 20,
-    "current_phase": "phase-1"
+    "progress_percentage": 22,
+    "current_phase": "phase-2"
   },
   "hierarchy": {
     "spec-root": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 14,
+      "completed_tasks": 15,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -536,7 +536,7 @@
     "phase-2": {
       "type": "phase",
       "title": "Indexed Cross-Reference Resolution",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "spec-root",
       "children": [
         "phase-2-files",
@@ -552,7 +552,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "purpose": "Replace O(n\u00b2) resolution with O(n log n) indexed lookups",
         "risk_level": "medium",
@@ -562,7 +562,7 @@
     "phase-2-files": {
       "type": "group",
       "title": "File Modifications",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2",
       "children": [
         "task-2-1",
@@ -571,7 +571,7 @@
         "task-2-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -584,7 +584,7 @@
     "task-2-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/indexing.py",
-      "status": "pending",
+      "status": "in_progress",
       "parent": "phase-2-files",
       "children": [
         "task-2-1-1",
@@ -600,7 +600,7 @@
         "depends": []
       },
       "total_tasks": 3,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/indexing.py",
         "task_category": "implementation",
@@ -610,13 +610,19 @@
     "task-2-1-1": {
       "type": "subtask",
       "title": "SymbolIndex class with hash-based lookups",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-2-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Create SymbolIndex with function_map: Dict[str, List[str]], class_map: Dict[str, List[str]], method_map: Dict[str, List[Tuple[str, str]]]"
+        "details": "Create SymbolIndex with function_map: Dict[str, List[str]], class_map: Dict[str, List[str]], method_map: Dict[str, List[Tuple[str, str]]]",
+        "started_at": "2025-11-20T19:18:40.467747Z",
+        "status_note": "Creating SymbolIndex class with hash-based lookups",
+        "completed_at": "2025-11-20T19:19:36.253682Z",
+        "needs_journaling": false,
+        "actual_hours": 0.015,
+        "journaled_at": "2025-11-20T19:19:36.261441Z"
       }
     },
     "task-2-1-2": {
@@ -2318,6 +2324,15 @@
       "content": "All child tasks in phase phase-1 have been completed.",
       "metadata": {},
       "task_id": "phase-1"
+    },
+    {
+      "timestamp": "2025-11-20T19:19:36.261430Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: SymbolIndex class with hash-based lookups",
+      "author": "claude-code",
+      "content": "Created SymbolIndex class with hash-based lookups for functions, classes, and methods.\n\nImplementation details:\n- File: src/claude_skills/claude_skills/llm_doc_gen/analysis/symbol_index.py (238 lines)\n- Data structures as specified:\n  - function_map: Dict[str, List[str]] - maps function names to file paths\n  - class_map: Dict[str, List[str]] - maps class names to file paths\n  - method_map: Dict[str, List[Tuple[str, str]]] - maps method names to (class_name, file_path)\n\nKey methods:\n- add_function(), add_class(), add_method() - O(1) insertion\n- find_function(), find_class(), find_method() - O(1) lookup\n- remove_file() - incremental update support\n- get_file_symbols() - reverse lookup for file contents\n- Comprehensive docstrings with examples",
+      "metadata": {},
+      "task_id": "task-2-1-1"
     }
   ]
 }
