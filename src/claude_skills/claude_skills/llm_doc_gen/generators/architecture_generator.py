@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 
+from ..markdown_validator import sanitize_llm_output
+
 
 @dataclass
 class ArchitectureData:
@@ -77,6 +79,22 @@ class ArchitectureGenerator:
         prompt_parts.append("**IMPORTANT: You have READ-ONLY access. Do not attempt to write files.**")
         prompt_parts.append("Analyze this codebase to identify architecture patterns, design decisions, and implementation patterns.")
         prompt_parts.append("Your findings will be used to compose the final architecture documentation.")
+        prompt_parts.append("")
+
+        # Files and directories to ignore
+        prompt_parts.append("## Files and Directories to Ignore")
+        prompt_parts.append("")
+        prompt_parts.append("When analyzing this codebase, **ignore and do not read** the following:")
+        prompt_parts.append("")
+        prompt_parts.append("- `specs/` - Project specifications (not source code)")
+        prompt_parts.append("- `.claude/` - Claude AI configuration")
+        prompt_parts.append("- `.agents/` - Agent configuration")
+        prompt_parts.append("- `AGENTS.md` - Agent documentation")
+        prompt_parts.append("- `CLAUDE.md` - Claude documentation")
+        prompt_parts.append("- Any paths matching `.gitignore` patterns")
+        prompt_parts.append("- Standard build/dependency directories (node_modules, dist, build, etc.)")
+        prompt_parts.append("")
+        prompt_parts.append("Focus only on actual source code and project documentation.")
         prompt_parts.append("")
 
         # Project context
@@ -315,10 +333,15 @@ class ArchitectureGenerator:
                     doc_parts.append(f"- `{attr}`")
                 doc_parts.append("")
 
-        # LLM research findings
+        # LLM research findings (sanitized for markdown validity)
         doc_parts.append("---")
         doc_parts.append("")
-        doc_parts.append(research_findings)
+        sanitized_findings, warnings = sanitize_llm_output(research_findings)
+        if warnings:
+            # Log warnings (in production, you might want to use proper logging)
+            for warning in warnings:
+                print(f"[WARN] Markdown validation: {warning}")
+        doc_parts.append(sanitized_findings)
         doc_parts.append("")
 
         # Footer with references
@@ -329,7 +352,7 @@ class ArchitectureGenerator:
         doc_parts.append("For additional information, see:")
         doc_parts.append("")
         doc_parts.append("- `index.md` - Master documentation index")
-        doc_parts.append("- `overview.md` - Project overview and summary")
+        doc_parts.append("- `project-overview.md` - Project overview and summary")
         doc_parts.append("- `development-guide.md` - Development workflow and setup")
         doc_parts.append("")
         doc_parts.append("---")

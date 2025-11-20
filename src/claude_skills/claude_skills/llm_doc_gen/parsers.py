@@ -77,7 +77,8 @@ class DeepScanParser:
         default_exclusions = [
             '__pycache__', '.git', 'node_modules', 'venv', '.venv',
             'build', 'dist', '.egg-info', 'test', 'tests',
-            '.pytest_cache', 'coverage', '.coverage'
+            '.pytest_cache', 'coverage', '.coverage',
+            'specs', '.claude', '.agents', 'AGENTS.md', 'CLAUDE.md'
         ]
 
         self.exclude_patterns = config.exclude_patterns or default_exclusions

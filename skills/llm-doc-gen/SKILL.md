@@ -204,17 +204,14 @@ sdd llm-doc resume ./docs
 **Before using this skill**, verify that LLM tools are available:
 
 ```bash
-# Check for cursor-agent
-cursor-agent --version
+# Check which tools are available for llm-doc-gen
+sdd test check-tools --skill llm-doc-gen
 
-# Check for gemini
-gemini --version
-
-# Check for codex
-codex --version
+# For JSON output
+sdd test check-tools --skill llm-doc-gen --json
 ```
 
-**Expected:** At least one LLM tool should respond with version information.
+**Expected:** At least one LLM tool should be detected as available.
 
 **IMPORTANT - How This Skill Works:**
 - ✅ **Skill invokes LLM tools** - Uses `execute_tool_with_fallback()` and `execute_tools_parallel()`

@@ -234,6 +234,56 @@ def detect_project_structure(project_root: Path) -> Dict[str, Any]:
     return structure
 
 
+def build_directory_tree(project_root: Path, max_depth: int = 3) -> str:
+    """
+    Build a text-based directory tree representation.
+
+    Args:
+        project_root: Root directory to scan
+        max_depth: Maximum depth to traverse
+
+    Returns:
+        String representation of directory tree
+    """
+    def _tree_recursive(path: Path, prefix: str = "", depth: int = 0) -> List[str]:
+        """Recursive helper to build tree structure."""
+        if depth > max_depth:
+            return []
+
+        # Skip common ignore dirs
+        ignore_dirs = {
+            "node_modules", "dist", "build", ".git", "__pycache__",
+            ".venv", "venv", ".tox", ".pytest_cache", ".mypy_cache",
+            ".eggs", "*.egg-info", "__pypackages__", ".coverage",
+            "specs", ".claude", ".agents"
+        }
+
+        items = []
+        try:
+            entries = sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name))
+        except PermissionError:
+            return []
+
+        # Filter out ignored directories
+        entries = [e for e in entries if e.name not in ignore_dirs and not e.name.startswith('.')]
+
+        for i, entry in enumerate(entries):
+            is_last = i == len(entries) - 1
+            connector = "└── " if is_last else "├── "
+            items.append(f"{prefix}{connector}{entry.name}")
+
+            # Recurse into directories
+            if entry.is_dir():
+                extension = "    " if is_last else "│   "
+                items.extend(_tree_recursive(entry, prefix + extension, depth + 1))
+
+        return items
+
+    tree_lines = [project_root.name + "/"]
+    tree_lines.extend(_tree_recursive(project_root))
+    return "\n".join(tree_lines)
+
+
 def scan_project_files(project_root: Path, max_files: int = 50) -> Dict[str, List[str]]:
     """
     Scan project for key files and source files.
@@ -272,7 +322,7 @@ def scan_project_files(project_root: Path, max_files: int = 50) -> Dict[str, Lis
     for ext in source_extensions:
         for file_path in project_root.rglob(f"*{ext}"):
             # Skip common ignore dirs
-            if any(part in file_path.parts for part in ["node_modules", "dist", "build", ".git", "__pycache__"]):
+            if any(part in file_path.parts for part in ["node_modules", "dist", "build", ".git", "__pycache__", "specs", ".claude", ".agents"]):
                 continue
 
             source_files.append(str(file_path.relative_to(project_root)))
@@ -307,6 +357,9 @@ def create_project_data_from_scan(
     # Detect structure
     structure = detect_project_structure(project_root)
 
+    # Build directory tree
+    directory_tree = build_directory_tree(project_root, max_depth=3)
+
     # Create ProjectData
     # This is simplified - full implementation would detect actual values
     return ProjectData(
@@ -315,7 +368,7 @@ def create_project_data_from_scan(
         repository_type=structure["repository_type"],
         primary_languages=["Python"],  # Would be detected
         tech_stack={"Language": "Python"},  # Would be detected
-        directory_structure={},
+        directory_structure=directory_tree,
         file_count=0,  # Would be counted
         total_loc=0,  # Would be counted
         parts=None  # Would be populated for multi-part

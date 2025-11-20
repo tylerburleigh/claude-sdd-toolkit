@@ -6,7 +6,7 @@ Implements patterns from ai_consultation.py.
 """
 
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass
 
 
@@ -19,7 +19,7 @@ class ProjectData:
     repository_type: str  # monolith, monorepo, multi-part
     primary_languages: List[str]
     tech_stack: Dict[str, Any]
-    directory_structure: Dict[str, Any]
+    directory_structure: Union[Dict[str, Any], str]  # Dict for legacy, str for tree representation
     file_count: int
     total_loc: int
     parts: Optional[List[Dict[str, Any]]] = None  # For multi-part projects
@@ -72,6 +72,22 @@ class OverviewGenerator:
         prompt_parts.append("**IMPORTANT: You have READ-ONLY access. Do not attempt to write files.**")
         prompt_parts.append("Analyze this codebase and provide research findings for a project overview.")
         prompt_parts.append("Your findings will be used to compose the final documentation.")
+        prompt_parts.append("")
+
+        # Files and directories to ignore
+        prompt_parts.append("## Files and Directories to Ignore")
+        prompt_parts.append("")
+        prompt_parts.append("When analyzing this codebase, **ignore and do not read** the following:")
+        prompt_parts.append("")
+        prompt_parts.append("- `specs/` - Project specifications (not source code)")
+        prompt_parts.append("- `.claude/` - Claude AI configuration")
+        prompt_parts.append("- `.agents/` - Agent configuration")
+        prompt_parts.append("- `AGENTS.md` - Agent documentation")
+        prompt_parts.append("- `CLAUDE.md` - Claude documentation")
+        prompt_parts.append("- Any paths matching `.gitignore` patterns")
+        prompt_parts.append("- Standard build/dependency directories (node_modules, dist, build, etc.)")
+        prompt_parts.append("")
+        prompt_parts.append("Focus only on actual source code and project documentation.")
         prompt_parts.append("")
 
         # Project context summary

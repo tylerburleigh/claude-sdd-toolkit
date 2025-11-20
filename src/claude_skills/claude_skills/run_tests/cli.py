@@ -102,7 +102,8 @@ def _parse_model_override(values: Optional[List[str]]) -> Optional[Any]:
 
 def cmd_check_tools(args: argparse.Namespace, printer: PrettyPrinter) -> int:
     """Check availability of external AI tools."""
-    available_tools = get_enabled_and_available_tools("run-tests")
+    skill_name = getattr(args, 'skill', 'run-tests')
+    available_tools = get_enabled_and_available_tools(skill_name)
 
     if getattr(args, 'json', False):
         result = {
@@ -273,6 +274,11 @@ def register_run_tests(subparsers: argparse._SubParsersAction, parent_parser: ar
         parents=[parent_parser],
         help="Check availability of external CLI tools",
         description="Check which external AI CLI tools are available",
+    )
+    check_parser.add_argument(
+        "--skill",
+        default="run-tests",
+        help="Skill name to check tools for (default: run-tests)",
     )
     check_parser.set_defaults(func=cmd_check_tools)
 

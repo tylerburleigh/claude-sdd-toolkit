@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 
+from ..markdown_validator import sanitize_llm_output
+
 
 @dataclass
 class ComponentData:
@@ -90,6 +92,22 @@ class ComponentGenerator:
         prompt_parts.append("**IMPORTANT: You have READ-ONLY access. Do not attempt to write files.**")
         prompt_parts.append("Analyze this codebase to understand component organization, directory purposes, and file patterns.")
         prompt_parts.append("Your findings will be used to compose the final component inventory documentation.")
+        prompt_parts.append("")
+
+        # Files and directories to ignore
+        prompt_parts.append("## Files and Directories to Ignore")
+        prompt_parts.append("")
+        prompt_parts.append("When analyzing this codebase, **ignore and do not read** the following:")
+        prompt_parts.append("")
+        prompt_parts.append("- `specs/` - Project specifications (not source code)")
+        prompt_parts.append("- `.claude/` - Claude AI configuration")
+        prompt_parts.append("- `.agents/` - Agent configuration")
+        prompt_parts.append("- `AGENTS.md` - Agent documentation")
+        prompt_parts.append("- `CLAUDE.md` - Claude documentation")
+        prompt_parts.append("- Any paths matching `.gitignore` patterns")
+        prompt_parts.append("- Standard build/dependency directories (node_modules, dist, build, etc.)")
+        prompt_parts.append("")
+        prompt_parts.append("Focus only on actual source code and project documentation.")
         prompt_parts.append("")
 
         # Project context
@@ -208,8 +226,10 @@ class ComponentGenerator:
         prompt_parts.append("- Example/sample data")
         prompt_parts.append("")
 
+        # Conditionally add section 8 for multi-part projects
+        next_section_num = 8
         if component_data.is_multi_part and component_data.project_parts:
-            prompt_parts.append("### 8. Integration Points (Multi-Part Projects)")
+            prompt_parts.append(f"### {next_section_num}. Integration Points (Multi-Part Projects)")
             prompt_parts.append("")
             prompt_parts.append("Describe how different parts integrate:")
             prompt_parts.append("- Communication patterns between parts")
@@ -217,8 +237,9 @@ class ComponentGenerator:
             prompt_parts.append("- Data flow between parts")
             prompt_parts.append("- Build/deployment relationships")
             prompt_parts.append("")
+            next_section_num += 1
 
-        prompt_parts.append("### 9. Development Notes")
+        prompt_parts.append(f"### {next_section_num}. Development Notes")
         prompt_parts.append("")
         prompt_parts.append("Provide helpful notes for developers:")
         prompt_parts.append("- Where to find specific functionality")
@@ -264,7 +285,7 @@ class ComponentGenerator:
         doc_parts = []
 
         # Header
-        doc_parts.append(f"# {component_data.project_name} - Source Tree Analysis")
+        doc_parts.append(f"# {component_data.project_name} - Component Inventory")
         doc_parts.append("")
         doc_parts.append(f"**Date:** {generated_date}")
         doc_parts.append("")
@@ -289,10 +310,15 @@ class ComponentGenerator:
             doc_parts.append("```")
             doc_parts.append("")
 
-        # LLM research findings
+        # LLM research findings (sanitized for markdown validity)
         doc_parts.append("---")
         doc_parts.append("")
-        doc_parts.append(research_findings)
+        sanitized_findings, warnings = sanitize_llm_output(research_findings)
+        if warnings:
+            # Log warnings (in production, you might want to use proper logging)
+            for warning in warnings:
+                print(f"[WARN] Markdown validation: {warning}")
+        doc_parts.append(sanitized_findings)
         doc_parts.append("")
 
         # Footer with references
@@ -303,7 +329,7 @@ class ComponentGenerator:
         doc_parts.append("For additional information, see:")
         doc_parts.append("")
         doc_parts.append("- `index.md` - Master documentation index")
-        doc_parts.append("- `overview.md` - Project overview and summary")
+        doc_parts.append("- `project-overview.md` - Project overview and summary")
         doc_parts.append("- `architecture.md` - Detailed architecture")
         doc_parts.append("")
         doc_parts.append("---")

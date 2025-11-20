@@ -264,16 +264,15 @@ class IndexGenerator:
         lines.append("### Core Documentation")
         lines.append("")
         lines.append(self._format_doc_link("project-overview.md", "Project Overview", "Executive summary and high-level architecture"))
-        lines.append(self._format_doc_link("source-tree-analysis.md", "Source Tree Analysis", "Annotated directory structure"))
         lines.append("")
 
         if not data.is_multi_part:
             # Single-part documentation links
             lines.append(self._format_doc_link("architecture.md", "Architecture", "Detailed technical architecture"))
 
-            comp_desc = "Catalog of major components"
+            comp_desc = "Component inventory with directory structure and organization patterns"
             if data.has_ui_components:
-                comp_desc += " and UI elements"
+                comp_desc += " including UI elements"
             lines.append(self._format_doc_link("component-inventory.md", "Component Inventory", comp_desc))
 
             lines.append(self._format_doc_link("development-guide.md", "Development Guide", "Local setup and development workflow"))
