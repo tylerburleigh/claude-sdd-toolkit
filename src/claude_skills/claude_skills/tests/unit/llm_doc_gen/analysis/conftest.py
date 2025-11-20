@@ -205,7 +205,7 @@ def mock_execute_tool(monkeypatch: pytest.MonkeyPatch) -> ToolResponse:
     )
 
     monkeypatch.setattr(
-        "claude_skills.code_doc.ai_consultation.execute_tool_with_fallback",
+        "claude_skills.llm_doc_gen.analysis.ai_consultation.execute_tool_with_fallback",
         lambda *args, **kwargs: response,
     )
     return response
@@ -223,7 +223,7 @@ def mock_execute_tool_failure(monkeypatch: pytest.MonkeyPatch) -> ToolResponse:
     )
 
     monkeypatch.setattr(
-        "claude_skills.code_doc.ai_consultation.execute_tool_with_fallback",
+        "claude_skills.llm_doc_gen.analysis.ai_consultation.execute_tool_with_fallback",
         lambda *args, **kwargs: response,
     )
     return response

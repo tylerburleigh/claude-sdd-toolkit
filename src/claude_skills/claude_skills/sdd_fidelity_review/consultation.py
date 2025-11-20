@@ -784,7 +784,15 @@ def consult_multiple_ai_on_fidelity(
     cache = None
 
     try:
+        # Track any tool availability errors to defer until after cache check
+        tool_availability_error: Optional[NoToolsAvailableError] = None
+        final_tools_to_consult: List[str] = []
+        resolved_models_map: Dict[str, Optional[str]] = {}
+        models_summary = ""
+        models_payload: Dict[str, Optional[str]] = {}
+
         # If no tools specified, detect available tools and filter by config
+        # We do this without raising errors yet, to allow cache check to happen first
         if tools is None:
             # Get enabled tools from config
             enabled_tools_config = get_enabled_fidelity_tools()
@@ -793,52 +801,57 @@ def consult_multiple_ai_on_fidelity(
             # Detect all available tools
             all_available_tools = ai_tools.get_enabled_and_available_tools(FIDELITY_SKILL_NAME)
             if not all_available_tools:
-                raise NoToolsAvailableError(
+                tool_availability_error = NoToolsAvailableError(
                     "No AI consultation tools available. "
                     f"Please install: {', '.join(ALL_SUPPORTED_TOOLS)}"
                 )
-
-            # Filter to only tools that are BOTH available AND enabled
-            tools = [t for t in all_available_tools if t in enabled_tool_names]
-
-            if not tools:
-                # Fallback to all available if none match enabled filter
-                logger.warning(
-                    f"No tools matched enabled config ({enabled_tool_names}). "
-                    f"Using all available tools: {', '.join(all_available_tools)}"
-                )
-                tools = all_available_tools
             else:
-                logger.info(f"Using enabled tools from config: {', '.join(tools)}")
+                # Filter to only tools that are BOTH available AND enabled
+                tools = [t for t in all_available_tools if t in enabled_tool_names]
 
-        # Filter to only available tools
-        available_tools = [t for t in tools if ai_tools.check_tool_available(t)]
-        if not available_tools:
-            raise NoToolsAvailableError(
-                f"None of the specified tools are available: {', '.join(tools)}"
+                if not tools:
+                    # Fallback to all available if none match enabled filter
+                    logger.warning(
+                        f"No tools matched enabled config ({enabled_tool_names}). "
+                        f"Using all available tools: {', '.join(all_available_tools)}"
+                    )
+                    tools = all_available_tools
+                else:
+                    logger.info(f"Using enabled tools from config: {', '.join(tools)}")
+
+        # Filter to only available tools (if we have tools to check)
+        if tools is not None and not tool_availability_error:
+            available_tools = [t for t in tools if ai_tools.check_tool_available(t)]
+            if not available_tools:
+                tool_availability_error = NoToolsAvailableError(
+                    f"None of the specified tools are available: {', '.join(tools)}"
+                )
+            else:
+                if len(available_tools) < len(tools):
+                    unavailable = set(tools) - set(available_tools)
+                    logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
+
+                enabled_tools_map = get_enabled_fidelity_tools()
+                final_tools_to_consult = [
+                    tool for tool in available_tools if tool in enabled_tools_map
+                ]
+                if not final_tools_to_consult:
+                    tool_availability_error = NoToolsAvailableError(
+                        f"All available tools ({', '.join(available_tools)}) are disabled in the configuration."
+                    )
+
+        # Resolve models if we have tools
+        if final_tools_to_consult and not tool_availability_error:
+            resolved_models_map = ai_config.resolve_models_for_tools(
+                FIDELITY_SKILL_NAME,
+                final_tools_to_consult,
+                override=model,
             )
+            models_summary = _summarize_models_map(resolved_models_map)
+            models_payload = dict(resolved_models_map)
 
-        if len(available_tools) < len(tools):
-            unavailable = set(tools) - set(available_tools)
-            logger.warning(f"Some tools unavailable: {', '.join(unavailable)}")
-
-        enabled_tools_map = get_enabled_fidelity_tools()
-        final_tools_to_consult = [
-            tool for tool in available_tools if tool in enabled_tools_map
-        ]
-        if not final_tools_to_consult:
-            raise NoToolsAvailableError(
-                f"All available tools ({', '.join(available_tools)}) are disabled in the configuration."
-            )
-
-        resolved_models_map = ai_config.resolve_models_for_tools(
-            FIDELITY_SKILL_NAME,
-            final_tools_to_consult,
-            override=model,
-        )
-        models_summary = _summarize_models_map(resolved_models_map)
-        models_payload = dict(resolved_models_map)
-
+        # Check cache before raising any tool availability errors
+        # This allows cache hits to short-circuit even when no tools are available
         if cache_enabled and cache_key_params and _CACHE_AVAILABLE:
             try:
                 cache = cache or CacheManager()
@@ -886,6 +899,10 @@ def consult_multiple_ai_on_fidelity(
                         })
             except Exception as e:
                 logger.warning(f"Cache lookup failed: {e}. Proceeding with AI consultation.")
+
+        # If we deferred a tool availability error and didn't get a cache hit, raise it now
+        if tool_availability_error:
+            raise tool_availability_error
 
         # Emit ai_consultation event before calling AI tools
         if progress_emitter:

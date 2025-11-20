@@ -180,13 +180,22 @@ class OpenCodeProvider(ProviderContext):
         return self.metadata.models[0].id
 
     def _ensure_model(self, candidate: str) -> str:
-        # OpenCode supports arbitrary provider/model combinations (e.g., openai/gpt-4o-mini)
-        # so we don't validate against a fixed list. Just ensure it's not empty.
+        # Validate that the model is not empty
         if not candidate or not candidate.strip():
             raise ProviderExecutionError(
                 "Model identifier cannot be empty",
                 provider=self.metadata.provider_name,
             )
+
+        # Validate against the list of supported models
+        available = {descriptor.id for descriptor in self.metadata.models}
+        if candidate not in available:
+            available_str = ", ".join(sorted(available))
+            raise ProviderExecutionError(
+                f"Model '{candidate}' is not supported. Available models: {available_str}",
+                provider=self.metadata.provider_name,
+            )
+
         return candidate
 
     def _is_port_open(self, port: int, host: str = "localhost") -> bool:

@@ -241,12 +241,12 @@ class TestModelResolution:
             captured["context"] = context
             return "mock-model"
 
-        monkeypatch.setattr("claude_skills.code_doc.ai_consultation.ai_config.resolve_tool_model", _mock_resolve)
+        monkeypatch.setattr("claude_skills.llm_doc_gen.analysis.ai_consultation.ai_config.resolve_tool_model", _mock_resolve)
 
         model = get_model_for_tool("gemini", doc_type="architecture", override={"gemini": "cli"})
         assert model == "mock-model"
         assert captured == {
-            "skill": "code-doc",
+            "skill": "llm-doc-gen",
             "tool": "gemini",
             "override": {"gemini": "cli"},
             "context": {"doc_type": "architecture"},
@@ -259,11 +259,11 @@ class TestModelResolution:
         ordered = ["gemini", "cursor-agent"]
 
         monkeypatch.setattr(
-            "claude_skills.code_doc.ai_consultation.get_available_tools",
+            "claude_skills.llm_doc_gen.analysis.ai_consultation.get_available_tools",
             lambda: ordered,
         )
         monkeypatch.setattr(
-            "claude_skills.code_doc.ai_consultation.ai_config.get_consensus_agents",
+            "claude_skills.llm_doc_gen.analysis.ai_consultation.ai_config.get_consensus_agents",
             lambda *_: ordered,
         )
 
@@ -273,7 +273,7 @@ class TestModelResolution:
         }
 
         monkeypatch.setattr(
-            "claude_skills.code_doc.ai_consultation.resolve_models_for_tools",
+            "claude_skills.llm_doc_gen.analysis.ai_consultation.resolve_models_for_tools",
             lambda tools, doc_type=None, override=None: resolved_models,
         )
 
@@ -292,7 +292,7 @@ class TestModelResolution:
             )
 
         monkeypatch.setattr(
-            "claude_skills.code_doc.ai_consultation.execute_tools_parallel",
+            "claude_skills.llm_doc_gen.analysis.ai_consultation.execute_tools_parallel",
             _mock_execute,
         )
 

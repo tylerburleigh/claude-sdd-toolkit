@@ -1125,24 +1125,29 @@ def sample_spec_invalid_phases(create_temp_spec_file):
 # =============================================================================
 
 @pytest.fixture(autouse=True)
-def mock_ai_config_enabled_tools(monkeypatch):
+def mock_ai_config_enabled_tools(request, monkeypatch):
     """
     Mock AI config to return all available tools as enabled.
 
     This prevents tests from being affected by the user's .claude/ai_config.yaml
     settings, ensuring tests are isolated and reproducible.
+
+    Skips mocking for tests in test_ai_config_models.py and test_ai_config_setup.py
+    which specifically test ai_config behavior.
     """
+    # Skip mocking for tests that are specifically testing ai_config behavior
+    test_module = request.node.fspath.basename
+    if test_module in ["test_ai_config_models.py", "test_ai_config_setup.py"]:
+        return
+
     def mock_get_enabled_tools(skill_name: str):
         """Return all available tools as enabled, ignoring user config."""
-        try:
-            # Try analysis module's get_available_tools first
-            from claude_skills.llm_doc_gen.analysis.ai_consultation import get_available_tools
-            available = get_available_tools()
-        except ImportError:
-            # Fallback to detecting available tools directly
-            from claude_skills.common.ai_tools import detect_available_tools
-            # Return a reasonable set of common tools
-            available = detect_available_tools(["gemini", "cursor-agent", "codex", "claude"])
+        # Use detect_available_tools directly to avoid circular dependency
+        # (get_available_tools() internally calls get_enabled_and_available_tools,
+        # which calls ai_config.get_enabled_tools(), creating infinite recursion)
+        from claude_skills.common.ai_tools import detect_available_tools
+        # Return a reasonable set of common tools
+        available = detect_available_tools(["gemini", "cursor-agent", "codex", "claude"])
         # Return a dict mapping tool names to minimal config dicts
         return {tool: {"enabled": True, "command": tool} for tool in available}
 

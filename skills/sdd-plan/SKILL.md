@@ -312,10 +312,10 @@ planning tasks.
 Generate documentation now? [Y/n]
 ```
 
-3. **If user agrees**, use Task tool to invoke code-doc subagent for documentation generation:
+3. **If user agrees**, use Task tool to invoke llm-doc-gen subagent for documentation generation:
 ```
 Task(
-  subagent_type: "sdd-toolkit:code-doc",
+  subagent_type: "sdd-toolkit:llm-doc-gen",
   prompt: "Generate codebase documentation",
   description: "Generate docs"
 )

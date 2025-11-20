@@ -30,7 +30,6 @@ SDD_PERMISSIONS = [
     "Skill(sdd-toolkit:sdd-validate)",
     "Skill(sdd-toolkit:sdd-render)",
     "Skill(sdd-toolkit:sdd-fidelity-review)",
-    "Skill(sdd-toolkit:code-doc)",
     "Skill(sdd-toolkit:doc-query)",
     # Skills (short form without namespace - also needed)
     "Skill(run-tests)",
@@ -41,7 +40,6 @@ SDD_PERMISSIONS = [
     "Skill(sdd-plan-review)",
     "Skill(sdd-validate)",
     "Skill(sdd-render)",
-    "Skill(code-doc)",
     "Skill(doc-query)",
     # Slash commands
     "SlashCommand(/sdd-begin)",

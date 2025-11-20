@@ -27,7 +27,7 @@ SKILL_MODULE_MAP = {
     'sdd-update': 'claude_skills.sdd_update.cli',
     'doc-query': 'claude_skills.doc_query.cli',
     'run-tests': 'claude_skills.run_tests.cli',
-    'code-doc': 'claude_skills.code_doc.cli',
+    'code-doc': 'claude_skills.llm_doc_gen.analysis.cli',
     'sdd-integration': 'claude_skills.doc_query.sdd_integration',
 }
 

@@ -1,7 +1,7 @@
 """
 Documentation Helper Functions
 
-Provides integration between SDD skills and the code-doc/doc-query system.
+Provides integration between SDD skills and the documentation/doc-query system.
 These functions enable proactive documentation generation and context gathering.
 """
 
@@ -177,7 +177,7 @@ def should_generate_docs(project_root: str = ".", interactive: bool = True) -> d
     Example:
         >>> result = should_generate_docs()
         >>> if result["should_generate"] and result["user_confirmed"]:
-        ...     # Run code-doc skill
+        ...     # Run doc generation
         ...     print("Generating documentation...")
     """
     # Check if docs are already available
@@ -218,7 +218,7 @@ def ensure_documentation_exists(
     This is a high-level convenience function that combines:
     - check_doc_query_available() - Check if docs exist
     - should_generate_docs() - Determine if generation is needed
-    - Skill(sdd-toolkit:code-doc) invocation - Actually generate docs
+    - `sdd doc generate` command invocation - Actually generate docs
 
     Args:
         project_root: Root directory (default: auto-detect)
@@ -259,9 +259,9 @@ def ensure_documentation_exists(
     # Auto-generate if requested
     if auto_generate:
         try:
-            # Invoke code-doc skill
+            # Invoke doc generation via unified CLI
             proc = subprocess.run(
-                ["code-doc", "generate", project_root],
+                ["sdd", "doc", "generate", project_root],
                 capture_output=True,
                 text=True,
                 timeout=300  # 5 minutes max
@@ -281,13 +281,13 @@ def ensure_documentation_exists(
         except subprocess.TimeoutExpired:
             return False, "Documentation generation timed out"
         except FileNotFoundError:
-            return False, "code-doc command not found in PATH"
+            return False, "sdd command not found in PATH"
         except Exception as e:
             return False, f"Error generating documentation: {str(e)}"
 
     # If prompt_user is True, return recommendation for user to decide
     if prompt_user:
-        return False, "Documentation not found - recommend running code-doc skill"
+        return False, "Documentation not found - recommend running `sdd doc generate`"
 
     # No auto-generate, no prompt - just return not available
     return False, "Documentation not available"

@@ -58,7 +58,7 @@ def get_model_for_tool(
     """
     context = _build_context(doc_type)
     return ai_config.resolve_tool_model(
-        "code-doc",
+        "llm-doc-gen",
         tool,
         override=override,
         context=context,
@@ -75,7 +75,7 @@ def resolve_models_for_tools(
     """
     context = _build_context(doc_type)
     ordered = ai_config.resolve_models_for_tools(
-        "code-doc",
+        "llm-doc-gen",
         tools,
         override=override,
         context=context,
@@ -91,7 +91,7 @@ def get_available_tools() -> List[str]:
     Returns:
         List of available tool names
     """
-    return get_enabled_and_available_tools("code-doc")
+    return get_enabled_and_available_tools("llm-doc-gen")
 
 
 def get_best_tool(doc_type: str, available_tools: Optional[List[str]] = None) -> Optional[str]:

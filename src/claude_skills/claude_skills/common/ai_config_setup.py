@@ -62,15 +62,6 @@ run-tests:
         timeout:
           cursor-agent: composer-1
 
-code-doc:
-  models:
-    overrides:
-      doc_type:
-        architecture:
-          cursor-agent: composer-1
-        ai_context:
-          gemini: pro
-
 sdd-plan-review:
   models:
     overrides:

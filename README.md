@@ -15,7 +15,7 @@ The SDD Toolkit is a Python library and CLI toolkit for Spec-Driven Development 
 ### Components
 
 **For Claude Code:**
-- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `code-doc`, `doc-query`, `llm-doc-gen`, etc.)
+- Skills - Interactive workflows (`sdd-plan`, `sdd-next`, `doc-query`, `llm-doc-gen`, etc.)
 - Slash Commands - Quick actions (`/sdd-begin`, `/sdd-setup`)
 - Subagent System - Specialized agents for multi-step tasks
 
@@ -146,7 +146,7 @@ Each major capability is implemented as an independent skill module:
 - **sdd-update** - Track progress, update status, journal decisions
 
 **Supporting Skills:**
-- Documentation: `code-doc`, `doc-query`, `llm-doc-gen`
+- Documentation: `doc-query`, `llm-doc-gen`
 - Quality: `sdd-validate`, `sdd-fidelity-review`, `sdd-plan-review`, `sdd-modify`
 - Testing: `run-tests`
 - Utilities: `sdd-render`, `context-tracker`, `sdd-pr`
@@ -230,7 +230,6 @@ All specs are Git-trackable JSON files.
 
 | Skill | Purpose | Example Usage |
 |-------|---------|---------------|
-| **code-doc** | Generate codebase docs | "Document this codebase" |
 | **doc-query** | Query & analyze code | "What calls authenticate()?" "Show call graph" |
 | **context-tracker** | Monitor Claude usage | "Show my context consumption" |
 
@@ -342,7 +341,6 @@ Each task represents a single, focused change.
 Skills using multi-agent consultation:
 - `sdd-plan-review` - Spec quality assessment
 - `sdd-fidelity-review` - Implementation verification
-- `code-doc` - Architecture analysis
 
 **Process:**
 1. Parallel consultation of 2+ AI models (default: cursor-agent + gemini)
@@ -417,7 +415,7 @@ User Request → Main Claude → Task Tool → Subagent → Execute → Report B
 
 **Skills Using Subagents:**
 - `sdd-validate`, `sdd-plan-review`, `sdd-fidelity-review`
-- `sdd-update`, `run-tests`, `code-doc`, `sdd-modify`
+- `sdd-update`, `run-tests`, `sdd-modify`
 
 **Skills Running Directly:**
 - `sdd-plan`, `sdd-next`, `doc-query`
@@ -474,7 +472,7 @@ Claude: Resuming rate-limiting-001
 ```
 You: Document this codebase with AI enhancement
 
-Claude: [Uses code-doc skill]
+Claude: [Uses llm-doc-gen]
         Analyzing 183 files...
         Consulting cursor-agent and gemini...
 
@@ -679,14 +677,6 @@ run-tests:
     gemini: gemini-2.5-pro
     cursor-agent: composer-1
 
-code-doc:
-  tool_priority:
-    - gemini
-    - cursor-agent
-  models:
-    gemini: gemini-2.5-flash
-    cursor-agent: composer-1
-
 sdd-plan-review:
   tool_priority:
     - gemini
@@ -811,7 +801,7 @@ From architecture analysis:
 
 ```bash
 ls ~/.claude/plugins/marketplaces/claude-sdd-toolkit/skills/
-# Should show: sdd-plan, sdd-next, code-doc, etc.
+# Should show: sdd-plan, sdd-next, doc-query, llm-doc-gen, etc.
 ```
 
 ### CLI Commands Not Found

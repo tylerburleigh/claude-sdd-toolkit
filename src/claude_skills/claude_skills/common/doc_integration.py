@@ -5,7 +5,7 @@ Provides unified utilities for checking documentation availability,
 prompting for generation, and handling user responses.
 
 This module serves as a shared contract between SDD skills (sdd-plan,
-sdd-next, sdd-update) and the documentation system (code-doc, doc-query).
+sdd-next, sdd-update) and the documentation system (llm-doc-gen, doc-query).
 """
 
 from enum import Enum
