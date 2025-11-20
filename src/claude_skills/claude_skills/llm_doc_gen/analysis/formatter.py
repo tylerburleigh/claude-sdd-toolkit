@@ -287,3 +287,38 @@ class JSONGenerator:
                 "functions": analysis['functions'],
                 "dependencies": analysis['dependencies']
             }
+
+    def generate_streaming(
+        self,
+        output_file: Path,
+        analysis: Dict[str, Any],
+        statistics: Dict[str, Any],
+        compress: bool = False
+    ) -> None:
+        """
+        Convenience method for streaming JSON output to file.
+
+        This is a shorthand for calling generate() with streaming=True.
+
+        Args:
+            output_file: Path where JSON output will be written
+            analysis: Analyzed codebase data
+            statistics: Code statistics
+            compress: Enable gzip compression (default: False)
+
+        Example:
+            >>> generator = JSONGenerator('my-project', '1.0.0')
+            >>> generator.generate_streaming(
+            ...     Path('output.json'),
+            ...     analysis_data,
+            ...     stats_data,
+            ...     compress=True
+            ... )
+        """
+        self.generate(
+            analysis=analysis,
+            statistics=statistics,
+            streaming=True,
+            output_path=output_file,
+            compress=compress
+        )
