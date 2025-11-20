@@ -360,10 +360,9 @@ def create_project_data_from_scan(
 
     # Initialize DocumentationGenerator
     generator = DocumentationGenerator(
-        root_path=project_root,
+        project_dir=project_root,
         project_name=project_name,
-        project_version="1.0.0",
-        output_dir=output_dir or project_root / "docs",
+        version="1.0.0",
         exclude_patterns=[]
     )
 
@@ -372,7 +371,13 @@ def create_project_data_from_scan(
 
     # Save JSON artifact as codebase.json (DO NOT save markdown)
     if output_dir:
-        generator.save_json()
+        output_path = output_dir / "codebase.json"
+        generator.save_json(
+            output_path=output_path,
+            analysis=result,
+            statistics=result.get("statistics", {}),
+            verbose=False
+        )
 
     # Extract statistics and full analysis from result
     statistics = result.get("statistics", {})
