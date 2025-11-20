@@ -17,7 +17,7 @@ from src.claude_skills.claude_skills.llm_doc_gen.analysis.ast_analysis import (
     InstantiationSite,
     ReferenceType
 )
-from src.claude_skills.claude_skills.llm_doc_gen.analysis.symbol_index import (
+from src.claude_skills.claude_skills.llm_doc_gen.analysis.optimization.indexing import (
     SymbolIndex,
     ImportIndex,
     FastResolver

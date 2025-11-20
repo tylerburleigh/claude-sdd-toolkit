@@ -21,7 +21,7 @@ try:
         SCHEMA_VERSION
     )
     from .ast_analysis import CrossReferenceGraph
-    from .symbol_index import FastResolver
+    from .optimization.indexing import FastResolver
     from .optimization.filters import FilterProfile, create_filter_chain
 except ImportError:
     from parsers import create_parser_factory, Language, ParseResult
@@ -36,7 +36,7 @@ except ImportError:
         SCHEMA_VERSION
     )
     from ast_analysis import CrossReferenceGraph
-    from symbol_index import FastResolver
+    from optimization.indexing import FastResolver
     from optimization.filters import FilterProfile, create_filter_chain
 
 

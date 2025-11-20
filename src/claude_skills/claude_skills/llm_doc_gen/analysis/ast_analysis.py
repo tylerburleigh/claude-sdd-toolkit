@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Set, Optional, Any, Tuple
 from enum import Enum
 
-from .symbol_index import SymbolIndex, ImportIndex
+from .optimization.indexing import SymbolIndex, ImportIndex
 
 
 class ReferenceType(Enum):
