@@ -446,7 +446,7 @@ class DocumentationGenerator:
             self.save_markdown(md_path, analysis, statistics, verbose=verbose)
 
         if format_type in ['json', 'both']:
-            json_path = output_dir / 'documentation.json'
+            json_path = output_dir / 'codebase.json'
             self.save_json(
                 json_path,
                 analysis,

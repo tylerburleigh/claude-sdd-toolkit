@@ -9,13 +9,13 @@
 
 | Metric | Value |
 |--------|-------|
-| **Lines of Code** | 133,087 |
-| **Total Files** | 389 |
+| **Lines of Code** | 140,148 |
+| **Total Files** | 401 |
 | **Top Languages** | python, javascript |
 
 ## Project Overview
 
-A comprehensive toolkit for spec-driven development with Claude
+claude-sdd-toolkit documentation
 
 ## Quick Reference
 

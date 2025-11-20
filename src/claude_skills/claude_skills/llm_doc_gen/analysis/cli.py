@@ -27,7 +27,7 @@ Examples:
     sdd doc generate ./src --name MyProject --version 0.1.0
     sdd doc generate ./src --format json --output-dir ./docs
     sdd doc analyze ./src --verbose
-    sdd doc validate ./docs/documentation.json
+    sdd doc validate ./docs/codebase.json
 """
 
 from __future__ import annotations
@@ -481,7 +481,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
 
             output_dir.mkdir(parents=True, exist_ok=True)
             md_path = output_dir / 'DOCUMENTATION.md'
-            json_path = output_dir / 'documentation.json'
+            json_path = output_dir / 'codebase.json'
             generator.save_markdown(md_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
             generator.save_json(json_path, analysis, statistics, verbose=getattr(args, 'verbose', False))
             printer.success(f"Structural documentation saved to {output_dir}")
@@ -545,7 +545,7 @@ def cmd_analyze_with_ai(args: argparse.Namespace, printer: PrettyPrinter) -> int
         output_dir.mkdir(parents=True, exist_ok=True)
 
         md_path = output_dir / 'DOCUMENTATION.md'
-        json_path = output_dir / 'documentation.json'
+        json_path = output_dir / 'codebase.json'
         generator.save_markdown(md_path, analysis, statistics, verbose=False)
         generator.save_json(json_path, analysis, statistics, verbose=False)
         printer.success(f"   ✅ {md_path}")
@@ -675,3 +675,6 @@ def register_code_doc(subparsers: argparse._SubParsersAction, parent_parser: arg
     analyze_ai_parser.add_argument('--skip-ai-context', action='store_true', help='Skip AI_CONTEXT.md generation')
     analyze_ai_parser.add_argument('--dry-run', action='store_true', help='Show what would be generated without running AI')
     analyze_ai_parser.set_defaults(func=cmd_analyze_with_ai)
+# Cache test comment
+# Cache test commentx
+# Cache test comment
