@@ -324,6 +324,65 @@ class JSONGenerator:
             compress=compress
         )
 
+    def generate_two_tier(
+        self,
+        output_dir: Path,
+        analysis: Dict[str, Any],
+        statistics: Dict[str, Any],
+        detail_dir: str = 'details'
+    ) -> Dict[str, Any]:
+        """
+        Generate two-tier documentation: summary + detailed per-module files.
+
+        Creates a lightweight summary JSON file (codebase.json) containing
+        signatures only, plus detailed per-module JSON files in a subdirectory.
+
+        Args:
+            output_dir: Base output directory
+            analysis: Analyzed codebase data
+            statistics: Code statistics
+            detail_dir: Name of subdirectory for detail files (default: 'details')
+
+        Returns:
+            Dict containing:
+                - 'summary_file': Path to the summary JSON file
+                - 'detail_files': List of paths to detailed module files
+
+        Example:
+            >>> generator = JSONGenerator('my-project', '1.0.0')
+            >>> result = generator.generate_two_tier(
+            ...     Path('docs'),
+            ...     analysis_data,
+            ...     stats_data
+            ... )
+            >>> print(result['summary_file'])  # docs/codebase.json
+            >>> print(result['detail_files'])  # [docs/details/module1.json, ...]
+        """
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate summary using SummaryGenerator
+        summary_gen = SummaryGenerator(self.project_name, self.version)
+        summary_data = summary_gen.generate(analysis, statistics)
+
+        # Write summary to codebase.json
+        summary_file = output_dir / 'codebase.json'
+        with open(summary_file, 'w', encoding='utf-8') as f:
+            json.dump(summary_data, f, indent=2, ensure_ascii=False)
+
+        # Generate detailed module files using DetailWriter
+        detail_writer = DetailWriter(self.project_name, self.version)
+        detail_files = detail_writer.write_module_details(
+            output_dir,
+            analysis,
+            statistics
+        )
+
+        return {
+            'summary_file': summary_file,
+            'detail_files': detail_files
+        }
+
 
 class SummaryGenerator:
     """
