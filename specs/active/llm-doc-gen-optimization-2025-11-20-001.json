@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T23:18:34.709048Z",
+  "last_updated": "2025-11-20T23:20:31.938428Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 88,
+    "progress_percentage": 89,
     "current_phase": "phase-6"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 60,
+      "completed_tasks": 61,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -2187,7 +2187,7 @@
         "depends": []
       },
       "total_tasks": 10,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {
         "purpose": "100x smaller primary output through summary/detail separation",
         "risk_level": "high",
@@ -2207,7 +2207,7 @@
         "task-6-4"
       ],
       "total_tasks": 7,
-      "completed_tasks": 2,
+      "completed_tasks": 3,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -2281,7 +2281,7 @@
     "task-6-2": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py",
-      "status": "pending",
+      "status": "completed",
       "parent": "phase-6-files",
       "children": [
         "task-6-2-1"
@@ -2296,7 +2296,7 @@
         "depends": []
       },
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/schema.py",
         "task_category": "implementation",
@@ -2307,13 +2307,19 @@
     "task-6-2-1": {
       "type": "subtask",
       "title": "Define summary and detail schemas",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-6-2",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Add SUMMARY_SCHEMA and DETAIL_SCHEMA constants, create to_summary() and to_detail() helper functions"
+        "details": "Add SUMMARY_SCHEMA and DETAIL_SCHEMA constants, create to_summary() and to_detail() helper functions",
+        "started_at": "2025-11-20T23:19:17.902368Z",
+        "status_note": "Adding SUMMARY_SCHEMA and DETAIL_SCHEMA constants with helper functions",
+        "completed_at": "2025-11-20T23:20:31.927754Z",
+        "needs_journaling": false,
+        "actual_hours": 0.021,
+        "journaled_at": "2025-11-20T23:20:31.935800Z"
       }
     },
     "task-6-3": {
@@ -3186,6 +3192,15 @@
       "content": "Created DetailWriter class in formatter.py to generate per-module detail files in docs/details/ directory. Implementation creates individual JSON files for each module containing full documentation with metadata, module info, classes, functions, and statistics. Added json import to formatter.py. Updated generator.py imports to export DetailWriter. Tested and verified: creates details directory, generates one JSON file per module with safe filenames, includes complete documentation data, proper JSON structure.",
       "metadata": {},
       "task_id": "task-6-1-2"
+    },
+    {
+      "timestamp": "2025-11-20T23:20:31.935793Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Define summary and detail schemas",
+      "author": "claude-code",
+      "content": "Added SUMMARY_SCHEMA and DETAIL_SCHEMA constants to schema.py for lightweight and full documentation formats. Implemented to_summary() helper function that strips docstrings, bodies, and complexity from functions/classes while preserving signatures, parameters, return types, and basic metadata. Implemented to_detail() helper function as passthrough for complete documentation. Tested and verified: constants defined correctly, to_summary() strips unwanted fields for both functions and classes, to_detail() preserves all data, method docstrings properly stripped in class summaries.",
+      "metadata": {},
+      "task_id": "task-6-2-1"
     }
   ]
 }

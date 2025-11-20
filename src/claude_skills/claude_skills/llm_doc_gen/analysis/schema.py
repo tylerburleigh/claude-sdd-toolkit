@@ -103,6 +103,74 @@ SCHEMA_VERSION = "2.0"
 SCHEMA_VERSION_MAJOR = 2
 SCHEMA_VERSION_MINOR = 0
 
+# Summary schema: Lightweight format with signatures only
+SUMMARY_SCHEMA = "summary-v1.0"
+
+# Detail schema: Full format with complete documentation
+DETAIL_SCHEMA = "detail-v1.0"
+
+
+def to_summary(data_dict: dict) -> dict:
+    """
+    Convert full documentation dict to summary format (signatures only).
+
+    Strips docstrings, function bodies, and detailed analysis while
+    preserving signatures, parameters, return types, and basic metadata.
+
+    Args:
+        data_dict: Full documentation dictionary (function or class)
+
+    Returns:
+        Lightweight summary dictionary with signatures only
+    """
+    # For functions: keep only signature-related fields
+    if 'signature' in data_dict:
+        return {
+            'name': data_dict.get('name'),
+            'signature': data_dict.get('signature'),
+            'file': data_dict.get('file'),
+            'line': data_dict.get('line'),
+            'parameters': data_dict.get('parameters', []),
+            'return_type': data_dict.get('return_type')
+        }
+
+    # For classes: keep structure but strip method details
+    if 'methods' in data_dict:
+        summary = {
+            'name': data_dict.get('name'),
+            'file': data_dict.get('file'),
+            'line': data_dict.get('line'),
+            'bases': data_dict.get('bases', []),
+            'methods': []
+        }
+        for method in data_dict.get('methods', []):
+            summary['methods'].append(to_summary(method))
+        return summary
+
+    # Fallback: return minimal info
+    return {
+        'name': data_dict.get('name'),
+        'file': data_dict.get('file'),
+        'line': data_dict.get('line')
+    }
+
+
+def to_detail(data_dict: dict) -> dict:
+    """
+    Convert to detail format (complete documentation).
+
+    This is essentially a pass-through since the default format
+    already includes all details. Provided for symmetry with to_summary()
+    and future extensibility.
+
+    Args:
+        data_dict: Documentation dictionary (function or class)
+
+    Returns:
+        Complete detail dictionary (unchanged from input)
+    """
+    return data_dict
+
 
 @dataclass
 class CallReference:
