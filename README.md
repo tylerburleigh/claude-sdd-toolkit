@@ -2,7 +2,7 @@
 
 > Systematic, trackable, AI-assisted development through machine-readable specifications
 
-[![Plugin Version](https://img.shields.io/badge/version-0.6.5-blue.svg)]()
+[![Plugin Version](https://img.shields.io/badge/version-0.6.8-blue.svg)]()
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)]()
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
 
@@ -908,6 +908,10 @@ sdd render <spec>
 
 ## Version History
 
+**0.6.8** - New llm-doc-gen skill for LLM-powered narrative documentation. Integrated code-doc as analysis module. Enhanced documentation with codebase statistics. [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)-style workflow orchestration with resumability.
+
+**0.6.5** - OpenCode AI provider with Node.js integration. Read-only security mode. Comprehensive provider documentation.
+
 **0.6.0** - Three-tier verbosity system (QUIET/NORMAL/VERBOSE) with ~50% output reduction. AI consultation enhancements with fallback and retry logic. Context optimization for sdd-next. Work mode configuration. High-level task operations.
 
 **0.5.1** - Provider abstraction with Gemini, Codex, Cursor Agent, Claude. Claude provider has read-only restrictions. 360s timeout for extended reasoning.
@@ -983,4 +987,4 @@ See [INSTALLATION.md](INSTALLATION.md) for setup.
 
 ---
 
-**Version**: 0.6.0 | **License**: MIT | **Author**: Tyler Burleigh
+**Version**: 0.6.8 | **License**: MIT | **Author**: Tyler Burleigh

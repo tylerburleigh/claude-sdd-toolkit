@@ -11,6 +11,10 @@ This module implements a flexible workflow execution system, enabling:
 The engine supports XML-based and YAML-based workflow definitions with
 advanced features like variable resolution, conditional branching, and
 iterative step execution.
+
+Design inspired by the BMAD (Building Multi-Agent Documentation) methodology
+(https://github.com/bmad-code-org/BMAD-METHOD) under MIT License.
+BMAD™ and BMAD-METHOD™ are trademarks of BMad Code, LLC.
 """
 
 import json
