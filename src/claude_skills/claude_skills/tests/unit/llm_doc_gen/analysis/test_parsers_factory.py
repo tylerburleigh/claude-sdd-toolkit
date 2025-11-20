@@ -4,8 +4,8 @@ Tests for ParserFactory multi-language coordination.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import Language
-from claude_skills.code_doc.parsers.factory import ParserFactory, create_parser_factory
+from claude_skills.llm_doc_gen.analysis.parsers.base import Language
+from claude_skills.llm_doc_gen.analysis.parsers.factory import ParserFactory, create_parser_factory
 
 
 class TestParserFactory:

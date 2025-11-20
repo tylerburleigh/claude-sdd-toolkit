@@ -4,7 +4,7 @@ Tests for base parser interface and data structures.
 
 import pytest
 from pathlib import Path
-from claude_skills.code_doc.parsers.base import (
+from claude_skills.llm_doc_gen.analysis.parsers.base import (
     Language,
     ParsedParameter,
     ParsedFunction,

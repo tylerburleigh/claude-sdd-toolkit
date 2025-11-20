@@ -13,7 +13,7 @@ from typing import Iterable
 
 import pytest
 
-from claude_skills.code_doc import detectors
+from claude_skills.llm_doc_gen.analysis import detectors
 from claude_skills.common.ai_tools import ToolResponse, ToolStatus
 
 

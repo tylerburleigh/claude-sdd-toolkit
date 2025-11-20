@@ -8,7 +8,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from claude_skills.code_doc.ai_consultation import (
+from claude_skills.llm_doc_gen.analysis.ai_consultation import (
     format_architecture_research_prompt,
     format_ai_context_research_prompt,
     get_best_tool,
