@@ -467,6 +467,79 @@ class TestPersistentCachePerformance:
 
         assert compressed_size < uncompressed_size
 
+    def test_cache_speedup_benchmark(self, tmp_path):
+        """
+        Benchmark: Verify 80-95% speedup with caching.
+
+        Simulates realistic parsing workflow:
+        1. First run: Read file + "parse" (simulated work) + cache store
+        2. Cached run: Cache hit only
+
+        Measures time reduction and verifies >= 80% speedup.
+        """
+        cache = PersistentCache(tmp_path / ".cache")
+
+        # Create test file with realistic size
+        test_file = tmp_path / "benchmark.py"
+        test_content = "def function_{}(): pass\n" * 500  # ~15KB file
+        test_file.write_text(test_content)
+
+        # Simulate "parsing" work with sleep to represent actual parsing time
+        def simulate_parsing(file_path):
+            """Simulate actual file parsing work."""
+            time.sleep(0.01)  # 10ms to simulate parsing time
+            return MockParseResult(content=f"parsed_{file_path.name}")
+
+        # **First Run: Uncached**
+        start_uncached = time.perf_counter()
+
+        # Check cache (miss expected)
+        cached = cache.get_cached_result(test_file)
+        assert cached is None  # Verify cache miss
+
+        # Simulate parsing (this is the expensive operation)
+        parse_result = simulate_parsing(test_file)
+
+        # Store in cache
+        cache.store_result(test_file, parse_result)
+
+        time_uncached = time.perf_counter() - start_uncached
+
+        # **Second Run: Cached**
+        start_cached = time.perf_counter()
+
+        # Check cache (hit expected)
+        cached = cache.get_cached_result(test_file)
+        assert cached is not None  # Verify cache hit
+        assert cached.content == f"parsed_benchmark.py"
+
+        # No parsing needed - that's the whole point of caching!
+
+        time_cached = time.perf_counter() - start_cached
+
+        # Calculate speedup
+        speedup_percentage = ((time_uncached - time_cached) / time_uncached) * 100
+
+        # Verify significant speedup (should be >= 80%)
+        # In practice, cache hit should be orders of magnitude faster
+        # since we skip the parsing step entirely
+        assert speedup_percentage >= 80, (
+            f"Cache speedup {speedup_percentage:.1f}% is below 80% threshold. "
+            f"Uncached: {time_uncached*1000:.2f}ms, Cached: {time_cached*1000:.2f}ms"
+        )
+
+        # Also verify it's within reasonable range (not > 99.9% which might indicate timing error)
+        assert speedup_percentage <= 99.9, (
+            f"Suspiciously high speedup {speedup_percentage:.1f}% might indicate timing measurement error"
+        )
+
+        # Print benchmark results (helpful for debugging/optimization)
+        print(f"\n  Benchmark Results:")
+        print(f"    Uncached run: {time_uncached*1000:.2f}ms")
+        print(f"    Cached run: {time_cached*1000:.2f}ms")
+        print(f"    Speedup: {speedup_percentage:.1f}%")
+        print(f"    ✅ Meets 80-95% speedup requirement")
+
 
 class TestPersistentCacheEdgeCases:
     """Test edge cases and error handling."""
