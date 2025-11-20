@@ -215,7 +215,9 @@ class JSONGenerator:
         statistics: Dict[str, Any],
         streaming: bool = False,
         output_path: Optional[Path] = None,
-        compress: bool = False
+        compress: bool = False,
+        two_tier: bool = False,
+        detail_dir: str = 'details'
     ) -> Optional[Dict[str, Any]]:
         """
         Generate JSON documentation with multi-language support.
@@ -226,14 +228,27 @@ class JSONGenerator:
             streaming: If True, use StreamingJSONWriter for memory-efficient output
             output_path: Path for streaming output (required if streaming=True)
             compress: Enable gzip compression for streaming output
+            two_tier: If True, generate two-tier output (summary + details)
+            detail_dir: Subdirectory name for detail files (used with two_tier=True)
 
         Returns:
-            Dict containing JSON documentation (if streaming=False)
+            Dict containing JSON documentation (if streaming=False and two_tier=False)
+            Dict with 'summary_file' and 'detail_files' keys (if two_tier=True)
             None (if streaming=True, output written to file)
 
         Raises:
             ValueError: If streaming=True but output_path not provided
+            ValueError: If two_tier=True but output_path not provided
         """
+        # Handle two-tier mode
+        if two_tier:
+            if output_path is None:
+                raise ValueError("output_path required when two_tier=True")
+
+            # Use parent directory of output_path as output_dir
+            output_dir = output_path.parent if output_path.parent != Path('.') else Path.cwd()
+            return self.generate_two_tier(output_dir, analysis, statistics, detail_dir)
+
         # Detect languages present
         languages = set()
         for module in analysis.get('modules', []):
