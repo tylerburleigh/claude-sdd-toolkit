@@ -10,6 +10,247 @@ from pathlib import Path
 from collections import defaultdict
 
 
+class ImportIndex:
+    """Fast lookup index for module imports and dependencies.
+
+    Maintains bidirectional mappings for import relationships, enabling quick
+    resolution of module dependencies and reverse dependencies.
+
+    Attributes:
+        imports: Maps each module to the set of modules it imports
+        imported_by: Reverse index mapping each module to modules that import it
+        module_to_file: Maps module names to their file paths
+
+    Example:
+        >>> index = ImportIndex()
+        >>> index.add_import("app.main", "app.config", "/app/main.py", "/app/config.py")
+        >>> index.add_import("app.main", "app.utils", "/app/main.py", "/app/utils.py")
+        >>>
+        >>> imports = index.get_imports("app.main")
+        >>> # Returns {"app.config", "app.utils"}
+        >>>
+        >>> importers = index.get_imported_by("app.config")
+        >>> # Returns {"app.main"}
+    """
+
+    def __init__(self):
+        """Initialize empty import index."""
+        self.imports: Dict[str, Set[str]] = defaultdict(set)
+        self.imported_by: Dict[str, Set[str]] = defaultdict(set)
+        self.module_to_file: Dict[str, str] = {}
+
+    def add_import(
+        self,
+        source_module: str,
+        imported_module: str,
+        source_file: str,
+        imported_file: Optional[str] = None
+    ) -> None:
+        """Add an import relationship to the index.
+
+        Args:
+            source_module: Name of the module doing the importing
+            imported_module: Name of the module being imported
+            source_file: Path to the source module's file
+            imported_file: Path to the imported module's file (optional)
+        """
+        # Add to imports mapping
+        self.imports[source_module].add(imported_module)
+
+        # Add to reverse mapping
+        self.imported_by[imported_module].add(source_module)
+
+        # Update module-to-file mappings
+        self.module_to_file[source_module] = source_file
+        if imported_file is not None:
+            self.module_to_file[imported_module] = imported_file
+
+    def get_imports(self, module: str) -> Set[str]:
+        """Get all modules imported by a given module.
+
+        Args:
+            module: Module name
+
+        Returns:
+            Set of module names that this module imports (empty if none)
+        """
+        return self.imports.get(module, set())
+
+    def get_imported_by(self, module: str) -> Set[str]:
+        """Get all modules that import a given module.
+
+        Args:
+            module: Module name
+
+        Returns:
+            Set of module names that import this module (empty if none)
+        """
+        return self.imported_by.get(module, set())
+
+    def get_file_path(self, module: str) -> Optional[str]:
+        """Get the file path for a module.
+
+        Args:
+            module: Module name
+
+        Returns:
+            File path for the module, or None if not found
+        """
+        return self.module_to_file.get(module)
+
+    def get_all_modules(self) -> Set[str]:
+        """Get set of all indexed module names.
+
+        Returns:
+            Set of all module names in the index
+        """
+        all_modules = set(self.imports.keys())
+        all_modules.update(self.imported_by.keys())
+        all_modules.update(self.module_to_file.keys())
+        return all_modules
+
+    def remove_module(self, module: str) -> None:
+        """Remove a module and all its import relationships.
+
+        Args:
+            module: Module name to remove
+        """
+        # Remove from imports (this module imports others)
+        if module in self.imports:
+            for imported in self.imports[module]:
+                # Remove from reverse mapping
+                if module in self.imported_by[imported]:
+                    self.imported_by[imported].remove(module)
+                    if not self.imported_by[imported]:
+                        del self.imported_by[imported]
+            del self.imports[module]
+
+        # Remove from imported_by (other modules import this one)
+        if module in self.imported_by:
+            for importer in self.imported_by[module]:
+                # Remove from forward mapping
+                if module in self.imports[importer]:
+                    self.imports[importer].remove(module)
+                    if not self.imports[importer]:
+                        del self.imports[importer]
+            del self.imported_by[module]
+
+        # Remove from module-to-file mapping
+        if module in self.module_to_file:
+            del self.module_to_file[module]
+
+    def remove_file(self, file_path: str) -> None:
+        """Remove all modules from a specific file.
+
+        Args:
+            file_path: Path to file whose modules should be removed
+        """
+        # Find all modules in this file
+        modules_to_remove = [
+            module for module, path in self.module_to_file.items()
+            if path == file_path
+        ]
+
+        # Remove each module
+        for module in modules_to_remove:
+            self.remove_module(module)
+
+    def get_transitive_imports(self, module: str, visited: Optional[Set[str]] = None) -> Set[str]:
+        """Get all modules transitively imported by a module.
+
+        Recursively follows import chains to find all dependencies.
+
+        Args:
+            module: Module name
+            visited: Set of already visited modules (used for cycle detection)
+
+        Returns:
+            Set of all modules transitively imported
+        """
+        if visited is None:
+            visited = set()
+
+        if module in visited:
+            return set()
+
+        visited.add(module)
+        result = set(self.imports.get(module, set()))
+
+        for imported in list(result):
+            result.update(self.get_transitive_imports(imported, visited))
+
+        return result
+
+    def get_transitive_importers(self, module: str, visited: Optional[Set[str]] = None) -> Set[str]:
+        """Get all modules that transitively import a module.
+
+        Recursively follows reverse import chains.
+
+        Args:
+            module: Module name
+            visited: Set of already visited modules (used for cycle detection)
+
+        Returns:
+            Set of all modules that transitively import this module
+        """
+        if visited is None:
+            visited = set()
+
+        if module in visited:
+            return set()
+
+        visited.add(module)
+        result = set(self.imported_by.get(module, set()))
+
+        for importer in list(result):
+            result.update(self.get_transitive_importers(importer, visited))
+
+        return result
+
+    def has_circular_dependency(self, module: str) -> bool:
+        """Check if a module is part of a circular import.
+
+        Args:
+            module: Module name to check
+
+        Returns:
+            True if module is part of a circular dependency
+        """
+        def has_cycle(current: str, visited: Set[str], rec_stack: Set[str]) -> bool:
+            visited.add(current)
+            rec_stack.add(current)
+
+            for imported in self.imports.get(current, set()):
+                if imported not in visited:
+                    if has_cycle(imported, visited, rec_stack):
+                        return True
+                elif imported in rec_stack:
+                    return True
+
+            rec_stack.remove(current)
+            return False
+
+        return has_cycle(module, set(), set())
+
+    def clear(self) -> None:
+        """Clear all indexed imports."""
+        self.imports.clear()
+        self.imported_by.clear()
+        self.module_to_file.clear()
+
+    def __len__(self) -> int:
+        """Get total number of indexed modules.
+
+        Returns:
+            Total count of unique modules
+        """
+        return len(self.get_all_modules())
+
+    def __repr__(self) -> str:
+        """Get string representation of index."""
+        return f"ImportIndex(modules={len(self)})"
+
+
 class SymbolIndex:
     """Fast hash-based lookup index for code symbols.
 
