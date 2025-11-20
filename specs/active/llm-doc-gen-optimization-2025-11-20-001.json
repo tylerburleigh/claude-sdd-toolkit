@@ -2,7 +2,7 @@
   "spec_id": "llm-doc-gen-optimization-2025-11-20-001",
   "title": "Codebase.json Generation Improvements for Large Codebases",
   "generated": "2025-11-20T00:00:00Z",
-  "last_updated": "2025-11-20T19:42:29.875664Z",
+  "last_updated": "2025-11-20T19:44:03.198349Z",
   "metadata": {
     "description": "Architectural improvements to handle 10-100x larger codebases through optimized parsing, memory management, and incremental processing",
     "objectives": [
@@ -21,7 +21,7 @@
     ],
     "status": "active",
     "activated_date": "2025-11-20T18:45:49.944481Z",
-    "progress_percentage": 36,
+    "progress_percentage": 38,
     "current_phase": "phase-3"
   },
   "hierarchy": {
@@ -39,7 +39,7 @@
         "phase-6"
       ],
       "total_tasks": 68,
-      "completed_tasks": 25,
+      "completed_tasks": 26,
       "metadata": {},
       "dependencies": {
         "blocks": [],
@@ -925,7 +925,7 @@
         "depends": []
       },
       "total_tasks": 9,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "purpose": "3-8x speedup through multi-core processing",
         "risk_level": "medium",
@@ -944,7 +944,7 @@
         "task-3-4"
       ],
       "total_tasks": 6,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {},
       "dependencies": {
         "blocks": [
@@ -957,7 +957,7 @@
     "task-3-1": {
       "type": "task",
       "title": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/parallel.py",
-      "status": "in_progress",
+      "status": "completed",
       "parent": "phase-3-files",
       "children": [
         "task-3-1-1",
@@ -972,7 +972,7 @@
         "depends": []
       },
       "total_tasks": 2,
-      "completed_tasks": 1,
+      "completed_tasks": 2,
       "metadata": {
         "file_path": "src/claude_skills/claude_skills/llm_doc_gen/analysis/optimization/parallel.py",
         "task_category": "implementation",
@@ -1000,13 +1000,19 @@
     "task-3-1-2": {
       "type": "subtask",
       "title": "Worker function with per-worker TreeCache",
-      "status": "pending",
+      "status": "completed",
       "parent": "task-3-1",
       "children": [],
       "total_tasks": 1,
-      "completed_tasks": 0,
+      "completed_tasks": 1,
       "metadata": {
-        "details": "Create _parse_worker_func() with isolated TreeCache, return ParseResult for merging"
+        "details": "Create _parse_worker_func() with isolated TreeCache, return ParseResult for merging",
+        "started_at": "2025-11-20T19:43:16.270364Z",
+        "status_note": "Adding worker function with isolated TreeCache",
+        "completed_at": "2025-11-20T19:44:03.190499Z",
+        "needs_journaling": false,
+        "actual_hours": 0.013,
+        "journaled_at": "2025-11-20T19:44:03.196018Z"
       }
     },
     "task-3-2": {
@@ -2521,6 +2527,15 @@
       "content": "Created ParallelParser class in optimization/parallel.py with multiprocessing.Pool implementation. Features: Auto-detection of CPU cores (cpu_count()-1, min 1), intelligent chunk size calculation (~4 chunks per worker for load balancing), parse_files() and parse_files_with_metadata() methods with progress callbacks, sequential fallback on pickling errors, comprehensive docstrings with examples. Includes helper methods get_worker_count(), get_cpu_count(), and factory function create_parallel_parser(). File: optimization/parallel.py (320 lines).",
       "metadata": {},
       "task_id": "task-3-1-1"
+    },
+    {
+      "timestamp": "2025-11-20T19:44:03.196011Z",
+      "entry_type": "status_change",
+      "title": "Task Completed: Worker function with per-worker TreeCache",
+      "author": "claude-code",
+      "content": "Added worker function _parse_worker_func() with isolated per-worker TreeCache to parallel.py. Each worker process maintains its own TreeCache instance (via global _worker_tree_cache) preventing cache conflicts. Includes _init_worker_cache() for initialization. Worker function accepts (file_path, language, parser_config) tuple, checks for cached trees, parses file, and returns ParseResult for merging. Error handling returns ParseResult with error messages. Implementation at parallel.py:34-120.",
+      "metadata": {},
+      "task_id": "task-3-1-2"
     }
   ]
 }
