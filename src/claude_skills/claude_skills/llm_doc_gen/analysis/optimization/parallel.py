@@ -15,12 +15,10 @@ from dataclasses import dataclass, field
 try:
     from ..parsers.base import ParseResult
     from ..tree_cache import TreeCache
-    from ..parsers import create_parser_factory, Language
 except ImportError:
     # Fallback for direct execution
     from parsers.base import ParseResult
     from tree_cache import TreeCache
-    from parsers import create_parser_factory, Language
 
 
 @dataclass

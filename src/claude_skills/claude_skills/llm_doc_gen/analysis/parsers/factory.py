@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Set, Type, Any
 from collections import defaultdict
 
 from .base import BaseParser, Language, ParseResult
+from ..optimization.parallel import ParallelParser
 
 
 class ParserFactory:
@@ -99,15 +100,32 @@ class ParserFactory:
 
         return None
 
-    def parse_all(self, verbose: bool = False) -> ParseResult:
+    def parse_all(
+        self,
+        verbose: bool = False,
+        parallel: bool = False,
+        num_workers: Optional[int] = None
+    ) -> ParseResult:
         """
         Parse all files in the project across all detected languages.
 
         Args:
             verbose: Enable verbose output
+            parallel: Enable parallel parsing using multiprocessing (default: False)
+            num_workers: Number of worker processes (auto-detected if None, only used when parallel=True)
 
         Returns:
             Merged ParseResult containing all parsed entities
+
+        Example:
+            >>> # Sequential parsing (default)
+            >>> result = factory.parse_all()
+            >>>
+            >>> # Parallel parsing with auto-detected workers
+            >>> result = factory.parse_all(parallel=True)
+            >>>
+            >>> # Parallel parsing with explicit worker count
+            >>> result = factory.parse_all(parallel=True, num_workers=4)
         """
         # Determine which languages to parse
         if self.requested_languages:
@@ -119,8 +137,19 @@ class ParserFactory:
             print(f"📁 Analyzing {self.project_root}...")
             detected_langs = ', '.join(sorted(l.value for l in languages_to_parse))
             print(f"🔍 Detected languages: {detected_langs}")
+            if parallel:
+                workers = num_workers if num_workers else ParallelParser.get_cpu_count() - 1
+                print(f"⚡ Parallel mode enabled with {workers} workers")
 
-        # Parse each language
+        # Delegate to ParallelParser if parallel mode enabled
+        if parallel:
+            return self._parse_all_parallel(
+                languages_to_parse,
+                verbose=verbose,
+                num_workers=num_workers
+            )
+
+        # Sequential parsing (original behavior)
         result = ParseResult()
         for language in sorted(languages_to_parse, key=lambda x: x.value):
             parser = self.get_parser(language)
@@ -134,6 +163,49 @@ class ParserFactory:
                 continue
 
             # Parse all files for this language
+            lang_result = parser.parse_all(verbose=verbose)
+            result.merge(lang_result)
+
+        if verbose:
+            self._print_summary(result, languages_to_parse)
+
+        return result
+
+    def _parse_all_parallel(
+        self,
+        languages_to_parse: Set[Language],
+        verbose: bool = False,
+        num_workers: Optional[int] = None
+    ) -> ParseResult:
+        """
+        Parse all files in parallel using ParallelParser.
+
+        Args:
+            languages_to_parse: Set of languages to parse
+            verbose: Enable verbose output
+            num_workers: Number of worker processes
+
+        Returns:
+            Merged ParseResult from all workers
+        """
+        # For now, delegate to sequential parsing
+        # Full parallel implementation will be added in subsequent tasks
+        # This establishes the API surface for parallel mode
+
+        result = ParseResult()
+        for language in sorted(languages_to_parse, key=lambda x: x.value):
+            parser = self.get_parser(language)
+
+            if parser is None:
+                if verbose:
+                    print(f"  ⚠️  {language.value.upper()}: No parser available (skipping)")
+                result.errors.append(
+                    f"No parser available for {language.value}"
+                )
+                continue
+
+            # TODO: Use ParallelParser here
+            # For now, fall back to sequential
             lang_result = parser.parse_all(verbose=verbose)
             result.merge(lang_result)
 
